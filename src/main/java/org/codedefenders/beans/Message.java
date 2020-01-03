@@ -9,7 +9,7 @@ public class Message {
     private boolean fadeOut;
 
     /**
-     * Constructs a new message with the given text. Use {@link MessageBean#add(String)} instead of calling the
+     * Constructs a new message with the given text. Use {@link MessagesBean#add(String)} instead of calling the
      * constructor directly.
      * @param text The text of the message.
      */

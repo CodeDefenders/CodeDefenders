@@ -19,7 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import org.apache.commons.lang.math.IntRange;
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +45,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
@@ -59,7 +57,7 @@ public class AdminUserManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminUserManagement.class);
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();

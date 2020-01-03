@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -38,7 +37,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link org.codedefenders.game.GameClass GameClasses}.
@@ -53,7 +51,7 @@ public class AdminClassesManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminClassesManagement.class);
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

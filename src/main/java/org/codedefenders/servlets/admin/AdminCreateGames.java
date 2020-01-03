@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -69,7 +69,7 @@ public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     public enum RoleAssignmentMethod {RANDOM, OPPOSITE}
 

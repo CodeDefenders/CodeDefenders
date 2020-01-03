@@ -18,13 +18,12 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.util.Constants;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,14 +32,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @WebServlet("/admin/settings")
 // TODO Does this enable CDI using @Property@Inject ?
 public class AdminSystemSettings extends HttpServlet {
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     public enum SETTING_NAME {
         SHOW_PLAYER_FEEDBACK {

@@ -19,7 +19,7 @@
 package org.codedefenders.servlets.games.battleground;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.IntentionDAO;
@@ -126,7 +126,7 @@ public class MultiplayerGameManager extends HttpServlet {
     private ITestCaseSelector regressionTestCaseSelector;
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

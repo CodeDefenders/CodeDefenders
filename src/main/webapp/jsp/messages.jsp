@@ -1,6 +1,6 @@
 <%@ page import="org.codedefenders.beans.Message" %>
 
-<jsp:useBean id="messages" class="org.codedefenders.beans.MessageBean" scope="request" />
+<jsp:useBean id="messages" class="org.codedefenders.beans.MessagesBean" scope="request" />
 
 <% if (messages.getCount() > 0) {
     boolean allFadeOut = true; %>

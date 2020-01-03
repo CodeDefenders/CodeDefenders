@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +100,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     @Inject
     private INotificationService notificationService;

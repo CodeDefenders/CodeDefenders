@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.servlets.util.Redirect;
@@ -43,7 +43,7 @@ import javax.servlet.http.HttpSession;
 public class FeedbackManager extends HttpServlet {
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 

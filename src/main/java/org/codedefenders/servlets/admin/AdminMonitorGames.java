@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.KillmapDAO;
@@ -38,7 +38,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -46,13 +45,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @WebServlet("/admin/monitor")
 public class AdminMonitorGames extends HttpServlet {
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     private MultiplayerGame mg;
 

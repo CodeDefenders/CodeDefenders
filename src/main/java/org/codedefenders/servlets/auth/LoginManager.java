@@ -19,7 +19,7 @@
 package org.codedefenders.servlets.auth;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.beans.MessageBean;
+import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
@@ -55,7 +55,7 @@ import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 public class LoginManager extends HttpServlet {
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
     private static final int PW_RESET_SECRET_LENGTH = 20;

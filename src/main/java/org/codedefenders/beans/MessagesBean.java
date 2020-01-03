@@ -17,7 +17,7 @@ import java.util.List;
  */
 @ManagedBean
 @SessionScoped
-public class MessageBean implements Iterable<Message>, Serializable {
+public class MessagesBean implements Iterable<Message>, Serializable {
     private long currentId = 0;
     private List<Message> messages = new ArrayList<>();
 
@@ -68,14 +68,14 @@ public class MessageBean implements Iterable<Message>, Serializable {
     private class MessageBridge extends ArrayList<String> {
         @Override
         public boolean add(String text) {
-            MessageBean.this.add(text);
+            MessagesBean.this.add(text);
             return true;
         }
 
         @Override
         public boolean addAll(Collection<? extends String> texts) {
             for (String text : texts) {
-                MessageBean.this.add(text);
+                MessagesBean.this.add(text);
             }
             return true;
         }

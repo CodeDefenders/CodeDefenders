@@ -21,7 +21,7 @@ public class BeanFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BeanFilter.class);
 
     @Inject
-    private MessageBean messages;
+    private MessagesBean messages;
 
     @Override
     public void init(FilterConfig config) throws ServletException {
