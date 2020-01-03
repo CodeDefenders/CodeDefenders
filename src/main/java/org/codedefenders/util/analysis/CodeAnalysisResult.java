@@ -19,6 +19,8 @@
 package org.codedefenders.util.analysis;
 
 import org.apache.commons.lang3.Range;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameClass.MethodDescription;
 import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
 
 import java.util.*;
@@ -42,8 +44,7 @@ public class CodeAnalysisResult {
     private final Set<Integer> emptyLines = new HashSet<>();
     private final Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
 
-    private int currentMethodIndex = 0;
-    private final List<TestAccordionCategory> methodDescriptions = new ArrayList<>();
+    private final List<MethodDescription> methodDescriptions = new ArrayList<>();
 
     CodeAnalysisResult imported(String imported) {
         this.additionalImports.add(imported);
@@ -90,12 +91,8 @@ public class CodeAnalysisResult {
         return this;
     }
 
-    CodeAnalysisResult testAccordionMethodDescription(String signature, int startLine, int endLine) {
-        this.methodDescriptions.add(new TestAccordionCategory(
-                signature,
-                startLine,
-                endLine,
-                String.valueOf(currentMethodIndex++)));
+    CodeAnalysisResult methodDescription(String signature, int startLine, int endLine) {
+        this.methodDescriptions.add(new MethodDescription(signature, startLine, endLine));
         return this;
     }
 
@@ -135,7 +132,7 @@ public class CodeAnalysisResult {
         return linesCoveringEmptyLines;
     }
 
-    public List<TestAccordionCategory> getTestAccordionMethodDescriptions() {
+    public List<MethodDescription> getMethodDescriptions() {
         return methodDescriptions;
     }
 }

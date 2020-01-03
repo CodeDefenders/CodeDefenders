@@ -179,4 +179,6 @@
     <input type="hidden" name="formType" value="logOut">
 </form>
 
+<jsp:include page="/jsp/game_components/progress_bar_common.jsp"/>
+
 <jsp:include page="/jsp/messages.jsp"/>

@@ -128,6 +128,6 @@ public class LoginFilter implements Filter {
 
         session.setAttribute("loginFrom", httpReq.getRequestURI());
         String context = httpReq.getContextPath();
-        httpResp.sendRedirect(context+ Paths.LOGIN);
+        httpResp.sendRedirect(context + Paths.LOGIN);
     }
 }

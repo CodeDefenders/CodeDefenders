@@ -222,11 +222,13 @@ public class DatabaseAccess {
 
         final Role role = DB.executeQueryReturnValue(query, mapper, values);
 
-        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-        
-        if (game.getCreatorId() == userId && role == null) {
-            return Role.OBSERVER;
+        if (role == null) {
+            MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+            if (game != null && game.getCreatorId() == userId) {
+                return Role.OBSERVER;
+            }
         }
+
         return Optional.ofNullable(role).orElse(Role.NONE);
     }
 

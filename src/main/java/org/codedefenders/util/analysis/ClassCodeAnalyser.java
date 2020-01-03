@@ -268,10 +268,10 @@ public class ClassCodeAnalyser {
 
             String signature = md.getDeclarationAsString(false, false, false);
             signature = signature.substring(signature.indexOf(' ') + 1); // Remove return type
+            result.methodDescription(signature, methodBegin, methodEnd);
 
             result.methodSignatures(Range.between(methodBegin, methodBodyBegin));
             result.methods(Range.between(methodBegin, methodEnd));
-            result.testAccordionMethodDescription(signature, methodBegin, methodEnd);
         }
 
         private static void extractResultsFromConstructorDeclaration(ConstructorDeclaration cd, CodeAnalysisResult result) {
@@ -286,7 +286,7 @@ public class ClassCodeAnalyser {
             }
 
             String signature = cd.getDeclarationAsString(false, false, false);
-            result.testAccordionMethodDescription(signature, constructorBegin, constructorEnd);
+            result.methodDescription(signature, constructorBegin, constructorEnd);
 
             result.methodSignatures(Range.between(constructorBegin, constructorBodyBegin));
             result.methods(Range.between(constructorBegin, constructorEnd));

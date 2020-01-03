@@ -41,9 +41,8 @@
 <jsp:include page="/jsp/header_main.jsp"/>
 
 </div></div></div></div></div>
-<div class="game-container">
 
-<% { %>
+<div class="game-container">
 
 <%-- Set request attributes for the components. --%>
 <%  PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
@@ -100,6 +99,8 @@
     final String description = puzzle.getDescription();
 %>
 
+<jsp:include page="/jsp/push_notifications.jsp"/>
+
     <div class="row" style="padding: 0px 15px;">
         <h4 class="col-md-2"><b><%=title%></b></h4>
         <h4><%=description%></h4>
@@ -121,7 +122,6 @@
     </div>
 
     <div class="col-md-6" id="cut-div">
-        <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
         <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
@@ -132,8 +132,10 @@
             </button>
         </form>
 
+        <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
         <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
-            <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
+            <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk"
+                    onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                 Attack!
             </button>
@@ -152,5 +154,3 @@
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%@ include file="/jsp/footer_game.jsp" %>
-
-<% } %>

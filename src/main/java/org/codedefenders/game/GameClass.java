@@ -26,12 +26,18 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.analysis.ClassCodeAnalyser;
 import org.codedefenders.util.analysis.CodeAnalysisResult;
-import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -67,7 +73,7 @@ public class GameClass {
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
-    private List<TestAccordionCategory> testAccordionMethodDescriptions = new ArrayList<>();
+    private List<MethodDescription> methodDescriptions = new ArrayList<>();
 
     private TestTemplate testTemplate;
 
@@ -147,7 +153,7 @@ public class GameClass {
             this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
             this.emptyLines.addAll(visit.getEmptyLines());
             this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
-            this.testAccordionMethodDescriptions.addAll(visit.getTestAccordionMethodDescriptions());
+            this.methodDescriptions.addAll(visit.getMethodDescriptions());
             this.visitedCode = true;
         }
     }
@@ -416,9 +422,9 @@ public class GameClass {
         return Collections.unmodifiableList(collect);
     }
 
-    public List<TestAccordionCategory> getTestAccordionMethodDescriptions() {
+    public List<MethodDescription> getMethodDescriptions() {
         visitCode();
-        return Collections.unmodifiableList(testAccordionMethodDescriptions);
+        return Collections.unmodifiableList(methodDescriptions);
     }
 
     @Override
@@ -499,6 +505,30 @@ public class GameClass {
 
         public GameClass create() {
             return new GameClass(this);
+        }
+    }
+
+    public static class MethodDescription {
+        private String description;
+        private int startLine;
+        private int endLine;
+
+        public MethodDescription(String description, int startLine, int endLine) {
+            this.description = description;
+            this.startLine = startLine;
+            this.endLine = endLine;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public int getStartLine() {
+            return startLine;
+        }
+
+        public int getEndLine() {
+            return endLine;
         }
     }
 }

@@ -80,6 +80,8 @@ public class MutationTester implements IMutationTester {
         for (Mutant mutant : mutants) {
             killed += testVsMutant(test, mutant) ? 1 : 0;
         }
+
+        // TODO: move the message logic out of this class
         if (killed == 0)
             if (mutants.size() == 0)
                 messages.add(TEST_SUBMITTED_MESSAGE);

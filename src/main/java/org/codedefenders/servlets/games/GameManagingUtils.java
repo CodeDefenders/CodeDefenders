@@ -41,6 +41,9 @@ import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.test.TestCompiledEvent;
+import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
@@ -72,10 +75,13 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private TestSmellDetector testSmellDetector;
-    
+
     @Inject
     private TestSmellsDAO testSmellsDAO;
-    
+
+    @Inject
+    private INotificationService notificationService;
+
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
     /**
@@ -153,17 +159,35 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
                 TargetExecution.Target.COMPILE_TEST);
+        boolean compileSuccess = compileTestTarget.status == TargetExecution.Status.SUCCESS;
 
-        // If the test did not compile we short circuit here. We shall not
-        // return null
-        if (compileTestTarget == null || !compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+        TestCompiledEvent tce = new TestCompiledEvent();
+        tce.setGameId(gameId);
+        tce.setUserId(ownerUserId);
+        tce.setTestId(newTest.getId());
+        tce.setSuccess(compileSuccess);
+        tce.setErrorMessage(compileSuccess ? null : compileTestTarget.message);
+        notificationService.post(tce);
+
+        // If the test did not compile we short circuit here. We shall not return null
+        if (!compileSuccess) {
             return newTest;
         }
 
         // Eventually check the test actually passes when applied to the
         // original code.
         if (compileTestTarget.status == TargetExecution.Status.SUCCESS) {
-            backend.testOriginal(newTestDir, newTest);
+            TargetExecution testOriginalTarget = backend.testOriginal(newTestDir, newTest);
+            boolean testOriginalSuccess = testOriginalTarget.status == TargetExecution.Status.SUCCESS;
+
+            TestTestedOriginalEvent ttoe = new TestTestedOriginalEvent();
+            ttoe.setGameId(gameId);
+            ttoe.setUserId(ownerUserId);
+            ttoe.setTestId(newTest.getId());
+            ttoe.setSuccess(testOriginalSuccess);
+            ttoe.setErrorMessage(testOriginalSuccess ? null : compileTestTarget.message);
+            notificationService.post(ttoe);
+
             detectTestSmells(newTest, cut);
         }
 

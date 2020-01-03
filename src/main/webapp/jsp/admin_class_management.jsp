@@ -33,7 +33,7 @@
 
     <h3>Classes</h3>
     <div>
-        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Click here</a> to uploaded a new class.
+        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Click here</a> to upload a new class.
     </div>
 
     <table id="tableClasses"

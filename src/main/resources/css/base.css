@@ -5526,21 +5526,6 @@ textarea:disabled:-ms-input-placeholder {
 select {
   width: 100%;
 }
-label,
-.label {
-  font-size: 80%;
-  color: #9e9e9e;
-}
-label:hover,
-.label:hover {
-  color: #9e9e9e;
-}
-label:not(div),
-.label:not(div) {
-  display: inline-block;
-  *display: inline;
-  *zoom: 1;
-}
 input[type=submit] {
   -webkit-appearance: none;
   border: 0;

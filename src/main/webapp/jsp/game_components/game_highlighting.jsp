@@ -379,8 +379,8 @@
         const codeMirror = $('<%=codeDivSelector%>').find('.CodeMirror')[0].CodeMirror;
         codeMirror.highlightCoverage = function () { highlightCoverage(this) };
         codeMirror.highlightMutants = function () { highlightMutants(this) };
-        codeMirror.clearCoverage = function () { clearCoverage(this) };
-        codeMirror.clearMutants = function () { clearMutants(this) };
+        <%--codeMirror.clearCoverage = function () { clearCoverage(this) };--%>
+        <%--codeMirror.clearMutants = function () { clearMutants(this) };--%>
         codeMirror.hideMutants = function () { hideMutants(this) };
         codeMirror.showMutants = function () { showMutants(this) };
         codeMirror.highlightCoverage();
