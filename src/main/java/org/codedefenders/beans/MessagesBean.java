@@ -5,7 +5,6 @@ import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -15,9 +14,10 @@ import java.util.List;
  * The messages are cleared whenever they are rendered in the JSP (see messages.jsp).
  * </p>
  */
+// TODO: Find a way to make this request scoped, so messages are not mixed when multiple tabs are used.
 @ManagedBean
 @SessionScoped
-public class MessagesBean implements Iterable<Message>, Serializable {
+public class MessagesBean implements Serializable {
     private long currentId;
     private List<Message> messages;
 
@@ -27,12 +27,11 @@ public class MessagesBean implements Iterable<Message>, Serializable {
     }
 
     /**
-     * Returns an iterator over the messages.
-     * @return An iterator over the messages.
+     * Returns a new list containing the messages.
+     * @return A new list containing the messages.
      */
-    @Override
-    public Iterator<Message> iterator() {
-        return messages.iterator();
+    public List<Message> getMessages() {
+        return new ArrayList<>(messages);
     }
 
     /**

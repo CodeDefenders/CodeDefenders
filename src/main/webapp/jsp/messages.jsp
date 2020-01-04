@@ -8,7 +8,7 @@
     <div class="alert alert-info" id="messages-div" style="width: 98.9vw">
         <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br/>
 
-        <% for (Message message : messages) { %>
+        <% for (Message message : messages.getMessages()) { %>
             <pre id="message-<%=message.getId()%>"><strong><%=message.getText()%></strong></pre>
             <% allFadeOut &= message.isFadeOut(); %>
             <%-- <% if (message.isFadeOut()) { %>
