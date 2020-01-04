@@ -9,6 +9,10 @@ public class PageInfoBean {
     private  String pageTitle;
     // Put additional information for headers and such here ...
 
+    public PageInfoBean() {
+        pageTitle = null;
+    }
+
     public String getPageTitle() {
         return pageTitle == null ? "Code Defenders" : pageTitle;
     }

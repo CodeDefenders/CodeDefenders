@@ -18,8 +18,13 @@ import java.util.List;
 @ManagedBean
 @SessionScoped
 public class MessagesBean implements Iterable<Message>, Serializable {
-    private long currentId = 0;
-    private List<Message> messages = new ArrayList<>();
+    private long currentId;
+    private List<Message> messages;
+
+    public MessagesBean() {
+        currentId = 0;
+        messages = new ArrayList<>();
+    }
 
     /**
      * Returns an iterator over the messages.
