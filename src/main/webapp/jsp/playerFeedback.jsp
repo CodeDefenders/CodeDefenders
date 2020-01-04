@@ -30,12 +30,14 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.database.GameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <%
 {
     int gameId = (Integer) request.getAttribute("gameId");
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-    int userId = ServletUtils.userId(request);
-    Role role = game.getRole(userId);
+    Role role = game.getRole(login.getUserId());
 %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
@@ -95,9 +97,7 @@
                 </h3>
             </div>
 
-            <%  int currentUserId = ((Integer) session.getAttribute("uid"));
-
-                boolean canSeePlayerFeedback = (currentUserId == game.getCreatorId()) || AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SHOW_PLAYER_FEEDBACK).getBoolValue();
+            <%  boolean canSeePlayerFeedback = (login.getUserId() == game.getCreatorId()) || AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SHOW_PLAYER_FEEDBACK).getBoolValue();
                 boolean canGiveFeedback = role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER);
                 if (canGiveFeedback) {%>
             <ul class="nav nav-tabs">
@@ -124,7 +124,7 @@
                         <tbody>
 
                         <%
-                            List<Integer> oldValues = FeedbackDAO.getFeedbackValues(gameId, userId);
+                            List<Integer> oldValues = FeedbackDAO.getFeedbackValues(gameId, login.getUserId());
                             for (Feedback.Type f : Feedback.types) {
                                 int oldValue = oldValues.isEmpty() ? -1 : oldValues.get(f.ordinal());
                                 if ((role.equals(Role.DEFENDER) &&

@@ -21,10 +21,8 @@
 <%@ page import="org.codedefenders.model.KeyMap" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<%
-    {
-        KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
-%>
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <div class="btn-toolbar" role="toolbar">
 
     <div class="btn-group" role="group">
@@ -37,14 +35,14 @@
         <div id="keymap-drowdown" class="dropdown">
             <button class="btn btn-default btn-ssm dropdown-toggle" type="button" id="editorModeMenu" data-toggle="dropdown">
                 <span class="caret"></span>
-                Editor Mode: <span id="current-keymap" ><%=keymap.getCMName()%></span>
+                Editor Mode: <span id="current-keymap" >${login.user.keyMap.CMName}</span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="editorModeMenu">
-                <li><a><%=keymap.getCMName()%></a></li>
+                <li><a>${login.user.keyMap.CMName}</a></li>
                 <li role="separator" class="divider"></li>
                 <%
                     for (KeyMap km : KeyMap.values()) {
-                        if (km != keymap) {
+                        if (km != login.getUser().getKeyMap()) {
                 %>
                         <li>
                             <a>
@@ -64,4 +62,3 @@
     </div>
 
 </div>
-<% } %>

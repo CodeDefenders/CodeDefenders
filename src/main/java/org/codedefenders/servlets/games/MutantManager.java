@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import com.google.gson.Gson;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -36,6 +37,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -46,6 +48,9 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/api/game_mutants")
 public class MutantManager extends HttpServlet {
 
+    @Inject
+    private LoginBean login;
+
     private static final Logger logger =
             LoggerFactory.getLogger(MutantManager.class);
 
@@ -55,8 +60,6 @@ public class MutantManager extends HttpServlet {
         int gameId = Integer.parseInt(request.getParameter("gameId"));
 
         AbstractGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-
-        int userId = (int) request.getSession().getAttribute("uid");
 
         Gson gson = new Gson();
         PrintWriter out = response.getWriter();
@@ -74,7 +77,7 @@ public class MutantManager extends HttpServlet {
 
                 List<Mutant> mutants = game.getMutants();
 
-                boolean showDiff = !DatabaseAccess.getRole(userId, gameId)
+                boolean showDiff = !DatabaseAccess.getRole(login.getUserId(), gameId)
                         .equals(Role.DEFENDER) || game.getLevel().equals(
                         GameLevel.EASY);
 
@@ -94,7 +97,7 @@ public class MutantManager extends HttpServlet {
         //TODO: Implement heavy load/DDOS handling
         if (request.getParameter("gameId") != null) {
             int pId = PlayerDAO.getPlayerIdForUserAndGame(
-                    (int)request.getSession().getAttribute("uid"),
+                    login.getUserId(),
                     Integer.parseInt(request.getParameter("gameId"))
             );
             return pId >= 0;

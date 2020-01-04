@@ -6,7 +6,7 @@ import javax.enterprise.context.RequestScoped;
 @ManagedBean
 @RequestScoped
 public class PageInfoBean {
-    private  String pageTitle;
+    private String pageTitle;
     // Put additional information for headers and such here ...
 
     public PageInfoBean() {

@@ -1,5 +1,6 @@
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -8,6 +9,7 @@ import org.codedefenders.util.Constants;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,11 +27,12 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/games/history")
 public class GameHistoryOverview extends HttpServlet {
 
+    @Inject
+    private LoginBean login;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        int userId = ServletUtils.userId(request);
-
-        List<UserMultiplayerGameInfo> games = MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(userId);
+        List<UserMultiplayerGameInfo> games = MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(login.getUserId());
         request.setAttribute("finishedBattlegroundGames", games);
 
         request.getRequestDispatcher(Constants.GAMES_HISTORY_JSP).forward(request, response);

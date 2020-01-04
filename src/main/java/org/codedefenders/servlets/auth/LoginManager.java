@@ -20,6 +20,7 @@ package org.codedefenders.servlets.auth;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.beans.MessagesBean;
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
@@ -56,6 +57,9 @@ public class LoginManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private LoginBean login;
 
     private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
     private static final int PW_RESET_SECRET_LENGTH = 20;
@@ -111,10 +115,8 @@ public class LoginManager extends HttpServlet {
                 } else {
                     User newUser = new User(username, User.encodePassword(password), email);
                     if (newUser.insert()) {
-                        HttpSession session = request.getSession();
-                        session.setAttribute("uid", newUser.getId());
-                        session.setAttribute("username", newUser.getUsername());
-                        session.setAttribute("user-keymap", newUser.getKeyMap());
+                        User insertedUser = UserDAO.getUserById(newUser.getId());
+                        login.loginUser(insertedUser);
                         // Log user activity including the timestamp
                         DatabaseAccess.logSession(newUser.getId(), getClientIpAddress(request));
                         response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
@@ -143,46 +145,20 @@ public class LoginManager extends HttpServlet {
                         if (User.passwordMatches(password, dbPassword)) {
                             if (activeUser.isActive()) {
                                 HttpSession session = request.getSession();
-                                // // Log user activity including the timestamp
+                                // Log user activity including the timestamp
                                 DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
-                                session.setAttribute("uid", activeUser.getId());
-                                session.setAttribute("username", activeUser.getUsername());
-                                session.setAttribute("user-keymap", activeUser.getKeyMap());
-                                //
+                                login.loginUser(activeUser);
+
                                 storeApplicationDataInSession(session);
 
-                                // Default redirect page: Home
-                                String defaultRedirectTarget = request.getContextPath() + Paths.GAMES_OVERVIEW;
-                                String redirectTarget = defaultRedirectTarget;
-
-                                Object from = session.getAttribute("loginFrom");
-                                if (from != null && !((String) from).endsWith(".ico")
-                                        && !((String) from).endsWith(".css")
-                                        && !((String) from).endsWith(".js")) {
-
-                                    redirectTarget = (String) from;
-
-                                    // Not sure why this is necessary
-                                    if (! redirectTarget.startsWith(request.getContextPath())) {
-                                        redirectTarget = request.getContextPath() + "/" + redirectTarget;
-                                    }
-
-                                    //  #140: after a POST to login we get a 302 to notifications
-                                    // This is the only place where we do a redirect to a target from a variable.
-                                    // So we avoid to redirect to notifications
-                                    if (redirectTarget.contains( Paths.API_NOTIFICATION)) {
-                                        // Clean up the session to avoid possible recursion
-                                        session.removeAttribute("loginFrom");
-                                        // Reset to redirect target
-                                        redirectTarget = defaultRedirectTarget;
-                                        // TODO Enable more data collection about this request
-                                        logger.warn("Resetting Redirect target to default !");
-                                    }
+                                if (login.isRedirectAfterLogin()) {
+                                    String redirectTarget = login.getRedirectURL();
+                                    login.clearRedirectAfterLogin();
+                                    response.sendRedirect(redirectTarget);
+                                } else {
+                                    // Default redirect page: Home
+                                    response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
                                 }
-
-                                // Do the actual redirect
-                                response.sendRedirect(redirectTarget);
-
                             } else {
                                 messages.add("Your account is inactive, login is only possible with an active account.");
                                 RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);

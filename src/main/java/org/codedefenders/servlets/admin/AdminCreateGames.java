@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -71,6 +72,9 @@ public class AdminCreateGames extends HttpServlet {
     @Inject
     private MessagesBean messages;
 
+    @Inject
+    private LoginBean login;
+
     public enum RoleAssignmentMethod {RANDOM, OPPOSITE}
 
     public enum TeamAssignmentMethod {RANDOM, SCORE_DESCENDING, SCORE_SHUFFLED}
@@ -81,7 +85,6 @@ public class AdminCreateGames extends HttpServlet {
     private static final int NB_CATEGORIES_FOR_SHUFFLING = 3;
     static final String USER_NAME_LIST_DELIMITER = "[\\r\\n]+";
 
-    private int currentUserID;
     private List<Integer> selectedUserIDs;
     private int cutID;
     private RoleAssignmentMethod roleAssignmentMethod;
@@ -113,7 +116,6 @@ public class AdminCreateGames extends HttpServlet {
 
         HttpSession session = request.getSession();
         // Get their user id from the session.
-        currentUserID = (Integer) session.getAttribute("uid");
 
         final String action = request.getParameter("formType");
         switch (action) {
@@ -482,7 +484,7 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
-                 cutID, currentUserID, gamesLevel, gamesState,
+                 cutID, login.getUserId(), gamesLevel, gamesState,
                 maxAssertionsPerTest, forceHamcrest, //
                 chatEnabled,
                 mutantValidatorLevel,

@@ -25,6 +25,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
@@ -119,7 +121,6 @@
 
             <%
             } else {
-                int currentUserID = (Integer) session.getAttribute("uid");
                 for (UserInfo userInfo : unassignedUsersInfo) {
                     int userId = userInfo.getUser().getId();
                     String username = userInfo.getUser().getUsername();
@@ -147,7 +148,7 @@
                     </button>
                 </td>
                 <td style="padding-top:4px; padding-bottom:4px">
-                    <%if (currentUserID != userId) {%>
+                    <% if (login.getUserId() != userId) { %>
                     <button class="btn btn-sm btn-danger" id="<%="inactive_user_"+userId%>" type="submit" value="<%=userId%>" name="setUserInactive"
                             <% if(!active) { %>
                             title="User is already set inactive." disabled

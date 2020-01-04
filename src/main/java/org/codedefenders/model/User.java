@@ -19,7 +19,6 @@
 package org.codedefenders.model;
 
 import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 public class User {
-
     private static final Logger logger = LoggerFactory.getLogger(User.class);
 
     private int id;

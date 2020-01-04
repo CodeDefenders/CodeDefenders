@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
@@ -70,7 +71,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
@@ -79,7 +79,6 @@ import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.servlets.util.ServletUtils.userId;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
@@ -101,6 +100,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private LoginBean login;
 
     @Inject
     private INotificationService notificationService;
@@ -137,11 +139,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final int userId = userId(request);
-
         final boolean canCreateGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
         if (!canCreateGames) {
-            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.", userId);
+            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.", login.getUserId());
             Redirect.redirectBack(request, response);
             return;
         }
@@ -174,7 +174,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
-        MultiplayerGame newGame = new MultiplayerGame.Builder(classId, userId, maxAssertionsPerTest, forceHamcrest)
+        MultiplayerGame newGame = new MultiplayerGame.Builder(classId, login.getUserId(), maxAssertionsPerTest, forceHamcrest)
                 .level(level)
                 .chatEnabled(chatEnabled)
                 .capturePlayersIntention(capturePlayersIntention)
@@ -186,7 +186,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         if (newGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event event = new Event(-1, newGame.getId(), userId, "Game Created",
+            Event event = new Event(-1, newGame.getId(), login.getUserId(), "Game Created",
                     EventType.GAME_CREATED, EventStatus.GAME, timestamp);
             event.insert();
         }
@@ -201,7 +201,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         // Add selected role to game if the creator participates as attacker/defender
         if (selectedRole.equals(Role.ATTACKER) || selectedRole.equals(Role.DEFENDER)) {
-            newGame.addPlayer(userId, selectedRole);
+            newGame.addPlayer(login.getUserId(), selectedRole);
         }
 
         int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, newGame.getId());
@@ -279,11 +279,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final int userId = userId(request);
-
         final boolean canJoinGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
         if (!canJoinGames) {
-            logger.warn("User {} tried to join a battleground game, but joining games is not permitted.", userId);
+            logger.warn("User {} tried to join a battleground game, but joining games is not permitted.", login.getUserId());
             Redirect.redirectBack(request, response);
             return;
         }
@@ -303,51 +301,49 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        Role role = game.getRole(userId);
+        Role role = game.getRole(login.getUserId());
 
         if (role != Role.NONE) {
-            logger.info("User {} already in the requested game. Has role {}", userId, role);
+            logger.info("User {} already in the requested game. Has role {}", login.getUserId(), role);
             return;
         }
         boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);
         boolean attackerParamExists = ServletUtils.parameterThenOrOther(request, "attacker", true, false);
 
-        User user = UserDAO.getUserById(userId);
-
         if (defenderParamExists) {
-            if (game.addPlayer(userId, Role.DEFENDER)) {
-                logger.info("User {} joined game {} as a defender.", userId, gameId);
+            if (game.addPlayer(login.getUserId(), Role.DEFENDER)) {
+                logger.info("User {} joined game {} as a defender.", login.getUserId(), gameId);
 
                 /*
                  * Publish the event about the user
                  */
                 GameJoinedEvent gje = new GameJoinedEvent();
                 gje.setGameId(game.getId());
-                gje.setUserId(user.getId());
-                gje.setUserName(user.getUsername());
+                gje.setUserId(login.getUserId());
+                gje.setUserName(login.getUser().getUsername());
                 notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
-                logger.info("User {} failed to join game {} as a defender.", userId, gameId);
+                logger.info("User {} failed to join game {} as a defender.", login.getUserId(), gameId);
                 response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
             }
         } else if (attackerParamExists) {
-            if (game.addPlayer(userId, Role.ATTACKER)) {
-                logger.info("User {} joined game {} as an attacker.", userId, gameId);
+            if (game.addPlayer(login.getUserId(), Role.ATTACKER)) {
+                logger.info("User {} joined game {} as an attacker.", login.getUserId(), gameId);
 
                 /*
                  * Publish the event about the user
                  */
                 GameJoinedEvent gje = new GameJoinedEvent();
                 gje.setGameId(game.getId());
-                gje.setUserId(userId);
-                gje.setUserName(user.getUsername());
+                gje.setUserId(login.getUserId());
+                gje.setUserName(login.getUser().getUsername());
                 notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
-                logger.info("User {} failed to join game {} as an attacker.", userId, gameId);
+                logger.info("User {} failed to join game {} as an attacker.", login.getUserId(), gameId);
                 response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
             }
         } else {
@@ -357,9 +353,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final int userId = userId(request);
-
-        HttpSession session = request.getSession();
         String contextPath = request.getContextPath();
 
         final Optional<Integer> gameIdOpt = gameId(request);
@@ -376,7 +369,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        final boolean removalSuccess = game.removePlayer(userId);
+        final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
             messages.add("An error occurred while leaving game " + gameId);
             response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
@@ -384,26 +377,24 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
 
         messages.add("Game " + gameId + " left");
-        DatabaseAccess.removePlayerEventsForGame(gameId, userId);
+        DatabaseAccess.removePlayerEventsForGame(gameId, login.getUserId());
 
         final EventType notifType = EventType.GAME_PLAYER_LEFT;
         final String message = "You successfully left the game.";
         final EventStatus eventStatus = EventStatus.NEW;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        Event notif = new Event(-1, gameId, userId, message, notifType, eventStatus, timestamp);
+        Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
         notif.insert();
 
-        logger.info("User {} successfully left game {}", userId, gameId);
+        logger.info("User {} successfully left game {}", login.getUserId(), gameId);
 
         /*
          * Publish the event about the user
          */
-        User user = UserDAO.getUserById(userId);
-
         GameLeftEvent gle = new GameLeftEvent();
         gle.setGameId(game.getId());
-        gle.setUserId(user.getId());
-        gle.setUserName(user.getUsername());
+        gle.setUserId(login.getUserId());
+        gle.setUserName(login.getUser().getUsername());
 
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
     }

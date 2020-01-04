@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**
@@ -23,6 +24,9 @@ public class BeanFilter implements Filter {
     @Inject
     private MessagesBean messages;
 
+    @Inject
+    private LoginBean login;
+
     @Override
     public void init(FilterConfig config) throws ServletException {
 
@@ -32,6 +36,7 @@ public class BeanFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         request.setAttribute("messages", messages);
+        request.setAttribute("login", login);
         chain.doFilter(request, response);
     }
 

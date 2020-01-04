@@ -34,14 +34,13 @@
     @param Integer endEditLine
         End of editable lines in the orginial mutant.
         If smaller than one or {@code null}, the code can be modified until the end.
-    @param KeyMap user-keymap (session attribute)
-        The user's preferred key map. Can be {@code null}.
     @param errorLines the list of lines on which the compiler reported an error.
         Those have to be highlighted
 --%>
 
-<%@ page import="org.codedefenders.model.KeyMap" %>
 <%@ page import="java.util.Map" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
 
 <%
     final String mutantCode = (String) request.getAttribute("mutantCode");
@@ -56,8 +55,8 @@
     if (endEditLine != null && (endEditLine < 1 || endEditLine < startEditLine)) {
         endEditLine = null;
     }
-    KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
 %>
+
 <script>
     let startEditLine = <%=startEditLine%> ;
     let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
@@ -166,7 +165,7 @@
             "Ctrl-Space": "autocomplete",
             "Tab": "insertSoftTab"
         },
-        keyMap: "<%=keymap.getCMName()%>",
+        keyMap: "${login.user.keyMap.CMName}",
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
@@ -233,7 +232,7 @@
                         "Ctrl-Space": "autocomplete",
                         "Tab": "insertSoftTab"
                     },
-                    keyMap: "<%=keymap.getCMName()%>",
+                    keyMap: "${login.user.keyMap.CMName}",
                     gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
                 });
 

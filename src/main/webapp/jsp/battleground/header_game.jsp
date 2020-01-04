@@ -19,15 +19,15 @@
 
 --%>
 <%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-    int userId = ServletUtils.userId(request);
-    Role role = game.getRole(userId);
+    Role role = game.getRole(login.getUserId());
     int gameId = (int) request.getAttribute("gameId");
 %>
 
@@ -40,8 +40,7 @@
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
-            <%  int userIdCurrent = ((Integer) session.getAttribute("uid"));
-                if (game.getCreatorId() == userIdCurrent) { %>
+            <% if (game.getCreatorId() == login.getUserId()) { %>
             <div class="admin-panel col-md-12">
                 <% if (game.getState() == GameState.ACTIVE) { %>
                 <form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">

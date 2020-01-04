@@ -33,6 +33,8 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.Role" %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
@@ -260,7 +262,6 @@
 
             <%
             } else {
-                int currentUserID = (Integer) session.getAttribute("uid");
                 for (List<String> userInfo : unassignedUsersInfo) {
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
@@ -271,7 +272,7 @@
 
             <tr id="<%="user_row_"+uid%>">
                 <td>
-                    <% if (uid != currentUserID) { %>
+                    <% if (uid != login.getUserId()) { %>
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange =
                             "updateCheckbox(this.value, this.checked);">
                     <%}%>

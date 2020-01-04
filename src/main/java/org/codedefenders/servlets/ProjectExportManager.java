@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
@@ -38,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -69,6 +71,9 @@ public class ProjectExportManager extends HttpServlet {
         "gradle/wrapper/gradle-wrapper.properties"
     };
 
+    @Inject
+    private LoginBean login;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final Optional<Integer> gameId = ServletUtils.gameId(request);
@@ -77,8 +82,7 @@ public class ProjectExportManager extends HttpServlet {
             return;
         }
 
-        final int userId = ServletUtils.userId(request);
-        if (DatabaseAccess.getRole(userId, gameId.get()) == Role.NONE) {
+        if (DatabaseAccess.getRole(login.getUserId(), gameId.get()) == Role.NONE) {
             Redirect.redirectBack(request, response);
             return;
         }

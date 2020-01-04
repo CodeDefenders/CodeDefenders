@@ -23,6 +23,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
@@ -71,7 +72,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.userId;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
@@ -89,6 +89,9 @@ public class ClassUploadManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private LoginBean login;
 
     @Inject
     private BackendExecutorService backend;
@@ -114,8 +117,7 @@ public class ClassUploadManager extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final boolean classUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
         if (!classUploadEnabled) {
-            final int userId = userId(request);
-            logger.warn("User {} tried to upload a class, but class upload is disabled.", userId);
+            logger.warn("User {} tried to upload a class, but class upload is disabled.", login.getUserId());
             return;
         }
 

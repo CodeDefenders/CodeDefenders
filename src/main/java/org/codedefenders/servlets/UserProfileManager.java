@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
@@ -62,6 +63,9 @@ public class UserProfileManager extends HttpServlet {
     @Inject
     private MessagesBean messages;
 
+    @Inject
+    private LoginBean login;
+
     private static final String DELETED_USER_NAME = "DELETED";
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";
     private static final String DELETED_USER_PASSWORD = "DELETED";
@@ -83,13 +87,11 @@ public class UserProfileManager extends HttpServlet {
             response.sendRedirect(ServletUtils.getBaseURL(request));
             return;
         }
-        final int userId = ServletUtils.userId(request);
-        final Optional<UserInfo> requestingUserInfo = Optional.ofNullable(AdminDAO.getUsersInfo(userId));
+        final Optional<UserInfo> requestingUserInfo = Optional.ofNullable(AdminDAO.getUsersInfo(login.getUserId()));
         if (!requestingUserInfo.isPresent()) {
             response.sendRedirect(request.getContextPath());
             return;
         }
-        request.setAttribute("userProfileInfo", requestingUserInfo.get());
 
         request.getRequestDispatcher(Constants.USER_PROFILE_JSP).forward(request, response);
     }
@@ -102,9 +104,6 @@ public class UserProfileManager extends HttpServlet {
             return;
         }
 
-        final HttpSession session = request.getSession();
-        final int userId = ServletUtils.userId(request);
-
         String responsePath = request.getContextPath() + Paths.USER_PROFILE;
 
         final String formType = ServletUtils.formType(request);
@@ -112,11 +111,11 @@ public class UserProfileManager extends HttpServlet {
             case "updateKeyMap": {
                 final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
                 final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
-                if (updateUserKeyMap(userId, editorKeyMap)) {
-                    session.setAttribute("user-keymap", editorKeyMap);
+                if (updateUserKeyMap(login.getUser(), editorKeyMap)) {
+                    login.getUser().setKeyMap(editorKeyMap);
                     messages.add("Successfully updated editor preference.");
                 } else {
-                    logger.info("Failed to update editor preference for user {}.", userId);
+                    logger.info("Failed to update editor preference for user {}.", login.getUserId());
                     messages.add("Failed to update editor preference.");
                 }
                 Redirect.redirectBack(request, response);
@@ -126,11 +125,11 @@ public class UserProfileManager extends HttpServlet {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
                 final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
-                final boolean success = updateUserInformation(userId, email, password, allowContact);
+                final boolean success = updateUserInformation(login.getUser(), email, password, allowContact);
                 if (success) {
                     messages.add("Successfully updated profile information.");
                 } else {
-                    logger.info("Failed to update profile information for user {}.", userId);
+                    logger.info("Failed to update profile information for user {}.", login.getUserId());
                     messages.add("Failed to update profile information. Please contact the page administrator.");
                 }
                 response.sendRedirect(responsePath);
@@ -138,12 +137,12 @@ public class UserProfileManager extends HttpServlet {
             }
             case "deleteAccount": {
                 // Does not actually delete the account but pseudomizes it
-                final boolean success = removeUserInformation(userId);
+                final boolean success = removeUserInformation(login.getUser());
                 if (success) {
-                    logger.info("User {} successfully set themselves as inactive.", userId);
+                    logger.info("User {} successfully set themselves as inactive.", login.getUserId());
                     messages.add("You successfully deleted your account. Sad to see you go. :(");
                 } else {
-                    logger.info("Failed to set user {} as inactive.", userId);
+                    logger.info("Failed to set user {} as inactive.", login.getUserId());
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");
                 }
                 response.sendRedirect(responsePath);
@@ -155,8 +154,7 @@ public class UserProfileManager extends HttpServlet {
         }
     }
 
-    private boolean updateUserKeyMap(int userId, KeyMap editorKeyMap) {
-        final User user = UserDAO.getUserById(userId);
+    private boolean updateUserKeyMap(User user, KeyMap editorKeyMap) {
         if (user == null) {
             return false;
         }
@@ -164,8 +162,7 @@ public class UserProfileManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean updateUserInformation(int userId, Optional<String> email, Optional<String> password, boolean allowContact) {
-        final User user = UserDAO.getUserById(userId);
+    private boolean updateUserInformation(User user, Optional<String> email, Optional<String> password, boolean allowContact) {
         if (user == null) {
             return false;
         }
@@ -181,8 +178,7 @@ public class UserProfileManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean removeUserInformation(int userId) {
-        final User user = UserDAO.getUserById(userId);
+    private boolean removeUserInformation(User user) {
         if (user == null) {
             return false;
         }

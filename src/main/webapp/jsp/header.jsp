@@ -24,6 +24,8 @@
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <%
     boolean profileEnabled = UserProfileManager.checkEnabled();
 %>
@@ -141,7 +143,7 @@
                             data-toggle="dropdown" href="#"
                             style="width: 100%"><span class="glyphicon glyphicon-user"
                                                       aria-hidden="true"></span>
-                        <%=request.getSession().getAttribute("username")%>
+                        ${login.user.username}
                         (<span id="notificationCount"></span>)
                         <span class="glyphicon glyphicon-menu-hamburger" style="float: right; margin-left: 15px"></span></a>
                         <ul id="userDropDown" class="dropdown-menu"

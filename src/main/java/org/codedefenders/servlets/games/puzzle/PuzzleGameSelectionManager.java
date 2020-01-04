@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameMode;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -62,6 +64,9 @@ import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 public class PuzzleGameSelectionManager extends HttpServlet {
     private static Logger logger = LoggerFactory.getLogger(PuzzleGameSelectionManager.class);
 
+    @Inject
+    private LoginBean login;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
@@ -72,7 +77,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         final String action = ServletUtils.formType(request);
         switch (action) {
             case "createGame":
-                createGame(request, response);
+                createGame(login.getUserId(), request, response);
                 break;
             case "endGame":
                 endGame(request, response);
@@ -95,8 +100,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      * @param response the response to the request.
      * @throws IOException when redirecting fails.
      */
-    static void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final int userId = ServletUtils.userId(request);
+    static void createGame(int userId, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
         if (!puzzleId.isPresent()) {
             logger.error("Failed to retrieve puzzleId from request.");
@@ -138,10 +142,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      * @param response the response to the request.
      * @throws IOException when redirecting fails.
      */
-    private static void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final HttpSession session = request.getSession();
-        final int userId = ((Integer) session.getAttribute("uid"));
-
+    private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {
             logger.error("Failed to retrieve gameId from request.");
@@ -173,7 +174,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
             return;
         }
 
-        logger.info("User {} ended puzzle {} manually.", userId, game.getPuzzleId());
+        logger.info("User {} ended puzzle {} manually.", login.getUserId(), game.getPuzzleId());
         game.setState(GameState.FAILED);
         game.update();
 

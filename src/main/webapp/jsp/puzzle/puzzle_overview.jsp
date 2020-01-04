@@ -26,6 +26,8 @@
 <%@ page import="org.codedefenders.model.PuzzleEntry" %>
 <%@ page import="java.util.SortedSet" %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <%--
     Displays all puzzles for a user. Puzzles may link to active puzzle games
     or are locked for the logged in user.
@@ -78,10 +80,9 @@
                                href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
                                 data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
                             <%
-                        }else if( ! puzzleEntry.isLocked() ){
+                        } else if(!puzzleEntry.isLocked()) {
                             final int puzzleId = puzzleEntry.getPuzzleId();
-                            final Integer userId = (Integer) request.getSession().getAttribute("uid");
-                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, userId);
+                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
                             String color = "btn-primary";
                             if (playedGame != null  && playedGame.getState().equals(GameState.SOLVED)) {
                                 color = "btn-success";

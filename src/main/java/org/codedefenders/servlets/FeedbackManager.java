@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.LoginBean;
 import org.codedefenders.beans.MessagesBean;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.model.Feedback;
@@ -45,13 +46,13 @@ public class FeedbackManager extends HttpServlet {
     @Inject
     private MessagesBean messages;
 
+    @Inject
+    private LoginBean login;
+
     private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        HttpSession session = request.getSession();
-        int uid = (Integer) session.getAttribute("uid");
-
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
         if (!gameIdOpt.isPresent()) {
             logger.error("No valid gameId parameter found");
@@ -63,7 +64,7 @@ public class FeedbackManager extends HttpServlet {
 
         switch (request.getParameter("formType")) {
             case "sendFeedback":
-                if (!saveFeedback(request, uid, gameId)) {
+                if (!saveFeedback(request, login.getUserId(), gameId)) {
                     messages.add("Could not save your feedback. Please try again later!");
                 }
         }

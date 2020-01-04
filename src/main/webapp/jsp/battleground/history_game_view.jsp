@@ -46,9 +46,6 @@
             return;
         }
     }
-
-    int uid = ((Integer) session.getAttribute("uid"));
-    Role role = game.getRole(uid);
 %>
 
 <%-- Set request attributes for the components. --%>
@@ -79,7 +76,6 @@
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PARTY);
     request.setAttribute("gameId", game.getId());
-    int userId = ServletUtils.userId(request); // required for playerFeedback, too
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");

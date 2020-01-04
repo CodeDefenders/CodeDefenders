@@ -27,12 +27,9 @@
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("About Code Defenders"); %>
 
-<%
-    Object uid = request.getSession().getAttribute("uid");
-    Object username = request.getSession().getAttribute("username");
-%>
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
 
-<% if (uid != null && username != null) { %>
+<% if (login.isLoggedIn()) { %>
     <jsp:include page="/jsp/header.jsp"/>
 <% } else { %>
     <jsp:include page="/jsp/header_logout.jsp"/>

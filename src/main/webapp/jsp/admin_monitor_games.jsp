@@ -27,6 +27,8 @@
 <%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
@@ -38,7 +40,7 @@
         <h3>Current Games</h3>
 
         <%
-            List<MultiplayerGame> insertedGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy( (Integer)request.getSession().getAttribute("uid"));
+            List<MultiplayerGame> insertedGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
             if (insertedGames.isEmpty()) {
         %>
         <div class="panel panel-default">

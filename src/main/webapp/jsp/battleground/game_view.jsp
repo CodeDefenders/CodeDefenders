@@ -20,12 +20,13 @@
 --%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-    int userId = ServletUtils.userId(request); // required for playerFeedback, too
-	Role role = game.getRole(userId); // required for header_game, too
+	Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
 <%-- Set request attributes for the components. --%>
 <%

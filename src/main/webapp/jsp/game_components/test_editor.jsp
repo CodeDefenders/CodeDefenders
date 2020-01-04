@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.KeyMap" %>
 
 <%--
     Displays the test code in a CodeMirror textarea.
@@ -30,9 +29,9 @@
     @param Integer startEditLine
         Start of editable lines. If smaller than one or {@code null}, the code can
         be modified from the start.
-    @param KeyMap user-keymap (session attribute)
-        The user's preferred key map. Can be {@code null}.
 --%>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
 
 <%
     String testCode = (String) request.getAttribute("testCode");
@@ -42,7 +41,6 @@
     if (startEditLine == null || startEditLine < 1) {
         startEditLine = 1;
     }
-    KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
 %>
 
 <pre><textarea id="code" name="test" title="test" cols="80" rows="30"><%=testCode%></textarea></pre>
@@ -142,7 +140,7 @@
             "Ctrl-Space": "autocomplete",
             "Tab": "insertSoftTab"
         },
-        keyMap: "<%=keymap.getCMName()%>",
+        keyMap: "${login.user.keyMap.CMName}",
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
