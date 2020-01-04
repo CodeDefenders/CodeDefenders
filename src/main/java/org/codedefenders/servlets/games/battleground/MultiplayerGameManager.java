@@ -135,7 +135,7 @@ public class MultiplayerGameManager extends HttpServlet {
     private ITestCaseSelector regressionTestCaseSelector;
 
     @Inject
-    INotificationService notificationService;
+    private INotificationService notificationService;
 
     @Inject
     private MessagesBean messages;
