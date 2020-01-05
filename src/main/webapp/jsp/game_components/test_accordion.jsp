@@ -145,7 +145,7 @@
         const ta_data = JSON.parse(`<%=taString%>`);
 
         /** A description and list of test ids for each category (method). */
-        const categories = ta_data.categories; //
+        const categories = ta_data.categories;
 
         /** Maps test ids to their DTO representation. */
         const tests = new Map(ta_data.tests);
@@ -223,7 +223,7 @@
         /**
          * Creates a modal to display the given test and shows it.
          * References to created models are cached in a map so they don't need to be generated again.
-         * @param {number} testId The id of the test to display.
+         * @param {object} test The test DTO to display.
          */
         const viewTestModal = function (test) {
             let modal = testModals.get(test.id);
@@ -262,7 +262,7 @@
             });
             editor.setSize('max-content', 'max-content');
 
-            <%-- TODO: Is there a better solution for this. --%>
+            <%-- TODO: Is there a better solution for this? --%>
             /* Refresh the CodeMirror instance once the modal is displayed.
              * If this is not done, it will display an empty textarea until it is clicked. */
             new MutationObserver((mutations, observer) => {
