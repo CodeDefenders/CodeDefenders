@@ -2,7 +2,6 @@ package org.codedefenders.beans.page;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
 
 /**
  * <p>Provides various page info, like the page title (and maybe other things later).</p>

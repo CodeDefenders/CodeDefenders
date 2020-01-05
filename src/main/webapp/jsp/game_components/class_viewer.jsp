@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 <%--
     Displays the class code for a class under test and its dependencies in a read-only CodeMirror textarea.
@@ -32,18 +31,13 @@
         Can be empty, but must not be {@code null}.
 --%>
 
-<%
-{
-    final String className = (String) request.getAttribute("className");
-    final String classCode = (String) request.getAttribute("classCode");
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
-    final Map<String, String> dependencies = (HashMap<String, String>) request.getAttribute("dependencies");
-%>
 <%
-    if (dependencies.isEmpty()) { // no dependencies -> no tabs
+    if (!classViewer.hasDependencies()) { // no dependencies -> no tabs
 %>
 <pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80"
-                                    rows="30"><%=classCode%></textarea></pre>
+                                    rows="30">${classViewer.classCode}</textarea></pre>
 <script>
     let editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
         lineNumbers: true,
@@ -55,7 +49,7 @@
     editorSUT.setSize("100%", 500);
 
     autocompletedClasses = {
-        '<%=className%>': editorSUT.getTextArea().value
+        '${classViewer.className}': editorSUT.getTextArea().value
     }
 </script>
 <%
@@ -63,9 +57,9 @@
 %>
 <div>
     <ul class="nav nav-tabs">
-        <li role="presentation" class="active"><a href="#<%=className%>" aria-controls="<%=className%>" role="tab" data-toggle="tab"><%=className%></a></li>
+        <li role="presentation" class="active"><a href="#${classViewer.className}" aria-controls="${classViewer.className}" role="tab" data-toggle="tab">${classViewer.className}</a></li>
         <%
-            for (String depName : dependencies.keySet()) {
+            for (String depName : classViewer.getDependencies().keySet()) {
         %>
         <li role="presentation"><a href="#<%=depName%>" aria-controls="<%=depName%>" role="tab" data-toggle="tab"><%=depName%></a></li>
         <%
@@ -74,9 +68,9 @@
     </ul>
 
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="<%=className%>" data-toggle="tab">
+        <div role="tabpanel" class="tab-pane active" id="${classViewer.className}" data-toggle="tab">
             <pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80"
-                                                rows="30"><%=classCode%></textarea></pre>
+                                                rows="30">${classViewer.classCode}</textarea></pre>
             <script>
                 let editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
                     lineNumbers: true,
@@ -88,12 +82,12 @@
                 editorSUT.setSize("100%", 457); // next to the test editor the cm editor would be too big
 
                 autocompletedClasses = {
-                    '<%=className%>': editorSUT.getTextArea().value
+                    '${classViewer.className}': editorSUT.getTextArea().value
                 }
             </script>
         </div>
         <%
-            for (Map.Entry<String, String> dependency : dependencies.entrySet()) {
+            for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
                 String depName = dependency.getKey();
                 String depCode = dependency.getValue();
         %>
@@ -131,6 +125,5 @@
 </div>
 <%
     }
-}
 %>
 

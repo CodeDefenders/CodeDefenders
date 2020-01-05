@@ -33,20 +33,20 @@
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 %>
 
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<% classViewer.setGameClass(game.getCUT()); %>
+<% classViewer.setDependenciesForClass(game.getCUT()); %>
+
 <%-- Set request attributes for the components. --%>
 <%
-    /* class_viewer */
     final GameClass cut = game.getCUT();
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-    
+
     if (previousTestCode != null) {
         request.setAttribute("testCode", previousTestCode);
         /* error_highlighting */
@@ -92,9 +92,9 @@
 <div class="row">
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="../game_components/class_viewer.jsp"%>
-        <%@include file="../game_components/game_highlighting.jsp" %>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
+        <jsp:include page="../game_components/class_viewer.jsp"/>
+        <jsp:include page="../game_components/game_highlighting.jsp"/>
+        <jsp:include page="../game_components/mutant_explanation.jsp"/>
     </div>
 
     <div class="col-md-6" id="utest-div">

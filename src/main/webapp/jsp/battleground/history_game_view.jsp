@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.Optional" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
@@ -48,16 +47,16 @@
     }
 %>
 
+<jsp:useBean id="classViewerData" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<% classViewerData.setGameClass(game.getCUT()); %>
+<% classViewerData.setDependenciesForClass(game.getCUT()); %>
+
 <%-- Set request attributes for the components. --%>
 <%
      /* playerFeedback and scoreboard */
     request.setAttribute("game", game);
 
-    /* class_viewer */
     final GameClass cut = game.getCUT();
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
