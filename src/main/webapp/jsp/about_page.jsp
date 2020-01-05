@@ -24,10 +24,10 @@
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.util.Properties" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("About Code Defenders"); %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <% if (login.isLoggedIn()) { %>
     <jsp:include page="/jsp/header.jsp"/>

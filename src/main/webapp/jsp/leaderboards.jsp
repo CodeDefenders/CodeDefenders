@@ -21,7 +21,7 @@
 <%@ page import="org.codedefenders.game.leaderboard.Leaderboard" %>
 <%@ page import="org.codedefenders.game.leaderboard.Entry" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Leaderboard"); %>
 
 <jsp:include page="/jsp/header_main.jsp"/>

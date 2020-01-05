@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.MessagesBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.util.Constants;

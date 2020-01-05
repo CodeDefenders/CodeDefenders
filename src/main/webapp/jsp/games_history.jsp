@@ -24,7 +24,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="java.util.Map" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Game History"); %>
 
 <%

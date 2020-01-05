@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;

@@ -18,14 +18,12 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
-import org.codedefenders.beans.LoginBean;
-import org.codedefenders.database.AdminDAO;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleGame;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -41,7 +39,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;

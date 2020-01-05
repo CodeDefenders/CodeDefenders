@@ -1,9 +1,8 @@
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.model.UserMultiplayerGameInfo;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 
 import java.io.IOException;

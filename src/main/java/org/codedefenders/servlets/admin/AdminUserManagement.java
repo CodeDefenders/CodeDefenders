@@ -19,7 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import org.apache.commons.lang.math.IntRange;
-import org.codedefenders.beans.MessagesBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;

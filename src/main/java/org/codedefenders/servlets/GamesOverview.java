@@ -18,14 +18,13 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 
 import java.io.IOException;

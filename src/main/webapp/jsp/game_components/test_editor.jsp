@@ -31,7 +31,7 @@
         be modified from the start.
 --%>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     String testCode = (String) request.getAttribute("testCode");

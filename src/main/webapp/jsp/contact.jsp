@@ -21,10 +21,10 @@
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.*" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Contact Us"); %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <% if (login.isLoggedIn()) { %>
 	<jsp:include page="/jsp/header.jsp"/>

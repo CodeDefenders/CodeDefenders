@@ -24,7 +24,7 @@
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     boolean profileEnabled = UserProfileManager.checkEnabled();

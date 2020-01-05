@@ -46,7 +46,7 @@
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 <%@ page import="org.codedefenders.notification.events.client.registration.RegistrationEvent" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     String name = request.getServerName();

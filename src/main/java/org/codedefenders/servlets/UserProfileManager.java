@@ -18,10 +18,9 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.LoginBean;
-import org.codedefenders.beans.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.User;
 import org.codedefenders.model.UserInfo;
@@ -44,7 +43,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged in {@link User}.

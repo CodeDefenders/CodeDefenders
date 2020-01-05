@@ -21,7 +21,7 @@
 <%@ page import="org.codedefenders.model.KeyMap" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <div class="btn-toolbar" role="toolbar">
 

@@ -1,5 +1,7 @@
 package org.codedefenders.beans;
 
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +13,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 /**

@@ -19,8 +19,8 @@
 package org.codedefenders.servlets.auth;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.beans.MessagesBean;
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;

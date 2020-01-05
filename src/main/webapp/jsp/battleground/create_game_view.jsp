@@ -27,7 +27,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.Role" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Battleground"); %>
 
 <jsp:include page="/jsp/header_main.jsp"/>

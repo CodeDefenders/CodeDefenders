@@ -18,14 +18,12 @@
  */
 package org.codedefenders.servlets.events;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

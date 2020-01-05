@@ -1,4 +1,4 @@
-package org.codedefenders.beans;
+package org.codedefenders.beans.user;
 
 import org.codedefenders.model.User;
 import org.codedefenders.util.Paths;

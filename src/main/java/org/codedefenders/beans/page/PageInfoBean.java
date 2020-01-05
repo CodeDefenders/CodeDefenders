@@ -1,4 +1,4 @@
-package org.codedefenders.beans;
+package org.codedefenders.beans.page;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;

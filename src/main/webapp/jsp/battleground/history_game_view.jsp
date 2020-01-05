@@ -28,7 +28,7 @@
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Game History"); %>
 
 <%

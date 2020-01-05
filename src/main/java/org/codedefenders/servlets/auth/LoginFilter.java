@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.auth;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

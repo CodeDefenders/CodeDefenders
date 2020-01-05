@@ -23,7 +23,7 @@
 <%@ page import="org.codedefenders.game.Role"%>
 <%@ page import="org.codedefenders.model.NotificationType"%>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     {

@@ -18,14 +18,13 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

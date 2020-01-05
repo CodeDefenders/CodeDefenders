@@ -27,7 +27,7 @@
 <%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <jsp:include page="/jsp/header_main.jsp"/>
 

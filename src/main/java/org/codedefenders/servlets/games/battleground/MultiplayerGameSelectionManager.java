@@ -18,8 +18,8 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
-import org.codedefenders.beans.LoginBean;
-import org.codedefenders.beans.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
@@ -28,7 +28,6 @@ import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.execution.TargetExecution;
@@ -41,7 +40,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;

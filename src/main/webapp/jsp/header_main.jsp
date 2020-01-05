@@ -19,7 +19,7 @@
 
 --%>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
 <jsp:include page="/jsp/header.jsp"/>
 

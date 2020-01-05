@@ -25,7 +25,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <jsp:include page="/jsp/header_main.jsp"/>
 

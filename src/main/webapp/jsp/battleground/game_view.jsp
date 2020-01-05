@@ -22,7 +22,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");

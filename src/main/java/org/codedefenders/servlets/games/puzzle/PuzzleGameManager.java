@@ -51,12 +51,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.beans.LoginBean;
-import org.codedefenders.beans.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;

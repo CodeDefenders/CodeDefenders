@@ -20,7 +20,7 @@ package org.codedefenders.servlets.games;
 
 import com.google.gson.Gson;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;

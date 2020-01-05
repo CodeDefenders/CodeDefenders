@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.MessagesBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.servlets.util.ServletUtils;

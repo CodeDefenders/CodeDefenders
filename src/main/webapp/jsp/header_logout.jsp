@@ -30,7 +30,7 @@
         Messages to display on page load.
 --%>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
 <script type="text/javascript">
     $(document).ready(function() {

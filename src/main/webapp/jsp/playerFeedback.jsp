@@ -31,7 +31,7 @@
 <%@ page import="org.codedefenders.database.GameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
 {

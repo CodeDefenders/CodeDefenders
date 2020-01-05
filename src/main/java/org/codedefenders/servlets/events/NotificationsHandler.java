@@ -20,10 +20,8 @@ package org.codedefenders.servlets.events;
 
 import com.google.gson.Gson;
 
-import org.codedefenders.beans.LoginBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;

@@ -1,4 +1,6 @@
-package org.codedefenders.beans;
+package org.codedefenders.beans.message;
+
+import org.codedefenders.beans.message.MessagesBean;
 
 /**
  * Represents a message shown on to a user on page load.

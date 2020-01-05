@@ -40,7 +40,7 @@
 
 <%@ page import="java.util.Map" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     final String mutantCode = (String) request.getAttribute("mutantCode");
