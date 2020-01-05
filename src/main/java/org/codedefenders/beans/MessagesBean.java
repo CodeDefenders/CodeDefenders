@@ -30,7 +30,7 @@ public class MessagesBean implements Serializable {
      * Returns a new list containing the messages.
      * @return A new list containing the messages.
      */
-    public List<Message> getMessages() {
+    public synchronized List<Message> getMessages() {
         return new ArrayList<>(messages);
     }
 
