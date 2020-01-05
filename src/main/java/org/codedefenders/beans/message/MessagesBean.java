@@ -1,8 +1,9 @@
 package org.codedefenders.beans.message;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.SessionScoped;
-import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,11 +15,11 @@ import java.util.List;
  * This bean is session-scoped so messages can be kept over multiple request when PGR (post redirect get) is applied.
  * The messages are cleared whenever they are rendered in the JSP (see messages.jsp).
  * </p>
+ * <p>Bean Name: {@code messages}</p>
  */
 // TODO: Find a way to make this request scoped, so messages are not mixed when multiple tabs are used.
 @ManagedBean
 @SessionScoped
-@Named("messages")
 public class MessagesBean implements Serializable {
     private long currentId;
     private List<Message> messages;
@@ -46,10 +47,12 @@ public class MessagesBean implements Serializable {
 
     /**
      * Adds a message. The new message is returned so that it can be modified via builder-style methods.
+     * The text of the message will be HTML escaped.
      * @param text The text of the message.
      * @return The newly created message.
      */
     public synchronized Message add(String text) {
+        text = StringEscapeUtils.escapeHtml(text);
         Message message = new Message(text, currentId++);
         messages.add(message);
         return message;

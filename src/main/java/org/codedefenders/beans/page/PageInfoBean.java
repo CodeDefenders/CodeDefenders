@@ -4,9 +4,12 @@ import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
+/**
+ * <p>Provides various page info, like the page title (and maybe other things later).</p>
+ * <p>Bean Name: {@code pageInfo}</p>
+ */
 @ManagedBean
 @RequestScoped
-@Named("pageInfo")
 public class PageInfoBean {
     private String pageTitle;
     // Put additional information for headers and such here ...
