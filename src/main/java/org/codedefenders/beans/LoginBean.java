@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 import java.io.Serializable;
 
 /**
@@ -14,6 +15,7 @@ import java.io.Serializable;
  */
 @ManagedBean
 @SessionScoped
+@Named("login")
 public class LoginBean implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(LoginBean.class);
 

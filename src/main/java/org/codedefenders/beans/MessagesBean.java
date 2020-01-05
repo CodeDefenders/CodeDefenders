@@ -2,6 +2,7 @@ package org.codedefenders.beans;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.List;
 // TODO: Find a way to make this request scoped, so messages are not mixed when multiple tabs are used.
 @ManagedBean
 @SessionScoped
+@Named("messages")
 public class MessagesBean implements Serializable {
     private long currentId;
     private List<Message> messages;
