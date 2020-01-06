@@ -715,8 +715,8 @@ public class MultiplayerGameManager extends HttpServlet {
                     String notification = login.getUser().getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.";
                     if (isMutantKillable) {
                         logger.warn("Mutant {} was accepted as equivalence but it is killable", m);
-                        message = message + " " + " However, the mutant was killable !";
-                        notification = notification + " " + " However, the mutant was killable !";
+                        message = message + " " + " However, the mutant was killable!";
+                        notification = notification + " " + " However, the mutant was killable!";
                     }
 
                     // At this point we where not able to kill the mutant will all the covering tests on the same class from different games
@@ -866,7 +866,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                 " is assumed equivalent.";
 
                         if (isMutantKillable) {
-                            notification = notification + " " + "However, the mutant was killable !";
+                            notification = notification + " " + "However, the mutant was killable!";
                         }
 
                         // only kill the one mutant that was claimed
@@ -888,7 +888,7 @@ public class MultiplayerGameManager extends HttpServlet {
             } else {
                 String message = TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
                 if (isMutantKillable) {
-                    message = message + " " + "Unfortunately, the mutant was killable !";
+                    message = message + " " + "Unfortunately, the mutant was killable!";
                 }
                 messages.add(message);
             }
