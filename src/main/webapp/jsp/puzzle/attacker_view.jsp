@@ -57,7 +57,7 @@
 <% mutantEditor.setEditableLinesForPuzzle(puzzle); %>
 
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<% if (game.getLevel() == GameLevel.EASY)
+<% if (game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED)
         testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
 
 <%
@@ -114,7 +114,7 @@
             <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
-        <% if (game.getLevel() == GameLevel.EASY) { %>
+        <% if (game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED) { %>
         <div id="tests-div">
             <h3>JUnit tests</h3>
             <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
