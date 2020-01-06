@@ -58,6 +58,9 @@
 <% testEditor.setEditableLinesForPuzzle(puzzle); %>
 <% testEditor.setMockingEnabled(false); %>
 
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
 <%
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -67,11 +70,6 @@
     } else {
         testEditor.setTestCodeForClass(cut);
     }
-
-    /* test_accordion */
-    request.setAttribute("cut", cut);
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
@@ -85,8 +83,8 @@
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
-    // request.setAttribute("tests", game.getTests());
-    // request.setAttribute("mutants", game.getMutants());
+    request.setAttribute("tests", game.getTests());
+    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", true);
     // request.setAttribute("gameType", GameMode.PUZZLE);
     // request.setAttribute("gameId", game.getId());

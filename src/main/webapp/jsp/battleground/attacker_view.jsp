@@ -42,6 +42,10 @@
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 <% mutantEditor.setDependenciesForClass(game.getCUT()); %>
 
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED))
+        testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
 <%
     /* mutant_editor */
     if (previousMutantCode != null) {
@@ -57,11 +61,6 @@
     request.setAttribute("mutantName", cut.getBaseName());
     request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
-    /* test_accordion */
-    request.setAttribute("cut", cut);
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
@@ -74,8 +73,8 @@
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#newmut-div");
-    // request.setAttribute("tests", game.getTests());
-    // request.setAttribute("mutants", game.getMutants());
+    request.setAttribute("tests", game.getTests());
+    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("gameType", GameMode.PARTY);
     // request.setAttribute("gameId", game.getId());

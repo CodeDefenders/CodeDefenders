@@ -42,6 +42,9 @@
 <% testEditor.setEditableLinesForClass(cut); %>
 <% testEditor.setMockingEnabled(cut.isMockingEnabled()); %>
 
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
 <%-- Set request attributes for the components. --%>
 <%
     /* test_editor */
@@ -60,11 +63,6 @@
         testEditor.setTestCodeForClass(cut);
     }
 
-    /* test_accordion */
-    request.setAttribute("cut", cut);
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
@@ -77,7 +75,7 @@
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
-    // request.setAttribute("tests", game.getTests());
+    request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", true);
     // request.setAttribute("gameType", GameMode.PARTY);

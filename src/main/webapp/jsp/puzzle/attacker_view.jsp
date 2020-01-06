@@ -56,6 +56,10 @@
 <% mutantEditor.setDependenciesForClass(game.getCUT()); %>
 <% mutantEditor.setEditableLinesForPuzzle(puzzle); %>
 
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% if (game.getLevel() == GameLevel.EASY)
+        testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
 <%
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
@@ -65,14 +69,6 @@
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }
-
-    request.setAttribute("mutantName", cut.getBaseName());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
-    /* test_accordion */
-    request.setAttribute("cut", cut);
-    request.setAttribute("mutants", game.getMutants());
-    request.setAttribute("tests", game.getTests());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
@@ -86,8 +82,8 @@
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
-    // request.setAttribute("tests", game.getTests());
-    // request.setAttribute("mutants", game.getMutants());
+    request.setAttribute("tests", game.getTests());
+    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("gameType", GameMode.PUZZLE);
     // request.setAttribute("gameId", game.getId());
