@@ -42,30 +42,31 @@
 
 </div></div></div></div></div>
 
-<% { %>
-
 <%-- Set request attributes for the components. --%>
 <%
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
+%>
 
-    /* class_viewer */
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<% classViewer.setClassCode(game.getCUT()); %>
+<% classViewer.setDependenciesForClass(game.getCUT()); %>
 
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<% testEditor.setEditableLinesForPuzzle(puzzle); %>
+<% testEditor.setMockingEnabled(false); %>
+
+<%
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     if (previousTestCode != null) {
-        request.setAttribute("testCode", previousTestCode);
+        testEditor.setPreviousTestCode(previousTestCode);
     } else {
-        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
+        testEditor.setTestCodeForClass(cut);
     }
-    request.setAttribute("mockingEnabled", false);
-    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
     /* test_accordion */
     request.setAttribute("cut", cut);
@@ -153,5 +154,3 @@
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%@ include file="/jsp/footer_game.jsp"%>
-
-<% } %>

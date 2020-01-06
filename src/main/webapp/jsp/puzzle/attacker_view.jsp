@@ -45,24 +45,29 @@
 <div class="game-container">
 
 <%-- Set request attributes for the components. --%>
-<%  PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
+<%
+    PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
+%>
 
+<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
+<% mutantEditor.setDependenciesForClass(game.getCUT()); %>
+<% mutantEditor.setEditableLinesForPuzzle(puzzle); %>
+
+<%
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     if (previousMutantCode != null) {
-        request.setAttribute("mutantCode", previousMutantCode);
+        mutantEditor.setPreviousMutantCode(cut, previousMutantCode);
     } else {
-        request.setAttribute("mutantCode", cut.getAsHTMLEscapedString());
+        mutantEditor.setMutantCodeForClass(cut);
     }
+
     request.setAttribute("mutantName", cut.getBaseName());
     request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
-    request.setAttribute("startEditLine", puzzle.getEditableLinesStart());
-    request.setAttribute("endEditLine", puzzle.getEditableLinesEnd());
 
     /* test_accordion */
     request.setAttribute("cut", cut);

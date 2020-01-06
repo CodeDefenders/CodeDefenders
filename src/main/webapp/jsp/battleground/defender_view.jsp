@@ -31,16 +31,19 @@
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    final GameClass cut = game.getCUT();
 %>
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<% classViewer.setGameClass(game.getCUT()); %>
+<% classViewer.setClassCode(game.getCUT()); %>
 <% classViewer.setDependenciesForClass(game.getCUT()); %>
+
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<% testEditor.setEditableLinesForClass(cut); %>
+<% testEditor.setMockingEnabled(cut.isMockingEnabled()); %>
 
 <%-- Set request attributes for the components. --%>
 <%
-    final GameClass cut = game.getCUT();
-
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -48,15 +51,14 @@
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
 
     if (previousTestCode != null) {
-        request.setAttribute("testCode", previousTestCode);
+        testEditor.setPreviousTestCode(previousTestCode);
+
         /* error_highlighting */
         request.setAttribute("codeDivSelectorForError", "#utest-div");
         request.setAttribute("errorLines", errorLines);
     } else {
-        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
+        testEditor.setTestCodeForClass(cut);
     }
-    request.setAttribute("mockingEnabled", cut.isMockingEnabled());
-    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
     /* test_accordion */
     request.setAttribute("cut", cut);

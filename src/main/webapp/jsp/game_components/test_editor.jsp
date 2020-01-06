@@ -21,32 +21,15 @@
 
 <%--
     Displays the test code in a CodeMirror textarea.
-
-    @param String testCode
-        The test code to display.
-    @param Boolean mockingEnabled
-        Enable autocompletions for Mockito methods.
-    @param Integer startEditLine
-        Start of editable lines. If smaller than one or {@code null}, the code can
-        be modified from the start.
 --%>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
-<%
-    String testCode = (String) request.getAttribute("testCode");
-    Boolean mockingEnabled = (Boolean) request.getAttribute("mockingEnabled");
-
-    Integer startEditLine = (Integer) request.getAttribute("startEditLine");
-    if (startEditLine == null || startEditLine < 1) {
-        startEditLine = 1;
-    }
-%>
-
-<pre><textarea id="code" name="test" title="test" cols="80" rows="30"><%=testCode%></textarea></pre>
+<pre><textarea id="code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
 
 <script>
-    let startEditLine = <%=startEditLine%> ;
+    let startEditLine = ${testEditor.editableLinesStart};
     let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
 
     let getReadOnlyLinesEnd = function(lines) {
@@ -58,7 +41,7 @@
     testMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
         "assertNotNull", "assertSame", "assertNotSame", "fail"];
 
-    <% if(mockingEnabled) { %>
+    <% if(testEditor.isMockingEnbaled()) { %>
         mockitoMethods = ["mock", "when", "then", "thenThrow", "doThrow", "doReturn", "doNothing"];
         // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
         // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)

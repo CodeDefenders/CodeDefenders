@@ -26,16 +26,15 @@
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+	final GameClass cut = game.getCUT();
 %>
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<% classViewer.setClassCode(game.getCUT()); %>
+<% classViewer.setDependenciesForClass(game.getCUT()); %>
 
 <%-- Set request attributes for the components. --%>
 <%
-	/* class_viewer */
-	final GameClass cut = game.getCUT();
-	request.setAttribute("className", cut.getBaseName());
-	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
 	/* test_accordion */
 	request.setAttribute("cut", cut);
 	request.setAttribute("mutants", game.getMutants());

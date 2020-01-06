@@ -45,18 +45,18 @@
             return;
         }
     }
+
+    final GameClass cut = game.getCUT();
 %>
 
-<jsp:useBean id="classViewerData" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<% classViewerData.setGameClass(game.getCUT()); %>
-<% classViewerData.setDependenciesForClass(game.getCUT()); %>
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<% classViewer.setClassCode(game.getCUT()); %>
+<% classViewer.setDependenciesForClass(game.getCUT()); %>
 
 <%-- Set request attributes for the components. --%>
 <%
      /* playerFeedback and scoreboard */
     request.setAttribute("game", game);
-
-    final GameClass cut = game.getCUT();
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

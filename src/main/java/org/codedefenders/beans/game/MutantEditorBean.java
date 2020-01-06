@@ -3,6 +3,7 @@ package org.codedefenders.beans.game;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 
@@ -14,25 +15,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <p>Provides data for the class viewer game component.</p>
- * <p>Bean Name: {@code classViewer}</p>
+ * <p>Provides data for the mutant editor game component.</p>
+ * <p>Bean Name: {@code mutantEditor}</p>
  */
 @ManagedBean
 @RequestScoped
-public class ClassViewerBean {
+public class MutantEditorBean {
     private String className;
-    private String classCode;
+    private String mutantCode;
     private Map<String, String> dependencies;
+    private Integer editableLinesStart;
+    private Integer editableLinesEnd;
 
-    public ClassViewerBean() {
+    public MutantEditorBean() {
         className = null;
-        classCode = null;
+        mutantCode = null;
         dependencies = new HashMap<>();
+        editableLinesStart = null;
+        editableLinesEnd = null;
     }
 
-    public void setClassCode(GameClass clazz) {
+    public void setMutantCodeForClass(GameClass clazz) {
         className = clazz.getName();
-        classCode = StringEscapeUtils.escapeHtml(clazz.getSourceCode());
+        mutantCode = StringEscapeUtils.escapeHtml(clazz.getSourceCode());
+    }
+
+    public void setPreviousMutantCode(GameClass clazz, String previousMutantCode) {
+        className = clazz.getName();
+        mutantCode = previousMutantCode;
     }
 
     public void setDependenciesForClass(GameClass clazz) {
@@ -44,14 +54,19 @@ public class ClassViewerBean {
         }
     }
 
+    public void setEditableLinesForPuzzle(Puzzle puzzle) {
+        this.editableLinesStart = puzzle.getEditableLinesStart();
+        this.editableLinesEnd = puzzle.getEditableLinesEnd();
+    }
+
     // --------------------------------------------------------------------------------
 
     public String getClassName() {
         return className;
     }
 
-    public String getClassCode() {
-        return classCode;
+    public String getMutantCode() {
+        return mutantCode;
     }
 
     public Map<String, String> getDependencies() {
@@ -60,5 +75,21 @@ public class ClassViewerBean {
 
     public boolean hasDependencies() {
         return !dependencies.isEmpty();
+    }
+
+    public int getEditableLinesStart() {
+        return editableLinesStart == null ? 1 : editableLinesStart;
+    }
+
+    public int getEditableLinesEnd() {
+        return editableLinesEnd;
+    }
+
+    public boolean hasEditableLinesStart() {
+        return editableLinesStart != null;
+    }
+
+    public boolean hasEditableLinesEnd() {
+        return editableLinesEnd != null;
     }
 }

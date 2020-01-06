@@ -36,18 +36,24 @@
     List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-
     final GameClass cut = game.getCUT();
+%>
 
+<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
+<% mutantEditor.setDependenciesForClass(game.getCUT()); %>
+
+<%
     /* mutant_editor */
     if (previousMutantCode != null) {
-        request.setAttribute("mutantCode", previousMutantCode);
+        mutantEditor.setPreviousMutantCode(cut, previousMutantCode);
+
         /* error_highlighting */
         request.setAttribute("codeDivSelectorForError", "#newmut-div");
         request.setAttribute("errorLines", errorLines);
     } else {
-        request.setAttribute("mutantCode", cut.getAsHTMLEscapedString());
+        mutantEditor.setMutantCodeForClass(cut);
     }
+
     request.setAttribute("mutantName", cut.getBaseName());
     request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 

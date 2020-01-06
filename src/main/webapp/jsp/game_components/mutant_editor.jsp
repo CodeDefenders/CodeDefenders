@@ -18,50 +18,21 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
 <%--
     Displays the mutant code in a CodeMirror textarea.
-
-    @param String mutantCode
-        The mutant code to display, but not {@code null}.
-    @param String mutantName
-        The class name of the mutant, but not {@code null}.
-    @param Map<String, String> dependencies
-        A mapping between a class name and the content of the CUT dependencies.
-        Can be empty, but must not be {@code null}.
-    @param Integer startEditLine
-        Start of editable lines. If smaller than one or {@code null}, the code can
-        be modified from the start.
-    @param Integer endEditLine
-        End of editable lines in the orginial mutant.
-        If smaller than one or {@code null}, the code can be modified until the end.
-    @param errorLines the list of lines on which the compiler reported an error.
-        Those have to be highlighted
 --%>
 
 <%@ page import="java.util.Map" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-
-<%
-    final String mutantCode = (String) request.getAttribute("mutantCode");
-    final String mutantName = (String) request.getAttribute("mutantName");
-    final Map<String, String> dependencies = (Map<String, String>) request.getAttribute("dependencies");
-
-    Integer startEditLine = (Integer) request.getAttribute("startEditLine");
-    if (startEditLine == null || startEditLine < 1) {
-        startEditLine = 1;
-    }
-    Integer endEditLine = (Integer) request.getAttribute("endEditLine");
-    if (endEditLine != null && (endEditLine < 1 || endEditLine < startEditLine)) {
-        endEditLine = null;
-    }
-%>
+<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 
 <script>
-    let startEditLine = <%=startEditLine%> ;
+    let startEditLine = ${mutantEditor.editableLinesStart};
     let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
 
-    let endEditLine = <%=endEditLine%>;
+    let endEditLine = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
 
     let getReadOnlyLinesEnd = function(lines) {
         if (endEditLine == null) {
@@ -147,10 +118,10 @@
 </script>
 
 <%
-    if (dependencies.isEmpty()) { // no dependencies -> no tabs
+    if (!mutantEditor.hasDependencies()) { // no dependencies -> no tabs
 %>
 <pre style="margin-top: 10px;"><textarea id="code" name="mutant" title="mutant" cols="80"
-                                         rows="50"><%=mutantCode%></textarea></pre>
+                                         rows="50">${mutantEditor.mutantCode}</textarea></pre>
 
 <script>
     let editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
@@ -205,9 +176,9 @@
 %>
 <div>
     <ul class="nav nav-tabs" style="margin-top: 15px">
-        <li role="presentation" class="active"><a href="#<%=mutantName%>" aria-controls="<%=mutantName%>" role="tab" data-toggle="tab"><%=mutantName%></a></li>
+        <li role="presentation" class="active"><a href="#${mutantEditor.className}" aria-controls="${mutantEditor.className}" role="tab" data-toggle="tab">${mutantEditor.className}</a></li>
         <%
-            for (String depName : dependencies.keySet()) {
+            for (String depName : mutantEditor.getDependencies().keySet()) {
         %>
         <li role="presentation"><a href="#<%=depName%>" aria-controls="<%=depName%>" role="tab" data-toggle="tab"><%=depName%></a></li>
         <%
@@ -216,9 +187,9 @@
     </ul>
 
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="<%=mutantName%>" data-toggle="tab">
+        <div role="tabpanel" class="tab-pane active" id="${mutantEditor.className}" data-toggle="tab">
             <pre><textarea id="code" name="mutant" title="mutant" cols="80"
-                                                     rows="50"><%=mutantCode%></textarea></pre>
+                                                     rows="50">${mutantEditor.mutantCode}</textarea></pre>
             <script>
                 let editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
                     lineNumbers: true,
@@ -249,12 +220,12 @@
                 });
 
                 autocompletedClasses = {
-                    '<%=mutantName%>': editorMutant.getTextArea().value
+                    '${mutantEditor.className}': editorMutant.getTextArea().value
                 }
             </script>
         </div>
         <%
-            for (Map.Entry<String, String> dependency : dependencies.entrySet()) {
+            for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
                 String depName = dependency.getKey();
                 String depCode = dependency.getValue();
         %>
