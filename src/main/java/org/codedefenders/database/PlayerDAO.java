@@ -115,4 +115,23 @@ public class PlayerDAO {
         final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
         return Optional.ofNullable(id).orElse(-1);
     }
+
+    /**
+     * Retrieves the player of a given user in a given game.
+     *
+     * @param userId The user identifier as an {@code int}.
+     * @param gameId The game identifier as an {@code int}.
+     * @return The player for a user in a game.
+     */
+    public static Player getPlayerForUserAndGame(int userId, int gameId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM view_players_with_userdata",
+                "WHERE Game_ID = ?",
+                "  AND User_ID = ?",
+                "  AND Active=TRUE;");
+        return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS,
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId));
+    }
 }

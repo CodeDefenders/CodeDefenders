@@ -26,9 +26,12 @@
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.Role" %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Game History"); %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     MultiplayerGame game;
@@ -47,6 +50,7 @@
     }
 
     final GameClass cut = game.getCUT();
+    Role role = game.getRole(login.getUserId());
 %>
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -61,6 +65,10 @@
 <% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
 <% gameHighlighting.setEnableFlagging(false); %>
 <% gameHighlighting.setCodeDivSelector("#cut-div"); %>
+
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
+<% playerFeedback.setGameInfo(game.getId(), game.getCreatorId()); %>
+<% playerFeedback.setPlayerInfo(login.getUser(), role); %>
 
 <%-- Set request attributes for the components. --%>
 <%

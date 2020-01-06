@@ -18,27 +18,18 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
 <%@page import="java.util.List"%>
 <%@page import="org.codedefenders.util.Paths"%>
-<%@page import="org.codedefenders.servlets.util.ServletUtils"%>
-<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.Feedback" %>
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.database.GameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.model.Feedback.Type" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 
-<%
-{
-    int gameId = (Integer) request.getAttribute("gameId");
-    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-    Role role = game.getRole(login.getUserId());
-%>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
     <style>
@@ -93,13 +84,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h3 class="modal-title">Feedback for Game <%=gameId%>
+                <h3 class="modal-title">Feedback for Game ${playerFeedback.gameId}
                 </h3>
             </div>
 
-            <%  boolean canSeePlayerFeedback = (login.getUserId() == game.getCreatorId()) || AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SHOW_PLAYER_FEEDBACK).getBoolValue();
-                boolean canGiveFeedback = role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER);
-                if (canGiveFeedback) {%>
+            <% if (playerFeedback.canGiveFeedback()) {%>
             <ul class="nav nav-tabs">
                 <li class="active" id="provideFeedbackLink">
                     <a onClick="switchModal()">
@@ -119,24 +108,17 @@
 
                 <form id="sendFeedback" action="<%=request.getContextPath() + Paths.API_FEEDBACK%>" method="post">
                     <input type="hidden" name="formType" value="sendFeedback">
-                    <input type="hidden" name="gameId" value="<%=gameId%>">
+                    <input type="hidden" name="gameId" value="${playerFeedback.gameId}">
                     <table class="table-hover table-striped table-responsive ">
                         <tbody>
 
                         <%
-                            List<Integer> oldValues = FeedbackDAO.getFeedbackValues(gameId, login.getUserId());
-                            for (Feedback.Type f : Feedback.types) {
-                                int oldValue = oldValues.isEmpty() ? -1 : oldValues.get(f.ordinal());
-                                if ((role.equals(Role.DEFENDER) &&
-                                        (f.equals(Feedback.Type.CUT_MUTATION_DIFFICULTY) ||
-                                                f.equals(Feedback.Type.DEFENDER_FAIRNESS) ||
-                                                f.equals(Feedback.Type.DEFENDER_COMPETENCE)))
-                                        ||
-                                        (role.equals(Role.ATTACKER) &&
-                                                (f.equals(Feedback.Type.CUT_TEST_DIFFICULTY) ||
-                                                        f.equals(Feedback.Type.ATTACKER_FAIRNESS) ||
-                                                        f.equals(Feedback.Type.ATTACKER_COMPETENCE))))
+                            List<Integer> ratings = playerFeedback.getOwnRatings();
+                            for (Type f : Feedback.types) {
+                                if (!playerFeedback.isRatingForRole(f)) {
                                     continue;
+                                }
+                                int oldValue = ratings.isEmpty() ? -1 : ratings.get(f.ordinal());
                         %>
 
                         <tr>
@@ -162,7 +144,7 @@
                                 </fieldset>
                             </td>
                         </tr>
-                        <%}%>
+                        <% } %>
                         </tbody>
 
                     </table>
@@ -180,40 +162,39 @@
             <%}%>
 
             <div class="modal-body" id="view_feedback_modal"
-                 style="<%=canGiveFeedback ? "display: none;" : ""%>">
+                 style="${playerFeedback.canGiveFeedback() ? "display: none;" : ""}">
 
-                <% if (FeedbackDAO.getNBFeedbacksForGame(gameId) > 0) {%>
+                <% if (playerFeedback.getAllRatings().size() > 0) { %>
                 <div class="table-responsive">
                 <table class="table-striped table-hover table-bordered table-responsive table-sm">
                     <thead>
                     <tr>
-                        <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
-                        <% for (Feedback.Type f : Feedback.Type.values()) {%>
-                        <th style="width: 12.5%" title="<%=f.description()%>"><%=f.displayName()%>
-                        </th>
+                        <th>${playerFeedback.canSeeFeedback() ? "Player" : ""}</th>
+                        <% for (Type f : Type.values()) {%>
+                            <th style="width: 12.5%" title="<%=f.description()%>"><%=f.displayName()%>
+                            </th>
                         <%}%>
                     </tr>
                     </thead>
                     <tbody>
 
                     <%
-                        if (canSeePlayerFeedback) {
-                            for (Player player : GameDAO.getAllPlayersForGame(gameId)) {
-                                User user = player.getUser();
-                                int playerUserId = user.getId();
+                        if (playerFeedback.canSeeFeedback()) {
+                            for (Map.Entry<Player, List<Integer>> entry : playerFeedback.getAllRatings().entrySet()) {
+                                Player player = entry.getKey();
+                                List<Integer> ratings = entry.getValue();
 
-                                if (FeedbackDAO.hasNotRated(gameId, playerUserId))
+                                if (ratings.isEmpty()) {
                                     continue;
+                                }
 
                                 String rowColor = player.getRole() == Role.ATTACKER ? "#9a002914" : "#0029a01a";
                     %>
                     <tr style="background-color:<%=rowColor%>">
-                        <td><%=user.getUsername()%>
-                        </td>
+                        <td><%=player.getUser().getUsername()%></td>
                         <%
-                            List<Integer> ratingValues = FeedbackDAO.getFeedbackValues(gameId, playerUserId);
-                            for (Feedback.Type f : Feedback.Type.values()) {
-                                int ratingValue = ratingValues == null ? -1 : ratingValues.get(f.ordinal());
+                            for (Type f : Type.values()) {
+                                int ratingValue = ratings.get(f.ordinal());
                                 if (ratingValue < 1) {
                         %>
                         <td></td>
@@ -222,10 +203,10 @@
 
                         <td>
                             <fieldset class="rating">
-                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
+                                <% for (int i = Feedback.MAX_RATING; i > 0; i--) { %>
                                 <label class="full" title="<%=i%>"
                                        style="font-size:9px; color:<%=i <= ratingValue  ? "#FFD700" : "#bdbdbd"%>"></label>
-                                <%}%>
+                                <% } %>
                             </fieldset>
                         </td>
 
@@ -243,14 +224,14 @@
                     <tr>
                         <td>Average</td>
                         <%
-                            List<Double> avgRatings = FeedbackDAO.getAverageGameRatings(gameId);
-                            for (Feedback.Type f : Feedback.types) {
-                                double ratingValue = avgRatings == null ? -1 : avgRatings.get(f.ordinal());
+                            List<Double> averageRatings = playerFeedback.getAverageRatings();
+                            for (Type f : Feedback.types) {
+                                double ratingValue = averageRatings.isEmpty() ? -1 : averageRatings.get(f.ordinal());
                                 if (ratingValue < 1) {
                         %>
                         <td></td>
 
-                        <%} else {%>
+                        <% } else { %>
 
                         <td>
                             <p style="text-align: left;"><%=String.format("%.1f", ratingValue)%></p>
@@ -292,6 +273,3 @@
         document.getElementById('viewFeedbackLink').classList.toggle('active');
     }
 </script>
-<%
-}
-%>

@@ -28,6 +28,11 @@
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 	Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
+
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
+<% playerFeedback.setGameInfo(game.getId(), game.getCreatorId()); %>
+<% playerFeedback.setPlayerInfo(login.getUser(), role); %>
+
 <%-- Set request attributes for the components. --%>
 <%
     /* playerFeedback & game_notifications */

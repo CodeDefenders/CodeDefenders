@@ -13,6 +13,10 @@ import javax.enterprise.context.RequestScoped;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <p>Provides data for the game highlighting game component.</p>
+ * <p>Bean Name: {@code gameHighlighting}</p>
+ */
 @ManagedBean
 @RequestScoped
 public class GameHighlightingBean {

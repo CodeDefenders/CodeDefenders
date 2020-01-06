@@ -92,10 +92,6 @@ public class FeedbackDAO {
         return values;
     }
 
-    public static boolean hasNotRated(int gameId, int userId) {
-        return getFeedbackValues(gameId, userId).isEmpty();
-    }
-
     public static List<Double> getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
         List<Double> values = DoubleStream.generate(() -> -1.0).limit(types.size()).boxed().collect(Collectors.toList());
 
@@ -147,13 +143,5 @@ public class FeedbackDAO {
 
     public static List<Double> getAverageTestDifficulties() {
         return getAverageClassDifficultyRatings(Type.CUT_TEST_DIFFICULTY);
-    }
-
-    public static int getNBFeedbacksForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT COUNT(DISTINCT User_ID) AS 'nb_feedbacks'",
-                "FROM ratings",
-                "WHERE Game_ID = ?;");
-        return DB.executeQueryReturnValue(query, rs -> rs.getInt(1), DatabaseValue.of(gameId));
     }
 }

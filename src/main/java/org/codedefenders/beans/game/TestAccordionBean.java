@@ -24,6 +24,10 @@ import java.util.Map;
 public class TestAccordionBean {
     private TestAccordionDTO testAccordionData;
 
+    public TestAccordionBean() {
+        testAccordionData = null;
+    }
+
     public void setTestAccordionData(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
         testAccordionData = new TestAccordionDTO(cut, testsList, mutantsList);
     }
