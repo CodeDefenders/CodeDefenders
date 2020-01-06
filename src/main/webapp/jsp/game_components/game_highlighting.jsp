@@ -18,35 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="com.google.gson.Gson" %>
-<%@ page import="com.google.gson.GsonBuilder" %>
-<%@ page import="org.codedefenders.game.GameHighlightingDTO" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="org.codedefenders.util.JSONUtils" %>
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
 
-    @param String codeDivSelector
-        Selector for the div the CodeMirror container is in. Should only contain one CodeMirror instance.
-    @param Boolean showEquivalenceButtton
-        Show a button to flag a selected mutant as equivalent.
-    @param List<Test> tests
-        The list of (valid) tests in the game.
-    @param List<Mutant> mutants
-        The list of (valid) mutants in the game.
-    @param GameMode gameType
-        The game mode of this currently played game.
-    @param int gameId
-        The game id of this currently played game. Used for URL parameters.
---%>
-
-<%--
     The game highlighting uses these HTML elements:
         - Mutant Icons:
             <div class="mutant-icons">
@@ -61,37 +36,22 @@
     The CSS is located in game_highlighting.css.
 --%>
 
-<% { %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 
-<%
-    String codeDivSelector = (String) request.getAttribute("codeDivSelector");
-    List<Test> tests = (List<Test>) request.getAttribute("tests");
-    List<Mutant> mutants = (List<Mutant>) request.getAttribute("mutants") ;
-    Boolean showEquivalenceButton = (Boolean) request.getAttribute("showEquivalenceButton");
-    GameMode gameType = (GameMode) request.getAttribute("gameType");
-    int gameId = (Integer) request.getAttribute("gameId");
-%>
-
-<%
-    GameHighlightingDTO gh = new GameHighlightingDTO(mutants, tests);
-    Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new JSONUtils.MapSerializer()).create();
-    String ghString = gson.toJson(gh);
-%>
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 
 <script>
     /* Wrap in a function so it has it's own scope. */
     (function () {
+        const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
 
         /* Game highlighting data. */
-        const gh_data = JSON.parse(`<%=ghString%>`);
+        const gh_data = JSON.parse('${gameHighlighting.JSON}');
         const mutantIdsPerLine = new Map(gh_data.mutantIdsPerLine);
         const testIdsPerLine = new Map(gh_data.testIdsPerLine);
         const mutants = new Map(gh_data.mutants);
         const tests = new Map(gh_data.tests);
-
-        /* Game highlighting settings. */
-        const showEquivalenceButton = Boolean(<%=showEquivalenceButton%>);
-        const gameType = '<%=gameType.name()%>';
 
         const MutantStatuses = {
             ALIVE: 'ALIVE',
@@ -113,12 +73,6 @@
             FLAGGED: '<%=request.getContextPath()%>/images/mutantFlagged.png',
             EQUIVALENT: '<%=request.getContextPath()%>/images/mutantEquiv.png',
             FLAG: '<%=request.getContextPath()%>/images/flag.png'
-        };
-
-        const GameTypes = {
-            PUZZLE: 'PUZZLE',
-            PARTY: 'PARTY',
-            DUEL: 'DUEL'
         };
 
         /*
@@ -264,7 +218,7 @@
 
             /* Create the button if it is supposed to be shown. */
             let button = '';
-            if (showEquivalenceButton
+            if (enableFlagging
                 && status === MutantStatuses.ALIVE
                 && testIdsPerLine.get(line)) {
                 button = createEquivalenceButton(line);
@@ -283,23 +237,18 @@
          * @return {string} The equivalence button.
          */
         const createEquivalenceButton = function (line) {
-            if (gameType === GameTypes.PARTY) {
+            <% if (gameHighlighting.getGameMode() == GameMode.PARTY) { %>
                 return `<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
                             <input type="hidden" name="formType" value="claimEquivalent">
                             <input type="hidden" name="equivLines" value="` + line + `">
-                            <input type="hidden" name="gameId" value="` + <%=gameId%> + `">
+                            <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">
                                 <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>
                         </form>`;
-            } else if (gameType === GameTypes.PUZZLE) {
-                /* For the moment we disallow equivalence duels in puzzles */
+            <% } else { %>
                 return '';
-            } else {
-                console.error('Unknown game type for equivalence button: ' + gameType);
-                /* If we are not sure what to do, just do not show the button */
-                return '';
-            }
+            <% } %>
         };
 
         /**
@@ -376,7 +325,7 @@
             $(codeMirror.getWrapperElement()).find('.mutant-icons').show();
         };
 
-        const codeMirror = $('<%=codeDivSelector%>').find('.CodeMirror')[0].CodeMirror;
+        const codeMirror = $('${gameHighlighting.codeDivSelector}').find('.CodeMirror')[0].CodeMirror;
         codeMirror.highlightCoverage = function () { highlightCoverage(this) };
         codeMirror.highlightMutants = function () { highlightMutants(this) };
         <%--codeMirror.clearCoverage = function () { clearCoverage(this) };--%>
@@ -388,4 +337,3 @@
     }());
 </script>
 
-<% } %>

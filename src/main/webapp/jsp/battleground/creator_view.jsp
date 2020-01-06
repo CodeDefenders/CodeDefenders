@@ -36,6 +36,12 @@
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
 
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
+<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
+<% gameHighlighting.setEnableFlagging(false); %>
+<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
+
 <%-- Set request attributes for the components. --%>
 <%
 	/* mutants_list */
@@ -47,14 +53,6 @@
 	request.setAttribute("viewDiff", true);
 	request.setAttribute("gameType", GameMode.PARTY);
 	request.setAttribute("gameId", game.getId());
-
-	/* game_highlighting */
-	request.setAttribute("codeDivSelector", "#cut-div");
-	request.setAttribute("tests", game.getTests());
-	request.setAttribute("mutants", game.getMutants());
-	request.setAttribute("showEquivalenceButton", false);
-	// request.setAttribute("gameType", GameMode.PARTY);
-    // request.setAttribute("gameId", game.getId());
 
 	/* mutant_explanation */
 	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

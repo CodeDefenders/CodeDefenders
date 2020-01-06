@@ -32,34 +32,33 @@
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     User equivDefender = (User) request.getAttribute("equivDefender");
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    final GameClass cut = game.getCUT();
 %>
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<% classViewer.setClassCode(game.getCUT()); %>
+<% classViewer.setDependenciesForClass(game.getCUT()); %>
+
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<% testEditor.setEditableLinesForClass(cut); %>
+<% testEditor.setMockingEnabled(cut.isMockingEnabled()); %>
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
+<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
+<% gameHighlighting.setEnableFlagging(false); %>
+<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
 
 <%-- Set request attributes for the components. --%>
 <%
-    /* class_viewer */
-    final GameClass cut = game.getCUT();
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     if (previousTestCode != null) {
-        request.setAttribute("testCode", previousTestCode);
+        testEditor.setPreviousTestCode(previousTestCode);
     } else {
-        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
+        testEditor.setTestCodeForClass(cut);
     }
-    request.setAttribute("mockingEnabled", cut.isMockingEnabled());
-    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
-
-    /* game_highlighting */
-    request.setAttribute("codeDivSelector", "#cut-div");
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-    request.setAttribute("showEquivalenceButton", false);
-    request.setAttribute("gameType", GameMode.PARTY);
-    request.setAttribute("gameId", game.getId());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
