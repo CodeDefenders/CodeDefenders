@@ -50,7 +50,7 @@
 <%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
-<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 

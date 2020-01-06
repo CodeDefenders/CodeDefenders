@@ -92,7 +92,7 @@
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
-<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 
 <div class="row" style="padding: 0px 15px;">
