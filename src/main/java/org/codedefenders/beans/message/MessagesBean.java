@@ -52,7 +52,9 @@ public class MessagesBean implements Serializable {
      * @return The newly created message.
      */
     public synchronized Message add(String text) {
-        text = StringEscapeUtils.escapeHtml(text);
+        // text = StringEscapeUtils.escapeHtml(text);
+        // TODO: we should escape this, but error messages embed <a> tags
+        //      -> add a add(void) method and a unescapedText(String) builder method?
         Message message = new Message(text, currentId++);
         messages.add(message);
         return message;
