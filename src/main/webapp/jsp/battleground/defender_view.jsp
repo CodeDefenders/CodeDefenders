@@ -54,6 +54,9 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
 <%-- Set request attributes for the components. --%>
 <%
     /* test_editor */
@@ -81,9 +84,6 @@
     request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
     request.setAttribute("gameType", GameMode.PARTY);
     request.setAttribute("gameId", game.getId());
-
-    /* test_progressbar */
-    // request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->

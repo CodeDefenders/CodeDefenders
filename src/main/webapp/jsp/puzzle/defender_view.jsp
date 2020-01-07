@@ -24,7 +24,6 @@
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="java.util.LinkedList" %>
@@ -48,6 +47,9 @@
 
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
+
+    final String title = puzzle.getTitle();
+    final String description = puzzle.getDescription();
 %>
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -70,6 +72,9 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
 <%
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -89,12 +94,6 @@
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PUZZLE);
     request.setAttribute("gameId", game.getId());
-
-    /* test_progressbar */
-    // request.setAttribute("gameId", game.getId());
-
-    final String title = puzzle.getTitle();
-    final String description = puzzle.getDescription();
 %>
 
 <jsp:include page="/jsp/push_notifications.jsp"/>

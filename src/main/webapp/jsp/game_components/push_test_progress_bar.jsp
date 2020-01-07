@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
 <%@ page import="org.codedefenders.notification.events.EventNames" %>
 <%@ page import="org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent" %>
 <%@ page import="org.codedefenders.notification.events.server.test.TestSubmittedEvent" %>
@@ -26,12 +27,11 @@
 <%@ page import="org.codedefenders.notification.events.server.test.TestTestedOriginalEvent" %>
 <%@ page import="org.codedefenders.notification.events.server.test.TestTestedMutantsEvent" %>
 
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+
 <%--
     Adds a JavaScript function testProgressBar() that inserts and updates a progressbar showing the status of the last
     submitted test. The progressbar is inserted after #logout. It gets progressbar updates from the WebSocket.
-
-    @param Integer gameId
-        The id of the game.
 --%>
 
 <script>
@@ -72,7 +72,7 @@
 
         const registerTestProgressBar = function () {
             pushSocket.subscribe('<%=EventNames.toClientEventName(TestProgressBarRegistrationEvent.class)%>', {
-                gameId: ${requestScope.gameId}
+                gameId: ${testProgressBar.gameId}
             });
 
             pushSocket.register('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>', onTestSubmitted);

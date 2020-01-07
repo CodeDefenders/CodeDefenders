@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
 <%@ page import="org.codedefenders.notification.events.EventNames" %>
 <%@ page import="org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent" %>
 <%@ page import="org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent" %>
@@ -26,12 +27,11 @@
 <%@ page import="org.codedefenders.notification.events.server.mutant.MutantTestedEvent" %>
 <%@ page import="org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent" %>
 
+<jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
+
 <%--
     Adds a JavaScript function mutantProgressBar() that inserts and updates a progressbar showing the status of the last
     submitted mutant. The progressbar is inserted after #logout. It gets progressbar updates from the WebSocket.
-
-    @param Integer gameId
-        The id of the game.
 --%>
 
 <script>
@@ -79,7 +79,7 @@
 
         const registerMutantProgressBar = function () {
             pushSocket.subscribe('<%=EventNames.toClientEventName(MutantProgressBarRegistrationEvent.class)%>', {
-                gameId: ${requestScope.gameId}
+                gameId: ${mutantProgressBar.gameId}
             });
 
             pushSocket.register('<%=EventNames.toServerEventName(MutantSubmittedEvent.class)%>', onMutantSubmitted);

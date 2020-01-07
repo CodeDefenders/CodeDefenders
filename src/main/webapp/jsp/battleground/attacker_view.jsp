@@ -56,6 +56,9 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+<jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
+<% mutantProgressBar.setGameId(game.getId()); %>
+
 <%
     /* mutant_editor */
     if (previousMutantCode != null) {
@@ -68,9 +71,6 @@
         mutantEditor.setMutantCodeForClass(cut);
     }
 
-    request.setAttribute("mutantName", cut.getBaseName());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
@@ -80,9 +80,6 @@
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PARTY);
     request.setAttribute("gameId", game.getId());
-
-    /* mutant_progressbar */
-    // request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->

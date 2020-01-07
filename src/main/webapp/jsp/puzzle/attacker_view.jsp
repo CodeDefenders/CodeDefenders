@@ -50,6 +50,9 @@
 
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
+
+    final String title = puzzle.getTitle();
+    final String description = puzzle.getDescription();
 %>
 
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
@@ -69,6 +72,9 @@
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+<jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
+<% mutantProgressBar.setGameId(game.getId()); %>
 
 <%
     /* mutant_editor */
@@ -91,12 +97,6 @@
     request.setAttribute("gameId", game.getId());
 
     /* finished_modal TODO */
-
-    /* mutant_progressbar */
-    // request.setAttribute("gameId", game.getId());
-
-    final String title = puzzle.getTitle();
-    final String description = puzzle.getDescription();
 %>
 
 <jsp:include page="/jsp/push_notifications.jsp"/>

@@ -52,6 +52,9 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
 <%-- Set request attributes for the components. --%>
 <%
     /* test_editor */
@@ -62,9 +65,6 @@
     } else {
         testEditor.setTestCodeForClass(cut);
     }
-
-    /* test_progressbar */
-//    request.setAttribute("gameId", game.getId());
 %>
 
 <div class="row">
