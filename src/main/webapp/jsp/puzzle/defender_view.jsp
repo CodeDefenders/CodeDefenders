@@ -67,6 +67,9 @@
 <% gameHighlighting.setEnableFlagging(true); %>
 <% gameHighlighting.setCodeDivSelector("#cut-div"); %>
 
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
 <%
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -86,9 +89,6 @@
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PUZZLE);
     request.setAttribute("gameId", game.getId());
-
-    /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* test_progressbar */
     // request.setAttribute("gameId", game.getId());

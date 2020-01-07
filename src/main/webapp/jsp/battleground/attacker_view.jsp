@@ -53,6 +53,9 @@
 <% gameHighlighting.setEnableFlagging(false); %>
 <% gameHighlighting.setCodeDivSelector("#newmut-div"); %>
 
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
 <%
     /* mutant_editor */
     if (previousMutantCode != null) {
@@ -77,9 +80,6 @@
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PARTY);
     request.setAttribute("gameId", game.getId());
-
-    /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
     /* mutant_progressbar */
     // request.setAttribute("gameId", game.getId());

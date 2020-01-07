@@ -70,13 +70,13 @@
 <% playerFeedback.setGameInfo(game.getId(), game.getCreatorId()); %>
 <% playerFeedback.setPlayerInfo(login.getUser(), role); %>
 
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
 <%-- Set request attributes for the components. --%>
 <%
      /* playerFeedback and scoreboard */
     request.setAttribute("game", game);
-
-    /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());

@@ -42,6 +42,9 @@
 <% gameHighlighting.setEnableFlagging(false); %>
 <% gameHighlighting.setCodeDivSelector("#cut-div"); %>
 
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
 <%-- Set request attributes for the components. --%>
 <%
 	/* mutants_list */
@@ -53,9 +56,6 @@
 	request.setAttribute("viewDiff", true);
 	request.setAttribute("gameType", GameMode.PARTY);
 	request.setAttribute("gameId", game.getId());
-
-	/* mutant_explanation */
-	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 %>
 
 </div> <%-- TODO move the whole div here after changing the header --%>
