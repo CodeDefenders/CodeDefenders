@@ -138,6 +138,7 @@ public class Puzzle {
         this.description = description;
         this.chapter = null;
     }
+
     public static Puzzle forPuzzleInfo(int puzzleId,
                                        Integer chapterId,
                                        Integer position,
@@ -262,7 +263,7 @@ public class Puzzle {
      */
     public PuzzleChapter getChapter() {
         if (chapterId != null && chapter == null) {
-           chapter = PuzzleDAO.getPuzzleChapterForId(chapterId);
+            chapter = PuzzleDAO.getPuzzleChapterForId(chapterId);
         }
         return chapter;
     }

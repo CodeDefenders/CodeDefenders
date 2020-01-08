@@ -62,8 +62,8 @@ import javax.servlet.http.HttpServletResponse;
  *     {@code GET /admin/api/puzzles} returns all puzzles and chapters.
  * </li>
  * <li>
- *     {@code GET /admin/api/puzzles/puzzle?id=<id>} returns only the requested puzzle, a 404 if the requested puzzle could
- *     be found or a 400 if the {@code id} parameter is missing.
+ *     {@code GET /admin/api/puzzles/puzzle?id=<id>} returns only the requested puzzle, a 404 if the requested puzzle
+ *     could be found or a 400 if the {@code id} parameter is missing.
  * </li>
  * <li>
  *     {@code GET /admin/api/puzzles/chapter?id=<id>} returns only the requested puzzle chapter, a 404 if the requested
@@ -90,7 +90,8 @@ public class AdminPuzzleAPI extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleAPI.class);
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         String url = request.getServletPath();
         String message;
         switch (url) {
@@ -128,7 +129,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String url = request.getServletPath();
         String message;
         switch (url) {
@@ -162,7 +163,7 @@ public class AdminPuzzleAPI extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String url = request.getServletPath();
         String message;
         switch (url) {
@@ -219,7 +220,8 @@ public class AdminPuzzleAPI extends HttpServlet {
                     logger.info("Puzzle class {} removed, but parent class {} is still used for other puzzles.",
                             puzzle.getClassId(), parentGameClass.getId());
                 } else {
-                    logger.info("Puzzle class {} removed and since parent class {} is not used for other puzzles, it's removed too.",
+                    logger.info("Puzzle class {} removed and since parent class {} is not used for other puzzles,"
+                                    + "it's removed too.",
                             puzzle.getClassId(), parentGameClass.getId());
                     GameClassDAO.forceRemoveClassForId(parentGameClass.getId());
 
@@ -248,7 +250,8 @@ public class AdminPuzzleAPI extends HttpServlet {
         writeJSONResponse(response, json.toString());
     }
 
-    private void handleDeletePuzzleChapterRequest(HttpServletResponse response, int puzzleChapterId) throws IOException {
+    private void handleDeletePuzzleChapterRequest(HttpServletResponse response,
+                                                  int puzzleChapterId) throws IOException {
         final PuzzleChapter puzzleChapter = PuzzleDAO.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -330,7 +333,9 @@ public class AdminPuzzleAPI extends HttpServlet {
         writeJSONResponse(response, json);
     }
 
-    private void handleUpdatePuzzle(HttpServletRequest request, HttpServletResponse response, int puzzleId) throws IOException {
+    private void handleUpdatePuzzle(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    int puzzleId) throws IOException {
         Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
         if (puzzle == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -370,7 +375,9 @@ public class AdminPuzzleAPI extends HttpServlet {
         writeJSONResponse(response, json.toString());
     }
 
-    private void handleUpdatePuzzleChapter(HttpServletRequest request, HttpServletResponse response, int puzzleChapterId) throws IOException {
+    private void handleUpdatePuzzleChapter(HttpServletRequest request,
+                                           HttpServletResponse response,
+                                           int puzzleChapterId) throws IOException {
         final PuzzleChapter puzzleChapter = PuzzleDAO.getPuzzleChapterForId(puzzleChapterId);
         if (puzzleChapter == null) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -480,8 +487,10 @@ public class AdminPuzzleAPI extends HttpServlet {
             String description = json.get("description").getAsString();
             int maxAssertionsPerTest = json.get("maxAssertionsPerTest").getAsInt();
             boolean forceHamcrest = json.get("forceHamcrest").getAsBoolean();
-            Integer editableLinesStart = json.get("editableLinesStart").isJsonNull() ? null : json.get("editableLinesStart").getAsInt();
-            Integer editableLinesEnd = json.get("editableLinesEnd").isJsonNull() ? null : json.get("editableLinesEnd").getAsInt();
+            Integer editableLinesStart =
+                    json.get("editableLinesStart").isJsonNull() ? null : json.get("editableLinesStart").getAsInt();
+            Integer editableLinesEnd =
+                    json.get("editableLinesEnd").isJsonNull() ? null : json.get("editableLinesEnd").getAsInt();
 
             return Puzzle.forPuzzleInfo(puzzleId, chapterId, position, title, description, maxAssertionsPerTest,
                     forceHamcrest, editableLinesStart, editableLinesEnd);

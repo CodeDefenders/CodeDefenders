@@ -70,7 +70,9 @@ public class GameClassDAO {
         boolean isActive = rs.getBoolean("Active");
         boolean isPuzzleClass = rs.getBoolean("Puzzle");
         Integer parentClassId = rs.getInt("Parent_Class");
-        if (rs.wasNull()) parentClassId = null;
+        if (rs.wasNull()) {
+            parentClassId = null;
+        }
 
         return GameClass.build()
                 .id(classId)
@@ -134,14 +136,15 @@ public class GameClassDAO {
      * Retrieves all (excluding puzzle) game classes in a {@link List}. Even non-playable or
      * inactive classes. These classes should never be shown to non-admin users, use
      * {@link #getAllPlayableClasses()} instead.
-     * <p>
-     * If no game classes are found, the list is empty, but not {@link null}.
+     *
+     * <p>If no game classes are found, the list is empty, but not {@link null}.
      *
      * @return all game classes.
      */
     public static List<GameClassInfo> getAllClassInfos() {
         String query = String.join("\n",
-                "SELECT classes.*, (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count",
+                "SELECT classes.*,",
+                "    (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count",
                 "FROM classes",
                 "WHERE Puzzle != 1",
                 "GROUP BY classes.Class_ID;"
@@ -153,8 +156,8 @@ public class GameClassDAO {
     /**
      * Retrieves all playable game classes in a {@link List}. You can use a playable
      * class for the creation of games.
-     * <p>
-     * If no game classes are found, the list is empty, but not {@link null}.
+     *
+     * <p>If no game classes are found, the list is empty, but not {@link null}.
      *
      * @return all game classes.
      */
@@ -250,7 +253,8 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of tests
      */
-    public static List<Test> getMappedTestsForClassId(Integer classId) throws UncheckedSQLException, SQLMappingException {
+    public static List<Test> getMappedTestsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         final String query = String.join("\n",
                 "SELECT tests.*",
                 "FROM tests, test_uploaded_with_class up",
@@ -288,7 +292,9 @@ public class GameClassDAO {
                 "   JavaFile,",
                 "   ClassFile",
                 "FROM dependencies WHERE Class_ID = ?;");
-        return DB.executeQueryReturnList(query, rs -> DependencyDAO.dependencyFromRS(rs, classId), DatabaseValue.of(classId));
+        return DB.executeQueryReturnList(query,
+                rs -> DependencyDAO.dependencyFromRS(rs, classId),
+                DatabaseValue.of(classId));
     }
 
     /**

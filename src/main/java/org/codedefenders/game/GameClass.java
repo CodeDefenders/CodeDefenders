@@ -283,7 +283,10 @@ public class GameClass {
                 .stream()
                 .map(Dependency::getJavaFile)
                 .map(Paths::get)
-                .collect(Collectors.toMap(FileUtils::extractFileNameNoExtension, FileUtils::readJavaFileWithDefaultHTMLEscaped));
+                .collect(Collectors.toMap(
+                        FileUtils::extractFileNameNoExtension,
+                        FileUtils::readJavaFileWithDefaultHTMLEscaped)
+                );
     }
 
     private void createTestTemplate() {
@@ -314,6 +317,8 @@ public class GameClass {
     }
 
     /**
+     * HTML escapes the test template.
+     *
      * @return a HTML escaped test template for a Junit Test as a {@link String}.
      */
     public String getHTMLEscapedTestTemplate() {
@@ -323,8 +328,8 @@ public class GameClass {
     /**
      * Returns the index of first editable line of this class
      * test template.
-     * <p>
-     * Note that first index starts at 1.
+     *
+     * <p>* Note that first index starts at 1.
      *
      * @return the first editable line of this class test template.
      * @see #getTestTemplate()
@@ -337,8 +342,10 @@ public class GameClass {
     }
 
     /**
+     * Gathers and returns all lines which non initialized fields.
+     *
      * @return All lines of not initialized fields as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
+     *     Can be empty, but never {@code null}.
      */
     public List<Integer> getNonInitializedFields() {
         visitCode();
@@ -347,8 +354,10 @@ public class GameClass {
     }
 
     /**
+     * Gathers and returns all lines which contain a method signature.
+     *
      * @return All lines of method signatures as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
+     *     Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignatures() {
         visitCode();
@@ -360,8 +369,10 @@ public class GameClass {
     }
 
     /**
+     * Gathers and returns all non coverable lines.
+     *
      * @return All lines which are not coverable as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
+     *     Can be empty, but never {@code null}.
      */
     public List<Integer> getNonCoverableCode() {
         visitCode();
@@ -373,7 +384,7 @@ public class GameClass {
      * to be recompiled against the mutant.
      *
      * @return All lines of compile time constants as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
+     *     Can be empty, but never {@code null}.
      */
     public List<Integer> getCompileTimeConstants() {
         visitCode();
@@ -385,7 +396,7 @@ public class GameClass {
      *
      * @param line the line the method signature is returned for.
      * @return All lines of the method signature a given line resides as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
+     *     Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignaturesForLine(Integer line) {
         visitCode();

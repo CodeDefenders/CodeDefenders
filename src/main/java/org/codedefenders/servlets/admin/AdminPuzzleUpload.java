@@ -50,11 +50,11 @@ import javax.servlet.http.HttpSession;
 
 /**
  * This {@link HttpServlet} handles admin upload of puzzles.
- * <p>
- * {@code GET} requests redirect to the admin puzzle upload page.
+ *
+ * <p>{@code GET} requests redirect to the admin puzzle upload page.
  * and {@code POST} requests handle batch uploading puzzle related information.
- * <p>
- * Serves under {@code /admin/puzzles/upload}.
+ *
+ * <p>Serves under {@code /admin/puzzles/upload}.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  */
@@ -66,13 +66,15 @@ public class AdminPuzzleUpload extends HttpServlet {
     private BackendExecutorService backend;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.getRequestDispatcher(Constants.ADMIN_PUZZLE_UPLOAD_JSP).forward(request, response);
     }
 
     @SuppressWarnings("Duplicates")
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         List<FileItem> items;
         try {
             items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
@@ -82,7 +84,9 @@ public class AdminPuzzleUpload extends HttpServlet {
             return;
         }
 
-        final Map<Boolean, List<FileItem>> parameters = items.stream().collect(Collectors.partitioningBy(FileItem::isFormField));
+        final Map<Boolean, List<FileItem>> parameters = items
+                .stream()
+                .collect(Collectors.partitioningBy(FileItem::isFormField));
         final List<FileItem> uploadParameters = parameters.get(true);
         final List<FileItem> fileParameters = parameters.get(false);
 

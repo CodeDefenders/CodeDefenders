@@ -21,8 +21,7 @@ package org.codedefenders.util;
 /**
  * This class contains URL path constants.
  *
- * <p>
- * If one path has to be adjusted, it has to be adjusted in the
+ * <p>If one path has to be adjusted, it has to be adjusted in the
  * specific servlet configuration, too.
  */
 public class Paths {
@@ -38,8 +37,6 @@ public class Paths {
     public static final String ABOUT_PAGE = "/about";
     public static final String CONTACT_PAGE = "/contact";
     public static final String LEADERBOARD_PAGE = "/leaderboard";
-    public static final String AI_PREPARER = "/ai_preparer";
-    public static final String UTESTING_PATH = "/utesting";
 
     public static final String USER_PROFILE = "/profile";
 

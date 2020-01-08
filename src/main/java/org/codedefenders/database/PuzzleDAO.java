@@ -114,7 +114,7 @@ public class PuzzleDAO {
      *
      * @param chapterId The chapter ID.
      * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
-     * in the chapter.
+     *     in the chapter.
      */
     public static List<Puzzle> getPuzzlesForChapterId(int chapterId) {
         String query = String.join("\n",
@@ -159,7 +159,10 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
+        return DB.executeQueryReturnValue(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DatabaseValue.of(puzzleId),
+                DatabaseValue.of(userId));
     }
 
     /**
@@ -169,7 +172,7 @@ public class PuzzleDAO {
      * @param puzzleId The puzzle ID.
      * @param userId   The user ID.
      * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
-     * given user. The list is sorted by the the timestamp of the games.
+     *     given user. The list is sorted by the the timestamp of the games.
      */
     public static List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
         String query = String.join("\n",
@@ -180,7 +183,10 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DatabaseValue.of(puzzleId),
+                DatabaseValue.of(userId));
     }
 
     /**
@@ -189,7 +195,7 @@ public class PuzzleDAO {
      *
      * @param userId The user ID.
      * @return A {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
-     * The list is sorted by the the timestamp of the games.
+     *     The list is sorted by the the timestamp of the games.
      */
     public static List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
         String query = String.join("\n",
@@ -525,7 +531,9 @@ public class PuzzleDAO {
             int chapterId = rs.getInt("puzzle_chapters.Chapter_ID");
 
             Integer position = rs.getInt("puzzle_chapters.Position");
-            if (rs.wasNull()) position = null;
+            if (rs.wasNull()) {
+                position = null;
+            }
 
             String title = rs.getString("puzzle_chapters.Title");
             String description = rs.getString("puzzle_chapters.Description");
@@ -545,15 +553,19 @@ public class PuzzleDAO {
      */
     private static Puzzle getPuzzleFromResultSet(ResultSet rs) {
         try {
-            int puzzleId = rs.getInt("puzzles.Puzzle_ID");
-            int classId = rs.getInt("puzzles.Class_ID");
-            Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
+            final int puzzleId = rs.getInt("puzzles.Puzzle_ID");
+            final int classId = rs.getInt("puzzles.Class_ID");
+            final Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
 
             Integer chapterId = rs.getInt("puzzles.Chapter_ID");
-            if (rs.wasNull()) chapterId = null;
+            if (rs.wasNull()) {
+                chapterId = null;
+            }
 
             Integer position = rs.getInt("puzzles.Position");
-            if (rs.wasNull()) position = null;
+            if (rs.wasNull()) {
+                position = null;
+            }
 
             String title = rs.getString("puzzles.Title");
             String description = rs.getString("puzzles.Description");
@@ -563,13 +575,18 @@ public class PuzzleDAO {
             int maxAssertions = rs.getInt("puzzles.Max_Assertions");
             boolean forceHamcrest = rs.getBoolean("puzzles.Force_Hamcrest");
 
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
+            CodeValidatorLevel mutantValidatorLevel =
+                    CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
 
             Integer editableLinesStart = rs.getInt("puzzles.Editable_Lines_Start");
-            if (rs.wasNull()) editableLinesStart = null;
+            if (rs.wasNull()) {
+                editableLinesStart = null;
+            }
 
             Integer editableLinesEnd = rs.getInt("puzzles.Editable_Lines_End");
-            if (rs.wasNull()) editableLinesEnd = null;
+            if (rs.wasNull()) {
+                editableLinesEnd = null;
+            }
 
             return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, forceHamcrest, mutantValidatorLevel,
                     editableLinesStart, editableLinesEnd, chapterId, position, title, description);

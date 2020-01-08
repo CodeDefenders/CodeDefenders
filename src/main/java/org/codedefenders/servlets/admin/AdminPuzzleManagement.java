@@ -43,40 +43,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet({"/admin/puzzles", "/admin/puzzles/management"})
 public class AdminPuzzleManagement extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleManagement.class);
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher(Constants.ADMIN_PUZZLE_MANAGEMENT_JSP).forward(request, response);
-    }
-
-    @SuppressWarnings("Duplicates")
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-        final String formType = ServletUtils.formType(request);
-        switch (formType) {
-            case "updatePuzzleChapter": {
-
-            }
-            case "inactivePuzzleChapter": {
-
-            }
-            case "removePuzzleChapter": {
-
-            }
-            case "rearrangePuzzleChapter": {
-
-            }
-            case "updatePuzzle": {
-
-            }
-            case "inactivePuzzle": {
-
-            }
-            case "removePuzzle": {
-
-            }
-        }
     }
 }
