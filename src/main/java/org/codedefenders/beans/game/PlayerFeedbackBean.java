@@ -9,6 +9,8 @@ import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,8 @@ import java.util.Map;
  */
 // TODO: Put some of this logic into the FeedbackDAO methods. This is a mess.
 // TODO: Also work with maps of feedback values instead of lists.
+@ManagedBean
+@RequestScoped
 public class PlayerFeedbackBean {
     private Integer gameId;
     private Integer creatorId;

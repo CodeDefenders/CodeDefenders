@@ -32,6 +32,12 @@
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
+    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
+    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
+    List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
+    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
+
+    boolean hasPreviousTest = previousTestCode != null;
 %>
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -41,6 +47,8 @@
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 <% testEditor.setEditableLinesForClass(cut); %>
 <% testEditor.setMockingEnabled(cut.isMockingEnabled()); %>
+<% if (hasPreviousTest) testEditor.setPreviousTestCode(previousTestCode);
+   else testEditor.setTestCodeForClass(cut); %>
 
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
@@ -57,24 +65,15 @@
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
 
+<% if (hasPreviousTest) { %>
+    <jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+    <% errorHighlighting.setCodeDivSelector("#utest-div"); %>
+    <% errorHighlighting.setErrorLines(errorLines); %>
+<% } %>
+
 <%-- Set request attributes for the components. --%>
+
 <%
-    /* test_editor */
-    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-
-    if (previousTestCode != null) {
-        testEditor.setPreviousTestCode(previousTestCode);
-
-        /* error_highlighting */
-        request.setAttribute("codeDivSelectorForError", "#utest-div");
-        request.setAttribute("errorLines", errorLines);
-    } else {
-        testEditor.setTestCodeForClass(cut);
-    }
-
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());

@@ -37,10 +37,14 @@
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
+
+    boolean hasPreviousMutant = previousMutantCode != null;
 %>
 
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 <% mutantEditor.setDependenciesForClass(game.getCUT()); %>
+<% if (hasPreviousMutant) mutantEditor.setPreviousMutantCode(cut, previousMutantCode);
+   else mutantEditor.setMutantCodeForClass(cut); %>
 
 <% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)) { %>
     <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
@@ -59,18 +63,13 @@
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 <% mutantProgressBar.setGameId(game.getId()); %>
 
+<% if (hasPreviousMutant) { %>
+    <jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+    <% errorHighlighting.setCodeDivSelector("#newmut-div"); %>
+    <% errorHighlighting.setErrorLines(errorLines); %>
+<% } %>
+
 <%
-    /* mutant_editor */
-    if (previousMutantCode != null) {
-        mutantEditor.setPreviousMutantCode(cut, previousMutantCode);
-
-        /* error_highlighting */
-        request.setAttribute("codeDivSelectorForError", "#newmut-div");
-        request.setAttribute("errorLines", errorLines);
-    } else {
-        mutantEditor.setMutantCodeForClass(cut);
-    }
-
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
