@@ -28,7 +28,7 @@
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     Role role = game.getRole(login.getUserId());
-    int gameId = (int) request.getAttribute("gameId");
+    int gameId = game.getId();
 %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>

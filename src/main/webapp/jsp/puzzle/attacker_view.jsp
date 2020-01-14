@@ -30,6 +30,7 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="java.util.ArrayList" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -76,6 +77,13 @@
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 <% mutantProgressBar.setGameId(game.getId()); %>
 
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+        game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
+<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
+<% mutantAccordion.setEnableFlagging(false); %>
+<% mutantAccordion.setViewDiff(true); %>
+
 <%
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
@@ -85,16 +93,6 @@
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }
-
-    /* mutants_list */
-    request.setAttribute("mutantsAlive", game.getAliveMutants());
-    request.setAttribute("mutantsKilled", game.getKilledMutants());
-    request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
-    request.setAttribute("mutantsMarkedEquivalent", new LinkedList<Mutant>());
-    request.setAttribute("markEquivalent", false);
-    request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", GameMode.PUZZLE);
-    request.setAttribute("gameId", game.getId());
 
     /* finished_modal TODO */
 %>

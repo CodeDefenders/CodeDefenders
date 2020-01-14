@@ -20,9 +20,6 @@
 --%>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
-
-<%-- TODO: list parameters --%>
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
@@ -45,18 +42,12 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<%-- Set request attributes for the components. --%>
-<%
-	/* mutants_list */
-	request.setAttribute("mutantsAlive", game.getAliveMutants());
-	request.setAttribute("mutantsKilled", game.getKilledMutants());
-	request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
-	request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-	request.setAttribute("markEquivalent", false);
-	request.setAttribute("viewDiff", true);
-	request.setAttribute("gameType", GameMode.PARTY);
-	request.setAttribute("gameId", game.getId());
-%>
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+		game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
+<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
+<% mutantAccordion.setEnableFlagging(false); %>
+<% mutantAccordion.setViewDiff(true); %>
 
 </div> <%-- TODO move the whole div here after changing the header --%>
 

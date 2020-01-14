@@ -31,59 +31,32 @@
 
 <%--
     Displays three tabs with a list of alive, killed and equivalent mutants respectively.
-
-    @param Boolean markEquivalent
-        Enable marking mutants as equivalent.
-    @param Boolean viewDiff
-        Enable viewing of the mutants diffs.
-    @param List<Mutant> mutantsAlive
-        The list of alive Mutants to display.
-    @param List<Mutant> mutantsKilled
-        The list of killed Mutants to display.
-    @param List<Mutant> mutantsEquivalent
-        The list of equivalent Mutants to display.
-    @param GameMode gameType
-        Type of the game. Used for the "Claim Equivalent" URLs and dialog message.
-        TODO find a better solution for this
-    @param int gameId
-        The game id of this currently played game. Used for URL parameters.
 --%>
 
-<% { %>
-
-<%
-    List<Mutant> mutantsAlive = (List<Mutant>) request.getAttribute("mutantsAlive");
-    List<Mutant> mutantsKilled = (List<Mutant>) request.getAttribute("mutantsKilled");
-    List<Mutant> mutantsMarkedEquivalent = (List<Mutant>) request.getAttribute("mutantsMarkedEquivalent");
-    List<Mutant> mutantsEquivalent = (List<Mutant>) request.getAttribute("mutantsEquivalent");
-    Boolean markEquivalent = (Boolean) request.getAttribute("markEquivalent");
-    Boolean viewDiff = (Boolean) request.getAttribute("viewDiff");
-    GameMode gameType = (GameMode) request.getAttribute("gameType");
-    int gameId = (Integer) request.getAttribute("gameId");
-%>
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 
 <div class="tabs bg-minus-3" role="tablist">
     <div class="crow fly no-gutter down">
         <div>
-            <a class="tab-link button text-black" href="#mutalivetab" role="tab" data-toggle="tab">Alive (<%= mutantsAlive.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutalivetab" role="tab" data-toggle="tab">Alive (${mutantAccordion.aliveMutants.size()})</a>
         </div>
 
         <div>
-            <a class="tab-link button text-black" href="#mutkilledtab" role="tab" data-toggle="tab">Killed(<%= mutantsKilled.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutkilledtab" role="tab" data-toggle="tab">Killed(${mutantAccordion.killedMutants.size()})</a>
         </div>
 
         <div>
-            <a class="tab-link button text-black" href="#mutmarkedequivtab" role="tab" data-toggle="tab">Flagged(<%= mutantsMarkedEquivalent.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutmarkedequivtab" role="tab" data-toggle="tab">Flagged(${mutantAccordion.flaggedMutants.size()})</a>
         </div>
 
         <div>
-            <a class="tab-link button text-black" href="#mutequivtab" role="tab" data-toggle="tab">Equivalent(<%= mutantsEquivalent.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutequivtab" role="tab" data-toggle="tab">Equivalent(${mutantAccordion.equivalentMutants.size()})</a>
         </div>
     </div>
 
     <div class="tab-content">
         <div class="tab-pane fade active in" id="mutalivetab">
-            <% if (! mutantsAlive.isEmpty()) { %>
+            <% if (mutantAccordion.hasAliveMutants()) { %>
                 <table id="alive-mutants" class="mutant-table display dataTable table table-striped table-hover table-responsive table-paragraphs bg-white">
                     <thead>  <%-- needed for datatable apparently --%>
                         <tr>
@@ -97,7 +70,7 @@
 
                     <%
                         // Sorting mutants
-                        List<Mutant> sortedMutants = new ArrayList<>(mutantsAlive);
+                        List<Mutant> sortedMutants = new ArrayList<>(mutantAccordion.getAliveMutants());
                         sortedMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedMutants) {
                     %>
@@ -113,18 +86,18 @@
                             </td>
                             <td class="col-sm-1">
                                 <%
-                                    if (markEquivalent
+                                    if (mutantAccordion.getEnableFlagging()
                                         && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
                                         && m.isCovered()
                                         && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                                        && gameType == GameMode.PARTY
+                                        && mutantAccordion.getGameMode() == GameMode.PARTY
                                         && m.getLines().size() >= 1) {
                                                 String lineString = String.join(",", m.getLines().stream().map(String::valueOf).collect(Collectors.toList()));
                                 %>
                                 <form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm('This will mark all player-created mutants on line(s) <%= lineString %> as equivalent. Are you sure?');">
                                     <input type="hidden" name="formType" value="claimEquivalent">
                                     <input type="hidden" name="equivLines" value="<%=lineString%>">
-                                    <input type="hidden" name="gameId" value="<%=gameId%>">
+                                    <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">
                                     <button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
                                 </form>
                                 <%
@@ -134,7 +107,7 @@
                                     <span>Flagged Equivalent</span>
                                 <%  } %>
 
-                                <% if (viewDiff){ %>
+                                <% if (mutantAccordion.getViewDiff()){ %>
                                 <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>"
                                    data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
                                     <div id="modalMut<%=m.getId()%>" class="modal mutant-modal fade" role="dialog"
@@ -174,7 +147,7 @@
         </div>
 
         <div class="tab-pane fade" id="mutkilledtab">
-            <% if (! mutantsKilled.isEmpty()) { %>
+            <% if (mutantAccordion.hasKilledMutants()) { %>
                 <table id="killed-mutants" class="mutant-table display dataTable table table-striped table-responsive table-paragraphs bg-white">
                     <thead>  <%-- needed for datatable apparently --%>
                         <tr>
@@ -189,7 +162,7 @@
 
                     <%
                         // Sorting mutants
-                        List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilled);
+                        List<Mutant> sortedKilledMutants = new ArrayList<>(mutantAccordion.getKilledMutants());
                         sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedKilledMutants) {
                     %>
@@ -298,7 +271,7 @@
         </div>
 
         <div class="tab-pane fade" id="mutmarkedequivtab">
-            <% if (! mutantsMarkedEquivalent.isEmpty()) { %>
+            <% if (mutantAccordion.hasFlaggedMutants()) { %>
             <table id="killed-mutants" class="mutant-table display dataTable table table-striped table-responsive table-paragraphs bg-white">
                 <thead>  <%-- needed for datatable apparently --%>
                 <tr>
@@ -313,7 +286,7 @@
 
                 <%
                     // Sorting mutants
-                    List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsMarkedEquivalent);
+                    List<Mutant> sortedKilledMutants = new ArrayList<>(mutantAccordion.getFlaggedMutants());
                     sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                     for (Mutant m : sortedKilledMutants) {
                 %>
@@ -328,7 +301,7 @@
                         <h4>points: <%=m.getScore()%></h4>
                     </td>
                     <td class="col-sm-1">
-                        <% if (viewDiff){ %>
+                        <% if (mutantAccordion.getViewDiff()){ %>
                         <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
                         <div id="modalMut<%=m.getId()%>" class="modal mutant-modal fade" role="dialog"
                              style="z-index: 10000;">
@@ -366,7 +339,7 @@
         </div>
 
         <div class="tab-pane fade" id="mutequivtab">
-            <% if (! mutantsEquivalent.isEmpty()) { %>
+            <% if (mutantAccordion.hasEquivalentMutants()) { %>
             <table id="equiv-mutants" class="mutant-table display dataTable table table-striped table-hover table-responsive table-paragraphs bg-white">
 
                 <thead>  <%-- needed for datatable apparently --%>
@@ -382,7 +355,7 @@
 
                     <%
                         // Sorting mutants
-                        List<Mutant> sortedMutantsEquiv = new ArrayList<>(mutantsEquivalent);
+                        List<Mutant> sortedMutantsEquiv = new ArrayList<>(mutantAccordion.getEquivalentMutants());
                         sortedMutantsEquiv.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedMutantsEquiv) {
                     %>
@@ -467,5 +440,3 @@
         }
     });
 </script>
-
-<% } %>

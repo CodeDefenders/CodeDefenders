@@ -71,19 +71,12 @@
     <% errorHighlighting.setErrorLines(errorLines); %>
 <% } %>
 
-<%-- Set request attributes for the components. --%>
-
-<%
-    /* mutants_list */
-    request.setAttribute("mutantsAlive", game.getAliveMutants());
-    request.setAttribute("mutantsKilled", game.getKilledMutants());
-    request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
-    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-    request.setAttribute("markEquivalent", true);
-    request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
-    request.setAttribute("gameType", GameMode.PARTY);
-    request.setAttribute("gameId", game.getId());
-%>
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+        game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
+<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
+<% mutantAccordion.setEnableFlagging(true); %>
+<% mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY); %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">

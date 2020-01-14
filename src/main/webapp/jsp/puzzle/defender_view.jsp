@@ -75,6 +75,13 @@
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
 
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+        game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
+<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
+<% mutantAccordion.setEnableFlagging(false); %>
+<% mutantAccordion.setViewDiff(true); %>
+
 <%
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -84,16 +91,6 @@
     } else {
         testEditor.setTestCodeForClass(cut);
     }
-
-    /* mutants_list */
-    request.setAttribute("mutantsAlive", game.getAliveMutants());
-    request.setAttribute("mutantsKilled", game.getKilledMutants());
-    request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
-    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-    request.setAttribute("markEquivalent", false);
-    request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", GameMode.PUZZLE);
-    request.setAttribute("gameId", game.getId());
 %>
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
