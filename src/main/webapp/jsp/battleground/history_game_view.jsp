@@ -100,6 +100,14 @@
 %>
 
 
+<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
+<%
+    scoreboard.setGameId(game.getId());
+    scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+    scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+%>
+
+
 
 
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
