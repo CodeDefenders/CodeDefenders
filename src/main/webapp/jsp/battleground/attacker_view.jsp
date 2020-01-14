@@ -18,13 +18,11 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="java.util.List" %>
 
 <%-- TODO: list parameters --%>
 
@@ -32,15 +30,10 @@
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
 
-    String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-
-    List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-
-    boolean hasPreviousMutant = previousMutantCode != null;
     boolean showTestAccordion = game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED);
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
 
@@ -49,8 +42,9 @@
 <%
     mutantEditor.setClassName(cut.getName());
     mutantEditor.setDependenciesForClass(game.getCUT());
-    if (hasPreviousMutant) {
-        mutantEditor.setPreviousMutantCode(previousMutantCode);
+    if (previousSubmission.hasMutant()) {
+        mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
+        previousSubmission.clearMutant();
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }
@@ -68,9 +62,10 @@
 
 <jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    if (hasPreviousMutant) {
-        errorHighlighting.setCodeDivSelector("#newmut-div");
-        errorHighlighting.setErrorLines(errorLines);
+    errorHighlighting.setCodeDivSelector("#newmut-div");
+    if (previousSubmission.hasErrorLines()) {
+        errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+        previousSubmission.clearErrorLines();
     }
 %>
 

@@ -30,8 +30,6 @@ import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
 import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
 import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
 import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
@@ -51,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.PuzzleDAO;
@@ -117,6 +116,9 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private LoginBean login;
 
+    @Inject
+    private PreviousSubmissionBean previousSubmission;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final PuzzleGame game;
@@ -176,8 +178,7 @@ public class PuzzleGameManager extends HttpServlet {
         final String action = ServletUtils.formType(request);
         switch (action) {
             case "reset":
-                session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-                session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
+                previousSubmission.clear();
                 Redirect.redirectBack(request, response);
                 break;
             case "createTest":
@@ -273,7 +274,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             messages.getBridge().addAll(validationMessage);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+            previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
         }
@@ -283,13 +284,13 @@ public class PuzzleGameManager extends HttpServlet {
             newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(), MODE_PUZZLE_DIR);
         } catch (IOException e) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+            previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
         }
         if (newTest == null) {
             messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+            previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
         }
@@ -298,7 +299,7 @@ public class PuzzleGameManager extends HttpServlet {
         if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+            previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
         }
@@ -307,13 +308,13 @@ public class PuzzleGameManager extends HttpServlet {
         if (!testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+            previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
         }
 
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-        session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
+        previousSubmission.clearTest();
 
         mutationTester.runTestOnAllMutants(game, newTest, messages.getBridge());
 
@@ -441,14 +442,14 @@ public class PuzzleGameManager extends HttpServlet {
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
                 messages.add(existingMutantTarget.message);
             }
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+            previousSubmission.setMutantCode(mutantText);
             Redirect.redirectBack(request, response);
             return;
         }
         final Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, login.getUserId(), MODE_PUZZLE_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+            previousSubmission.setMutantCode(mutantText);
             logger.error("Error creating mutant for puzzle game. Game: {}, Class: {}, User: {}. Aborting.", gameId, game.getClassId(), login.getUserId(), mutantText);
             Redirect.redirectBack(request, response);
             return;
@@ -475,13 +476,13 @@ public class PuzzleGameManager extends HttpServlet {
             if (errorMessage != null) {
                 messages.add(errorMessage);
             }
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+            previousSubmission.setMutantCode(mutantText);
             Redirect.redirectBack(request, response);
             return;
         }
 
         messages.add(MUTANT_COMPILED_MESSAGE);
-        session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+        previousSubmission.clearMutant();
         mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
 
         MutantTestedEvent mte = new MutantTestedEvent();

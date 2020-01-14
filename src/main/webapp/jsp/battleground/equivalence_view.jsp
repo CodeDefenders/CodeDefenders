@@ -33,11 +33,9 @@
 
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
-
-    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    boolean hasPreviousTest = previousTestCode != null;
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
 
@@ -53,8 +51,8 @@
 <%
     testEditor.setEditableLinesForClass(cut);
     testEditor.setMockingEnabled(cut.isMockingEnabled());
-    if (hasPreviousTest) {
-        testEditor.setPreviousTestCode(previousTestCode);
+    if (previousSubmission.hasTest()) {
+        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
     } else {
         testEditor.setTestCodeForClass(cut);
     }

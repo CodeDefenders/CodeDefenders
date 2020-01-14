@@ -23,7 +23,6 @@
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
-<%@ page import="static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
@@ -51,11 +50,9 @@
     final String description = puzzle.getDescription();
 
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
-
-    String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-    request.getSession().removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-    boolean hasPreviousMutant = previousMutantCode != null;
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
 
@@ -65,8 +62,10 @@
     mutantEditor.setDependenciesForClass(game.getCUT());
     mutantEditor.setClassName(cut.getName());
     mutantEditor.setEditableLinesForPuzzle(puzzle);
-    if (hasPreviousMutant) {
-        mutantEditor.setPreviousMutantCode(previousMutantCode);
+    if (previousSubmission.hasMutant()) {
+        mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
+        previousSubmission.clearMutant();
+        previousSubmission.clearErrorLines(); // TODO: move this to error highlighting bean
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }

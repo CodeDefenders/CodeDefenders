@@ -27,8 +27,8 @@
 
 <%
     {
-				int gameId = (Integer) request.getAttribute("gameId");
 				MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+				int gameId = game.getId();
 				Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
 <script>

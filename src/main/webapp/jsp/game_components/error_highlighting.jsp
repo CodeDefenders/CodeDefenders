@@ -27,7 +27,7 @@
 
 <jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
-<% if(errorHighlighting.hasCodeDivSelector()) { %>
+<% if(errorHighlighting.hasErrorLines()) { %>
 <script>
     /* Wrap in a function so it has it's own scope. Inspired by game_highlighting.jsp*/
     (function () {

@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.games.battleground;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
@@ -98,9 +99,6 @@ import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
@@ -143,6 +141,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private LoginBean login;
+
+    @Inject
+    private PreviousSubmissionBean previousSubmission;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -221,8 +222,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             case "reset": {
-                final HttpSession session = request.getSession();
-                session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+                previousSubmission.clear();
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -322,7 +322,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> test = ServletUtils.getStringParameter(request, "test");
         if (!test.isPresent()) {
-            session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
+            previousSubmission.clearTest();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -347,7 +347,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         if (!validationSuccess) {
             messages.getBridge().addAll(validationMessage);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -358,7 +358,7 @@ public class MultiplayerGameManager extends HttpServlet {
             newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(), MODE_BATTLEGROUND_DIR);
         } catch (IOException io) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -410,7 +410,7 @@ public class MultiplayerGameManager extends HttpServlet {
             if (!validatedCoveredLines) { // || !validatedKilledMutants
                 messages.add(userIntentionsValidationMessage.toString());
                 // Keep the test around
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -433,12 +433,12 @@ public class MultiplayerGameManager extends HttpServlet {
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
-            session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
+            previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml);
             messages.add(decorate);
             //
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -447,7 +447,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -535,7 +535,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
         if (!mutant.isPresent()) {
-            session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+            previousSubmission.clearMutant();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -549,7 +549,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 && (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
             messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
             // Keep the mutant code in the view for later
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+            previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -594,7 +594,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
                 messages.add(existingMutantTarget.message);
             }
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+            previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -602,7 +602,7 @@ public class MultiplayerGameManager extends HttpServlet {
         Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, login.getUserId(), MODE_BATTLEGROUND_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+            previousSubmission.setMutantCode(mutantText);
             logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}", gameId, game.getClassId(), login.getUserId(), mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -633,13 +633,13 @@ public class MultiplayerGameManager extends HttpServlet {
                 // Extract the line numbers of the errors
                 List<Integer> errorLines = extractErrorLines(errorMessage);
                 // Store them in the session so they can be picked up later
-                session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
+                previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml);
                 messages.add(decorate);
 
             }
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+            previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -663,14 +663,14 @@ public class MultiplayerGameManager extends HttpServlet {
             // This parameter is required !
             if (intention == null) {
                 messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+                previousSubmission.setMutantCode(mutantText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
             collectAttackerIntentions(newMutant, intention);
         }
         // Clean the mutated code only if mutant is accepted
-        session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+        previousSubmission.clearMutant();
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
@@ -756,7 +756,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Reject equivalence and submit killing test case
             final Optional<String> test = ServletUtils.getStringParameter(request, "test");
             if (!test.isPresent()) {
-                session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
+                previousSubmission.clearTest();
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -783,7 +783,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             if (!validationSuccess) {
                 messages.getBridge().addAll(validationMessage);
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -794,7 +794,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(), MODE_BATTLEGROUND_DIR);
             } catch (IOException io) {
                 messages.add(TEST_GENERIC_ERROR_MESSAGE);
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -803,7 +803,7 @@ public class MultiplayerGameManager extends HttpServlet {
             final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
             if (!equivMutantId.isPresent()) {
                 logger.info("Missing equivMutantId parameter.");
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -818,7 +818,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 if (compileTestTarget != null) {
                     messages.add(compileTestTarget.message);
                 }
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -828,7 +828,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 logger.debug("testOriginalTarget: " + testOriginalTarget);
                 messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
                 messages.add(testOriginalTarget.message);
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }

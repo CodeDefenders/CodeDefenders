@@ -52,8 +52,6 @@
 
     final GameClass cut = game.getCUT();
     Role role = game.getRole(login.getUserId());
-
-    request.setAttribute("game", game);
 %>
 
 

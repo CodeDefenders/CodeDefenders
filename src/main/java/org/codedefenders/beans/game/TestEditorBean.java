@@ -38,7 +38,7 @@ public class TestEditorBean {
     }
 
     public void setPreviousTestCode(String previousTestCode) {
-        testCode = previousTestCode;
+        testCode = StringEscapeUtils.escapeHtml(previousTestCode);
     }
 
     public void setEditableLinesForClass(GameClass clazz) {

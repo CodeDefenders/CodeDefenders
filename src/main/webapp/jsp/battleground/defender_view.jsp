@@ -18,28 +18,20 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="java.util.List" %>
 
 <%-- TODO: list parameters --%>
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
-
-    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-
-    List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-
-    boolean hasPreviousTest = previousTestCode != null;
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
 
@@ -55,8 +47,9 @@
 <%
     testEditor.setEditableLinesForClass(cut);
     testEditor.setMockingEnabled(cut.isMockingEnabled());
-    if (hasPreviousTest) {
-        testEditor.setPreviousTestCode(previousTestCode);
+    if (previousSubmission.hasTest()) {
+        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
+        previousSubmission.clearTest();
     } else {
         testEditor.setTestCodeForClass(cut);
     }
@@ -74,9 +67,10 @@
 
 <jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    if (hasPreviousTest) {
-        errorHighlighting.setCodeDivSelector("#utest-div");
-        errorHighlighting.setErrorLines(errorLines);
+    errorHighlighting.setCodeDivSelector("#utest-div");
+    if (previousSubmission.hasErrorLines()) {
+        errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+        previousSubmission.clearErrorLines();
     }
 %>
 

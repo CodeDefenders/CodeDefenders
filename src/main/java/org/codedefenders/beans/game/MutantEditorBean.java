@@ -44,7 +44,7 @@ public class MutantEditorBean {
     }
 
     public void setPreviousMutantCode(String previousMutantCode) {
-        mutantCode = previousMutantCode;
+        mutantCode = StringEscapeUtils.escapeHtml(previousMutantCode);
     }
 
     public void setDependenciesForClass(GameClass clazz) {

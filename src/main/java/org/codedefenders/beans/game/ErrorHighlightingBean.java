@@ -31,8 +31,8 @@ public class ErrorHighlightingBean {
 
     // --------------------------------------------------------------------------------
 
-    public boolean hasCodeDivSelector() {
-        return codeDivSelector != null;
+    public boolean hasErrorLines() {
+        return errorLines != null;
     }
 
     public String getCodeDivSelector() {

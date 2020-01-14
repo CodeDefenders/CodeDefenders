@@ -42,13 +42,6 @@
     scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
-<%-- Set request attributes for the components. --%>
-<%
-    /* playerFeedback & game_notifications */
-    request.setAttribute("gameId", game.getId());
-    // playerId already set in servlet.
-    // request.setAttribute("playerId", playerId);
-%>
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
 
 <%-- Push notifications using WebSocket --%>

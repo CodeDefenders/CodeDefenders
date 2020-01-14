@@ -46,11 +46,9 @@
 
     final String title = puzzle.getTitle();
     final String description = puzzle.getDescription();
-
-    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    boolean hasPreviousTest = previousTestCode != null;
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
 
@@ -66,8 +64,10 @@
 <%
     testEditor.setEditableLinesForPuzzle(puzzle);
     testEditor.setMockingEnabled(false);
-    if (hasPreviousTest) {
-        testEditor.setPreviousTestCode(previousTestCode);
+    if (previousSubmission.hasTest()) {
+        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
+        previousSubmission.clearTest();
+        previousSubmission.clearErrorLines(); // TODO: move this to error highlighting bean
     } else {
         testEditor.setTestCodeForClass(cut);
     }

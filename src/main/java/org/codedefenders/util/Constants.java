@@ -167,10 +167,6 @@ public class Constants {
     public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant survived its first test.";
     public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
 
-    public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
-    public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
-    public static final String SESSION_ATTRIBUTE_ERROR_LINES = "errorLines";
-
     // Request attributes
     public static final String REQUEST_ATTRIBUTE_PUZZLE_GAME = "active_user_puzzle_game";
 
