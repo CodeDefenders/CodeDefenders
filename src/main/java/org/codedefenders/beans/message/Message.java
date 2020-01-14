@@ -1,9 +1,11 @@
 package org.codedefenders.beans.message;
 
+import java.io.Serializable;
+
 /**
  * Represents a message shown on to a user on page load.
  */
-public class Message {
+public class Message implements Serializable {
     private long id;
     private String text;
     private boolean fadeOut;
