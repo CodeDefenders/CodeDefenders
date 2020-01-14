@@ -53,7 +53,7 @@ public class AdminAnalyticsKillMapsApi extends HttpServlet {
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String type = request.getParameter("fileType");
+        String type = request.getParameter("filetype");
         if (type == null) {
             type = "json";
         }
