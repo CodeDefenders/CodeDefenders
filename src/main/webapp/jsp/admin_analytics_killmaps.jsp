@@ -44,9 +44,9 @@
     </table>
 
     <div class="btn-group">
-        <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?filetype=csv"
+        <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
             type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?filetype=json"
+        <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
     <div style="display: inline-block; margin-left: 10px;">
