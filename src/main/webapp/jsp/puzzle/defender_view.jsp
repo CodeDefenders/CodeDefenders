@@ -24,9 +24,6 @@
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="java.util.LinkedList" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 
 <%--
@@ -41,7 +38,6 @@
 
 </div></div></div></div></div>
 
-<%-- Set request attributes for the components. --%>
 <%
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
@@ -50,48 +46,66 @@
 
     final String title = puzzle.getTitle();
     final String description = puzzle.getDescription();
-%>
 
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<% classViewer.setClassCode(game.getCUT()); %>
-<% classViewer.setDependenciesForClass(game.getCUT()); %>
-
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<% testEditor.setEditableLinesForPuzzle(puzzle); %>
-<% testEditor.setMockingEnabled(false); %>
-
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
-
-<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
-<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
-<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
-<% gameHighlighting.setEnableFlagging(true); %>
-<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
-
-<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
-<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
-
-<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
-<% testProgressBar.setGameId(game.getId()); %>
-
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
-        game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
-<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
-<% mutantAccordion.setEnableFlagging(false); %>
-<% mutantAccordion.setViewDiff(true); %>
-
-<%
-    /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    if (previousTestCode != null) {
+    boolean hasPreviousTest = previousTestCode != null;
+%>
+
+
+
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<%
+    testEditor.setEditableLinesForPuzzle(puzzle);
+    testEditor.setMockingEnabled(false);
+    if (hasPreviousTest) {
         testEditor.setPreviousTestCode(previousTestCode);
     } else {
         testEditor.setTestCodeForClass(cut);
     }
 %>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(true);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+            game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+    mutantAccordion.setEnableFlagging(false);
+    mutantAccordion.setViewDiff(true);
+%>
+
+
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
+
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 

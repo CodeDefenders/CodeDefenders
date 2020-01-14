@@ -21,33 +21,51 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 
+<%-- TODO: list parameters --%>
+
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 	final GameClass cut = game.getCUT();
 %>
 
+
+
+
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<% classViewer.setClassCode(game.getCUT()); %>
-<% classViewer.setDependenciesForClass(game.getCUT()); %>
+<%
+	classViewer.setClassCode(game.getCUT());
+	classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+	gameHighlighting.setGameData(game.getMutants(), game.getTests());
+	gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+	gameHighlighting.setEnableFlagging(false);
+	gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+	mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+			game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+	mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+	mutantAccordion.setEnableFlagging(false);
+	mutantAccordion.setViewDiff(true);
+%>
+
 
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
 
-<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
-<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
-<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
-<% gameHighlighting.setEnableFlagging(false); %>
-<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
-		game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
-<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
-<% mutantAccordion.setEnableFlagging(false); %>
-<% mutantAccordion.setViewDiff(true); %>
+
+
 
 </div> <%-- TODO move the whole div here after changing the header --%>
 

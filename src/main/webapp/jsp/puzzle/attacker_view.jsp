@@ -24,13 +24,8 @@
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
 <%@ page import="static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT" %>
-<%@ page import="java.util.LinkedList" %>
-<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="java.util.ArrayList" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -39,13 +34,13 @@
     @param PuzzleGame Constants#REQUEST_ATTRIBUTE_PUZZLE_GAME
         The puzzle game to be displayed.
 --%>
+
 <jsp:include page="/jsp/header_main.jsp"/>
 
 </div></div></div></div></div>
 
 <div class="game-container">
 
-<%-- Set request attributes for the components. --%>
 <%
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
@@ -54,48 +49,66 @@
 
     final String title = puzzle.getTitle();
     final String description = puzzle.getDescription();
+
+    boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
+
+    String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+    request.getSession().removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+    boolean hasPreviousMutant = previousMutantCode != null;
 %>
 
-<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
-<% mutantEditor.setDependenciesForClass(game.getCUT()); %>
-<% mutantEditor.setEditableLinesForPuzzle(puzzle); %>
 
-<% if (game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED) { %>
-    <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
-    <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
-<% } %>
+
+
+<jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
+<%
+    mutantEditor.setDependenciesForClass(game.getCUT());
+    mutantEditor.setClassName(cut.getName());
+    mutantEditor.setEditableLinesForPuzzle(puzzle);
+    if (hasPreviousMutant) {
+        mutantEditor.setPreviousMutantCode(previousMutantCode);
+    } else {
+        mutantEditor.setMutantCodeForClass(cut);
+    }
+%>
+
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
-<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
-<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
-<% gameHighlighting.setEnableFlagging(false); %>
-<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
 
-<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
-<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+             game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+    mutantAccordion.setEnableFlagging(false);
+    mutantAccordion.setViewDiff(true);
+%>
+
+
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<%
+    if (showTestAccordion) {
+        testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants());
+    }
+%>
+
 
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 <% mutantProgressBar.setGameId(game.getId()); %>
 
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
-        game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
-<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
-<% mutantAccordion.setEnableFlagging(false); %>
-<% mutantAccordion.setViewDiff(true); %>
 
-<%
-    /* mutant_editor */
-    String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-    request.getSession().removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-    if (previousMutantCode != null) {
-        mutantEditor.setPreviousMutantCode(cut, previousMutantCode);
-    } else {
-        mutantEditor.setMutantCodeForClass(cut);
-    }
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-    /* finished_modal TODO */
-%>
+
+
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
@@ -111,7 +124,7 @@
             <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
-        <% if (game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED) { %>
+        <% if (showTestAccordion) { %>
         <div id="tests-div">
             <h3>JUnit tests</h3>
             <jsp:include page="/jsp/game_components/test_accordion.jsp"/>

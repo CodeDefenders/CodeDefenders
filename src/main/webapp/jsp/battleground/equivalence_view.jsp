@@ -21,7 +21,6 @@
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
@@ -31,41 +30,55 @@
 <%
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     User equivDefender = (User) request.getAttribute("equivDefender");
+
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
-%>
 
-<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<% classViewer.setClassCode(game.getCUT()); %>
-<% classViewer.setDependenciesForClass(game.getCUT()); %>
-
-<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<% testEditor.setEditableLinesForClass(cut); %>
-<% testEditor.setMockingEnabled(cut.isMockingEnabled()); %>
-
-<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
-<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
-<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
-<% gameHighlighting.setEnableFlagging(false); %>
-<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
-
-<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
-<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
-
-<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
-<% testProgressBar.setGameId(game.getId()); %>
-
-<%-- Set request attributes for the components. --%>
-<%
-    /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    if (previousTestCode != null) {
+    boolean hasPreviousTest = previousTestCode != null;
+%>
+
+
+
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<%
+    testEditor.setEditableLinesForClass(cut);
+    testEditor.setMockingEnabled(cut.isMockingEnabled());
+    if (hasPreviousTest) {
         testEditor.setPreviousTestCode(previousTestCode);
     } else {
         testEditor.setTestCodeForClass(cut);
     }
 %>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+
 
 <div class="row">
     <div class="col-md-6" id="equivmut-div">

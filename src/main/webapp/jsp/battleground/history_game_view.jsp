@@ -32,6 +32,8 @@
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
+<%-- TODO: list parameters --%>
+
 <%
     MultiplayerGame game;
     {
@@ -54,32 +56,51 @@
     request.setAttribute("game", game);
 %>
 
+
+
+
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<% classViewer.setClassCode(game.getCUT()); %>
-<% classViewer.setDependenciesForClass(game.getCUT()); %>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+            game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+    mutantAccordion.setEnableFlagging(false);
+    mutantAccordion.setViewDiff(true);
+%>
+
 
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
 
-<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
-<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
-<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
-<% gameHighlighting.setEnableFlagging(false); %>
-<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
-
-<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
-<% playerFeedback.setGameInfo(game.getId(), game.getCreatorId()); %>
-<% playerFeedback.setPlayerInfo(login.getUser(), role); %>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
-        game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
-<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
-<% mutantAccordion.setEnableFlagging(false); %>
-<% mutantAccordion.setViewDiff(true); %>
+
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
+<%
+    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+    playerFeedback.setPlayerInfo(login.getUser(), role);
+%>
+
+
+
 
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
 

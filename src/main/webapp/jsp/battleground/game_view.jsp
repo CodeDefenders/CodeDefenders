@@ -30,8 +30,10 @@
 %>
 
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
-<% playerFeedback.setGameInfo(game.getId(), game.getCreatorId()); %>
-<% playerFeedback.setPlayerInfo(login.getUser(), role); %>
+<%
+    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+    playerFeedback.setPlayerInfo(login.getUser(), role);
+%>
 
 <%-- Set request attributes for the components. --%>
 <%

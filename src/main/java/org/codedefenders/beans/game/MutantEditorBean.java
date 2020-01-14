@@ -35,13 +35,15 @@ public class MutantEditorBean {
         editableLinesEnd = null;
     }
 
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
     public void setMutantCodeForClass(GameClass clazz) {
-        className = clazz.getName();
         mutantCode = StringEscapeUtils.escapeHtml(clazz.getSourceCode());
     }
 
-    public void setPreviousMutantCode(GameClass clazz, String previousMutantCode) {
-        className = clazz.getName();
+    public void setPreviousMutantCode(String previousMutantCode) {
         mutantCode = previousMutantCode;
     }
 

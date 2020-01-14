@@ -25,58 +25,85 @@
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%-- TODO: list parameters --%>
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
+
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
+
     List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
 
     boolean hasPreviousTest = previousTestCode != null;
 %>
 
+
+
+
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
-<% classViewer.setClassCode(game.getCUT()); %>
-<% classViewer.setDependenciesForClass(game.getCUT()); %>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
 
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
-<% testEditor.setEditableLinesForClass(cut); %>
-<% testEditor.setMockingEnabled(cut.isMockingEnabled()); %>
-<% if (hasPreviousTest) testEditor.setPreviousTestCode(previousTestCode);
-   else testEditor.setTestCodeForClass(cut); %>
+<%
+    testEditor.setEditableLinesForClass(cut);
+    testEditor.setMockingEnabled(cut.isMockingEnabled());
+    if (hasPreviousTest) {
+        testEditor.setPreviousTestCode(previousTestCode);
+    } else {
+        testEditor.setTestCodeForClass(cut);
+    }
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(true);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<%
+    if (hasPreviousTest) {
+        errorHighlighting.setCodeDivSelector("#utest-div");
+        errorHighlighting.setErrorLines(errorLines);
+    }
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+            game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+    mutantAccordion.setEnableFlagging(true);
+    mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
+%>
+
 
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
 
-<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
-<% gameHighlighting.setGameData(game.getMutants(), game.getTests()); %>
-<% gameHighlighting.setFlaggingData(game.getMode(), game.getId()); %>
-<% gameHighlighting.setEnableFlagging(true); %>
-<% gameHighlighting.setCodeDivSelector("#cut-div"); %>
-
-<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
-<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
 
-<% if (hasPreviousTest) { %>
-    <jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
-    <% errorHighlighting.setCodeDivSelector("#utest-div"); %>
-    <% errorHighlighting.setErrorLines(errorLines); %>
-<% } %>
 
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<% mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
-        game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending()); %>
-<% mutantAccordion.setFlaggingData(game.getMode(), game.getId()); %>
-<% mutantAccordion.setEnableFlagging(true); %>
-<% mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY); %>
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
