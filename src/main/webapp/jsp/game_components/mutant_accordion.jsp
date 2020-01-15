@@ -19,10 +19,7 @@
 
 --%>
 <%@ page import="org.codedefenders.beans.game.MutantAccordionBean.MutantAccordionCategory" %>
-<%@ page import="com.google.gson.GsonBuilder" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="org.codedefenders.util.JSONUtils" %>
-<%@ page import="org.codedefenders.beans.game.MutantAccordionBean" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 
@@ -106,3 +103,163 @@
     </div>
 </div>
 
+<script>
+    /* Wrap in a function so it has it's own scope. */
+    (function () {
+
+        /** A description and list of mutant ids for each category (method). */
+        const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
+
+        /** Maps mutant ids to their DTO representation. */
+        const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
+
+        /** Maps mutant ids to modals that show the tests' code. */
+        const mutantModals = new Map();
+
+        /* Functions to generate table columns. */
+        const genId             = row => 'Mutant ' + row.id;
+        const genCreator        = row =>  row.creatorName;
+        const genPoints         = row => '<span class="ma-column-name">Points:</span> '  + row.points;
+        const genViewButton     = row => '<button class="ma-view-button btn btn-ssm btn-primary">View</button>';
+        const genIcon           = row => {
+            switch (row.state) {
+                case "ALIVE":
+                    return '<span class=\"mutantCUTImage mutantImageAlive\"></span>';
+                case "KILLED":
+                    return '<span class=\"mutantCUTImage mutantImageKilled\"></span>';
+                case "EQUIVALENT":
+                    return '<span class=\"mutantCUTImage mutantImageEquiv\"></span>';
+                case "FLAGGED":
+                    return '<span class=\"mutantCUTImage mutantImageFlagged\"></span>';
+            }
+        };
+        const genAdditionalButton = row => {
+            switch (row.state) {
+                <% if (mutantAccordion.getEnableFlagging() ) {%>
+                case "ALIVE":
+                    if (row.covered) {
+                    return '<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
+                        '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
+                        '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
+                        '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
+                        '      <button type="submit" class="btn btn-default btn-ssm btn-right">Claim Equivalent</button>\n' +
+                        '   </form>';
+                    } else {
+                        return '';
+                    }
+                <% } %>
+                case "KILLED":
+                    /* TODO Implement Modal for killing test */
+                    return '<a class="btn btn-default btn-ssm btn-diff" <%--data-toggle="modal" data-target="#modalMutKillMessage18995"--%>>View Killing Test</a>';
+                default:
+                    return '';
+            }
+        };
+
+        /**
+         * Returns the test DTO that describes the row of an element in a DataTables row.
+         * @param {HTMLElement} element An HTML element contained in a table row.
+         * @param {object} dataTable The DataTable the row belongs to.
+         * @return {object} The test DTO the row describes.
+         */
+        const rowData = function (element, dataTable) {
+            const row = $(element).closest('tr');
+            return dataTable.row(row).data();
+        };
+
+        /**
+         * Creates a modal to display the given test and shows it.
+         * References to created models are cached in a map so they don't need to be generated again.
+         * @param {object} mutant The test DTO to display.
+         */
+        const viewMutantModal = function (mutant) {
+            let modal = mutantModals.get(mutant.id);
+            if (modal !== undefined) {
+                modal.modal('show');
+                return;
+            }
+
+            modal = $(
+                `<div class="modal mutant-modal fade" role="dialog">
+                    <div class="modal-dialog" style="width: max-content; max-width: 90%; min-width: 500px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Mutant ` + mutant.id + ` (by ` + mutant.creatorName + `)</h4>
+                            </div>
+                            <div class="modal-body">
+                                <pre class="readonly-pre"><textarea name="mutant-` + mutant.id + `"></textarea></pre>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
+            modal.appendTo(document.body);
+            mutantModals.set(mutant.id, modal);
+
+            const textarea = modal.find('textarea').get(0);
+            const editor = CodeMirror.fromTextArea(textarea, {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: "text/x-java",
+                readOnly: true,
+
+            });
+            editor.setSize('max-content', 'max-content');
+
+            <%-- TODO: Is there a better solution for this? --%>
+            /* Refresh the CodeMirror instance once the modal is displayed.
+             * If this is not done, it will display an empty textarea until it is clicked. */
+            new MutationObserver((mutations, observer) => {
+                for (const mutation of mutations) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        editor.refresh();
+                        observer.disconnect();
+                    }
+                }
+            }).observe(modal.get(0), {attributes: true});
+
+            MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
+            modal.modal('show');
+        };
+
+        /* Loop through the categories and create a mutant table for each one. */
+        for (const category of categories) {
+            const rows = category.mutantIds
+                .sort()
+                .map(mutants.get, mutants);
+
+            /* Create the DataTable. */
+            const tableElement = $('#ma-table-' + category.id);
+            const dataTable = tableElement.DataTable({
+                data: rows,
+                columns: [
+                    { data: null, title: '', defaultContent: '' },
+                    { data: genIcon, title: '' },
+                    { data: genId, title: '' },
+                    { data: genCreator, title: '' },
+                    { data: genPoints, title: '' },
+                    { data: genViewButton, title: '' },
+                    { data: genAdditionalButton, title: '' }
+                ],
+                scrollY: '400px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: {
+                    emptyTable: category.id === 'all'
+                        ? 'No mutants.'
+                        : 'No mutants in this method.'
+                }
+            });
+
+            /* Assign function to the "View" buttons. */
+            tableElement.on('click', '.ma-view-button', function () {
+                const test = rowData(this, dataTable);
+                viewMutantModal(test);
+            });
+        }
+    }());
+</script>

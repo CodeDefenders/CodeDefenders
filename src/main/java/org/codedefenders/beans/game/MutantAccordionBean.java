@@ -1,5 +1,6 @@
 package org.codedefenders.beans.game;
 
+import com.google.common.collect.Comparators;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
@@ -37,13 +38,13 @@ public class MutantAccordionBean {
 
     public String jsonFromCategories() {
         Gson gson = new GsonBuilder()
-            .registerTypeAdapter(Map.class, new JSONUtils.MapSerializer())
             .create();
         return gson.toJson(categories);
     }
 
     public String jsonMutants() {
         Map<Integer, MutantAccordionMutantDTO> mutants = new HashMap<>();
+
         for (Mutant mutant : aliveMutants) {
             mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE));
         }
@@ -56,10 +57,36 @@ public class MutantAccordionBean {
         for (Mutant mutant : equivalentMutants) {
             mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT));
         }
+        // TODO If we try to sort the mutants according to the order they appear in the class we need to sort the Ids in the MutantAccordionCategory.
+/*        Map<Integer, MutantAccordionMutantDTO> result =
+            mutants.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(sortedByLineNumberAscending()))
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new)); */
         Gson gson = new GsonBuilder()
-            .registerTypeAdapter(Map.class, new JSONUtils.MapSerializer())
+            // It is important that its LinkedHashMap.class, it doesn't work if I change it to Map.class ...
+            .registerTypeAdapter(LinkedHashMap.class, new JSONUtils.MapSerializer())
             .create();
         return gson.toJson(mutants);
+    }
+
+    public static Comparator<MutantAccordionMutantDTO> sortedByLineNumberAscending() {
+        return (o1, o2) -> {
+            List<Integer> lines1 = o1.lines;
+            List<Integer> lines2 = o2.lines;
+
+            if (lines1.isEmpty()) {
+                if (lines2.isEmpty()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (lines2.isEmpty()) {
+                return 1;
+            }
+
+            return Collections.min(lines1) - Collections.min(lines2);
+        };
     }
 
     public MutantAccordionBean() {
@@ -88,11 +115,11 @@ public class MutantAccordionBean {
 
         categories = new ArrayList<>();
 
-        MutantAccordionCategory allMutants = new MutantAccordionCategory("All mutants", "all");
+        MutantAccordionCategory allMutants = new MutantAccordionCategory("All Mutants", "all");
         allMutants.addMutantIds(getMutants().stream().map(x -> x.id).collect(Collectors.toList()));
         categories.add(allMutants);
 
-        MutantAccordionCategory mutantsWithoutMethod = new MutantAccordionCategory("Mutants without method", "noMethod");
+        MutantAccordionCategory mutantsWithoutMethod = new MutantAccordionCategory("Mutants outside methods", "noMethod");
         categories.add(mutantsWithoutMethod);
 
         List<GameClass.MethodDescription> methodDescriptions = cut.getMethodDescriptions();
@@ -291,12 +318,20 @@ public class MutantAccordionBean {
         private final MutantState state;
         @Expose
         private final int points;
+        @Expose
+        private final String lineString;
+        @Expose
+        private final Boolean covered;
+        private final List<Integer> lines;
 
         public MutantAccordionMutantDTO(Mutant mutant, MutantState state) {
             id = mutant.getId();
             creatorName = mutant.getCreatorName();
             points = mutant.getScore();
             this.state = state;
+            covered = mutant.isCovered();
+            lines = mutant.getLines();
+            lineString = mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(","));
         }
     }
 
