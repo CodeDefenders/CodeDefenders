@@ -45,9 +45,9 @@
     </table>
 
     <div class="btn-group">
-        <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?filetype=csv"
+        <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
             type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?filetype=json"
+        <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=json"
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
 
