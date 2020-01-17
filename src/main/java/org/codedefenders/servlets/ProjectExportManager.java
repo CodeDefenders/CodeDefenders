@@ -48,8 +48,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This {@link HttpServlet} handles requests for exporting a {@link GameClass}
  * as a Gradle project.
- * <p>
- * Serves on path: {@code /project-export}.
+ *
+ * <p>Serves on path: {@code /project-export}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#PROJECT_EXPORT
@@ -70,7 +70,8 @@ public class ProjectExportManager extends HttpServlet {
     };
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         final Optional<Integer> gameId = ServletUtils.gameId(request);
         if (!gameId.isPresent()) {
             Redirect.redirectBack(request, response);
@@ -88,15 +89,16 @@ public class ProjectExportManager extends HttpServlet {
         List<Dependency> dependencies = GameClassDAO.getMappedDependenciesForClassId(cut.getId());
 
         final Set<Path> paths = dependencies
-            .stream()
-            .map(Dependency::getJavaFile)
-            .map(Paths::get)
-            .collect(Collectors.toSet());
+                .stream()
+                .map(Dependency::getJavaFile)
+                .map(Paths::get)
+                .collect(Collectors.toSet());
         paths.add(Paths.get(cut.getJavaFile()));
 
         final Map<String, byte[]> files = new HashMap<>();
         {
-            final String templateFileName = testDir.resolve(packagePath.resolve("Test" + Paths.get(cut.getJavaFile()).getFileName().toString())).toString();
+            String name = "Test" + Paths.get(cut.getJavaFile()).getFileName().toString();
+            final String templateFileName = ProjectExportManager.testDir.resolve(packagePath.resolve(name)).toString();
             final byte[] templateFileContent = cut.getTestTemplate().getBytes();
             files.put(templateFileName, templateFileContent);
         }
