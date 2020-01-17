@@ -20,7 +20,7 @@
 --%>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%  String pageTitle = "Welcome";
+<%  String pageTitle = "Welcome to Code Defenders";
     List<MultiplayerGame> openGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
     Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
 %>

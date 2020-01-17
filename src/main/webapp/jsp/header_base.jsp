@@ -22,7 +22,7 @@
 <html>
 
 <head>
-    <title>Code Defenders<%= pageTitle != null ? " - " + pageTitle : "" %></title>
+    <title><%= pageTitle != null ? pageTitle : "Code Defenders" %></title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
