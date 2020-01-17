@@ -49,31 +49,32 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- * This {@link HttpServlet} handles admin management of puzzles.
- * <p>
- * {@code GET} requests redirect to the admin puzzle page
+ * This {@link HttpServlet} handles admin upload of puzzles.
+ *
+ * <p>{@code GET} requests redirect to the admin puzzle upload page.
  * and {@code POST} requests handle batch uploading puzzle related information.
- * <p>
- * Serves under {@code /admin/puzzles}.
+ *
+ * <p>Serves under {@code /admin/puzzles/upload}.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  */
-@WebServlet("/admin/puzzles")
-public class AdminPuzzleManager extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleManager.class);
+@WebServlet("/admin/puzzles/upload")
+public class AdminPuzzleUpload extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleUpload.class);
 
     @Inject
     private BackendExecutorService backend;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher(Constants.ADMIN_PUZZLE_JSP).forward(request, response);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.getRequestDispatcher(Constants.ADMIN_PUZZLE_UPLOAD_JSP).forward(request, response);
     }
 
     @SuppressWarnings("Duplicates")
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         List<FileItem> items;
         try {
             items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
@@ -83,7 +84,9 @@ public class AdminPuzzleManager extends HttpServlet {
             return;
         }
 
-        final Map<Boolean, List<FileItem>> parameters = items.stream().collect(Collectors.partitioningBy(FileItem::isFormField));
+        final Map<Boolean, List<FileItem>> parameters = items
+                .stream()
+                .collect(Collectors.partitioningBy(FileItem::isFormField));
         final List<FileItem> uploadParameters = parameters.get(true);
         final List<FileItem> fileParameters = parameters.get(false);
 

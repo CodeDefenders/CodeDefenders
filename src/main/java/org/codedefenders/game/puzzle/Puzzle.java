@@ -139,6 +139,19 @@ public class Puzzle {
         this.chapter = null;
     }
 
+    public static Puzzle forPuzzleInfo(int puzzleId,
+                                       Integer chapterId,
+                                       Integer position,
+                                       String title,
+                                       String description,
+                                       int maxAssertionsPerTest,
+                                       boolean forceHamcrest,
+                                       Integer editableLinesStart,
+                                       Integer editableLinesEnd) {
+        return new Puzzle(puzzleId, -1, null, null, maxAssertionsPerTest, forceHamcrest,
+            null, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+    }
+
     public int getPuzzleId() {
         return puzzleId;
     }
@@ -178,11 +191,11 @@ public class Puzzle {
     public void setMaxAssertionsPerTest(int maxAssertionsPerTest) {
         this.maxAssertionsPerTest = maxAssertionsPerTest;
     }
-    
+
     public boolean isForceHamcrest() {
         return this.forceHamcrest;
     }
-    
+
     public void setForceHamcrest(boolean forceHamcrest) {
         this.forceHamcrest = forceHamcrest;
     }
@@ -250,7 +263,7 @@ public class Puzzle {
      */
     public PuzzleChapter getChapter() {
         if (chapterId != null && chapter == null) {
-           chapter = PuzzleDAO.getPuzzleChapterForId(chapterId);
+            chapter = PuzzleDAO.getPuzzleChapterForId(chapterId);
         }
         return chapter;
     }
