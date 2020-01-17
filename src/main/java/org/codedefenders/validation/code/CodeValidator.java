@@ -22,7 +22,6 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -73,9 +72,9 @@ import difflib.DiffUtils;
 /**
  * This class offers static methods to validate code, primarily checking validity of tests and mutants.
  *
- * Use {@link #validateTestCodeGetMessage(String, int, boolean)} to validate test code with a boolean result value.
+ * <p>Use {@link #validateTestCodeGetMessage(String, int, boolean)} to validate test code with a boolean result value.
  *
- * Use {@link #validateMutantGetMessage(String, String, CodeValidatorLevel)} to validate
+ * <p>Use {@link #validateMutantGetMessage(String, String, CodeValidatorLevel)} to validate
  * mutants and get a {@link ValidationMessage} back.
  *
  * @author Jose Rojas
@@ -90,16 +89,17 @@ public class CodeValidator {
 
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
-    public final static String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
-    private final static String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
-    private final static String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
-    private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
+    public static final String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
+    private static final String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
+    private static final String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
+    private static final String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
     // This is package protected to enable TestCodeVisitor to check for prohibited call as well
-    final static String[] PROHIBITED_CALLS = {
-            "System.", "Random.", "Thread.", "Random(", "random(", "randomUUID(", "Date(", "java.io", "java.nio", "java.sql", "java.net"
+    static final String[] PROHIBITED_CALLS = {
+            "Date(", "Random(", "Random.", "System.", "Thread.", "java.io",
+            "java.net", "java.nio", "java.sql", "random(", "randomUUID("
     };
-    private final static String[] COMMENT_TOKENS = {"//", "/*"};
-    private final static String TERNARY_OP_REGEX = ".*\\?.*:.*";
+    private static final String[] COMMENT_TOKENS = {"//", "/*"};
+    private static final String TERNARY_OP_REGEX = ".*\\?.*:.*";
 
     public static String getMD5FromFile(String filePath) {
         try {
@@ -112,23 +112,27 @@ public class CodeValidator {
     }
 
     // TODO Cannot use ValidationMessage as that is an ENUM type...
-    public static List<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions, boolean forceHamcrest) {
+    public static List<String> validateTestCodeGetMessage(String testCode,
+                                                          int maxNumberOfAssertions,
+                                                          boolean forceHamcrest) {
         try {
             CompilationUnit cu = getCompilationUnitFromText(testCode);
             return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, forceHamcrest);
         } catch (ParseException e) {
             // Pretend this never happened so we send back to the user the compiler error message
-//            return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});
+            // return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});
             return new ArrayList<>();
         } catch (Throwable e) {
             logger.error("Problem in validating test code \n" + testCode, e);
-            return Arrays.asList(new String[]{"Invalid test. Something went wrong."});
+            return Arrays.asList("Invalid test. Something went wrong.");
 
         }
     }
 
     // This validation pipeline should use the Chain-of-Responsibility design pattern
-    public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
+    public static ValidationMessage validateMutantGetMessage(String originalCode,
+                                                             String mutatedCode,
+                                                             CodeValidatorLevel level) {
 
         // Literally identical
         if (originalCode.equals(mutatedCode)) {
@@ -151,30 +155,30 @@ public class CodeValidator {
         try {
             originalCU = getCompilationUnitFromText(originalCode);
             mutatedCU = getCompilationUnitFromText(mutatedCode);
-        } catch ( IOException | ParseException e) {
-            // At this point the syntax of original code and the mutant is broken and the compiler will spot the same error
-            // so we return a mutant valid message to allow the request processing to move forward
+        } catch (IOException | ParseException e) {
+            // At this point the syntax of original code and the mutant is broken and the compiler will spot the same
+            // error so we return a mutant valid message to allow the request processing to move forward
             logger.debug("Error parsing code: {}", e.getMessage());
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
 
         // Check if package was modified
-        if( containsChangesToPackageDeclarations( originalCU, mutatedCU ) ){
+        if (containsChangesToPackageDeclarations(originalCU, mutatedCU)) {
             return ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
         }
 
         // Check a class signature was modified
-        if( containsChangesToClassDeclarations( originalCU, mutatedCU ) ){
+        if (containsChangesToClassDeclarations(originalCU, mutatedCU)) {
             return ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
         }
 
         // If the mutants contains changes to method signatures, mark it as not valid
         if (level == CodeValidatorLevel.STRICT) {
-                if (mutantChangesMethodSignatures(originalCU, mutatedCU)
-                        || mutantChangesFieldNames(originalCU, mutatedCU)
-                        || mutantChangesImportStatements(originalCU, mutatedCU)) {
-                    return ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
-                }
+            if (mutantChangesMethodSignatures(originalCU, mutatedCU)
+                    || mutantChangesFieldNames(originalCU, mutatedCU)
+                    || mutantChangesImportStatements(originalCU, mutatedCU)) {
+                return ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
+            }
         }
 
         if (level == CodeValidatorLevel.STRICT && containsInstanceOfChanges(originalCU, mutatedCU)) {
@@ -182,7 +186,7 @@ public class CodeValidator {
         }
 
         // Use AST to check for equivalence of CUT
-        if( originalCU.equals( mutatedCU ) ){
+        if (originalCU.equals(mutatedCU)) {
             return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
         }
 
@@ -196,8 +200,8 @@ public class CodeValidator {
         }
 
         // rudimentary word-level matching as dmp works on character level
-        List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalCode, mutatedCode);
-        if (level == CodeValidatorLevel.STRICT && containsProhibitedModifierChanges(word_changes)) {
+        List<DiffMatchPatch.Diff> wordChanges = tokenDiff(originalCode, mutatedCode);
+        if (level == CodeValidatorLevel.STRICT && containsProhibitedModifierChanges(wordChanges)) {
             return ValidationMessage.MUTANT_VALIDATION_MODIFIER;
         }
 
@@ -235,16 +239,15 @@ public class CodeValidator {
     }
 
     /**
-     * Check if the mutation introduce a change to the package declaration of the mutant
+     * Check if the mutation introduce a change to the package declaration of the mutant.
      */
     private static boolean containsChangesToPackageDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
-        return ! originalCU.getPackageDeclaration().equals( mutatedCU.getPackageDeclaration() );
+        return !originalCU.getPackageDeclaration().equals(mutatedCU.getPackageDeclaration());
     }
 
-
-    private static Map<String, EnumSet> extractTypeDeclaration(TypeDeclaration td ){
+    private static Map<String, EnumSet> extractTypeDeclaration(TypeDeclaration td) {
         Map<String, EnumSet> typeData = new HashMap<>();
-        typeData.put( td.getNameAsString(), td.getModifiers());
+        typeData.put(td.getNameAsString(), td.getModifiers());
         // Inspect if this type declares inner classes
         for (Object bd : td.getMembers()) {
             if (bd instanceof TypeDeclaration) {
@@ -256,24 +259,24 @@ public class CodeValidator {
     }
 
     /**
-     * Check if the mutation introduce a change to a class declaration in the mutant
+     * Check if the mutation introduce a change to a class declaration in the mutant.
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         Map<String, EnumSet> originalTypes = new HashMap<>();
-        for(TypeDeclaration type : originalCU.getTypes()){
+        for (TypeDeclaration type : originalCU.getTypes()) {
             originalTypes.putAll(extractTypeDeclaration(type));
         }
         //
         Map<String, EnumSet> mutatedTypes = new HashMap<>();
-        for(TypeDeclaration type : mutatedCU.getTypes()){
+        for (TypeDeclaration type : mutatedCU.getTypes()) {
             mutatedTypes.putAll(extractTypeDeclaration(type));
         }
         //
-        return ! originalTypes.equals( mutatedTypes );
+        return !originalTypes.equals(mutatedTypes);
     }
 
     /**
-     * Check if the mutation introduce a change to an instanceof condition
+     * Check if the mutation introduce a change to an instanceof condition.
      */
     private static boolean containsInstanceOfChanges(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         final List<ReferenceType> instanceOfInsideOriginal = new ArrayList<>();
@@ -304,12 +307,12 @@ public class CodeValidator {
 
         visitor.visit(originalCU,null);
 
-        if( ! instanceOfInsideOriginal.isEmpty() ){
-            analyzingMutant.set( true );
+        if (!instanceOfInsideOriginal.isEmpty()) {
+            analyzingMutant.set(true);
             visitor.visit(mutatedCU, null);
         }
 
-        return ! instanceOfInsideMutated.equals( instanceOfInsideOriginal );
+        return !instanceOfInsideMutated.equals(instanceOfInsideOriginal);
     }
 
     private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
@@ -320,11 +323,13 @@ public class CodeValidator {
             // added comments triggers validation
             return true;
         }
-        // We cannot use equality here because inserting empty lines will change the lineStart attribute of the Comment node.
+        // We cannot use equality here because inserting empty lines will change the
+        // lineStart attribute of the Comment node.
         for (int i = 0; i < originalComments.length; i++) {
             // Somehow the mutated comments contain char(13) '\r' in addition to '\n'
             // TODO Where those come from? CodeMirror?
-            if ( ! originalComments[i].toString().replaceAll("\\r","").equals(mutatedComments[i].toString().replaceAll("\\r","")) ) {
+            if (!originalComments[i].toString().replaceAll("\\r", "")
+                    .equals(mutatedComments[i].toString().replaceAll("\\r", ""))) {
                 return true;
             }
         }
@@ -392,9 +397,9 @@ public class CodeValidator {
 
     private static String removeQuoted(String s, String quotationMark) {
         while (s.contains(quotationMark)) {
-            int index_first_occ = s.indexOf(quotationMark);
-            int index_second_occ = index_first_occ + s.substring(index_first_occ + 1).indexOf(quotationMark);
-            s = s.substring(0, index_first_occ - 1) + s.substring(index_second_occ + 2);
+            int indexFirstOcc = s.indexOf(quotationMark);
+            int indexSecondOcc = indexFirstOcc + s.substring(indexFirstOcc + 1).indexOf(quotationMark);
+            s = s.substring(0, indexFirstOcc - 1) + s.substring(indexSecondOcc + 2);
         }
         return s;
     }
@@ -405,7 +410,8 @@ public class CodeValidator {
         if (originalTokens.length == mutatedTokens.length) {
             for (int i = 0; i < originalTokens.length; i++) {
                 // TODO 29/10/18: Extract Mutant.regex somewhere else. This isn't mutant specific.
-                if (!originalTokens[i].replaceAll(Mutant.regex, "").equals(mutatedTokens[i].replaceAll(Mutant.regex, ""))) {
+                if (!originalTokens[i].replaceAll(Mutant.regex, "")
+                        .equals(mutatedTokens[i].replaceAll(Mutant.regex, ""))) {
                     return false;
                 }
             }
@@ -416,7 +422,8 @@ public class CodeValidator {
         return false;
     }
 
-    private static boolean onlyLiteralsChanged(String orig, String muta) { //FIXME this will not work if a string contains \"
+    //FIXME this will not work if a string contains \"
+    private static boolean onlyLiteralsChanged(String orig, String muta) {
         final String originalWithout = removeQuoted(removeQuoted(orig, "\""), "\'");
         final String mutantWithout = removeQuoted(removeQuoted(muta, "\""), "\'");
         return originalWithout.equals(mutantWithout);
@@ -439,17 +446,11 @@ public class CodeValidator {
     }
 
     private static Set<String> extractImportStatements(CompilationUnit cu) {
-        final PrettyPrinterConfiguration p = new PrettyPrinterConfiguration().setPrintComments( false );
-        Set<String> result = new HashSet<>();
-        for( ImportDeclaration id : cu.getImports() ){
-            result.add( id.toString( p ) );
-        }
-        return result;
-        // I have no idea on how to use stream with map and paramenters
-//        return cu.getImports()
-//                .stream()
-//                .map(ImportDeclaration::toString(p))
-//                .collect(Collectors.toSet());
+        final PrettyPrinterConfiguration p = new PrettyPrinterConfiguration().setPrintComments(false);
+        return cu.getImports()
+                .stream()
+                .map(dec -> dec.toString(p))
+                .collect(Collectors.toSet());
     }
 
     // TODO Maybe we should replace this with a visitor instead ?
@@ -457,7 +458,7 @@ public class CodeValidator {
         Set<String> fieldNames = new HashSet<>();
 
         // Method signatures in the class including constructors
-        for ( Object bd : td.getMembers()) {
+        for (Object bd : td.getMembers()) {
             if (bd instanceof FieldDeclaration) {
                 for (VariableDeclarator vd : ((FieldDeclaration) bd).getVariables()) {
                     fieldNames.add(vd.getNameAsString());
@@ -519,7 +520,7 @@ public class CodeValidator {
             if (!visitor.isValid()) {
                 return visitor.getMessage();
             }
-        } catch ( ParseProblemException ignored) {
+        } catch (ParseProblemException ignored) {
             // TODO: Why is ignoring this acceptable?
             // Phil: I don't know, but otherwise some tests would fail, since they cannot be parsed.
         }

@@ -44,15 +44,15 @@ import static org.codedefenders.util.Constants.TEST_CLASSPATH;
 /**
  * This class handles compilation of Java classes using the
  * native {@link JavaCompiler}. This class includes a static internal class {@link JavaFileObject}.
- * <p>
- * Offering static methods, java files can be compiled, either by reading the file
+ *
+ * <p>Offering static methods, java files can be compiled, either by reading the file
  * content from the hard disk or providing it. The resulting {@code .class} file path
  * is returned.
- * <p>
- * Dependency files of a Java class are either removed or moved into {@link Constants#CUTS_DEPENDENCY_DIR}
+ *
+ * <p>Dependency files of a Java class are either removed or moved into {@link Constants#CUTS_DEPENDENCY_DIR}
  * based on the parent directory of the associated Java class.
- * <p>
- * Test cases can also be compiled, but require a reference to the tested class.
+ *
+ * <p>Test cases can also be compiled, but require a reference to the tested class.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see CompileException
@@ -82,14 +82,15 @@ public class Compiler {
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaFileForContent(String javaFilePath, String javaFileContent) throws CompileException, IllegalStateException {
+    public static String compileJavaFileForContent(String javaFilePath, String javaFileContent)
+            throws CompileException, IllegalStateException {
         return compileJavaFile(new JavaFileObject(javaFilePath, javaFileContent));
     }
 
     /**
      * Before making adjustments:
-     * <p>
-     * To store the {@code .class} file in the same directory as the {@code .java} file,
+     *
+     * <p>To store the {@code .class} file in the same directory as the {@code .java} file,
      * {@code javac} requires no options, but here, somehow the standard tomcat directory
      * is used, so the option {@code -d} is required.
      */
@@ -130,12 +131,15 @@ public class Compiler {
      *
      * @param javaFilePath    Path to the {@code .java} file.
      * @param javaFileContent Content of the {@code .java} file.
-     * @param dependencies    a list of {@link JavaFileObject JavaFileObjects}, which the given java file is compiled together
-     *                        with. All these files must be in the same folder as the given java file.
+     * @param dependencies    a list of {@link JavaFileObject JavaFileObjects}, which the given java file is compiled
+     *                        together with. All these files must be in the same folder as the given java file.
      * @return A path to the {@code .class} file of the compiled given java file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaFileForContentWithDependencies(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
+    public static String compileJavaFileForContentWithDependencies(String javaFilePath,
+                                                                   String javaFileContent,
+                                                                   List<JavaFileObject> dependencies)
+            throws CompileException, IllegalStateException {
         return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath, javaFileContent), dependencies, false);
     }
 
@@ -148,8 +152,16 @@ public class Compiler {
      *                                    {@code dependencies/}.
      * @see #compileJavaFileForContentWithDependencies(String, String, List)
      */
-    public static String compileJavaFileForContentWithDependencies(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
-        return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath, javaFileContent), dependencies, cleanUpDependencyClassFiles);
+    public static String compileJavaFileForContentWithDependencies(String javaFilePath,
+                                                                   String javaFileContent,
+                                                                   List<JavaFileObject> dependencies,
+                                                                   boolean cleanUpDependencyClassFiles)
+            throws CompileException, IllegalStateException {
+        return compileJavaFileWithDependencies(
+                new JavaFileObject(javaFilePath, javaFileContent),
+                dependencies,
+                cleanUpDependencyClassFiles
+        );
     }
 
     /**
@@ -157,12 +169,13 @@ public class Compiler {
      * The compiled class is stored in the same directory the specified java file lies.
      *
      * @param javaFilePath Path to the {@code .java} file.
-     * @param dependencies a list of {@link JavaFileObject JavaFileObjects}, which the given java file is compiled together
-     *                     with. All these files must be in the same folder as the given java file.
+     * @param dependencies a list of {@link JavaFileObject JavaFileObjects}, which the given java file is compiled
+     *                     together with. All these files must be in the same folder as the given java file.
      * @return A path to the {@code .class} file of the compiled given java file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
+    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies)
+            throws CompileException, IllegalStateException {
         return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath), dependencies, false);
     }
 
@@ -175,8 +188,12 @@ public class Compiler {
      *                                    {@code dependencies/}.
      * @see #compileJavaFileWithDependencies(String, List)
      */
-    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
-        return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath), dependencies, cleanUpDependencyClassFiles);
+    public static String compileJavaFileWithDependencies(String javaFilePath,
+                                                         List<JavaFileObject> dependencies,
+                                                         boolean cleanUpDependencyClassFiles)
+            throws CompileException, IllegalStateException {
+        return compileJavaFileWithDependencies(
+                new JavaFileObject(javaFilePath), dependencies, cleanUpDependencyClassFiles);
     }
 
     /**
@@ -184,7 +201,10 @@ public class Compiler {
      * is added to the compilation units.
      */
     @SuppressWarnings("Duplicates")
-    private static String compileJavaFileWithDependencies(JavaFileObject javaFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
+    private static String compileJavaFileWithDependencies(JavaFileObject javaFile,
+                                                          List<JavaFileObject> dependencies,
+                                                          boolean cleanUpDependencyClassFiles)
+            throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
         final Path baseDir = Paths.get(javaFile.getPath()).getParent();
@@ -227,8 +247,8 @@ public class Compiler {
     /**
      * Compiles a java test file for a given path. The compiled class
      * is stored in the same directory the specified java file lies.
-     * <p>
-     * Similar to {@link #compileJavaFile(String)}, but includes libraries
+     *
+     * <p>Similar to {@link #compileJavaFile(String)}, but includes libraries
      * required for testing.
      *
      * @param javaTestFilePath Path to the {@code .java} test file.
@@ -236,7 +256,8 @@ public class Compiler {
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaTestFile(String javaTestFilePath, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
+    public static String compileJavaTestFile(String javaTestFilePath, List<JavaFileObject> dependencies)
+            throws CompileException, IllegalStateException {
         return compileJavaTestFile(new JavaFileObject(javaTestFilePath), dependencies, false);
     }
 
@@ -248,18 +269,21 @@ public class Compiler {
      *                                    are removed after compilation.
      * @see #compileJavaFileWithDependencies(String, List)
      */
-    public static String compileJavaTestFile(String javaTestFilePath, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
+    public static String compileJavaTestFile(String javaTestFilePath,
+                                             List<JavaFileObject> dependencies,
+                                             boolean cleanUpDependencyClassFiles)
+            throws CompileException, IllegalStateException {
         return compileJavaTestFile(new JavaFileObject(javaTestFilePath), dependencies, cleanUpDependencyClassFiles);
     }
 
     /**
      * Compiles a java file for a given path <i>and</i> file content.
      * The class is stored in the same directory the specified java file lies.
-     * <p>
-     * Similar to {@link #compileJavaFileForContent(String, String)}, but includes libraries
+     *
+     * <p>Similar to {@link #compileJavaFileForContent(String, String)}, but includes libraries
      * required for testing.
-     * <p>
-     * Removes all {@code .class} files, but the class file of the test case.
+     *
+     * <p>Removes all {@code .class} files, but the class file of the test case.
      *
      * @param javaFilePath    Path to the {@code .java} test file.
      * @param javaFileContent Content of the {@code .java} test file.
@@ -267,7 +291,10 @@ public class Compiler {
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaTestFileForContent(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
+    public static String compileJavaTestFileForContent(String javaFilePath,
+                                                       String javaFileContent,
+                                                       List<JavaFileObject> dependencies)
+            throws CompileException, IllegalStateException {
         return compileJavaTestFile(new JavaFileObject(javaFilePath, javaFileContent), dependencies, false);
     }
 
@@ -278,8 +305,13 @@ public class Compiler {
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
      *                                    are removed after compilation.
      */
-    public static String compileJavaTestFileForContent(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
-        return compileJavaTestFile(new JavaFileObject(javaFilePath, javaFileContent), dependencies, cleanUpDependencyClassFiles);
+    public static String compileJavaTestFileForContent(String javaFilePath,
+                                                       String javaFileContent,
+                                                       List<JavaFileObject> dependencies,
+                                                       boolean cleanUpDependencyClassFiles)
+            throws CompileException, IllegalStateException {
+        return compileJavaTestFile(
+                new JavaFileObject(javaFilePath, javaFileContent), dependencies, cleanUpDependencyClassFiles);
     }
 
     /**
@@ -287,7 +319,10 @@ public class Compiler {
      * but includes JUnit, Hamcrest and Mockito libraries required for running the tests.
      */
     @SuppressWarnings("Duplicates")
-    private static String compileJavaTestFile(JavaFileObject testFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
+    private static String compileJavaTestFile(JavaFileObject testFile,
+                                              List<JavaFileObject> dependencies,
+                                              boolean cleanUpDependencyClassFiles)
+            throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
         final Path baseDir = Paths.get(testFile.getPath()).getParent();
@@ -360,8 +395,10 @@ public class Compiler {
             try {
                 final Path oldPath = getClassPath(dependency, baseDirectory);
                 // path relative from the base directory, {@code dependencies/} folder just has to be added between them
-                final Path classFileStructure = baseDirectory.relativize(Paths.get(oldPath.toString().replace(".java", ".class")));
-                final Path newPath = Paths.get(baseDirectory.toString(), CUTS_DEPENDENCY_DIR, classFileStructure.toString());
+                final Path classFileStructure = baseDirectory.relativize(
+                        Paths.get(oldPath.toString().replace(".java", ".class")));
+                final Path newPath =
+                        Paths.get(baseDirectory.toString(), CUTS_DEPENDENCY_DIR, classFileStructure.toString());
 
                 Files.createDirectories(newPath.getParent());
                 Files.move(oldPath, newPath);
@@ -384,12 +421,12 @@ public class Compiler {
      */
     private static Path getClassPath(JavaFileObject javaFile, Path baseDirectory) throws IOException {
         final String targetName = javaFile.getName().replace(".java", ".class");
-        final BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> path.getFileName().toString().equals(targetName);
+        final BiPredicate<Path, BasicFileAttributes> matcher =
+                (path, attr) -> path.getFileName().toString().equals(targetName);
 
         final Optional<Path> first = Files.find(baseDirectory, 200, matcher).findFirst();
-        if (first.isPresent()) {
-            return first.get().toAbsolutePath();
-        }
-        return Paths.get(javaFile.getPath().replace(".java", ".class"));
+        return first
+                .map(Path::toAbsolutePath)
+                .orElseGet(() -> Paths.get(javaFile.getPath().replace(".java", ".class")));
     }
 }

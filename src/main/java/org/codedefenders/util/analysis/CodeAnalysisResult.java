@@ -19,16 +19,19 @@
 package org.codedefenders.util.analysis;
 
 import org.apache.commons.lang3.Range;
-import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameClass.MethodDescription;
-import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Container for lines or ranges of lines used for the {@link ClassCodeAnalyser}.
- * <p>
- * Setter methods can be chained.
+ *
+ * <p>Setter methods can be chained.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see ClassCodeAnalyser

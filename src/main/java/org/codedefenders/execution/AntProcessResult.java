@@ -18,17 +18,16 @@
  */
 package org.codedefenders.execution;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Jose Rojas
@@ -70,8 +69,9 @@ public class AntProcessResult {
                         hasFailure = Integer.parseInt(m.group(2)) > 0;
                         hasError = Integer.parseInt(m.group(3)) > 0;
                     }
-                } else if (line.equalsIgnoreCase("BUILD SUCCESSFUL"))
+                } else if (line.equalsIgnoreCase("BUILD SUCCESSFUL")) {
                     compiled = true;
+                }
             }
             compilerOutput = sanitize(compilerOutputBuilder.toString());
             testOutput = reduce(testOutputBuilder.toString());
@@ -81,36 +81,37 @@ public class AntProcessResult {
         }
     }
 
-    private String reduce(String fullTestOutput){
+    private String reduce(String fullTestOutput) {
         // Remove redundant content.
-        StringBuffer reduced = new StringBuffer();
+        StringBuilder reduced = new StringBuilder();
         // Skip all the lines until: [junit] Testcase: test took
         Iterator<String> lineIterator = Arrays.asList(fullTestOutput.split("\n")).iterator();
-        while( lineIterator.hasNext() ){
+        while (lineIterator.hasNext()) {
             String line = lineIterator.next().trim();
-            if( line.startsWith("[junit] Testcase: test took")){
-                reduced.append( line ).append("\n");
+            if (line.startsWith("[junit] Testcase: test took")) {
+                reduced.append(line).append("\n");
                 break;
             }
         }
         // The next line is FAILED we can skip it
-        if( lineIterator.hasNext() ){
+        if (lineIterator.hasNext()) {
             lineIterator.next();
         }
-        
+
         // Add all the line until the last one
         // "[junit] Test TestLift FAILED";
-        while( lineIterator.hasNext() ){
+        while (lineIterator.hasNext()) {
             String line = lineIterator.next().trim();
-            
-            if( line.startsWith("[junit] Test ") && line.endsWith("FAILED")){
+
+            if (line.startsWith("[junit] Test ") && line.endsWith("FAILED")) {
                 break;
             }
-            reduced.append( line ).append("\n");
+            reduced.append(line)
+                    .append("\n");
         }
         return reduced.toString();
     }
-    
+
     /**
      * Sanitize the compiler output by identifying the output folder and
      * removing it from the compiler output before sending it over the clients.
@@ -120,7 +121,7 @@ public class AntProcessResult {
      */
     private String sanitize(String fullCompilerOutput) {
         String outputFolder = null; // This is what we shall remove from the log
-        StringBuffer sanitized = new StringBuffer();
+        StringBuilder sanitized = new StringBuilder();
         for (String line : fullCompilerOutput.split("\n")) {
             // This might not work with dependencies, but we should always
             // mutate one file at time, right?
@@ -172,11 +173,11 @@ public class AntProcessResult {
 
     @Override
     public String toString() {
-        return "AntProcessResult{" +
-                "inputStreamText='" + inputStreamText + '\'' +
-                ", errorStreamText='" + errorStreamText + '\'' +
-                ", exceptionText='" + exceptionText + '\'' +
-                '}';
+        return "AntProcessResult{"
+                + "inputStreamText='" + inputStreamText + '\''
+                + ", errorStreamText='" + errorStreamText + '\''
+                + ", exceptionText='" + exceptionText + '\''
+                + '}';
     }
 
 }

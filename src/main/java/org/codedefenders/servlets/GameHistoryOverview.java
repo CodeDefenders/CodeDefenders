@@ -18,8 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This {@link HttpServlet} redirects to the games history page.
  *
- * <p>
- * Serves on path: {@code /games/history}.
+ * <p>Serves on path: {@code /games/history}.
  *
  * @see org.codedefenders.util.Paths#GAMES_HISTORY
  */

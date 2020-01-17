@@ -18,10 +18,10 @@
  */
 package org.codedefenders.model;
 
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.Role;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.game.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,7 @@ public class Event {
     @Override
     public String toString() {
         return "Event " + getEventType() + " " + getEventStatus() + //" from user " + getUser().getId() +
-                " with message "+ getMessage();
+                " with message " + getMessage();
     }
 
     private int eventId;
@@ -89,15 +89,16 @@ public class Event {
 
     public Event(int eventId, int gameId, int userId, String message, String eventType,
                  String eventStatus, Timestamp timestamp) {
-        this(eventId, gameId, userId, message, EventType.valueOf(eventType), EventStatus.valueOf(eventStatus), timestamp);
+        this(eventId, gameId, userId, message, EventType.valueOf(eventType),
+                EventStatus.valueOf(eventStatus), timestamp);
     }
 
     public Event(int eventId, int gameId, int userId, String message, EventType eventType,
                  EventStatus eventStatus, Timestamp timestamp) {
-        String eString = eventType.toString();
-        if (eString.contains("ATTACKER")) {
+        String eventString = eventType.toString();
+        if (eventString.contains("ATTACKER")) {
             role = Role.ATTACKER;
-        } else if (eString.contains("DEFENDER")) {
+        } else if (eventString.contains("DEFENDER")) {
             role = Role.DEFENDER;
         } else {
             role = Role.OBSERVER;
@@ -127,21 +128,22 @@ public class Event {
 
         if (procMessage.contains("@event_user")) {
             User user = getUser();
-            
-            String userLabel = ( user == null ) ? "Unknown" :
-                (user.getUsername().equals( currentUserName )) ? "You" : user.getUsername();
-            String color = ( user == null ) ? "#000000": ROLE_COLORS.get(role);
-            
-            procMessage = procMessage.replace("@event_user", "<span style='color: " + color + "'>@"+userLabel+"</span>");
+
+            String userLabel = (user == null) ? "Unknown" :
+                    (user.getUsername().equals(currentUserName)) ? "You" : user.getUsername();
+            String color = (user == null) ? "#000000" : ROLE_COLORS.get(role);
+
+            procMessage = procMessage.replace("@event_user", "<span style='color: " + color + "'>@"
+                    + userLabel + "</span>");
         }
 
         if (procMessage.contains("@chat_message")) {
             procMessage = procMessage.replace("@chat_message",
                     getChatMessage());
         } else if (emphasise) {
-            procMessage = "<span style='font-style: italic; font-weight: " +
-                    "bold;'>" + procMessage +
-                    "</span>";
+            procMessage = "<span style='font-style: italic; font-weight: "
+                    + "bold;'>" + procMessage
+                    + "</span>";
         }
 
         return procMessage;
@@ -152,7 +154,7 @@ public class Event {
             return "";
         }
         if (parsedChatMessage == null) {
-            parsedChatMessage = parse(new HashMap<String, String>(),
+            parsedChatMessage = parse(new HashMap<>(),
                     chatMessage, false);
         }
         return parsedChatMessage;
@@ -164,7 +166,7 @@ public class Event {
     }
 
     public void parse(boolean emphasise) {
-        parse(new HashMap<String, String>(), emphasise);
+        parse(new HashMap<>(), emphasise);
     }
 
     public String getMessage() {
@@ -201,21 +203,24 @@ public class Event {
 
     public boolean insert() {
         Connection conn = DB.getConnection();
-        String query = "";
-        DatabaseValue[] valueList = null;
+        String query;
+        DatabaseValue[] valueList;
 
-        if( eventType.equals(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT) ||
-            eventType.equals(EventType.DEFENDER_MUTANT_EQUIVALENT) ||
-            eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT) ){
-            query="INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message) VALUES (?, ?, ?, ?, ?);";
+        if (eventType.equals(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT)
+                || eventType.equals(EventType.DEFENDER_MUTANT_EQUIVALENT)
+                || eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT)) {
+            query = String.join("\n",
+                    "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
+                    "VALUES (?, ?, ?, ?, ?);");
             valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
                     DatabaseValue.of(userId),
                     DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(eventStatus.toString()),
-                    DatabaseValue.of( message)};
-        }
-        else {
-            query="INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status) VALUES (?, ?, ?, ?);";
+                    DatabaseValue.of(message)};
+        } else {
+            query = String.join("\n",
+                    "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)",
+                    "VALUES (?, ?, ?, ?);");
             valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
                     DatabaseValue.of(userId),
                     DatabaseValue.of(eventType.toString()),
@@ -240,7 +245,10 @@ public class Event {
 
     public boolean update() {
         Connection conn = DB.getConnection();
-        String query = "UPDATE events SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?) WHERE Event_ID=?";
+        String query = String.join("\n",
+                "UPDATE events",
+                "SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?)",
+                "WHERE Event_ID=?");
         DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
                 DatabaseValue.of(userId),
                 DatabaseValue.of(eventType.toString()),
@@ -251,12 +259,7 @@ public class Event {
         return DB.executeUpdate(stmt, conn);
     }
 
-    public final static Comparator<Event> MAX_ID_COMPARATOR = new Comparator<Event>() {
-        @Override
-        public int compare(Event o1, Event o2) {
-            return o1.eventId - o2.eventId;
-        }
-    };
+    public static final Comparator<Event> MAX_ID_COMPARATOR = Comparator.comparingInt(o -> o.eventId);
 
     public int getId() {
         return this.eventId;

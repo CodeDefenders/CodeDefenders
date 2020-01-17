@@ -34,12 +34,19 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.DEBUG_MODE;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT;
+
 /**
  * Utility class for sending emails. Email credentials are stored in
  * the {@link AdminSystemSettings}. If no email credentials are specified
  * no mails will be sent.
- * <p>
- * Consists of static methods, which allow sending mails.
+ *
+ * <p>Consists of static methods, which allow sending mails.
  */
 public class EmailUtils {
     private static final Logger logger = LoggerFactory.getLogger(EmailUtils.class);
@@ -53,7 +60,7 @@ public class EmailUtils {
      * @return {@code true} if successful, {@code false} otherwise.
      */
     public static boolean sendEmail(String to, String subject, String text) {
-        final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
+        final String emailAddress = AdminDAO.getSystemSetting(EMAIL_ADDRESS).getStringValue();
         return sendEmail(to, subject, text, emailAddress);
     }
 
@@ -66,7 +73,7 @@ public class EmailUtils {
      * @return {@code true} if successful, {@code false} otherwise.
      */
     public static boolean sendEmailToSelf(String subject, String text, String replyTo) {
-        final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
+        final String emailAddress = AdminDAO.getSystemSetting(EMAIL_ADDRESS).getStringValue();
         return sendEmail(emailAddress, subject, text, replyTo);
     }
 
@@ -81,17 +88,17 @@ public class EmailUtils {
      * @return {@code true} if successful, {@code false} otherwise.
      */
     private static boolean sendEmail(String to, String subject, String text, String replyTo) {
-        final boolean emailEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue();
+        final boolean emailEnabled = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
         if (!emailEnabled) {
             logger.error("Tried to send a mail, but sending emails is disabled. Update your system settings.");
             return false;
         }
 
-        final String smtpHost = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST).getStringValue();
-        final int smtpPort = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT).getIntValue();
-        final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
-        final String emailPassword = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD).getStringValue();
-        final boolean debug = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.DEBUG_MODE).getBoolValue();
+        final String smtpHost = AdminDAO.getSystemSetting(EMAIL_SMTP_HOST).getStringValue();
+        final int smtpPort = AdminDAO.getSystemSetting(EMAIL_SMTP_PORT).getIntValue();
+        final String emailAddress = AdminDAO.getSystemSetting(EMAIL_ADDRESS).getStringValue();
+        final String emailPassword = AdminDAO.getSystemSetting(EMAIL_PASSWORD).getStringValue();
+        final boolean debug = AdminDAO.getSystemSetting(DEBUG_MODE).getBoolValue();
 
         try    {
             Properties props = System.getProperties();
@@ -103,7 +110,8 @@ public class EmailUtils {
             Session session = Session.getInstance(props, new javax.mail.Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(emailAddress, emailPassword);
-                }});
+                }
+            });
 
             session.setDebug(debug);
             MimeMessage msg = new MimeMessage(session);

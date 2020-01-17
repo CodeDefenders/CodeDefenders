@@ -1,6 +1,10 @@
 package org.codedefenders.notification.events.client.registration;
 
-import org.codedefenders.notification.events.server.game.*;
+import org.codedefenders.notification.events.server.game.GameCreatedEvent;
+import org.codedefenders.notification.events.server.game.GameJoinedEvent;
+import org.codedefenders.notification.events.server.game.GameLeftEvent;
+import org.codedefenders.notification.events.server.game.GameStartedEvent;
+import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 
 /**

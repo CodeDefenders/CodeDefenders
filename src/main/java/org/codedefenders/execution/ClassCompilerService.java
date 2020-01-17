@@ -18,38 +18,40 @@
  */
 package org.codedefenders.execution;
 
-import java.io.File;
-
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 
+import java.io.File;
+
 public interface ClassCompilerService {
 
     /**
-     * Compiles mutant
-     * @param dir Mutant directory
-     * @param jFile Java source file
-     * @param gameID Game identifier
-     * @param cut Class under test
-     * @param ownerId User who submitted mutant
+     * Compiles mutant.
+     *
+     * @param dir      Mutant directory
+     * @param javaFile Java source file
+     * @param gameId   Game identifier
+     * @param cut      Class under test
+     * @param ownerId  User who submitted mutant
      * @return A {@link Mutant} object
      */
-    Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId);
+    Mutant compileMutant(File dir, String javaFile, int gameId, GameClass cut, int ownerId);
 
     /**
-     * Compiles test
-     * @param dir Test directory
-     * @param jFile Java source file
-     * @param gameID Game identifier
-     * @param cut Class under test
-     * @param ownerId Player who submitted test
+     * Compiles test.
+     *
+     * @param dir      Test directory
+     * @param javaFile Java source file
+     * @param gameId   Game identifier
+     * @param cut      Class under test
+     * @param ownerId  Player who submitted test
      * @return A {@link Test} object
      */
-    Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId);
+    Test compileTest(File dir, String javaFile, int gameId, GameClass cut, int ownerId);
 
     /**
-     * Compiles CUT
+     * Compiles CUT.
      *
      * @param cut Class under test
      * @return The path to the compiled CUT
@@ -57,7 +59,8 @@ public interface ClassCompilerService {
     String compileCUT(GameClass cut) throws CompileException;
 
     /**
-     * Compiles generated test suite
+     * Compiles generated test suite.
+     *
      * @param cut Class under test
      */
     boolean compileGenTestSuite(final GameClass cut);

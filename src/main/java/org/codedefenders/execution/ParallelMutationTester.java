@@ -18,15 +18,19 @@
  */
 package org.codedefenders.execution;
 
-import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_SUBMITTED_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_LAST_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_N_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
+import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.scoring.Scorer;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -41,34 +45,27 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
 import javax.enterprise.inject.Alternative;
-import javax.inject.Inject;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.codedefenders.configuration.Property;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.scoring.Scorer;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_SUBMITTED_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_LAST_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_N_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
 
 /**
  * This is a parallel implementation of IMutationTester. Parallelism is achieved
  * by means of the injected executionService
  *
- * We inject instances using {@link MutationTesterProducer}
+ * <p>We inject instances using {@link MutationTesterProducer}
  */
 @Alternative // This disable the automatic injection so we pass dependencies via the constructor
 public class ParallelMutationTester extends MutationTester //
-        implements IMutationTester // This MIGHT be superfluous but I am not
-                                   // sure how CDI works with annotations
-{
+        // This MIGHT be superfluous but I am not sure how CDI works with annotations
+        implements IMutationTester {
     private ExecutorService testExecutorThreadPool;
 
     public ParallelMutationTester(BackendExecutorService backend, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
@@ -115,8 +112,9 @@ public class ParallelMutationTester extends MutationTester //
 
         // TODO Mayse use some timeout ?!
         for (final Mutant mutant : mutants) {
-            if (useMutantCoverage && !test.isMutantCovered(mutant))
+            if (useMutantCoverage && !test.isMutantCovered(mutant)) {
                 continue;
+            }
 
             // checks if task done
             // System.out.println(
@@ -165,21 +163,23 @@ public class ParallelMutationTester extends MutationTester //
         // test.update();
         test.incrementScore(Scorer.score(game, test, killedMutants));
 
-        if (killed == 0)
-            if (mutants.size() == 0)
+        if (killed == 0) {
+            if (mutants.size() == 0) {
                 messages.add(TEST_SUBMITTED_MESSAGE);
-            else
+            } else {
                 messages.add(TEST_KILLED_ZERO_MESSAGE);
-        else {
+            }
+        } else {
             Event notif = new Event(-1, game.getId(), u.getId(),
                     u.getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
                     EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
             notif.insert();
             if (killed == 1) {
-                if (mutants.size() == 1)
+                if (mutants.size() == 1) {
                     messages.add(TEST_KILLED_LAST_MESSAGE);
-                else
+                } else {
                     messages.add(TEST_KILLED_ONE_MESSAGE);
+                }
             } else {
                 messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
             }
@@ -290,8 +290,9 @@ public class ParallelMutationTester extends MutationTester //
         ArrayList<Test> missedTests = new ArrayList<Test>();
         if (game instanceof MultiplayerGame) {
             for (Test t : tests) {
-                if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines()))
+                if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines())) {
                     missedTests.add(t);
+                }
             }
             // mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant,
             // missedTests));
@@ -301,12 +302,13 @@ public class ParallelMutationTester extends MutationTester //
 
         int nbRelevantTests = missedTests.size();
         // Mutant survived
-        if (nbRelevantTests == 0)
+        if (nbRelevantTests == 0) {
             messages.add(MUTANT_SUBMITTED_MESSAGE);
-        else if (nbRelevantTests <= 1)
+        } else if (nbRelevantTests <= 1) {
             messages.add(MUTANT_ALIVE_1_MESSAGE);
-        else
+        } else {
             messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests));
+        }
         Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         notif.insert();

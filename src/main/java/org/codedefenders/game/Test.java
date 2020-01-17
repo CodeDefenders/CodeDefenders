@@ -20,7 +20,12 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.*;
+import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -64,7 +69,7 @@ public class Test {
     private LineCoverage lineCoverage;
 
     /**
-     * Creates a new Test with following attributes:
+     * Creates a new Test with following attributes.
      * <ul>
      * <li><code>gameId -1</code></li>
      * <li><code>playerId -1</code></li>
@@ -95,12 +100,14 @@ public class Test {
     }
 
     @Deprecated
-    public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
-        this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
+    public Test(int testId, int classId, int gameId, String javaFile, String classFile,
+                int roundCreated,int mutantsKilled, int playerId) {
+        this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId,
+                Collections.emptyList(), Collections.emptyList(), 0);
     }
 
-    public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
-                int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
+    public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated,
+                int mutantsKilled, int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
         this(classId, gameId, javaFile, classFile, playerId);
 
         this.id = testId;
@@ -208,8 +215,8 @@ public class Test {
         List<Integer> coverage = lineCoverage.getLinesCovered();
         Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
 
-        for(Mutant m : mutants) {
-            if(CollectionUtils.containsAny(coverage, m.getLines())) {
+        for (Mutant m : mutants) {
+            if (CollectionUtils.containsAny(coverage, m.getLines())) {
                 coveredMutants.add(m);
             }
         }
@@ -250,8 +257,9 @@ public class Test {
     }
 
     public String getFullyQualifiedClassName() {
-        if (classFile == null)
+        if (classFile == null) {
             return null;
+        }
 
         ClassPool classPool = ClassPool.getDefault();
         CtClass cc = null;
@@ -315,6 +323,6 @@ public class Test {
 
     @Override
     public String toString() {
-        return "[testId=" + id + ",classId="+ classId + ",mutantsKilled=" + mutantsKilled + ",score=" + score + "]";
+        return "[testId=" + id + ",classId=" + classId + ",mutantsKilled=" + mutantsKilled + ",score=" + score + "]";
     }
 }

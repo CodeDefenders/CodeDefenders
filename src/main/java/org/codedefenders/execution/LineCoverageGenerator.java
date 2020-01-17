@@ -51,15 +51,15 @@ public class LineCoverageGenerator {
 
     /**
      * Generates and returns line coverage for a given {@link GameClass} and {@link Path path to a java test file}.
-     * <p>
-     * The method requires the file 'jacoco.exec' to be present in the
+     *
+     * <p>The method requires the file 'jacoco.exec' to be present in the
      * folder the test lies in, otherwise the generation fails and an
      * empty {@link LineCoverage} instance is returned.
      *
      * @param gameClass    the class that is tested.
      * @param testJavaFile the test java file in which parent folder the 'jacoco.exe' file exists as a {@link Path}.
      * @return a {@link LineCoverage} instance with covered and uncovered lines if successful,
-     * empty lists for covered and uncovered lines if failed.
+     *     empty lists for covered and uncovered lines if failed.
      */
     public static LineCoverage generate(GameClass gameClass, Path testJavaFile) {
         final File reportDirectory = testJavaFile.getParent().toFile();
@@ -87,7 +87,7 @@ public class LineCoverageGenerator {
         // is thread safe so I instantiate a new one every time.
         final String regex = new File(gameClass.getClassFile()).getName().split("\\.")[0] + "\\$?.*\\.class";
         final Pattern innerClassPatter = Pattern.compile(regex);
-        for (File classFile : classFileFolder.listFiles((dir, name) -> innerClassPatter.matcher(name).matches())){
+        for (File classFile : classFileFolder.listFiles((dir, name) -> innerClassPatter.matcher(name).matches())) {
             try {
                 analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
             } catch (IOException e) {

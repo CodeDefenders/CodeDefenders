@@ -29,7 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 public class Redirect {
     private static final Logger logger = LoggerFactory.getLogger(Redirect.class);
 
-    private Redirect() { }
+    private Redirect() {
+    }
 
     /**
      * Redirect back to the referer, or to the start page if the header does not specify a referer.

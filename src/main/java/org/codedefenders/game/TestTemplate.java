@@ -255,7 +255,8 @@ public class TestTemplate {
                 //     appendLines(JUNIT5_TEST_DECLARATION);
                 //     break;
                 default:
-                    throw new IllegalArgumentException("No test method implemented for " + testingFramework.name() + ".");
+                    throw new IllegalArgumentException("No test method implemented for "
+                            + testingFramework.name() + ".");
             }
 
             appendLines("        // test here!\n");

@@ -74,8 +74,8 @@ public abstract class AbstractGame {
         return classId;
     }
 
-    public List<Event> getEvents(){
-        if (events == null){
+    public List<Event> getEvents() {
+        if (events == null) {
             events = DatabaseAccess.getEventsForGame(getId());
         }
         return events;
@@ -112,7 +112,9 @@ public abstract class AbstractGame {
         return this.mode;
     }
 
-    protected void setMode(GameMode newMode) { this.mode = newMode; }
+    protected void setMode(GameMode newMode) {
+        this.mode = newMode;
+    }
 
     public List<Test> getTests() {
         return getTests(false);
@@ -126,16 +128,16 @@ public abstract class AbstractGame {
     }
 
     public List<Mutant> getMutants() {
-        if (mutants == null){
+        if (mutants == null) {
             mutants = MutantDAO.getValidMutantsForGame(id);
         }
         return mutants;
     }
 
     public List<Mutant> getAliveMutants() {
-        return getMutants().stream().filter(mutant -> mutant.isAlive() &&
-                mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) &&
-                mutant.getClassFile() != null).collect(Collectors.toList());
+        return getMutants().stream().filter(mutant -> mutant.isAlive()
+                && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                && mutant.getClassFile() != null).collect(Collectors.toList());
     }
 
     public List<Mutant> getKilledMutants() {
@@ -150,7 +152,8 @@ public abstract class AbstractGame {
     public List<Mutant> getMutantsMarkedEquivalent() {
         return getMutants()
                 .stream()
-                .filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) || mutant.getEquivalent().equals(DECLARED_YES))
+                .filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES)
+                        || mutant.getEquivalent().equals(DECLARED_YES))
                 .collect(Collectors.toList());
     }
 
@@ -161,10 +164,11 @@ public abstract class AbstractGame {
                 .collect(Collectors.toList());
     }
 
-    public Mutant getMutantByID(int mutantID) {
+    public Mutant getMutantByID(int mutantId) {
         for (Mutant m : getMutants()) {
-            if (m.getId() == mutantID)
+            if (m.getId() == mutantId) {
                 return m;
+            }
         }
         return null;
     }

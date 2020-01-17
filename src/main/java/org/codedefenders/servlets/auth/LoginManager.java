@@ -49,6 +49,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.REQUIRE_MAIL_VALIDATION;
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
@@ -63,10 +65,10 @@ public class LoginManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
     private static final int PW_RESET_SECRET_LENGTH = 20;
-    private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" +
-            "Change your password here: %s\n" +
-            "This link is only valid for %d hours.\n\n" +
-            "Greetings, your CodeDefenders team";
+    private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n"
+            + "Change your password here: %s\n"
+            + "This link is only valid for %d hours.\n\n"
+            + "Greetings, your CodeDefenders team";
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -136,7 +138,7 @@ public class LoginManager extends HttpServlet {
                     dispatcher.forward(request, response);
                 } else {
                     String dbPassword = activeUser.getEncodedPassword();
-                    boolean requireValidation = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REQUIRE_MAIL_VALIDATION).getBoolValue();
+                    boolean requireValidation = AdminDAO.getSystemSetting(REQUIRE_MAIL_VALIDATION).getBoolValue();
                     if (requireValidation && !activeUser.isValidated()) {
                         messages.add("Account email is not validated.");
                         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
@@ -160,7 +162,8 @@ public class LoginManager extends HttpServlet {
                                     response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
                                 }
                             } else {
-                                messages.add("Your account is inactive, login is only possible with an active account.");
+                                messages.add("Your account is inactive, login is only possible with an active"
+                                        + "account.");
                                 RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
                                 dispatcher.forward(request, response);
                             }
@@ -181,10 +184,11 @@ public class LoginManager extends HttpServlet {
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
                     DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
-                    String hostAddr = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+                    String hostAddr = request.getScheme() + "://" + request.getServerName() + ":"
+                            + request.getServerPort() + request.getContextPath();
                     String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
                     String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
-                            AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
+                            AdminDAO.getSystemSetting(PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
                     if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
                         messages.add("A link for changing your password has been sent to " + email);
                     }
@@ -219,6 +223,8 @@ public class LoginManager extends HttpServlet {
                 }
                 response.sendRedirect(responseURL);
                 break;
+            default:
+                // ignored
         }
     }
 
@@ -276,8 +282,11 @@ public class LoginManager extends HttpServlet {
     }
 
     private boolean invalidIP(String ip) {
-        return (ip == null) || (ip.length() == 0) ||
-                ("unknown".equalsIgnoreCase(ip)) || ("0:0:0:0:0:0:0:1".equals(ip));
+        return (ip == null)
+                || (ip.length() == 0)
+                || ("unknown".equalsIgnoreCase(ip))
+                || ("0:0:0:0:0:0:0:1".equals(ip)
+        );
     }
 
     /**
@@ -295,7 +304,9 @@ public class LoginManager extends HttpServlet {
 
     // TODO extract that method to a util class
     public static boolean validEmailAddress(String email) {
-        if (email == null) return false;
+        if (email == null) {
+            return false;
+        }
         boolean result = true;
         try {
             InternetAddress emailAddr = new InternetAddress(email);

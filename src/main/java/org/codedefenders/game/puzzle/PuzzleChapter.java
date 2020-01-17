@@ -45,6 +45,8 @@ public class PuzzleChapter {
     private String description;
 
     /**
+     * Constructs a new puzzle chapter instance.
+     *
      * @param chapterId ID of the chapter in the database.
      * @param position Position of the chapter in the chapter list. Can be null.
      * @param title Title of the chapter. Can be null.

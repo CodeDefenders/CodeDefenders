@@ -53,8 +53,8 @@ public interface IGameManagingUtils {
     /**
      * Stores a given mutant and calls {@link AntRunner#compileMutant(File, String, int, GameClass, int)
      * AntRunner#compileMutant()}.
-     * <p>
-     * <b>Here, the mutated code is assumed to be valid.</b>
+     *
+     * <p><b>Here, the mutated code is assumed to be valid.</b>
      *
      * @param gameId       the identifier of the game the mutant is created in.
      * @param classId      the identifier of the class the mutant is mutated from.

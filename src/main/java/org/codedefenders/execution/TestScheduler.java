@@ -18,15 +18,16 @@
  */
 package org.codedefenders.execution;
 
+import org.codedefenders.game.Test;
+
 import java.util.Collection;
 import java.util.List;
-
-import org.codedefenders.game.Test;
 
 public interface TestScheduler {
 
     /**
-     * Returns an ordered sequence of tests to be executed
+     * Returns an ordered sequence of tests to be executed.
+     *
      * @param tests
      * @return
      */

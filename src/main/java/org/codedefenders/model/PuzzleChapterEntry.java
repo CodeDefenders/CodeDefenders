@@ -29,8 +29,8 @@ import java.util.TreeSet;
  * This class is a wrapper around {@link PuzzleChapter} and a sorted set of
  * {@link PuzzleEntry}s. This class is used to display puzzles
  * or its games in the {@link PuzzleOverview}.
- * <p>
- * Implements {@link Comparable} by comparing the positions of the
+ *
+ * <p>Implements {@link Comparable} by comparing the positions of the
  * puzzle chapters.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>

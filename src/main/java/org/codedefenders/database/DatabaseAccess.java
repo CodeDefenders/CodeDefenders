@@ -38,8 +38,8 @@ import java.util.Set;
 /**
  * This class handles database logic for functionality which has not
  * yet been extracted to specific data access objects (DAO).
- * <p>
- * This means that more or less most methods are legacy and/or should
+ *
+ * <p>This means that more or less most methods are legacy and/or should
  * be moved to DAOs.
  */
 public class DatabaseAccess {
@@ -112,7 +112,7 @@ public class DatabaseAccess {
 
     /**
      * Retrieve the latest (in the past 5 minutes and not yet seen)
-     * events that belong to a game and relate to equivalence duels
+     * events that belong to a game and relate to equivalence duels.
      */
     // FIXME userId not useful
     public static List<Event> getNewEquivalenceDuelEventsForGame(int gameId, int lastMessageId) {
@@ -132,7 +132,7 @@ public class DatabaseAccess {
         // EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
         // ATTACKER_MUTANT_KILLED_EQUIVALENT
         DatabaseValue[] values = new DatabaseValue[]{
-//                DatabaseValue.of(userId),
+                // DatabaseValue.of(userId),
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(EventStatus.GAME.toString()),
                 DatabaseValue.of(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()),
@@ -243,13 +243,15 @@ public class DatabaseAccess {
 
     public static int getEquivalentDefenderId(Mutant m) {
         String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
-        final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
+        final Integer id = DB.executeQueryReturnValue(query,
+                rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
         return Optional.ofNullable(id).orElse(-1);
     }
 
     public static int getPlayerPoints(int playerId) {
         String query = "SELECT Points FROM players WHERE ID=?;";
-        final Integer points = DB.executeQueryReturnValue(query, rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
+        final Integer points = DB.executeQueryReturnValue(query,
+                rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
         return Optional.ofNullable(points).orElse(0);
     }
 
@@ -313,6 +315,7 @@ public class DatabaseAccess {
             return TestDAO.getTestById(testId);
         }
     }
+
     public static Set<Mutant> getKilledMutantsForTestId(int testId) {
         String query = String.join("\n",
                 "SELECT DISTINCT m.*",
@@ -332,7 +335,7 @@ public class DatabaseAccess {
     }
 
     /**
-     * This also automatically update the Timestamp field using CURRENT_TIMESTAMP()
+     * This also automatically update the Timestamp field using CURRENT_TIMESTAMP().
      */
     public static void logSession(int uid, String ipAddress) {
         String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
@@ -356,10 +359,11 @@ public class DatabaseAccess {
         return Optional.ofNullable(result).orElse(-1);
     }
 
-    public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId, int lastSubmissionId, boolean isDefender) {
+    public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId,
+                                                                         int lastSubmissionId, boolean isDefender) {
         // Current test is the one right after lastTestId in the user/game context
-        String query = isDefender ?
-                "SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in (SELECT Test_ID FROM tests" :
+        String query = isDefender
+                ? "SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in (SELECT Test_ID FROM tests" :
                 "SELECT * FROM targetexecutions WHERE Mutant_ID > ? AND Mutant_ID in (SELECT Mutant_ID FROM mutants";
         query += " WHERE game_id=? AND player_id = (SELECT id from players where game_id=? and user_id=?))"
                 + "AND TargetExecution_ID >= (SELECT MAX(TargetExecution_ID) from targetexecutions);";
@@ -388,16 +392,20 @@ public class DatabaseAccess {
     }
 
     public static int getUserIDForPWResetSecret(String pwResetSecret) {
-        String query = "SELECT User_ID\n" +
-                "FROM users\n" +
-                "WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < (SELECT INT_VALUE\n" +
-                "                                                                    FROM settings\n" +
-                "                                                                    WHERE name =\n" +
-                "                                                                    'PASSWORD_RESET_SECRET_LIFESPAN')\n" +
-                "      AND\n" +
-                "      pw_reset_secret = ?;";
+        String query = String.join("\n",
+                "",
+                "SELECT User_ID",
+                "FROM users",
+                "WHERE",
+                "  TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) <",
+                "             (SELECT INT_VALUE",
+                "              FROM settings",
+                "              WHERE name = 'PASSWORD_RESET_SECRET_LIFESPAN')",
+                "AND",
+                "  pw_reset_secret = ?;");
 
-        final Integer userId = DB.executeQueryReturnValue(query, rs -> rs.getInt("User_ID"), DatabaseValue.of(pwResetSecret));
+        final Integer userId = DB.executeQueryReturnValue(query,
+                rs -> rs.getInt("User_ID"), DatabaseValue.of(pwResetSecret));
         return Optional.ofNullable(userId).orElse(-1);
     }
 }

@@ -48,10 +48,10 @@ import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 
 /**
  * This {@link HttpServlet} handles management of {@link PuzzleGame}.
- * <p>
- * Offers {@code POST} request handling for creating and ending a given game.
- * <p>
- * Serves under {@code /puzzle/games}.
+ *
+ * <p>Offers {@code POST} request handling for creating and ending a given game.
+ *
+ * <p>Serves under {@code /puzzle/games}.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameManager
@@ -65,12 +65,14 @@ public class PuzzleGameSelectionManager extends HttpServlet {
     private LoginBean login;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
         final String action = ServletUtils.formType(request);
         switch (action) {
             case "createGame":
@@ -88,16 +90,16 @@ public class PuzzleGameSelectionManager extends HttpServlet {
 
     /**
      * Creates a puzzle game for a given request for the required parameter {@code puzzleId}.
-     * <p>
-     * If the provided parameter is not valid, the request will abort and return a {@code 400} status code.
-     * <p>
-     * If a puzzle game can be created, the game is started and the user is redirected to the game page.
+     *
+     * <p>If the provided parameter is not valid, the request will abort and return a {@code 400} status code.
+     *
+     * <p>If a puzzle game can be created, the game is started and the user is redirected to the game page.
      *
      * @param request  the request to create a test.
      * @param response the response to the request.
      * @throws IOException when redirecting fails.
      */
-    static void createGame(int userId, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    static void createGame(int userId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
         if (!puzzleId.isPresent()) {
             logger.error("Failed to retrieve puzzleId from request.");
@@ -130,16 +132,16 @@ public class PuzzleGameSelectionManager extends HttpServlet {
 
     /**
      * Ends a puzzle game for a given request for the required parameter {@code gameId} before the game is solved.
-     * <p>
-     * If the provided parameter is not valid, the request will abort and return a {@code 400} status code.
-     * <p>
-     * If found, the game is shut down and the user is redirected to the puzzle overview page.
+     *
+     * <p>If the provided parameter is not valid, the request will abort and return a {@code 400} status code.
+     *
+     * <p>If found, the game is shut down and the user is redirected to the puzzle overview page.
      *
      * @param request  the request to create a mutant.
      * @param response the response to the request.
      * @throws IOException when redirecting fails.
      */
-    private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {
             logger.error("Failed to retrieve gameId from request.");

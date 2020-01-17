@@ -40,6 +40,7 @@ public interface TestSolvingStrategy {
         try {
             return ((TestSolvingStrategy) Types.valueOf(name).clazz.newInstance());
         } catch (IllegalArgumentException | IllegalAccessException | InstantiationException ignored) {
+            // ignored
         }
         return null;
     }

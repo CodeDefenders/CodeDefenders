@@ -28,8 +28,8 @@ import java.util.List;
 public class Feedback {
 
     public static List<Type> types = Collections.unmodifiableList(Arrays.asList(Type.values()));
-    public final static int MAX_RATING = 5;
-    public final static int MIN_RATING = -1;
+    public static final int MAX_RATING = 5;
+    public static final int MIN_RATING = -1;
 
     public enum Type {
         CUT_MUTATION_DIFFICULTY("Mutation Difficulty", "The class under test is difficult to mutate"),

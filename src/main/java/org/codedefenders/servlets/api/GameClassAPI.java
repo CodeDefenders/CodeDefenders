@@ -38,11 +38,11 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} offers an API for {@link GameClass game classes}.
- * <p>
- * A {@code GET} request with the {@code classId} parameter results in a JSON string containing
+ *
+ * <p>A {@code GET} request with the {@code classId} parameter results in a JSON string containing
  * class information, including the source code.
- * <p>
- * Serves on path: {@code /api/class}.
+ *
+ * <p>Serves on path: {@code /api/class}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#API_CLASS
@@ -51,9 +51,10 @@ import javax.servlet.http.HttpServletResponse;
 public class GameClassAPI extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         final Optional<GameClass> classId = ServletUtils.getIntParameter(request, "classId")
-            .map(GameClassDAO::getClassForId);
+                .map(GameClassDAO::getClassForId);
 
         if (!classId.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);

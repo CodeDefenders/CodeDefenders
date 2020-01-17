@@ -34,8 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This {@link HttpServlet} handles requests to send mails. Mails are sent
  * using {@link EmailUtils#sendEmailToSelf(String, String, String)}.
- * <p>
- * Serves on path: {@code /api/sendmail}.
+ *
+ * <p>Serves on path: {@code /api/sendmail}.
  * @see Paths#API_SEND_EMAIL
  */
 @WebServlet("/api/sendmail")

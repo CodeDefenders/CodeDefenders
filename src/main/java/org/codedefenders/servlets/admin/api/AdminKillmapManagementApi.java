@@ -20,6 +20,7 @@ package org.codedefenders.servlets.admin.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -29,16 +30,17 @@ import org.codedefenders.database.KillmapDAO.KillMapProgress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/admin/api/killmapmanagement")
 public class AdminKillmapManagementApi extends HttpServlet {
@@ -93,7 +95,7 @@ public class AdminKillmapManagementApi extends HttpServlet {
 
         long timeStart = System.currentTimeMillis();
 
-        List <? extends KillMapProgress> progresses = getData(dataType, killmapType);
+        List<? extends KillMapProgress> progresses = getData(dataType, killmapType);
         if (progresses == null) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
@@ -120,7 +122,7 @@ public class AdminKillmapManagementApi extends HttpServlet {
     private void doGetCSV(HttpServletResponse response, String dataType, String killmapType) throws IOException {
         response.setContentType("text/csv");
 
-        List <? extends KillMapProgress> progresses = getData(dataType, killmapType);
+        List<? extends KillMapProgress> progresses = getData(dataType, killmapType);
         if (progresses == null) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;

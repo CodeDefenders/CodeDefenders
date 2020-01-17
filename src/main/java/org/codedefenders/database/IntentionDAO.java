@@ -35,8 +35,8 @@ public class IntentionDAO {
 
     /**
      * Stores a given {@link DefenderIntention} in the database.
-     * <p>
-     * For context information, the associated {@link Test} of the intention
+     *
+     * <p>For context information, the associated {@link Test} of the intention
      * is provided as well.
      *
      * @param test      the given test as a {@link Test}.
@@ -71,8 +71,8 @@ public class IntentionDAO {
 
     /**
      * Stores a given {@link AttackerIntention} in the database.
-     * <p>
-     * For context information, the associated {@link Test} of the intention
+     *
+     * <p>For context information, the associated {@link Test} of the intention
      * is provided as well.
      *
      * @param mutant      the given mutant as a {@link Mutant}.

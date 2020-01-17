@@ -48,6 +48,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * Represents an instance of a {@link Puzzle puzzle}, which is played by one player.
+ *
  * @see Puzzle
  */
 public class PuzzleGame extends AbstractGame {
@@ -101,7 +102,7 @@ public class PuzzleGame extends AbstractGame {
      * If any error occurs during the preparation, {@code null} will be returned.
      *
      * @param puzzle {@link Puzzle} to create a {@link PuzzleGame} for.
-     * @param uid User ID of the user who plays the puzzle.
+     * @param uid    User ID of the user who plays the puzzle.
      * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or {@code null} if any error occurred.
      */
     public static PuzzleGame createPuzzleGame(Puzzle puzzle, int uid) {
@@ -140,13 +141,15 @@ public class PuzzleGame extends AbstractGame {
 
         /* Add the mutants from the puzzle. */
         for (Mutant mutant : mappedMutants) {
-            final Mutant newMutant = new Mutant(game.id, game.classId, mutant.getJavaFile(), mutant.getClassFile(), true, dummyAttackerId);
+            final Mutant newMutant = new Mutant(game.id, game.classId,
+                    mutant.getJavaFile(), mutant.getClassFile(), true, dummyAttackerId);
             newMutant.insert();
             mutantMap.put(mutant.getId(), newMutant);
         }
 
         if (!mutantMap.isEmpty() && !testMap.isEmpty()) {
-            for (TargetExecution targetExecution : TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.classId)) {
+            for (TargetExecution targetExecution :
+                    TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.classId)) {
                 Test test = testMap.get(targetExecution.testId);
                 Mutant mutant = mutantMap.get(targetExecution.mutantId);
 
@@ -180,8 +183,9 @@ public class PuzzleGame extends AbstractGame {
 
     /**
      * Constructor for creating a new puzzle game (instantiating a puzzle).
+     *
      * @param puzzle The {@link Puzzle} the {@link PuzzleGame} is for.
-     * @param uid The user id of the user who the puzzle is for.
+     * @param uid    The user id of the user who the puzzle is for.
      */
     private PuzzleGame(Puzzle puzzle, int uid) {
         /* AbstractGame attributes */
@@ -247,18 +251,20 @@ public class PuzzleGame extends AbstractGame {
     /**
      * Returns the pre-defined mutants from the puzzle.
      * If the mutants are requested for the first time for this instance, they will be queried from the database.
+     *
      * @return The pre-defined mutants from the puzzle.
      */
     public List<Mutant> getPuzzleMutants() {
-       if (mutants == null) {
-           mutants = getMutants();
-       }
-       return mutants.stream().filter(m -> m.getPlayerId() == DUMMY_ATTACKER_USER_ID).collect(Collectors.toList());
+        if (mutants == null) {
+            mutants = getMutants();
+        }
+        return mutants.stream().filter(m -> m.getPlayerId() == DUMMY_ATTACKER_USER_ID).collect(Collectors.toList());
     }
 
     /**
      * Returns the pre-defined tests from the puzzle.
      * If the tests are requested for the first time for this instance, they will be queried from the database.
+     *
      * @return The pre-defined tests from the puzzle.
      */
     public List<Test> getPuzzleTests() {
@@ -271,6 +277,7 @@ public class PuzzleGame extends AbstractGame {
     /**
      * Returns the player-written mutants.
      * If the mutants are requested for the first time for this instance, they will be queried from the database.
+     *
      * @return The player-written mutants.
      */
     public List<Mutant> getPlayerMutants() {
@@ -283,6 +290,7 @@ public class PuzzleGame extends AbstractGame {
     /**
      * Returns the player-written mutants.
      * If the tests are requested for the first time for this instance, they will be queried from the database.
+     *
      * @return The player-written mutants.
      */
     public List<Test> getPlayerTests() {
@@ -296,6 +304,7 @@ public class PuzzleGame extends AbstractGame {
      * Returns the number of valid mutants and tests the player submitted in the game.
      * This counts every mutant that was successfully validated and compiled, and every test that was successfully
      * validated, compiled and tested against the original class.
+     *
      * @return Rhe number of valid mutants and tests the player submitted in the game.
      */
     public int getValidSubmissionCount() {
@@ -306,6 +315,7 @@ public class PuzzleGame extends AbstractGame {
      * Returns the number of invalid mutants and tests the player submitted in the game.
      * This counts every mutant that couldn't be validated or compiled, and every test that couldn't be validated or
      * compiled, or failed against the original class.
+     *
      * @return Rhe number of valid mutants and tests the player submitted in the game.
      */
     public int getInvalidSubmissionCount() {
@@ -339,6 +349,7 @@ public class PuzzleGame extends AbstractGame {
     /**
      * Returns the {@link Puzzle} this is an instance of. If the puzzle is requested for the first time for this
      * instance, it will be queried from the database.
+     *
      * @return The puzzle this is an instance of.
      */
     public Puzzle getPuzzle() {
@@ -354,6 +365,7 @@ public class PuzzleGame extends AbstractGame {
 
     /**
      * Increments the current round by one and returns the new current round.
+     *
      * @return The new current round.
      */
     public int incrementCurrentRound() {
@@ -364,8 +376,9 @@ public class PuzzleGame extends AbstractGame {
      * Adds a player with the given user ID and {@link Role} to the game.
      * The dummy attacker and defender can only be added with their respective {@link Role}.
      * The actual player can only be added with the active role, which the puzzle specifies.
+     *
      * @param userId The user ID.
-     * @param role The {@link Role}.
+     * @param role   The {@link Role}.
      * @return {@code true} Id the player was successfully added to the puzzle, {@code false} otherwise.
      * @see Constants#DUMMY_ATTACKER_USER_ID
      * @see Constants#DUMMY_DEFENDER_USER_ID

@@ -86,13 +86,15 @@ public class AdminSystemSettings extends HttpServlet {
         CONNECTION_POOL_CONNECTIONS {
             @Override
             public String toString() {
-                return "Number of permanently open connections. Recommended: >20 \nLowering this number closes the delta in connections!";
+                return "Number of permanently open connections. Recommended: >20 \n"
+                        + "Lowering this number closes the delta in connections!";
             }
         },
         CONNECTION_WAITING_TIME {
             @Override
             public String toString() {
-                return "Amount of time in ms a thread waits to be notified of newly available connections. Recommended: ~5000ms";
+                return "Amount of time in ms a thread waits to be notified of newly available connections."
+                        + "Recommended: ~5000ms";
             }
         },
         SITE_NOTICE {
@@ -134,7 +136,8 @@ public class AdminSystemSettings extends HttpServlet {
         EMAILS_ENABLED {
             @Override
             public String toString() {
-                return "Send emails from the specified account for verification, resetting passwords and when the admin changes user info";
+                return "Send emails from the specified account for verification, resetting passwords and when"
+                        + "the admin changes user info";
             }
         },
         PASSWORD_RESET_SECRET_LIFESPAN {
@@ -270,14 +273,18 @@ public class AdminSystemSettings extends HttpServlet {
                         break;
                     case INT_VALUE:
                         setting.setIntValue(Integer.parseInt(valueString));
-                        if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS))
+                        if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS)) {
                             ConnectionPool.instance().updateSize(Integer.parseInt(valueString));
-                        if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME))
+                        }
+                        if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME)) {
                             ConnectionPool.instance().updateWaitingTime(Integer.parseInt(valueString));
+                        }
                         break;
                     case BOOL_VALUE:
                         setting.setBoolValue(valueString != null);
                         break;
+                    default:
+                        // ignored
                 }
                 success = success && AdminDAO.updateSystemSetting(setting);
             }

@@ -57,7 +57,7 @@ public class LoginFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -87,7 +87,8 @@ public class LoginFilter implements Filter {
     }
 
     @Override
-    public void destroy() { }
+    public void destroy() {
+    }
 
     private boolean loginRequired(HttpServletRequest request) {
         String path = request.getRequestURI();
@@ -115,8 +116,9 @@ public class LoginFilter implements Filter {
                 || path.contains(context + "/papers")
                 || path.endsWith(context + Paths.API_SEND_EMAIL)
                 || path.endsWith(context + Paths.ABOUT_PAGE)
-                || path.endsWith(context + Paths.CONTACT_PAGE))
+                || path.endsWith(context + Paths.CONTACT_PAGE)) {
             return false;
+        }
 
         Pattern excludeUrls = Pattern.compile("^.*/(css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
         Matcher m = excludeUrls.matcher(path);

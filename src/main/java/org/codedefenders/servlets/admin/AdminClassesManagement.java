@@ -41,8 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link org.codedefenders.game.GameClass GameClasses}.
  *
- * <p>
- * Serves on path: {@code /admin/classes}.
+ * <p>Serves on path: {@code /admin/classes}.
  *
  * @see Paths#ADMIN_CLASSES
  */

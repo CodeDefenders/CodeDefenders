@@ -44,11 +44,11 @@ import static org.codedefenders.servlets.util.ServletUtils.ctx;
 
 /**
  * This {@link HttpServlet} handles to the landing page under "/".
- * <p>
- * {@code GET} requests redirects to a landing page, depending whether
+ *
+ * <p>{@code GET} requests redirects to a landing page, depending whether
  * the requesting user is logged in or not.
- * <p>
- * Serves under {@code /}.
+ *
+ * <p>Serves under {@code /}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#LANDING_PAGE
@@ -60,7 +60,8 @@ public class LandingPage extends HttpServlet {
     private LoginBean login;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
 
         if (login.isLoggedIn()) {
             // User logged in? Send him to the games overview.

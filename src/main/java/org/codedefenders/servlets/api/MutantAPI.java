@@ -38,11 +38,11 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} offers an API for {@link Mutant mutants}.
- * <p>
- * A {@code GET} request with the {@code mutantId} parameter results in a JSON string containing
+ *
+ * <p>A {@code GET} request with the {@code mutantId} parameter results in a JSON string containing
  * mutant information, including the source code diff.
- * <p>
- * Serves on path: {@code /api/mutant}.
+ *
+ * <p>Serves on path: {@code /api/mutant}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#API_MUTANT
@@ -51,9 +51,10 @@ import javax.servlet.http.HttpServletResponse;
 public class MutantAPI extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         final Optional<Mutant> mutant = ServletUtils.getIntParameter(request, "mutantId")
-            .map(MutantDAO::getMutantById);
+                .map(MutantDAO::getMutantById);
 
         if (!mutant.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);

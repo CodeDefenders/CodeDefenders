@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -47,10 +48,11 @@ import javax.servlet.http.HttpSession;
 /**
  * This {@link HttpServlet} handles notification requests. Notifications are logged and
  * stored server side. Clients request their most recent notifications.
- * <p>
- * In this servlet, all {@link NotificationType NotificationTypes} are handled.
- * <p>
- * Serves on path: {@code /api/notifications}.
+ *
+ * <p>In this servlet, all {@link NotificationType NotificationTypes} are handled.
+ *
+ * <p>Serves on path: {@code /api/notifications}.
+ *
  * @see org.codedefenders.util.Paths#API_NOTIFICATION
  */
 @WebServlet("/api/notifications")
@@ -108,7 +110,8 @@ public class NotificationsHandler extends HttpServlet {
      * If parameters are valid, responds with a JSON list of most recent {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handlePushEventRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handlePushEventRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         final String gameIdString = request.getParameter("gameId");
         if (gameIdString == null) {
             response.setStatus(400);
@@ -127,7 +130,8 @@ public class NotificationsHandler extends HttpServlet {
         final Object lastMsg1 = request.getSession().getAttribute("lastMsg");
         final int lastMessageId = lastMsg1 != null ? (Integer) lastMsg1 : 0;
 
-        final ArrayList<Event> events = new ArrayList<>(DatabaseAccess.getNewEquivalenceDuelEventsForGame(gameId, lastMessageId));
+        final ArrayList<Event> events =
+                new ArrayList<>(DatabaseAccess.getNewEquivalenceDuelEventsForGame(gameId, lastMessageId));
         if (!events.isEmpty()) {
             int lastMsg = Collections.max(events, Event.MAX_ID_COMPARATOR).getId();
             session.setAttribute("lastMsg", lastMsg);
@@ -152,7 +156,8 @@ public class NotificationsHandler extends HttpServlet {
      * If parameters are valid, responds with a JSON list of most recent game {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         final String timestampString = request.getParameter("timestamp");
         if (timestampString == null) {
             response.setStatus(400);
@@ -203,7 +208,8 @@ public class NotificationsHandler extends HttpServlet {
      * If parameters are valid, responds with a JSON list of most recent user {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
         final String timestampString = request.getParameter("timestamp");
         if (timestampString == null) {
             response.setStatus(400);

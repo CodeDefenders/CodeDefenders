@@ -38,11 +38,11 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} offers an API for {@link Test tests}.
- * <p>
- * A {@code GET} request with the {@code testId} parameter results in a JSON string containing
+ *
+ * <p>A {@code GET} request with the {@code testId} parameter results in a JSON string containing
  * test information, including the source code.
- * <p>
- * Serves on path: {@code /api/test}.
+ *
+ * <p>Serves on path: {@code /api/test}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#API_TEST
@@ -51,9 +51,10 @@ import javax.servlet.http.HttpServletResponse;
 public class TestAPI extends HttpServlet {
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         final Optional<Test> test = ServletUtils.getIntParameter(request, "testId")
-            .map(TestDAO::getTestById);
+                .map(TestDAO::getTestById);
 
         if (!test.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);

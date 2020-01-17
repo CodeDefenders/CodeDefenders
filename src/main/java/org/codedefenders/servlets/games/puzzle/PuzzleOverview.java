@@ -46,10 +46,10 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} handles to the overview page of {@link PuzzleGame}s.
- * <p>
- * {@code GET} requests redirect to the puzzle overview page.
- * <p>
- * Serves under {@code /puzzles}.
+ *
+ * <p>{@code GET} requests redirect to the puzzle overview page.
+ *
+ * <p>Serves under {@code /puzzles}.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameSelectionManager
@@ -64,7 +64,8 @@ public class PuzzleOverview extends HttpServlet {
     private LoginBean login;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         final Set<PuzzleGame> activePuzzles = new HashSet<>(PuzzleDAO.getActivePuzzleGamesForUser(login.getUserId()));
 
         final SortedSet<PuzzleChapterEntry> puzzles = PuzzleDAO.getPuzzleChapters()
@@ -87,8 +88,8 @@ public class PuzzleOverview extends HttpServlet {
     /**
      * Helper function which converts a {@link PuzzleChapter} to a {@link PuzzleChapterEntry} for a
      * given userId and a set of active {@link PuzzleGame}s.
-     * <p>
-     * All {@link Puzzle}s for the chapter, which the given user has active games for, are replaced
+     *
+     * <p>All {@link Puzzle}s for the chapter, which the given user has active games for, are replaced
      * with the active game.
      *
      * @param userId        the user who requested the puzzle.
@@ -97,7 +98,8 @@ public class PuzzleOverview extends HttpServlet {
      * @see PuzzleChapterEntry
      * @see #toPuzzleChapterEntry(int, Set)
      */
-    private Function<PuzzleChapter, PuzzleChapterEntry> toPuzzleChapterEntry(int userId, Set<PuzzleGame> activePuzzles) {
+    private Function<PuzzleChapter, PuzzleChapterEntry> toPuzzleChapterEntry(int userId,
+                                                                             Set<PuzzleGame> activePuzzles) {
         return puzzleChapter -> {
             final Set<PuzzleEntry> puzzleEntries = PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())
                     .stream()
@@ -111,7 +113,7 @@ public class PuzzleOverview extends HttpServlet {
      * Helper function which converts a {@link Puzzle} to a {@link PuzzleEntry} for a given userId and a
      * set of active {@link PuzzleGame}s.
      *
-     * If there exist an active game for this puzzle, the returned entry contains a {@link PuzzleGame} instance.
+     * <p>If there exist an active game for this puzzle, the returned entry contains a {@link PuzzleGame} instance.
      * Otherwise, the returned entry contains a {@link Puzzle} instance.
      *
      * @param userId        the user who requested the puzzle. The puzzle may be locked for the user.

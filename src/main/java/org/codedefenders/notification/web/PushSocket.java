@@ -130,8 +130,9 @@ public class PushSocket {
     }
 
     @OnOpen
-    public synchronized void open(Session session, @PathParam("ticket") String ticket, @PathParam("userId") Integer userId)
-            throws IOException {
+    public synchronized void open(Session session,
+                                  @PathParam("ticket") String ticket,
+                                  @PathParam("userId") Integer userId) throws IOException {
 
         if (! ticketingServices.validateTicket(ticket, userId)) {
             logger.info("Invalid ticket for session " + session);

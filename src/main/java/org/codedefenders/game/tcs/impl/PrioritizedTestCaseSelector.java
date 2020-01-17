@@ -11,7 +11,7 @@ public abstract class PrioritizedTestCaseSelector implements ITestCaseSelector {
     public abstract List<Test> prioritize(List<Test> allTests);
 
     @Override
-    final public List<Test> select(List<Test> allTests, int maxTests) {
+    public final List<Test> select(List<Test> allTests, int maxTests) {
         if (allTests.size() < 2) {
             return allTests.stream().limit(maxTests).collect(Collectors.toList());
         }

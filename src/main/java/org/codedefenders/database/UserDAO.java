@@ -163,9 +163,21 @@ public class UserDAO {
                 .toArray(DatabaseValue[]::new);
 
         class GameCreator {
-            int gameId; GameCreator gameId(int gameId) {this.gameId = gameId; return this;}
-            String name; GameCreator name(String name) {this.name = name; return this;}
+            int gameId;
+
+            GameCreator gameId(int gameId) {
+                this.gameId = gameId;
+                return this;
+            }
+
+            String name;
+
+            GameCreator name(String name) {
+                this.name = name;
+                return this;
+            }
         }
+
         final RSMapper<GameCreator> mapper = (rs) -> new GameCreator()
                 .gameId(rs.getInt("games.ID"))
                 .name(rs.getString("users.Username"));

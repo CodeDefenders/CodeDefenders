@@ -46,10 +46,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
+
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
- * <p>
- * Serves on path: {@code /admin/users}.
+ *
+ * <p>Serves on path: {@code /admin/users}.
+ *
  * @see org.codedefenders.util.Paths#ADMIN_USERS
  */
 @WebServlet("/admin/users")
@@ -63,13 +66,13 @@ public class AdminUserManagement extends HttpServlet {
     public static final char[] DIGITS = "0123456789".toCharArray();
 
     private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
-    private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n " +
-            "An account has been created for you with Username %s and Password %s.\n" +
-            "You can log in at %s. \n\n Happy coding!";
+    private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n "
+            + "An account has been created for you with Username %s and Password %s.\n"
+            + "You can log in at %s. \n\n Happy coding!";
     private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-    private static final String PASSWORD_RESET_MSG = "%s, \n\n" +
-            "your password has been reset to %s\n" +
-            "Please change it at your next convenience.";
+    private static final String PASSWORD_RESET_MSG = "%s, \n\n"
+            + "your password has been reset to %s\n"
+            + "Please change it at your next convenience.";
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -81,8 +84,8 @@ public class AdminUserManagement extends HttpServlet {
         String responsePath = request.getContextPath() + Paths.ADMIN_USERS;
 
         final String formType = ServletUtils.formType(request);
-		switch (formType) {
-			case "manageUsers": {
+        switch (formType) {
+            case "manageUsers": {
                 final Optional<Integer> userToReset = ServletUtils.getIntParameter(request, "resetPasswordButton");
                 if (userToReset.isPresent()) {
                     messages.add(resetUserPW(userToReset.get()));
@@ -100,23 +103,25 @@ public class AdminUserManagement extends HttpServlet {
                 }
                 final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
                 if (userToEdit.isPresent()) {
-                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEdit.get();
-                    break;
+                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
+                            + "?editUser=" + userToEdit.get();
                 }
+                break;
             }
-			case "createUsers": {
+            case "createUsers": {
                 final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
-				if (!userList.isPresent()) {
+                if (!userList.isPresent()) {
                     logger.error("Creating users failed. Missing parameter 'user_name_list'");
                 } else {
                     logger.info("Creating users....");
                     createUserAccounts(request, userList.get());
-					logger.info("Creating users succeeded.");
-				}
-				break;
+                    logger.info("Creating users succeeded.");
+                }
+                break;
             }
-			case "editUser": {
-			    // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the userid from the session attributes
+            case "editUser": {
+                // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
+                //  'userid' from the session attributes
                 final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
                 if (!userId.isPresent()) {
                     logger.error("Creating users failed. Missing request parameter 'uid'");
@@ -125,21 +130,22 @@ public class AdminUserManagement extends HttpServlet {
                     String msg = editUser(userId.get(), request, successMsg);
                     messages.add(msg);
                     if (!msg.equals(successMsg)) {
-                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userId.get();
+                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
+                                + "?editUser=" + userId.get();
                     }
                 }
                 break;
             }
-			default:
+            default:
                 logger.error("Action {" + formType + "} not recognised.");
                 break;
-		}
+        }
 
         response.sendRedirect(responsePath);
     }
 
     private boolean setUserInactive(int userId) {
-	    final User user = UserDAO.getUserById(userId);
+        final User user = UserDAO.getUserById(userId);
         if (user == null) {
             return false;
         }
@@ -148,46 +154,53 @@ public class AdminUserManagement extends HttpServlet {
 
     }
 
-	private String editUser(int userId, HttpServletRequest request, String successMsg) {
+    private String editUser(int userId, HttpServletRequest request, String successMsg) {
         User u = UserDAO.getUserById(userId);
-        if (u == null)
+        if (u == null) {
             return "Error. User " + userId + " cannot be retrieved from database.";
+        }
 
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        String confirm_password = request.getParameter("confirm_password");
+        String confirmPassword = request.getParameter("confirm_password");
 
-        if (!password.equals(confirm_password))
+        if (!password.equals(confirmPassword)) {
             return "Passwords don't match";
+        }
 
-        if (!name.equals(u.getUsername()) && UserDAO.getUserByName(name) != null)
+        if (!name.equals(u.getUsername()) && UserDAO.getUserByName(name) != null) {
             return "Username " + name + " is already taken";
+        }
 
-        if (!email.equals(u.getEmail()) && UserDAO.getUserByEmail(email) != null)
+        if (!email.equals(u.getEmail()) && UserDAO.getUserByEmail(email) != null) {
             return "Email " + email + " is already in use";
+        }
 
-        if (!LoginManager.validEmailAddress(email))
+        if (!LoginManager.validEmailAddress(email)) {
             return "Email Address is not valid";
+        }
 
         if (!password.equals("")) {
             // we don't want to encode the already encoded password from the DB
-            if (!LoginManager.validPassword(password))
+            if (!LoginManager.validPassword(password)) {
                 return "Password is not valid";
+            }
             u.setEncodedPassword(User.encodePassword(password));
         }
         u.setUsername(name);
         u.setEmail(email);
 
-        if (!u.update())
+        if (!u.update()) {
             return "Error trying to update info for user " + userId + "!";
+        }
         return successMsg;
     }
 
     private void createUserAccounts(HttpServletRequest request, String userNameListString) {
         final String[] lines = userNameListString.split(AdminCreateGames.USER_NAME_LIST_DELIMITER);
 
-        final boolean sendMail = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue();
+        final boolean sendMail = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
         final String hostAddress = ServletUtils.getBaseURL(request);
 
         for (String credentials : lines) {
@@ -197,12 +210,12 @@ public class AdminUserManagement extends HttpServlet {
 
     /**
      * Creates a user for a given string, which has to be formatted like:
-     * <p>
-     * {@code username,password}
-     * <p>
-     * {@code username,password,email}
      *
-     * Values can be separated by either ',' or ';'.
+     * <p>{@code username,password}
+     *
+     * <p>{@code username,password,email}
+     *
+     * <p>Values can be separated by either ',' or ';'.
      */
     private void createUserAccount(String userCredentials, boolean sendMail, String hostAddress) {
         // credentials have following form: username, password, email (optional)
@@ -223,16 +236,16 @@ public class AdminUserManagement extends HttpServlet {
             messages.add("Username '" + username + "' already in use.");
             return;
         }
-        if(!LoginManager.validUsername(username)) {
+        if (!LoginManager.validUsername(username)) {
             logger.info("Failed to create user. Username invalid:" + username);
             messages.add("Username '" + username + "' invalid, user not created");
             return;
         }
 
         final String password = credentials[1].trim();
-        if(!LoginManager.validPassword(password)) {
+        if (!LoginManager.validPassword(password)) {
             logger.info("Failed to create user. Password invalid:" + password);
-            messages.add("Password for user "+ username +" invalid, user not created");
+            messages.add("Password for user " + username + " invalid, user not created");
             return;
         }
 
@@ -258,7 +271,7 @@ public class AdminUserManagement extends HttpServlet {
             logger.error(errorMsg);
             messages.add(errorMsg);
         } else {
-            messages.add("Created user "+ username + (hasMail ? " ("+email+")" : ""));
+            messages.add("Created user " + username + (hasMail ? " (" + email + ")" : ""));
             if (hasMail && sendMail && hostAddress != null) {
                 final boolean mailSuccess = sendNewAccountMsg(email, username, password, hostAddress);
                 if (!mailSuccess) {
@@ -286,7 +299,7 @@ public class AdminUserManagement extends HttpServlet {
         String newPassword = generatePW();
 
         if (AdminDAO.setUserPassword(uid, User.encodePassword(newPassword))) {
-            if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
+            if (AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue()) {
                 User u = UserDAO.getUserById(uid);
                 String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
                 EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
@@ -308,7 +321,10 @@ public class AdminUserManagement extends HttpServlet {
         }
         char[] resultChars = sb.toString().toCharArray();
 
-        List<Integer> randomInts = Arrays.stream(new IntRange(0, length - 1).toArray()).boxed().collect(Collectors.toList());
+        List<Integer> randomInts = Arrays
+                .stream(new IntRange(0, length - 1).toArray())
+                .boxed()
+                .collect(Collectors.toList());
         Collections.shuffle(randomInts);
 
         int c = 0;

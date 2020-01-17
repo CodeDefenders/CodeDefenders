@@ -21,8 +21,8 @@ package org.codedefenders.validation.code;
 /**
  * This enumeration represents states and their
  * message during code validation.
- * <p>
- * Use {@link #get()} to retrieve the message as a {@link String}.
+ *
+ * <p>Use {@link #get()} to retrieve the message as a {@link String}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */

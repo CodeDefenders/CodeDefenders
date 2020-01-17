@@ -20,6 +20,7 @@ package org.codedefenders.servlets.admin.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -29,16 +30,17 @@ import org.codedefenders.database.AnalyticsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/admin/api/classes")
 public class AdminAnalyticsClassesApi extends HttpServlet {
@@ -139,11 +141,12 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
 
         for (ClassDataDTO clazz : classData) {
             try {
-                for(int i = 0; i < 10; i++) {
+                for (int i = 0; i < 10; i++) {
                     csvPrinter.print(PropertyUtils.getProperty(clazz, columns[i]));
                 }
-                for(String ratingName : ratingNames) {
-                    ClassDataDTO.ClassRating rating = (ClassDataDTO.ClassRating) PropertyUtils.getProperty(clazz.getRatings(), ratingName);
+                for (String ratingName : ratingNames) {
+                    ClassDataDTO.ClassRating rating =
+                            (ClassDataDTO.ClassRating) PropertyUtils.getProperty(clazz.getRatings(), ratingName);
                     csvPrinter.print(rating.getCount());
                     csvPrinter.print(rating.getSum());
                 }
@@ -157,5 +160,6 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException { }
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    }
 }

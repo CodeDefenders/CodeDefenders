@@ -18,8 +18,8 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
@@ -46,7 +46,6 @@ import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -56,7 +55,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +68,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
 import static org.codedefenders.servlets.util.ServletUtils.gameId;
@@ -82,19 +82,17 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * This {@link HttpServlet} handles selection of {@link MultiplayerGame battleground games}.
- * <p>
- * {@code GET} requests redirect to the game overview page and {@code POST} requests handle creating, joining
+ *
+ * <p>{@code GET} requests redirect to the game overview page and {@code POST} requests handle creating, joining
  * and entering {@link MultiplayerGame battleground games}.
- * <p>
- * Serves under {@code /multiplayer/games}.
+ *
+ * <p>Serves under {@code /multiplayer/games}.
  *
  * @see org.codedefenders.util.Paths#BATTLEGROUND_SELECTION
  */
 @WebServlet("/multiplayer/games")
 public class MultiplayerGameSelectionManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameSelectionManager.class);
-
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
     @Inject
     private MessagesBean messages;
@@ -137,7 +135,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final boolean canCreateGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
+        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
         if (!canCreateGames) {
             logger.warn("User {} tried to create a battleground game, but creating games is not permitted.", login.getUserId());
             Redirect.redirectBack(request, response);
@@ -158,7 +156,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
             forceHamcrest = parameterThenOrOther(request, "forceHamcrest", true, false);
             automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
-            mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel").map(CodeValidatorLevel::valueOrNull).get();
+            mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel")
+                    .map(CodeValidatorLevel::valueOrNull)
+                    .get();
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
         } catch (NoSuchElementException e) {
             logger.error("At least one request parameter was missing or was no valid integer value.", e);
@@ -277,7 +277,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final boolean canJoinGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
+        final boolean canJoinGames = AdminDAO.getSystemSetting(GAME_JOINING).getBoolValue();
         if (!canJoinGames) {
             logger.warn("User {} tried to join a battleground game, but joining games is not permitted.", login.getUserId());
             Redirect.redirectBack(request, response);

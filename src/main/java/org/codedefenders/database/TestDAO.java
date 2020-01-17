@@ -106,7 +106,8 @@ public class TestDAO {
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId));
     }
 
-    public static List<Test> getTestsForGameAndUser(int gameId, int userId) throws UncheckedSQLException, SQLMappingException {
+    public static List<Test> getTestsForGameAndUser(int gameId, int userId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT * FROM tests ",
                 "LEFT JOIN players ON players.ID = tests.Player_ID ",
@@ -114,14 +115,18 @@ public class TestDAO {
                 "WHERE tests.Game_ID = ?",
                 "  AND players.User_ID = ?",
                 ";");
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId), DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query,
+                TestDAO::testFromRS,
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId));
     }
 
 
     /**
      * Returns the {@link Test Tests} from the given game for the given player
      */
-    public static List<Test> getTestsForGameAndPlayer(int gameId, int playerId) throws UncheckedSQLException, SQLMappingException {
+    public static List<Test> getTestsForGameAndPlayer(int gameId, int playerId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT * FROM tests ",
                 "LEFT JOIN players ON players.ID = tests.Player_ID ",
@@ -129,16 +134,16 @@ public class TestDAO {
                 "WHERE tests.Game_ID = ?",
                 "  AND tests.Player_ID = ?",
                 ";");
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId), DatabaseValue.of( playerId));
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS,
+                DatabaseValue.of(gameId), DatabaseValue.of(playerId));
     }
 
     /**
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
      *
-     * @param gameId the identifier of the given game.
+     * @param gameId        the identifier of the given game.
      * @param defendersOnly If {@code true}, only return tests that were written by defenders.
-     *                      <p>
      *                      Include also the tests uploaded by the System Defender
      * @return a {@link List} of valid tests for the given game.
      */
@@ -188,7 +193,8 @@ public class TestDAO {
                 "SELECT t.*",
                 "FROM view_valid_tests t",
                 (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
-                "WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? ) AND t.Game_ID=? ",
+                "WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? )",
+                "  AND t.Game_ID=? ",
                 (defendersOnly ? "AND pl.Role='DEFENDER';" : ";"));
         return DB.executeQueryReturnList(query, TestDAO::testFromRS,
                 DatabaseValue.of(aliveMutant.getId()),
@@ -198,8 +204,8 @@ public class TestDAO {
     /**
      * Returns the valid {@link Test Tests} from the games played on the given class.
      * Valid tests are compilable and do not fail when executed against the original class.
-     * <p>
-     * Include also the tests from the System Defender
+     *
+     * <p>Include also the tests from the System Defender
      *
      * @param classId the identifier of the given class.
      * @return a {@link List} of valid tests for the given class.
@@ -231,8 +237,8 @@ public class TestDAO {
 
     /**
      * Stores a given {@link Test} in the database.
-     * <p>
-     * This method does not update the given test object.
+     *
+     * <p>This method does not update the given test object.
      * Use {@link Test#insert()} instead.
      *
      * @param test the given test as a {@link Test}.
@@ -241,7 +247,8 @@ public class TestDAO {
      */
     public static int storeTest(Test test) throws UncheckedSQLException {
         String relativeJavaFile = FileUtils.getRelativeDataPath(test.getJavaFile()).toString();
-        String relativeClassFile = test.getClassFile() == null ? null : FileUtils.getRelativeDataPath(test.getClassFile()).toString();
+        String relativeClassFile =
+                test.getClassFile() == null ? null : FileUtils.getRelativeDataPath(test.getClassFile()).toString();
         int gameId = test.getGameId();
         int roundCreated = test.getRoundCreated();
         int mutantsKilled = test.getMutantsKilled();
@@ -254,11 +261,22 @@ public class TestDAO {
         String linesUncovered = "";
 
         if (lineCoverage != null) {
-            linesCovered = lineCoverage.getLinesCovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
-            linesUncovered = lineCoverage.getLinesUncovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
+            linesCovered = lineCoverage.getLinesCovered()
+                    .stream()
+                    .sorted()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+            linesUncovered = lineCoverage.getLinesUncovered()
+                    .stream()
+                    .sorted()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
         }
 
-        String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";
+        String query = String.join("\n",
+                "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID,",
+                "Points, Class_ID, Lines_Covered, Lines_Uncovered)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?);");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(relativeJavaFile),
                 DatabaseValue.of(relativeClassFile),
@@ -294,12 +312,18 @@ public class TestDAO {
         final int score = test.getScore();
 
         String linesCoveredString = "";
-        String linesUncoveredString= "";
+        String linesUncoveredString = "";
 
         LineCoverage lineCoverage = test.getLineCoverage();
         if (lineCoverage != null) {
-            linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-            linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesCoveredString = lineCoverage.getLinesCovered()
+                    .stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+            linesUncoveredString = lineCoverage.getLinesUncovered()
+                    .stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
         }
 
 

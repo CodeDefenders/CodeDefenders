@@ -54,10 +54,9 @@ public class FileUtils {
     public static String createIndexXML(File dir, String fileName, String contents) throws IOException {
         Path path = Paths.get(dir.getAbsolutePath(), fileName + ".xml");
         File infoFile = path.toFile();
-        FileWriter infoWriter = new FileWriter(infoFile);
-        BufferedWriter bInfoWriter = new BufferedWriter(infoWriter);
-        bInfoWriter.write(contents);
-        bInfoWriter.close();
+        BufferedWriter infoWriter = new BufferedWriter(new FileWriter(infoFile));
+        infoWriter.write(contents);
+        infoWriter.close();
         return path.toString();
     }
 
@@ -115,10 +114,10 @@ public class FileUtils {
 
     /**
      * Reads a {@code .java} for a given file path, or if failed return a default.
-     * <p>
-     * If the file cannot be found, {@code [File Not Found]} is returned.
-     * <p>
-     * If the file cannot be read, {@code [File Not Readable]} is returned.
+     *
+     * <p>If the file cannot be found, {@code [File Not Found]} is returned.
+     *
+     * <p>If the file cannot be read, {@code [File Not Readable]} is returned.
      *
      * @param javaFilePath the path to the java file.
      * @return the java file, or a default.
@@ -144,8 +143,8 @@ public class FileUtils {
 
     /**
      * Returns the file name without extension for a given file path.
-     * <p>
-     * E.g. for {@code Test.java}, the method returns {@code Test}.
+     *
+     * <p>E.g. for {@code Test.java}, the method returns {@code Test}.
      *
      * @param filePath the path of the file.
      * @return the file name without file extension.
@@ -213,10 +212,10 @@ public class FileUtils {
         }
     }
 
-   /**
+    /**
      * Returns the qualified name of a java class for a given {@code .java} file content.
-     * <p>
-     * E.g. {@code java.util.Collection} for {@link Collection}.
+     *
+     * <p>E.g. {@code java.util.Collection} for {@link Collection}.
      *
      * @param javaClassFilePath The path to the java class file.
      * @return A qualified name of the given java class.
@@ -252,6 +251,7 @@ public class FileUtils {
                 // removing folder again, if empty
                 Files.delete(folderPath);
             } catch (DirectoryNotEmptyException ignored) {
+                // ignored
             }
             throw e;
         }

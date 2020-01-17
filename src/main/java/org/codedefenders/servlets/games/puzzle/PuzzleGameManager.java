@@ -18,40 +18,10 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
-import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
-import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.IMutationTester;
@@ -85,12 +55,47 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
+import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
+import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
+import static org.codedefenders.game.puzzle.solving.MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
+import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link PuzzleGame PuzzleGames}.
- * <p>
- * {@code GET} requests allow accessing puzzle games and {@code POST} requests handle creating of tests or mutants.
- * <p>
- * Serves under {@code /puzzlegame}.
+ *
+ * <p>{@code GET} requests allow accessing puzzle games and {@code POST} requests handle creating of tests or mutants.
+ *
+ * <p>Serves under {@code /puzzlegame}.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameSelectionManager
@@ -120,7 +125,8 @@ public class PuzzleGameManager extends HttpServlet {
     private PreviousSubmissionBean previousSubmission;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         final PuzzleGame game;
 
         final Optional<Integer> gameIdOpt = gameId(request);
@@ -130,12 +136,14 @@ public class PuzzleGameManager extends HttpServlet {
             game = PuzzleDAO.getPuzzleGameForId(gameId);
 
             if (game == null) {
-                logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database for gameId: {}.", gameId);
+                logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database"
+                        + "for gameId: {}.", gameId);
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
             }
             if (game.getCreatorId() != login.getUserId()) {
-                logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.", login.getUserId(), gameId);
+                logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.",
+                        login.getUserId(), gameId);
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
             }
@@ -150,7 +158,8 @@ public class PuzzleGameManager extends HttpServlet {
             game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
 
             if (game == null) {
-                logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}", puzzleId, login.getUserId());
+                logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}",
+                        puzzleId, login.getUserId());
                 PuzzleGameSelectionManager.createGame(login.getUserId(), request, response);
                 return;
             }
@@ -173,7 +182,8 @@ public class PuzzleGameManager extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
         final HttpSession session = request.getSession();
         final String action = ServletUtils.formType(request);
         switch (action) {
@@ -196,14 +206,14 @@ public class PuzzleGameManager extends HttpServlet {
 
     /**
      * Creates a test for an active puzzle game for a given request with the required parameters.
-     * <p>
-     * If the requesting user is not a defender or the test is not valid, the request will abort
+     *
+     * <p>If the requesting user is not a defender or the test is not valid, the request will abort
      * and return a {@code 400} status code.
-     * <p>
-     * If the submitted test solves the puzzle, the puzzle game is finished. Otherwise, the number
+     *
+     * <p>If the submitted test solves the puzzle, the puzzle game is finished. Otherwise, the number
      * of submits is incremented by one.
-     * <p>
-     * After request handling the user is redirected back to the game page.
+     *
+     * <p>After request handling the user is redirected back to the game page.
      *
      * @param request  the request to create a test.
      * @param response the response to the request.
@@ -211,7 +221,9 @@ public class PuzzleGameManager extends HttpServlet {
      * @throws IOException when redirecting fails.
      */
     @SuppressWarnings("Duplicates")
-    private void createTest(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    private void createTest(HttpServletRequest request,
+                            HttpServletResponse response,
+                            HttpSession session) throws IOException {
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {
             logger.error("Cannot create test for this puzzle. Failed to retrieve gameId from request.");
@@ -262,7 +274,11 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
+        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
+                testText,
+                game.getMaxAssertionsPerTest(),
+                game.isForceHamcrest()
+        );
         boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
@@ -281,7 +297,8 @@ public class PuzzleGameManager extends HttpServlet {
 
         final Test newTest;
         try {
-            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(), MODE_PUZZLE_DIR);
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(),
+                    MODE_PUZZLE_DIR);
         } catch (IOException e) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
             previousSubmission.setTestCode(testText);
@@ -295,7 +312,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+        final TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, COMPILE_TEST);
         if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
@@ -304,7 +321,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+        final TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TEST_ORIGINAL);
         if (!testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
@@ -344,21 +361,23 @@ public class PuzzleGameManager extends HttpServlet {
 
     /**
      * Creates a mutant for an active puzzle game for a given request with the required parameters.
-     * <p>
-     * If the requesting user is not an attacker or the mutant is not valid, the request will abort
+     *
+     * <p>If the requesting user is not an attacker or the mutant is not valid, the request will abort
      * and return a {@code 400} status code.
-     * <p>
-     * If the submitted mutant solves the puzzle, the puzzle game is finished. Otherwise, the number
+     *
+     * <p>If the submitted mutant solves the puzzle, the puzzle game is finished. Otherwise, the number
      * of submits is incremented by one.
-     * <p>
-     * After request handling the user is redirected back to the game page.
+     *
+     * <p>After request handling the user is redirected back to the game page.
      *
      * @param request  the request to create a mutant.
      * @param response the response to the request.
      * @param session  the session of the requesting user.
      * @throws IOException when redirecting fails.
      */
-    private void createMutant(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    private void createMutant(HttpServletRequest request,
+                              HttpServletResponse response,
+                              HttpSession session) throws IOException {
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {
             logger.error("Cannot create mutant for this puzzle. Failed to retrieve gameId from request.");
@@ -408,7 +427,8 @@ public class PuzzleGameManager extends HttpServlet {
 
         final CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
 
-        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
+        ValidationMessage validationMessage =
+                CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
         boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
@@ -437,7 +457,8 @@ public class PuzzleGameManager extends HttpServlet {
 
         if (!duplicateCheckSuccess) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
-            TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+            TargetExecution existingMutantTarget =
+                    TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, COMPILE_MUTANT);
             if (existingMutantTarget != null && !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
                 messages.add(existingMutantTarget.message);
@@ -446,17 +467,20 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        final Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, login.getUserId(), MODE_PUZZLE_DIR);
+        final Mutant newMutant =
+                gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, login.getUserId(),
+                        MODE_PUZZLE_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             previousSubmission.setMutantCode(mutantText);
-            logger.error("Error creating mutant for puzzle game. Game: {}, Class: {}, User: {}. Aborting.", gameId, game.getClassId(), login.getUserId(), mutantText);
+            logger.error("Error creating mutant for puzzle game. Game: {}, Class: {}, User: {}. Aborting.",
+                    gameId, game.getClassId(), login.getUserId());
             Redirect.redirectBack(request, response);
             return;
         }
 
         final TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
-                TargetExecution.Target.COMPILE_MUTANT);
+                COMPILE_MUTANT);
         boolean compileSuccess = compileMutantTarget != null
                 && compileMutantTarget.status == TargetExecution.Status.SUCCESS;
         String errorMessage = (compileMutantTarget != null
@@ -492,7 +516,7 @@ public class PuzzleGameManager extends HttpServlet {
         notificationService.post(mte);
 
         // may be // final MutantSolvingStrategy solving = game.getMutantSolver();
-        final MutantSolvingStrategy solver = MutantSolvingStrategy.get(MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS.name());
+        final MutantSolvingStrategy solver = MutantSolvingStrategy.get(SURVIVED_ALL_MUTANTS.name());
         if (solver == null) {
             throw new IllegalStateException("Mutant solving strategy not found. That shouldn't happen.");
         }
@@ -511,8 +535,10 @@ public class PuzzleGameManager extends HttpServlet {
     }
 
     private String generateWinningMessage(HttpServletRequest request, PuzzleGame game, boolean isAnAttackGame) {
-        StringBuffer message = new StringBuffer();
-        message.append("Congratulations, your " + (isAnAttackGame ? "mutant" : "test") + " solved the puzzle!");
+        StringBuilder message = new StringBuilder();
+        message.append("Congratulations, your ")
+                .append(isAnAttackGame ? "mutant" : "test")
+                .append(" solved the puzzle!");
 
         /*
          * TODO: this code does not yet consider already solved and locked
@@ -526,13 +552,11 @@ public class PuzzleGameManager extends HttpServlet {
          * next not empty chapters
          */
         for (PuzzleChapter puzzleChapter : PuzzleDAO.getPuzzleChapters()) {
-
             // Skip chapters before this one
             if (puzzleChapter.getChapterId() < currentChapter) {
                 continue;
-            }
-            // Check in current and next chapters
-            else if (puzzleChapter.getChapterId() >= currentChapter) {
+            } else if (puzzleChapter.getChapterId() >= currentChapter) {
+                // Check in current and next chapters
                 /*
                  * This returns the puzzles ordered by position and (hopefully)
                  * and empty, not-null list if there's not puzzles
@@ -544,19 +568,23 @@ public class PuzzleGameManager extends HttpServlet {
                         continue;
                     }
                     // Skip already solved puzzles
-                    PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(), login.getUserId());
-                    if (
-                            playedGame == null || // Not yet played this puzzle
-                            ( playedGame != null  && ! playedGame.getState().equals(GameState.SOLVED)) // played but not yet solved. Condition expressed to be readable.
+                    PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
+                            login.getUserId());
+                    // Not yet played this puzzle
+                    if (playedGame == null
+                            || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
                     ) {
                         message.append(" ")
-                                .append("Try to solve the <a href=" + request.getContextPath() + Paths.PUZZLE_GAME
-                                        + "?puzzleId=" + puzzle.getPuzzleId()
-                                        + ">next Puzzle</a>, or go back to the <a href=" + request.getContextPath()
-                                        + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
+                                .append("Try to solve the <a href=")
+                                .append(request.getContextPath())
+                                .append(Paths.PUZZLE_GAME)
+                                .append("?puzzleId=")
+                                .append(puzzle.getPuzzleId())
+                                .append(">next Puzzle</a>, or go back to the <a href=")
+                                .append(request.getContextPath())
+                                .append(Paths.PUZZLE_GAME)
+                                .append(">Puzzle Overview</a>.");
                         return message.toString();
-                    } else {
-                        continue;
                     }
                 }
             }
@@ -565,8 +593,11 @@ public class PuzzleGameManager extends HttpServlet {
         /*
          * If we got here, the user has solved all the puzzles ?
          */
-        message.append(" ").append("You solved all the puzzles, go back to the <a href=" + request.getContextPath()
-                + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
+        message.append(" ")
+                .append("You solved all the puzzles, go back to the <a href=")
+                .append(request.getContextPath())
+                .append(Paths.PUZZLE_GAME)
+                .append(">Puzzle Overview</a>.");
         return message.toString();
     }
 }

@@ -82,11 +82,11 @@ import javax.sql.DataSource;
  * This class allows adding {@link GameClass game classes (CUTs)}, {@link Mutant mutants},
  * {@link Test tests}, {@link PuzzleChapter puzzle chapters} and {@link Puzzle puzzles}
  * programmatically.
- * <p>
- * Using {@link #main(String[]) the main method}, this installer can be used
+ *
+ * <p>Using {@link #main(String[]) the main method}, this installer can be used
  * as a command line tool.
- * <p>
- * Using {@link #installPuzzles(Path, BackendExecutorService) installPuzzles()}, the
+ *
+ * <p>Using {@link #installPuzzles(Path, BackendExecutorService) installPuzzles()}, the
  * installer can be called programmatically inside code defenders.
  *
  * @author gambi
@@ -147,7 +147,8 @@ public class Installer {
 
         // Get an instance of backend from the Context
         InitialContext initialContext = new InitialContext();
-        BackendExecutorService backend = (BackendExecutorService) initialContext.lookup("java:comp/env/codedefenders/backend");
+        BackendExecutorService backend =
+                (BackendExecutorService) initialContext.lookup("java:comp/env/codedefenders/backend");
         // No need to create the zip file, we can directly use the "exploded" directory
         Installer.installPuzzles(commandLine.getBundleDirectory().toPath(), backend);
         // the exit
@@ -158,11 +159,16 @@ public class Installer {
      * Looks for puzzle related files in a given directory.
      * In the directory, this method will look for files in the following sub-folders:
      * <ul>
-     * <li>{@code cuts/}</li> holds puzzles classes. See {@link #installCUT(File) installCUT()} for file convention.
-     * <li>{@code mutants/}</li> holds puzzle mutants. See {@link #installMutant(File)}  installedMutant()} for file convention.
-     * <li>{@code tests/}</li> holds puzzles tests. See {@link #installTest(File) installTest()} for file convention.
-     * <li>{@code puzzleChapters/}</li> holds puzzle chapters information. See {@link #installPuzzleChapter(File) installPuzzleChapter()} for file convention.
-     * <li>{@code puzzles/}</li> holds puzzle information. See {@link #installPuzzle(File) installPuzzle()} for file convention.
+     * <li>{@code cuts/}</li> holds puzzles classes.
+     *   See {@link #installCUT(File) installCUT()} for file convention.
+     * <li>{@code mutants/}</li> holds puzzle mutants.
+     *   See {@link #installMutant(File)}  installedMutant()} for file convention.
+     * <li>{@code tests/}</li> holds puzzles tests.
+     *   See {@link #installTest(File) installTest()} for file convention.
+     * <li>{@code puzzleChapters/}</li> holds puzzle chapters information.
+     *   See {@link #installPuzzleChapter(File) installPuzzleChapter()} for file convention.
+     * <li>{@code puzzles/}</li> holds puzzle information.
+     *   See {@link #installPuzzle(File) installPuzzle()} for file convention.
      * </ul>
      *
      * @param directory the directory puzzle related files are looked at.
@@ -180,8 +186,8 @@ public class Installer {
 
     /**
      * Finds all files for in a given directory for a given file extension.
-     * <p>
-     * Iterates through a maximal folder depth of 5.
+     *
+     * <p>Iterates through a maximal folder depth of 5.
      *
      * @param directory the directory the files should be found in.
      * @param fileExtension the extension of the to be found files.
@@ -207,7 +213,8 @@ public class Installer {
         return files;
     }
 
-    private void run(List<File> cuts, List<File> mutants, List<File> tests, List<File> puzzleChapterSpecs, List<File> puzzleSpecs) {
+    private void run(List<File> cuts, List<File> mutants, List<File> tests,
+                     List<File> puzzleChapterSpecs, List<File> puzzleSpecs) {
         for (File cutFile : cuts) {
             try {
                 installCUT(cutFile);
@@ -251,8 +258,8 @@ public class Installer {
 
     /**
      * Sets up the {@link InitialContext} for a given configuration.
-     * <p>
-     * Also adds the database {@link DataSource} to the initial context.
+     *
+     * <p>Also adds the database {@link DataSource} to the initial context.
      *
      * @param configurations the configuration used to set the initial context.
      * @throws NamingException when setting the initial context fails.
@@ -286,7 +293,8 @@ public class Installer {
         // Maybe there's a way to provide the beans definition directly here...
         Weld weld = new Weld();
         WeldContainer container = weld.initialize();
-        // Manually load the dependencies and set the backend in the context, this is only because I cannot inject BeanManager
+        // Manually load the dependencies and set the backend in the context,
+        // this is only because I cannot inject BeanManager
         BackendExecutorService backend = container.instance().select(BackendExecutorService.class).get();
         ic.bind("java:comp/env/codedefenders/backend", backend);
         // Weld will be automatically closed at system.exit
@@ -397,7 +405,8 @@ public class Installer {
         Path cutDir = Paths.get(Constants.CUTS_DIR, classAlias);
         Path folderPath = cutDir.resolve(Constants.CUTS_TESTS_DIR).resolve(String.valueOf(targetPosition));
         Path javaFilePath = FileUtils.storeFile(folderPath, testFileName, testFileContent);
-        String classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath.toString(), testFileContent, dependencies, true);
+        String classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath.toString(),
+                testFileContent, dependencies, true);
 
         String testDir = folderPath.toString();
         String qualifiedName = FileUtils.getFullyQualifiedName(classFilePath);
@@ -419,10 +428,10 @@ public class Installer {
     /**
      * File convention: {@code puzzleChapters/<files>}. Chapter specification files just
      * need to be in that folder.
-     * <p>
-     * Mandatory properties: {@code chapterId}.
-     * <p>
-     * Optional properties: {@code position}, {@code title}, {@code description}.
+     *
+     * <p>Mandatory properties: {@code chapterId}.
+     *
+     * <p>Optional properties: {@code position}, {@code title}, {@code description}.
      */
     private void installPuzzleChapter(File puzzleChapterSpecFile) throws Exception {
         Properties cfg = new Properties();
@@ -449,13 +458,13 @@ public class Installer {
      * File convention: {@code puzzles/<cut_alias>/<puzzle_alias_ext>}.
      * {@code <puzzle_alias_ext>} is used for the puzzle alias, which is constructed as follows:
      * {@code <cut_alias>_puzzle_<puzzle_alias_ext>}
-     * <p>
-     * Mandatory properties: {@code activeRole} ({@link Role#DEFENDER 'DEFENDER'} or {@link Role#ATTACKER 'ATTACKER'}),
-     * {@code gameLevel} ({@link GameLevel#EASY 'EASY'} or {@link GameLevel#HARD 'HARD'},
+     *
+     * <p>Mandatory properties: {@code activeRole} ({@link Role#DEFENDER 'DEFENDER'} or
+     * {@link Role#ATTACKER 'ATTACKER'}), {@code gameLevel} ({@link GameLevel#EASY 'EASY'}
+     * or {@link GameLevel#HARD 'HARD'},
      * {@code chapterId} (has to be of existing chapter).
      *
-     * <p>
-     * Optional properties: {@code mutants}, {@code tests}, {@code title}, {@code description},
+     * <p>Optional properties: {@code mutants}, {@code tests}, {@code title}, {@code description},
      * {@code editableLinesStart}, {@code editableLinesEnd},
      * {@code position}.
      */
@@ -523,8 +532,8 @@ public class Installer {
 
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
-        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, forceHamcrest, mutantValidatorLevel,
-                editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, forceHamcrest,
+                mutantValidatorLevel, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
         int puzzleId = PuzzleDAO.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();

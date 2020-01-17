@@ -64,7 +64,7 @@ public class ConfigurableEagerTest extends AbstractSmell {
     }
 
     /**
-     * Checks of 'Eager Test' smell
+     * Checks of 'Eager Test' smell.
      */
     @Override
     public String getSmellName() {
@@ -72,7 +72,7 @@ public class ConfigurableEagerTest extends AbstractSmell {
     }
 
     /**
-     * Returns true if any of the elements has a smell
+     * Returns true if any of the elements has a smell.
      */
     @Override
     public boolean getHasSmell() {
@@ -81,14 +81,15 @@ public class ConfigurableEagerTest extends AbstractSmell {
 
     /**
      * Analyze the test file for test methods that exhibit the 'Eager Test'
-     * smell
+     * smell.
      */
     @Override
     public void runAnalysis(CompilationUnit testFileCompilationUnit, CompilationUnit productionFileCompilationUnit,
             String testFileName, String productionFileName) throws FileNotFoundException {
 
-        if (productionFileCompilationUnit == null)
+        if (productionFileCompilationUnit == null) {
             throw new FileNotFoundException();
+        }
 
         ConfigurableEagerTest.ClassVisitor classVisitor;
 
@@ -109,7 +110,7 @@ public class ConfigurableEagerTest extends AbstractSmell {
     }
 
     /**
-     * Visitor class
+     * Visitor class.
      */
     private class ClassVisitor extends VoidVisitorAdapter<Void> {
         private MethodDeclaration currentMethod = null;
@@ -149,8 +150,7 @@ public class ConfigurableEagerTest extends AbstractSmell {
                 if (Util.isValidTestMethod(n)) {
                     currentMethod = n;
                     testMethod = new TestMethod(currentMethod.getNameAsString());
-                    testMethod.setHasSmell(false); // default value is false
-                                                   // (i.e. no smell)
+                    testMethod.setHasSmell(false); // default value is false (i.e. no smell)
                     super.visit(n, arg);
 
                     /*
@@ -167,8 +167,7 @@ public class ConfigurableEagerTest extends AbstractSmell {
                     productionVariables = new ArrayList<>();
                     calledMethods = new ArrayList<>();
                 }
-            } else { // collect a list of all public/protected members of the
-                     // production class
+            } else { // collect a list of all public/protected members of the production class
                 for (Modifier modifier : n.getModifiers()) {
                     if (modifier.name().toLowerCase().equals("public")
                             || modifier.name().toLowerCase().equals("protected")) {
@@ -235,7 +234,7 @@ public class ConfigurableEagerTest extends AbstractSmell {
 
         /**
          * This method is utilized to obtain the scope of a chained method
-         * statement
+         * statement.
          */
         private void getFinalScope(MethodCallExpr n) {
             if (n.getScope().isPresent()) {

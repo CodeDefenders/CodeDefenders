@@ -329,7 +329,7 @@ public class GameClass {
      * Returns the index of first editable line of this class
      * test template.
      *
-     * <p>* Note that first index starts at 1.
+     * <p>Note that first index starts at 1.
      *
      * @return the first editable line of this class test template.
      * @see #getTestTemplate()

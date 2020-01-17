@@ -23,8 +23,8 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 
 /**
  * Interface for a mutant solving strategy.
- * <p>
- * {@link #solve(PuzzleGame, Mutant)} returns whether a submitted mutant resulted in a state
+ *
+ * <p>{@link #solve(PuzzleGame, Mutant)} returns whether a submitted mutant resulted in a state
  * of the puzzle game, which the strategy marks as solved.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
@@ -40,6 +40,7 @@ public interface MutantSolvingStrategy {
         try {
             return ((MutantSolvingStrategy) Types.valueOf(name).clazz.newInstance());
         } catch (IllegalArgumentException | IllegalAccessException | InstantiationException ignored) {
+            // ignored
         }
         return null;
     }

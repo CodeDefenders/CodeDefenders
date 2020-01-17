@@ -56,7 +56,8 @@ public class User implements Serializable {
         this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT);
     }
 
-    public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active, boolean allowContact, KeyMap keyMap) {
+    public User(int id, String username, String encodedPassword, String email, boolean validated,
+                boolean active, boolean allowContact, KeyMap keyMap) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;

@@ -38,13 +38,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
+
 /**
  * This {@link HttpServlet} handles to the overview page of
  * {@link MultiplayerGame Battleground} games.
- * <p>
- * {@code GET} requests redirect to a game overview page.
- * <p>
- * Serves under {@code /games/overview}.
+ *
+ * <p>{@code GET} requests redirect to a game overview page.
+ *
+ * <p>Serves under {@code /games/overview}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleOverview
@@ -57,17 +60,20 @@ public class GamesOverview extends HttpServlet {
     private LoginBean login;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<UserMultiplayerGameInfo> activeGames = MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(login.getUserId());
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
+        List<UserMultiplayerGameInfo> activeGames =
+                MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("activeGames", activeGames);
 
-        List<UserMultiplayerGameInfo> openGames = MultiplayerGameDAO.getOpenMultiplayerGamesWithInfoForUser(login.getUserId());
+        List<UserMultiplayerGameInfo> openGames =
+                MultiplayerGameDAO.getOpenMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("openGames", openGames);
 
-        boolean gamesJoinable = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
+        boolean gamesJoinable = AdminDAO.getSystemSetting(GAME_JOINING).getBoolValue();
         request.setAttribute("gamesJoinable", gamesJoinable);
 
-        boolean gamesCreatable = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
+        boolean gamesCreatable = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
         request.setAttribute("gamesCreatable", gamesCreatable);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.USER_GAMES_OVERVIEW_JSP);

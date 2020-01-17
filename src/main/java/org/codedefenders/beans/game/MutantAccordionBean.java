@@ -6,16 +6,29 @@ import com.google.common.collect.TreeRangeMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.*;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameMode;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JSONUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * <p>Provides data for the mutant accordion game component.</p>
@@ -83,7 +96,8 @@ public class MutantAccordionBean {
         allMutants.addMutantIds(getMutants().stream().map(x -> x.id).collect(Collectors.toList()));
         categories.add(allMutants);
 
-        MutantAccordionCategory mutantsWithoutMethod = new MutantAccordionCategory("Mutants outside methods", "noMethod");
+        MutantAccordionCategory mutantsWithoutMethod =
+                new MutantAccordionCategory("Mutants outside methods", "noMethod");
         categories.add(mutantsWithoutMethod);
 
         List<GameClass.MethodDescription> methodDescriptions = cut.getMethodDescriptions();
@@ -179,10 +193,22 @@ public class MutantAccordionBean {
     public List<MutantAccordionMutantDTO> getMutants() {
         // TODO Why do mutants don't have this simple attribute?
         List<MutantAccordionMutantDTO> mutants = new ArrayList<>();
-        mutants.addAll(aliveMutants.stream().map(x -> new MutantAccordionMutantDTO(x, MutantState.ALIVE)).collect(Collectors.toList()));
-        mutants.addAll(killedMutants.stream().map(x -> new MutantAccordionMutantDTO(x, MutantState.KILLED)).collect(Collectors.toList()));
-        mutants.addAll(equivalentMutants.stream().map(x -> new MutantAccordionMutantDTO(x, MutantState.EQUIVALENT)).collect(Collectors.toList()));
-        mutants.addAll(flaggedMutants.stream().map(x -> new MutantAccordionMutantDTO(x, MutantState.FLAGGED)).collect(Collectors.toList()));
+        mutants.addAll(aliveMutants
+                .stream()
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.ALIVE))
+                .collect(Collectors.toList()));
+        mutants.addAll(killedMutants
+                .stream()
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.KILLED))
+                .collect(Collectors.toList()));
+        mutants.addAll(equivalentMutants
+                .stream()
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.EQUIVALENT))
+                .collect(Collectors.toList()));
+        mutants.addAll(flaggedMutants
+                .stream()
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.FLAGGED))
+                .collect(Collectors.toList()));
         return mutants;
     }
 
@@ -252,7 +278,8 @@ public class MutantAccordionBean {
         for (Mutant mutant : equivalentMutants) {
             mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT));
         }
-        // TODO If we try to sort the mutants according to the order they appear in the class we need to sort the Ids in the MutantAccordionCategory.
+        // TODO If we try to sort the mutants according to the order they appear in the
+        //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()
                 // It is important that its LinkedHashMap.class, it doesn't work if I change it to Map.class ...
                 .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
@@ -356,7 +383,9 @@ public class MutantAccordionBean {
             points = mutant.getScore();
             this.state = state;
             covered = mutant.isCovered();
-            description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream().filter(Objects::nonNull).collect(Collectors.joining("<br>")));
+            description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout()
+                    .stream()
+                    .filter(Objects::nonNull).collect(Collectors.joining("<br>")));
             if (mutant.getKillingTest() != null) {
                 killedByName = UserDAO.getUserForPlayer(mutant.getKillingTest().getPlayerId()).getUsername();
                 killedByTestId = mutant.getKillingTest().getId();

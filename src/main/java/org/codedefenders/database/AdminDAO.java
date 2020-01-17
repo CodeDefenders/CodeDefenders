@@ -23,6 +23,8 @@ import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.model.User;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,7 +38,7 @@ public class AdminDAO {
 
     public static final String TIMESTAMP_NEVER = "never";
 
-    public static Entry getScore(int userID) throws UncheckedSQLException, SQLMappingException {
+    public static Entry getScore(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT",
                 "  U.username                            AS username,",
@@ -64,7 +66,7 @@ public class AdminDAO {
                 "   GROUP BY PD.user_id)",
                 "    AS Defender ON U.user_id = Defender.user_id",
                 "WHERE U.user_id = ?;");
-        return DB.executeQueryReturnValue(query, DatabaseAccess::entryFromRS, DatabaseValue.of(userID));
+        return DB.executeQueryReturnValue(query, DatabaseAccess::entryFromRS, DatabaseValue.of(userId));
     }
 
     public static boolean deletePlayerTest(int pid) {
@@ -236,6 +238,7 @@ public class AdminDAO {
                 "ORDER BY lastLogin DESC, User_ID;");
         return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS);
     }
+
     public static UserInfo getUsersInfo(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT DISTINCT",
@@ -289,7 +292,7 @@ public class AdminDAO {
 
     public static List<List<String>> getPlayersInfo(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-        "SELECT",
+                "SELECT",
                 "  ID,",
                 "  Username,",
                 "  Role,",
@@ -338,21 +341,22 @@ public class AdminDAO {
                 "                  ) AS t",
                 "             GROUP BY Player_ID) AS lastAction",
                 "    ON Player_ID = activePlayers.ID",
-                "  LEFT JOIN (SELECT",
-                "               COUNT(*) AS nbSubmissions,",
-                "               Player_ID",
-                "             FROM (SELECT",
-                "                     Player_ID,",
-                "                     tests.Test_ID",
-                "                   FROM (tests",
-                "                     JOIN targetexecutions t2 ON tests.Test_ID = t2.Test_ID)",
-                "                   WHERE t2.Target = 'COMPILE_TEST' AND t2.Status = 'SUCCESS'",
-                "                   UNION SELECT",
-                "                           Player_ID,",
-                "                           mutants.Mutant_ID",
-                "                         FROM (mutants",
-                "                           JOIN targetexecutions t2 ON mutants.Mutant_ID = t2.Mutant_ID)",
-                "                         WHERE t2.Target = 'COMPILE_MUTANT' AND t2.Status = 'SUCCESS') AS TestsAndMutants",
+                "  LEFT JOIN (",
+                "        SELECT",
+                "          COUNT(*) AS nbSubmissions,",
+                "          Player_ID",
+                "        FROM (SELECT",
+                "                Player_ID,",
+                "                tests.Test_ID",
+                "              FROM (tests",
+                "                JOIN targetexecutions t2 ON tests.Test_ID = t2.Test_ID)",
+                "              WHERE t2.Target = 'COMPILE_TEST' AND t2.Status = 'SUCCESS'",
+                "              UNION SELECT",
+                "                      Player_ID,",
+                "                      mutants.Mutant_ID",
+                "                    FROM (mutants",
+                "                      JOIN targetexecutions t2 ON mutants.Mutant_ID = t2.Mutant_ID)",
+                "                    WHERE t2.Target = 'COMPILE_MUTANT' AND t2.Status = 'SUCCESS') AS TestsAndMutants",
                 "             GROUP BY Player_ID) AS submissions ON submissions.Player_ID = ID",
                 "ORDER BY Role, nbSubmissions;");
 
@@ -399,6 +403,8 @@ public class AdminDAO {
             case BOOL_VALUE:
                 value = DatabaseValue.of(setting.getBoolValue());
                 break;
+            default:
+                // ignored
         }
 
         String query = String.join("\n",
@@ -410,8 +416,8 @@ public class AdminDAO {
     }
 
     private static AdminSystemSettings.SettingsDTO settingFromRS(ResultSet rs) throws SQLException {
-        AdminSystemSettings.SETTING_NAME name = AdminSystemSettings.SETTING_NAME.valueOf(rs.getString("name"));
-        AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+        SETTING_NAME name = SETTING_NAME.valueOf(rs.getString("name"));
+        SETTING_TYPE settingType = SETTING_TYPE.valueOf(rs.getString("type"));
         switch (settingType) {
             case STRING_VALUE:
                 return new AdminSystemSettings.SettingsDTO(name, rs.getString(settingType.name()));
@@ -430,7 +436,7 @@ public class AdminDAO {
         return DB.executeQueryReturnList(query, AdminDAO::settingFromRS);
     }
 
-    public static AdminSystemSettings.SettingsDTO getSystemSetting(AdminSystemSettings.SETTING_NAME name)
+    public static AdminSystemSettings.SettingsDTO getSystemSetting(SETTING_NAME name)
             throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM settings WHERE settings.name = ?;";
         return DB.executeQueryReturnValue(query, AdminDAO::settingFromRS, DatabaseValue.of(name.name()));
@@ -440,13 +446,13 @@ public class AdminDAO {
     /**
      * This does not close the given {@link Connection}.
      */
-    static AdminSystemSettings.SettingsDTO getSystemSettingInt(AdminSystemSettings.SETTING_NAME name, Connection conn) throws SQLException {
+    static AdminSystemSettings.SettingsDTO getSystemSettingInt(SETTING_NAME name, Connection conn) throws SQLException {
         String query = "SELECT * FROM settings WHERE settings.name = ?;";
         PreparedStatement stmt = conn.prepareStatement(query);
         stmt.setString(1, name.name());
         ResultSet rs = stmt.executeQuery();
         if (rs.next()) {
-            AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+            SETTING_TYPE settingType = SETTING_TYPE.valueOf(rs.getString("type"));
             return new AdminSystemSettings.SettingsDTO(name, rs.getInt(settingType.name()));
         }
         return null;
