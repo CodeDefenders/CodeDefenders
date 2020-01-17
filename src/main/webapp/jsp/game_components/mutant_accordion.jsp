@@ -30,12 +30,15 @@
     #mutants-accordion {
         margin-bottom: 0;
     }
+
     #mutants-accordion .panel-body {
         padding: 0;
     }
+
     #mutants-accordion thead {
         display: none;
     }
+
     #mutants-accordion .dataTables_scrollHead {
         display: none;
     }
@@ -44,6 +47,7 @@
         padding-top: .375em;
         padding-bottom: .375em;
     }
+
     #mutants-accordion td {
         vertical-align: middle;
     }
@@ -51,20 +55,22 @@
     #mutants-accordion .panel-title.ma-covered {
         color: black;
     }
+
     #mutants-accordion .panel-title:not(.ma-covered) {
         color: #B0B0B0;
     }
-    #mutants-accordion .ta-column-name {
+
+    #mutants-accordion .ma-column-name {
         color: #B0B0B0;
     }
 
-    #mutants-accordion .ta-count {
+    #mutants-accordion .ma-count {
         margin-right: .5em;
         padding-bottom: .2em;
     }
 
-    #mutants-accordion .ta-covered-link,
-    #mutants-accordion .ta-killed-link {
+    #mutants-accordion .ma-covered-link,
+    #mutants-accordion .ma-killed-link {
         color: inherit;
     }
 </style>
@@ -115,13 +121,13 @@
 
         /** Maps mutant ids to modals that show the tests' code. */
         const mutantModals = new Map();
+        const testModals = new Map();
 
         /* Functions to generate table columns. */
-        const genId             = row => 'Mutant ' + row.id;
-        const genCreator        = row =>  row.creatorName;
-        const genPoints         = row => '<span class="ma-column-name">Points:</span> '  + row.points;
-        const genViewButton     = row => '<button class="ma-view-button btn btn-ssm btn-primary">View</button>';
-        const genIcon           = row => {
+        const genId = row => 'Mutant ' + row.id + ' <span class="ma-column-name>  by  </span> ' + row.creatorName + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
+        const genPoints = row => '<span class="ma-column-name">Points:</span> ' + row.points;
+        const genLines = row => row.description;
+        const genIcon = row => {
             switch (row.state) {
                 case "ALIVE":
                     return '<span class=\"mutantCUTImage mutantImageAlive\"></span>';
@@ -133,34 +139,38 @@
                     return '<span class=\"mutantCUTImage mutantImageFlagged\"></span>';
             }
         };
+        const genViewButton = row => (<%=mutantAccordion.getViewDiff()%> || row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm btn-right">View</button>' : '');
         const genAdditionalButton = row => {
             switch (row.state) {
-                <% if (mutantAccordion.getEnableFlagging() ) {%>
+                    <% if (mutantAccordion.canFlag()) {%>
                 case "ALIVE":
-                    if (row.covered) {
-                    return '<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
-                        '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
-                        '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
-                        '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
-                        '      <button type="submit" class="btn btn-default btn-ssm btn-right">Claim Equivalent</button>\n' +
-                        '   </form>';
+                    if (row.canMarkEquivalent) {
+                        if (row.covered) {
+                            return '<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
+                                    '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
+                                    '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
+                                    '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
+                                    '      <button type="submit" class="btn btn-default btn-ssm btn-right">Claim Equivalent</button>\n' +
+                                    '   </form>';
+                        } else {
+                            return '<button type="submit" class="btn btn-default btn-ssm btn-right" disabled>Claim Equivalent</button>';
+                        }
                     } else {
                         return '';
                     }
-                <% } %>
+                    <% } %>
                 case "KILLED":
-                    /* TODO Implement Modal for killing test */
-                    return '<a class="btn btn-default btn-ssm btn-diff" <%--data-toggle="modal" data-target="#modalMutKillMessage18995"--%>>View Killing Test</a>';
+                    return '<button class="ma-view-test-button btn btn-default btn-ssm btn-right">View Killing Test</button>';
                 default:
                     return '';
             }
         };
 
         /**
-         * Returns the test DTO that describes the row of an element in a DataTables row.
+         * Returns the mutant DTO that describes the row of an element in a DataTables row.
          * @param {HTMLElement} element An HTML element contained in a table row.
          * @param {object} dataTable The DataTable the row belongs to.
-         * @return {object} The test DTO the row describes.
+         * @return {object} The mutant DTO the row describes.
          */
         const rowData = function (element, dataTable) {
             const row = $(element).closest('tr');
@@ -168,9 +178,9 @@
         };
 
         /**
-         * Creates a modal to display the given test and shows it.
+         * Creates a modal to display the given mutant and shows it.
          * References to created models are cached in a map so they don't need to be generated again.
-         * @param {object} mutant The test DTO to display.
+         * @param {object} mutant The mutant DTO to display.
          */
         const viewMutantModal = function (mutant) {
             let modal = mutantModals.get(mutant.id);
@@ -180,7 +190,7 @@
             }
 
             modal = $(
-                `<div class="modal mutant-modal fade" role="dialog">
+                    `<div class="modal mutant-modal fade" role="dialog">
                     <div class="modal-dialog" style="width: max-content; max-width: 90%; min-width: 500px;">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -188,7 +198,7 @@
                                 <h4 class="modal-title">Mutant ` + mutant.id + ` (by ` + mutant.creatorName + `)</h4>
                             </div>
                             <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="mutant-` + mutant.id + `"></textarea></pre>
+                                <pre class="readonly-pre"><textarea class="mutdiff" name="mutant-` + mutant.id + `"></textarea></pre>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -198,6 +208,65 @@
                 </div>`);
             modal.appendTo(document.body);
             mutantModals.set(mutant.id, modal);
+
+            const textarea = modal.find('textarea').get(0);
+            const editor = CodeMirror.fromTextArea(textarea, {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: "text/x-diff",
+                readOnly: true,
+
+            });
+            editor.setSize('max-content', 'max-content');
+
+            <%-- TODO: Is there a better solution for this? --%>
+            /* Refresh the CodeMirror instance once the modal is displayed.
+             * If this is not done, it will display an empty textarea until it is clicked. */
+            new MutationObserver((mutations, observer) => {
+                for (const mutation of mutations) {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        editor.refresh();
+                        observer.disconnect();
+                    }
+                }
+            }).observe(modal.get(0), {attributes: true});
+
+            MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
+            modal.modal('show');
+        };
+
+        /**
+         * Creates a modal to display the given test and shows it.
+         * References to created models are cached in a map so they don't need to be generated again.
+         * @param {object} test The test DTO to display.
+         */
+        const viewTestModal = function (test) {
+            let modal = testModals.get(test.id);
+            if (modal !== undefined) {
+                modal.modal('show');
+                return;
+            }
+
+            modal = $(
+                    `<div class="modal mutant-modal fade" role="dialog">
+                    <div class="modal-dialog" style="width: max-content; max-width: 90%; min-width: 500px;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Test ` + test.id + ` (by ` + test.creatorName + `)</h4>
+                            </div>
+                            <div class="modal-body">
+                                <pre class="readonly-pre"><textarea name="test-` + test.id + `"></textarea></pre>
+                                <pre class="readonly-pre build-trace">` + test.killMessage +`</pre>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
+            modal.appendTo(document.body);
+            testModals.set(test.id, modal);
 
             const textarea = modal.find('textarea').get(0);
             const editor = CodeMirror.fromTextArea(textarea, {
@@ -221,28 +290,29 @@
                 }
             }).observe(modal.get(0), {attributes: true});
 
-            MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
+            TestAPI.getAndSetEditorValue(textarea, editor);
             modal.modal('show');
         };
+
 
         /* Loop through the categories and create a mutant table for each one. */
         for (const category of categories) {
             const rows = category.mutantIds
-                .sort()
-                .map(mutants.get, mutants);
+                    .sort()
+                    .map(mutants.get, mutants);
 
             /* Create the DataTable. */
             const tableElement = $('#ma-table-' + category.id);
             const dataTable = tableElement.DataTable({
                 data: rows,
                 columns: [
-                    { data: null, title: '', defaultContent: '' },
-                    { data: genIcon, title: '' },
-                    { data: genId, title: '' },
-                    { data: genCreator, title: '' },
-                    { data: genPoints, title: '' },
-                    { data: genViewButton, title: '' },
-                    { data: genAdditionalButton, title: '' }
+                    {data: null, title: '', defaultContent: ''},
+                    {data: genIcon, title: ''},
+                    {data: genId, title: ''},
+                    {data: genLines, title: ''},
+                    {data: genPoints, title: ''},
+                    {data: genViewButton, title: ''},
+                    {data: genAdditionalButton, title: ''}
                 ],
                 scrollY: '400px',
                 scrollCollapse: true,
@@ -250,8 +320,8 @@
                 dom: 't',
                 language: {
                     emptyTable: category.id === 'all'
-                        ? 'No mutants.'
-                        : 'No mutants in this method.'
+                            ? 'No mutants.'
+                            : 'No mutants in this method.'
                 }
             });
 
@@ -260,6 +330,12 @@
                 const test = rowData(this, dataTable);
                 viewMutantModal(test);
             });
+
+            /* Assign function to the "View killing test" buttons. */
+            tableElement.on('click', '.ma-view-test-button', function () {
+                const mutant = rowData(this, dataTable);
+                viewTestModal({"id": mutant.killedByTestId, "creatorName": mutant.killedByName, "killMessage": mutant.killMessage});
+            })
         }
     }());
 </script>

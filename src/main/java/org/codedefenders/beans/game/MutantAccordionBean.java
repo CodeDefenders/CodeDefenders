@@ -1,13 +1,15 @@
 package org.codedefenders.beans.game;
 
-import com.google.common.collect.Comparators;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.*;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.JSONUtils;
 
 import javax.annotation.ManagedBean;
@@ -38,7 +40,7 @@ public class MutantAccordionBean {
 
     public String jsonFromCategories() {
         Gson gson = new GsonBuilder()
-            .create();
+                .create();
         return gson.toJson(categories);
     }
 
@@ -58,15 +60,10 @@ public class MutantAccordionBean {
             mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT));
         }
         // TODO If we try to sort the mutants according to the order they appear in the class we need to sort the Ids in the MutantAccordionCategory.
-/*        Map<Integer, MutantAccordionMutantDTO> result =
-            mutants.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(sortedByLineNumberAscending()))
-                .collect(Collectors.toMap(
-                    Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new)); */
         Gson gson = new GsonBuilder()
-            // It is important that its LinkedHashMap.class, it doesn't work if I change it to Map.class ...
-            .registerTypeAdapter(LinkedHashMap.class, new JSONUtils.MapSerializer())
-            .create();
+                // It is important that its LinkedHashMap.class, it doesn't work if I change it to Map.class ...
+                .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
+                .create();
         return gson.toJson(mutants);
     }
 
@@ -174,7 +171,7 @@ public class MutantAccordionBean {
                 }
             }
 
-            if (! belongsMethod) {
+            if (!belongsMethod) {
                 mutantsWithoutMethod.addMutantId(mutant.getId());
             }
         }
@@ -201,6 +198,10 @@ public class MutantAccordionBean {
 
     public Boolean getEnableFlagging() {
         return enableFlagging;
+    }
+
+    public Boolean canFlag() {
+        return enableFlagging && gameMode == GameMode.PARTY;
     }
 
     public Integer getGameId() {
@@ -322,16 +323,45 @@ public class MutantAccordionBean {
         private final String lineString;
         @Expose
         private final Boolean covered;
+        @Expose
+        private final String killedByName;
+        @Expose
+        private final boolean canMarkEquivalent;
+        @Expose
+        private final boolean canView;
         private final List<Integer> lines;
+        @Expose
+        private final int killedByTestId;
+        @Expose
+        private final String killMessage;
+        @Expose
+        private final String description;
 
         public MutantAccordionMutantDTO(Mutant mutant, MutantState state) {
+            String killedByName1;
             id = mutant.getId();
             creatorName = mutant.getCreatorName();
             points = mutant.getScore();
             this.state = state;
             covered = mutant.isCovered();
+            description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream().filter(Objects::nonNull).collect(Collectors.joining("<br>")));
+            if (mutant.getKillingTest() != null) {
+                killedByName = UserDAO.getUserForPlayer(mutant.getKillingTest().getPlayerId()).getUsername();
+                killedByTestId = mutant.getKillingTest().getId();
+                killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
+            } else {
+                killedByName = null;
+                killedByTestId = -1;
+                killMessage = null;
+            }
+
+
             lines = mutant.getLines();
-            lineString = mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(","));
+            lineString = lines.stream().map(String::valueOf).collect(Collectors.joining(","));
+            canMarkEquivalent = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                    && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                    && mutant.getLines().size() >= 1;
+            canView = state == MutantState.KILLED || state == MutantState.EQUIVALENT;
         }
     }
 
