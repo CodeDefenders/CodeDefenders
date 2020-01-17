@@ -461,6 +461,9 @@ public class Mutant implements Serializable {
         List<String> fragementSummary = new ArrayList<>();
 
         Patch p = getDifferences();
+        String modified = null;
+        String deleted = null;
+        String added = null;
         for (Delta d : p.getDeltas()) {
             Chunk chunk = d.getOriginal();
             // position starts at 0 but code readout starts at 1
@@ -482,21 +485,28 @@ public class Mutant implements Serializable {
                 fragementSummary.add( String.format("%d-%d", firstLine, endLine) );
             }
             // update mutant description
-            String text;
             switch (d.getType()) {
             case CHANGE:
-                text = "Modified ";
+                modified = modified == null ? "Modified " + desc : modified + ", " + desc;
                 break;
             case DELETE:
-                text = "Removed ";
+                deleted = deleted == null ? "Removed " + desc : deleted + ", " + desc;
                 break;
             case INSERT:
-                text = "Added ";
+                added = added == null ? "Added " + desc : added + ", " + desc;
                 break;
             default:
                 throw new IllegalStateException("Found unknown delta type " + d.getType());
             }
-            description.add(StringEscapeUtils.escapeHtml(text + desc + "\n"));
+        }
+        if (modified != null) {
+            description.add(StringEscapeUtils.escapeHtml(modified + "\n"));
+        }
+        if (deleted != null) {
+            description.add(StringEscapeUtils.escapeHtml(deleted + "\n"));
+        }
+        if (added != null) {
+            description.add(StringEscapeUtils.escapeHtml(added + "\n"));
         }
 
         setLines( mutatedLines );
