@@ -18,10 +18,26 @@ import java.util.List;
 @RequestScoped
 // TODO: For now this just has setters for the attributes from the mutant list (+ the CUT). Change this as needed.
 public class MutantAccordionBean {
+    /**
+     * Show a button to flag a selected mutant as equivalent.
+     */
     private Boolean enableFlagging;
+
+    /**
+     * The mode of the currently played game.
+     * Used to determine how to flag mutants.
+     */
     private GameMode gameMode;
+
+    /**
+     * The game id of the currently played game.
+     * Used for URL parameters.
+     */
     private Integer gameId;
 
+    /**
+     * Enable viewing of the mutant diffs.
+     */
     private Boolean viewDiff;
 
     private GameClass cut;

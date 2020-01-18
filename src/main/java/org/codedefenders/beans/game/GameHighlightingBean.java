@@ -20,10 +20,32 @@ import java.util.Map;
 @ManagedBean
 @RequestScoped
 public class GameHighlightingBean {
+    /**
+     * Contains the test and mutant information to be displayed in the highlighting.
+     */
+    // TODO: Move code from GameHighlightingDTO here?
     private GameHighlightingDTO gameHighlightingData;
+
+    /**
+     * Selector for the div the CodeMirror container is in. Should only contain one CodeMirror instance.
+     */
     private String codeDivSelector;
+
+    /**
+     * Show a button to flag a selected mutant as equivalent.
+     */
     private Boolean enableFlagging;
+
+    /**
+     * The game mode of the currently played game.
+     * Used to determine how to flag mutants.
+     */
     private GameMode gameMode;
+
+    /**
+     * The game id of the currently played game.
+     * Used for URL parameters.
+     */
     private Integer gameId;
 
     public GameHighlightingBean() {

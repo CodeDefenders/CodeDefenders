@@ -22,6 +22,9 @@ import java.util.Map;
 @RequestScoped
 // TODO: Move code out of TestAccordionDTO and in here?
 public class TestAccordionBean {
+    /**
+     * Contains the test and mutant information to be displayed in the accordion.
+     */
     private TestAccordionDTO testAccordionData;
 
     public TestAccordionBean() {

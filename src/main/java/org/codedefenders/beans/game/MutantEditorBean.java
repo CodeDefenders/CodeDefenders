@@ -21,10 +21,32 @@ import java.util.Map;
 @ManagedBean
 @RequestScoped
 public class MutantEditorBean {
+    /**
+     * The class name of the mutant.
+     */
     private String className;
+
+    /**
+     * The mutant code to display.
+     */
     private String mutantCode;
+
+    /**
+     * The dependencies of the mutant to display, mapped by their names.
+     * Can be empty, but must not be {@code null}.
+     */
     private Map<String, String> dependencies;
+
+    /**
+     * Start of editable lines in the mutant.
+     * If {@code null}, the code can be modified from the start.
+     */
     private Integer editableLinesStart;
+
+    /**
+     * End of editable lines in the mutant.
+     * If {@code null}, the code can be modified until the end.
+     */
     private Integer editableLinesEnd;
 
     public MutantEditorBean() {
@@ -43,6 +65,10 @@ public class MutantEditorBean {
         mutantCode = StringEscapeUtils.escapeHtml(clazz.getSourceCode());
     }
 
+    /**
+     * Sets the code for the mutant editor from the previous submission of the player.
+     * @param previousMutantCode The code from the previous submission, not HTML-escaped.
+     */
     public void setPreviousMutantCode(String previousMutantCode) {
         mutantCode = StringEscapeUtils.escapeHtml(previousMutantCode);
     }
@@ -67,6 +93,10 @@ public class MutantEditorBean {
         return className;
     }
 
+    /**
+     * Returns the HTML-escaped code of the mutant.
+     * @return The HTML-escaped code of the mutant.
+     */
     public String getMutantCode() {
         return mutantCode;
     }

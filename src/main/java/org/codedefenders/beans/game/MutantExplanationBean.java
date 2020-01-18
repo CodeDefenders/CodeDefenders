@@ -12,6 +12,9 @@ import javax.enterprise.context.RequestScoped;
 @ManagedBean
 @RequestScoped
 public class MutantExplanationBean {
+    /**
+     * The validation level to display.
+     */
     private CodeValidatorLevel codeValidatorLevel;
 
     public MutantExplanationBean() {

@@ -21,9 +21,27 @@ import java.util.Map;
 @ManagedBean
 @RequestScoped
 public class TestEditorBean {
+    /**
+     * The test code to display.
+     */
     private String testCode;
+
+    /**
+     * Start of editable lines in the test.
+     * If {@code null}, the code can be modified from the start.
+     */
     private Integer editableLinesStart;
-    private Integer editableLinesEnd; // Currently not used
+
+    /**
+     * End of editable lines in the test.
+     * If {@code null}, the code can be modified until the end.
+     * Currently not used.
+     */
+    private Integer editableLinesEnd;
+
+    /**
+     * Enable autocompletion for mockito methods.
+     */
     private Boolean mockingEnabled;
 
     public TestEditorBean() {
@@ -37,6 +55,10 @@ public class TestEditorBean {
         testCode = StringEscapeUtils.escapeHtml(clazz.getTestTemplate());
     }
 
+    /**
+     * Sets the code for the test editor from the previous submission of the player.
+     * @param previousTestCode The code from the previous submission, not HTML-escaped.
+     */
     public void setPreviousTestCode(String previousTestCode) {
         testCode = StringEscapeUtils.escapeHtml(previousTestCode);
     }
@@ -56,6 +78,10 @@ public class TestEditorBean {
 
     // --------------------------------------------------------------------------------
 
+    /**
+     * Returns the HTML-escaped code of the test.
+     * @return The HTML-escaped code of the test.
+     */
     public String getTestCode() {
         return testCode;
     }

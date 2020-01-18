@@ -10,6 +10,10 @@ import javax.enterprise.context.RequestScoped;
 @ManagedBean
 @RequestScoped
 public class TestProgressBarBean {
+    /**
+     * The game id of the currently played game.
+     * Used for event parameters.
+     */
     private Integer gameId;
 
     public TestProgressBarBean() {

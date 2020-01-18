@@ -13,7 +13,14 @@ import java.util.List;
 @ManagedBean
 @RequestScoped
 public class ErrorHighlightingBean {
+    /**
+     * Selector for the div the CodeMirror container is in. Should only contain one CodeMirror instance.
+     */
     private String codeDivSelector;
+
+    /**
+     * The line numbers of the errors reported by the compiler.
+     */
     private List<Integer> errorLines;
 
     public ErrorHighlightingBean() {

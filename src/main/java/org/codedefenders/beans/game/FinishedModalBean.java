@@ -12,6 +12,9 @@ import javax.enterprise.context.RequestScoped;
 @ManagedBean
 @RequestScoped
 public class FinishedModalBean {
+    /**
+     * Indicates if the player has won or lost the game, or if the game ended in a draw.
+     */
     private GameOutcome outcome;
 
     public FinishedModalBean() {

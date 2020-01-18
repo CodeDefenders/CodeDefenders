@@ -20,8 +20,20 @@ import java.util.Map;
 @ManagedBean
 @RequestScoped
 public class ClassViewerBean {
+    /**
+     * The name of the class to display.
+     */
     private String className;
+
+    /**
+     * The source code of the class to display.
+     */
     private String classCode;
+
+    /**
+     * The dependencies of the class to display, mapped by their names.
+     * Can be empty, but must not be {@code null}.
+     */
     private Map<String, String> dependencies;
 
     public ClassViewerBean() {
@@ -50,6 +62,10 @@ public class ClassViewerBean {
         return className;
     }
 
+    /**
+     * Returns the HTML-escaped code of the class.
+     * @return The HTML-escaped code of the class.
+     */
     public String getClassCode() {
         return classCode;
     }

@@ -13,6 +13,9 @@ import java.util.List;
 @SessionScoped
 // TODO: Put error message here and show it somewhere different than the messages?
 public class PreviousSubmissionBean implements Serializable {
+    /**
+     * The
+     */
     private String mutantCode;
     private String testCode;
     private List<Integer> errorLines;
