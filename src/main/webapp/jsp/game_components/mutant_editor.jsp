@@ -18,12 +18,11 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="java.util.Map" %>
 
 <%--
     Displays the mutant code in a CodeMirror textarea.
 --%>
-
-<%@ page import="java.util.Map" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>

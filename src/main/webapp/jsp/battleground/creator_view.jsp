@@ -21,7 +21,10 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 
-<%-- TODO: list parameters --%>
+<%--
+    @param MutliplayerGame game
+        The game to be displayed.
+--%>
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
@@ -29,6 +32,7 @@
 %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -65,6 +69,7 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 </div> <%-- TODO move the whole div here after changing the header --%>

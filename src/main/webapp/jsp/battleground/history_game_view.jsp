@@ -27,12 +27,15 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.Role" %>
 
+<%--
+    @param Integer gameId
+        The id of the game to be displayed.
+--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Game History"); %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-
-<%-- TODO: list parameters --%>
 
 <%
     MultiplayerGame game;
@@ -55,6 +58,7 @@
 %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -106,6 +110,7 @@
 %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:include page="/jsp/battleground/header_game.jsp"/>

@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
@@ -35,9 +37,6 @@
 
     The CSS is located in game_highlighting.css.
 --%>
-
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
 

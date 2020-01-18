@@ -25,7 +25,14 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 
-<%-- TODO: list parameters --%>
+<%--
+    @param MutliplayerGame game
+        The game to be displayed.
+    @param Mutant equivMutant
+        The mutant flagged as equivalent.
+    @param User equivDefender
+        The user that flagged the mutant.
+--%>
 
 <%
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
@@ -38,6 +45,7 @@
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -76,6 +84,7 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <div class="row">

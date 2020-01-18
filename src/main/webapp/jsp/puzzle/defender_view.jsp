@@ -24,7 +24,6 @@
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.util.Constants" %>
 
 <%--
     Puzzle game view for a defender. Retrieves the given puzzle game
@@ -33,10 +32,6 @@
     @param PuzzleGame Constants#REQUEST_ATTRIBUTE_PUZZLE_GAME
         The puzzle game to be displayed.
 --%>
-
-<jsp:include page="/jsp/header_main.jsp"/>
-
-</div></div></div></div></div>
 
 <%
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
@@ -51,6 +46,7 @@
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
@@ -105,7 +101,11 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
+
+<jsp:include page="/jsp/header_main.jsp"/>
+</div></div></div></div></div>
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 

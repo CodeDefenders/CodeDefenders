@@ -34,12 +34,6 @@
         The puzzle game to be displayed.
 --%>
 
-<jsp:include page="/jsp/header_main.jsp"/>
-
-</div></div></div></div></div>
-
-<div class="game-container">
-
 <%
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
@@ -55,6 +49,7 @@
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
@@ -107,7 +102,12 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
+
+<jsp:include page="/jsp/header_main.jsp"/>
+</div></div></div></div></div>
+<div class="game-container">
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 

@@ -19,17 +19,6 @@
 
 --%>
 <%@ page import="java.util.Map" %>
-<%--
-    Displays the class code for a class under test and its dependencies in a read-only CodeMirror textarea.
-
-    @param String classCode
-        The source code of the class to display, but not {@code null}.
-    @param String className
-        The class name of the CUT, but not {@code null}.
-    @param Map<String, String> dependencies
-        A mapping between a class name and the content of the CUT dependencies.
-        Can be empty, but must not be {@code null}.
---%>
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 

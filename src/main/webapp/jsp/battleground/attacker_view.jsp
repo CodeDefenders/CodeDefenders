@@ -24,7 +24,10 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<%-- TODO: list parameters --%>
+<%--
+    @param MutliplayerGame game
+        The game to be displayed.
+--%>
 
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
@@ -36,6 +39,7 @@
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
@@ -96,6 +100,7 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
+<%-- -------------------------------------------------------------------------------- --%>
 
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
