@@ -124,7 +124,7 @@
         const testModals = new Map();
 
         /* Functions to generate table columns. */
-        const genId = row => 'Mutant ' + row.id + ' <span class="ma-column-name>  by  </span> ' + row.creatorName + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
+        const genId = row => '<span class="ma-mutant-link btn-link" style="padding: 0">Mutant ' + row.id + '</span> <span class="ma-column-name>  by  </span> ' + row.creatorName + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
         const genPoints = row => '<span class="ma-column-name">Points:</span> ' + row.points;
         const genLines = row => row.description;
         const genIcon = row => {
@@ -335,7 +335,15 @@
             tableElement.on('click', '.ma-view-test-button', function () {
                 const mutant = rowData(this, dataTable);
                 viewTestModal({"id": mutant.killedByTestId, "creatorName": mutant.killedByName, "killMessage": mutant.killMessage});
-            })
+            });
+
+            /* Assign function to the "Mutant <id>" link. */
+            tableElement.on('click', '.ma-mutant-link', function () {
+                const mutant = rowData(this, dataTable);
+                const cm = $('#cut-div, #newmut-div').find('.CodeMirror').get(0).CodeMirror;
+                cm.scrollIntoView({line:mutant.lines[0]-1, char:0}, cm.getScrollInfo().clientHeight/2-10);
+                $("#cut-div, #newmut-div")[0].scrollIntoView();
+            });
         }
     }());
 </script>
