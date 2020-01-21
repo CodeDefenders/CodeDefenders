@@ -108,7 +108,7 @@
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Existing Mutants</h3>
-            <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
+            <jsp:include page="/jsp/game_components/mutant_accordion.jsp"/>
         </div>
 
         <% if (showTestAccordion) { %>
