@@ -17,7 +17,9 @@
         <% } %>
 
         <% if (allFadeOut) { %>
-            <script> $('#messages-div').delay(10000).fadeOut(); </script>
+            <script>
+                $(document).ready(() => $('#messages-div').delay(10000).fadeOut());
+            </script>
         <% } %>
     </div>
 

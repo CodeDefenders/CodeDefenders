@@ -21,22 +21,8 @@
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
-<%--
-    @param String pageTitle
-        The title of the page.
-        TODO: change this to a bean?
-        FIXME: don't use pageTitle to identify the page here!
-    @param List<String> messages
-        Messages to display on page load.
---%>
-
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#messages-div').delay(10000).fadeOut();
-    });
-</script>
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width">
         <div class="ws-12 container" style="text-align: right; clear:
