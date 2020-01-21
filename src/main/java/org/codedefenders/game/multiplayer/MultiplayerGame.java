@@ -62,32 +62,32 @@ public class MultiplayerGame extends AbstractGame {
     protected List<Mutant> mutants;
     protected List<Test> tests;
     */
-    private List<Player> attackers;
-    private List<Player> defenders;
-    private int defenderValue;
-    private int attackerValue;
-    private float lineCoverage;
-    private float mutantCoverage;
-    private float prize;
+    protected List<Player> attackers;
+    protected List<Player> defenders;
+    protected int defenderValue;
+    protected int attackerValue;
+    protected float lineCoverage;
+    protected float mutantCoverage;
+    protected float prize;
 
-    private boolean requiresValidation;
-    private int maxAssertionsPerTest;
-    private boolean forceHamcrest;
+    protected boolean requiresValidation;
+    protected int maxAssertionsPerTest;
+    protected boolean forceHamcrest;
 
-    private boolean chatEnabled;
-    private CodeValidatorLevel mutantValidatorLevel;
+    protected boolean chatEnabled;
+    protected CodeValidatorLevel mutantValidatorLevel;
 
-    private boolean capturePlayersIntention;
+    protected boolean capturePlayersIntention;
 
     // We need a temporary location where to store information about system tests
     // and mutants
-    private boolean withTests;
-    private boolean withMutants;
+    protected boolean withTests;
+    protected boolean withMutants;
 
     // 0 means disabled
-    private int automaticMutantEquivalenceThreshold = 0;
+    protected int automaticMutantEquivalenceThreshold = 0;
 
-    public static class Builder {
+    public static class Builder<T extends Builder<T>>  {
         // mandatory values
         private final int classId;
         private final int creatorId;
@@ -123,102 +123,102 @@ public class MultiplayerGame extends AbstractGame {
             this.forceHamcrest = forceHamcrest;
         }
 
-        public Builder cut(GameClass cut) {
-            this.cut = cut;
-            return this;
-        }
+		public T cut(GameClass cut) {
+			this.cut = cut;
+			return (T) this;
+		}
 
-        public Builder id(int id) {
-            this.id = id;
-            return this;
-        }
+		public T id(int id) {
+			this.id = id;
+			return (T) this;
+		}
 
-        public Builder requiresValidation(boolean requiresValidation) {
-            this.requiresValidation = requiresValidation;
-            return this;
-        }
+		public T requiresValidation(boolean requiresValidation) {
+			this.requiresValidation = requiresValidation;
+			return (T) this;
+		}
 
-        public Builder capturePlayersIntention(boolean capturePlayersIntention) {
-            this.capturePlayersIntention = capturePlayersIntention;
-            return this;
-        }
+		public T capturePlayersIntention(boolean capturePlayersIntention) {
+			this.capturePlayersIntention = capturePlayersIntention;
+			return (T) this;
+		}
 
-        public Builder chatEnabled(boolean chatEnabled) {
-            this.chatEnabled = chatEnabled;
-            return this;
-        }
+		public T chatEnabled(boolean chatEnabled) {
+			this.chatEnabled = chatEnabled;
+			return (T) this;
+		}
 
-        public Builder prize(float prize) {
-            this.prize = prize;
-            return this;
-        }
+		public T prize(float prize) {
+			this.prize = prize;
+			return (T) this;
+		}
 
-        public Builder lineCoverage(float lineCoverage) {
-            this.lineCoverage = lineCoverage;
-            return this;
-        }
+		public T lineCoverage(float lineCoverage) {
+			this.lineCoverage = lineCoverage;
+			return (T) this;
+		}
 
-        public Builder mutantCoverage(float mutantCoverage) {
-            this.mutantCoverage = mutantCoverage;
-            return this;
-        }
+		public T mutantCoverage(float mutantCoverage) {
+			this.mutantCoverage = mutantCoverage;
+			return (T) this;
+		}
 
-        public Builder defenderValue(int defenderValue) {
-            this.defenderValue = defenderValue;
-            return this;
-        }
+		public T defenderValue(int defenderValue) {
+			this.defenderValue = defenderValue;
+			return (T) this;
+		}
 
-        public Builder attackerValue(int attackerValue) {
-            this.attackerValue = attackerValue;
-            return this;
-        }
+		public T attackerValue(int attackerValue) {
+			this.attackerValue = attackerValue;
+			return (T) this;
+		}
 
-        public Builder state(GameState state) {
-            this.state = state;
-            return this;
-        }
+		public T state(GameState state) {
+			this.state = state;
+			return (T) this;
+		}
 
-        public Builder level(GameLevel level) {
-            this.level = level;
-            return this;
-        }
+		public T level(GameLevel level) {
+			this.level = level;
+			return (T) this;
+		}
 
-        public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
-            this.mutantValidatorLevel = mutantValidatorLevel;
-            return this;
-        }
+		public T mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+			this.mutantValidatorLevel = mutantValidatorLevel;
+			return (T) this;
+		}
 
-        public Builder attackers(List<Player> attackers) {
-            this.attackers = attackers;
-            return this;
-        }
+		public T attackers(List<Player> attackers) {
+			this.attackers = attackers;
+			return (T) this;
+		}
 
-        public Builder defenders(List<Player> defenders) {
-            this.defenders = defenders;
-            return this;
-        }
+		public T defenders(List<Player> defenders) {
+			this.defenders = defenders;
+			return (T) this;
+		}
 
-        public Builder withTests(boolean withTests) {
-            this.withTests = withTests;
-            return this;
-        }
+		public T withTests(boolean withTests) {
+			this.withTests = withTests;
+			return (T) this;
+		}
 
-        public Builder withMutants(boolean withMutants) {
-            this.withMutants = withMutants;
-            return this;
-        }
+		public T withMutants(boolean withMutants) {
+			this.withMutants = withMutants;
+			return (T) this;
+		}
 
-        public Builder automaticMutantEquivalenceThreshold(int threshold) {
-            this.automaticMutantEquivalenceThreshold = threshold;
-            return this;
-        }
+		public T automaticMutantEquivalenceThreshold(int threshold) {
+			this.automaticMutantEquivalenceThreshold = threshold;
+			return (T) this;
+		}
 
-        public MultiplayerGame build() {
-            return new MultiplayerGame(this);
-        }
-    }
+		public MultiplayerGame build() {
+			return new MultiplayerGame(this);
+		}
+	}
 
-    private MultiplayerGame(Builder builder) {
+    protected MultiplayerGame(Builder builder) {
         this.mode = GameMode.PARTY;
 
         this.cut = builder.cut;
@@ -362,7 +362,7 @@ public class MultiplayerGame extends AbstractGame {
         return false;
     }
 
-    private boolean canJoinGame(int userId) {
+    protected boolean canJoinGame(int userId) {
         return !requiresValidation || UserDAO.getUserById(userId).isValidated();
     }
 
