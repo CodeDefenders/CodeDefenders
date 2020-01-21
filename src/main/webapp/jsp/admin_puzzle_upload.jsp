@@ -18,18 +18,21 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Admin Puzzle Upload"); %>
+
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
 	<% request.setAttribute("adminActivePage", "adminPuzzles"); %>
 	<jsp:include page="/jsp/admin_navigation.jsp"/>
 
-	<h2>Puzzle Management</h2>
 	<h3>Upload Puzzles</h3>
 
     Puzzle information is uploaded in a single zip file. For details on the convention, expand the description.
 
-    <button class="btn btn-light" type="button" data-toggle="collapse" data-target="#collapseExplanation" aria-expanded="false">
+    <button class="btn" type="button" data-toggle="collapse" data-target="#collapseExplanation" aria-expanded="false">
         Toggle puzzle upload convention description.
     </button>
     <div class="collapse" id="collapseExplanation">
@@ -102,14 +105,14 @@
     </div>
 
     <div class="full-width">
-        <form id="uploadPuzzles" name="uploadPuzzles" action="<%=request.getContextPath() + Paths.ADMIN_PUZZLES%>"
+        <form id="uploadPuzzles" name="uploadPuzzles" action="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_UPLOAD%>"
               class="form-upload" method="post" enctype="multipart/form-data">
             <input type="hidden" name="formType" value="uploadPuzzles">
             <span class="file-select">
 				<input id="fileUploadPuzzles" name="fileUploadPuzzles" type="file" class="file-loading" accept=".zip"/>
             </span>
             <br>
-            <button class="btn btn-md btn-primary" type="submit" id="upload" onClick="this.form.submit(); this.disabled=true; this.innerText='Uploading...';">Upload</button>
+            <button class="btn btn-primary" type="submit" id="upload" onClick="this.form.submit(); this.disabled=true; this.innerText='Uploading...';">Upload</button>
         </form>
     </div>
 

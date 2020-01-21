@@ -47,19 +47,20 @@
         <a id="adminMonitorGames" href="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>">Monitor Games</a>
     </li>
     <li class="<%=active(activePage,"adminUserMgmt")%>">
-        <a id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Manage Users</a>
+        <a id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Users</a>
     </li>
     <li class="<%=active(activePage,"adminClasses")%>">
-        <a id="adminClasses" href="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>">Manage Classes</a>
+        <a id="adminClasses" href="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>">Classes</a>
     </li>
-    <li class="<%=active(activePage,"adminPuzzles")%>">
-        <a id="adminPuzzles" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLES%>">Manage Puzzles</a>
-    </li>
-    <li class="<%=active(activePage,"adminSystemSettings")%>">
-        <a id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
+    <li class="<%=active(activePage,"adminPuzzles")%> dropdown">
+        <a id="adminPuzzles" class="dropdown-toggle" data-toggle="dropdown" href="#">Puzzles&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>
+        <ul class="dropdown-menu">
+            <li><a id="adminPuzzleManagement" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_MANAGEMENT%>">Manage</a></li>
+            <li><a id="adminPuzzleUpload" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_UPLOAD%>">Upload</a></li>
+        </ul>
     </li>
     <li class="<%=active(activePage,"adminKillMaps")%>">
-        <a id="adminKillMaps" href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">Manage Analysis</a>
+        <a id="adminKillMaps" href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">Analysis</a>
     </li>
     <li class="<%=active(activePage,"adminAnalytics")%> dropdown">
         <a id="adminAnalytics" class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>
@@ -68,5 +69,8 @@
             <li><a id="adminAnalyticsClasses" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
             <li><a id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
         </ul>
+    </li>
+    <li class="<%=active(activePage,"adminSystemSettings")%>">
+        <a id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
     </li>
 </ul>

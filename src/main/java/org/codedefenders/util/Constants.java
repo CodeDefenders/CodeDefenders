@@ -27,7 +27,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 /**
- * @author Jose Rojas
+ * This class contains most constants used in Code Defenders.
+ * For URL paths, see {@link org.codedefenders.util.Paths}.
+ *
+ * @see org.codedefenders.util.Paths
  */
 public class Constants {
 
@@ -50,8 +53,8 @@ public class Constants {
         // Check Env
         if (dataHome == null) {
             ProcessBuilder pb = new ProcessBuilder();
-            Map env = pb.environment();
-            dataHome = (String) env.get("CODEDEFENDERS_DATA");
+            Map<String, String> env = pb.environment();
+            dataHome = env.get("CODEDEFENDERS_DATA");
         }
         // Check System properties
         if (dataHome == null) {
@@ -94,7 +97,8 @@ public class Constants {
     public static final String LIB_HAMCREST = Paths.get(DATA_DIR, "lib", "hamcrest-all-1.3.jar").toString();
     public static final String LIB_MOCKITO = Paths.get(DATA_DIR, "lib", "mockito-all-1.9.5.jar").toString();
 
-    public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST + File.pathSeparatorChar + Constants.LIB_MOCKITO;
+    public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST
+            + File.pathSeparatorChar + Constants.LIB_MOCKITO;
 
     public static final String TEST_PREFIX = "Test";
     public static final String JAVA_SOURCE_EXT = ".java";
@@ -106,10 +110,10 @@ public class Constants {
 
     // JSP file paths
     public static final String INDEX_JSP = "/jsp/index.jsp";
-	public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
+    public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
 
-    public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();;
+    public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
 
@@ -124,11 +128,12 @@ public class Constants {
 
     public static final String ADMIN_USER_JSP = "/jsp/admin_user_mgmt.jsp";
     public static final String ADMIN_GAMES_JSP = "/jsp/admin_create_games.jsp";
-    public static final String ADMIN_PUZZLE_JSP = "/jsp/admin_puzzles.jsp";
     public static final String ADMIN_CLASSES_JSP = "/jsp/admin_class_management.jsp";
     public static final String ADMIN_SETTINGS_JSP = "/jsp/admin_system_settings.jsp";
     public static final String ADMIN_MONITOR_JSP = "/jsp/admin_monitor_games.jsp";
     public static final String ADMIN_KILLMAPS_JSP = "/jsp/admin_killmap_management.jsp";
+    public static final String ADMIN_PUZZLE_MANAGEMENT_JSP = "/jsp/admin_puzzle_management.jsp";
+    public static final String ADMIN_PUZZLE_UPLOAD_JSP = "/jsp/admin_puzzle_upload.jsp";
     public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp/admin_analytics_users.jsp";
     public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp/admin_analytics_classes.jsp";
     public static final String ADMIN_ANALYTICS_KILLMAPS_JSP = "/jsp/admin_analytics_killmaps.jsp";

@@ -29,6 +29,9 @@
     Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
 %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Welcome to Code Defenders"); %>
+
 <jsp:include page="/jsp/header_logout.jsp"/>
 
 <div class="nest">

@@ -25,6 +25,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * This class handles the database logic for puzzles.
@@ -98,7 +101,7 @@ public class PuzzleDAO {
     public static List<Puzzle> getPuzzles() {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM puzzles",
+                "FROM view_active_puzzles as puzzles",
                 "ORDER BY Chapter_ID, Position;"
         );
 
@@ -111,12 +114,12 @@ public class PuzzleDAO {
      *
      * @param chapterId The chapter ID.
      * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
-     * in the chapter.
+     *     in the chapter.
      */
     public static List<Puzzle> getPuzzlesForChapterId(int chapterId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM puzzles",
+                "FROM view_active_puzzles as puzzles",
                 "WHERE Chapter_ID = ?",
                 "ORDER BY Position;"
         );
@@ -156,7 +159,10 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
+        return DB.executeQueryReturnValue(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DatabaseValue.of(puzzleId),
+                DatabaseValue.of(userId));
     }
 
     /**
@@ -166,7 +172,7 @@ public class PuzzleDAO {
      * @param puzzleId The puzzle ID.
      * @param userId   The user ID.
      * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
-     * given user. The list is sorted by the the timestamp of the games.
+     *     given user. The list is sorted by the the timestamp of the games.
      */
     public static List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
         String query = String.join("\n",
@@ -177,7 +183,10 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DatabaseValue.of(puzzleId),
+                DatabaseValue.of(userId));
     }
 
     /**
@@ -186,7 +195,7 @@ public class PuzzleDAO {
      *
      * @param userId The user ID.
      * @return A {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
-     * The list is sorted by the the timestamp of the games.
+     *     The list is sorted by the the timestamp of the games.
      */
     public static List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
         String query = String.join("\n",
@@ -314,11 +323,74 @@ public class PuzzleDAO {
         return DB.executeUpdateQueryGetKeys(query, values);
     }
 
+
+    /**
+     * Updates the given {@link PuzzleInfo puzzle information} in the database.
+     *
+     * @param puzzle The {@link PuzzleInfo}.
+     * @return {@code true} if the update was successful, {@code false} otherwise.
+     */
+    public static boolean updatePuzzle(PuzzleInfo puzzle) {
+        String query = String.join("\n",
+                "UPDATE puzzles",
+                "SET Chapter_ID           = ?,",
+                "    Position             = ?,",
+                "    Title                = ?,",
+                "    Description          = ?,",
+                "    Max_Assertions       = ?,",
+                "    Force_Hamcrest       = ?,",
+                "    Editable_Lines_Start = ?,",
+                "    Editable_Lines_End   = ?",
+                "WHERE Puzzle_ID = ?;"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(puzzle.getChapterId()),
+            DatabaseValue.of(puzzle.getPosition()),
+            DatabaseValue.of(puzzle.getTitle()),
+            DatabaseValue.of(puzzle.getDescription()),
+            DatabaseValue.of(puzzle.getMaxAssertionsPerTest()),
+            DatabaseValue.of(puzzle.isForceHamcrest()),
+            DatabaseValue.of(puzzle.getEditableLinesStart()),
+            DatabaseValue.of(puzzle.getEditableLinesEnd()),
+
+            DatabaseValue.of(puzzle.getPuzzleId()),
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
+    /**
+     * Updates the given {@link PuzzleChapter}'s values in the database.
+     *
+     * @param chapter The {@link PuzzleChapter}.
+     * @return {@code true} if the update was successful, {@code false} otherwise.
+     */
+    public static boolean updatePuzzleChapter(PuzzleChapter chapter) {
+        String query = String.join("\n",
+                "UPDATE puzzle_chapters",
+                "SET Position    = ?,",
+                "    Title       = ?,",
+                "    Description = ?",
+                "WHERE Chapter_ID = ?;"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(chapter.getPosition()),
+            DatabaseValue.of(chapter.getTitle()),
+            DatabaseValue.of(chapter.getDescription()),
+
+            DatabaseValue.of(chapter.getChapterId()),
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
     /**
      * Updates the given {@link PuzzleGame}'s values in the database.
      *
      * @param game The {@link PuzzleGame}.
-     * @return {@code true} if the update was successful, {@code false}a otherwise.
+     * @return {@code true} if the update was successful, {@code false} otherwise.
      */
     public static boolean updatePuzzleGame(PuzzleGame game) {
         String query = String.join("\n",
@@ -356,6 +428,99 @@ public class PuzzleDAO {
     }
 
     /**
+     * Checks for a given puzzle whether at least one game
+     * with this puzzle exists.
+     *
+     * @param puzzle the checked puzzle.
+     * @return {@code true} if at least one game does exist, {@code false} otherwise.
+     */
+    public static boolean gamesExistsForPuzzle(@Nonnull Puzzle puzzle) {
+        String query = String.join("\n",
+                    "SELECT (COUNT(games.ID) > 0) AS games_exist",
+                    "FROM games, puzzles",
+                    "WHERE puzzles.Puzzle_ID = ?",
+                    "AND games.Class_ID = puzzles.Class_ID");
+
+        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("games_exist"),
+                DatabaseValue.of(puzzle.getPuzzleId()));
+    }
+
+    /**
+     * Sets the 'Active' column of a given puzzle to a given value.
+     *
+     * @param puzzle the given puzzle the active value is set for.
+     * @param active whether the puzzle is active or not.
+     * @return {@code true} if setting active was successful, {@code false} otherwise.
+     */
+    public static boolean setPuzzleActive(@Nonnull Puzzle puzzle, boolean active) {
+        String query = String.join("\n",
+                "UPDATE puzzles",
+                    "SET ACTIVE = ?",
+                    "WHERE Puzzle_ID = ?;"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(active),
+            DatabaseValue.of(puzzle.getPuzzleId())
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
+    /**
+     * Removes a given puzzle chapter from the database.
+     * All puzzles, which reference this puzzle chapter, have their
+     * puzzle chapter attribute set to {@code null} in the database.
+     *
+     * @param chapter the puzzle chapter to be removed.
+     * @return {@code true} when the removal was successful, {@code false} otherwise.
+     */
+    public static boolean removePuzzleChapter(@Nonnull  PuzzleChapter chapter) {
+        String query = "DELETE FROM puzzle_chapters WHERE Chapter_ID = ?;";
+        return DB.executeUpdateQuery(query, DatabaseValue.of(chapter.getChapterId()));
+    }
+
+    /**
+     * Returns the parent class of a puzzle class.
+     * The puzzle class is a copy of the parent class and still requires
+     * the source files of its parent class.
+     *
+     * @param puzzleClassId the identifier of the puzzle child class.
+     * @return the parent class of the given puzzle class.
+     */
+    public static GameClass getParentGameClass(int puzzleClassId) {
+        String query = String.join("\n",
+                "SELECT classes.*",
+                "FROM classes,",
+                "     view_puzzle_classes puzzle_classes",
+                "WHERE puzzle_classes.Class_ID = ?",
+                "  AND classes.Class_ID = puzzle_classes.Parent_Class;"
+        );
+
+        return DB.executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, DatabaseValue.of(puzzleClassId));
+    }
+
+    /**
+     * Checks whether the source files of a given class are used for puzzle classes.
+     *
+     * @param classId the identifier of the checked game class.
+     * @return {@code true} if class files are used, {@code false} otherwise.
+     */
+    public static boolean classSourceUsedForPuzzleClasses(int classId) {
+        String query = String.join("\n",
+                "SELECT (COUNT(c1.Class_ID)) > 0 as class_used",
+                "FROM classes c1,",
+                "     view_puzzle_classes c2",
+                "WHERE c1.Class_ID = ?",
+                "      AND c1.JavaFile = c2.JavaFile"
+        );
+
+        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("class_used"),
+                DatabaseValue.of(classId));
+    }
+
+
+    /**
      * Creates a {@link PuzzleChapter} from a {@link ResultSet}.
      *
      * @param rs The {@link ResultSet}.
@@ -366,7 +531,9 @@ public class PuzzleDAO {
             int chapterId = rs.getInt("puzzle_chapters.Chapter_ID");
 
             Integer position = rs.getInt("puzzle_chapters.Position");
-            if (rs.wasNull()) position = null;
+            if (rs.wasNull()) {
+                position = null;
+            }
 
             String title = rs.getString("puzzle_chapters.Title");
             String description = rs.getString("puzzle_chapters.Description");
@@ -386,31 +553,40 @@ public class PuzzleDAO {
      */
     private static Puzzle getPuzzleFromResultSet(ResultSet rs) {
         try {
-            int puzzleId = rs.getInt("puzzles.Puzzle_ID");
-            int classId = rs.getInt("puzzles.Class_ID");
-            Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
+            final int puzzleId = rs.getInt("puzzles.Puzzle_ID");
+            final int classId = rs.getInt("puzzles.Class_ID");
+            final Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
 
             Integer chapterId = rs.getInt("puzzles.Chapter_ID");
-            if (rs.wasNull()) chapterId = null;
+            if (rs.wasNull()) {
+                chapterId = null;
+            }
 
             Integer position = rs.getInt("puzzles.Position");
-            if (rs.wasNull()) position = null;
+            if (rs.wasNull()) {
+                position = null;
+            }
 
             String title = rs.getString("puzzles.Title");
             String description = rs.getString("puzzles.Description");
 
             GameLevel level = GameLevel.valueOf(rs.getString("puzzles.Level"));
-            
-            int maxAssertions = rs.getInt("Max_Assertions");
-            boolean forceHamcrest = rs.getBoolean("Force_Hamcrest"); 
-            
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
+
+            int maxAssertions = rs.getInt("puzzles.Max_Assertions");
+            boolean forceHamcrest = rs.getBoolean("puzzles.Force_Hamcrest");
+
+            CodeValidatorLevel mutantValidatorLevel =
+                    CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
 
             Integer editableLinesStart = rs.getInt("puzzles.Editable_Lines_Start");
-            if (rs.wasNull()) editableLinesStart = null;
+            if (rs.wasNull()) {
+                editableLinesStart = null;
+            }
 
             Integer editableLinesEnd = rs.getInt("puzzles.Editable_Lines_End");
-            if (rs.wasNull()) editableLinesEnd = null;
+            if (rs.wasNull()) {
+                editableLinesEnd = null;
+            }
 
             return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, forceHamcrest, mutantValidatorLevel,
                     editableLinesStart, editableLinesEnd, chapterId, position, title, description);

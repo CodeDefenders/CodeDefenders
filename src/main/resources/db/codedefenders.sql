@@ -94,6 +94,7 @@ CREATE TABLE `classes` (
   `AiPrepared` tinyint(1) DEFAULT '0',
   `RequireMocking` tinyint(1) DEFAULT '0',
   `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
+  `Parent_Class` int(11) DEFAULT NULL,
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   `TestingFramework` ENUM('JUNIT4', 'JUNIT5') NOT NULL DEFAULT 'JUNIT4',
   `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
@@ -311,6 +312,7 @@ DROP TABLE IF EXISTS `puzzles`;
 CREATE TABLE `puzzles` (
   `Puzzle_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Class_ID` int(11) NOT NULL,
+  `Active` tinyint(1) DEFAULT '1',
   `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
   `Level` enum('EASY','HARD') DEFAULT 'HARD',
   `Max_Assertions` int(11) NOT NULL DEFAULT '2',
@@ -583,15 +585,20 @@ SELECT *
 FROM `view_active_classes`
 WHERE Puzzle = 1;
 
+CREATE OR REPLACE VIEW `view_active_puzzles` AS
+SELECT *
+FROM `puzzles`
+WHERE Active = 1;
+
 CREATE OR REPLACE VIEW `view_battleground_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
 FROM games,
      classes
 WHERE Mode = 'PARTY'
   AND games.Class_ID = classes.Class_ID;
 
 CREATE OR REPLACE VIEW `view_puzzle_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
 FROM games,
      classes
 WHERE Mode = 'PUZZLE'

@@ -20,9 +20,9 @@ package org.codedefenders.util;
 
 /**
  * This class contains URL path constants.
- * <p>
- * If one path has to be adjusted, it has to be adjusted in the {@code web.xml}
- * servlet mapping configuration, too.
+ *
+ * <p>If one path has to be adjusted, it has to be adjusted in the
+ * specific servlet configuration, too.
  */
 public class Paths {
 
@@ -37,8 +37,6 @@ public class Paths {
     public static final String ABOUT_PAGE = "/about";
     public static final String CONTACT_PAGE = "/contact";
     public static final String LEADERBOARD_PAGE = "/leaderboard";
-    public static final String AI_PREPARER = "/ai_preparer";
-    public static final String UTESTING_PATH = "/utesting";
 
     public static final String USER_PROFILE = "/profile";
 
@@ -60,11 +58,13 @@ public class Paths {
     public static final String ADMIN_PAGE = "/admin";
     public static final String ADMIN_GAMES = "/admin/games";
     public static final String ADMIN_MONITOR = "/admin/monitor";
-    public static final String ADMIN_PUZZLES = "/admin/puzzles";
     public static final String ADMIN_CLASSES = "/admin/classes";
     public static final String ADMIN_USERS = "/admin/users";
     public static final String ADMIN_SETTINGS = "/admin/settings";
     public static final String ADMIN_KILLMAPS = "/admin/killmaps";
+
+    public static final String ADMIN_PUZZLE_MANAGEMENT = "/admin/puzzles/management";
+    public static final String ADMIN_PUZZLE_UPLOAD = "/admin/puzzles/upload";
 
     public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
     public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
@@ -75,11 +75,15 @@ public class Paths {
     public static final String API_MUTANTS = "/api/game_mutants";
     public static final String API_FEEDBACK = "/api/feedback";
     public static final String API_SEND_EMAIL = "/api/sendmail";
+    public static final String API_CLASS = "/api/class";
+    public static final String API_TEST = "/api/test";
+    public static final String API_MUTANT = "/api/mutant";
+
     public static final String API_ANALYTICS_USERS = "/admin/api/users";
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";
     public static final String API_ANALYTICS_KILLMAP = "/admin/api/killmap";
     public static final String API_KILLMAP_MANAGEMENT = "/admin/api/killmapmanagement";
-    public static final String API_CLASS = "/api/class";
-    public static final String API_TEST = "/api/test";
-    public static final String API_MUTANT = "/api/mutant";
+    public static final String API_ADMIN_PUZZLES_ALL = "/admin/api/puzzles";
+    public static final String API_ADMIN_PUZZLE = "/admin/api/puzzles/puzzle";
+    public static final String API_ADMIN_PUZZLECHAPTER = "/admin/api/puzzles/chapter";
 }
