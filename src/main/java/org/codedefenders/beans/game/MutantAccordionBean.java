@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
  */
 @ManagedBean
 @RequestScoped
-// TODO: For now this just has setters for the attributes from the mutant list (+ the CUT). Change this as needed.
 public class MutantAccordionBean {
     private Boolean enableFlagging;
     private GameMode gameMode;
@@ -37,54 +36,6 @@ public class MutantAccordionBean {
     private List<Mutant> equivalentMutants;
     private List<Mutant> flaggedMutants;
     private List<MutantAccordionCategory> categories;
-
-    public String jsonFromCategories() {
-        Gson gson = new GsonBuilder()
-                .create();
-        return gson.toJson(categories);
-    }
-
-    public String jsonMutants() {
-        Map<Integer, MutantAccordionMutantDTO> mutants = new HashMap<>();
-
-        for (Mutant mutant : aliveMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE));
-        }
-        for (Mutant mutant : killedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.KILLED));
-        }
-        for (Mutant mutant : flaggedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.FLAGGED));
-        }
-        for (Mutant mutant : equivalentMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT));
-        }
-        // TODO If we try to sort the mutants according to the order they appear in the class we need to sort the Ids in the MutantAccordionCategory.
-        Gson gson = new GsonBuilder()
-                // It is important that its LinkedHashMap.class, it doesn't work if I change it to Map.class ...
-                .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
-                .create();
-        return gson.toJson(mutants);
-    }
-
-    public static Comparator<MutantAccordionMutantDTO> sortedByLineNumberAscending() {
-        return (o1, o2) -> {
-            List<Integer> lines1 = o1.lines;
-            List<Integer> lines2 = o2.lines;
-
-            if (lines1.isEmpty()) {
-                if (lines2.isEmpty()) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            } else if (lines2.isEmpty()) {
-                return 1;
-            }
-
-            return Collections.min(lines1) - Collections.min(lines2);
-        };
-    }
 
     public MutantAccordionBean() {
         enableFlagging = null;
@@ -129,9 +80,6 @@ public class MutantAccordionBean {
         if (methodCategories.isEmpty()) {
             return;
         }
-
-
-
 
         /* Map ranges of methods to their test accordion infos. */
         @SuppressWarnings("UnstableApiUsage")
@@ -213,6 +161,7 @@ public class MutantAccordionBean {
     }
 
     public List<MutantAccordionMutantDTO> getMutants() {
+        // TODO Why do mutants don't have this simple attribute?
         List<MutantAccordionMutantDTO> mutants = new ArrayList<>();
         mutants.addAll(aliveMutants.stream().map(x -> new MutantAccordionMutantDTO(x, MutantState.ALIVE)).collect(Collectors.toList()));
         mutants.addAll(killedMutants.stream().map(x -> new MutantAccordionMutantDTO(x, MutantState.KILLED)).collect(Collectors.toList()));
@@ -264,6 +213,54 @@ public class MutantAccordionBean {
 
     public boolean hasFlaggedMutants() {
         return !flaggedMutants.isEmpty();
+    }
+
+    public String jsonFromCategories() {
+        Gson gson = new GsonBuilder()
+                .create();
+        return gson.toJson(categories);
+    }
+
+    public String jsonMutants() {
+        Map<Integer, MutantAccordionMutantDTO> mutants = new HashMap<>();
+
+        for (Mutant mutant : aliveMutants) {
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE));
+        }
+        for (Mutant mutant : killedMutants) {
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.KILLED));
+        }
+        for (Mutant mutant : flaggedMutants) {
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.FLAGGED));
+        }
+        for (Mutant mutant : equivalentMutants) {
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT));
+        }
+        // TODO If we try to sort the mutants according to the order they appear in the class we need to sort the Ids in the MutantAccordionCategory.
+        Gson gson = new GsonBuilder()
+                // It is important that its LinkedHashMap.class, it doesn't work if I change it to Map.class ...
+                .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
+                .create();
+        return gson.toJson(mutants);
+    }
+
+    public static Comparator<MutantAccordionMutantDTO> sortedByLineNumberAscending() {
+        return (o1, o2) -> {
+            List<Integer> lines1 = o1.lines;
+            List<Integer> lines2 = o2.lines;
+
+            if (lines1.isEmpty()) {
+                if (lines2.isEmpty()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (lines2.isEmpty()) {
+                return 1;
+            }
+
+            return Collections.min(lines1) - Collections.min(lines2);
+        };
     }
 
     public static class MutantAccordionCategory {
@@ -338,7 +335,6 @@ public class MutantAccordionBean {
         private final String description;
 
         public MutantAccordionMutantDTO(Mutant mutant, MutantState state) {
-            String killedByName1;
             id = mutant.getId();
             creatorName = mutant.getCreatorName();
             points = mutant.getScore();
@@ -366,7 +362,7 @@ public class MutantAccordionBean {
     }
 
     // TODO: Do we have this already somwhere?
-    public static enum MutantState {
+    public enum MutantState {
         KILLED,
         ALIVE,
         EQUIVALENT,
