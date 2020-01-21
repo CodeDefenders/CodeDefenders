@@ -101,8 +101,9 @@ public class ProjectExportManager extends HttpServlet {
 
         final Map<String, byte[]> files = new HashMap<>();
         {
-            String name = "Test" + Paths.get(cut.getJavaFile()).getFileName().toString();
-            final String templateFileName = ProjectExportManager.testDir.resolve(packagePath.resolve(name)).toString();
+            final String templateFileName = testDir
+                    .resolve(packagePath.resolve("Test" + Paths.get(cut.getJavaFile()).getFileName().toString()))
+                    .toString();
             final byte[] templateFileContent = cut.getTestTemplate().getBytes();
             files.put(templateFileName, templateFileContent);
         }

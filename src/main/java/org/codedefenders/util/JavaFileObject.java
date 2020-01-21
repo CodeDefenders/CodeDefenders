@@ -29,10 +29,10 @@ import javax.tools.SimpleJavaFileObject;
  * {@link SimpleJavaFileObject} implementation, which allows for reading file content
  * from memory (by calling constructor with path <i>and</i> content) or reading
  * the file content from the hard-disk (by calling constructor just with path).
- * <p>
- * Inherited attributes {@code uri} and {@code kind}.
- * <p>
- * Useful methods: {@link #getName()}
+ *
+ * <p>Inherited attributes {@code uri} and {@code kind}.
+ *
+ * <p>Useful methods: {@link #getName()}
  */
 public class JavaFileObject extends SimpleJavaFileObject {
     private String path;
@@ -92,7 +92,7 @@ public class JavaFileObject extends SimpleJavaFileObject {
      */
     public String getContent() {
         return content;
-    };
+    }
 
     @Override
     public String getName() {

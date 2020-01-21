@@ -35,13 +35,14 @@ import javax.servlet.http.HttpServletRequest;
  */
 public final class ServletUtils {
     private static final Logger logger = LoggerFactory.getLogger(ServletUtils.class);
+
     private ServletUtils() {
     }
 
     /**
      * Returns the context path a of a given {@link HttpServletRequest}.
-     * <p>
-     * {@code ctx(request)} can be used as a shorter version of {@code request.getContextPath()}
+     *
+     * <p>{@code ctx(request)} can be used as a shorter version of {@code request.getContextPath()}
      *
      * @param request the request the context is retrieved from.
      * @return the application context.
@@ -79,18 +80,20 @@ public final class ServletUtils {
     public static String formType(HttpServletRequest request) {
         final Optional<String> formType = getStringParameter(request, "formType");
         if (!formType.isPresent()) {
-            throw new IllegalStateException("Could not retrieve 'formType' from request. Aborting request. Making sure the request parameters are set correctly.");
+            throw new IllegalStateException("Could not retrieve 'formType' from request."
+                    + "Aborting request. Making sure the request parameters are set correctly.");
         }
         return formType.get();
     }
 
     /**
      * Extracts the {@code gameId} URL parameter from a given request.
-     * <p>
-     * If {@code gameId} is no valid integer value, the method returns {@link Optional#empty()}.
+     *
+     * <p>If {@code gameId} is no valid integer value, the method returns {@link Optional#empty()}.
      *
      * @param request the request, which {@code gameId} is extracted from.
-     * @return a valid integer extracted from the {@code gameId} parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
+     * @return a valid integer extracted from the {@code gameId} parameter of the given request wrapped in an
+     *     {@link Optional}, or {@link Optional#empty()}.
      * @see ServletUtils#getIntParameter(HttpServletRequest, String)
      */
     public static Optional<Integer> gameId(HttpServletRequest request) {
@@ -99,12 +102,13 @@ public final class ServletUtils {
 
     /**
      * Extracts a given integer URL parameter from a given request.
-     * <p>
-     * If the parameter is no valid integer value, the method returns an empty {@link Optional}.
+     *
+     * <p>If the parameter is no valid integer value, the method returns an empty {@link Optional}.
      *
      * @param request   the request, which the parameter is extracted from.
      * @param parameter the given URL parameter.
-     * @return a valid integer extracted for the parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
+     * @return a valid integer extracted for the parameter of the given request wrapped in an {@link Optional},
+     *     or {@link Optional#empty()}.
      */
     public static Optional<Integer> getIntParameter(HttpServletRequest request, String parameter) {
         return Optional.ofNullable(request.getParameter(parameter)).map(s -> {
@@ -118,12 +122,13 @@ public final class ServletUtils {
 
     /**
      * Extracts a given float URL parameter from a given request.
-     * <p>
-     * If the parameter is no valid float value, the method returns an empty {@link Optional}.
+     *
+     * <p>If the parameter is no valid float value, the method returns an empty {@link Optional}.
      *
      * @param request   the request, which the parameter is extracted from.
      * @param parameter the given URL parameter.
-     * @return a valid float extracted for the parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
+     * @return a valid float extracted for the parameter of the given request wrapped in an {@link Optional},
+     *     or {@link Optional#empty()}.
      */
     public static Optional<Float> getFloatParameter(HttpServletRequest request, String parameter) {
         return Optional.ofNullable(request.getParameter(parameter)).map(s -> {
@@ -137,12 +142,13 @@ public final class ServletUtils {
 
     /**
      * Extracts a given URL parameter from a given request.
-     * <p>
-     * If the parameter is not a valid string value, the method returns an empty {@link Optional}.
+     *
+     * <p>If the parameter is not a valid string value, the method returns an empty {@link Optional}.
      *
      * @param request   the request, which the parameter is extracted from.
      * @param parameter the given URL parameter.
-     * @return a string extracted for the parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
+     * @return a string extracted for the parameter of the given request wrapped in an {@link Optional},
+     *     or {@link Optional#empty()}.
      */
     public static Optional<String> getStringParameter(HttpServletRequest request, String parameter) {
         return Optional.ofNullable(request.getParameter(parameter)).filter(s -> !s.isEmpty());

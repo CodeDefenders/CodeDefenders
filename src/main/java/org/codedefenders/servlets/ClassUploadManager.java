@@ -37,9 +37,13 @@ import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.LineCoverageGenerator;
-import org.codedefenders.game.*;
+import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.TestingFramework;
 import org.codedefenders.model.Dependency;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -71,6 +75,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
@@ -79,8 +84,9 @@ import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 
 /**
  * This {@link HttpServlet} handles the upload of Java class files, which includes file validation and storing.
- * <p>
- * Serves on path: {@code /class-upload}.
+ *
+ * <p>Serves on path: {@code /class-upload}.
+ *
  * @see org.codedefenders.util.Paths#CLASS_UPLOAD
  */
 @WebServlet("/class-upload")
@@ -102,7 +108,7 @@ public class ClassUploadManager extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final boolean classUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
+        final boolean classUploadEnabled = AdminDAO.getSystemSetting(CLASS_UPLOAD).getBoolValue();
         if (classUploadEnabled) {
             RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.CLASS_UPLOAD_VIEW_JSP);
             dispatcher.forward(request, response);
@@ -115,7 +121,7 @@ public class ClassUploadManager extends HttpServlet {
     @SuppressWarnings("Duplicates")
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final boolean classUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
+        final boolean classUploadEnabled = AdminDAO.getSystemSetting(CLASS_UPLOAD).getBoolValue();
         if (!classUploadEnabled) {
             logger.warn("User {} tried to upload a class, but class upload is disabled.", login.getUserId());
             return;
@@ -161,7 +167,9 @@ public class ClassUploadManager extends HttpServlet {
         // Splits request parameters by FileItem#isFormField into
         // upload and file parameters to ensure that all upload parameters
         // set before storing files.
-        final Map<Boolean, List<FileItem>> parameters = items.stream().collect(Collectors.partitioningBy(FileItem::isFormField));
+        final Map<Boolean, List<FileItem>> parameters = items
+                .stream()
+                .collect(Collectors.partitioningBy(FileItem::isFormField));
         final List<FileItem> uploadParameters = parameters.get(true);
         final List<FileItem> fileParameters = parameters.get(false);
 
@@ -173,7 +181,8 @@ public class ClassUploadManager extends HttpServlet {
                 case "classAlias":
                     classAlias = fieldValue;
                     if (!validateAlias(classAlias)) {
-                        logger.error("Class upload failed. Provided alias '{}' contained whitespaces or special characters. Aborting.", classAlias);
+                        logger.error("Class upload failed. Provided alias '{}' contained whitespaces or special "
+                                + "characters. Aborting.", classAlias);
                         messages.add("Class upload failed. Alias must not contain whitespaces or special characters.");
                         abortRequestAndCleanUp(request, response);
                         return;
@@ -214,7 +223,8 @@ public class ClassUploadManager extends HttpServlet {
             byte[] fileContentBytes = fileParameter.get();
             if (fileContentBytes.length == 0) {
                 logger.error("Class upload failed. Given file {} was empty", fileName);
-                messages.add("Class upload failed. File content for " + fileName + " could not be read. Please try again.");
+                messages.add("Class upload failed. File content for " + fileName
+                        + " could not be read. Please try again.");
                 abortRequestAndCleanUp(request, response);
                 return;
             }
@@ -279,27 +289,28 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         final List<JavaFileObject> dependencies = new ArrayList<>();
-            final String fileName = cutFile.fileName;
-            final String fileContent = new String(cutFile.fileContent, Charset.forName("UTF-8")).trim();
-            if (!fileName.endsWith(".java")) {
-                logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
-                messages.add("Class upload failed. The class under test must be a .java file.");
-                abortRequestAndCleanUp(request, response);
-                return;
-            }
-            if (reservedClassNames.contains(fileName)) {
-                logger.error("Class with reserved name uploaded. Aborting.");
-                messages.add("Class upload failed. " + fileName + " is a reserved class name, please rename your Java class.");
-                abortRequestAndCleanUp(request, response);
-                return;
-            }
-            cutFileName = fileName;
-            if (fileContent == null) {
-                logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
-                messages.add("Class upload failed. Internal error. Sorry about that!");
-                abortRequestAndCleanUp(request, response);
-                return;
-            }
+        final String fileName = cutFile.fileName;
+        final String fileContent = new String(cutFile.fileContent, Charset.forName("UTF-8")).trim();
+        if (!fileName.endsWith(".java")) {
+            logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
+            messages.add("Class upload failed. The class under test must be a .java file.");
+            abortRequestAndCleanUp(request, response);
+            return;
+        }
+        if (reservedClassNames.contains(fileName)) {
+            logger.error("Class with reserved name uploaded. Aborting.");
+            messages.add("Class upload failed. " + fileName
+                    + " is a reserved class name, please rename your Java class.");
+            abortRequestAndCleanUp(request, response);
+            return;
+        }
+        cutFileName = fileName;
+        if (fileContent == null) {
+            logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
+            messages.add("Class upload failed. Internal error. Sorry about that!");
+            abortRequestAndCleanUp(request, response);
+            return;
+        }
 
         if (classAlias == null || classAlias.equals("")) {
             classAlias = fileName.replace(".java", "");
@@ -332,17 +343,18 @@ public class ClassUploadManager extends HttpServlet {
                 messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                    return;
-                } catch (IllegalStateException e) {
-                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
-                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                return;
+            } catch (IllegalStateException e) {
+                logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your "
+                        + "installed version.", e);
+                messages.add("Class upload failed. Internal error. Sorry about that!");
 
-                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                    return;
-                }
-            } else {
-                final String zipFileName = dependenciesZipFile.fileName;
-                final byte[] zipFileContent = dependenciesZipFile.fileContent;
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                return;
+            }
+        } else {
+            final String zipFileName = dependenciesZipFile.fileName;
+            final byte[] zipFileContent = dependenciesZipFile.fileContent;
 
             if (!zipFileName.endsWith(".zip")) {
                 logger.error("Class upload failed. Given file {} was not a .zip file.", zipFileName);
@@ -385,7 +397,8 @@ public class ClassUploadManager extends HttpServlet {
                 final String depJavaFilePath;
                 try {
                     final Path folderPath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
-                    depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent).toString();
+                    depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent)
+                            .toString();
                     final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
                     dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                 } catch (IOException e) {
@@ -407,15 +420,15 @@ public class ClassUploadManager extends HttpServlet {
                 messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                    return;
-                } catch (IllegalStateException e) {
-                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
-                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                return;
+            } catch (IllegalStateException e) {
+                logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your instance.", e);
+                messages.add("Class upload failed. Internal error. Sorry about that!");
 
-                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                    return;
-                }
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                return;
             }
+        }
 
         String classQualifiedName;
         try {
@@ -466,7 +479,8 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         if (mutantsZipFile != null) {
-            final boolean failed = addMutants(request, response, compiledClasses, cutId, cutFileName, cutDir, mutantsZipFile, dependencies);
+            final boolean failed = addMutants(request, response, compiledClasses,
+                    cutId, cutFileName, cutDir, mutantsZipFile, dependencies);
             if (failed) {
                 // tests zip failed and abort method has been called.
                 return;
@@ -474,7 +488,8 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         if (testsZipFile != null) {
-            final boolean failed = addTests(request, response, compiledClasses, cutId, cutDir, cut, testsZipFile, dependencies);
+            final boolean failed = addTests(request, response, compiledClasses,
+                    cutId, cutDir, cut, testsZipFile, dependencies);
             if (failed) {
                 // tests zip failed and abort method has been called.
                 return;
@@ -570,7 +585,8 @@ public class ClassUploadManager extends HttpServlet {
                 return true;
             }
             if (!fileName.equals(cutFileName)) {
-                logger.error("Class uploaded failed. Mutant {} has not the same class name as CUT, {}", fileName, cutFileName);
+                logger.error("Class uploaded failed. Mutant {} has not the same class name as CUT, {}",
+                        fileName, cutFileName);
                 messages.add("Class upload failed. Mutants must have same class name as class under test!");
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return true;
@@ -605,7 +621,8 @@ public class ClassUploadManager extends HttpServlet {
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
                 } catch (IllegalStateException e) {
-                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your"
+                            + "installed version.", e);
                     messages.add("Class upload failed. Internal error. Sorry about that!");
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
@@ -613,15 +630,18 @@ public class ClassUploadManager extends HttpServlet {
                 }
             } else {
                 try {
-                    classFilePath = Compiler.compileJavaFileForContentWithDependencies(javaFilePath, fileContent, dependencies, true);
+                    classFilePath = Compiler.compileJavaFileForContentWithDependencies(javaFilePath, fileContent,
+                            dependencies, true);
                 } catch (CompileException e) {
-                    logger.error("Class upload failed. Could not compile mutant {} with dependencies{}!\n\n{}", fileName, dependencies, e.getMessage());
+                    logger.error("Class upload failed. Could not compile mutant {} with dependencies{}!\n\n{}",
+                            fileName, dependencies, e.getMessage());
                     messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage());
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
                 } catch (IllegalStateException e) {
-                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your"
+                            + "installed version.", e);
                     messages.add("Class upload failed. Internal error. Sorry about that!");
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
@@ -733,7 +753,7 @@ public class ClassUploadManager extends HttpServlet {
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                 return true;
             } catch (IllegalStateException e) {
-                logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your instance.", e);
                 messages.add("Class upload failed. Internal error. Sorry about that!");
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
@@ -776,10 +796,10 @@ public class ClassUploadManager extends HttpServlet {
     /**
      * Aborts a given request by removing all uploaded compile classes from for
      * the database and {@code .java} and {@code .class} files from the system.
-     * <p>
-     * Also redirects the user.
-     * <p>
-     * This method should be the last thing called when aborting a request.
+     *
+     * <p>Also redirects the user.
+     *
+     * <p>This method should be the last thing called when aborting a request.
      *
      * @param request         The handled request.
      * @param response        The response of the handled requests.
@@ -788,8 +808,11 @@ public class ClassUploadManager extends HttpServlet {
      * @param files           Optional additional files, which need to be removed.
      * @throws IOException When an error during redirecting occurs.
      */
-    private static void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response, Path cutDir,
-                                               List<CompiledClass> compiledClasses, String... files) throws IOException {
+    private static void abortRequestAndCleanUp(HttpServletRequest request,
+                                               HttpServletResponse response,
+                                               Path cutDir,
+                                               List<CompiledClass> compiledClasses,
+                                               String... files) throws IOException {
         logger.debug("Aborting request...");
         if (cutDir != null) {
             final List<Integer> cuts = new LinkedList<>();
@@ -810,6 +833,8 @@ public class ClassUploadManager extends HttpServlet {
                     case TEST:
                         tests.add(compiledClass.id);
                         break;
+                    default:
+                        // ignore
                 }
             }
 
@@ -848,14 +873,15 @@ public class ClassUploadManager extends HttpServlet {
 
     /**
      * Aborts a given request by redirecting the user.
-     * <p>
-     * This method should be the last thing called when aborting a request.
+     *
+     * <p>This method should be the last thing called when aborting a request.
      *
      * @param request  The handled request.
      * @param response The response of the handled requests.
      * @throws IOException When an error during redirecting occurs.
      */
-    private static void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private static void abortRequestAndCleanUp(HttpServletRequest request,
+                                               HttpServletResponse response) throws IOException {
         logger.debug("Aborting request without removing files...");
         Redirect.redirectBack(request, response);
         logger.debug("Aborting request without removing files...done");
@@ -863,10 +889,10 @@ public class ClassUploadManager extends HttpServlet {
 
     /**
      * Container for a file with its name and content.
-     * <p>
-     * Name is stored as a {@link String}, content as a {@code byte[]}.
+     *
+     * <p>Name is stored as a {@link String}, content as a {@code byte[]}.
      */
-    private class SimpleFile {
+    private static class SimpleFile {
         private String fileName;
         private byte[] fileContent;
 
@@ -880,7 +906,7 @@ public class ClassUploadManager extends HttpServlet {
      * Container for paths to {@code .java} and {@code .class}
      * files of a java class.
      */
-    private class JavaFileReferences {
+    private static class JavaFileReferences {
         private String javaFile;
         private String classFile;
 
@@ -895,7 +921,7 @@ public class ClassUploadManager extends HttpServlet {
      * They have a type {@link CompileClassType}, an {@code id} and
      * paths to {@code .java} and {@code .class} files.
      */
-    private class CompiledClass {
+    private static class CompiledClass {
         private CompileClassType type;
         private Integer id;
 

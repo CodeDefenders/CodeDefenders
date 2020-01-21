@@ -66,6 +66,9 @@ public class FeedbackManager extends HttpServlet {
                 if (!saveFeedback(request, login.getUserId(), gameId)) {
                     messages.add("Could not save your feedback. Please try again later!");
                 }
+                break;
+            default:
+                // ignored
         }
 
         Redirect.redirectBack(request, response);

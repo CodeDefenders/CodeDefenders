@@ -41,7 +41,7 @@ public interface BackendExecutorService {
     void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception;
 
     /**
-     * Executes a test against the original code
+     * Executes a test against the original code.
      *
      * @param dir  Test directory
      * @param test A {@link Test} object
@@ -50,7 +50,7 @@ public interface BackendExecutorService {
     TargetExecution testOriginal(File dir, Test test);
 
     /**
-     * Executes a test against a mutant
+     * Executes a test against a mutant.
      *
      * @param m A {@link Mutant} object
      * @param t A {@link Test} object

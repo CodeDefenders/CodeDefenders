@@ -51,17 +51,17 @@ public class ConfigurationPropertyProducer {
     @Property
     @Produces
     public int produceInt(final InjectionPoint ip) {
-        return Integer.valueOf(this.properties.getProperty(getKey(ip)));
+        return Integer.parseInt(this.properties.getProperty(getKey(ip)));
     }
 
     @Property
     @Produces
     public boolean produceBoolean(final InjectionPoint ip) {
         String key = getKey(ip);
-        if( this.properties.containsKey(key) ){
+        if (this.properties.containsKey(key)) {
             String value = this.properties.getProperty(key);
-            return "enabled".equals( value );
-        }else {
+            return "enabled".equals(value);
+        } else {
             return false;
         }
     }
@@ -77,8 +77,8 @@ public class ConfigurationPropertyProducer {
     public void init() {
         /**
          * Under the assumption that those properties are NOT dynamically
-         * changed after the startup of the execution we fill them here only
-         * once... Otherwise, we need to update this implementation to include also DB provided configuration properties.
+         * changed after the startup of the execution we fill them here only once...
+         * Otherwise, we need to update this implementation to include also DB provided configuration properties.
          */
         this.properties = new Properties();
         // Read all the properties from the context !
@@ -93,8 +93,7 @@ public class ConfigurationPropertyProducer {
 
             while (list.hasMore()) {
                 String name = list.next().getName();
-                properties.put(name, (String) environmentContext.lookup(name));
-//                System.out.println("ConfigurationPropertyProducer.init() Registering " + name + " with value " + environmentContext.lookup(name) );
+                properties.put(name, environmentContext.lookup(name));
             }
 
         } catch (NamingException e) {

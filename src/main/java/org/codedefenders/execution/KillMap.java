@@ -18,14 +18,25 @@
  */
 package org.codedefenders.execution;
 
-import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
-import static org.codedefenders.execution.KillMap.KillMapEntry.Status.NO_KILL;
-import static org.codedefenders.execution.KillMap.KillMapEntry.Status.UNKNOWN;
+import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -39,16 +50,9 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
-import org.codedefenders.execution.KillMap.KillMapEntry;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.NO_KILL;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.UNKNOWN;
 
 /**
  * Maps tests to their killed mutants in a finished game.
@@ -67,7 +71,7 @@ public class KillMap {
 
     private static boolean USE_COVERAGE = true;
     private static boolean PARALLELIZE = true;
-    private final static int NUM_THREADS = 40;
+    private static final int NUM_THREADS = 40;
     /* TODO: Put this into config.properties? MutationTester also has hard-coded number of threads. */
 
     static {
@@ -89,7 +93,7 @@ public class KillMap {
             logger.error("Encountered missing option", e);
         }
 
-         /* Get the BackendExecutorService since dependency injection does not work on this class. */
+        /* Get the BackendExecutorService since dependency injection does not work on this class. */
         try {
             InitialContext initialContext = new InitialContext();
             BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
@@ -209,8 +213,8 @@ public class KillMap {
             }
         }
 
-        logger.info("Computation of killmap finished after " + Duration.between(startTime, Instant.now()).getSeconds() +
-                " seconds");
+        logger.info("Computation of killmap finished after " + Duration.between(startTime, Instant.now()).getSeconds()
+                + " seconds");
     }
 
     /**
@@ -232,14 +236,14 @@ public class KillMap {
             synchronized (KillMap.class) {
                 logger.info(String.format("Computing killmap for %s game %d: %d tests, %d mutants, %d entries provided",
                         game.getMode(), game.getId(), tests.size(), mutants.size(), entries.size()));
-                
+
                 // TODO refactor this into a CDI
                 ExecutorService executor = PARALLELIZE
                         ? Executors.newFixedThreadPool(NUM_THREADS)
                         : Executors.newSingleThreadExecutor();
-                        
+
                 killmap.compute(executor);
-                
+
                 if (game.isFinished()) {
                     KillmapDAO.setHasKillMap(game.getId(), true);
                 }
@@ -270,11 +274,11 @@ public class KillMap {
             synchronized (KillMap.class) {
                 logger.info(String.format("Computing killmap for class %d: %d tests, %d mutants, %d entries provided",
                         classId, tests.size(), mutants.size(), entries.size()));
-             // TODO refactor this into a CDI
+                // TODO refactor this into a CDI
                 ExecutorService executor = PARALLELIZE
                         ? Executors.newFixedThreadPool(NUM_THREADS)
                         : Executors.newSingleThreadExecutor();
-                        
+
                 killmap.compute(executor);
             }
         } else {
@@ -305,13 +309,14 @@ public class KillMap {
             if (tests.size() * mutants.size() != entries.size()) {
                 /* Synchronized, so only one killmap is computed at a time. */
                 synchronized (KillMap.class) {
-                    logger.info(String.format("Computing custom killmap (class %d): %d tests, %d mutants, %d entries provided",
+                    logger.info(String.format(
+                            "Computing custom killmap (class %d): %d tests, %d mutants, %d entries provided",
                             classId, tests.size(), mutants.size(), entries.size()));
-                 // TODO refactor this into a CDI
+                    // TODO refactor this into a CDI
                     ExecutorService executor = PARALLELIZE
                             ? Executors.newFixedThreadPool(NUM_THREADS)
                             : Executors.newSingleThreadExecutor();
-                            
+
                     killmap.compute(executor);
                 }
             } else {
@@ -321,30 +326,32 @@ public class KillMap {
             return killmap;
         }
     }
-    
+
     /**
-     * Returns the killmap for the given tests against a mutant to validate if the claimed equivalent mutant is killable.
-     * 
-     * The tests and mutants must belong to the same class (with the same class id).
-     * 
+     * Returns the killmap for the given tests against a mutant to validate if the claimed equivalent
+     * mutant is killable.
+     *
+     * <p>The tests and mutants must belong to the same class (with the same class id).
+     *
      * <bf>This operation is blocking and may take a long time</bf>
      *
      * @param tests The tests used for the validation.
      * @param mutant The mutant to validate.
      * @param classId The class id of the class the tests and mutants belong to.
-     * 
+     *
      */
     public static KillMap forMutantValidation(List<Test> tests, Mutant mutant, int classId) {
         List<KillMapEntry> entries = new ArrayList<>();
-        KillMap killmap = new KillMap(tests, Arrays.asList(new Mutant[] { mutant }), classId, entries);
-        logger.debug("Validating mutant {} using custom killmap (partial results are stored in the db) using: {} tests", mutant, tests.size());
+        KillMap killmap = new KillMap(tests, Arrays.asList(mutant), classId, entries);
+        logger.debug("Validating mutant {} using custom killmap (partial results are stored in the db) using: {} tests",
+                mutant, tests.size());
 
-        // TODO this creates a surge in the load as the number of executor services might grow 
-        // by refactoring this into a CDI we should be able to easily control the situation and queue jobs. 
+        // TODO this creates a surge in the load as the number of executor services might grow
+        // by refactoring this into a CDI we should be able to easily control the situation and queue jobs.
         ExecutorService executor = PARALLELIZE
                 ? Executors.newFixedThreadPool(NUM_THREADS)
                 : Executors.newSingleThreadExecutor();
-           
+
         try {
             killmap.compute(executor);
         } catch (InterruptedException | ExecutionException e) {
@@ -394,7 +401,7 @@ public class KillMap {
      * @param test The given test.
      * @return All "test vs. mutant" execution results for the given test.
      */
-    public KillMapEntry[] getEntriesForTest (Test test) {
+    public KillMapEntry[] getEntriesForTest(Test test) {
         return (KillMapEntry[]) ArrayUtils.clone(matrix[indexOf(test)]);
     }
 

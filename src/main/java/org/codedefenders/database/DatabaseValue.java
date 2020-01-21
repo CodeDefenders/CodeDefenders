@@ -23,8 +23,8 @@ import java.sql.Types;
 
 /**
  * This class represents values which can be inserted into a SQL database.
- * <p>
- * Instances have a type and a value, which can be {@code null},
+ *
+ * <p>Instances have a type and a value, which can be {@code null},
  * if a SQL {@code NULL} value is represented.
  */
 public class DatabaseValue<T> {
@@ -153,8 +153,8 @@ public class DatabaseValue<T> {
             } else if (BOOLEAN.clazz == clazz) {
                 return BOOLEAN;
             } else {
-                throw new IllegalArgumentException("Tried to create database value for class " + clazz.getName() +
-                        ", which is not supported!");
+                throw new IllegalArgumentException("Tried to create database value for class " + clazz.getName()
+                        + ", which is not supported!");
             }
         }
     }

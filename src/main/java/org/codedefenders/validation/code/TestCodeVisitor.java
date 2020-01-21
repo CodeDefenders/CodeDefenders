@@ -18,16 +18,6 @@
  */
 package org.codedefenders.validation.code;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -49,12 +39,21 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 /**
  * This class checks test code and checks whether the code is valid or not.
- * <p>
- * Extends {@link VoidVisitorAdapter} but doesn't use the generic extra
+ *
+ * <p>Extends {@link VoidVisitorAdapter} but doesn't use the generic extra
  * parameter on {@code visit(Node, __)}, so it's set to {@link Void} here.
- * <p>
  *
  * @author Jose Rojas
  * @author gambi
@@ -63,7 +62,7 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration;
 // Does this really need to short-circuit at the first error?
 class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private static final Logger logger = LoggerFactory.getLogger(TestCodeVisitor.class);
-//  we can use TypeSolver for the visit to implement a fine grain security mechanism
+    // we can use TypeSolver for the visit to implement a fine grain security mechanism
 
     private static final int MAX_NUMBER_OF_CLASSES = 1;
     private static final int MAX_NUMBER_OF_METHODS = 1;
@@ -101,7 +100,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         this.forceHamcrest = forceHamcrest;
     }
 
-    public List<String> buildValidationMessages(){
+    public List<String> buildValidationMessages() {
         List<String> formattedValidationMessages = new ArrayList<>();
 
         if (classCount > MAX_NUMBER_OF_CLASSES) {
@@ -111,7 +110,8 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             formattedValidationMessages.add("Invalid test suite contains more than one method declaration.");
         }
 
-        // Conditions on the aggregate metrics (i.e., total count of statement) cannot be checked only after the visit completes
+        // Conditions on the aggregate metrics (i.e., total count of statement)
+        // cannot be checked only after the visit completes
         if (stmtCount == MIN_NUMBER_OF_STATEMENTS) {
             isValid = false;
             messages.add("Test does not contain any valid statement.");
@@ -154,7 +154,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        String stringStmt = stmt.toString( new PrettyPrinterConfiguration().setPrintComments(false));
+        String stringStmt = stmt.toString(new PrettyPrinterConfiguration().setPrintComments(false));
         for (String prohibited : CodeValidator.PROHIBITED_CALLS) {
             // This might be a bit too strict... We shall use typeSolver otherwise.
             if (stringStmt.contains(prohibited)) {
@@ -174,7 +174,6 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
         final String name = stmt.getNameAsString();
         if (name.equals("System") || name.equals("Random") || name.equals("Thread")) {
-//            messages.add("Test contains System/Random/Thread uses");
             messages.add("Test contains a call to a prohibited method: " + name);
             isValid = false;
             return;
@@ -261,7 +260,6 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
         stmtCount++;
         if (stmt.toString().startsWith("System.") || stmt.toString().startsWith("Random.")) {
-//            messages.add("There is a call to System/Random.*");
             messages.add("Test contains an invalid statement: " + stmt.toString());
             isValid = false;
             return;
@@ -279,23 +277,23 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         /*
          * Count assertions
          */
-        if( anyJunitAssertionMatch || hamcrestAssertThatMatch){
+        if (anyJunitAssertionMatch || hamcrestAssertThatMatch) {
             assertionCount++;
         }
 
         /*
-         * If forced Hamcrest is on, then there must not be JUnit assertions 
-         * 
-         * TODO What if there's no assertions at all ? 
+         * If forced Hamcrest is on, then there must not be JUnit assertions
+         *
+         * TODO What if there's no assertions at all ?
          */
-        if( forceHamcrest && anyJunitAssertionMatch ){
-                messages.add("Test contains a JUnit assertion: " + stmt.toString());
-                isValid = false;
-                return;
+        if (forceHamcrest && anyJunitAssertionMatch) {
+            messages.add("Test contains a JUnit assertion: " + stmt.toString());
+            isValid = false;
+            return;
         }
 
         if (assertionCount > maxNumberOfAssertions) {
-            messages.add("Test contains more than "+ maxNumberOfAssertions + " assertions");
+            messages.add("Test contains more than " + maxNumberOfAssertions + " assertions");
             isValid = false;
             return;
         }
@@ -311,8 +309,8 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         Optional<Expression> initializer = stmt.getInitializer();
         if (initializer.isPresent()) {
             String initString = initializer.get().toString();
-            if (initString.startsWith("System.*") || initString.startsWith("Random.*") ||
-                    initString.contains("Thread")) {
+            if (initString.startsWith("System.*") || initString.startsWith("Random.*")
+                    || initString.contains("Thread")) {
                 messages.add("Test contains an invalid variable declaration: " + initString);
                 isValid = false;
             }

@@ -26,8 +26,8 @@ import java.util.List;
 
 /**
  * This class offers an interface for Scoring classes, which calculate the scores of a mutant or test.
- * <p>
- * This class also offers static methods, which call the {@link SizeScorer} implementation.
+ *
+ * <p>This class also offers static methods, which call the {@link SizeScorer} implementation.
  */
 public abstract class Scorer {
 

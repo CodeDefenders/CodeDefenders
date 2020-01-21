@@ -18,23 +18,6 @@
  */
 package org.codedefenders.execution;
 
-import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
-import static org.codedefenders.util.Constants.CUTS_DIR;
-import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -48,6 +31,23 @@ import org.codedefenders.game.Test;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.ManagedBean;
+import javax.inject.Inject;
+
+import static org.codedefenders.util.Constants.AI_DIR;
+import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
+import static org.codedefenders.util.Constants.CUTS_DIR;
+import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 /**
  * @author Jose Rojas
@@ -93,7 +93,8 @@ public class AntRunner implements //
     public boolean testKillsMutant(Mutant mutant, Test test) {
         GameClass cut = GameClassDAO.getClassForGameId(mutant.getGameId());
 
-        AntProcessResult result = runAntTarget("test-mutant", mutant.getDirectory(), test.getDirectory(), cut, test.getFullyQualifiedClassName());
+        AntProcessResult result = runAntTarget("test-mutant", mutant.getDirectory(), test.getDirectory(),
+                cut, test.getFullyQualifiedClassName());
 
         // Return true iff test failed
         return result.hasFailure();
@@ -110,26 +111,32 @@ public class AntRunner implements //
         }
 
         // Check if this mutant requires a test recompilation
-        AntProcessResult result = null;
+        String target;
         if (mutant.doesRequireRecompilation()) {
-            result = runAntTarget("recompiled-test-mutant", mutant.getDirectory(), test.getDirectory(), cut, test.getFullyQualifiedClassName());
+            target = "recompiled-test-mutant";
         } else {
-            result = runAntTarget("test-mutant", mutant.getDirectory(), test.getDirectory(), cut, test.getFullyQualifiedClassName());
+            target = "test-mutant";
         }
+        AntProcessResult result = runAntTarget(target, mutant.getDirectory(), test.getDirectory(),
+                cut, test.getFullyQualifiedClassName());
+
 
         TargetExecution newExec;
 
         if (result.hasFailure()) {
             // The test failed, i.e., it detected the mutant. Store JUnit output as kill message
             String killMessage = result.getJUnitMessage();
-            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.FAIL, killMessage );
+            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT,
+                    TargetExecution.Status.FAIL, killMessage);
         } else if (result.hasError()) {
             // The test is in error, interpreted also as detecting the mutant
             String message = result.getErrorMessage();
-            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.ERROR, message);
+            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT,
+                    TargetExecution.Status.ERROR, message);
         } else {
             // The test passed, i.e., it did not detect the mutant
-            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.SUCCESS, null);
+            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT,
+                    TargetExecution.Status.SUCCESS, null);
         }
         newExec.insert();
         return newExec;
@@ -140,20 +147,24 @@ public class AntRunner implements //
         logger.info("Running test {} on mutant {}", t.getId(), m.getId());
         GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 
-        AntProcessResult result = runAntTarget("recompile-test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
+        AntProcessResult result = runAntTarget("recompile-test-mutant", m.getDirectory(),
+                t.getDirectory(), cut, t.getFullyQualifiedClassName());
 
         TargetExecution newExec;
 
         if (result.hasFailure()) {
             // The test failed, i.e., it detected the mutant
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.FAIL, null);
+            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
+                    TargetExecution.Status.FAIL, null);
         } else if (result.hasError()) {
             // The test is in error, interpreted also as detecting the mutant
             String message = result.getErrorMessage();
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.ERROR, message);
+            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
+                    TargetExecution.Status.ERROR, message);
         } else {
             // The test passed, i.e., it did not detect the mutant
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.SUCCESS, null);
+            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
+                    TargetExecution.Status.SUCCESS, null);
         }
         newExec.insert();
         return newExec;
@@ -168,7 +179,8 @@ public class AntRunner implements //
         String suiteDir = Paths.get(AI_DIR, "tests", cut.getAlias()).toString();
 
         // TODO: is this actually executing a whole test suite?
-        AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), suiteDir, cut, cut.getName() + Constants.SUITE_EXT);
+        AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), suiteDir,
+                cut, cut.getName() + Constants.SUITE_EXT);
 
         // return true if tests pass without failures or errors
         return !(result.hasError() || result.hasFailure());
@@ -194,7 +206,8 @@ public class AntRunner implements //
     public TargetExecution testOriginal(File dir, Test t) {
         GameClass cut = GameClassDAO.getClassForGameId(t.getGameId());
 
-        AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName(), forceLocalExecution);
+        AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(),
+                cut, t.getFullyQualifiedClassName(), forceLocalExecution);
 
         // add coverage information
         final LineCoverage coverage = LineCoverageGenerator.generate(cut, Paths.get(t.getJavaFile()));
@@ -214,7 +227,8 @@ public class AntRunner implements //
             status = TargetExecution.Status.SUCCESS;
             message = null;
         }
-        TargetExecution testExecution = new TargetExecution(t.getId(), 0, TargetExecution.Target.TEST_ORIGINAL, status, message);
+        TargetExecution testExecution = new TargetExecution(t.getId(), 0,
+                TargetExecution.Target.TEST_ORIGINAL, status, message);
         testExecution.insert();
         return testExecution;
     }
@@ -233,9 +247,11 @@ public class AntRunner implements //
             logger.info("Compiled uploaded CUT successfully");
             File f = Paths.get(CUTS_DIR, cut.getAlias()).toFile();
             final String compiledClassName = FilenameUtils.getBaseName(cut.getJavaFile()) + Constants.JAVA_CLASS_EXT;
-            LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
-            if (!matchingFiles.isEmpty())
+            LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(
+                    f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+            if (!matchingFiles.isEmpty()) {
                 pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
+            }
         } else {
             // Otherwise the CUT failed to compile
             String message = result.getCompilerOutput();
@@ -248,10 +264,11 @@ public class AntRunner implements //
     /**
      * {@inheritDoc}
      */
-    public Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
+    public Mutant compileMutant(File dir, String javaFile, int gameId, GameClass cut, int ownerId) {
 
         // Gets the classname for the mutant from the game it is in
-        AntProcessResult result = runAntTarget("compile-mutant", dir.getAbsolutePath(), null, cut, null, forceLocalExecution);
+        AntProcessResult result = runAntTarget("compile-mutant", dir.getAbsolutePath(), null,
+                cut, null, forceLocalExecution);
 
         logger.info("Compilation result: {}", result);
 
@@ -261,23 +278,26 @@ public class AntRunner implements //
             // Create and insert a new target execution recording successful compile, with no message to report, and return its ID
             // Locate .class file
             final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
-            final LinkedList<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
+            final LinkedList<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(
+                    dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
             assert (!matchingFiles.isEmpty()) : "if compilation was successful, .class file must exist";
-            String cFile = matchingFiles.get(0).getAbsolutePath();
-            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameID);
-            newMutant = new Mutant(gameID, cut.getId(), jFile, cFile, true, playerId);
+            String classFile = matchingFiles.get(0).getAbsolutePath();
+            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId);
             newMutant.insert();
-            TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.SUCCESS, null);
+            TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
+                    TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.SUCCESS, null);
             newExec.insert();
         } else {
             // The mutant failed to compile
             // New target execution recording failed compile, providing the return messages from the ant javac task
             String message = result.getCompilerOutput();
-            logger.error("Failed to compile mutant {}: {}", jFile, message);
-            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameID);
-            newMutant = new Mutant(gameID, cut.getId(), jFile, null, false, playerId);
+            logger.error("Failed to compile mutant {}: {}", javaFile, message);
+            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId);
             newMutant.insert();
-            TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.FAIL, message);
+            TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
+                    TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.FAIL, message);
             newExec.insert();
         }
         return newMutant;
@@ -286,36 +306,40 @@ public class AntRunner implements //
     /**
      * {@inheritDoc}
      */
-    public Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
+    public Test compileTest(File dir, String javaFile, int gameId, GameClass cut, int ownerId) {
         //public static int compileTest(ServletContext context, Test t) {
 
-        AntProcessResult result = runAntTarget("compile-test", null, dir.getAbsolutePath(), cut, null, forceLocalExecution);
+        AntProcessResult result = runAntTarget("compile-test", null, dir.getAbsolutePath(),
+                cut, null, forceLocalExecution);
 
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameID);
+        int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
 
         // If the input stream returned a 'successful build' message, the test compiled correctly
         if (result.compiled()) {
             // Create and insert a new target execution recording successful compile, with no message to report, and return its ID
             // Locate .class file
-            final String compiledClassName = FilenameUtils.getBaseName(jFile) + JAVA_CLASS_EXT;
-            final List<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
+            final String compiledClassName = FilenameUtils.getBaseName(javaFile) + JAVA_CLASS_EXT;
+            final List<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(
+                    dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
             assert (!matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
-            String cFile = matchingFiles.get(0).getAbsolutePath();
+            String classFile = matchingFiles.get(0).getAbsolutePath();
             logger.info("Compiled test {}", compiledClassName);
-            Test newTest = new Test(cut.getId(), gameID, jFile, cFile, playerId);
+            Test newTest = new Test(cut.getId(), gameId, javaFile, classFile, playerId);
             boolean inserted = newTest.insert();
             assert (inserted); // if compilation was successful, .class file must exist
-            TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.SUCCESS, null);
+            TargetExecution newExec = new TargetExecution(newTest.getId(), 0,
+                    TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.SUCCESS, null);
             newExec.insert();
             return newTest;
         } else {
             // The test failed to compile
             // New target execution recording failed compile, providing the return messages from the ant javac task
             String message = result.getCompilerOutput();
-            logger.error("Failed to compile test {}: {}", jFile, message);
-            Test newTest = new Test(cut.getId(), gameID, jFile, null, playerId);
+            logger.error("Failed to compile test {}: {}", javaFile, message);
+            Test newTest = new Test(cut.getId(), gameId, javaFile, null, playerId);
             newTest.insert();
-            TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.FAIL, message);
+            TargetExecution newExec = new TargetExecution(newTest.getId(), 0,
+                    TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.FAIL, message);
             newExec.insert();
             return newTest;
         }
@@ -355,11 +379,13 @@ public class AntRunner implements //
      * @param testClassName Name of JUnit test class
      * @return Result an AntProcessResult object containing output details of the ant process
      */
-    private AntProcessResult runAntTarget(String target, String mutantFile, String testDir, GameClass cut, String testClassName) {
+    private AntProcessResult runAntTarget(String target, String mutantFile, String testDir,
+                                          GameClass cut, String testClassName) {
         return runAntTarget(target, mutantFile, testDir, cut, testClassName, false);
     }
 
-    private AntProcessResult runAntTarget(String target, String mutantDir, String testDir, GameClass cut, String testClassName, boolean forcedLocally) {
+    private AntProcessResult runAntTarget(String target, String mutantDir, String testDir, GameClass cut,
+                                          String testClassName, boolean forcedLocally) {
         logger.info("Running Ant Target: {} with mFile: {} and tFile: {}", target, mutantDir, testDir);
 
         ProcessBuilder pb = new ProcessBuilder();
@@ -384,19 +410,22 @@ public class AntRunner implements //
             command.add("srun");
 
             // Select reservation cluster
-            if (clusterReservationName != null)
+            if (clusterReservationName != null) {
                 command.add("--reservation=" + clusterReservationName);
+            }
 
             // Timeout. Note that there's a plus 10 minutes of grace period
             // anyway
             // TODO This is unsafe we need to check this is a valid integer
-            if (clusterTimeOutMinutes != null)
+            if (clusterTimeOutMinutes != null) {
                 command.add("--time=" + clusterTimeOutMinutes);
+            }
             //
             command.add("ant");
         } else {
             logger.debug("Local Execution");
-            env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar" + File.pathSeparator + "lib/junit-4.12.jar" + File.pathSeparator + "lib/mockito-all-1.9.5.jar");
+            env.put("CLASSPATH","lib/hamcrest-all-1.3.jar" + File.pathSeparator + "lib/junit-4.12.jar"
+                    + File.pathSeparator + "lib/mockito-all-1.9.5.jar");
 
             String command_ = antHome + "/bin/ant";
 

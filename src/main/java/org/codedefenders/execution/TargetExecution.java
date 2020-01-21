@@ -58,7 +58,8 @@ public class TargetExecution {
         this.message = message;
     }
 
-    public TargetExecution(int id, int testId, int mutantId, Target target, Status status, String message, Timestamp timestamp) {
+    public TargetExecution(int id, int testId, int mutantId, Target target, Status status,
+                           String message, Timestamp timestamp) {
         this(testId, mutantId, target, status, message);
         this.id = id;
         this.timestamp = timestamp;
@@ -84,15 +85,15 @@ public class TargetExecution {
 
     @Override
     public String toString() {
-        return "TargetExecution{" +
-                "id=" + id +
-                ", testId=" + testId +
-                ", mutantId=" + mutantId +
-                ", target='" + target + '\'' +
-                ", status='" + status + '\'' +
-                ", message='" + message + '\'' +
-                ", timestamp=" + timestamp +
-                '}';
+        return "TargetExecution{"
+                + "id=" + id
+                + ", testId=" + testId
+                + ", mutantId=" + mutantId
+                + ", target='" + target + '\''
+                + ", status='" + status + '\''
+                + ", message='" + message + '\''
+                + ", timestamp=" + timestamp
+                + '}';
     }
 
 }

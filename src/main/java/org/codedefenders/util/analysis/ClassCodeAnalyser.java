@@ -18,14 +18,6 @@
  */
 package org.codedefenders.util.analysis;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.Range;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
@@ -43,6 +35,14 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
+
+import org.apache.commons.lang3.Range;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Code analysing class which uses {@link ResultVisitor} to iterate through java class code
@@ -114,7 +114,7 @@ public class ClassCodeAnalyser {
             // Lines which contain comments are not empty
             for (Comment c : n.getAllContainedComments()) {
                 for (int line = c.getBegin().get().line; line <= c.getEnd().get().line; line++) {
-                    nonEmptyLines.add( line );
+                    nonEmptyLines.add(line);
                 }
             }
 
@@ -148,20 +148,23 @@ public class ClassCodeAnalyser {
                     emptyLines.add(line);
                 }
 
-                // We finally found the lines which can cover those empty lines by looking at the first non-empty, non-comment statement
-                // If that is covered, then the empty is covered. TODO Not sure how we handle the '{' opening the blocks tho.
+                // We finally found the lines which can cover those empty lines by looking
+                // at the first non-empty, non-comment statement
+                // If that is covered, then the empty is covered.
+                // TODO Not sure how we handle the '{' opening the blocks tho.
                 for (int emptyLine : emptyLines) {
-                    // By default the end of the block which directly contains the empty line is the statement which can cover it
+                    // By default the end of the block which directly contains
+                    // the empty line is the statement which can cover it
                     int coveringLine = blockEnd;
                     for (Statement s : statements) {
-                        int sStart = s.getBegin().get().line;
-                        if (sStart < emptyLine) {
+                        int statementStart = s.getBegin().get().line;
+                        if (statementStart < emptyLine) {
                             // Skip statements that are before the empty line
                             continue;
                         } else {
                             // This works because statements are not empty and are not comments
-                            if (sStart <= coveringLine) {
-                                coveringLine = sStart;
+                            if (statementStart <= coveringLine) {
+                                coveringLine = statementStart;
                             }
                         }
                     }
@@ -231,7 +234,8 @@ public class ClassCodeAnalyser {
         }
 
         private static void extractResultsFromFieldDeclaration(FieldDeclaration f, CodeAnalysisResult result) {
-            final boolean compileTimeConstant = f.isFinal() && ((f.getCommonType() instanceof PrimitiveType) || (String.class.getSimpleName().equals(f.getElementType().asString())));
+            final boolean compileTimeConstant = f.isFinal() && ((f.getCommonType() instanceof PrimitiveType)
+                    || (String.class.getSimpleName().equals(f.getElementType().asString())));
             for (VariableDeclarator v : f.getVariables()) {
                 for (int line = v.getBegin().get().line; line <= v.getEnd().get().line; line++) {
                     if (compileTimeConstant) {
@@ -274,7 +278,8 @@ public class ClassCodeAnalyser {
             result.methods(Range.between(methodBegin, methodEnd));
         }
 
-        private static void extractResultsFromConstructorDeclaration(ConstructorDeclaration cd, CodeAnalysisResult result) {
+        private static void extractResultsFromConstructorDeclaration(ConstructorDeclaration cd,
+                                                                     CodeAnalysisResult result) {
             // Constructors always have a body.
             int constructorBegin = cd.getBegin().get().line;
             int constructorBodyBegin = cd.getBody().getBegin().get().line;

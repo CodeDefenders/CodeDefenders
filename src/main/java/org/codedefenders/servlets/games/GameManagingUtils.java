@@ -18,19 +18,6 @@
  */
 package org.codedefenders.servlets.games;
 
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.TESTS_DIR;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -48,12 +35,24 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
+
+import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.util.Constants.TESTS_DIR;
 
 /**
  * This class offers utility methods used by servlets managing active
@@ -147,7 +146,8 @@ public class GameManagingUtils implements IGameManagingUtils {
      * {@inheritDoc}
      */
     @Override
-    public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory) throws IOException {
+    public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
+            throws IOException {
         GameClass cut = GameClassDAO.getClassForId(classId);
 
         Path path = Paths.get(TESTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
@@ -195,7 +195,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     }
 
     // Enable testability. it can be declared also protected
-    public void detectTestSmells(Test newTest, GameClass cut){
+    public void detectTestSmells(Test newTest, GameClass cut) {
         try {
             // Detect test smell
             TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());

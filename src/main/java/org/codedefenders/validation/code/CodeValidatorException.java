@@ -18,6 +18,7 @@
  */
 package org.codedefenders.validation.code;
 
+// FIXME: None of the constructors is ever used. Remove this exception?
 public class CodeValidatorException extends Exception {
 
     private static final long serialVersionUID = -4526964014168540391L;

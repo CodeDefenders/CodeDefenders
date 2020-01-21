@@ -60,8 +60,8 @@ public class TargetExecutionDAO {
 
     /**
      * Stores a given {@link TargetExecution} in the database.
-     * <p>
-     * This method does not update the given target execution object.
+     *
+     * <p>This method does not update the given target execution object.
      * Use {@link TargetExecution#insert()} instead.
      *
      * @param targetExecution the given target execution as a {@link TargetExecution}.
@@ -77,7 +77,8 @@ public class TargetExecutionDAO {
                         : targetExecution.message.substring(0, MESSAGE_LIMIT);
 
         if (targetExecution.hasTest() && targetExecution.hasMutant()) {
-            query = "INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);";
+            query = "INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message)"
+                    + " VALUES (?, ?, ?, ?, ?);";
             values = new DatabaseValue[] {
                     DatabaseValue.of(targetExecution.testId),
                     DatabaseValue.of(targetExecution.mutantId),
@@ -197,12 +198,12 @@ public class TargetExecutionDAO {
      */
     public static List<TargetExecution> getTargetExecutionsForUploadedWithClass(int classId) {
         final String query = String.join("\n",
-            "SELECT te.*",
-            "FROM targetexecutions te, classes c",
-            "WHERE c.Class_ID = ?",
-            "  AND te.Mutant_ID IN (SELECT Mutant_ID FROM mutant_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
-            "  AND te.Test_ID IN (SELECT Test_ID FROM test_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
-            ";"
+                "SELECT te.*",
+                "FROM targetexecutions te, classes c",
+                "WHERE c.Class_ID = ?",
+                "  AND te.Mutant_ID IN (SELECT Mutant_ID FROM mutant_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
+                "  AND te.Test_ID IN (SELECT Test_ID FROM test_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
+                ";"
         );
 
         return DB.executeQueryReturnList(query, TargetExecutionDAO::targetExecutionFromRS, DatabaseValue.of(classId));

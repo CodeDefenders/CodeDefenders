@@ -35,7 +35,7 @@ public class DB {
     private static ConnectionPool connPool = ConnectionPool.instance();
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
-    public synchronized static Connection getConnection() {
+    public static synchronized Connection getConnection() {
         return connPool.getDBConnection();
     }
 
@@ -67,7 +67,8 @@ public class DB {
         return stmt;
     }
 
-    private static void assignDatabaseValue(PreparedStatement stmt, DatabaseValue value, int position) throws SQLException {
+    private static void assignDatabaseValue(PreparedStatement stmt, DatabaseValue value, int position)
+            throws SQLException {
         final DatabaseValue.Type type = value.getType();
         switch (type) {
             case NULL:
@@ -250,8 +251,11 @@ public class DB {
      * @see RSMapper
      * @see Statement#setFetchSize(int)
      */
-    static <T> List<T> executeQueryReturnListWithFetchSize(String query, int fetchSize, RSMapper<T> mapper, DatabaseValue... params)
-        throws UncheckedSQLException, SQLMappingException {
+    static <T> List<T> executeQueryReturnListWithFetchSize(String query,
+                                                           int fetchSize,
+                                                           RSMapper<T> mapper,
+                                                           DatabaseValue... params)
+            throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
@@ -338,7 +342,7 @@ public class DB {
      * @return a list of generated keys in the same order as the given list of elements.
      */
     static <T> List<Integer> executeBatchQueryReturnKeys(String query, List<T> elements, DBVExtractor<T> valueExtractor)
-        throws UncheckedSQLException, SQLMappingException {
+            throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();
         PreparedStatement stmt = null;

@@ -31,7 +31,7 @@ import difflib.DiffUtils;
 import difflib.Patch;
 
 /**
- * Basic utilities for mutants
+ * Basic utilities for mutants.
  *
  * @author gambi
  */
@@ -51,7 +51,7 @@ public class MutantUtils {
         Patch differences = DiffUtils.diff(sutLines, mutantLines);
         List<Integer> reversedLinesToDelete = new ArrayList<>();
         // Position are 0-indexed
-        for(Delta delta : differences.getDeltas() ){
+        for (Delta delta : differences.getDeltas()) {
             final Delta.TYPE type = delta.getType();
             switch (type) {
                 case CHANGE:
@@ -59,17 +59,19 @@ public class MutantUtils {
                         break;
                     }
                 case INSERT:
-                    for(int nestedIndex = 0; nestedIndex < delta.getRevised().getLines().size(); nestedIndex++ ){
-                        Object o = delta.getRevised().getLines().get( nestedIndex );
-                        if( o instanceof String ){
+                    for (int nestedIndex = 0; nestedIndex < delta.getRevised().getLines().size(); nestedIndex++) {
+                        Object o = delta.getRevised().getLines().get(nestedIndex);
+                        if (o instanceof String) {
                             String line = (String) o;
-                            if(line.trim().length() == 0 ){
+                            if (line.trim().length() == 0) {
                                 int pos = delta.getRevised().getPosition() + nestedIndex;
                                 reversedLinesToDelete.add(0, pos);
                             }
                         }
                     }
-                    default: break;
+                    break;
+                default:
+                    break;
             }
         }
         // Now remove the lines from the last to the first

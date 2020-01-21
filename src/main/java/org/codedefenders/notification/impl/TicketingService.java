@@ -18,7 +18,7 @@
  */
 package org.codedefenders.notification.impl;
 
-import static java.time.temporal.ChronoUnit.HOURS;
+import org.codedefenders.notification.ITicketingService;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 
-import org.codedefenders.notification.ITicketingService;
+import static java.time.temporal.ChronoUnit.HOURS;
 
 /**
  * Authenticates users' WebSocket connections generating a ticket for users and validating it when opening the

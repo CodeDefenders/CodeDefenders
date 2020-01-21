@@ -39,8 +39,6 @@ import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import java.sql.Timestamp;
-import java.text.Format;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 
@@ -125,26 +123,95 @@ public class MultiplayerGame extends AbstractGame {
             this.forceHamcrest = forceHamcrest;
         }
 
-        public Builder cut(GameClass cut) { this.cut = cut; return this; }
-        public Builder id(int id) { this.id = id; return this; }
-        public Builder requiresValidation(boolean requiresValidation) { this.requiresValidation = requiresValidation; return this; }
-        public Builder capturePlayersIntention(boolean capturePlayersIntention) { this.capturePlayersIntention = capturePlayersIntention; return this; }
-        public Builder chatEnabled(boolean chatEnabled) { this.chatEnabled = chatEnabled; return this; }
-        public Builder prize(float prize) { this.prize = prize; return this; }
-        public Builder lineCoverage(float lineCoverage) { this.lineCoverage = lineCoverage; return this; }
-        public Builder mutantCoverage(float mutantCoverage) { this.mutantCoverage = mutantCoverage; return this; }
-        public Builder defenderValue(int defenderValue) { this.defenderValue = defenderValue; return this; }
-        public Builder attackerValue(int attackerValue) { this.attackerValue = attackerValue; return this; }
-        public Builder state(GameState state) { this.state = state; return this; }
-        public Builder level(GameLevel level) { this.level = level; return this; }
-        public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) { this.mutantValidatorLevel = mutantValidatorLevel; return this; }
-        public Builder attackers(List<Player> attackers) { this.attackers = attackers; return this; }
-        public Builder defenders(List<Player> defenders) { this.defenders = defenders; return this; }
+        public Builder cut(GameClass cut) {
+            this.cut = cut;
+            return this;
+        }
 
-        public Builder withTests(boolean withTests) { this.withTests = withTests; return this; }
-        public Builder withMutants(boolean withMutants) { this.withMutants = withMutants; return this; }
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
 
-        public Builder automaticMutantEquivalenceThreshold(int threshold){ this.automaticMutantEquivalenceThreshold = threshold; return this; }
+        public Builder requiresValidation(boolean requiresValidation) {
+            this.requiresValidation = requiresValidation;
+            return this;
+        }
+
+        public Builder capturePlayersIntention(boolean capturePlayersIntention) {
+            this.capturePlayersIntention = capturePlayersIntention;
+            return this;
+        }
+
+        public Builder chatEnabled(boolean chatEnabled) {
+            this.chatEnabled = chatEnabled;
+            return this;
+        }
+
+        public Builder prize(float prize) {
+            this.prize = prize;
+            return this;
+        }
+
+        public Builder lineCoverage(float lineCoverage) {
+            this.lineCoverage = lineCoverage;
+            return this;
+        }
+
+        public Builder mutantCoverage(float mutantCoverage) {
+            this.mutantCoverage = mutantCoverage;
+            return this;
+        }
+
+        public Builder defenderValue(int defenderValue) {
+            this.defenderValue = defenderValue;
+            return this;
+        }
+
+        public Builder attackerValue(int attackerValue) {
+            this.attackerValue = attackerValue;
+            return this;
+        }
+
+        public Builder state(GameState state) {
+            this.state = state;
+            return this;
+        }
+
+        public Builder level(GameLevel level) {
+            this.level = level;
+            return this;
+        }
+
+        public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+            this.mutantValidatorLevel = mutantValidatorLevel;
+            return this;
+        }
+
+        public Builder attackers(List<Player> attackers) {
+            this.attackers = attackers;
+            return this;
+        }
+
+        public Builder defenders(List<Player> defenders) {
+            this.defenders = defenders;
+            return this;
+        }
+
+        public Builder withTests(boolean withTests) {
+            this.withTests = withTests;
+            return this;
+        }
+
+        public Builder withMutants(boolean withMutants) {
+            this.withMutants = withMutants;
+            return this;
+        }
+
+        public Builder automaticMutantEquivalenceThreshold(int threshold) {
+            this.automaticMutantEquivalenceThreshold = threshold;
+            return this;
+        }
 
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
@@ -221,7 +288,7 @@ public class MultiplayerGame extends AbstractGame {
         return maxAssertionsPerTest;
     }
 
-    public boolean isForceHamcrest(){
+    public boolean isForceHamcrest() {
         return forceHamcrest;
     }
 
@@ -237,7 +304,7 @@ public class MultiplayerGame extends AbstractGame {
         return automaticMutantEquivalenceThreshold;
     }
 
-    public Role getRole(int userId){
+    public Role getRole(int userId) {
         if (getDefenderPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.DEFENDER;
         } else if (getAttackerPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
@@ -278,7 +345,8 @@ public class MultiplayerGame extends AbstractGame {
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role, et, EventStatus.GAME, timestamp);
+        Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role,
+                et, EventStatus.GAME, timestamp);
         e.insert();
 
         Event notif = new Event(-1, id, userId, "You joined a game as " + role, et, EventStatus.NEW, timestamp);
@@ -314,19 +382,19 @@ public class MultiplayerGame extends AbstractGame {
 
     /**
      * This method calculates the mutant score for every attacker in the game.
-     * <p>
-     * The result is a mapping of playerId to player score.
+     *
+     * <p>The result is a mapping of playerId to player score.
      *
      * @return mapping from playerId to player score.
      */
     public HashMap<Integer, PlayerScore> getMutantScores() {
-        HashMap<Integer, PlayerScore> mutantScores = new HashMap<Integer, PlayerScore>();
+        final HashMap<Integer, PlayerScore> mutantScores = new HashMap<>();
 
-        HashMap<Integer, Integer> mutantsAlive = new HashMap<Integer, Integer>();
-        HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
-        HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
-        HashMap<Integer, Integer> mutantsChallenged = new HashMap<Integer, Integer>();
-        HashMap<Integer, Integer> duelsWon = new HashMap<Integer, Integer>();
+        final HashMap<Integer, Integer> mutantsAlive = new HashMap<Integer, Integer>();
+        final HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
+        final HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
+        final HashMap<Integer, Integer> mutantsChallenged = new HashMap<Integer, Integer>();
+        final HashMap<Integer, Integer> duelsWon = new HashMap<Integer, Integer>();
 
         // TODO why not getMutants()
         List<Mutant> allMutants = getAliveMutants();
@@ -389,8 +457,12 @@ public class MultiplayerGame extends AbstractGame {
 
         for (int i : mutantsKilled.keySet()) {
             PlayerScore ps = mutantScores.get(i);
-            ps.setMutantKillInformation(mutantsAlive.get(i) + " / " + mutantsKilled.get(i) + " / " + mutantsEquiv.get((i)));
-            ps.setDuelInformation(duelsWon.get(i) + " / " + mutantsEquiv.get(i) + " / " + mutantsChallenged.get((i)));
+            ps.setMutantKillInformation(
+                    mutantsAlive.get(i) + " / " + mutantsKilled.get(i) + " / " + mutantsEquiv.get((i))
+            );
+            ps.setDuelInformation(
+                    duelsWon.get(i) + " / " + mutantsEquiv.get(i) + " / " + mutantsChallenged.get((i))
+            );
 
         }
 
@@ -399,18 +471,18 @@ public class MultiplayerGame extends AbstractGame {
 
     /**
      * This method calculates the test score for every defender in the game.
-     * <p>
-     * The result is a mapping of playerId to player score.
+     *
+     * <p>The result is a mapping of playerId to player score.
      *
      * @return mapping from playerId to player score.
      */
     public HashMap<Integer, PlayerScore> getTestScores() {
-        HashMap<Integer, PlayerScore> testScores = new HashMap<>();
-        HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
+        final HashMap<Integer, PlayerScore> testScores = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
 
-        HashMap<Integer, Integer> challengesOpen = new HashMap<>();
-        HashMap<Integer, Integer> challengesWon = new HashMap<>();
-        HashMap<Integer, Integer> challengesLost = new HashMap<>();
+        final HashMap<Integer, Integer> challengesOpen = new HashMap<>();
+        final HashMap<Integer, Integer> challengesWon = new HashMap<>();
+        final HashMap<Integer, Integer> challengesLost = new HashMap<>();
 
         int defendersTeamId = -1;
         testScores.put(defendersTeamId, new PlayerScore(defendersTeamId));
@@ -466,31 +538,37 @@ public class MultiplayerGame extends AbstractGame {
         }
 
         for (Mutant m : getKilledMutants()) {
-            if (!m.getEquivalent().equals(PROVEN_NO))
+            if (!m.getEquivalent().equals(PROVEN_NO)) {
                 continue;
+            }
 
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
-            if(defenderId != defendersTeamId)
+            if (defenderId != defendersTeamId) {
                 challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
+            }
         }
         for (Mutant m : getMutantsMarkedEquivalent()) {
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
-            if(defenderId != defendersTeamId)
+            if (defenderId != defendersTeamId) {
                 challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
+            }
         }
         for (Mutant m : getMutantsMarkedEquivalentPending()) {
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
-            if(defenderId != defendersTeamId)
+            if (defenderId != defendersTeamId) {
                 challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
+            }
         }
 
         for (int playerId : testScores.keySet()) {
-            testScores.get(playerId).setDuelInformation(challengesWon.get(playerId) + " / " + challengesLost.get(playerId) + " / " + challengesOpen.get((playerId)));
+            testScores.get(playerId).setDuelInformation(challengesWon.get(playerId)
+                    + " / " + challengesLost.get(playerId) + " / " + challengesOpen.get((playerId)));
         }
-        testScores.get(defendersTeamId).setDuelInformation(challengesWon.get(defendersTeamId) + " / " + challengesLost.get(defendersTeamId) + " / " + challengesOpen.get((defendersTeamId)));
+        testScores.get(defendersTeamId).setDuelInformation(challengesWon.get(defendersTeamId)
+                + " / " + challengesLost.get(defendersTeamId) + " / " + challengesOpen.get((defendersTeamId)));
         for (int i : mutantsKilled.keySet()) {
             PlayerScore ps = testScores.get(i);
             ps.setMutantKillInformation("" + mutantsKilled.get(i));
@@ -501,8 +579,9 @@ public class MultiplayerGame extends AbstractGame {
 
     public boolean isLineCovered(int lineNumber) {
         for (Test test : getTests(true)) {
-            if (test.getLineCoverage().getLinesCovered().contains(lineNumber))
+            if (test.getLineCoverage().getLinesCovered().contains(lineNumber)) {
                 return true;
+            }
         }
         return false;
     }
@@ -547,6 +626,8 @@ public class MultiplayerGame extends AbstractGame {
                     notifyGame("The game has ended.", et);
                 }
                 break;
+            default:
+                // ignored
         }
     }
 
@@ -562,10 +643,10 @@ public class MultiplayerGame extends AbstractGame {
     private void notifyAttackers(String message, EventType et) {
         for (Player player : getAttackerPlayers()) {
             Event notif = new Event(-1, id,
-                player.getUser().getId(),
-                message,
-                et, EventStatus.NEW,
-                new Timestamp(System.currentTimeMillis()));
+                    player.getUser().getId(),
+                    message,
+                    et, EventStatus.NEW,
+                    new Timestamp(System.currentTimeMillis()));
             notif.insert();
         }
     }
@@ -573,10 +654,10 @@ public class MultiplayerGame extends AbstractGame {
     private void notifyDefenders(String message, EventType et) {
         for (Player player : getDefenderPlayers()) {
             Event notif = new Event(-1, id,
-                player.getUser().getId(),
-                message,
-                et, EventStatus.NEW,
-                new Timestamp(System.currentTimeMillis()));
+                    player.getUser().getId(),
+                    message,
+                    et, EventStatus.NEW,
+                    new Timestamp(System.currentTimeMillis()));
             notif.insert();
         }
     }

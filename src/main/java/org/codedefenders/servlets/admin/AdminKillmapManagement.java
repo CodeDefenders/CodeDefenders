@@ -18,24 +18,23 @@
  */
 package org.codedefenders.servlets.admin;
 
-import static org.codedefenders.util.MessageUtils.pluralize;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.lang3.StringUtils;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.execution.KillMapProcessor;
-import org.codedefenders.util.Constants;
+import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +53,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static org.codedefenders.util.MessageUtils.pluralize;
 
 /**
  * Handles toggling killmap processing, queueing killmaps for computation, deleting killmaps and cancelling queued
@@ -185,6 +186,8 @@ public class AdminKillmapManagement extends HttpServlet {
                     case "deleteKillMaps":
                         deleteKillMaps(killmapType, ids);
                         break;
+                    default:
+                        // ignored
                 }
                 break;
 

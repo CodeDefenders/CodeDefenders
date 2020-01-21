@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
- // TODO Phil 02/01/19: this seems to be never used so we may remove it?
+// TODO Phil 02/01/19: this seems to be never used so we may remove it?
 @WebServlet("/api/game_mutants")
 public class MutantManager extends HttpServlet {
 
@@ -81,7 +81,7 @@ public class MutantManager extends HttpServlet {
                         .equals(Role.DEFENDER) || game.getLevel().equals(
                         GameLevel.EASY);
 
-                for (Mutant m : mutants){
+                for (Mutant m : mutants) {
                     m.prepareForSerialise(showDiff);
                 }
 
@@ -96,11 +96,11 @@ public class MutantManager extends HttpServlet {
     private boolean canAccess(HttpServletRequest request) {
         //TODO: Implement heavy load/DDOS handling
         if (request.getParameter("gameId") != null) {
-            int pId = PlayerDAO.getPlayerIdForUserAndGame(
+            int playerId = PlayerDAO.getPlayerIdForUserAndGame(
                     login.getUserId(),
                     Integer.parseInt(request.getParameter("gameId"))
             );
-            return pId >= 0;
+            return playerId >= 0;
         }
         return false;
     }

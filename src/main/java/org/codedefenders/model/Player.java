@@ -24,7 +24,7 @@ import org.codedefenders.game.Role;
 /**
  * This class serves as a container for players.
  *
- * Users in a game as represented as players and have a certain role.
+ * <p>Users in a game as represented as players and have a certain role.
  *
  * @see Role
  */

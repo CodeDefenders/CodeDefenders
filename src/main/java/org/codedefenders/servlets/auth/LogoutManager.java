@@ -27,18 +27,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Created by thoma on 11/07/2016.
+ * This servlet handles login out of Code Defenders.
+ *
+ * <p>Serves on path: {@code /logout}.
+ * @see org.codedefenders.util.Paths#LOGOUT
  */
 @WebServlet("/logout")
 public class LogoutManager extends HttpServlet {
-    private static final long serialVersionUID = -4985646814054170059L;
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.getSession().invalidate();
         response.sendRedirect(request.getContextPath() + "/");
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.getSession().invalidate();
         response.sendRedirect(request.getContextPath() + "/");
     }

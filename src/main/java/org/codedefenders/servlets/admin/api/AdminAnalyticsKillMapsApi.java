@@ -20,6 +20,7 @@ package org.codedefenders.servlets.admin.api;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -29,16 +30,17 @@ import org.codedefenders.database.AnalyticsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @WebServlet("/admin/api/killmap")
 public class AdminAnalyticsKillMapsApi extends HttpServlet {
@@ -122,7 +124,7 @@ public class AdminAnalyticsKillMapsApi extends HttpServlet {
         CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(columns));
 
         for (KillmapDataDTO k : killmapData) {
-            for(String column : columns) {
+            for (String column : columns) {
                 try {
                     csvPrinter.print(PropertyUtils.getProperty(k, column));
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -136,5 +138,6 @@ public class AdminAnalyticsKillMapsApi extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException { }
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    }
 }

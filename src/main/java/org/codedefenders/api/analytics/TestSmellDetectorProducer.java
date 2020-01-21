@@ -38,7 +38,7 @@ public class TestSmellDetectorProducer {
 
     // Enable
     public static final int EAGER_TEST_THRESHOLD = 4;
-    
+
     // See https://stackoverflow.com/questions/2264758/resolution-of-external-3rd-party-beans-in-weld
     public @Produces @RequestScoped TestSmellDetector createTestSmellDetector() {
         List<AbstractSmell> testSmells = new ArrayList<AbstractSmell>();
@@ -60,5 +60,5 @@ public class TestSmellDetectorProducer {
         // testSmells.add(new VerboseTest());
         // testSmells.add(new DependentTest());
         return new TestSmellDetector(testSmells);
-      }
+    }
 }

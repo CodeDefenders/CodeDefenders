@@ -26,8 +26,8 @@ import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapType;
+import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -52,8 +52,6 @@ public class AdminMonitorGames extends HttpServlet {
     @Inject
     private MessagesBean messages;
 
-    private MultiplayerGame mg;
-
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
     }
@@ -76,6 +74,7 @@ public class AdminMonitorGames extends HttpServlet {
         String playerToRemoveIdGameIdString = request.getParameter("activeGameUserRemoveButton");
         String playerToSwitchIdGameIdString = request.getParameter("activeGameUserSwitchButton");
         boolean switchUser = playerToSwitchIdGameIdString != null;
+        MultiplayerGame mg;
         if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
             int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
             int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
@@ -86,8 +85,9 @@ public class AdminMonitorGames extends HttpServlet {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
                 mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
-                if (!mg.addPlayerForce(userId, newRole))
+                if (!mg.addPlayerForce(userId, newRole)) {
                     messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
+                }
             }
 
         } else {  // admin is starting or stopping selected games
@@ -101,7 +101,7 @@ public class AdminMonitorGames extends HttpServlet {
                 // Get the identifying information required to create a game from the submitted form.
 
                 try {
-                    gameId = Integer.parseInt( gameSelectedViaPlayButton );
+                    gameId = Integer.parseInt(gameSelectedViaPlayButton);
                 } catch (Exception e) {
                     messages.add("There was a problem with the form.");
                     response.sendRedirect(request.getContextPath() + "/admin");
@@ -109,7 +109,7 @@ public class AdminMonitorGames extends HttpServlet {
                 }
 
 
-                String errorMessage = "ERROR trying to start or stop game " + String.valueOf(gameId)
+                String errorMessage = "ERROR trying to start or stop game " + gameId
                         + ".\nIf this problem persists, contact your administrator.";
 
                 mg = MultiplayerGameDAO.getMultiplayerGame(gameId);
@@ -129,7 +129,8 @@ public class AdminMonitorGames extends HttpServlet {
                     }
                 }
             } else {
-                GameState newState = request.getParameter("games_btn").equals("Start Games") ? GameState.ACTIVE : GameState.FINISHED;
+                GameState newState = request.getParameter("games_btn").equals("Start Games")
+                        ? GameState.ACTIVE : GameState.FINISHED;
                 for (String gameId : selectedGames) {
                     mg = MultiplayerGameDAO.getMultiplayerGame(Integer.parseInt(gameId));
                     mg.setState(newState);
@@ -138,7 +139,7 @@ public class AdminMonitorGames extends HttpServlet {
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob( new KillMapJob(KillMapType.GAME, Integer.parseInt(gameId)));
+                            KillmapDAO.enqueueJob(new KillMapJob(KillMapType.GAME, Integer.parseInt(gameId)));
                         }
                     }
                 }
@@ -150,12 +151,14 @@ public class AdminMonitorGames extends HttpServlet {
 
     private static boolean deletePlayer(int pid, int gid) {
         for (Test t : TestDAO.getTestsForGame(gid)) {
-            if (t.getPlayerId() == pid)
+            if (t.getPlayerId() == pid) {
                 AdminDAO.deleteTestTargetExecutions(t.getId());
+            }
         }
         for (Mutant m : MutantDAO.getValidMutantsForGame(gid)) {
-            if (m.getPlayerId() == pid)
+            if (m.getPlayerId() == pid) {
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
+            }
         }
         DatabaseAccess.removePlayerEventsForGame(gid, pid);
         AdminDAO.deleteAttackerEquivalences(pid);

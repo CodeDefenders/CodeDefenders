@@ -18,26 +18,6 @@
  */
 package org.codedefenders.execution;
 
-import static org.codedefenders.execution.TargetExecution.Status.ERROR;
-import static org.codedefenders.execution.TargetExecution.Status.FAIL;
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
-import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_SUBMITTED_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_LAST_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_N_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.enterprise.inject.Alternative;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -54,12 +34,32 @@ import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.enterprise.inject.Alternative;
+
+import static org.codedefenders.execution.TargetExecution.Status.ERROR;
+import static org.codedefenders.execution.TargetExecution.Status.FAIL;
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
+import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_SUBMITTED_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_LAST_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_N_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
+
 /**
  * Class that handles compilation and testing by creating a Process with the
  * relevant ant target. Since execution is related to single request, we use a
  * Request Scope.
  *
- * We inject instances using {@link MutationTesterProducer}
+ * <p>We inject instances using {@link MutationTesterProducer}
  */
 @Alternative // This disable the automatic injection so we pass dependencies via the constructor
 public class MutationTester implements IMutationTester {
@@ -82,17 +82,19 @@ public class MutationTester implements IMutationTester {
         }
 
         // TODO: move the message logic out of this class
-        if (killed == 0)
-            if (mutants.size() == 0)
+        if (killed == 0) {
+            if (mutants.size() == 0) {
                 messages.add(TEST_SUBMITTED_MESSAGE);
-            else
+            } else {
                 messages.add(TEST_KILLED_ZERO_MESSAGE);
-        else {
+            }
+        } else {
             if (killed == 1) {
-                if (mutants.size() == 1)
+                if (mutants.size() == 1) {
                     messages.add(TEST_KILLED_LAST_MESSAGE);
-                else
+                } else {
                     messages.add(TEST_KILLED_ONE_MESSAGE);
+                }
             } else {
                 messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
             }
@@ -149,21 +151,23 @@ public class MutationTester implements IMutationTester {
         // test.update();
         test.incrementScore(Scorer.score(game, test, killedMutants));
 
-        if (killed == 0)
-            if (mutants.size() == 0)
+        if (killed == 0) {
+            if (mutants.size() == 0) {
                 messages.add(TEST_SUBMITTED_MESSAGE);
-            else
+            } else {
                 messages.add(TEST_KILLED_ZERO_MESSAGE);
-        else {
+            }
+        } else {
             Event notif = new Event(-1, game.getId(), u.getId(),
                     u.getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
                     EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
             notif.insert();
             if (killed == 1) {
-                if (mutants.size() == 1)
+                if (mutants.size() == 1) {
                     messages.add(TEST_KILLED_LAST_MESSAGE);
-                else
+                } else {
                     messages.add(TEST_KILLED_ONE_MESSAGE);
+                }
             } else {
                 messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
             }
@@ -207,8 +211,7 @@ public class MutationTester implements IMutationTester {
                         new Timestamp(System.currentTimeMillis()));
                 notif.insert();
 
-                return; // return as soon as the first test kills the mutant we
-                        // return
+                return; // return as soon as the first test kills the mutant we return
             }
         }
 
@@ -218,8 +221,9 @@ public class MutationTester implements IMutationTester {
         ArrayList<Test> missedTests = new ArrayList<Test>();
         if (game instanceof MultiplayerGame) {
             for (Test t : tests) {
-                if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines()))
+                if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines())) {
                     missedTests.add(t);
+                }
             }
             // mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant,
             // missedTests));
@@ -229,12 +233,13 @@ public class MutationTester implements IMutationTester {
 
         int nbRelevantTests = missedTests.size();
         // Mutant survived
-        if (nbRelevantTests == 0)
+        if (nbRelevantTests == 0) {
             messages.add(MUTANT_SUBMITTED_MESSAGE);
-        else if (nbRelevantTests <= 1)
+        } else if (nbRelevantTests <= 1) {
             messages.add(MUTANT_ALIVE_1_MESSAGE);
-        else
+        } else {
             messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests));
+        }
         Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         notif.insert();
@@ -270,7 +275,7 @@ public class MutationTester implements IMutationTester {
 
         logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
         test.killMutant();
-        mutant.setKillMessage( executedTarget.message );
+        mutant.setKillMessage(executedTarget.message);
         MutantDAO.updateMutantKillMessageForMutant(mutant);
         return true;
     }
@@ -299,11 +304,11 @@ public class MutationTester implements IMutationTester {
             if (mutant.kill(PROVEN_NO)) {
                 logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
                 test.killMutant();
-                mutant.setKillMessage( executedTarget.message );
+                mutant.setKillMessage(executedTarget.message);
                 MutantDAO.updateMutantKillMessageForMutant(mutant);
             } else {
-                logger.info(
-                        "Test {} would have killed Mutant {} and resolve equivalence, but Mutant {} was alredy dead. No need to resolve equivalence.!",
+                logger.info("Test {} would have killed Mutant {} and resolve equivalence,"
+                                + "but Mutant {} was alredy dead. No need to resolve equivalence.!",
                         test.getId(), mutant.getId(), mutant.getId());
             }
         } else {

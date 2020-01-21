@@ -64,8 +64,8 @@ public class ZipFileUtils {
     /**
      * Extracts a {@link List} of {@link JavaFileObject JavaFileObjects} from a
      * given zip file by mapping the file name and the file content.
-     * <p>
-     * NOTE: Per design, this method completely ignores the folder structure inside the zip file. This
+     *
+     * <p>NOTE: Per design, this method completely ignores the folder structure inside the zip file. This
      * allows to extract files with the same file name, but in different folders.
      *
      * @param zipFile        a {@link ZipFile} object from which the files are read.
@@ -112,8 +112,8 @@ public class ZipFileUtils {
     /**
      * Extracts a given zip file in a folder and returns the path
      * of the root directory.
-     * <p>
-     * NOTE: While the folder is meant to to temporary, the folder has to be removed again.
+     *
+     * <p>NOTE: While the folder is meant to to temporary, the folder has to be removed again.
      * After dealing with the files, the whole directory (i.e. the returned path) can be removed.
      *
      * @param zipFile        the zip file that is extracted as a {@link ZipFile}.

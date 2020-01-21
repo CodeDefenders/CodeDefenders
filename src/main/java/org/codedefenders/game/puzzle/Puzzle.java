@@ -97,6 +97,8 @@ public class Puzzle {
     private PuzzleChapter chapter;
 
     /**
+     * Constructs a new Puzzle instance.
+     *
      * @param puzzleId ID of the chapter.
      * @param classId Class ID of the class the puzzle uses.
      *                The mutants and test for the puzzle come together with the class.

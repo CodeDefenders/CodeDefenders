@@ -72,7 +72,7 @@ public class MutantDAO {
         String killMessage = rs.getString("KillMessage");
 
         Mutant mutant = new Mutant(mutantId, classId, gameId, absoluteJavaFile, absoluteClassFile, alive, equiv,
-                roundCreated, roundKilled, playerId, md5, killMessage );
+                roundCreated, roundKilled, playerId, md5, killMessage);
         mutant.setScore(points);
         // since mutated lines can be null
         final String mutatedLines = rs.getString("MutatedLines");
@@ -106,33 +106,39 @@ public class MutantDAO {
     /**
      * Returns the {@link Mutant} with the given md5 sum from the given game.
      */
-    public static Mutant getMutantByGameAndMd5(int gameId, String md5) throws UncheckedSQLException, SQLMappingException {
+    public static Mutant getMutantByGameAndMd5(int gameId, String md5)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT * FROM view_mutants_with_user m",
                 "WHERE m.Game_ID = ? AND m.MD5 = ?;");
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of(md5));
+        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS,
+                DatabaseValue.of(gameId), DatabaseValue.of(md5));
     }
 
     /**
-     * Returns the {@link Mutant Mutants} from the given game for the given player
+     * Returns the {@link Mutant Mutants} from the given game for the given player.
      */
-    public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId) throws UncheckedSQLException, SQLMappingException {
+    public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT * FROM view_mutants_with_user m",
                 "WHERE m.Game_ID = ?",
                 "  AND m.Player_ID = ?;");
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( playerId));
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
+                DatabaseValue.of(gameId), DatabaseValue.of(playerId));
     }
 
     /**
-     * Returns the {@link Mutant Mutants} from the given game for the given user
+     * Returns the {@link Mutant Mutants} from the given game for the given user.
      */
-    public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId) throws UncheckedSQLException, SQLMappingException {
+    public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT * FROM view_mutants_with_user m",
                 "WHERE m.Game_ID = ?",
                 "  AND m.User_ID = ?;");
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( userId));
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
+                DatabaseValue.of(gameId), DatabaseValue.of( userId));
     }
 
     /**
@@ -167,7 +173,8 @@ public class MutantDAO {
                 "WHERE m.Mutant_ID = up.Mutant_ID",
                 "  AND m.Class_ID = ?;");
 
-        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
+        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS,
+                DatabaseValue.of(classId)));
 
         return result;
     }
@@ -175,7 +182,8 @@ public class MutantDAO {
     /**
      * Returns the compilable {@link Mutant Mutants} submitted by the given player.
      */
-    public static List<Mutant> getValidMutantsForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
+    public static List<Mutant> getValidMutantsForPlayer(int playerId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM view_valid_mutants m ",
@@ -185,8 +193,8 @@ public class MutantDAO {
 
     /**
      * Stores a given {@link Mutant} in the database.
-     * <p>
-     * This method does not update the given mutant object.
+     *
+     * <p>This method does not update the given mutant object.
      * Use {@link Mutant#insert()} instead.
      *
      * @param mutant the given mutant as a {@link Mutant}.
@@ -195,7 +203,8 @@ public class MutantDAO {
      */
     public static int storeMutant(Mutant mutant) throws Exception {
         String relativeJavaFile = FileUtils.getRelativeDataPath(mutant.getJavaFile()).toString();
-        String relativeClassFile = mutant.getClassFile() == null ? null : FileUtils.getRelativeDataPath(mutant.getClassFile()).toString();
+        String relativeClassFile = mutant.getClassFile()
+                == null ? null : FileUtils.getRelativeDataPath(mutant.getClassFile()).toString();
         int gameId = mutant.getGameId();
         int classId = mutant.getClassId();
         int roundCreated = mutant.getRoundCreated();
@@ -207,7 +216,8 @@ public class MutantDAO {
         String mutatedLinesString = StringUtils.join(mutant.getLines(), ",");
 
         String query = String.join("\n",
-                "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Equivalent, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)",
+                "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Equivalent,",
+                        "Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)",
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
         DatabaseValue[] values = new DatabaseValue[]{
@@ -249,13 +259,13 @@ public class MutantDAO {
         int score = mutant.getScore();
 
         String query = String.join("\n",
-            "UPDATE mutants",
-            "SET",
-            "  Equivalent=?,",
-            "  Alive=?,",
-            "  RoundKilled=?,",
-            "  Points=?",
-            "WHERE Mutant_ID=? AND Alive=1;"
+                "UPDATE mutants",
+                "SET",
+                "  Equivalent=?,",
+                "  Alive=?,",
+                "  RoundKilled=?,",
+                "  Points=?",
+                "WHERE Mutant_ID=? AND Alive=1;"
         );
         DatabaseValue[] values = new DatabaseValue[]{
             DatabaseValue.of(equivalent.name()),
@@ -282,9 +292,9 @@ public class MutantDAO {
         String killMessage = mutant.getKillMessage();
 
         String query = String.join("\n",
-            "UPDATE mutants",
-            "SET KillMessage=?",
-            "WHERE Mutant_ID=?;"
+                "UPDATE mutants",
+                "SET KillMessage=?",
+                "WHERE Mutant_ID=?;"
         );
         DatabaseValue[] values = new DatabaseValue[]{
             DatabaseValue.of(killMessage),
@@ -388,7 +398,8 @@ public class MutantDAO {
      */
     public static int getNumTestsKillMutant(int mutantId) {
         String query = "SELECT * FROM mutants WHERE Mutant_ID=?;";
-        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"), DatabaseValue.of(mutantId));
+        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"),
+                DatabaseValue.of(mutantId));
         return Optional.ofNullable(kills).orElse(0);
     }
 }

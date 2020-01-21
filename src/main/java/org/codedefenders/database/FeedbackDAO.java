@@ -42,8 +42,9 @@ public class FeedbackDAO {
     public static boolean storeFeedback(int gameId, int userId, List<Integer> ratingsList) {
         StringBuilder bob = new StringBuilder("INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ");
 
-        if (ratingsList.size() > types.size() || ratingsList.size() < 1)
+        if (ratingsList.size() > types.size() || ratingsList.size() < 1) {
             return false;
+        }
 
         String queryValues = "(?, ?, ?, ?),";
         List<DatabaseValue> allValuesList = new ArrayList<>();
@@ -85,7 +86,8 @@ public class FeedbackDAO {
             return true;
         };
 
-        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DatabaseValue.of(gameId), DatabaseValue.of(userId));
+        DatabaseValue[] dbvalues = {DatabaseValue.of(gameId), DatabaseValue.of(userId)};
+        List<Boolean> result = DB.executeQueryReturnList(query, mapper, dbvalues);
         if (result.isEmpty()) {
             return Collections.emptyList();
         }
@@ -93,7 +95,9 @@ public class FeedbackDAO {
     }
 
     public static List<Double> getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
-        List<Double> values = DoubleStream.generate(() -> -1.0).limit(types.size()).boxed().collect(Collectors.toList());
+        List<Double> values = DoubleStream.generate(() -> -1.0).limit(types.size())
+                .boxed()
+                .collect(Collectors.toList());
 
         String query = String.join("\n",
                 "SELECT AVG(value) AS 'average', type",
@@ -136,7 +140,8 @@ public class FeedbackDAO {
         return DB.executeQueryReturnList(query, rs -> rs.getDouble(1), DatabaseValue.of(feedbackType.name()));
     }
 
-    // TODO Phil 28/12/18: pretty sure this doesn't result in the wanted behavior. This is ordered, but when trying to map to classes, the classes aren't ordered so the mapping just disappears.
+    // TODO Phil 28/12/18: pretty sure this doesn't result in the wanted behavior.
+    //  This is ordered, but when trying to map to classes, the classes aren't ordered so the mapping just disappears.
     public static List<Double> getAverageMutationDifficulties() {
         return getAverageClassDifficultyRatings(Type.CUT_MUTATION_DIFFICULTY);
     }

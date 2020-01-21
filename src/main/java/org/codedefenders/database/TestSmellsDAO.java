@@ -76,6 +76,8 @@ public class TestSmellsDAO {
      * @return A list of all tests smells for a given test.
      */
     public List<String> getDetectedTestSmellsForTest(Test test) {
-        return DB.executeQueryReturnList(GET_SMELL_QUERY, rs -> rs.getString("smell_name"), DatabaseValue.of(test.getId()));
+        return DB.executeQueryReturnList(GET_SMELL_QUERY,
+                rs -> rs.getString("smell_name"),
+                DatabaseValue.of(test.getId()));
     }
 }

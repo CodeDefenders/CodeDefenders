@@ -88,37 +88,40 @@ public class KillMapProcessor implements ServletContextListener {
                 KillMapJob theJob = gamesToProcess.get(0);
                 currentJob = theJob;
 
-                switch ( theJob.getType() ) {
-                case CLASS:
-                    try{
-                        KillMap.forClass(theJob.getId());
-                    } catch (InterruptedException | ExecutionException e) {
-                        logger.warn("Killmap computation failed!", e);
-                    } catch (Throwable e) {
-                        logger.warn("Killmap computation failed!", e);
-                    } finally {
-                        // If the job fails and we leave it in the database,
-                        // we risk to create an infinite loop. So we remove it every time !
-                        KillmapDAO.removeJob(theJob);
-                    }
-                    break;
-                case GAME:
-                    try {
-                        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame( theJob.getId() );
+                switch (theJob.getType()) {
+                    case CLASS:
+                        try {
+                            KillMap.forClass(theJob.getId());
+                        } catch (InterruptedException | ExecutionException e) {
+                            logger.warn("Killmap computation failed!", e);
+                        } catch (Throwable e) {
+                            logger.warn("Killmap computation failed!", e);
+                        } finally {
+                            // If the job fails and we leave it in the database,
+                            // we risk to create an infinite loop. So we remove it every time !
+                            KillmapDAO.removeJob(theJob);
+                        }
+                        break;
+                    case GAME:
+                        try {
+                            MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(theJob.getId());
 
-                        assert game.getId() == theJob.getId();
+                            assert game.getId() == theJob.getId();
 
-                        logger.info("Computing killmap for game " + game.getId());
-                        KillMap.forGame(game);
-                        logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
-                        // At this point we can remove the job from the DB
-                    } catch (Throwable e) {
-                        logger.warn("Killmap computation failed!", e);
-                    } finally {
-                        // If the job fails and we leave it in the database,
-                        // we risk to create an infinite loop. So we remove it every time !
-                        KillmapDAO.removeJob(theJob);
-                    }
+                            logger.info("Computing killmap for game " + game.getId());
+                            KillMap.forGame(game);
+                            logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
+                            // At this point we can remove the job from the DB
+                        } catch (Throwable e) {
+                            logger.warn("Killmap computation failed!", e);
+                        } finally {
+                            // If the job fails and we leave it in the database,
+                            // we risk to create an infinite loop. So we remove it every time !
+                            KillmapDAO.removeJob(theJob);
+                        }
+                        break;
+                    default:
+                        // ignored
                 }
 
                 currentJob = null;
@@ -148,7 +151,7 @@ public class KillMapProcessor implements ServletContextListener {
 
     /**
      * Return the ID of the games or classes for which there's a pending killmap
-     * computation
+     * computation.
      */
     public List<KillMapJob> getPendingJobs() {
         return KillmapDAO.getPendingJobs();
@@ -202,7 +205,9 @@ public class KillMapProcessor implements ServletContextListener {
         }
     }
 
-    /** Represents a job for computing a killmap */
+    /**
+     * Represents a job for computing a killmap.
+     */
     public static class KillMapJob {
         private KillMap.KillMapType type;
         private Integer id;

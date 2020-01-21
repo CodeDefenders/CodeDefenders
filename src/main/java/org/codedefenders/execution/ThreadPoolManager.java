@@ -18,9 +18,6 @@
  */
 package org.codedefenders.execution;
 
-import static java.util.Optional.ofNullable;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -43,11 +40,12 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
+import static java.util.Optional.ofNullable;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 /**
  * This is taken from:
- *
  * https://rmannibucau.wordpress.com/2016/02/29/cdi-replace-the-configuration-by-a-register-pattern/
- *
  * TODO Maybe we can replace this with a ServletListener?
  */
 @ApplicationScoped
@@ -77,7 +75,9 @@ public class ThreadPoolManager {
             throw new IllegalStateException("Pool not available");
         }
         return pools.computeIfAbsent(ip.getAnnotated().getAnnotation(ThreadPool.class).value(), name ->
-            ofNullable(models.get(name)).map(ThreadPoolModel::create).orElseThrow(() -> new IllegalArgumentException("No pool '" + name + "' defined.")));
+            ofNullable(models.get(name))
+                    .map(ThreadPoolModel::create)
+                    .orElseThrow(() -> new IllegalArgumentException("No pool '" + name + "' defined.")));
     }
 
     /**
@@ -146,7 +146,8 @@ public class ThreadPoolManager {
         }
 
         public ThreadPoolManager add() {
-            this.registration.models.put(name, new ThreadPoolModel(core, max, keepAliveTime, keepAliveTimeUnit, workQueue, threadFactory, handler, shutdownTime, shutdownTimeUnit));
+            this.registration.models.put(name, new ThreadPoolModel(core, max, keepAliveTime, keepAliveTimeUnit,
+                    workQueue, threadFactory, handler, shutdownTime, shutdownTimeUnit));
             return registration;
         }
     }
@@ -180,7 +181,8 @@ public class ThreadPoolManager {
         }
 
         private ThreadPoolExecutor create() {
-            return new ThreadPoolExecutor(core, max, keepAliveTime, keepAliveTimeUnit, workQueue, threadFactory, handler);
+            return new ThreadPoolExecutor(core, max, keepAliveTime, keepAliveTimeUnit,
+                    workQueue, threadFactory, handler);
         }
 
         private void destroy(final ThreadPoolExecutor executor) {

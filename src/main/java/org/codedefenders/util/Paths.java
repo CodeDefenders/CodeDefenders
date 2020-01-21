@@ -21,8 +21,8 @@ package org.codedefenders.util;
 /**
  * This class contains URL path constants.
  *
- * <p>If one path has to be adjusted, it has to be adjusted in the
- * specific servlet configuration, too.
+ * <p>If one path has to be adjusted, it has to be adjusted in the {@code web.xml}
+ * servlet mapping configuration, too.
  */
 public class Paths {
 

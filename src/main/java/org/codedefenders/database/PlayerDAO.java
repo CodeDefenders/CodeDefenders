@@ -29,7 +29,6 @@ import java.util.Optional;
 
 /**
  * This class handles the database logic for players.
- * A
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Player
@@ -56,8 +55,9 @@ public class PlayerDAO {
 
     /**
      * Constructs a player from a {@link ResultSet} entry.
-     * <p>
-     * Requires the user information to have the following column names. Naming these columns should be done with SQL aliasing.
+     *
+     * <p>Requires the user information to have the following column names.
+     * Naming these columns should be done with SQL aliasing.
      *
      * <ul>
      *     <li>{@code usersPassword}</li>

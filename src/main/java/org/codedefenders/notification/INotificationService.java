@@ -31,9 +31,9 @@ package org.codedefenders.notification;
  *
  */
 public interface INotificationService {
-    public void register(Object eventHandler);
+    void register(Object eventHandler);
 
-    public void unregister(Object eventHandler);
+    void unregister(Object eventHandler);
 
-    public void post(Object message);
+    void post(Object message);
 }

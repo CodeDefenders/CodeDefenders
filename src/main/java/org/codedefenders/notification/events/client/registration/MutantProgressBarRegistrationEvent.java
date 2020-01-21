@@ -1,7 +1,11 @@
 package org.codedefenders.notification.events.client.registration;
 
 import com.google.gson.annotations.Expose;
-import org.codedefenders.notification.events.server.mutant.*;
+
+import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
+import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 
 /**

@@ -111,7 +111,7 @@ public class Mutant implements Serializable {
     private String killMessage;
 
     /**
-     * Creates a new Mutant with following attributes:
+     * Creates a new Mutant with following attributes.
      * <ul>
      * <li><code>gameId -1</code></li>
      * <li><code>playerId -1</code></li>
@@ -132,37 +132,39 @@ public class Mutant implements Serializable {
     }
 
     /**
-     * Creates a mutant
+     * Creates a mutant.
      *
      * @param gameId
-     * @param jFile
-     * @param cFile
+     * @param javaFile
+     * @param classFile
      * @param alive
      * @param playerId
      */
-    public Mutant(int gameId, int classId,  String jFile, String cFile, boolean alive, int playerId) {
+    public Mutant(int gameId, int classId,  String javaFile, String classFile, boolean alive, int playerId) {
         this.gameId = gameId;
         this.classId = classId;
         this.roundCreated = GameDAO.getCurrentRound(gameId);
-        this.javaFile = jFile;
-        this.classFile = cFile;
+        this.javaFile = javaFile;
+        this.classFile = classFile;
         this.alive = alive;
         this.equivalent = Equivalence.ASSUMED_NO;
         this.playerId = playerId;
     }
 
-    public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
-        this(gid, classId, jFile, cFile, alive, playerId);
+    public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
+                  int roundCreated, int roundKilled, int playerId) {
+        this(gid, classId, javaFile, classFile, alive, playerId);
         this.id = mid;
         this.equivalent = equiv;
-        this.roundCreated = rCreated;
-        this.roundKilled = rKilled;
+        this.roundCreated = roundCreated;
+        this.roundKilled = roundKilled;
 
         score = 0;
     }
 
-    public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId, String md5, String killMessage) {
-        this(mid, classId, gid, jFile, cFile, alive, equiv, rCreated, rKilled, playerId);
+    public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
+                  int roundCreated, int roundKilled, int playerId, String md5, String killMessage) {
+        this(mid, classId, gid, javaFile, classFile, alive, equiv, roundCreated, roundKilled, playerId);
         this.md5 = md5;
         this.killMessage = killMessage;
     }
@@ -248,8 +250,8 @@ public class Mutant implements Serializable {
 
     // TODO why does incrementScore update the DB entry, shouldn't this be done with update()
     // TODO Phil 12/12/18: extract database logic to MutantDAO
-    public void incrementScore(int score){
-        if( score == 0 ){
+    public void incrementScore(int score) {
+        if (score == 0) {
             logger.debug("Do not update mutant {} score by 0", getId());
             return;
         }
@@ -304,8 +306,9 @@ public class Mutant implements Serializable {
     public boolean isCovered() {
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
         for (Test t : tests) {
-            if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines()))
+            if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines())) {
                 return true;
+            }
         }
         return false;
     }
@@ -314,8 +317,8 @@ public class Mutant implements Serializable {
     public Set<Test> getCoveringTests() {
         Set<Test> coveringTests = new LinkedHashSet<>();
 
-        for(Test t : TestDAO.getValidTestsForGame(gameId, false)) {
-            if(t.isMutantCovered(this)) {
+        for (Test t : TestDAO.getValidTestsForGame(gameId, false)) {
+            if (t.isMutantCovered(this)) {
                 coveringTests.add(t);
             }
         }
@@ -326,7 +329,7 @@ public class Mutant implements Serializable {
     public boolean doesRequireRecompilation() {
         // dummy game with id = -1 has null class, and this check cannot be implemented...
         GameClass cut = GameClassDAO.getClassForGameId(gameId);
-        if(  cut == null ){
+        if (cut == null) {
             cut = GameClassDAO.getClassForId(classId);
         }
         return CollectionUtils.containsAny(cut.getCompileTimeConstants(), getLines());
@@ -342,7 +345,7 @@ public class Mutant implements Serializable {
     // Not sure
     private void computeDifferences() {
         GameClass sut = GameClassDAO.getClassForGameId(gameId);
-        if( sut == null ){
+        if (sut == null) {
             // in this case gameId might have been -1 (upload)
             // so we try to reload the sut
             sut = GameClassDAO.getClassForId(classId);
@@ -369,7 +372,7 @@ public class Mutant implements Serializable {
 
     public String getPatchString() {
         GameClass sut = GameClassDAO.getClassForGameId(gameId);
-        if( sut == null ){
+        if (sut == null) {
             // in this case gameId might have been -1 (upload)
             // so we try to reload the sut
             sut = GameClassDAO.getClassForId(classId);
@@ -385,8 +388,9 @@ public class Mutant implements Serializable {
         List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
         StringBuilder unifiedPatch = new StringBuilder();
         for (String s : unifiedPatches) {
-            if ("--- null".equals(s) || "+++ null".equals(s))
+            if ("--- null".equals(s) || "+++ null".equals(s)) {
                 continue;
+            }
             unifiedPatch.append(s).append(System.getProperty("line.separator"));
         }
         return unifiedPatch.toString();
@@ -396,18 +400,18 @@ public class Mutant implements Serializable {
         return StringEscapeUtils.escapeHtml(getPatchString());
     }
 
-    public Test getKillingTest(){
+    public Test getKillingTest() {
         return DatabaseAccess.getKillingTestForMutantId(id);
     }
 
     public String getKillMessage() {
-        if( killMessage != null ){
+        if (killMessage != null) {
             return killMessage;
         } else {
             return Constants.DEFAULT_KILL_MESSAGE;
         }
-
     }
+
     public String getHTMLEscapedKillMessage() {
         return StringEscapeUtils.escapeHtml(getKillMessage());
     }
@@ -440,7 +444,7 @@ public class Mutant implements Serializable {
         return lines;
     }
 
-    public String getSummaryString(){
+    public String getSummaryString() {
         if (summaryString == null) {
             computeLinesAndDescription();
         }
@@ -451,7 +455,7 @@ public class Mutant implements Serializable {
      * Identify lines in the original source code that have been modified
      * by a mutation.
      *
-     * An insertion only modifies the line it was inserted in
+     * <p>An insertion only modifies the line it was inserted in
      */
     private void computeLinesAndDescription() {
         // This workflow is not really nice...
@@ -481,22 +485,22 @@ public class Mutant implements Serializable {
                     mutatedLines.add(l);
                 }
                 desc = String.format("lines %d-%d", firstLine, endLine);
-                fragementSummary.remove( fragementSummary.size() - 1);
-                fragementSummary.add( String.format("%d-%d", firstLine, endLine) );
+                fragementSummary.remove(fragementSummary.size() - 1);
+                fragementSummary.add(String.format("%d-%d", firstLine, endLine));
             }
             // update mutant description
             switch (d.getType()) {
-            case CHANGE:
-                modified = modified == null ? "Modified " + desc : modified + ", " + desc;
-                break;
-            case DELETE:
-                deleted = deleted == null ? "Removed " + desc : deleted + ", " + desc;
-                break;
-            case INSERT:
-                added = added == null ? "Added " + desc : added + ", " + desc;
-                break;
-            default:
-                throw new IllegalStateException("Found unknown delta type " + d.getType());
+                case CHANGE:
+                    modified = modified == null ? "Modified " + desc : modified + ", " + desc;
+                    break;
+                case DELETE:
+                    deleted = deleted == null ? "Removed " + desc : deleted + ", " + desc;
+                    break;
+                case INSERT:
+                    added = added == null ? "Added " + desc : added + ", " + desc;
+                    break;
+                default:
+                    throw new IllegalStateException("Found unknown delta type " + d.getType());
             }
         }
         if (modified != null) {
@@ -509,7 +513,7 @@ public class Mutant implements Serializable {
             description.add(StringEscapeUtils.escapeHtml(added + "\n"));
         }
 
-        setLines( mutatedLines );
+        setLines(mutatedLines);
 
         // Generate the summaryString
         summaryString = String.join(",", fragementSummary);
@@ -524,9 +528,12 @@ public class Mutant implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         Mutant mutant = (Mutant) o;
 
@@ -555,13 +562,14 @@ public class Mutant implements Serializable {
     public void prepareForSerialise(boolean showDifferences) {
         getHTMLReadout();
         getLines();
-        if (showDifferences)
+        if (showDifferences) {
             getDifferences();
-        else
+        } else {
             difference = new Patch();
+        }
     }
 
-    /*
+    /**
      * This comparators place first mutants that modify lines at the top of the file.
      */
     public static Comparator<Mutant> sortByLineNumberAscending() {
@@ -600,7 +608,8 @@ public class Mutant implements Serializable {
 
     @Override
     public String toString() {
-        return "[mutantId=" + getId() + ",alive="+ isAlive() + ",equivalent=" + getEquivalent() + ",score=" + getScore() + "]";
+        return "[mutantId=" + getId() + ",alive=" + isAlive()
+                + ",equivalent=" + getEquivalent() + ",score=" + getScore() + "]";
     }
 
     public void setKillMessage(String message) {

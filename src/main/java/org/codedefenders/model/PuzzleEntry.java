@@ -27,12 +27,12 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * This class is a wrapper around {@link Puzzle} and {@link PuzzleGame}
  * using {@link Type} as a discriminator. This class is used to display
  * puzzles or its games in the {@link PuzzleOverview}.
- * <p>
- * An instance can either contain a puzzle or a puzzle game.
+ *
+ * <p>An instance can either contain a puzzle or a puzzle game.
  * A puzzle has an additional attribute {@code locked}, which indicates
  * that a puzzle cannot be played by a user.
- * <p>
- * Implements {@link Comparable} by comparing the identifiers of the
+ *
+ * <p>Implements {@link Comparable} by comparing the identifiers of the
  * puzzles, retrieved from {@link #getPuzzleId()}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
@@ -43,6 +43,7 @@ public class PuzzleEntry implements Comparable {
         PUZZLE,
         GAME
     }
+
     private Type type;
 
     private Puzzle puzzle;
@@ -85,6 +86,8 @@ public class PuzzleEntry implements Comparable {
                 return this.puzzle.getPuzzleId();
             case GAME:
                 return this.game.getPuzzleId();
+            default:
+                // ignored
         }
         return -1;
     }
@@ -95,6 +98,8 @@ public class PuzzleEntry implements Comparable {
                 return this.puzzle;
             case GAME:
                 return this.game.getPuzzle();
+            default:
+                // ignored
         }
         return null;
     }

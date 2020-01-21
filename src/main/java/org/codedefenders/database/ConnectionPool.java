@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +37,9 @@ import javax.naming.NamingException;
  * This class manages database connection by collecting connections in a pool which can be queried.
  * Queried connections have to be released to the pool again, otherwise the pool is leaking.
  *
- * Available connections are handled in a {@link Queue}.
+ * <p>Available connections are handled in a {@link Queue}.
  *
- * The connection pool limits the number of instances to one. The instance can
+ * <p>The connection pool limits the number of instances to one. The instance can
  * get retrieved using {@link #instance()}.
  */
 public final class ConnectionPool {
@@ -62,6 +63,8 @@ public final class ConnectionPool {
     private int nbConnections = 20;
 
     /**
+     * Get the {@link ConnectionPool} instance.
+     *
      * @return the connection pool. There should always only be one instance.
      */
     public static synchronized ConnectionPool instance() {
@@ -186,7 +189,8 @@ public final class ConnectionPool {
                 returnConn = refreshConnection();
                 if (returnConn.isClosed() || !returnConn.createStatement().execute("SELECT 1;")) {
                     logger.error("Connection could not be refreshed.");
-                    throw new NoMoreConnectionsException("No connections available. Refreshed connection is closed or failed to execute statement");
+                    throw new NoMoreConnectionsException("No connections available."
+                            + "Refreshed connection is closed or failed to execute statement");
                 }
                 logger.info("SQL connection {} refreshed successfully.", returnConn);
             } catch (SQLException e1) {
@@ -255,13 +259,15 @@ public final class ConnectionPool {
      * This does not close the given {@link Connection}.
      */
     private void getParametersFromDB(Connection conn) throws SQLException {
-        final AdminSystemSettings.SettingsDTO conns = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn);
+        final AdminSystemSettings.SettingsDTO conns =
+                AdminDAO.getSystemSettingInt(SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn);
         if (conns == null) {
             logger.warn("Could not retrieve CONNECTION_POOL_CONNECTIONS from database. Using default value.");
         } else {
             nbConnections = conns.getIntValue();
         }
-        final AdminSystemSettings.SettingsDTO waitingTime = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_WAITING_TIME, conn);
+        final AdminSystemSettings.SettingsDTO waitingTime =
+                AdminDAO.getSystemSettingInt(SETTING_NAME.CONNECTION_WAITING_TIME, conn);
         if (waitingTime == null) {
             logger.warn("Could not retrieve CONNECTION_WAITING_TIME from database. Using default value.");
         } else {
@@ -279,7 +285,7 @@ public final class ConnectionPool {
      *
      * @author wendling
      */
-    class NoMoreConnectionsException extends RuntimeException {
+    static class NoMoreConnectionsException extends RuntimeException {
         NoMoreConnectionsException(String message) {
             super(message);
         }

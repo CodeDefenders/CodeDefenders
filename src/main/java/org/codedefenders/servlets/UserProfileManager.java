@@ -46,10 +46,9 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged in {@link User}.
- *
  * This functionality may be disabled, e.g. in a class room setting. See {@link #checkEnabled()}.
- * <p>
- * Serves on path: {@code /profile}.
+ *
+ * <p>Serves on path: {@code /profile}.
  * @see org.codedefenders.util.Paths#USER_PROFILE
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
@@ -79,7 +78,8 @@ public class UserProfileManager extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request,
+                         HttpServletResponse response) throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
             response.sendRedirect(ServletUtils.getBaseURL(request));
@@ -95,7 +95,8 @@ public class UserProfileManager extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response) throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
             response.sendRedirect(request.getContextPath());
@@ -160,7 +161,8 @@ public class UserProfileManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean updateUserInformation(User user, Optional<String> email, Optional<String> password, boolean allowContact) {
+    private boolean updateUserInformation(User user, Optional<String> email,
+                                          Optional<String> password, boolean allowContact) {
         if (user == null) {
             return false;
         }

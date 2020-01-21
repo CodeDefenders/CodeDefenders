@@ -18,9 +18,6 @@
  */
 package org.codedefenders.validation.code;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -35,13 +32,16 @@ import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class checks mutant code and checks whether the code is valid or not.
- * <p>
- * Extends {@link ModifierVisitorAdapter} but doesn't use the generic extra
+ *
+ * <p>Extends {@link ModifierVisitor} but doesn't use the generic extra
  * parameter on {@code visit(Node, __)}, so it's set to {@link Void} here.
- * <p>
- * Instances of this class can be used as follows:
+ *
+ * <p>Instances of this class can be used as follows:
  * <pre><code>Node node = ...;
 MutationVisitor visitor = new MutationVisitor(level);
 visitor.visit(node, null);
@@ -210,7 +210,7 @@ class MutationVisitor extends ModifierVisitor<Void> {
             return stmt;
         }
         super.visit(stmt, args);
-        if (stmt.getInitializer() != null && stmt.getInitializer().toString().startsWith("System.*")) {
+        if (stmt.getInitializer().isPresent() && stmt.getInitializer().get().toString().startsWith("System.*")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_DECLARATION;
             isValid = false;
         }
