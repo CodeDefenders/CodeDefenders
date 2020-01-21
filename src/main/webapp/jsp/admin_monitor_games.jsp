@@ -25,19 +25,22 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.*" %>
+<%@ page import="org.codedefenders.util.Constants" %>
 
-<% String pageTitle = null; %>
-<%@ include file="/jsp/header_main.jsp" %>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post">
         <input type="hidden" name="formType" value="startStopGame">
         <h3>Current Games</h3>
 
         <%
-            List<MultiplayerGame> insertedGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy( (Integer)request.getSession().getAttribute("uid"));
+            List<MultiplayerGame> insertedGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
             if (insertedGames.isEmpty()) {
         %>
         <div class="panel panel-default">

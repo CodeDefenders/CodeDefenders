@@ -29,12 +29,17 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<% String pageTitle = null; %>
-<%@ include file="/jsp/header_main.jsp" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.Role" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
+<jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <form id="insertGames" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post">
         <input type="hidden" name="formType" value="insertGames"/>
@@ -257,7 +262,6 @@
 
             <%
             } else {
-                int currentUserID = (Integer) session.getAttribute("uid");
                 for (List<String> userInfo : unassignedUsersInfo) {
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
@@ -268,7 +272,7 @@
 
             <tr id="<%="user_row_"+uid%>">
                 <td>
-                    <% if (uid != currentUserID) { %>
+                    <% if (uid != login.getUserId()) { %>
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange =
                             "updateCheckbox(this.value, this.checked);">
                     <%}%>

@@ -18,8 +18,7 @@
  */
 package org.codedefenders.servlets.auth;
 
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +27,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -48,9 +48,12 @@ import javax.servlet.http.HttpSession;
 public class LoginFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 
-	@Override
-    public void init(FilterConfig config) throws ServletException { }
+    @Inject
+    LoginBean login;
 
+    @Override
+    public void init(FilterConfig config) throws ServletException {
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -63,11 +66,9 @@ public class LoginFilter implements Filter {
             chain.doFilter(request, response);
         } else {
             HttpSession session = httpRequest.getSession();
-            Integer uid = (Integer) session.getAttribute("uid");
 
-            if (uid != null) {
-                User user = UserDAO.getUserById(uid);
-                if (user != null && user.isActive()) {
+            if (login.isLoggedIn()) {
+                if (login.getUser().isActive()) {
                     /* Disable caching in the HTTP header.
                      * https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for-php-site */
                     httpResponse.setHeader("Pragma", "No-cache");
@@ -123,11 +124,8 @@ public class LoginFilter implements Filter {
     }
 
     private void redirectToLogin(HttpServletRequest httpReq, ServletResponse response) throws IOException {
-        HttpSession session = httpReq.getSession();
         HttpServletResponse httpResp = (HttpServletResponse) response;
-
-        session.setAttribute("loginFrom", httpReq.getRequestURI());
-        String context = httpReq.getContextPath();
-        httpResp.sendRedirect(context + Paths.LOGIN);
+        login.redirectAfterLogin(httpReq.getRequestURI());
+        httpResp.sendRedirect(httpReq.getContextPath() + Paths.LOGIN);
     }
 }

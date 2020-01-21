@@ -18,18 +18,26 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.game.Role"%>
-<%@page import="org.codedefenders.util.Paths"%>
-<%@page import="java.util.Optional"%>
-<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
-<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="java.util.Optional" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.Role" %>
+
+<%--
+    @param Integer gameId
+        The id of the game to be displayed.
+--%>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Game History"); %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
-    String pageTitle="Game History";
-
     MultiplayerGame game;
     {
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
@@ -45,59 +53,77 @@
         }
     }
 
-    int uid = ((Integer) session.getAttribute("uid"));
-    Role role = game.getRole(uid);
-%>
-
-<%-- Set request attributes for the components. --%>
-<%
-     /* playerFeedback and scoreboard */
-    request.setAttribute("game", game);
-
-    /* class_viewer */
     final GameClass cut = game.getCUT();
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
-    /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
-
-    /* test_accordion */
-    request.setAttribute("cut", cut);
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-
-    /* mutants_list */
-    request.setAttribute("mutantsAlive", game.getAliveMutants());
-    request.setAttribute("mutantsKilled", game.getKilledMutants());
-    request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
-    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-    request.setAttribute("markEquivalent", false);
-    request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", GameMode.PARTY);
-    request.setAttribute("gameId", game.getId());
-    int userId = ServletUtils.userId(request); // required for playerFeedback, too
-
-    /* game_highlighting */
-    request.setAttribute("codeDivSelector", "#cut-div");
-    // request.setAttribute("tests", game.getTests());
-    // request.setAttribute("mutants", game.getMutants());
-    request.setAttribute("showEquivalenceButton", false);
-    // request.setAttribute("gameType", GameMode.PARTY);
-//    request.setAttribute("gameId", game.getId());
+    Role role = game.getRole(login.getUserId());
 %>
-<%@ include file="/jsp/battleground/header_game.jsp" %>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+            game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+    mutantAccordion.setEnableFlagging(false);
+    mutantAccordion.setViewDiff(true);
+%>
+
+
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
+<%
+    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+    playerFeedback.setPlayerInfo(login.getUser(), role);
+%>
+
+
+<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
+<%
+    scoreboard.setGameId(game.getId());
+    scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+    scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+%>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
+
+<jsp:include page="/jsp/battleground/header_game.jsp"/>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
-<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Existing Mutants</h3>
-            <%@include file="../game_components/mutants_list.jsp"%>
+            <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
         <div id="tests-div">
@@ -108,9 +134,9 @@
 
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="../game_components/class_viewer.jsp"%>
-        <%@ include file="../game_components/game_highlighting.jsp" %>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
+        <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+        <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 </div>
 

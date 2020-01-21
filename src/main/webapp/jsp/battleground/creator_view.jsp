@@ -18,42 +18,59 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% { %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
 
-<%-- Set request attributes for the components. --%>
+<%--
+    @param MutliplayerGame game
+        The game to be displayed.
+--%>
+
 <%
-	/* class_viewer */
+	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 	final GameClass cut = game.getCUT();
-	request.setAttribute("className", cut.getBaseName());
-	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
-	/* test_accordion */
-	request.setAttribute("cut", cut);
-	request.setAttribute("mutants", game.getMutants());
-	request.setAttribute("tests", game.getTests());
-
-	/* mutants_list */
-	request.setAttribute("mutantsAlive", game.getAliveMutants());
-	request.setAttribute("mutantsKilled", game.getKilledMutants());
-	request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
-	request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-	request.setAttribute("markEquivalent", false);
-	request.setAttribute("viewDiff", true);
-	request.setAttribute("gameType", GameMode.PARTY);
-	request.setAttribute("gameId", game.getId());
-
-	/* game_highlighting */
-	request.setAttribute("codeDivSelector", "#cut-div");
-	// request.setAttribute("tests", game.getTests());
-	// request.setAttribute("mutants", game.getMutants());
-	request.setAttribute("showEquivalenceButton", false);
-	// request.setAttribute("gameType", GameMode.PARTY);
-    // request.setAttribute("gameId", game.getId());
-
-	/* mutant_explanation */
-	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 %>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+	classViewer.setClassCode(game.getCUT());
+	classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+	gameHighlighting.setGameData(game.getMutants(), game.getTests());
+	gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+	gameHighlighting.setEnableFlagging(false);
+	gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+	mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+			game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+	mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+	mutantAccordion.setEnableFlagging(false);
+	mutantAccordion.setViewDiff(true);
+%>
+
+
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
 
 </div> <%-- TODO move the whole div here after changing the header --%>
 
@@ -61,7 +78,7 @@
 	<div class="col-md-6">
 		<div id="mutants-div">
 			<h3>Existing Mutants</h3>
-			<%@include file="../game_components/mutants_list.jsp"%>
+			<jsp:include page="/jsp/game_components/mutants_list.jsp"/>
 		</div>
 
 		<div id="tests-div">
@@ -72,10 +89,8 @@
 
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
-		<%@include file="../game_components/class_viewer.jsp"%>
-		<%@ include file="../game_components/game_highlighting.jsp" %>
-		<%@include file="../game_components/mutant_explanation.jsp"%>
+		<jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+		<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+		<jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
 	</div>
 </div>
-
-<% } %>

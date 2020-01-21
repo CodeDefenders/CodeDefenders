@@ -18,14 +18,15 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%
-    String pageTitle = "Admin Puzzle Upload";
-%>
-<%@ include file="/jsp/header_main.jsp"%>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Admin Puzzle Upload"); %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
 	<% request.setAttribute("adminActivePage", "adminPuzzles"); %>
-	<%@ include file="/jsp/admin_navigation.jsp"%>
+	<jsp:include page="/jsp/admin_navigation.jsp"/>
 
 	<h3>Upload Puzzles</h3>
 

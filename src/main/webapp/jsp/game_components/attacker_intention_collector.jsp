@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.game.GameState" %>
+
 <script>
     var attackButton = document.getElementById('submitMutant');
     var theForm = document.getElementById('atk');
@@ -44,19 +46,19 @@
 
     // Create the attackDropDown
     var attackDropDown = document.createElement('div');
-    attackDropDown.setAttribute("id", "attackDropDown")
-    attackDropDown.setAttribute("class", "dropdown")
-    attackDropDown.setAttribute("style", "float: right; margin-right: 5px")
+    attackDropDown.setAttribute("id", "attackDropDown");
+    attackDropDown.setAttribute("class", "dropdown");
+    attackDropDown.setAttribute("style", "float: right; margin-right: 5px");
 
     var attackDropDownButton = document.createElement('button');
-    attackDropDownButton.setAttribute("type", "button")
-    attackDropDownButton.setAttribute("class", "btn btn-primary btn-game btn-right dropdown-toggle")
-    attackDropDownButton.setAttribute("data-toggle", "dropdown")
+    attackDropDownButton.setAttribute("type", "button");
+    attackDropDownButton.setAttribute("class", "btn btn-primary btn-game btn-right dropdown-toggle");
+    attackDropDownButton.setAttribute("data-toggle", "dropdown");
     // Note the ID !
-    attackDropDownButton.setAttribute("id", "submitMutantTemp" )
-    attackDropDownButton.setAttribute("form", "atk" )
-    attackDropDownButton.setAttribute("aria-haspopup", "true" )
-    attackDropDownButton.setAttribute("aria-expanded", "false" )
+    attackDropDownButton.setAttribute("id", "submitMutantTemp" );
+    attackDropDownButton.setAttribute("form", "atk");
+    attackDropDownButton.setAttribute("aria-haspopup", "true");
+    attackDropDownButton.setAttribute("aria-expanded", "false");
     attackDropDownButton.innerHTML="Attack <span class=\"glyphicon glyphicon-triangle-bottom\" style=\"font-size: small\"/></span>";
     //
     attackDropDown.appendChild(attackDropDownButton)
@@ -69,7 +71,7 @@
     originalAttachButton.parentNode.replaceChild(attackDropDown, originalAttachButton);
 
     // Finally we adjust the id of the submitMutantTemp button
-    attackDropDownButton.setAttribute("id", "submitMutant")
+    attackDropDownButton.setAttribute("id", "submitMutant");
 
     // create <ul> element containing list of intention options
     var intentionList = document.createElement('ul');

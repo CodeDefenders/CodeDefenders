@@ -19,6 +19,9 @@
 package org.codedefenders.servlets.games.battleground;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.IntentionDAO;
@@ -96,9 +99,6 @@ import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
@@ -131,10 +131,19 @@ public class MultiplayerGameManager extends HttpServlet {
     private TestSmellsDAO testSmellsDAO;
 
     @Inject
-    INotificationService notificationService;
+    private ITestCaseSelector regressionTestCaseSelector;
 
     @Inject
-    private ITestCaseSelector regressionTestCaseSelector;
+    private INotificationService notificationService;
+
+    @Inject
+    private MessagesBean messages;
+
+    @Inject
+    private LoginBean login;
+
+    @Inject
+    private PreviousSubmissionBean previousSubmission;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -152,11 +161,10 @@ public class MultiplayerGameManager extends HttpServlet {
             response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
             return;
         }
-        int userId = ServletUtils.userId(request);
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
+        int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
-        if (playerId == -1 && game.getCreatorId() != userId) {
-            logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
+        if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
+            logger.info("User {} not part of game {}. Aborting request.", login.getUserId(), gameId);
             response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
             return;
         }
@@ -214,8 +222,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             case "reset": {
-                final HttpSession session = request.getSession();
-                session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+                previousSubmission.clear();
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -298,14 +305,10 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @SuppressWarnings("Duplicates")
     private void createTest(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
-        final int userId = ServletUtils.userId(request);
-
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
-        if (game.getRole(userId) != Role.DEFENDER) {
+        if (game.getRole(login.getUserId()) != Role.DEFENDER) {
             messages.add("Can only submit tests if you are an Defender!");
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -319,7 +322,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> test = ServletUtils.getStringParameter(request, "test");
         if (!test.isPresent()) {
-            session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
+            previousSubmission.clearTest();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -327,7 +330,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         TestSubmittedEvent tse = new TestSubmittedEvent();
         tse.setGameId(gameId);
-        tse.setUserId(userId);
+        tse.setUserId(login.getUserId());
         notificationService.post(tse);
 
         // Do the validation even before creating the mutant
@@ -337,14 +340,14 @@ public class MultiplayerGameManager extends HttpServlet {
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(gameId);
-        tve.setUserId(userId);
+        tve.setUserId(login.getUserId());
         tve.setSuccess(validationSuccess);
         tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.addAll(validationMessage);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            messages.getBridge().addAll(validationMessage);
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -352,10 +355,10 @@ public class MultiplayerGameManager extends HttpServlet {
         // From this point on we assume that test is valid according to the rules (but it might still not compile)
         Test newTest;
         try {
-            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR);
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(), MODE_BATTLEGROUND_DIR);
         } catch (IOException io) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -407,13 +410,13 @@ public class MultiplayerGameManager extends HttpServlet {
             if (!validatedCoveredLines) { // || !validatedKilledMutants
                 messages.add(userIntentionsValidationMessage.toString());
                 // Keep the test around
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
         }
 
-        logger.debug("New Test {} by user {}", newTest.getId(), userId);
+        logger.debug("New Test {} by user {}", newTest.getId(), login.getUserId());
         TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
         if (game.isCapturePlayersIntention()) {
@@ -424,27 +427,27 @@ public class MultiplayerGameManager extends HttpServlet {
         }
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+            messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             // We escape the content of the message for new tests since user can embed there anything
             String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
-            session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
+            previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml);
             messages.add(decorate);
             //
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
         TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
             // testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
-            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -452,20 +455,20 @@ public class MultiplayerGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
         // Include Test Smells in the messages back to user
-        includeDetectTestSmellsInMessages(newTest, messages);
+        includeDetectTestSmellsInMessages(newTest);
 
-        final String message = UserDAO.getUserById(userId).getUsername() + " created a test";
+        final String message = login.getUser().getUsername() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        final Event notif = new Event(-1, gameId, userId, message, EventType.DEFENDER_TEST_CREATED, EventStatus.GAME, timestamp);
+        final Event notif = new Event(-1, gameId, login.getUserId(), message, EventType.DEFENDER_TEST_CREATED, EventStatus.GAME, timestamp);
         notif.insert();
 
-        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages.getBridge());
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
         TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
         ttme.setGameId(gameId);
-        ttme.setUserId(userId);
+        ttme.setUserId(login.getUserId());
         notificationService.post(ttme);
 
         // Clean up the session
@@ -484,7 +487,7 @@ public class MultiplayerGameManager extends HttpServlet {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // TODO may be not robust
-                errorLines.add( Integer.parseInt(m.group(1)));
+                errorLines.add(Integer.parseInt(m.group(1)));
             }
         }
         return errorLines;
@@ -515,14 +518,10 @@ public class MultiplayerGameManager extends HttpServlet {
 
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
-        final int userId = ServletUtils.userId(request);
-
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
-        if (game.getRole(userId) != Role.ATTACKER) {
+        if (game.getRole(login.getUserId()) != Role.ATTACKER) {
             messages.add("Can only submit mutants if you are an Attacker!");
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -536,13 +535,13 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
         if (!mutant.isPresent()) {
-            session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+            previousSubmission.clearMutant();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
         final String mutantText = mutant.get();
 
-        int attackerID = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
+        int attackerID = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         // If the user has pending duels we cannot accept the mutant, but we keep it around
         // so students do not lose mutants once the duel is solved.
@@ -550,14 +549,14 @@ public class MultiplayerGameManager extends HttpServlet {
                 && (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
             messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
             // Keep the mutant code in the view for later
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+            previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
 
         MutantSubmittedEvent mse = new MutantSubmittedEvent();
         mse.setGameId(gameId);
-        mse.setUserId(userId);
+        mse.setUserId(login.getUserId());
         notificationService.post(mse);
 
         // Do the validation even before creating the mutant
@@ -567,7 +566,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         MutantValidatedEvent mve = new MutantValidatedEvent();
         mve.setGameId(gameId);
-        mve.setUserId(userId);
+        mve.setUserId(login.getUserId());
         mve.setSuccess(validationSuccess);
         notificationService.post(mve);
 
@@ -583,7 +582,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
         mdce.setGameId(gameId);
-        mdce.setUserId(userId);
+        mdce.setUserId(login.getUserId());
         mdce.setSuccess(duplicateCheckSuccess);
         mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
         notificationService.post(mdce);
@@ -595,16 +594,16 @@ public class MultiplayerGameManager extends HttpServlet {
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
                 messages.add(existingMutantTarget.message);
             }
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+            previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
 
-        Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_BATTLEGROUND_DIR);
+        Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, login.getUserId(), MODE_BATTLEGROUND_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
-            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}", gameId, game.getClassId(), userId, mutantText);
+            previousSubmission.setMutantCode(mutantText);
+            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}", gameId, game.getClassId(), login.getUserId(), mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -620,13 +619,13 @@ public class MultiplayerGameManager extends HttpServlet {
 
         MutantCompiledEvent mce = new MutantCompiledEvent();
         mce.setGameId(gameId);
-        mce.setUserId(userId);
+        mce.setUserId(login.getUserId());
         mce.setMutantId(newMutant.getId());
         mce.setSuccess(compileSuccess);
         mce.setErrorMessage(errorMessage);
 
         if (!compileSuccess) {
-            messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
+            messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
             // There's a ton of defensive programming here...
             if (errorMessage != null) {
                 // We escape the content of the message for new tests since user can embed there anything
@@ -634,28 +633,28 @@ public class MultiplayerGameManager extends HttpServlet {
                 // Extract the line numbers of the errors
                 List<Integer> errorLines = extractErrorLines(errorMessage);
                 // Store them in the session so they can be picked up later
-                session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
+                previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml);
                 messages.add(decorate);
 
             }
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+            previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
 
         messages.add(MUTANT_COMPILED_MESSAGE);
-        final String notificationMsg = UserDAO.getUserById(userId).getUsername() + " created a mutant.";
-        Event notif = new Event(-1, gameId, userId, notificationMsg, EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
+        final String notificationMsg = login.getUser().getUsername() + " created a mutant.";
+        Event notif = new Event(-1, gameId, login.getUserId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
-        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
         mte.setGameId(gameId);
-        mte.setUserId(userId);
+        mte.setUserId(login.getUserId());
         mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
@@ -664,28 +663,24 @@ public class MultiplayerGameManager extends HttpServlet {
             // This parameter is required !
             if (intention == null) {
                 messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+                previousSubmission.setMutantCode(mutantText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
             collectAttackerIntentions(newMutant, intention);
         }
         // Clean the mutated code only if mutant is accepted
-        session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+        previousSubmission.clearMutant();
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
 
     @SuppressWarnings("Duplicates")
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
-        final int userId = ServletUtils.userId(request);
-
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
-        if (game.getRole(userId) != Role.ATTACKER) {
+        if (game.getRole(login.getUserId()) != Role.ATTACKER) {
             messages.add("Can only resolve equivalence duels if you are an Attacker!");
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -708,23 +703,20 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             int mutantId = equivMutantId.get();
-            int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
+            int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
             List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
             for (Mutant m : mutantsPending) {
                 if (m.getId() == mutantId && m.getPlayerId() == playerId) {
-                    User eventUser = UserDAO.getUserById(userId);
-
-
                     // Here we check if the accepted equivalence is "possibly" equivalent
-                    boolean isMutantKillable = isMutantKillableByOtherTests( m );
+                    boolean isMutantKillable = isMutantKillableByOtherTests(m);
 
                     String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
-                    String notification = eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.";
+                    String notification = login.getUser().getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.";
                     if (isMutantKillable) {
                         logger.warn("Mutant {} was accepted as equivalence but it is killable", m);
-                        message = message + " " + " However, the mutant was killable !";
-                        notification = notification + " " + " However, the mutant was killable !";
+                        message = message + " " + " However, the mutant was killable!";
+                        notification = notification + " " + " However, the mutant was killable!";
                     }
 
                     // At this point we where not able to kill the mutant will all the covering tests on the same class from different games
@@ -735,7 +727,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // Notify the attacker
                     Event notifEquiv = new Event(-1, game.getId(),
-                            userId,
+                            login.getUserId(),
                             notification,
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
@@ -744,7 +736,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
                         int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
-                        notification = eventUser.getUsername() + " accepts that the mutant " + m.getId()
+                        notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
                         Event notifDefenderEquiv = new Event(-1, game.getId(), defenderId, notification,
                                 EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
@@ -758,13 +750,13 @@ public class MultiplayerGameManager extends HttpServlet {
                 }
             }
 
-            logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.", userId, mutantId);
+            logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.", login.getUserId(), mutantId);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
         } else if (handleRejectEquivalence) {
             // Reject equivalence and submit killing test case
             final Optional<String> test = ServletUtils.getStringParameter(request, "test");
             if (!test.isPresent()) {
-                session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
+                previousSubmission.clearTest();
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -772,7 +764,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             TestSubmittedEvent tse = new TestSubmittedEvent();
             tse.setGameId(gameId);
-            tse.setUserId(userId);
+            tse.setUserId(login.getUserId());
             notificationService.post(tse);
 
             // TODO Duplicate code here !
@@ -784,14 +776,14 @@ public class MultiplayerGameManager extends HttpServlet {
 
             TestValidatedEvent tve = new TestValidatedEvent();
             tve.setGameId(gameId);
-            tve.setUserId(userId);
+            tve.setUserId(login.getUserId());
             tve.setSuccess(validationSuccess);
             tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.addAll(validationMessage);
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                messages.getBridge().addAll(validationMessage);
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -799,10 +791,10 @@ public class MultiplayerGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             Test newTest;
             try {
-                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR);
+                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, login.getUserId(), MODE_BATTLEGROUND_DIR);
             } catch (IOException io) {
                 messages.add(TEST_GENERIC_ERROR_MESSAGE);
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -811,7 +803,7 @@ public class MultiplayerGameManager extends HttpServlet {
             final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
             if (!equivMutantId.isPresent()) {
                 logger.info("Missing equivMutantId parameter.");
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -822,11 +814,11 @@ public class MultiplayerGameManager extends HttpServlet {
 
             if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
                 logger.debug("compileTestTarget: " + compileTestTarget);
-                messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+                messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
                 if (compileTestTarget != null) {
                     messages.add(compileTestTarget.message);
                 }
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -834,9 +826,9 @@ public class MultiplayerGameManager extends HttpServlet {
             if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
                 //  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
                 logger.debug("testOriginalTarget: " + testOriginalTarget);
-                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
                 messages.add(testOriginalTarget.message);
-                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -855,8 +847,8 @@ public class MultiplayerGameManager extends HttpServlet {
 
                 if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-                    final String message = UserDAO.getUserById(userId).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
-                    Event notif = new Event(-1, gameId, userId, message, EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+                    final String message = login.getUser().getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
+                    Event notif = new Event(-1, gameId, login.getUserId(), message, EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     notif.insert();
                     if (mPending.getId() == mutantId) {
@@ -869,18 +861,18 @@ public class MultiplayerGameManager extends HttpServlet {
                     if (mPending.getId() == mutantId) {
                         // Here we check if the accepted equivalence is "possibly" equivalent
                         isMutantKillable = isMutantKillableByOtherTests( mPending );
-                        String notification = UserDAO.getUserById(userId).getUsername() +
+                        String notification = login.getUser().getUsername() +
                                 " lost an equivalence duel. Mutant " + mPending.getId() +
                                 " is assumed equivalent.";
 
                         if (isMutantKillable) {
-                            notification = notification + " " + "However, the mutant was killable !";
+                            notification = notification + " " + "However, the mutant was killable!";
                         }
 
                         // only kill the one mutant that was claimed
                         mPending.kill(ASSUMED_YES);
 
-                        Event notif = new Event(-1, gameId, userId, notification,
+                        Event notif = new Event(-1, gameId, login.getUserId(), notification,
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
                         notif.insert();
@@ -896,7 +888,7 @@ public class MultiplayerGameManager extends HttpServlet {
             } else {
                 String message = TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
                 if (isMutantKillable) {
-                    message = message + " " + "Unfortunately, the mutant was killable !";
+                    message = message + " " + "Unfortunately, the mutant was killable!";
                 }
                 messages.add(message);
             }
@@ -909,7 +901,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
             ttme.setGameId(gameId);
-            ttme.setUserId(userId);
+            ttme.setUserId(login.getUserId());
             ttme.setTestId(newTest.getId());
             notificationService.post(ttme);
 
@@ -924,14 +916,9 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
-        final int userId = ServletUtils.userId(request);
-
         final String contextPath = ctx(request);
-        final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
-        Role role = game.getRole(userId);
+        Role role = game.getRole(login.getUserId());
 
         if (role != Role.DEFENDER) {
             messages.add("Can only claim mutant as equivalent if you are a Defender!");
@@ -954,7 +941,7 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
+        int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
         AtomicInteger claimedMutants = new AtomicInteger();
         AtomicBoolean noneCovered = new AtomicBoolean(true);
         List<Mutant> mutantsAlive = game.getAliveMutants();
@@ -991,9 +978,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
         int nClaimed = claimedMutants.get();
         if (nClaimed > 0) {
-            String flaggingChatMessage = UserDAO.getUserById(userId).getUsername() + " flagged "
+            String flaggingChatMessage = login.getUser().getUsername() + " flagged "
                     + nClaimed + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
-            Event event = new Event(-1, gameId, userId, flaggingChatMessage,
+            Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
                     EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                     new Timestamp(System.currentTimeMillis()));
             event.insert();
@@ -1024,7 +1011,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
     }
 
-    private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
+    private void includeDetectTestSmellsInMessages(Test newTest) {
         List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {

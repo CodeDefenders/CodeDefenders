@@ -18,10 +18,12 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.game.GameState"%>
+<%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.*" %>
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%--
     Puzzle game view for a defender. Retrieves the given puzzle game
@@ -31,68 +33,79 @@
         The puzzle game to be displayed.
 --%>
 
-<% String pageTitle = null; %>
-<%@ include file="/jsp/header_main.jsp" %>
-
-</div></div></div></div></div>
-
-<% { %>
-
-<%-- Set request attributes for the components. --%>
 <%
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     final GameClass cut = game.getCUT();
     final Puzzle puzzle = game.getPuzzle();
 
-    /* class_viewer */
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
-    /* test_editor */
-    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    if (previousTestCode != null) {
-        request.setAttribute("testCode", previousTestCode);
-    } else {
-        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
-    }
-    request.setAttribute("mockingEnabled", false);
-    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
-
-    /* test_accordion */
-    request.setAttribute("cut", cut);
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-
-    /* mutants_list */
-    request.setAttribute("mutantsAlive", game.getAliveMutants());
-    request.setAttribute("mutantsKilled", game.getKilledMutants());
-    request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
-    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-    request.setAttribute("markEquivalent", false);
-    request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", GameMode.PUZZLE);
-    request.setAttribute("gameId", game.getId());
-
-    /* game_highlighting */
-    request.setAttribute("codeDivSelector", "#cut-div");
-    // request.setAttribute("tests", game.getTests());
-    // request.setAttribute("mutants", game.getMutants());
-    request.setAttribute("showEquivalenceButton", true);
-    // request.setAttribute("gameType", GameMode.PUZZLE);
-    // request.setAttribute("gameId", game.getId());
-
-    /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
-
-    /* test_progressbar */
-    // request.setAttribute("gameId", game.getId());
-
     final String title = puzzle.getTitle();
     final String description = puzzle.getDescription();
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<%
+    testEditor.setEditableLinesForPuzzle(puzzle);
+    testEditor.setMockingEnabled(false);
+    if (previousSubmission.hasTest()) {
+        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
+        previousSubmission.clearTest();
+        previousSubmission.clearErrorLines(); // TODO: move this to error highlighting bean
+    } else {
+        testEditor.setTestCodeForClass(cut);
+    }
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(true);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+            game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+    mutantAccordion.setEnableFlagging(false);
+    mutantAccordion.setViewDiff(true);
+%>
+
+
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
+
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
+
+<jsp:include page="/jsp/header_main.jsp"/>
+</div></div></div></div></div>
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
@@ -105,13 +118,13 @@
     <div class="row" style="padding: 0px 15px;">
         <div class="col-md-6" id="cut-div">
             <h3>Class Under Test</h3>
-            <%@include file="../game_components/class_viewer.jsp" %>
-            <%@include file="../game_components/game_highlighting.jsp"%>
-            <%@include file="../game_components/mutant_explanation.jsp" %>
+            <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+            <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         </div>
 
         <div class="col-md-6" id="ut-div">
-            <%@include file="/jsp/game_components/push_test_progress_bar.jsp" %>
+            <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
             <h3>Write a new JUnit test here
                 <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
                         onClick="testProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
@@ -125,16 +138,16 @@
                 <input type="hidden" name="formType" value="createTest">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
 
-                <%@include file="../game_components/test_editor.jsp" %>
+                <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             </form>
-            <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
+            <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
         </div>
     </div>
 
     <div class="row" style="padding: 0px 15px;">
         <div class="col-md-6" id="mutants-div">
             <h3>Existing Mutants</h3>
-            <%@include file="../game_components/mutants_list.jsp" %>
+            <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
         <div class="col-md-6">
@@ -146,6 +159,4 @@
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<%@include file="../footer_game.jsp" %>
-
-<% } %>
+<%@ include file="/jsp/footer_game.jsp"%>

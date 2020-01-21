@@ -18,16 +18,17 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<% String pageTitle=null; %>
 
-<%@ include file="/jsp/header_main.jsp" %>
+<jsp:include page="/jsp/header_main.jsp"/>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
-	final UserInfo userInfo = ((UserInfo) request.getAttribute("userProfileInfo"));
     int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 %>
+
 <div>
     <div id="user-information-container">
         <h2>Profile Information</h2>
@@ -62,12 +63,12 @@
                 <div class="form-group row">
                     <label for="updatedEmail" class="col-sm-2 col-form-label">E-Mail</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="updatedEmail" name="updatedEmail" placeholder="<%=userInfo.getUser().getEmail()%>">
+                        <input type="email" class="form-control" id="updatedEmail" name="updatedEmail" placeholder="<%=login.getUser().getEmail()%>">
                     </div>
                 </div>
                 <div class="form-group row">
                     <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact" value="true"
-                        <%=userInfo.getUser().getAllowContact() ? "checked" : ""%>>
+                        <%=login.getUser().getAllowContact() ? "checked" : ""%>>
                     <label class="form-check-label" for="allowContact">
                         Allow us to contact your email address.
                     </label>

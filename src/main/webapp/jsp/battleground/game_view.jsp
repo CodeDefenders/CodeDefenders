@@ -18,27 +18,31 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% String pageTitle="In Game"; %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.GameLevel" %>
-<%@ page import="org.codedefenders.game.GameState" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-    int userId = ServletUtils.userId(request); // required for playerFeedback, too
-	Role role = game.getRole(userId); // required for header_game, too
+	Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
-<%-- Set request attributes for the components. --%>
+
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 <%
-    /* playerFeedback & game_notifications */
-    request.setAttribute("gameId", game.getId());
-    // playerId already set in servlet.
-    // request.setAttribute("playerId", playerId);
+    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+    playerFeedback.setPlayerInfo(login.getUser(), role);
 %>
-<%@ include file="/jsp/battleground/header_game.jsp" %>
+
+<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
+<%
+    scoreboard.setGameId(game.getId());
+    scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+    scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+%>
+
+<jsp:include page="/jsp/battleground/header_game.jsp"/>
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
@@ -48,30 +52,28 @@
 <%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
-<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <div class="crow fly no-gutter up">
 <%
-    messages = new ArrayList<>();
-    session.setAttribute("messages", messages);
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
 
     switch (role){
         case ATTACKER:
             if (openEquivalenceDuel) { %>
-                <%@ include file="/jsp/battleground/equivalence_view.jsp" %>
+                <jsp:include page="/jsp/battleground/equivalence_view.jsp"/>
             <% } else { %>
-                <%@ include file="/jsp/battleground/attacker_view.jsp" %>
+                <jsp:include page="/jsp/battleground/attacker_view.jsp"/>
             <% }
             break;
         case DEFENDER:
-            %><%@ include file="/jsp/battleground/defender_view.jsp" %>
+            %><jsp:include page="/jsp/battleground/defender_view.jsp"/>
             <%
             break;
         case OBSERVER:
-            %><%@ include file="/jsp/battleground/creator_view.jsp" %><%
+            %><jsp:include page="/jsp/battleground/creator_view.jsp"/><%
             break;
         default:
             response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);

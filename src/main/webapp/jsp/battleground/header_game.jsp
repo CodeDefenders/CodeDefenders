@@ -18,24 +18,29 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% pageTitle = null; %>
-<%@ include file="/jsp/header_main.jsp" %>
-</div></div></div></div></div>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
-    {
-        int gameId = (int) request.getAttribute("gameId");
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    Role role = game.getRole(login.getUserId());
+    int gameId = game.getId();
 %>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Game " + game.getId() + " (" + role.getFormattedString() + ")"); %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+</div></div></div></div></div>
 
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
-            <% String userRole = role.getFormattedString(); %>
-            <div><h2 style="margin-top: 7px"><%= "Game " + game.getId() + " (" + userRole + ")" %>
-            </h2></div>
-
-            <%  int userIdCurrent = ((Integer) session.getAttribute("uid"));
-                if (game.getCreatorId() == userIdCurrent) { %>
+            <% if (game.getCreatorId() == login.getUserId()) { %>
             <div class="admin-panel col-md-12">
                 <% if (game.getState() == GameState.ACTIVE) { %>
                 <form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
@@ -82,6 +87,3 @@
         </div>
     </nav>
     <div class="clear"></div>
-<%
-    }
-%>

@@ -18,13 +18,15 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.game.puzzle.PuzzleGame"%>
-<%@page import="org.codedefenders.database.PuzzleDAO"%>
-<%@page import="org.codedefenders.game.GameState"%>
+<%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
+<%@ page import="org.codedefenders.database.PuzzleDAO" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleChapter" %>
 <%@ page import="org.codedefenders.model.PuzzleChapterEntry" %>
 <%@ page import="org.codedefenders.model.PuzzleEntry" %>
-<% String pageTitle = null; %>
+<%@ page import="java.util.SortedSet" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%--
     Displays all puzzles for a user. Puzzles may link to active puzzle games
@@ -37,8 +39,7 @@
 
 --%>
 <!doctype html>
-<%@ include file="/jsp/header_main.jsp"
-%>
+<jsp:include page="/jsp/header_main.jsp"/>
 <%
 {
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
@@ -79,10 +80,9 @@
                                href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
                                 data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
                             <%
-                        }else if( ! puzzleEntry.isLocked() ){
+                        } else if(!puzzleEntry.isLocked()) {
                             final int puzzleId = puzzleEntry.getPuzzleId();
-                            final Integer userId = (Integer) request.getSession().getAttribute("uid");
-                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, userId);
+                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
                             String color = "btn-primary";
                             if (playedGame != null  && playedGame.getState().equals(GameState.SOLVED)) {
                                 color = "btn-success";
@@ -117,4 +117,4 @@
 <%
 }
 %>
-<%@include file="../footer.jsp" %>
+<%@include file="/jsp/footer.jsp" %>

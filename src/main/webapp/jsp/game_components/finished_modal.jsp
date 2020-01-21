@@ -18,34 +18,12 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
 
 <%--
     Shows a modal, which indicates that a game is finished.
-
-    @param Boolean win
-        Indicates that the player won.
-    @param Boolean loss
-        Indicates that the player lost.
 --%>
 
-<% { %>
-
-<%
-    Boolean win = (Boolean) request.getAttribute("win");
-    Boolean loss = (Boolean) request.getAttribute("loss");
-%>
-
-<%
-    String message;
-    if (win) {
-        message = Constants.WINNER_MESSAGE;
-    } else if (loss) {
-        message = Constants.LOSER_MESSAGE;
-    } else {
-        message = Constants.DRAW_MESSAGE;
-    }
-%>
+<jsp:useBean id="finishedModal" class="org.codedefenders.beans.game.FinishedModalBean" scope="request"/>
 
 <div id="finishedModal" class="modal fade">
     <div class="modal-dialog">
@@ -55,7 +33,7 @@
                 <h4 class="modal-title">Game Over</h4>
             </div>
             <div class="modal-body">
-                <p><%= message %></p>
+                <p>${finishedModal.message}</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
@@ -67,5 +45,3 @@
 <script>
     $('#finishedModal').modal('show');
 </script>
-
-<% } %>

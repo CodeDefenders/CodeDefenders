@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.KillmapDAO;
@@ -37,17 +38,19 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @WebServlet("/admin/monitor")
 public class AdminMonitorGames extends HttpServlet {
+
+    @Inject
+    private MessagesBean messages;
 
     private MultiplayerGame mg;
 
@@ -56,16 +59,10 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        HttpSession session = request.getSession();
-        // Get their user id from the session.
-        ArrayList<String> messages = new ArrayList<String>();
-        session.setAttribute("messages", messages);
-
         switch (request.getParameter("formType")) {
 
             case "startStopGame":
-                startStopGame(request, response, messages);
+                startStopGame(request, response);
                 break;
             default:
                 System.err.println("Action not recognised");
@@ -75,7 +72,7 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
 
-    private void startStopGame(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages) throws IOException {
+    private void startStopGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String playerToRemoveIdGameIdString = request.getParameter("activeGameUserRemoveButton");
         String playerToSwitchIdGameIdString = request.getParameter("activeGameUserSwitchButton");
         boolean switchUser = playerToSwitchIdGameIdString != null;
@@ -83,9 +80,9 @@ public class AdminMonitorGames extends HttpServlet {
             int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
             int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
             int userId = UserDAO.getUserForPlayer(playerToRemoveId).getId();
-            if (!deletePlayer(playerToRemoveId, gameToRemoveFromId))
+            if (!deletePlayer(playerToRemoveId, gameToRemoveFromId)) {
                 messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
-            else if (switchUser) {
+            } else if (switchUser) {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
                 mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
@@ -98,7 +95,7 @@ public class AdminMonitorGames extends HttpServlet {
             String[] selectedGames = request.getParameterValues("selectedGames");
             String gameSelectedViaPlayButton = request.getParameter("start_stop_btn");
 
-            if (selectedGames == null || gameSelectedViaPlayButton != null ) {
+            if (selectedGames == null || gameSelectedViaPlayButton != null) {
                 // admin is starting or stopping a single game
                 int gameId = -1;
                 // Get the identifying information required to create a game from the submitted form.
@@ -127,7 +124,7 @@ public class AdminMonitorGames extends HttpServlet {
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob( new KillMapJob(KillMapType.GAME, gameId));
+                            KillmapDAO.enqueueJob(new KillMapJob(KillMapType.GAME, gameId));
                         }
                     }
                 }

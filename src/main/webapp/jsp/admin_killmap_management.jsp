@@ -25,8 +25,7 @@
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 
-<% String pageTitle = null; %>
-<%@ include file="/jsp/header_main.jsp" %>
+<jsp:include page="/jsp/header_main.jsp"/>
 
 <%
     /* The current page. There are three pages:
@@ -49,7 +48,7 @@
 
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminKillMaps"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <div class="panel panel-default" style="margin-top: 25px;">
         <div class="panel-body">

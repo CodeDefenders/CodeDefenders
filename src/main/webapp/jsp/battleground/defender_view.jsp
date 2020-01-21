@@ -18,72 +18,99 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
-<% { %>
+<%--
+    @param MutliplayerGame game
+        The game to be displayed.
+--%>
 
-<%-- Set request attributes for the components. --%>
 <%
-    /* class_viewer */
+	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
-    /* test_editor */
-    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-    
-    if (previousTestCode != null) {
-        request.setAttribute("testCode", previousTestCode);
-        /* error_highlighting */
-        request.setAttribute("codeDivSelectorForError", "#utest-div");
-        request.setAttribute("errorLines", errorLines);
-    } else {
-        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
-    }
-    request.setAttribute("mockingEnabled", cut.isMockingEnabled());
-    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
-
-    /* test_accordion */
-    request.setAttribute("cut", cut);
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-
-    /* mutants_list */
-    request.setAttribute("mutantsAlive", game.getAliveMutants());
-    request.setAttribute("mutantsKilled", game.getKilledMutants());
-    request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
-    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-    request.setAttribute("markEquivalent", true);
-    request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
-    request.setAttribute("gameType", GameMode.PARTY);
-    request.setAttribute("gameId", game.getId());
-
-    /* game_highlighting */
-    request.setAttribute("codeDivSelector", "#cut-div");
-    // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-    request.setAttribute("showEquivalenceButton", true);
-    // request.setAttribute("gameType", GameMode.PARTY);
-    // request.setAttribute("gameId", game.getId());
-
-    /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
-
-    /* test_progressbar */
-    // request.setAttribute("gameId", game.getId());
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<%
+    testEditor.setEditableLinesForClass(cut);
+    testEditor.setMockingEnabled(cut.isMockingEnabled());
+    if (previousSubmission.hasTest()) {
+        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
+        previousSubmission.clearTest();
+    } else {
+        testEditor.setTestCodeForClass(cut);
+    }
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(true);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<%
+    errorHighlighting.setCodeDivSelector("#utest-div");
+    if (previousSubmission.hasErrorLines()) {
+        errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+        previousSubmission.clearErrorLines();
+    }
+%>
+
+
+<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
+<%
+    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+            game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+    mutantAccordion.setEnableFlagging(true);
+    mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
+%>
+
+
+<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+<% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
+
+
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="../game_components/class_viewer.jsp"%>
-        <%@include file="../game_components/game_highlighting.jsp" %>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
+        <jsp:include page="../game_components/class_viewer.jsp"/>
+        <jsp:include page="../game_components/game_highlighting.jsp"/>
+        <jsp:include page="../game_components/mutant_explanation.jsp"/>
     </div>
 
     <div class="col-md-6" id="utest-div">
@@ -97,13 +124,13 @@
             </button>
         </h3>
 
-        <form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return false;">
-            <%@include file="../game_components/test_editor.jsp"%>
+            <form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
+            <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             <input type="hidden" name="formType" value="createTest">
             <input type="hidden" name="gameId" value="<%= game.getId() %>" />
         </form>
-        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
-        <%@include file="../game_components/error_highlighting.jsp" %>
+        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
+        <jsp:include page="/jsp/game_components/error_highlighting.jsp"/>
     </div>
 </div>
 
@@ -112,7 +139,7 @@
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6" id="mutants-div">
         <h3>Existing Mutants</h3>
-        <%@include file="../game_components/mutants_list.jsp"%>
+        <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
     </div>
 
     <div class="col-md-6">
@@ -122,5 +149,3 @@
 </div>
 
 <div>
-
-<% } %>

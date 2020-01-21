@@ -18,11 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title><%= pageTitle != null ? pageTitle : "Code Defenders" %></title>
+    <title>${pageInfo.pageTitle}</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -190,15 +193,3 @@
 </head>
 
 <body class="page-grid">
-<%@ page import="java.util.*" %>
-<%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
-<%@ page import="org.codedefenders.game.Role" %>
-<%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="org.codedefenders.util.Paths" %>

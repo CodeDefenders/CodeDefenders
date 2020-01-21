@@ -18,27 +18,25 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
-<%@page import="org.codedefenders.model.Player"%>
-<%@page import="java.util.List"%>
-<%@page import="org.codedefenders.util.Constants"%>
-<%@page import="org.codedefenders.database.TestDAO"%>
-<%@page import="org.codedefenders.database.MutantDAO"%>
+<%@ page import="org.codedefenders.model.Player" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.database.TestDAO" %>
+<%@ page import="org.codedefenders.database.MutantDAO" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="org.codedefenders.model.User" %>
-<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.Map" %>
+
+<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
 <%
-
-
-    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-
-    HashMap mutantScores = game.getMutantScores();
-    HashMap testScores = game.getTestScores();
+    Map<Integer, PlayerScore> mutantScores = scoreboard.getMutantsScores();
+    Map<Integer, PlayerScore> testScores = scoreboard.getTestScores();
 
     // Those return the PlayerID not the UserID
-    final List<Player> attackers = game.getAttackerPlayers();
-    final List<Player> defenders = game.getDefenderPlayers();
+    final List<Player> attackers = scoreboard.getAttackers();
+    final List<Player> defenders = scoreboard.getDefenders();
 %>
+
 <div id="scoreboard" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
     <div class="modal-dialog">
         <!-- Modal content-->
@@ -77,7 +75,7 @@
                         // Does system attacker submitted any mutant?
                         // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
                         // For system generated mutants,  mutant.playerID == userID, which is wrong...
-                        if(aUser.getId() == Constants.DUMMY_ATTACKER_USER_ID && MutantDAO.getMutantsByGameAndUser(game.getId(), aUser.getId()).isEmpty() ){
+                        if(aUser.getId() == Constants.DUMMY_ATTACKER_USER_ID && MutantDAO.getMutantsByGameAndUser(scoreboard.getGameId(), aUser.getId()).isEmpty() ){
                            continue;
                         }
 
@@ -178,10 +176,10 @@
                             // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
                             // XXX: Hardcoded id for system user
                             // TODO #418
-                            if(dUser.getId() == Constants.DUMMY_DEFENDER_USER_ID && TestDAO.getTestsForGameAndUser(game.getId(), dUser.getId()).isEmpty() ){
+                            if(dUser.getId() == Constants.DUMMY_DEFENDER_USER_ID && TestDAO.getTestsForGameAndUser(scoreboard.getGameId(), dUser.getId()).isEmpty() ){
                                 continue;
                              }
-                            
+
                             total = 0;
                     %>
                     <tr class="defender"><td>

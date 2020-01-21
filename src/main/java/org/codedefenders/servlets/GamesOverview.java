@@ -18,18 +18,19 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -52,14 +53,15 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/games/overview")
 public class GamesOverview extends HttpServlet {
 
+    @Inject
+    private LoginBean login;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final int userId = ServletUtils.userId(request);
-
-        List<UserMultiplayerGameInfo> activeGames = MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(userId);
+        List<UserMultiplayerGameInfo> activeGames = MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("activeGames", activeGames);
 
-        List<UserMultiplayerGameInfo> openGames = MultiplayerGameDAO.getOpenMultiplayerGamesWithInfoForUser(userId);
+        List<UserMultiplayerGameInfo> openGames = MultiplayerGameDAO.getOpenMultiplayerGamesWithInfoForUser(login.getUserId());
         request.setAttribute("openGames", openGames);
 
         boolean gamesJoinable = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();

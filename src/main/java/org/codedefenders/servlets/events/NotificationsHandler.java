@@ -20,9 +20,8 @@ package org.codedefenders.servlets.events;
 
 import com.google.gson.Gson;
 
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -37,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -58,6 +58,9 @@ public class NotificationsHandler extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(NotificationsHandler.class);
     private static final Gson gson = new Gson();
 
+    @Inject
+    private LoginBean login;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (!hasParameters(request)) {
@@ -68,18 +71,16 @@ public class NotificationsHandler extends HttpServlet {
         final HttpSession session = request.getSession();
         response.setContentType("application/json");
 
-        int userId = (int) session.getAttribute("uid");
-
         final NotificationType type = NotificationType.valueOf(request.getParameter("type"));
         switch (type) {
             case PUSHEVENT:
-                handlePushEventRequest(session, request, response, userId);
+                handlePushEventRequest(session, request, response);
                 break;
             case GAMEEVENT:
-                handleGameEventRequest(request, response, userId);
+                handleGameEventRequest(request, response);
                 break;
             case USEREVENT:
-                handleUserEventRequest(request, response, userId);
+                handleUserEventRequest(request, response);
                 break;
             default:
                 logger.error("Received request with wrong request type: " + type.name());
@@ -107,7 +108,7 @@ public class NotificationsHandler extends HttpServlet {
      * If parameters are valid, responds with a JSON list of most recent {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handlePushEventRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
+    private void handlePushEventRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String gameIdString = request.getParameter("gameId");
         if (gameIdString == null) {
             response.setStatus(400);
@@ -132,9 +133,8 @@ public class NotificationsHandler extends HttpServlet {
             session.setAttribute("lastMsg", lastMsg);
         }
 
-        final String username = UserDAO.getUserById(userId).getUsername();
         for (Event e : events) {
-            e.setCurrentUserName(username);
+            e.setCurrentUserName(login.getUser().getUsername());
             e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
@@ -152,7 +152,7 @@ public class NotificationsHandler extends HttpServlet {
      * If parameters are valid, responds with a JSON list of most recent game {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
+    private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String timestampString = request.getParameter("timestamp");
         if (timestampString == null) {
             response.setStatus(400);
@@ -182,12 +182,11 @@ public class NotificationsHandler extends HttpServlet {
             return;
         }
 
-        final Role role = DatabaseAccess.getRole(userId, gameId);
+        final Role role = DatabaseAccess.getRole(login.getUserId(), gameId);
         final ArrayList<Event> events = new ArrayList<>(DatabaseAccess.getNewEventsForGame(gameId, timestamp, role));
 
-        final String username = UserDAO.getUserById(userId).getUsername();
         for (Event e : events) {
-            e.setCurrentUserName(username);
+            e.setCurrentUserName(login.getUser().getUsername());
             e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
@@ -204,7 +203,7 @@ public class NotificationsHandler extends HttpServlet {
      * If parameters are valid, responds with a JSON list of most recent user {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
+    private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String timestampString = request.getParameter("timestamp");
         if (timestampString == null) {
             response.setStatus(400);
@@ -220,11 +219,10 @@ public class NotificationsHandler extends HttpServlet {
             return;
         }
 
-        final String username = UserDAO.getUserById(userId).getUsername();
         // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need for extra check
-        final List<Event> events = DatabaseAccess.getNewEventsForUser(userId, timestamp)
+        final List<Event> events = DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp)
                 .stream()
-                .peek(event -> event.setCurrentUserName(username))
+                .peek(event -> event.setCurrentUserName(login.getUser().getUsername()))
                 .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
                 .collect(Collectors.toList());
 

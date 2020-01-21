@@ -18,14 +18,11 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ include file="/jsp/header_base.jsp" %>
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#messages-div').delay(10000).fadeOut();
-    });
-</script>
+
+<jsp:include page="/jsp/header_base.jsp"/>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width">
         <div class="ws-12 container" style="text-align: right; clear:
@@ -54,10 +51,10 @@
             <!-- navigation bar -->
             <div id="bs-example-navbar-collapse-1" class="navbar-collapse collapse">
                 <ul class="crow no-gutter nav navbar-nav" style="display: flow-root; position: relative; z-index: 1000">
-                    <%if (!pageTitle.equals("Login")) {%>
+                    <% if (!request.getRequestURI().contains("login")) { %>
                     <li class="col-md-4"><a class="text-white button tab-link bg-minus-1"
                                                href="login" style="width:100%; margin-right: 80px">Login</a></li>
-                    <%}%>
+                    <% } %>
 
                     <li class="col-md-4"><a
                             class="text-white button tab-link bg-minus-1"
@@ -69,15 +66,5 @@
         </div>
     </div>
 </div>
-<%
-    ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
-    request.getSession().removeAttribute("messages");
-    if (messages != null && !messages.isEmpty()) {
-%>
-<div class="alert alert-info" id="messages-div">
-    <% for (String m : messages) { %>
-    <pre><strong><%=m%></strong></pre>
-    <% } %>
-    <script> $('#messages-div').delay(10000).fadeOut(); </script>
-</div>
-<% } %>
+
+<jsp:include page="/jsp/messages.jsp"/>

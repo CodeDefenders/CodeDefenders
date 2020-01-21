@@ -29,8 +29,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.notification.ITicketingService;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
@@ -39,6 +39,9 @@ import org.slf4j.LoggerFactory;
 @WebFilter(filterName = "TicketingFilter")
 public class TicketingFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(TicketingFilter.class);
+
+    @Inject
+    private LoginBean login;
 
     public static final String TICKET_REQUEST_ATTRIBUTE_NAME = "notification-ticket";
 
@@ -53,7 +56,6 @@ public class TicketingFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         HttpServletRequest httpReq = (HttpServletRequest) request;
-        HttpSession session = httpReq.getSession();
 
         /*
          * Either this request is an HTTP request AND the session has a valid userId,
@@ -72,14 +74,13 @@ public class TicketingFilter implements Filter {
             }
         } else {
             if (requiresTicket(httpReq)) {
-                Integer userId = (Integer) session.getAttribute("uid");
-                if (userId != null) {
+                if (login.isLoggedIn()) {
                     /*
                      * This is a valid HTTP request from LoginFilter, we decorate it with a new ticket.
                      */
-                    String ticket = ticketingService.generateTicketForOwner(userId);
+                    String ticket = ticketingService.generateTicketForOwner(login.getUserId());
                     request.setAttribute(TICKET_REQUEST_ATTRIBUTE_NAME, ticket);
-                    logger.debug("Registering ticket " + ticket + " for user " + userId
+                    logger.debug("Registering ticket " + ticket + " for user " + login.getUserId()
                             + " from " + httpReq.getRequestURI());
                 }
             }

@@ -18,10 +18,10 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.User;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -54,10 +55,14 @@ import static org.codedefenders.servlets.util.ServletUtils.ctx;
  */
 @WebServlet("")
 public class LandingPage extends HttpServlet {
+
+    @Inject
+    private LoginBean login;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        if (isUserLoggedIn(request)) {
+        if (login.isLoggedIn()) {
             // User logged in? Send him to the games overview.
             response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
         } else {
@@ -76,16 +81,5 @@ public class LandingPage extends HttpServlet {
 
             request.getRequestDispatcher(Constants.INDEX_JSP).forward(request, response);
         }
-    }
-
-    private boolean isUserLoggedIn(HttpServletRequest request) {
-        final Integer userId = (Integer) request.getSession().getAttribute("uid");
-        if (userId != null) {
-            final User user = UserDAO.getUserById(userId);
-            if (user != null && user.isActive()) {
-                return true;
-            }
-        }
-        return false;
     }
 }

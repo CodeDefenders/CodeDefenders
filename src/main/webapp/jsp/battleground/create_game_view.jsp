@@ -23,8 +23,15 @@
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<% String pageTitle = "Create Battleground"; %>
-<%@ include file="/jsp/header_main.jsp" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.game.Role" %>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Create Battleground"); %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <%
     List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
     boolean isClassUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();

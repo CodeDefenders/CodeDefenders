@@ -22,17 +22,18 @@
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="java.io.IOException" %>
-<% String pageTitle = "About CodeDefenders"; %>
+<%@ page import="java.util.Properties" %>
 
-<%
-    Object uid = request.getSession().getAttribute("uid");
-    Object username = request.getSession().getAttribute("username");
-    if (uid != null && username != null){
-%>
-<%@ include file="/jsp/header.jsp" %>
-<%} else {%>
-<%@ include file="/jsp/header_logout.jsp" %>
-<%}%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("About Code Defenders"); %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
+<% if (login.isLoggedIn()) { %>
+    <jsp:include page="/jsp/header.jsp"/>
+<% } else { %>
+    <jsp:include page="/jsp/header_logout.jsp"/>
+<% } %>
 
 <div class="container" style=" max-width: 50%; min-width: 25%; ">
     <h2 style="text-align: center">About CodeDefenders</h2>

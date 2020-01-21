@@ -18,13 +18,13 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +37,7 @@ import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -59,15 +60,16 @@ import javax.servlet.http.HttpServletResponse;
 public class PuzzleOverview extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleOverview.class);
 
+    @Inject
+    private LoginBean login;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final int userId = ServletUtils.userId(request);
-
-        final Set<PuzzleGame> activePuzzles = new HashSet<>(PuzzleDAO.getActivePuzzleGamesForUser(userId));
+        final Set<PuzzleGame> activePuzzles = new HashSet<>(PuzzleDAO.getActivePuzzleGamesForUser(login.getUserId()));
 
         final SortedSet<PuzzleChapterEntry> puzzles = PuzzleDAO.getPuzzleChapters()
                 .stream()
-                .map(toPuzzleChapterEntry(userId, activePuzzles))
+                .map(toPuzzleChapterEntry(login.getUserId(), activePuzzles))
                 .collect(Collectors.toCollection(TreeSet::new));
 
         request.setAttribute("puzzleChapterEntries", puzzles);

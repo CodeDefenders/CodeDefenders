@@ -19,45 +19,73 @@
 
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+
+<%--
+    @param MutliplayerGame game
+        The game to be displayed.
+    @param Mutant equivMutant
+        The mutant flagged as equivalent.
+    @param User equivDefender
+        The user that flagged the mutant.
+--%>
 
 <%
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     User equivDefender = (User) request.getAttribute("equivDefender");
-%>
 
-<%-- Set request attributes for the components. --%>
-<%
-    /* class_viewer */
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
-    request.setAttribute("className", cut.getBaseName());
-    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
-
-    /* test_editor */
-    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-    if (previousTestCode != null) {
-        request.setAttribute("testCode", previousTestCode);
-    } else {
-        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
-    }
-    request.setAttribute("mockingEnabled", cut.isMockingEnabled());
-    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
-
-    /* game_highlighting */
-    request.setAttribute("codeDivSelector", "#cut-div");
-    request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
-    request.setAttribute("showEquivalenceButton", false);
-    request.setAttribute("gameType", GameMode.PARTY);
-    request.setAttribute("gameId", game.getId());
-
-    /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
-
-    /* test_progressbar */
-//    request.setAttribute("gameId", game.getId());
 %>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+    classViewer.setClassCode(game.getCUT());
+    classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+
+<jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
+<%
+    testEditor.setEditableLinesForClass(cut);
+    testEditor.setMockingEnabled(cut.isMockingEnabled());
+    if (previousSubmission.hasTest()) {
+        testEditor.setPreviousTestCode(previousSubmission.getTestCode());
+    } else {
+        testEditor.setTestCodeForClass(cut);
+    }
+%>
+
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+    gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
+<% testProgressBar.setGameId(game.getId()); %>
+
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<%-- -------------------------------------------------------------------------------- --%>
+
 
 <div class="row">
     <div class="col-md-6" id="equivmut-div">
@@ -99,7 +127,7 @@
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
                 <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%= equivMutant.getId() %>">
 
-                <%@include file="../game_components/test_editor.jsp"%>
+                <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                 <button class="btn btn-danger btn-left" name="acceptEquivalent" type="submit"
                         onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
@@ -115,9 +143,9 @@
 
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="../game_components/class_viewer.jsp"%>
-        <%@include file="../game_components/game_highlighting.jsp"%>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
+        <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+        <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 
 </div>

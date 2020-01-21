@@ -18,18 +18,17 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% String pageTitle = "Help"; %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Help"); %>
 
-<%
-	Object uid = request.getSession().getAttribute("uid");
-	Object username = request.getSession().getAttribute("username");
-	if (uid != null && username != null){
-%>
-<%@ include file="/jsp/header.jsp" %>
-<%} else {%>
-<%@ include file="/jsp/header_logout.jsp" %>
-<%}%>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
+<% if (login.isLoggedIn()) { %>
+    <jsp:include page="/jsp/header.jsp"/>
+<% } else { %>
+    <jsp:include page="/jsp/header_logout.jsp"/>
+<% } %>
 
 <div class="container" id="help-main-div">
     <h1>Help</h1>

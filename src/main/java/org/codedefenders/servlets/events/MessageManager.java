@@ -18,13 +18,12 @@
  */
 package org.codedefenders.servlets.events;
 
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +31,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -47,8 +47,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet("/api/messages")
 public class MessageManager extends HttpServlet {
-
     private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);
+
+    @Inject
+    private LoginBean login;
 
     /**
      * Checks for a given request whether it holds the required parameters.
@@ -77,9 +79,8 @@ public class MessageManager extends HttpServlet {
             return;
         }
         int gameId = Integer.parseInt(request.getParameter("gameId"));
-        int userId = (int) request.getSession().getAttribute("uid");
 
-        final Role role = DatabaseAccess.getRole(userId, gameId);
+        final Role role = DatabaseAccess.getRole(login.getUserId(), gameId);
 
         EventType eventType = EventType.valueOf(request.getParameter("target"));
 
@@ -94,12 +95,11 @@ public class MessageManager extends HttpServlet {
                 }
             }
             final EventStatus status = EventStatus.GAME;
-            final User user = UserDAO.getUserById(userId);
             final String chatMessage = request.getParameter("message");
-            final String message = user.getUsername() + ": " + chatMessage;
+            final String message = login.getUser().getUsername() + ": " + chatMessage;
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-            final Event e = new Event(0, gameId, userId, message, eventType, status, timestamp);
+            final Event e = new Event(0, gameId, login.getUserId(), message, eventType, status, timestamp);
             e.setChatMessage(DatabaseAccess.sanitise(chatMessage));
 
             if (e.insert()) {

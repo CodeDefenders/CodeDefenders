@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2018 Code Defenders contributors
+    Copyright (C) 2016-2019 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -29,10 +29,9 @@
 <%--
     Adds a JavaScript function mutantProgressBar() that inserts and updates a progressbar showing the status of the last
     submitted mutant. The progressbar is inserted after #logout. It gets progressbar updates from the WebSocket.
-
-    @param Integer gameId
-        The id of the game.
 --%>
+
+<jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 
 <script>
     /* Wrap in a function so it has it's own scope. */
@@ -79,7 +78,7 @@
 
         const registerMutantProgressBar = function () {
             pushSocket.subscribe('<%=EventNames.toClientEventName(MutantProgressBarRegistrationEvent.class)%>', {
-                gameId: ${requestScope.gameId}
+                gameId: ${mutantProgressBar.gameId}
             });
 
             pushSocket.register('<%=EventNames.toServerEventName(MutantSubmittedEvent.class)%>', onMutantSubmitted);

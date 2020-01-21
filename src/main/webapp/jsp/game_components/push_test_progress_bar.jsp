@@ -29,10 +29,9 @@
 <%--
     Adds a JavaScript function testProgressBar() that inserts and updates a progressbar showing the status of the last
     submitted test. The progressbar is inserted after #logout. It gets progressbar updates from the WebSocket.
-
-    @param Integer gameId
-        The id of the game.
 --%>
+
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 
 <script>
     /* Wrap in a function so it has it's own scope. */
@@ -72,7 +71,7 @@
 
         const registerTestProgressBar = function () {
             pushSocket.subscribe('<%=EventNames.toClientEventName(TestProgressBarRegistrationEvent.class)%>', {
-                gameId: ${requestScope.gameId}
+                gameId: ${testProgressBar.gameId}
             });
 
             pushSocket.register('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>', onTestSubmitted);

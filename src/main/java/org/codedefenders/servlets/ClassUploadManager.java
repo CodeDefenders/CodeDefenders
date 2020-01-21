@@ -23,6 +23,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -34,7 +36,6 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.*;
 import org.codedefenders.model.Dependency;
@@ -69,10 +70,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.userId;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
@@ -89,6 +88,12 @@ public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
 
     @Inject
+    private MessagesBean messages;
+
+    @Inject
+    private LoginBean login;
+
+    @Inject
     private BackendExecutorService backend;
 
     private static List<String> reservedClassNames = Arrays.asList(
@@ -102,9 +107,6 @@ public class ClassUploadManager extends HttpServlet {
             RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.CLASS_UPLOAD_VIEW_JSP);
             dispatcher.forward(request, response);
         } else {
-            HttpSession session = request.getSession();
-            ArrayList<String> messages = new ArrayList<>();
-            session.setAttribute("messages", messages);
             messages.add("Class upload is disabled.");
             response.sendRedirect(ctx(request) + org.codedefenders.util.Paths.GAMES_OVERVIEW);
         }
@@ -115,14 +117,9 @@ public class ClassUploadManager extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final boolean classUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
         if (!classUploadEnabled) {
-            final int userId = userId(request);
-            logger.warn("User {} tried to upload a class, but class upload is disabled.", userId);
+            logger.warn("User {} tried to upload a class, but class upload is disabled.", login.getUserId());
             return;
         }
-
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         logger.debug("Uploading CUT");
 
@@ -469,7 +466,7 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         if (mutantsZipFile != null) {
-            final boolean failed = addMutants(request, response, messages, compiledClasses, cutId, cutFileName, cutDir, mutantsZipFile, dependencies);
+            final boolean failed = addMutants(request, response, compiledClasses, cutId, cutFileName, cutDir, mutantsZipFile, dependencies);
             if (failed) {
                 // tests zip failed and abort method has been called.
                 return;
@@ -477,7 +474,7 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         if (testsZipFile != null) {
-            final boolean failed = addTests(request, response, messages, compiledClasses, cutId, cutDir, cut, testsZipFile, dependencies);
+            final boolean failed = addTests(request, response, compiledClasses, cutId, cutDir, cut, testsZipFile, dependencies);
             if (failed) {
                 // tests zip failed and abort method has been called.
                 return;
@@ -523,7 +520,6 @@ public class ClassUploadManager extends HttpServlet {
      *
      * @param request         the request the mutants are added for.
      * @param response        the response to the request.
-     * @param messages        messages which will be shown to the user, which made the request.
      * @param compiledClasses a list of previously added CUT, tests and mutants,
      *                        which need to get cleaned up once something fails.
      * @param cutId           the identifier of the class under test.
@@ -535,7 +531,7 @@ public class ClassUploadManager extends HttpServlet {
      * @throws IOException when aborting the request fails.
      */
     @SuppressWarnings("Duplicates")
-    private boolean addMutants(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
+    private boolean addMutants(HttpServletRequest request, HttpServletResponse response,
                                List<CompiledClass> compiledClasses, int cutId, String cutFileName, Path cutDir,
                                SimpleFile mutantsZipFile, List<JavaFileObject> dependencies) throws IOException {
         boolean withDependencies = !dependencies.isEmpty();
@@ -658,7 +654,6 @@ public class ClassUploadManager extends HttpServlet {
      *
      * @param request         the request the tests are added for.
      * @param response        the response to the request.
-     * @param messages        messages which will be shown to the user, which made the request.
      * @param compiledClasses a list of previously added CUT, tests and mutants,
      *                        which need to get cleaned up once something fails.
      * @param cutId           the identifier of the class under test.
@@ -670,7 +665,7 @@ public class ClassUploadManager extends HttpServlet {
      * @throws IOException when aborting the request fails.
      */
     @SuppressWarnings("Duplicates")
-    private boolean addTests(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
+    private boolean addTests(HttpServletRequest request, HttpServletResponse response,
                              List<CompiledClass> compiledClasses, int cutId, Path cutDir, GameClass cut,
                              SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {
 

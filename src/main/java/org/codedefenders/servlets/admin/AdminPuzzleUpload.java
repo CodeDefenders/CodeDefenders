@@ -24,6 +24,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.installer.Installer;
 import org.codedefenders.servlets.util.Redirect;
@@ -34,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,7 +46,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * This {@link HttpServlet} handles admin upload of puzzles.
@@ -64,6 +63,9 @@ public class AdminPuzzleUpload extends HttpServlet {
 
     @Inject
     private BackendExecutorService backend;
+
+    @Inject
+    private MessagesBean messages;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -131,10 +133,6 @@ public class AdminPuzzleUpload extends HttpServlet {
 
     @SuppressWarnings("Duplicates")
     private void createPuzzles(HttpServletRequest request, List<FileItem> fileParameters) throws IOException {
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
-
         for (FileItem fileParameter : fileParameters) {
             final String fieldName = fileParameter.getFieldName();
             final String fileName = FilenameUtils.getName(fileParameter.getName());

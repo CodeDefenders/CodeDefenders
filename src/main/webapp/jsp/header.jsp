@@ -18,13 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 
-<%@ include file="/jsp/header_base.jsp" %>
+<jsp:include page="/jsp/header_base.jsp"/>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     boolean profileEnabled = UserProfileManager.checkEnabled();
@@ -143,7 +143,7 @@
                             data-toggle="dropdown" href="#"
                             style="width: 100%"><span class="glyphicon glyphicon-user"
                                                       aria-hidden="true"></span>
-                        <%=request.getSession().getAttribute("username")%>
+                        ${login.user.username}
                         (<span id="notificationCount"></span>)
                         <span class="glyphicon glyphicon-menu-hamburger" style="float: right; margin-left: 15px"></span></a>
                         <ul id="userDropDown" class="dropdown-menu"
@@ -183,29 +183,4 @@
 
 <jsp:include page="/jsp/game_components/progress_bar_common.jsp"/>
 
-<%
-    ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
-    request.getSession().removeAttribute("messages");
-    if (messages != null && !messages.isEmpty()) {
-%>
-<div class="alert alert-info" id="messages-div" style="width: 98.9vw">
-    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br/>
-    <%
-        boolean fadeOut = true;
-        for (String m : messages) { %>
-    <pre><strong><%=m%></strong></pre>
-    <%
-            if (m.equals(Constants.MUTANT_UNCOMPILABLE_MESSAGE)
-                    || m.equals(Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE)
-                    || m.equals(Constants.TEST_DID_NOT_COMPILE_MESSAGE)) {
-                fadeOut = false;
-            } else if (m.contains("Congratulations, your") && m.contains("solved the puzzle!")){
-                fadeOut = false;
-            }
-        }
-        if (fadeOut) {
-    %>
-    <script> $('#messages-div').delay(10000).fadeOut(); </script>
-    <% } %>
-</div>
-<% } %>
+<jsp:include page="/jsp/messages.jsp"/>

@@ -18,62 +18,62 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.servlets.util.ServletUtils"%>
 <%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
 <%@page import="org.codedefenders.util.Paths"%>
 <%@ page import="org.codedefenders.game.Role"%>
 <%@ page import="org.codedefenders.model.NotificationType"%>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
     {
-				int gameId = (Integer) request.getAttribute("gameId");
 				MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-				int userId = ServletUtils.userId(request); // required for playerFeedback, too
-				Role role = game.getRole(userId); // required for header_game, too
+				int gameId = game.getId();
+				Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
 <script>
     var receivedMessage = []
-    
+
     // Scroll down "a lot"
     var scrollToBottom = function(view){
     	view.scrollTop(1E10)
     }
-    
+
     var refreshTheChatWindows = function(sortedMessagesToDisplay){
-        
+
         var total = sortedMessagesToDisplay.length
 
         var gameView = $("#game-notifications-game").children("div.events")
         gameView.empty()
-        
+
         var attackView = $("#game-notifications-attackers").children("div.events")
         attackView.empty()
-        
+
         var defendView = $("#game-notifications-defenders").children("div.events")
         defendView.empty()
-        
+
         // Messages are sorted so we can render them on the fly
         for (var index = 0; index < total; index++) {
-        	
+
             if (sortedMessagesToDisplay[index].eventType == "DEFENDER_MESSAGE"){
             	defendView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
             	scrollToBottom(defendView);
-                                 
+
             } else if (sortedMessagesToDisplay[index].eventType == "ATTACKER_MESSAGE"){
             	attackView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
             	scrollToBottom(attackView);
-                
+
             } else {
             	gameView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
             	scrollToBottom(gameView);
             }
         }
-    } 
-    
+    }
+
     //If the user is logged in, start receiving notifications
     var updateGameNotifications = function(url) {
-    	
-        $.getJSON(url, 
+
+        $.getJSON(url,
         		function (r) {
             for (var i = 0; i < r.length; i++){
                 r[i].time = Date.parse(r[i].time);
@@ -83,9 +83,9 @@
             receivedMessage.sort(function (a, b) {
                 return a.time - b.time;
             });
-            
+
             refreshTheChatWindows( receivedMessage );
-            
+
         });
     };
 
@@ -133,7 +133,7 @@
 			$(r).each(function (index) {
 
 				// Skip messages that belong to the current user
-				if( r[index].userId == <%=request.getSession().getAttribute("uid")%> ){
+				if(r[index].userId == ${login.userId}){
 					return;
 				}
 				// Create the Div to host events if that's not there

@@ -20,8 +20,12 @@
 --%>
 <%@ page import="org.codedefenders.game.leaderboard.Leaderboard" %>
 <%@ page import="org.codedefenders.game.leaderboard.Entry" %>
-<% String pageTitle="Leaderboard"; %>
-<%@ include file="/jsp/header_main.jsp" %>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Leaderboard"); %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <div class="w-100">
 	<h3>Battlegrounds</h3>
 	<table id="tableMPLeaderboard" class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">

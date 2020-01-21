@@ -20,15 +20,16 @@
 --%>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
-<% String pageTitle = null; %>
-<%@ include file="/jsp/header_main.jsp" %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <%
     List<GameClassInfo> allClasses  = (List<GameClassInfo>) request.getAttribute("classInfos");
 %>
 
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminClasses"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <h3>Classes</h3>
     <div>

@@ -46,12 +46,13 @@
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 <%@ page import="org.codedefenders.notification.events.client.registration.RegistrationEvent" %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
     String name = request.getServerName();
     int port = request.getServerPort();
     String context = request.getContextPath();
     String ticket = (String) request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME);
-    int uid = (Integer) session.getAttribute("uid");
 %>
 
 <script type="text/javascript">
@@ -220,7 +221,7 @@
         }
     }
 
-    const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=uid%>";
+    const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=login.getUserId()%>";
     window.PushSocket = PushSocket;
     window.pushSocket = new PushSocket(wsUri);
 </script>

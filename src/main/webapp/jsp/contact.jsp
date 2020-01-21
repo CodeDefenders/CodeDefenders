@@ -20,17 +20,18 @@
 --%>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.*" %>
-<% String pageTitle = "Contact Us"; %>
 
-<%
-	Object uid = request.getSession().getAttribute("uid");
-	Object username = request.getSession().getAttribute("username");
-	if (uid != null && username != null){
-%>
-<%@ include file="/jsp/header.jsp" %>
-<%} else {%>
-<%@ include file="/jsp/header_logout.jsp" %>
-<%}%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Contact Us"); %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
+<% if (login.isLoggedIn()) { %>
+	<jsp:include page="/jsp/header.jsp"/>
+<% } else { %>
+	<jsp:include page="/jsp/header_logout.jsp"/>
+<% } %>
+
 <%
 	String result = (String)request.getSession().getAttribute("emailSent");
 	request.getSession().removeAttribute("emailSent");
