@@ -18,20 +18,21 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.codedefenders.database.DB.RSMapper;
 
 /**
  * This class handles the database logic for multiplayer games.
@@ -87,7 +88,55 @@ public class MultiplayerGameDAO {
                 .requiresValidation(requiresValidation)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
-                .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
+                .automaticMutantEquivalenceThreshold( automaticMutantEquivalenceThreshold )
+                .build();
+    }
+    
+    /**
+     * Constructs a {@link MeleeGame} from a {@link ResultSet} entry.
+     *
+     * @param rs The {@link ResultSet}.
+     * @return The constructed battleground game, or {@code null} if the game is no multiplayer game.
+     * @see RSMapper
+     */
+    static MeleeGame meleeGameFromRS(ResultSet rs) throws SQLException {
+        GameMode mode = GameMode.valueOf(rs.getString("Mode"));
+        if (mode != GameMode.MELEE) {
+            return null;
+        }
+        GameClass cut = GameClassDAO.gameClassFromRS(rs);
+        int id = rs.getInt("ID");
+        int classId = rs.getInt("Class_ID");
+        int creatorId = rs.getInt("Creator_ID");
+        GameState state = GameState.valueOf(rs.getString("State"));
+        GameLevel level = GameLevel.valueOf(rs.getString("Level"));
+        int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
+        boolean forceHamcrest = rs.getBoolean("ForceHamcrest");
+        boolean chatEnabled = rs.getBoolean("ChatEnabled");
+        CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
+        boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
+        boolean requiresValidation = rs.getBoolean("RequiresValidation");
+        float lineCoverage = rs.getFloat("Coverage_Goal");
+        float mutantCoverage = rs.getFloat("Mutant_Goal");
+        int defenderValue = rs.getInt("Defender_Value");
+        int attackerValue = rs.getInt("Attacker_Value");
+
+        int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
+
+        return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
+                .cut(cut)
+                .id(id)
+                .state(state)
+                .level(level)
+                .attackerValue(attackerValue)
+                .defenderValue(defenderValue)
+                .chatEnabled(chatEnabled)
+                .capturePlayersIntention(capturePlayersIntention)
+                .mutantValidatorLevel(mutantValidator)
+                .requiresValidation(requiresValidation)
+                .lineCoverage(lineCoverage)
+                .mutantCoverage(mutantCoverage)
+                .automaticMutantEquivalenceThreshold( automaticMutantEquivalenceThreshold )
                 .build();
     }
 
@@ -99,13 +148,23 @@ public class MultiplayerGameDAO {
      * @return The constructed battleground game information.
      * @see RSMapper
      */
-    static UserMultiplayerGameInfo openGameInfoFromRS(ResultSet rs) throws SQLException {
+    static UserMultiplayerGameInfo openMultiplayerGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
         final MultiplayerGame game = multiplayerGameFromRS(rs);
         final String creatorName = rs.getString("creatorName");
 
         return UserMultiplayerGameInfo.forOpen(userId, game, creatorName);
     }
+    
+    static UserMeleeGameInfo openMeleeGameInfoFromRS(ResultSet rs) throws SQLException {
+        final int userId = rs.getInt("userId");
+        final MeleeGame game = meleeGameFromRS(rs);
+        final String creatorName = rs.getString("creatorName");
+
+        return UserMeleeGameInfo.forOpen(userId, game, creatorName);
+    }
+    
+    
 
     /**
      * Constructs an active {@link UserMultiplayerGameInfo}, i.e. a game the user participates in,
@@ -115,7 +174,7 @@ public class MultiplayerGameDAO {
      * @return The constructed battleground game information.
      * @see RSMapper
      */
-    static UserMultiplayerGameInfo activeGameInfoFromRS(ResultSet rs) throws SQLException {
+    static UserMultiplayerGameInfo activeMultyPlayerGameInfoFromRS(ResultSet rs) throws SQLException {
         final int userId = rs.getInt("userId");
         final MultiplayerGame game = multiplayerGameFromRS(rs);
         final Role role = Role.valueOrNull(rs.getString("playerRole"));
@@ -123,6 +182,15 @@ public class MultiplayerGameDAO {
 
         return UserMultiplayerGameInfo.forActive(userId, game, role, creatorName);
     }
+    
+    static UserMeleeGameInfo activeMeleeGameInfoFromRS(ResultSet rs) throws SQLException {
+        final int userId = rs.getInt("userId");
+        final MeleeGame game = meleeGameFromRS(rs);
+        final String creatorName = rs.getString("creatorName");
+        final Role role = Role.valueOrNull(rs.getString("playerRole"));
+        return UserMeleeGameInfo.forActive(userId, game, (Role.OBSERVER.equals( role )), creatorName);
+    }
+    
 
     /**
      * Constructs an active {@link UserMultiplayerGameInfo}, i.e. a game the user did participate,
@@ -279,6 +347,19 @@ public class MultiplayerGameDAO {
 
         return DB.executeQueryReturnValue(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
+    
+    public static MeleeGame getMeleeGame(int gameId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM view_melee_games",
+                "WHERE ID=?;");
+
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(gameId)
+        };
+
+        return DB.executeQueryReturnValue(query, MultiplayerGameDAO::meleeGameFromRS, values);
+    }
 
     /**
      * Retrieves a list of all {@link MultiplayerGame MultiplayerGames} which are not finished, i.e. available.
@@ -322,9 +403,30 @@ public class MultiplayerGameDAO {
                 "    AND p.Active = TRUE)",
                 ";");
 
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::openGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::openMultiplayerGameInfoFromRS, DatabaseValue.of(userId));
     }
 
+    public static List<UserMeleeGameInfo> getOpenMeleeGamesWithInfoForUser(int userId) {
+        final String query = String.join("\n",
+                "SELECT DISTINCT g.*,",
+                "    u.User_ID AS `userId`,",
+                "    (SELECT creators.Username",
+                "       FROM view_valid_users creators",
+                "       WHERE g.Creator_ID = creators.User_ID) AS creatorName",
+                "FROM view_melee_games AS g,",
+                "    view_valid_users u",
+                "WHERE u.User_ID = ?",
+                "  AND (g.State = 'CREATED' OR g.State = 'ACTIVE')",
+                "  AND g.Creator_ID != u.User_ID",
+                "  AND g.ID NOT IN (SELECT ig.ID",
+                "    FROM games ig",
+                "    INNER JOIN players p ON ig.ID = p.Game_ID",
+                "    WHERE p.User_ID = u.User_ID",
+                "    AND p.Active = TRUE)",
+                ";");
+
+            return DB.executeQueryReturnList(query, MultiplayerGameDAO::openMeleeGameInfoFromRS, DatabaseValue.of(userId));
+    }
 
     /**
      * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} for games
@@ -352,9 +454,34 @@ public class MultiplayerGameDAO {
                 "    OR (cu.User_ID = p.User_ID AND p.Active = TRUE))",
                 "GROUP BY g.ID;");
 
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::activeGameInfoFromRS, DatabaseValue.of(userId));
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::activeMultyPlayerGameInfoFromRS, DatabaseValue.of(userId));
     }
 
+    public static List<UserMeleeGameInfo> getActiveMeleeGamesWithInfoForUser(int userId) {
+        final String query = String.join("\n",
+                "SELECT g.*,",
+                "  cu.User_ID as userId,",
+                "  IFNULL(p.Role, 'OBSERVER') as playerRole,",
+                "  vu.Username as creatorName",
+                //
+                "FROM view_melee_games g",
+                //
+                "INNER JOIN view_valid_users vu",
+                "ON g.Creator_ID = vu.User_ID",
+                "INNER JOIN view_valid_users cu",
+                "ON cu.User_ID = ?",
+                "LEFT JOIN players p",
+                "ON cu.User_ID = p.User_ID",
+                "AND g.ID = p.Game_ID",
+                "WHERE",
+                "  (g.State = 'CREATED' or g.State = 'ACTIVE')",
+                "   AND(cu.User_ID = g.Creator_ID",
+                "       OR (cu.User_ID = p.User_ID AND p.Active = TRUE))",
+                "GROUP BY g.ID");
+
+                return DB.executeQueryReturnList(query, MultiplayerGameDAO::activeMeleeGameInfoFromRS, DatabaseValue.of(userId));
+    }
+    
     /**
      * Retrieves a list of active {@link MultiplayerGame MultiplayerGames}, which are
      * played by a given user.
