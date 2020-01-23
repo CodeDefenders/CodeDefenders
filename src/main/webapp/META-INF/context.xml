@@ -13,6 +13,7 @@
 
             maxTotal="200"
             maxWaitMillis="1000"
+            maxIdle="0"
 
             driverClassName="com.mysql.cj.jdbc.Driver"
 
