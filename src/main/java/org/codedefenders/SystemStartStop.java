@@ -41,13 +41,13 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private ThreadPoolManager mgr;
 
+    /**
+     * This method is called when the servlet context is initialized(when
+     * the Web application is deployed). You can initialize servlet context
+     * related data here.
+     */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        /*
-         * This method is called when the servlet context is initialized(when
-         * the Web application is deployed). You can initialize servlet context
-         * related data here.
-         */
         try {
             ConnectionPool.instance();
             logger.info("Code Defenders started successfully.");
@@ -59,12 +59,12 @@ public class SystemStartStop implements ServletContextListener {
         mgr.register("test-executor").withMax(4).withCore(2).add();
     }
 
+    /**
+     * This method is invoked when the Servlet Context (the Web application)
+     * is undeployed or Application Server shuts down.
+     */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        /*
-         * This method is invoked when the Servlet Context (the Web application)
-         * is undeployed or Application Server shuts down.
-         */
         try {
             ConnectionPool.instance().closeDBConnections();
         } catch (Throwable e) {
