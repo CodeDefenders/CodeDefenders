@@ -54,6 +54,8 @@ public class Paths {
 
     public static final String PUZZLE_OVERVIEW = "/puzzles";
     public static final String PUZZLE_GAME = "/puzzlegame";
+    public static final String PUZZLE_GAME_SELECTION = "/puzzle/games";
+
 
     public static final String ADMIN_PAGE = "/admin";
     public static final String ADMIN_GAMES = "/admin/games";
@@ -63,6 +65,7 @@ public class Paths {
     public static final String ADMIN_SETTINGS = "/admin/settings";
     public static final String ADMIN_KILLMAPS = "/admin/killmaps";
 
+    public static final String ADMIN_PUZZLE_OVERVIEW = "/admin/puzzles";
     public static final String ADMIN_PUZZLE_MANAGEMENT = "/admin/puzzles/management";
     public static final String ADMIN_PUZZLE_UPLOAD = "/admin/puzzles/upload";
 

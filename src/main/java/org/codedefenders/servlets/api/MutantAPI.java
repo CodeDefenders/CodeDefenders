@@ -45,9 +45,8 @@ import javax.servlet.http.HttpServletResponse;
  * <p>Serves on path: {@code /api/mutant}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see org.codedefenders.util.Paths#API_MUTANT
  */
-@WebServlet("/api/mutant")
+@WebServlet(org.codedefenders.util.Paths.API_MUTANT)
 public class MutantAPI extends HttpServlet {
 
     @Override

@@ -52,10 +52,8 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
  * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
  *
  * <p>Serves on path: {@code /admin/users}.
- *
- * @see org.codedefenders.util.Paths#ADMIN_USERS
  */
-@WebServlet("/admin/users")
+@WebServlet(org.codedefenders.util.Paths.ADMIN_USERS)
 public class AdminUserManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminUserManagement.class);
 

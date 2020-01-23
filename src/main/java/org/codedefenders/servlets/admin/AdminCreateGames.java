@@ -40,6 +40,7 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ import javax.servlet.http.HttpSession;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
-@WebServlet(urlPatterns = {"/admin", "/admin/games"})
+@WebServlet(urlPatterns = {Paths.ADMIN_PAGE, Paths.ADMIN_GAMES})
 public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
 

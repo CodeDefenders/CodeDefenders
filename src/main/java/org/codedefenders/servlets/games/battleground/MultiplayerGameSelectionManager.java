@@ -87,10 +87,8 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
  * and entering {@link MultiplayerGame battleground games}.
  *
  * <p>Serves under {@code /multiplayer/games}.
- *
- * @see org.codedefenders.util.Paths#BATTLEGROUND_SELECTION
  */
-@WebServlet("/multiplayer/games")
+@WebServlet(org.codedefenders.util.Paths.BATTLEGROUND_SELECTION)
 public class MultiplayerGameSelectionManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameSelectionManager.class);
 

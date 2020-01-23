@@ -45,7 +45,7 @@ tomcat.path=...
 
 ### Installation script
 
-To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input. 
+To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input.
 
 ```bash
 cd installation
@@ -118,7 +118,7 @@ Since we use Docker containers which are not (yet) registered in any Docker publ
 mvn clean compile package war:war integration-test -PST
 ```
 
-This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). Finally, it runs all tests, which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for Code Defenders (one for the backend and on one for the front-end) and one docker instance for Selenium. 
+This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). Finally, it runs all tests, which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for Code Defenders (one for the backend and on one for the front-end) and one docker instance for Selenium.
 When containers are ready, the test code send the commands to the Selenium instance which must necessarily run on port 4444. When a test ends, all containers are disposed.
 
 There's few catches. Since we use selenium-standalone we can run ONLY one system test at the time. The alternative (not in place) is to start a selenium-hub.
@@ -149,9 +149,9 @@ docker-compose up
 
 This command will build the required containers by cloning the git repo and by invoking the expected maven commands. As a consequence, the first time you run docker-compose it might take a while.
 
-**Note** On the console, you will see outputs like: 
+**Note** On the console, you will see outputs like:
 ```
-db_1: mbind: Operation not allowed 
+db_1: mbind: Operation not allowed
 ```
 You can ignore them.
 

@@ -89,7 +89,7 @@ import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
  *
  * @see org.codedefenders.util.Paths#CLASS_UPLOAD
  */
-@WebServlet("/class-upload")
+@WebServlet(org.codedefenders.util.Paths.CLASS_UPLOAD)
 public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
 

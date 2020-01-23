@@ -49,11 +49,10 @@ import javax.servlet.http.HttpServletResponse;
  * This functionality may be disabled, e.g. in a class room setting. See {@link #checkEnabled()}.
  *
  * <p>Serves on path: {@code /profile}.
- * @see org.codedefenders.util.Paths#USER_PROFILE
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
-@WebServlet("/profile")
+@WebServlet(org.codedefenders.util.Paths.USER_PROFILE)
 public class UserProfileManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(UserProfileManager.class);
 

@@ -30,9 +30,8 @@ import javax.servlet.http.HttpServletResponse;
  * This servlet handles login out of Code Defenders.
  *
  * <p>Serves on path: {@code /logout}.
- * @see org.codedefenders.util.Paths#LOGOUT
  */
-@WebServlet("/logout")
+@WebServlet(org.codedefenders.util.Paths.LOGOUT)
 public class LogoutManager extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
