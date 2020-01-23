@@ -41,10 +41,6 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private ThreadPoolManager mgr;
 
-    // Public constructor is required by servlet spec
-    public SystemStartStop() {
-    }
-
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         /*
