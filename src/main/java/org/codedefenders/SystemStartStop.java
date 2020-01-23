@@ -65,9 +65,8 @@ public class SystemStartStop implements ServletContextListener {
          */
         try {
             ConnectionPool.instance().closeDBConnections();
-            logger.info("Code Defenders shut down successfully.");
         } catch (Throwable e) {
-            logger.error("Error in closing connections", e);
+            logger.error("Error in closing database connections", e);
         }
         // The ThreadPoolManager should be able to automatically stop the instances
     }
