@@ -20,7 +20,6 @@ package org.codedefenders;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.junit.Ignore;
@@ -41,13 +40,13 @@ import java.nio.file.Paths;
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 import static org.codedefenders.validation.code.CodeValidator.getMD5FromText;
 import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -65,7 +64,7 @@ public class CodeValidatorTest {
 	@Test
     public void changeInClassSignatureShouldTriggerValidation() {
         String originalCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -73,9 +72,9 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
-                + " public final class Test{"+ "\n" 
+                + " public final class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -83,16 +82,16 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
-        
+
         assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
-	
+
 	@Test
     public void noChangeInClassSignatureShouldNotTriggerValidation() {
         String originalCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -100,9 +99,9 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -110,14 +109,14 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
-        
+
         assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
-	
-	// TODO Not a good test with so many assert. This is 
-	@Test 
+
+	// TODO Not a good test with so many assert. This is
+	@Test
 	public void testVariousChangesToClassSignatureRelaxed(){
 	    CodeValidatorLevel level = CodeValidatorLevel.RELAXED;
 	    assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
@@ -130,8 +129,8 @@ public class CodeValidatorTest {
         //
         assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
 	}
-	
-	@Test 
+
+	@Test
     public void testVariousChangesToClassSignatureModerate(){
         CodeValidatorLevel level = CodeValidatorLevel.MODERATE;
         assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
@@ -142,8 +141,8 @@ public class CodeValidatorTest {
         //
         assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
     }
-	
-	@Test 
+
+	@Test
     public void testVariousChangesToClassSignatureStrict(){
         CodeValidatorLevel level = CodeValidatorLevel.STRICT;
         assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
@@ -154,14 +153,14 @@ public class CodeValidatorTest {
         //
         assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
     }
-	
-	
+
+
     @Test
     public void changeToPackageShouldTriggerValidation() {
         String originalCode = ""
                 + "package theoriginalpackage;"+ "\n"
                 + "\n"
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -169,11 +168,11 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
                 + "package anotherpackage;"+ "\n"
                 + "\n"
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -181,16 +180,16 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
-        
+
         assertEquals(MUTANT_VALIDATION_PACKAGE_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
-    
+
     @Test
     public void changeToEmptyPackageShouldTriggerValidation() {
         String originalCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -198,11 +197,11 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
                 + "package anotherpackage;"+ "\n"
                 + "\n"
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -210,9 +209,9 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
-        
+
         assertEquals(MUTANT_VALIDATION_PACKAGE_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
 
@@ -221,7 +220,7 @@ public class CodeValidatorTest {
         String originalCode = ""
                 + "package theoriginalpackage;"+ "\n"
                 + "\n"
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -229,11 +228,11 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
                 + "package theoriginalpackage;"+ "\n"
                 + "\n"
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -241,16 +240,16 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
-        
+
         assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
-    
+
     @Test
     public void sameEmptyPackageDeclarationShouldNotTriggerValidation() {
         String originalCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -258,9 +257,9 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -268,16 +267,16 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
-        
+
         assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
-    
+
 	@Test
     public void mutantChangeInstanceofUsingStrictCheckingTriggerValidation(){
         String originalCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -285,9 +284,9 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -295,16 +294,16 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
-        
+
         assertEquals(MUTANT_VALIDATION_LOGIC_INSTANCEOF, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
-	
+
 	@Test
     public void mutantMultipleChangesInstanceofUsingStrictCheckingTriggerValidation(){
         String originalCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Object ){"+ "\n"
@@ -318,9 +317,9 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -334,16 +333,16 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
         ValidationMessage actualMessage = validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel);
         assertEquals(MUTANT_VALIDATION_LOGIC_INSTANCEOF, actualMessage);
     }
-	
+
 	@Test
     public void mutantNoChangeInstanceofUsingStrictCheckingShouldNotTriggerValidation(){
         String originalCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -357,9 +356,9 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         String mutatedCode = ""
-                + " public class Test{"+ "\n" 
+                + " public class Test{"+ "\n"
                 + "  public void pow() { " + "\n"
                 + "   Integer a = new Integer(3);"+ "\n"
                 + "   if( a instanceof Number ){"+ "\n"
@@ -373,14 +372,14 @@ public class CodeValidatorTest {
                 + "   }"+ "\n"
                 + " }"+ "\n"
                 + "}";
-        
+
         CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
         ValidationMessage actualMessage = validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel);
         assertEquals(MUTANT_VALIDATION_SUCCESS, actualMessage);
     }
-    
-	
-	
+
+
+
 	@Test
 	public void mutantAfterSlashShouldNotTriggerValidation(){
 		String originalCode = ""
@@ -391,18 +390,18 @@ public class CodeValidatorTest {
 				+ "/*" + "\n"
 				+ "* Some Comment" + "\n"
 				+ "*/" + "\n"
-				+ "public Complex pow(Complex p) { " + "\n" 
-		        +"double a = real, b = imag, c = p.real, d = p.imag;" + "\n" 
-		        +"double ns = a * a + b * b;" + "\n" 
-		        +"double dArg = d / 2;" + "\n" 
-		        +"double cArg = c * arg();" + "\n" 
-		        +"double dDenom = Math.pow(Math.E, d * arg());" + "\n" 
-		        +"double newReal = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.cos(cArg) * Math.log(ns) - Math.sin(dArg) * Math.sin(cArg) * Math.log(ns));" + "\n" 
-		        +"double newImag = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.sin(cArg) * Math.log(ns) + Math.sin(dArg) * Math.cos(cArg) * Math.log(ns));" + "\n" 
+				+ "public Complex pow(Complex p) { " + "\n"
+		        +"double a = real, b = imag, c = p.real, d = p.imag;" + "\n"
+		        +"double ns = a * a + b * b;" + "\n"
+		        +"double dArg = d / 2;" + "\n"
+		        +"double cArg = c * arg();" + "\n"
+		        +"double dDenom = Math.pow(Math.E, d * arg());" + "\n"
+		        +"double newReal = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.cos(cArg) * Math.log(ns) - Math.sin(dArg) * Math.sin(cArg) * Math.log(ns));" + "\n"
+		        +"double newImag = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.sin(cArg) * Math.log(ns) + Math.sin(dArg) * Math.cos(cArg) * Math.log(ns));" + "\n"
 		        +"return new Complex(newReal, newImag);" + "\n"
 		        + "}"
 		        + "}";
-		
+
 		String mutatedCode = ""
 				+ "/**" + "\n"
 				+ "* Some Java Doc" + "\n"
@@ -411,23 +410,23 @@ public class CodeValidatorTest {
 				+ "/*" + "\n"
 				+ "* Some Comment" + "\n"
 				+ "*/" + "\n"
-				+ "public Complex pow(Complex p) { " + "\n" 
-		        +"double a = real, b = imag, c = p.real, d = p.imag;" + "\n" 
-		        +"double ns = a * a + b * b;" + "\n" 
-		        +"double dArg = d / 5;" + "\n" // Here's the mutation 
-		        +"double cArg = c * arg();" + "\n" 
-		        +"double dDenom = Math.pow(Math.E, d * arg());" + "\n" 
-		        +"double newReal = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.cos(cArg) * Math.log(ns) - Math.sin(dArg) * Math.sin(cArg) * Math.log(ns));" + "\n" 
-		        +"double newImag = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.sin(cArg) * Math.log(ns) + Math.sin(dArg) * Math.cos(cArg) * Math.log(ns));" + "\n" 
+				+ "public Complex pow(Complex p) { " + "\n"
+		        +"double a = real, b = imag, c = p.real, d = p.imag;" + "\n"
+		        +"double ns = a * a + b * b;" + "\n"
+		        +"double dArg = d / 5;" + "\n" // Here's the mutation
+		        +"double cArg = c * arg();" + "\n"
+		        +"double dDenom = Math.pow(Math.E, d * arg());" + "\n"
+		        +"double newReal = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.cos(cArg) * Math.log(ns) - Math.sin(dArg) * Math.sin(cArg) * Math.log(ns));" + "\n"
+		        +"double newImag = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.sin(cArg) * Math.log(ns) + Math.sin(dArg) * Math.cos(cArg) * Math.log(ns));" + "\n"
 		        +"return new Complex(newReal, newImag);" + "\n"
 		        + "}"
-		        + "}"; 
-		
+		        + "}";
+
 		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
-		
+
 		assertNotEquals("The MD5 is the same", getMD5FromText(originalCode), getMD5FromText(mutatedCode));
 	}
-	
+
 	@Test
 	public void testMakingStringLiteralsDoesNotTriggersValidation() throws IOException{
 		String originalCode = "" + "\n" +
@@ -518,7 +517,7 @@ public class CodeValidatorTest {
 
 		assertEquals(MUTANT_VALIDATION_IDENTICAL, validateMutantGetMessage(code, mutatedCode, codeValidatorLevel));
 	}
-	
+
 	@Test
 	public void testAddingNewEmptyLinesOrLineBreakingShouldTriggerValidation() throws IOException {
 		String originalCode = "public class Test{\n" +
@@ -717,7 +716,7 @@ public class CodeValidatorTest {
 
 	@Ignore
 	@Test
-	public void testInfiniteParserRecursionWithSingleTokens() throws IOException, CodeValidatorException {
+	public void testInfiniteParserRecursionWithSingleTokens() throws IOException {
 		final String code = String.join("\n",
 				"public class XmlElementTest {",
 				"	",
@@ -732,7 +731,7 @@ public class CodeValidatorTest {
 	}
 
 	@Test
-	public void testCompileErrorsShouldNotBeCatchedByValidator() throws IOException, CodeValidatorException {
+	public void testCompileErrorsShouldNotBeCatchedByValidator() throws IOException {
 		String code = String.join("\n",
 				"public class XmlElementTest {",
 				"	",
@@ -748,42 +747,42 @@ public class CodeValidatorTest {
 	}
 
 	@Test
-	public void testInvalidSuiteWithTwoClasses() throws IOException, CodeValidatorException {
+	public void testInvalidSuiteWithTwoClasses() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TwoClasses.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
 		assertFalse("Should be invalid; file contains a two classes", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
 	}
 
 	@Test
-	public void testInvalidEmptyTest() throws IOException, CodeValidatorException {
+	public void testInvalidEmptyTest() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("EmptyTest.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
 		assertFalse(CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
 	}
 
 	@Test
-	public void testInvalidTwoTests() throws IOException, CodeValidatorException {
+	public void testInvalidTwoTests() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TwoTests.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
 		assertFalse("Should be invalid; class contains two tests", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
 	}
 
 	@Test
-	public void testInvalidTestWithTooManyAssertions() throws IOException, CodeValidatorException {
+	public void testInvalidTestWithTooManyAssertions() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithTooManyAssertions.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
 		assertFalse("Should be invalid; test has too many assertions", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
 	}
 
 	@Test
-	public void testInvalidTestWithIf() throws IOException, CodeValidatorException {
+	public void testInvalidTestWithIf() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithIf.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
 		assertFalse("Should be invalid; test contains if statement", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
 	}
 
 	@Test
-	public void testInvalidTestWithSystemCalls() throws IOException, CodeValidatorException {
+	public void testInvalidTestWithSystemCalls() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithSystemCall.java");
 		final String code1 = new String(Files.readAllBytes(Paths.get(url.getPath())));
 		assertFalse("Should be invalid; test contains system call", CodeValidator.validateTestCodeGetMessage(code1, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
@@ -832,7 +831,7 @@ public class CodeValidatorTest {
 	}
 
 	@Test
-	public void testValidTest() throws IOException, CodeValidatorException {
+	public void testValidTest() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("ValidTest.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
 		assertTrue("Should be valid", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
@@ -893,7 +892,7 @@ public class CodeValidatorTest {
 				+ "int x = 0;" + "\n"
 				+ "}"
 				+ "}";
-		
+
 		String mutant = ""
 				+ "public class Test{" + "\n"
 				+ " public void test(){" + "\n"
@@ -1030,28 +1029,28 @@ public class CodeValidatorTest {
 				"public class Test { public test(){ r.num = r.num;}}",
 				"public class Test { public test(){ r.num = r.num | ((r.num & (1 << 29)) << 1);}} ", codeValidatorLevel));
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(
-				"public class Test { public test(){ r.num = r.num;}}", 
+				"public class Test { public test(){ r.num = r.num;}}",
 				"public class Test { public test(){ r.num = r.num << 1+344;}}", codeValidatorLevel));
 	}
 
 	// Test smell too many assertions
 	@Test
 	public void testClassSignatureChange() throws Exception {
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, 
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(
 						"public class Rational  {}",
 						"public final class Rational  {}", codeValidatorLevel));
-		
+
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(
 						"class Rational  {}",
 						"public class Rational  {}", codeValidatorLevel));
 
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, 
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(
 						"class Rational  {}",
 						"final class Rational  {}", codeValidatorLevel));
-		
+
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(
 						"public class Rational  {}",
@@ -1062,7 +1061,7 @@ public class CodeValidatorTest {
 						"final class Rational  {}",
 						"class Rational  {}", codeValidatorLevel));
 	}
-	
+
 	@Test
 	public void testInnerClassProtected(){
 				assertNotEquals(MUTANT_VALIDATION_SUCCESS,
@@ -1087,7 +1086,7 @@ public class CodeValidatorTest {
 						+ "format(\"\", \"sec\", \"third\");"
 						+ "}"
 						+ "}", codeValidatorLevel));
-		
+
 		assertEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(
 						""
@@ -1095,14 +1094,14 @@ public class CodeValidatorTest {
 						+ "public test(){"
 						+ "String s = \"\";"
 						+ "}"
-						+ "}", 
+						+ "}",
 						""
 						+ "public class Test {"
-						+ "public test(){"			
+						+ "public test(){"
 						+ "String s = \" \";"
 						+ "}"
 						+ "}", codeValidatorLevel));
-		
+
 		assertEquals(MUTANT_VALIDATION_SUCCESS,
 					validateMutantGetMessage(
 							""
@@ -1117,7 +1116,7 @@ public class CodeValidatorTest {
 							+ "String s = \"stringval \";"
 							+ "}"
 							+ "}", codeValidatorLevel));
-		
+
 		for (String p : CodeValidator.PROHIBITED_BITWISE_OPERATORS) {
 			assertEquals(p + " in a String should be valid", MUTANT_VALIDATION_SUCCESS,
 					validateMutantGetMessage(
@@ -1135,7 +1134,7 @@ public class CodeValidatorTest {
 							+ "}", codeValidatorLevel));
 		}
 
-		assertEquals(MUTANT_VALIDATION_SUCCESS, 
+		assertEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(""
 						+ "public class Test {"
 						+ "public test(){"
@@ -1148,9 +1147,9 @@ public class CodeValidatorTest {
 						+ "String s = \";?{} <<\";"
 						+ "}"
 						+ "}", codeValidatorLevel));
-		
-		
-		assertEquals(MUTANT_VALIDATION_SUCCESS, 
+
+
+		assertEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(
 						""
 						+ "public class Test {"
@@ -1162,8 +1161,8 @@ public class CodeValidatorTest {
 						+ "String s = \"public final protected\";"
 						+ "}"
 						+ "}", codeValidatorLevel));
-		
-		assertEquals(MUTANT_VALIDATION_SUCCESS, 
+
+		assertEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(""
 						+ "public class Test {"
 						+ "public test(){"
@@ -1192,7 +1191,7 @@ public class CodeValidatorTest {
 				+ "String s = \"\";// added comment" + "\n"
 				+ "if(x > 0) \n\t return x;" + "\n"
 				+ "}" + "\n"
-				+ "}"; 
+				+ "}";
 		assertNotEquals("added single line comment", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage( originalCode, mutatedCode, codeValidatorLevel));
 
 		mutatedCode = "public class Test{"+ "\n"
@@ -1200,9 +1199,9 @@ public class CodeValidatorTest {
 				+ "String s = \"\";// added comment" + "\n"
 				+ "if(x > 1) \n\t return x; // comment" + "\n"
 				+ "}" + "\n"
-				+ "}"; 
+				+ "}";
 		assertNotEquals("added single line comment in new line", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
-		
+
 		/////
 		originalCode = "public class Test{"+ "\n"
 				+ "public void test(){"+ "\n"
@@ -1231,7 +1230,7 @@ public class CodeValidatorTest {
 				+ "}" + "\n"
 				+ "}";
 		assertEquals("modified code, single line comment unchanged", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
-		
+
 		originalCode = "public class Test{"+ "\n"
 				+ "public void test(){"+ "\n"
 				+ "String s = \"\";" + "\n"
@@ -1247,7 +1246,7 @@ public class CodeValidatorTest {
 		assertNotEquals("added multiline comment", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
 
 	}
-	
+
 	@Test
 	public void testModifiedCommentInNewLineAfterUnchangedComment(){
 		String originalCode = ""
@@ -1263,7 +1262,7 @@ public class CodeValidatorTest {
 				+ "public class Test{"+ "\n"
 				+ "public void test(){"+ "\n"
 				+ "String s = \"\"; //comment\n"
-				+ "int foo; //new comment" + "\n" 
+				+ "int foo; //new comment" + "\n"
 				+ "int foo1;" + "\n"
 				+ "if(x > 0) \n\t return x; //x is positive" + "\n"
 				+ "}" + "\n"
@@ -1280,7 +1279,7 @@ public class CodeValidatorTest {
 				+ "if(x > 0) \n\t return x; //x is positive" + "\n"
 				+ "}" + "\n"
 				+ "}";
-		
+
 		String mutatedCode = "public class Test{"+ "\n"
 				+ "public void test(){"+ "\n"
 				+ "String s = \"\"; // comment" + "\n"
@@ -1288,9 +1287,9 @@ public class CodeValidatorTest {
 				+ "if(x > 0) \n\t return x; //x is positive" + "\n"
 				+ "}" + "\n"
 				+ "}";
-		
+
 		assertEquals("changed code in new line after unchanged comment", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
-		
+
 	}
 
 	// THIS IS BAD PRACTICE! Cannot really tell what those tests do !
@@ -1396,11 +1395,11 @@ public class CodeValidatorTest {
 						+ "public class Test {"
 						+ "void test() {}"
 						+ "}", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, 
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(""
 						+ "public class Test {"
 						+ "public void test() {}"
-						+ "}", 
+						+ "}",
 						""
 						+ "public class Test {"
 						+ "protected void test() {}"
@@ -1428,22 +1427,22 @@ public class CodeValidatorTest {
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, CodeValidatorLevel.MODERATE));
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, CodeValidatorLevel.STRICT));
 	}
-	
-	
+
+
 	@Test
 	public void testInvalidMutantsWithChangesAtMultilineComments(){
-		String originalCode = 
+		String originalCode =
 				"/*" + "\n"
 				+ "* This is a multiLine comment " + "\n"
 				+ "*/"+ "\n"
 				+ "public class Test{}";
-		String mutatedCode = 
+		String mutatedCode =
 				"/*" + "\n"
 				+ "* This is a MODIFIED multiLine comment " + "\n"
 				+ "*/"+ "\n"
 				+ "public class Test{}";
-		
+
 		assertEquals(MUTANT_VALIDATION_COMMENT, validateMutantGetMessage(originalCode, mutatedCode, CodeValidatorLevel.MODERATE));
 	}
-	
+
 }

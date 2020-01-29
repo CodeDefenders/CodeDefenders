@@ -20,7 +20,6 @@ package org.codedefenders.itests;
 
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -32,7 +31,6 @@ import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -181,7 +179,7 @@ public class ExecutionTest {
      * trivial mutant
      */
     @Test
-    public void testMutant9559() throws IOException, CodeValidatorException {
+    public void testMutant9559() throws IOException {
         // MOVE THIS CODE TO BEFORE OF FACTORY METHOD
         ArrayList<String> messages = new ArrayList<String>();
         // Create the users
