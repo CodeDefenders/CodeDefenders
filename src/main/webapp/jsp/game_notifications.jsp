@@ -18,10 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -32,50 +32,50 @@
         Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
 <script>
-    var receivedMessage = []
+    const receivedMessage = [];
 
     // Scroll down "a lot"
-    var scrollToBottom = function (view) {
+    const scrollToBottom = function (view) {
         view.scrollTop(1E10)
-    }
+    };
 
-    var refreshTheChatWindows = function (sortedMessagesToDisplay) {
+    const refreshTheChatWindows = function (sortedMessagesToDisplay) {
 
-        var total = sortedMessagesToDisplay.length
+        const total = sortedMessagesToDisplay.length;
 
-        var gameView = $("#game-notifications-game").children("div.events")
-        gameView.empty()
+        const gameView = $("#game-notifications-game").children("div.events");
+        gameView.empty();
 
-        var attackView = $("#game-notifications-attackers").children("div.events")
-        attackView.empty()
+        const attackView = $("#game-notifications-attackers").children("div.events");
+        attackView.empty();
 
-        var defendView = $("#game-notifications-defenders").children("div.events")
-        defendView.empty()
+        const defendView = $("#game-notifications-defenders").children("div.events");
+        defendView.empty();
 
         // Messages are sorted so we can render them on the fly
-        for (var index = 0; index < total; index++) {
+        for (let index = 0; index < total; index++) {
 
-            if (sortedMessagesToDisplay[index].eventType == "DEFENDER_MESSAGE") {
-                defendView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
+            if (sortedMessagesToDisplay[index].eventType === "DEFENDER_MESSAGE") {
+                defendView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>");
                 scrollToBottom(defendView);
 
-            } else if (sortedMessagesToDisplay[index].eventType == "ATTACKER_MESSAGE") {
-                attackView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
+            } else if (sortedMessagesToDisplay[index].eventType === "ATTACKER_MESSAGE") {
+                attackView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>");
                 scrollToBottom(attackView);
 
             } else {
-                gameView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
+                gameView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>");
                 scrollToBottom(gameView);
             }
         }
-    }
+    };
 
     //If the user is logged in, start receiving notifications
-    var updateGameNotifications = function (url) {
+    const updateGameNotifications = function (url) {
 
         $.getJSON(url,
                 function (r) {
-                    for (var i = 0; i < r.length; i++) {
+                    for (let i = 0; i < r.length; i++) {
                         r[i].time = Date.parse(r[i].time);
                         receivedMessage.push(r[i]);
                     }
@@ -89,17 +89,17 @@
                 });
     };
 
-    var toggleNotificationTimer = function (show) {
+    const toggleNotificationTimer = function (show) {
         //TODO: Show/Hide loading animation
     };
 
-    var updateGameMutants = function (url) {
+    const updateGameMutants = function (url) {
         $.getJSON(url, function (r) {
-            var mutLines = [];
+            const mutLines = [];
             $(r).each(function (index) {
-                var mut = r[index];
+                const mut = r[index];
 
-                for (line in mut.lines) {
+                for (const line in mut.lines) {
                     if (!mutLines[line]) {
                         mutLines[line] = [];
                     }
@@ -115,10 +115,10 @@
 
     // TODO Make this a on-demand function call when one clicks on the notification icons...
     $(document).ready(function () {
-        var interval = 5000;
-        var lastTime = 0;
+        const interval = 5000;
+        let lastTime = 0;
         setInterval(function () {
-            var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.GAMEEVENT%>&gameId=<%=gameId%>&timestamp=" + lastTime;
+            const url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.GAMEEVENT%>&gameId=<%=gameId%>&timestamp=" + lastTime;
             lastTime = Math.round(new Date().getTime() / 1000);
             updateGameNotifications(url);
         }, interval)
@@ -128,37 +128,37 @@
 
 <script type="text/javascript">
 
-    var updateMessages = function (url) {
+    const updateMessages = function (url) {
         $.getJSON(url, function (r) {
             $(r).each(function (index) {
 
                 // Skip messages that belong to the current user
-                if (r[index].userId == ${login.userId}) {
+                if (r[index].userId === ${login.userId}) {
                     return;
                 }
                 // Create the Div to host events if that's not there
                 if (document.getElementById("push-events-div") == null) {
-                    var div = document.createElement('div');
+                    const div = document.createElement('div');
                     div.setAttribute('class', 'alert alert-info');
                     div.setAttribute('id', 'push-events-div');
                     // This is fine, but then it closes it and no messaged can be shown anymore !
                     div.innerHTML = '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
                             '    <span aria-hidden="true">&times;</span>' +
                             '  </button><br/>';
-                    var form = document.getElementById('logout');
+                    const form = document.getElementById('logout');
                     form.parentNode.insertBefore(div, form.nextSibling);
                 }
 
-                var msgId = '_' + Math.random().toString(36).substr(2, 9);
-                var msg = document.createElement('pre');
+                const msgId = '_' + Math.random().toString(36).substr(2, 9);
+                const msg = document.createElement('pre');
                 msg.setAttribute('id', msgId);
-                msg.innerHTML = "<strong>" + r[index].message + "</strong>"
+                msg.innerHTML = "<strong>" + r[index].message + "</strong>";
                 document.getElementById("push-events-div").appendChild(msg);
                 // Fade out and remove the message
                 $('#' + msgId).delay(10000).fadeOut("normal", function () {
                     $(this).remove();
                     // Check how many elements are left, in case no more messages are there, remove the bar as well...
-                    var div = document.getElementById("push-events-div");
+                    const div = document.getElementById("push-events-div");
                     if (div != null) {
                         if (div.getElementsByTagName('*').length <= 2) { // There's <a> and <br>
                             document.getElementById("push-events-div").remove();
@@ -172,9 +172,9 @@
     $(document).ready(function () {
         //notifications written here:
         // refreshed every 5 seconds
-        var interval = 5000;
+        const interval = 5000;
         setInterval(function () {
-            var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.PUSHEVENT%>&gameId=" + <%=gameId%> +"&timestamp=" + (new Date().getTime() - interval);
+            const url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.PUSHEVENT%>&gameId=" + <%=gameId%> +"&timestamp=" + (new Date().getTime() - interval);
             updateMessages(url);
         }, interval)
     });
