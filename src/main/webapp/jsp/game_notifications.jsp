@@ -142,9 +142,7 @@
                     div.setAttribute('class', 'alert alert-info');
                     div.setAttribute('id', 'push-events-div');
                     // This is fine, but then it closes it and no messaged can be shown anymore !
-                    div.innerHTML = '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-                            '    <span aria-hidden="true">&times;</span>' +
-                            '  </button><br/>';
+                    div.innerHTML = '<button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button><br/>';
                     const form = document.getElementById('logout');
                     form.parentNode.insertBefore(div, form.nextSibling);
                 }
