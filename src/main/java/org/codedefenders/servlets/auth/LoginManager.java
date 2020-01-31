@@ -54,7 +54,7 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
-@WebServlet("/login")
+@WebServlet(Paths.LOGIN)
 public class LoginManager extends HttpServlet {
 
     @Inject

@@ -29,6 +29,7 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.installer.Installer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 import org.codedefenders.util.ZipFileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  */
-@WebServlet("/admin/puzzles/upload")
+@WebServlet(Paths.ADMIN_PUZZLE_UPLOAD)
 public class AdminPuzzleUpload extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleUpload.class);
 

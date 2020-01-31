@@ -24,6 +24,7 @@ import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/api/feedback")
+@WebServlet(Paths.API_FEEDBACK)
 public class FeedbackManager extends HttpServlet {
 
     @Inject

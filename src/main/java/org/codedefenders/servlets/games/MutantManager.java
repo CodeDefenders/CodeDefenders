@@ -45,7 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 // TODO Phil 02/01/19: this seems to be never used so we may remove it?
-@WebServlet("/api/game_mutants")
+@WebServlet(Paths.API_MUTANTS)
 public class MutantManager extends HttpServlet {
 
     @Inject

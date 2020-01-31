@@ -120,7 +120,7 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  *
  * @see org.codedefenders.util.Paths#BATTLEGROUND_GAME
  */
-@WebServlet("/multiplayergame")
+@WebServlet(org.codedefenders.util.Paths.BATTLEGROUND_GAME)
 public class MultiplayerGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);

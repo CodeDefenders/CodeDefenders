@@ -51,7 +51,6 @@ import static org.codedefenders.servlets.util.ServletUtils.ctx;
  * <p>Serves under {@code /}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see org.codedefenders.util.Paths#LANDING_PAGE
  */
 @WebServlet("")
 public class LandingPage extends HttpServlet {
@@ -72,7 +71,8 @@ public class LandingPage extends HttpServlet {
             Collections.shuffle(availableMultiplayerGames, new Random(LocalDate.now().getLong(ChronoField.EPOCH_DAY)));
             availableMultiplayerGames = availableMultiplayerGames
                     .stream()
-                    .filter(game -> game.getDefenderPlayers().size() != 0 && game.getAttackerPlayers().size() != 0)
+                    .filter(game -> !game.getDefenderPlayers().isEmpty())
+                    .filter(game -> !game.getAttackerPlayers().isEmpty())
                     .limit(10)
                     .collect(Collectors.toList());
 

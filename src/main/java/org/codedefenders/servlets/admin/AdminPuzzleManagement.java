@@ -18,10 +18,8 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.codedefenders.util.Paths;
 
 import java.io.IOException;
 
@@ -41,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  */
-@WebServlet({"/admin/puzzles", "/admin/puzzles/management"})
+@WebServlet({Paths.ADMIN_PUZZLE_OVERVIEW, Paths.ADMIN_PUZZLE_MANAGEMENT})
 public class AdminPuzzleManagement extends HttpServlet {
 
     @Override

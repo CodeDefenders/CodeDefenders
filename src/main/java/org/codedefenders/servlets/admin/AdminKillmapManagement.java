@@ -82,7 +82,7 @@ import static org.codedefenders.util.MessageUtils.pluralize;
  *      <li>ids: either a comma separated list or a JSON array of class/game ids</li>
  * </ul>
  */
-@WebServlet("/admin/killmaps/*")
+@WebServlet(Paths.ADMIN_KILLMAPS + "/*")
 public class AdminKillmapManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminKillmapManagement.class);
 

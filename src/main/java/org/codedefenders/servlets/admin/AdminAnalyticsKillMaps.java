@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/admin/analytics/killmaps")
+@WebServlet(Paths.ADMIN_ANALYTICS_KILLMAPS)
 public class AdminAnalyticsKillMaps extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsKillMaps.class);
 
