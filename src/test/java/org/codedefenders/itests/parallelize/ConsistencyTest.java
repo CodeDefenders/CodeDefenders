@@ -38,9 +38,33 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.itests.IntegrationTest;
+import org.codedefenders.model.User;
+import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidator;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,34 +89,9 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
-import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.model.User;
-import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -211,11 +210,10 @@ public class ConsistencyTest {
      * mutant can be killed only once and points are reported correctly.
      *
      * @throws IOException
-     * @throws CodeValidatorException
      * @throws InterruptedException
      */
     @Test
-    public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException, InterruptedException {
+    public void testRunAllTestsOnMutant() throws IOException, InterruptedException {
         User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
         observer.insert();
         //

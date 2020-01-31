@@ -21,7 +21,6 @@ package org.codedefenders.itests.parallelize;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.RandomTestScheduler;
@@ -38,7 +37,6 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -63,7 +61,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -435,7 +432,7 @@ public class ParallelizeTest {
     }
 
     @Test
-    public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException {
+    public void testRunAllTestsOnMutant() throws IOException {
 
         MultiplayerGame battlegroundGame = setupTestBattlegroundUsing("Lift");
         int defenderID = battlegroundGame.getDefenderPlayers().get(0).getId();
