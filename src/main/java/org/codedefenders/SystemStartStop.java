@@ -23,10 +23,16 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
 
 @WebListener
 public class SystemStartStop implements ServletContextListener {
@@ -65,10 +71,26 @@ public class SystemStartStop implements ServletContextListener {
          */
         try {
             ConnectionPool.instance().closeDBConnections();
-            logger.info("Code Defenders shut down successfully.");
         } catch (Throwable e) {
-            logger.error("Error in closing connections", e);
+            logger.error("Error in closing database connections", e);
         }
+
+        // https://stackoverflow.com/questions/11872316/tomcat-guice-jdbc-memory-leak
+        AbandonedConnectionCleanupThread.checkedShutdown();
+        logger.info("AbandonedConnectionCleanupThread shut down.");
+
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        Driver d = null;
+        while (drivers.hasMoreElements()) {
+            try {
+                d = drivers.nextElement();
+                DriverManager.deregisterDriver(d);
+                logger.info(String.format("Driver %s deregistered", d));
+            } catch (SQLException ex) {
+                logger.warn(String.format("Error deregistering driver %s", d), ex);
+            }
+        }
+
         // The ThreadPoolManager should be able to automatically stop the instances
     }
 }
