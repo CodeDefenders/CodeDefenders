@@ -1,7 +1,6 @@
 package org.codedefenders.beans;
 
 import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +23,6 @@ public class BeanFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BeanFilter.class);
 
     @Inject
-    private MessagesBean messages;
-
-    @Inject
     private LoginBean login;
 
     @Inject
@@ -41,7 +37,6 @@ public class BeanFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        request.setAttribute("messages", messages);
         request.setAttribute("login", login);
         request.setAttribute("previousSubmission", previousSubmission);
         chain.doFilter(request, response);
