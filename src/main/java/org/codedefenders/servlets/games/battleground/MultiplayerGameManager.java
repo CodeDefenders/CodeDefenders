@@ -443,7 +443,7 @@ public class MultiplayerGameManager extends HttpServlet {
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml);
-            messages.add(decorate);
+            messages.add(decorate).escape(false);
             //
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -652,7 +652,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml);
-                messages.add(decorate);
+                messages.add(decorate).escape(false);
 
             }
             previousSubmission.setMutantCode(mutantText);
