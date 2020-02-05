@@ -52,7 +52,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
@@ -316,7 +316,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        MeleeGame game = MultiplayerGameDAO.getMeleeGame(gameId);
+        MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -365,7 +365,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        MeleeGame game = MultiplayerGameDAO.getMeleeGame(gameId);
+        MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -413,7 +413,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        MeleeGame game = MultiplayerGameDAO.getMeleeGame(gameId);
+        MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -444,7 +444,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        MeleeGame game = MultiplayerGameDAO.getMeleeGame(gameId);
+        MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);

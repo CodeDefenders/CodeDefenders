@@ -1,12 +1,10 @@
 package org.codedefenders.model;
 
+import java.util.List;
+
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
-import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-
-import java.util.List;
 
 /**
  * This class contains information about a {@link MeleeGame} from the view of a single {@link User}.
@@ -53,6 +51,16 @@ public class UserMeleeGameInfo {
 
         info.isObserver = false;
         
+        return info;
+    }
+    
+    public static UserMeleeGameInfo forFinished(int userId, MeleeGame game, String creatorName) {
+        UserMeleeGameInfo info = new UserMeleeGameInfo();
+        info.type = Type.FINISHED;
+        info.userId = userId;
+        info.game = game;
+        info.creatorName = creatorName;
+
         return info;
     }
     
@@ -104,6 +112,10 @@ public class UserMeleeGameInfo {
         /**
          * The user could join this game.
          */
-        OPEN
+        OPEN,
+        /**
+         * The user part of this game, but it is now finished.
+         */
+        FINISHED
     }
 }

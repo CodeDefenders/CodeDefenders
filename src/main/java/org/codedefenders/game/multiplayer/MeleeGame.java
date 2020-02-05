@@ -29,7 +29,12 @@ import java.util.List;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -40,13 +45,167 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 
-public class MeleeGame extends MultiplayerGame {
+public class MeleeGame extends AbstractGame {
 
-    public static class Builder extends MultiplayerGame.Builder<Builder> {
+    /*
+     * Inherited from AbstractGame
+     * 
+     * protected GameClass cut; protected int id; protected int classId; protected
+     * int creatorId; protected GameState state; protected GameLevel level;
+     * protected GameMode mode; protected ArrayList<Event> events; protected
+     * List<Mutant> mutants; protected List<Test> tests;
+     */
+    private List<Player> players;
+
+    @Deprecated
+    private int defenderValue;
+    @Deprecated
+    private int attackerValue;
+
+    private float lineCoverage;
+    private float mutantCoverage;
+    private float prize;
+
+    private boolean requiresValidation;
+    private int maxAssertionsPerTest;
+    private boolean forceHamcrest;
+
+    private boolean chatEnabled;
+    private CodeValidatorLevel mutantValidatorLevel;
+
+    private boolean capturePlayersIntention;
+
+    // We need a temporary location where to store information about system tests
+    // and mutants
+    private boolean withTests;
+    private boolean withMutants;
+
+    // 0 means disabled
+    private int automaticMutantEquivalenceThreshold = 0;
+
+    public static class Builder {
+        // mandatory values
+        private final int classId;
+        private final int creatorId;
+        private final int maxAssertionsPerTest;
+        private final boolean forceHamcrest;
+
+        // optional values with default values
+        private GameClass cut = null;
+
+        // Melee games do not have attackers and defenders, just players
+        private List<Player> players = null;
+
+        private int id = -1;
+        private boolean requiresValidation = false;
+        private boolean capturePlayersIntention = false;
+        private boolean chatEnabled = false;
+        private float lineCoverage = 1f;
+        private float mutantCoverage = 1f;
+        private float prize = 1f;
+        // private int defenderValue = 100;
+        // private int attackerValue = 100;
+        private GameState state = GameState.CREATED;
+        private GameLevel level = GameLevel.HARD;
+        private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
+
+        private boolean withTests = false;
+        private boolean withMutants = false;
+
+        private int automaticMutantEquivalenceThreshold = 0;
 
         public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest) {
-            super(classId, creatorId, maxAssertionsPerTest, forceHamcrest);
+            this.classId = classId;
+            this.creatorId = creatorId;
+            this.maxAssertionsPerTest = maxAssertionsPerTest;
+            this.forceHamcrest = forceHamcrest;
+        }
+
+        public Builder cut(GameClass cut) {
+            this.cut = cut;
+            return this;
+        }
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder requiresValidation(boolean requiresValidation) {
+            this.requiresValidation = requiresValidation;
+            return this;
+        }
+
+        public Builder capturePlayersIntention(boolean capturePlayersIntention) {
+            this.capturePlayersIntention = capturePlayersIntention;
+            return this;
+        }
+
+        public Builder chatEnabled(boolean chatEnabled) {
+            this.chatEnabled = chatEnabled;
+            return this;
+        }
+
+        public Builder prize(float prize) {
+            this.prize = prize;
+            return this;
+        }
+
+        public Builder lineCoverage(float lineCoverage) {
+            this.lineCoverage = lineCoverage;
+            return this;
+        }
+
+        public Builder mutantCoverage(float mutantCoverage) {
+            this.mutantCoverage = mutantCoverage;
+            return this;
+        }
+
+//        public Builder defenderValue(int defenderValue) {
+//            this.defenderValue = defenderValue;
+//            return this;
+//        }
+//
+//        public Builder attackerValue(int attackerValue) {
+//            this.attackerValue = attackerValue;
+//            return this;
+//        }
+
+        public Builder state(GameState state) {
+            this.state = state;
+            return this;
+        }
+
+        public Builder level(GameLevel level) {
+            this.level = level;
+            return this;
+        }
+
+        public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+            this.mutantValidatorLevel = mutantValidatorLevel;
+            return this;
+        }
+
+        public Builder players(List<Player> players) {
+            this.players = players;
+            return this;
+        }
+
+        public Builder withTests(boolean withTests) {
+            this.withTests = withTests;
+            return this;
+        }
+
+        public Builder withMutants(boolean withMutants) {
+            this.withMutants = withMutants;
+            return this;
+        }
+
+        public Builder automaticMutantEquivalenceThreshold(int threshold) {
+            this.automaticMutantEquivalenceThreshold = threshold;
+            return this;
         }
 
         public MeleeGame build() {
@@ -55,8 +214,78 @@ public class MeleeGame extends MultiplayerGame {
     }
 
     protected MeleeGame(Builder builder) {
-        super(builder);
         this.mode = GameMode.MELEE;
+
+        this.cut = builder.cut;
+        this.players = builder.players;
+        this.id = builder.id;
+        this.classId = builder.classId;
+        this.creatorId = builder.creatorId;
+        this.state = builder.state;
+        this.level = builder.level;
+        this.lineCoverage = builder.lineCoverage;
+        this.mutantCoverage = builder.mutantCoverage;
+        this.prize = builder.prize;
+        this.requiresValidation = builder.requiresValidation;
+        this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
+        this.forceHamcrest = builder.forceHamcrest;
+        this.chatEnabled = builder.chatEnabled;
+        this.mutantValidatorLevel = builder.mutantValidatorLevel;
+        this.capturePlayersIntention = builder.capturePlayersIntention;
+
+        // This is mostly a temporary patch
+        this.withMutants = builder.withMutants;
+        this.withTests = builder.withTests;
+
+        this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
+    }
+
+    public boolean hasSystemTests() {
+        return this.withTests;
+    }
+
+    public boolean hasSystemMutants() {
+        return this.withMutants;
+    }
+
+    public float getLineCoverage() {
+        return lineCoverage;
+    }
+
+    public float getMutantCoverage() {
+        return mutantCoverage;
+    }
+
+    public float getPrize() {
+        return prize;
+    }
+
+    public void setPrize(float prize) {
+        this.prize = prize;
+    }
+
+    public boolean isChatEnabled() {
+        return chatEnabled;
+    }
+
+    public int getMaxAssertionsPerTest() {
+        return maxAssertionsPerTest;
+    }
+
+    public boolean isForceHamcrest() {
+        return forceHamcrest;
+    }
+
+    public CodeValidatorLevel getMutantValidatorLevel() {
+        return mutantValidatorLevel;
+    }
+
+    public boolean isCapturePlayersIntention() {
+        return capturePlayersIntention;
+    }
+
+    public int getAutomaticMutantEquivalenceThreshold() {
+        return automaticMutantEquivalenceThreshold;
     }
 
     /*
@@ -66,6 +295,10 @@ public class MeleeGame extends MultiplayerGame {
         List<Player> players = GameDAO.getPlayersForGame(getId(), Role.DEFENDER);
         players.addAll(GameDAO.getPlayersForGame(getId(), Role.ATTACKER));
         return players;
+    }
+
+    protected boolean canJoinGame(int userId) {
+        return !requiresValidation || UserDAO.getUserById(userId).isValidated();
     }
 
     public boolean addPlayer(int userId) {
@@ -173,6 +406,9 @@ public class MeleeGame extends MultiplayerGame {
                 if (mm.getEquivalent().equals(PROVEN_NO)) {
                     duelsWon.put(mm.getPlayerId(), duelsWon.get(mm.getPlayerId()) + 1);
                     duelsWon.put(-1, duelsWon.get(-1) + 1);
+                    // Actually adds points for the player and the team
+//                    ps.increaseTotalScore(1);
+//                    ts.increaseTotalScore(1);
                 }
             }
 
@@ -201,12 +437,12 @@ public class MeleeGame extends MultiplayerGame {
      * @return mapping from playerId to player score.
      */
     public HashMap<Integer, PlayerScore> getTestScores() {
-        HashMap<Integer, PlayerScore> testScores = new HashMap<>();
-        HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
+        final HashMap<Integer, PlayerScore> testScores = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
 
-        HashMap<Integer, Integer> challengesOpen = new HashMap<>();
-        HashMap<Integer, Integer> challengesWon = new HashMap<>();
-        HashMap<Integer, Integer> challengesLost = new HashMap<>();
+        final HashMap<Integer, Integer> challengesOpen = new HashMap<>();
+        final HashMap<Integer, Integer> challengesWon = new HashMap<>();
+        final HashMap<Integer, Integer> challengesLost = new HashMap<>();
 
         int defendersTeamId = -1;
         testScores.put(defendersTeamId, new PlayerScore(defendersTeamId));
@@ -215,7 +451,7 @@ public class MeleeGame extends MultiplayerGame {
         challengesWon.put(defendersTeamId, 0);
         challengesLost.put(defendersTeamId, 0);
 
-        for (Player player : getDefenderPlayers()) {
+        for (Player player : getPlayers()) {
             int defenderId = player.getId();
             testScores.put(defenderId, new PlayerScore(defenderId));
             mutantsKilled.put(defenderId, 0);
@@ -225,7 +461,7 @@ public class MeleeGame extends MultiplayerGame {
         }
 
         for (Test test : getTests()) {
-            if (getAttackerPlayers().stream().anyMatch(p -> p.getId() == test.getPlayerId())) {
+            if (getPlayers().stream().anyMatch(p -> p.getId() == test.getPlayerId())) {
                 continue;
             }
             if (!testScores.containsKey(test.getPlayerId())) {
@@ -248,7 +484,7 @@ public class MeleeGame extends MultiplayerGame {
         }
 
         for (int playerId : mutantsKilled.keySet()) {
-            if (playerId < 0 || getAttackerPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
+            if (playerId < 0 || getPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
                 continue;
             }
             int teamKey = defendersTeamId;
@@ -262,22 +498,29 @@ public class MeleeGame extends MultiplayerGame {
         }
 
         for (Mutant m : getKilledMutants()) {
-            if (!m.getEquivalent().equals(PROVEN_NO))
+            if (!m.getEquivalent().equals(PROVEN_NO)) {
                 continue;
+            }
 
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
-            challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
+            if (defenderId != defendersTeamId) {
+                challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
+            }
         }
         for (Mutant m : getMutantsMarkedEquivalent()) {
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
-            challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
+            if (defenderId != defendersTeamId) {
+                challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
+            }
         }
         for (Mutant m : getMutantsMarkedEquivalentPending()) {
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
-            challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
+            if (defenderId != defendersTeamId) {
+                challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
+            }
         }
 
         for (int playerId : testScores.keySet()) {
@@ -286,7 +529,6 @@ public class MeleeGame extends MultiplayerGame {
         }
         testScores.get(defendersTeamId).setDuelInformation(challengesWon.get(defendersTeamId) + " / "
                 + challengesLost.get(defendersTeamId) + " / " + challengesOpen.get((defendersTeamId)));
-
         for (int i : mutantsKilled.keySet()) {
             PlayerScore ps = testScores.get(i);
             ps.setMutantKillInformation("" + mutantsKilled.get(i));
@@ -304,4 +546,116 @@ public class MeleeGame extends MultiplayerGame {
         }
         return false;
     }
+
+    public void notifyPlayers() {
+        List<Event> events = getEvents();
+
+        switch (state) {
+        case ACTIVE:
+            if (!listContainsEvent(events, EventType.GAME_STARTED)) {
+                EventType et = EventType.GAME_STARTED;
+                notifyAttackers("Game has started. Attack now!", et);
+                notifyDefenders("Game has started. Defend now!", et);
+                notifyCreator("Your game as started!", et);
+                notifyGame("The game has started!", et);
+            }
+            break;
+        case GRACE_ONE:
+            if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)) {
+                EventType et = EventType.GAME_GRACE_ONE;
+                notifyAttackers("A game has entered Grace One.", et);
+                notifyDefenders("A game has entered Grace One.", et);
+                notifyCreator("Your game has entered Grace One", et);
+                notifyGame("The game as entered Grace Period One", et);
+            }
+            break;
+        case GRACE_TWO:
+            if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)) {
+                EventType et = EventType.GAME_GRACE_TWO;
+                notifyAttackers("A game has entered Grace Two.", et);
+                notifyDefenders("A game has entered Grace Two.", et);
+                notifyCreator("Your game has entered Grace Two", et);
+                notifyGame("The game as entered Grace Period Two", et);
+            }
+            break;
+        case FINISHED:
+            if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
+                EventType et = EventType.GAME_FINISHED;
+                notifyAttackers("A game has finished.", et);
+                notifyDefenders("A game has finished.", et);
+                notifyCreator("Your game has finished.", et);
+                notifyGame("The game has ended.", et);
+            }
+            break;
+        default:
+            // ignored
+        }
+    }
+
+    private boolean listContainsEvent(List<Event> events, EventType et) {
+        for (Event e : events) {
+            if (e.getEventType().equals(et)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void notifyAttackers(String message, EventType et) {
+        for (Player player : getPlayers()) {
+            Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
+                    new Timestamp(System.currentTimeMillis()));
+            notif.insert();
+        }
+    }
+
+    private void notifyDefenders(String message, EventType et) {
+        for (Player player : getPlayers()) {
+            Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
+                    new Timestamp(System.currentTimeMillis()));
+            notif.insert();
+        }
+    }
+
+    private void notifyCreator(String message, EventType et) {
+        // Event for game log: started
+        Event notif = new Event(-1, id, creatorId, message, et, EventStatus.NEW,
+                new Timestamp(System.currentTimeMillis()));
+        notif.insert();
+    }
+
+    private void notifyGame(String message, EventType et) {
+        // Event for game log: started
+        Event notif = new Event(-1, id, creatorId, message, et, EventStatus.GAME,
+                new Timestamp(System.currentTimeMillis()));
+        notif.insert();
+    }
+
+    public boolean addPlayer(int userId, Role role) {
+        return canJoinGame(userId) && addPlayerForce(userId, role);
+    }
+
+    public boolean insert() {
+        try {
+            this.id = MeleeGameDAO.storeMeleeGame(this);
+            return true;
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store multiplayer game to database.", e);
+            return false;
+        }
+    }
+
+    public boolean update() {
+        return MeleeGameDAO.updateMeleeGame(this);
+    }
+    
+    public boolean isLineCovered(int lineNumber) {
+        for (Test test : getTests(true)) {
+            if (test.getLineCoverage().getLinesCovered().contains(lineNumber)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 public interface IMutationTester {
@@ -30,6 +31,12 @@ public interface IMutationTester {
     void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages);
 
     void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages);
+    
+    // TODO Why we need duplicate method here for Multiplayer and Melee
+    void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages);
+
+    // TODO WHy we need this?
+    void runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant, ArrayList<String> messages);
 
     /**
      * Execute all the tests registered for the defenders against the provided
@@ -63,5 +70,6 @@ public interface IMutationTester {
     void runEquivalenceTest(Test test, Mutant mutant);
 
     boolean testVsMutant(Test test, Mutant mutant);
+
 
 }
