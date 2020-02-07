@@ -288,6 +288,15 @@ public class MeleeGame extends AbstractGame {
         return automaticMutantEquivalenceThreshold;
     }
 
+    public Role getRole(int userId) {
+        if (getPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
+            return Role.PLAYER;
+        } else if (userId == getCreatorId()) {
+            return Role.OBSERVER;
+        } else {
+            return Role.NONE;
+        }
+    }
     /*
      * Every user has two players, one as defender and one as attacker
      */
@@ -295,6 +304,12 @@ public class MeleeGame extends AbstractGame {
         List<Player> players = GameDAO.getPlayersForGame(getId(), Role.DEFENDER);
         players.addAll(GameDAO.getPlayersForGame(getId(), Role.ATTACKER));
         return players;
+    }
+
+    public boolean isObserver(int userId) {
+        logger.info("DEBUG: MeleeGame:" + this.id + " isObserver: " + userId + " while creatorId is " + creatorId);
+        return creatorId == userId;
+
     }
 
     protected boolean canJoinGame(int userId) {
@@ -648,7 +663,7 @@ public class MeleeGame extends AbstractGame {
     public boolean update() {
         return MeleeGameDAO.updateMeleeGame(this);
     }
-    
+
     public boolean isLineCovered(int lineNumber) {
         for (Test test : getTests(true)) {
             if (test.getLineCoverage().getLinesCovered().contains(lineNumber)) {

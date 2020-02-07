@@ -100,6 +100,8 @@ public class Event {
             role = Role.ATTACKER;
         } else if (eventString.contains("DEFENDER")) {
             role = Role.DEFENDER;
+        } else if (eventString.contains("PLAYER")) {
+            role = Role.PLAYER;
         } else {
             role = Role.OBSERVER;
         }

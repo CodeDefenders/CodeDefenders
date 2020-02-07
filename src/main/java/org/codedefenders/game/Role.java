@@ -25,6 +25,7 @@ public enum Role {
     ATTACKER("Attacker"),
     DEFENDER("Defender"),
     OBSERVER("Observer"),
+    PLAYER("Player"),
     NONE;
 
     private final String displayName;

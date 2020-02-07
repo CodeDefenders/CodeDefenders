@@ -18,75 +18,59 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-
-<%
-    String pageTitle = "In Game";
-%>
 <%@ page import="org.codedefenders.game.Role"%>
-<%@page import="org.codedefenders.game.multiplayer.MeleeGame"%>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils"%>
+<%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
 <%@ page import="org.codedefenders.util.Paths"%>
-<%@ page import="org.codedefenders.game.GameClass"%>
-<%@ page import="org.codedefenders.game.GameLevel"%>
-<%@ page import="org.codedefenders.game.GameState"%>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
-    int userId = ServletUtils.userId(request); // required for playerFeedback, too
-    Role role = (Role) request.getAttribute(Constants.USER_ROLE);          
-%>
-<%
-    /* playerFeedback & game_notifications */
-    request.setAttribute("gameId", game.getId());
-    // playerId already set in servlet.
-    // request.setAttribute("playerId", playerId);
+    Role role = game.getRole(login.getUserId());
 %>
 
-<%@ include file="/jsp/melee/header_game.jsp"%>
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
+<%
+    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+    playerFeedback.setPlayerInfo(login.getUser(), role);
+%>
+
+<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
+<%
+    scoreboard.setGameId(game.getId());
+    scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+%>
+
+<jsp:include page="/jsp/melee/header_game.jsp"/>
 
 <%-- Push notifications using WebSocket --%>
-<%--<%@ include file="/jsp/push_notifications.jsp"%>--%>
+<jsp:include page="/jsp/push_notifications.jsp"/>
 <%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
 <%--<%@ include file="/jsp/push_game_notifications.jsp"%>--%>
 <%-- Show the mail icon with counts of unread notifications: requires push_notifications.jsp --%>
 <%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
 
-<jsp:include page="/jsp/scoring_tooltip.jsp" />
-<jsp:include page="/jsp/playerFeedback.jsp" />
-<jsp:include page="/jsp/battleground/game_scoreboard.jsp" />
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp" />
+<jsp:include page="/jsp/scoring_tooltip.jsp"/>
+<%-- <jsp:include page="/jsp/player_feedback.jsp"/> --%>
+<%-- <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/> --%>
+<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <div class="crow fly no-gutter up">
 	<%
-	    messages = new ArrayList<>();
-	    session.setAttribute("messages", messages);
-
-	    switch (role) {
-	    case OBSERVER:
-	%><%@ include file="/jsp/melee/creator_view.jsp"%>
+	    if (role.equals(Role.OBSERVER)) {
+	%>
+			<jsp:include page="/jsp/melee/creator_view.jsp" />
 	<%
-	    break;
-	    // TODO is this safe ?
-	    default:
-	    // Default all-inclusive page
-	%><%@ include file="/jsp/melee/player_view.jsp"%>
+	    } else {
+	        // Default all-inclusive page
+	%>
+		<jsp:include page="/jsp/melee/creator_view.jsp" />
+	<%-- <jsp:include page="/jsp/melee/player_view.jsp" /> --%>
 	<%
-	    break;
 	    }
 	%>
 </div>
-<%-- <%
- if (game.isCapturePlayersIntention()) {
-    if (role == Role.DEFENDER) {
---%>
-<%-- <%@ include file="/jsp/game_components/defender_intention_collector.jsp" %>--%>
-<%-- <%
-	} else if (role == Role.ATTACKER) {
-%>--%>
-<%-- <%@ include file="/jsp/game_components/attacker_intention_collector.jsp" %>--%>
-<%-- <%
-	}
-}
-%>--%>
+
 <!-- This corresponds to dispatcher.Dispatch -->
-<jsp:include page="/jsp/game_notifications.jsp" />
-<%@ include file="/jsp/battleground/footer_game.jsp"%>
+<jsp:include page="/jsp/game_notifications.jsp"/>
+<%@ include file="/jsp/melee/footer_game.jsp" %>
