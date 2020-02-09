@@ -110,7 +110,7 @@ public class MeleeGameDAO {
         final MeleeGame game = meleeGameFromRS(rs);
         final String creatorName = rs.getString("creatorName");
         final Role role = Role.valueOrNull(rs.getString("playerRole"));
-        return UserMeleeGameInfo.forActive(userId, game, (Role.OBSERVER.equals(role)), creatorName);
+        return UserMeleeGameInfo.forActive(userId, game, role, creatorName);
     }
 
     /**

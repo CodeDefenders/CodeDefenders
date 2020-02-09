@@ -151,6 +151,7 @@
                 </td>
             </tr>
             <tr>
+           		<%-- TODO Would be unfair to have the observer also be a player? She can stop the game when she's winning ... --%>
                 <td title="Chose your role for this game">
                     Role selection
                 </td>
@@ -158,8 +159,8 @@
                     <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
                             data-size="medium">
                             <!-- Hardcoded Roles -->
-                            <option selected>Observer</option>
-                            <option>Player</option>
+                            <option selected value="OBSERVER">Observer</option>
+                            <!-- <option>Player</option> -->
                     </select>
                 </td>
             </tr>

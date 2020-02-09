@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 
 /**
@@ -22,8 +23,7 @@ public class UserMeleeGameInfo {
     private MeleeGame game;
     private String creatorName;
     
-    private boolean isObserver;
-
+    private Role role;
     /**
      * Use {@link #forOpen(int, MeleeGame, String) forActive()} and
      * {@link #forActive(int, MeleeGame, String) forOpen()} methods.
@@ -31,13 +31,13 @@ public class UserMeleeGameInfo {
      */
     private UserMeleeGameInfo() {}
 
-    public static UserMeleeGameInfo forActive(int userId, MeleeGame game, boolean isObserver, String creatorName) {
+    public static UserMeleeGameInfo forActive(int userId, MeleeGame game, Role role, String creatorName) {
         UserMeleeGameInfo info = new UserMeleeGameInfo();
         info.type = Type.ACTIVE;
         info.userId = userId;
         info.game = game;
         info.creatorName = creatorName;
-        info.isObserver = isObserver;
+        info.role = role;
 
         return info;
     }
@@ -48,8 +48,6 @@ public class UserMeleeGameInfo {
         info.userId = userId;
         info.game = game;
         info.creatorName = creatorName;
-
-        info.isObserver = false;
         
         return info;
     }
@@ -64,8 +62,9 @@ public class UserMeleeGameInfo {
         return info;
     }
     
-    public boolean isObserver(){
-        return isObserver;
+    public Role userRole(){
+        assert type != Type.OPEN;
+        return role;
     }
 
     public int userId() {

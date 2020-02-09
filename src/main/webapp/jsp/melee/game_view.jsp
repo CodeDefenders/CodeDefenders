@@ -62,10 +62,8 @@
 			<jsp:include page="/jsp/melee/creator_view.jsp" />
 	<%
 	    } else {
-	        // Default all-inclusive page
 	%>
-		<jsp:include page="/jsp/melee/creator_view.jsp" />
-	<%-- <jsp:include page="/jsp/melee/player_view.jsp" /> --%>
+			<jsp:include page="/jsp/melee/player_view.jsp" />
 	<%
 	    }
 	%>

@@ -28,17 +28,13 @@
 
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
-    // There is no role in MeleeGame except "BOTH/Observer" maybe? Role role = game.getRole(login.getUserId());
-    int gameId = game.getId();
-    boolean observer = game.isObserver(login.getUserId());
+	Role role = game.getRole(login.getUserId());
+	int gameId = game.getId();
 %>
 
-<jsp:useBean id="pageInfo"
-	class="org.codedefenders.beans.page.PageInfoBean" scope="request" />
-<%-- PLAYER is hardcoded since I have no idea if we need Observer here --%>
-<%
-    pageInfo.setPageTitle("Game " + game.getId() + " ( " + (observer ? "OBSERVER" : "PLAYER" )+ ")");
-%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Game " + game.getId() + " (" + role.getFormattedString() + ")"); %>
+
 
 <jsp:include page="/jsp/header_main.jsp" />
 </div>

@@ -306,12 +306,6 @@ public class MeleeGame extends AbstractGame {
         return players;
     }
 
-    public boolean isObserver(int userId) {
-        logger.info("DEBUG: MeleeGame:" + this.id + " isObserver: " + userId + " while creatorId is " + creatorId);
-        return creatorId == userId;
-
-    }
-
     protected boolean canJoinGame(int userId) {
         return !requiresValidation || UserDAO.getUserById(userId).isValidated();
     }

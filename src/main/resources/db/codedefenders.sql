@@ -146,7 +146,7 @@ CREATE TABLE `games` (
   `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO','SOLVED','FAILED') DEFAULT 'CREATED',
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
-  `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
+  `ActiveRole` enum('ATTACKER','DEFENDER','PLAYER') NOT NULL DEFAULT 'ATTACKER',
   `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE', 'MELEE') NOT NULL DEFAULT 'PARTY',
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
@@ -249,7 +249,7 @@ CREATE TABLE `players` (
   `User_ID` int(11) NOT NULL,
   `Game_ID` int(11) NOT NULL,
   `Points` int(11) NOT NULL,
-  `Role` enum('ATTACKER','DEFENDER') NOT NULL,
+  `Role` enum('ATTACKER','DEFENDER','PLAYER') NOT NULL,
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `players_User_ID_Game_ID_uindex` (`User_ID`,`Game_ID`),
@@ -561,12 +561,25 @@ VALUES
   ('DEFENDER_TEST_CREATED','@event_user created a test'),
   ('DEFENDER_TEST_ERROR','@event_user created a test that errored'),
   ('DEFENDER_TEST_READY','Test by @event_user is ready'),
+  ('PLAYER_JOINED','@event_user joined the game'),
+  ('PLAYER_MESSAGE','@event_user: @chat_message'),
+  ('PLAYER_MUTANT_CREATED','@event_user created a mutant'),
+  ('PLAYER_MUTANT_ERROR','@event_user created a mutant that errored'),
+  ('PLAYER_MUTANT_KILLED_EQUIVALENT','@event_user proved a mutant non-equivalent'),
+  ('PLAYER_MUTANT_SURVIVED','@event_user created a mutant that survived'),
+  ('PLAYER_KILLED_MUTANT','@event_user killed a mutant'),
+  ('PLAYER_MUTANT_CLAIMED_EQUIVALENT','@event_user claimed a mutant equivalent'),
+  ('PLAYER_MUTANT_EQUIVALENT','@event_user caught an equivalence'),
+  ('PLAYER_TEST_CREATED','@event_user created a test'),
+  ('PLAYER_TEST_ERROR','@event_user created a test that errored'),
+  ('PLAYER_TEST_READY','Test by @event_user is ready'),
   ('GAME_CREATED','Game created'),('GAME_FINISHED','Game Over!'),
   ('GAME_GRACE_ONE','The game is entering grace period one.'),
   ('GAME_GRACE_TWO','The game is entering grace period two.'),
   ('GAME_MESSAGE','@event_user: @chat_message'),
   ('GAME_MESSAGE_ATTACKER','@event_user: @chat_message'),
   ('GAME_MESSAGE_DEFENDER','@event_user: @chat_message'),
+  ('GAME_MESSAGE_PLAYER','@event_user: @chat_message'),
   ('GAME_PLAYER_LEFT','@event_user left the game'),
   ('GAME_STARTED','The game has started!');
 
@@ -680,6 +693,7 @@ CREATE OR REPLACE VIEW `view_defenders`
       sum(T.MutantsKilled) AS NKilled
     FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID
     GROUP BY PD.user_id;
+
 
 CREATE OR REPLACE VIEW `view_leaderboard`
   AS

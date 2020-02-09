@@ -197,17 +197,15 @@ public class MeleeGameSelectionManager extends HttpServlet {
         List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(classId);
 
         // Always add system player to send mutants and tests at runtime!
-        nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
-        nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
+        nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER);
 
         // Add selected role to game if the creator participates as non-observer (i.e., player)
         if (selectedRole.equals(Role.NONE)) {
-            nGame.addPlayer(login.getUserId(), Role.ATTACKER);
-            nGame.addPlayer(login.getUserId(), Role.DEFENDER);
+            nGame.addPlayer(login.getUserId(), Role.PLAYER);
         }
 
-        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
-        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, nGame.getId());
+        int dummyPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
+       
 
         // this mutant map links the uploaded mutants and the once generated from them here
         // This implements bookkeeping for killmap
@@ -229,7 +227,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                         // Alive be default
                         true,
                         //
-                        dummyAttackerPlayerId);
+                        dummyPlayerId);
                 // insert this into the DB and link the mutant to the game
                 newMutant.insert();
                 // BookKeeping
@@ -243,7 +241,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             for (Test test : uploadedTests) {
                 // At this point we need to fill in all the details
                 Test newTest = new Test(-1, classId, nGame.getId(), test.getJavaFile(),
-                        test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
+                        test.getClassFile(), 0, 0, dummyPlayerId, test.getLineCoverage().getLinesCovered(),
                         test.getLineCoverage().getLinesUncovered(), 0);
                 newTest.insert();
                 testMap.put(test, newTest);
