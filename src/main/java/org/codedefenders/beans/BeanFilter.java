@@ -16,8 +16,10 @@ import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
 /**
- * Adds various beans to the request, so they can be shared between the application and ths JSPs.
+ * Adds various beans to the request, so they can be shared between the application and the JSPs.
  */
+/* This filter should only be required until we change our JSPs to use the JSP tag libraries, since the tags can access
+ * the session beans directly, without this extra step of adding them to the request.  */
 @WebFilter(filterName = "BeanFilter")
 public class BeanFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BeanFilter.class);
