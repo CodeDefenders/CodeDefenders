@@ -145,7 +145,7 @@ CREATE TABLE `games` (
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
   `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
-  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE') NOT NULL DEFAULT 'PARTY',
+  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE', 'MELEE') NOT NULL DEFAULT 'PARTY',
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
@@ -596,6 +596,13 @@ FROM games,
 WHERE Mode = 'PUZZLE'
   AND games.Class_ID = classes.Class_ID;
 
+CREATE OR REPLACE VIEW `view_melee_games` AS
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle
+FROM games,
+     classes
+WHERE Mode = 'MELEE'
+  AND games.Class_ID = classes.Class_ID;
+  
 CREATE OR REPLACE VIEW `view_mutants_with_user` AS
 SELECT mutants.*, users.*
 FROM mutants

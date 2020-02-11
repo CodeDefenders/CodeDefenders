@@ -112,6 +112,7 @@ public class TicketingFilter implements Filter {
          * List here the pages which require the web socket!
          */
         return path.startsWith(context + Paths.BATTLEGROUND_GAME)
+                || path.startsWith(context + Paths.MELEE_GAME)
                 || path.startsWith(context + Paths.PUZZLE_GAME);
     }
 

@@ -221,19 +221,26 @@ public class NotificationsHandler extends HttpServlet {
             timestamp = Long.parseLong(timestampString);
         } catch (NumberFormatException e) {
             response.setStatus(400);
-            logger.error("User Event: Error trying to format timestamp.", e);
+            logger.error("User Event: Error trying to format timestamp." + e );
             return;
         }
 
-        // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need for extra check
-        final List<Event> events = DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp)
-                .stream()
-                .peek(event -> event.setCurrentUserName(login.getUser().getUsername()))
-                .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
-                .collect(Collectors.toList());
+        try {
+            // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need
+            // for extra check
+            final List<Event> events = DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp).stream()
+                    .peek(event -> event.setCurrentUserName(login.getUser().getUsername()))
+                    .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
+                    .collect(Collectors.toList());
 
-        PrintWriter out = response.getWriter();
-        out.print(gson.toJson(events));
-        out.flush();
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(events));
+            out.flush();
+        } catch (NullPointerException e) {
+            logger.info("" + DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp));
+            logger.error("NPE: " + e);
+
+        }
+
     }
 }

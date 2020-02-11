@@ -135,7 +135,7 @@ public class PushSocket {
                                   @PathParam("userId") Integer userId) throws IOException {
 
         if (! ticketingServices.validateTicket(ticket, userId)) {
-            logger.info("Invalid ticket for session " + session);
+            logger.info("Invalid ticket " + ticket + " for session " + session);
             session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
             return;
         }
