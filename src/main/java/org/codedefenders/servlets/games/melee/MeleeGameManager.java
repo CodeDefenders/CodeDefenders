@@ -163,39 +163,32 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        // Moving this to a private method causes a problem since servlet fields are not
-        // thread-safe !
-        int attackerPlayerId = -1;
-        int defenderPlayerId = -1;
-
+        int playerId = -1;
         List<Integer> playerIdsForUser = PlayerDAO.getPlayersIdForUserAndGame(userId, game.getId());
 
         for (Player player : game.getPlayers()) {
             if (playerIdsForUser.contains(player.getId())) {
-                attackerPlayerId = player.getId();
-            }
-            if (playerIdsForUser.contains(player.getId())) {
-                defenderPlayerId = player.getId();
+                playerId = player.getId();
             }
         }
 
-        if (game.getCreatorId() != userId && (attackerPlayerId == -1 || defenderPlayerId == -1)) {
+        if (game.getCreatorId() != userId && playerId == -1) {
             // Something odd with the registration - TODO
-            logger.warn("Wrong registration with the User {} in Melee Game {} : attack {} -- defendr }{", userId,
-                    gameId, attackerPlayerId, defenderPlayerId);
+            logger.warn("Wrong registration with the User {} in Melee Game {}", userId, gameId);
             response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
             return;
         }
 
+        // TODO There must be a better way to undestand the role, like we do in the jsp?
         Role userRole = Role.NONE;
-        if (game.getCreatorId() == userId && attackerPlayerId == -1 && defenderPlayerId == -1) {
-            // The creator is NOT playing the game
+        if (game.getCreatorId() == userId && playerId == -1) {
+            // The creator is CAN NOT playing the game
             userRole = Role.OBSERVER;
         }
 
         // check is there is a pending equivalence duel for this user.
-        final int _attackerPlayerId = attackerPlayerId;
-        game.getMutantsMarkedEquivalentPending().stream().filter(m -> m.getPlayerId() == _attackerPlayerId).findFirst()
+        final int _playerId = playerId;
+        game.getMutantsMarkedEquivalentPending().stream().filter(m -> m.getPlayerId() == _playerId).findFirst()
                 .ifPresent(mutant -> {
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
@@ -204,12 +197,6 @@ public class MeleeGameManager extends HttpServlet {
         // Set the data for the game view page
         request.setAttribute("game", game);
         //
-//        request.setAttribute( Constants.SESSION_ATTRIBUTE_ATTACKER_ID, attackerPlayerId);
-//        request.setAttribute( Constants.SESSION_ATTRIBUTE_DEFENDER_ID, defenderPlayerId);
-
-        // Store the current role in the request
-//        request.setAttribute( Constants.USER_ROLE, userRole);
-
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_VIEW_JSP);
         dispatcher.forward(request, response);
     }
@@ -241,35 +228,26 @@ public class MeleeGameManager extends HttpServlet {
         final String action = ServletUtils.formType(request);
         final User user = UserDAO.getUserById(login.getUserId());
 
-        // TODO Consider moving this validation logic to some other place
-        // (HTTPServlet.service() maybe ? )
-        // Moving this to a private method causes a problem since servlet fields are not
-        // thread-safe !
-        int attackerPlayerId = -1;
-        int defenderPlayerId = -1;
+        int playerId = -1;
 
         List<Integer> playerIdsForUser = PlayerDAO.getPlayersIdForUserAndGame(login.getUserId(), game.getId());
 
         for (Player player : game.getPlayers()) {
             if (playerIdsForUser.contains(player.getId())) {
-                attackerPlayerId = player.getId();
-            }
-            if (playerIdsForUser.contains(player.getId())) {
-                defenderPlayerId = player.getId();
+                playerId = player.getId();
             }
         }
 
-        if (attackerPlayerId == -1 || defenderPlayerId == -1) {
+        if (playerId == -1) {
             // Something odd with the registration - TODO
-            logger.warn("Wrong registration with the User {} in Melee Game {} : attack {} -- defendr }{", login.getUserId(),
-                    gameId, attackerPlayerId, defenderPlayerId);
+            logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
             Redirect.redirectBack(request, response);
             return;
         }
 
         switch (action) {
         case "createMutant": {
-            createMutant(request, response, user, game, attackerPlayerId);
+            createMutant(request, response, user, game, playerId);
             triggerAutomaticMutantEquivalenceForGame(game);
             return;
         }
@@ -282,16 +260,17 @@ public class MeleeGameManager extends HttpServlet {
         }
         case "reset": {
             final HttpSession session = request.getSession();
+            // TODO Why those are commented out?
 //            session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
             response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
         }
         case "claimEquivalent": {
-            claimEquivalent(request, response, gameId, game, defenderPlayerId);
+            claimEquivalent(request, response, gameId, game, playerId);
             return;
         }
         case "resolveEquivalence": {
-            resolveEquivalence(request, response, gameId, game, attackerPlayerId);
+            resolveEquivalence(request, response, gameId, game, playerId);
             return;
         }
         default:
@@ -351,8 +330,6 @@ public class MeleeGameManager extends HttpServlet {
 
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
@@ -373,10 +350,12 @@ public class MeleeGameManager extends HttpServlet {
         // TODO Where do we check that the test is not a duplicate ?!
 
         // Do the validation even before creating the mutant
-        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText,
+        List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
                 game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-        if (!validationMessage.isEmpty()) {
-            messages.addAll(validationMessage);
+        if (!validationMessages.isEmpty()) {
+            for (String validationMessage : validationMessages) {
+                messages.add(validationMessage);
+            }
 //            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
@@ -473,7 +452,7 @@ public class MeleeGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
         // Include Test Smells in the messages back to user
-        includeDetectTestSmellsInMessages(newTest, messages);
+        includeDetectTestSmellsInMessages(newTest, messages.getBridge());
 
         final String message = user.getUsername() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -482,7 +461,7 @@ public class MeleeGameManager extends HttpServlet {
         notif.insert();
 
         //
-        mutationTester.runTestOnAllMeleeMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMeleeMutants(game, newTest, messages.getBridge());
 
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
@@ -535,12 +514,10 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, User user, MeleeGame game,
-            int attackerPlayerId) throws IOException {
+            int playerId) throws IOException {
+
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-
-        session.setAttribute("messages", messages);
 
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
@@ -551,22 +528,23 @@ public class MeleeGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
         if (!mutant.isPresent()) {
-//            session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
         }
 
         final String mutantText = mutant.get();
 
-        // If the user has pending duels we cannot accept the mutant, but we keep it
-        // around
-        // so students do not lose mutants once the duel is solved.
-        if (gameManagingUtils.hasAttackerPendingMutantsInGame(game.getId(), attackerPlayerId)
+        /*
+         * If the user has pending duels we cannot accept this mutant, but we keep it
+         * around so the user does not lose it once the duel is solved. TODO I guess we
+         * need to store it somewhere...
+         * session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT,
+         * StringEscapeUtils.escapeHtml(mutantText));
+         */
+        if (gameManagingUtils.hasAttackerPendingMutantsInGame(game.getId(), playerId)
                 && (session.getAttribute(Constants.BLOCK_ATTACKER) != null)
                 && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
             messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
-            // Keep the mutant code in the view for later
-//            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
         }
@@ -584,7 +562,7 @@ public class MeleeGameManager extends HttpServlet {
         }
         Mutant existingMutant = gameManagingUtils.existingMutant(game.getId(), mutantText);
         //
-        if (existingMutant != null && existingMutant.getCreatorId() == attackerPlayerId) {
+        if (existingMutant != null && existingMutant.getCreatorId() == playerId) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant,
                     TargetExecution.Target.COMPILE_MUTANT);
@@ -592,13 +570,13 @@ public class MeleeGameManager extends HttpServlet {
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
                 messages.add(existingMutantTarget.message);
             }
-//            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
         }
         // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
         // then we get the PLAYER_ID when we get id of the mutants' creator?
         Mutant newMutant = gameManagingUtils.createMutant(game.getId(), game.getClassId(), mutantText, user.getId(),
+                // TODO Should we use a different directory structure for MELEE GAMES?
                 MODE_BATTLEGROUND_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
@@ -634,11 +612,12 @@ public class MeleeGameManager extends HttpServlet {
 
         messages.add(MUTANT_COMPILED_MESSAGE);
         final String notificationMsg = UserDAO.getUserById(user.getId()).getUsername() + " created a mutant.";
+        // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
         Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
 
-        mutationTester.runAllTestsOnMeleeMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMeleeMutant(game, newMutant, messages.getBridge());
 
         game.update();
 
@@ -662,7 +641,7 @@ public class MeleeGameManager extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private void resolveEquivalence(HttpServletRequest request, HttpServletResponse response, //
             int gameId, MeleeGame game, //
-            int attackerPlayerId) throws IOException {
+            int playerId) throws IOException {
 
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
@@ -691,7 +670,7 @@ public class MeleeGameManager extends HttpServlet {
 
             for (Mutant m : mutantsPending) {
                 // This might be replaced by m.getCreatorId() == userId
-                if (m.getId() == mutantId && m.getPlayerId() == attackerPlayerId) {
+                if (m.getId() == mutantId && m.getPlayerId() == playerId) {
                     m.kill(Mutant.Equivalence.DECLARED_YES);
                     DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
@@ -812,8 +791,9 @@ public class MeleeGameManager extends HttpServlet {
                     newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
                     final String message = UserDAO.getUserById(login.getUserId()).getUsername() + " killed mutant "
                             + mPending.getId() + " in an equivalence duel.";
-                    Event notif = new Event(-1, gameId, login.getUserId(), message, EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT,
-                            EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+                    Event notif = new Event(-1, gameId, login.getUserId(), message,
+                            EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+                            new Timestamp(System.currentTimeMillis()));
                     notif.insert();
                     if (mPending.getId() == mutantId) {
                         killedClaimed = true;
@@ -826,8 +806,9 @@ public class MeleeGameManager extends HttpServlet {
                         mPending.kill(ASSUMED_YES);
                         final String message = UserDAO.getUserById(login.getUserId()).getUsername()
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
-                        Event notif = new Event(-1, gameId, login.getUserId(), message, EventType.DEFENDER_MUTANT_EQUIVALENT,
-                                EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+                        Event notif = new Event(-1, gameId, login.getUserId(), message,
+                                EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
+                                new Timestamp(System.currentTimeMillis()));
                         notif.insert();
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
@@ -863,12 +844,9 @@ public class MeleeGameManager extends HttpServlet {
 
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response, //
             int gameId, MeleeGame game, //
-            int defenderPlayerId) throws IOException {
+            int playerId) throws IOException {
 
         final String contextPath = ctx(request);
-        final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
             messages.add("You cannot claim mutants as equivalent in this game anymore.");
@@ -895,7 +873,7 @@ public class MeleeGameManager extends HttpServlet {
                             // Keep only the mutants which containts the claimed line
                             .filter(m -> m.getLines().contains(line)
                                     && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
-                            // Keep only the mutant that do not belong to the user
+                            // Keep only the mutant that do not belong to the user. TODO Sometimes creator refers to player and sometimes to user?
                             .filter(m -> m.getCreatorId() != login.getUserId()).forEach(m -> {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
@@ -908,7 +886,7 @@ public class MeleeGameManager extends HttpServlet {
                                         new Timestamp(System.currentTimeMillis()));
                                 event.insert();
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
-                                DatabaseAccess.insertEquivalence(m, defenderPlayerId);
+                                DatabaseAccess.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });
@@ -921,8 +899,8 @@ public class MeleeGameManager extends HttpServlet {
 
         int nClaimed = claimedMutants.get();
         if (nClaimed > 0) {
-            String flaggingChatMessage = UserDAO.getUserById(login.getUserId()).getUsername() + " flagged " + nClaimed + " mutant"
-                    + (nClaimed == 1 ? "" : "s") + " as equivalent.";
+            String flaggingChatMessage = UserDAO.getUserById(login.getUserId()).getUsername() + " flagged " + nClaimed
+                    + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
                     EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                     new Timestamp(System.currentTimeMillis()));

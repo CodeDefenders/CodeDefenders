@@ -119,8 +119,15 @@ public abstract class AbstractGame {
     public List<Test> getTests() {
         return getTests(false);
     }
+    
+    // NOTE: I do not want to break compatibility so I define yet another method...
+    public List<Test> getAllTests() {
+        return TestDAO.getValidTestsForGame(this.id, false);
+    }
+    
 
     public List<Test> getTests(boolean defendersOnly) {
+        // TODO Why we cache this result?
         if (tests == null) {
             tests = TestDAO.getValidTestsForGame(this.id, defendersOnly);
         }

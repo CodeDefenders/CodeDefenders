@@ -58,6 +58,8 @@ import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import difflib.myers.MyersDiff;
+
 /**
  * Class that handles compilation and testing by creating a Process with the
  * relevant ant target. Since execution is related to single request, we use a
@@ -183,13 +185,20 @@ public class MutationTester implements IMutationTester {
 
     @Override
     public void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages) {
-        int killed = 0;
-        List<Mutant> mutants = game.getAliveMutants();
-        mutants.addAll(game.getMutantsMarkedEquivalentPending());
-        List<Mutant> killedMutants = new ArrayList<Mutant>();
 
-        // Acquire and release the connection
-        User u = UserDAO.getUserForPlayer(test.getPlayerId());
+        int testOwnerPlayerId = test.getPlayerId();
+        User u = UserDAO.getUserForPlayer(testOwnerPlayerId);
+
+        List<Mutant> mutants = game.getAliveMutants().stream().filter(m -> m.getPlayerId() != testOwnerPlayerId)
+                .collect(Collectors.toList());
+
+        List<Mutant> mutantsMarkedEquivalent = game.getMutantsMarkedEquivalentPending().stream()
+                .filter(m -> m.getPlayerId() != testOwnerPlayerId).collect(Collectors.toList());
+        
+        mutants.addAll(mutantsMarkedEquivalent);
+        
+        int killed = 0;
+        List<Mutant> killedMutants = new ArrayList<Mutant>();
 
         for (Mutant mutant : mutants) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -256,6 +265,8 @@ public class MutationTester implements IMutationTester {
         runAllTestsOnMutant(game, mutant, messages, new RandomTestScheduler());
     }
 
+    // TODO This clashes with our abstraction as for melee games we need to double
+    // check tests and mutants do not belong to the same user
     @Override
     public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages,
             TestScheduler scheduler) {
@@ -403,30 +414,12 @@ public class MutationTester implements IMutationTester {
     public void runAllTestsOnMeleeMutant(MeleeGame game, Mutant mutant, ArrayList<String> messages,
             TestScheduler scheduler) {
 
-        // TODO: ALESSIO this must be fixed !!!
-        int attackerPlayerId = mutant.getPlayerId();
-        User u = UserDAO.getUserForPlayer(attackerPlayerId);
-        int userId = u.getId();
+        int mutantOwnerPlayerId = mutant.getPlayerId();
+        User u = UserDAO.getUserForPlayer(mutantOwnerPlayerId);
 
-        List<Integer> playerIdsForUser = PlayerDAO.getPlayersIdForUserAndGame(userId, game.getId());
-
-        int _defenderPlayerId = -2;
-
-        for (Player player : game.getPlayers()) {
-            if (playerIdsForUser.contains(player.getId())) {
-                _defenderPlayerId = player.getId();
-                break;
-            }
-        }
-
-        if (_defenderPlayerId == -2) {
-            logger.warn("Cannot find defender id for {} in meelee game {}", userId, game.getId());
-            return;
-        }
-
-        final int defenderPlayerId = _defenderPlayerId;
-
-        List<Test> testsToExecute = game.getTests(true).stream().filter(t -> t.getPlayerId() != defenderPlayerId)
+        // Get all the tests from the game which DO NOT belong to mutantOwnerPlayerId
+        // Note we need to return the test for all the roles to include PLAYER
+        List<Test> testsToExecute = game.getAllTests().stream().filter(t -> t.getPlayerId() != mutantOwnerPlayerId)
                 .collect(Collectors.toList());
         List<Test> tests = scheduler.scheduleTests(testsToExecute);
 

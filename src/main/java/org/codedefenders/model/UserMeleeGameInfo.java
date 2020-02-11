@@ -38,6 +38,7 @@ public class UserMeleeGameInfo {
         info.game = game;
         info.creatorName = creatorName;
         info.role = role;
+        assert info.role == Role.OBSERVER || info.role == Role.PLAYER;
 
         return info;
     }

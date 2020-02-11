@@ -301,8 +301,7 @@ public class MeleeGame extends AbstractGame {
      * Every user has two players, one as defender and one as attacker
      */
     public List<Player> getPlayers() {
-        List<Player> players = GameDAO.getPlayersForGame(getId(), Role.DEFENDER);
-        players.addAll(GameDAO.getPlayersForGame(getId(), Role.ATTACKER));
+        List<Player> players = GameDAO.getPlayersForGame(getId(), Role.PLAYER);
         return players;
     }
 
@@ -311,7 +310,7 @@ public class MeleeGame extends AbstractGame {
     }
 
     public boolean addPlayer(int userId) {
-        if (canJoinGame(userId) && addPlayerForce(userId, Role.ATTACKER) && addPlayerForce(userId, Role.DEFENDER)) {
+        if (canJoinGame(userId) && addPlayerForce(userId, Role.PLAYER)) {
             User u = UserDAO.getUserById(userId);
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event e = new Event(-1, id, userId, u.getUsername() + " joined melee game", EventType.GAME_PLAYER_JOINED,
@@ -556,6 +555,7 @@ public class MeleeGame extends AbstractGame {
         return false;
     }
 
+    // TODO Change this to reflect the PLAYER roles
     public void notifyPlayers() {
         List<Event> events = getEvents();
 
@@ -563,8 +563,7 @@ public class MeleeGame extends AbstractGame {
         case ACTIVE:
             if (!listContainsEvent(events, EventType.GAME_STARTED)) {
                 EventType et = EventType.GAME_STARTED;
-                notifyAttackers("Game has started. Attack now!", et);
-                notifyDefenders("Game has started. Defend now!", et);
+                notifyPlayers("Game has started. Attack and Defend now!", et);
                 notifyCreator("Your game as started!", et);
                 notifyGame("The game has started!", et);
             }
@@ -572,8 +571,7 @@ public class MeleeGame extends AbstractGame {
         case GRACE_ONE:
             if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)) {
                 EventType et = EventType.GAME_GRACE_ONE;
-                notifyAttackers("A game has entered Grace One.", et);
-                notifyDefenders("A game has entered Grace One.", et);
+                notifyPlayers("A game has entered Grace One.", et);
                 notifyCreator("Your game has entered Grace One", et);
                 notifyGame("The game as entered Grace Period One", et);
             }
@@ -581,8 +579,7 @@ public class MeleeGame extends AbstractGame {
         case GRACE_TWO:
             if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)) {
                 EventType et = EventType.GAME_GRACE_TWO;
-                notifyAttackers("A game has entered Grace Two.", et);
-                notifyDefenders("A game has entered Grace Two.", et);
+                notifyPlayers("A game has entered Grace Two.", et);
                 notifyCreator("Your game has entered Grace Two", et);
                 notifyGame("The game as entered Grace Period Two", et);
             }
@@ -590,8 +587,7 @@ public class MeleeGame extends AbstractGame {
         case FINISHED:
             if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
                 EventType et = EventType.GAME_FINISHED;
-                notifyAttackers("A game has finished.", et);
-                notifyDefenders("A game has finished.", et);
+                notifyPlayers("A game has finished.", et);
                 notifyCreator("Your game has finished.", et);
                 notifyGame("The game has ended.", et);
             }
@@ -610,15 +606,7 @@ public class MeleeGame extends AbstractGame {
         return false;
     }
 
-    private void notifyAttackers(String message, EventType et) {
-        for (Player player : getPlayers()) {
-            Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
-                    new Timestamp(System.currentTimeMillis()));
-            notif.insert();
-        }
-    }
-
-    private void notifyDefenders(String message, EventType et) {
+    private void notifyPlayers(String message, EventType et) {
         for (Player player : getPlayers()) {
             Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
