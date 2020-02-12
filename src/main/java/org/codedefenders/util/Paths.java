@@ -46,6 +46,7 @@ public class Paths {
 
     public static final String PROJECT_EXPORT = "/project-export";
 
+    public static final String EQUIVALENCE_DUELS_GAME = "/equivalence-duels";
 
     public static final String BATTLEGROUND_GAME = "/multiplayergame";
     public static final String BATTLEGROUND_HISTORY = "/multiplayer/history";

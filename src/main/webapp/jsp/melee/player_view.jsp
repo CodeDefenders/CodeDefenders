@@ -1,5 +1,6 @@
-<%@page import="org.codedefenders.game.Mutant"%>
-<%@page import="org.codedefenders.game.multiplayer.MeleeGame"%>
+<%@ page import="org.codedefenders.model.User"%>
+<%@ page import="org.codedefenders.game.Mutant"%>
+<%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
 <%@ page import="org.codedefenders.game.GameLevel"%>
 <%@ page import="org.codedefenders.game.GameState"%>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
@@ -10,12 +11,14 @@
     @param MeleeGame game
         The game to be displayed.
 --%>
-
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
-			final GameClass cut = game.getCUT();
+    final GameClass cut = game.getCUT();
 
 	boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
+
+    final User user = login.getUser(); 
 
 %>
 
@@ -49,20 +52,28 @@
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
 			gameHighlighting.setFlaggingData(game.getMode(), game.getId());
 			gameHighlighting.setEnableFlagging(false);
-			// TODO Which one to use?
-			/* gameHighlighting.setCodeDivSelector("#newmut-div");
-			gameHighlighting.setCodeDivSelector("#cut-div"); */
+			// We should show game highlithing only inside the mutant editor
+			gameHighlighting.setCodeDivSelector("#newmut-div");
 %>
 
-<jsp:useBean id="errorHighlighting"
+<jsp:useBean id="testErrorHighlighting"
 	class="org.codedefenders.beans.game.ErrorHighlightingBean"
 	scope="request" />
 <%
-    // TODO Which one to use?
-			/* errorHighlighting.setCodeDivSelector("#utest-div");
-			errorHighlighting.setCodeDivSelector("#newmut-div"); */
+			testErrorHighlighting.setCodeDivSelector("#utest-div");
 			if (previousSubmission.hasErrorLines()) {
-				errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+			    testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+				previousSubmission.clearErrorLines();
+			}
+%>
+
+<jsp:useBean id="mutantErrorHighlighting"
+	class="org.codedefenders.beans.game.ErrorHighlightingBean"
+	scope="request" />
+<%
+			mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
+			if (previousSubmission.hasErrorLines()) {
+			    mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
 				previousSubmission.clearErrorLines();
 			}
 %>
@@ -71,12 +82,10 @@
 	class="org.codedefenders.beans.game.MutantAccordionBean"
 	scope="request" />
 <%
-    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+    mutantAccordion.setMutantAccordionData(cut, user, game.getAliveMutants(), game.getKilledMutants(),
 					game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
 			mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-			mutantAccordion.setEnableFlagging(false);
-			// TODO Which one to user
-			mutantAccordion.setViewDiff(true);
+			mutantAccordion.setEnableFlagging(true);
 			mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
 %>
 
@@ -158,7 +167,7 @@
             <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
             <!-- THE FOLLOWING IS DUPLICATED ! -->
-            <jsp:include page="/jsp/game_components/error_highlighting.jsp"/>
+            <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
         </form>
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
@@ -187,7 +196,7 @@
         </form>
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
         <!-- THE FOLLOWING IS DUPLICATED ! -->
-        <jsp:include page="/jsp/game_components/error_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 </div>
 

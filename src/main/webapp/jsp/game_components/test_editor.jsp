@@ -26,7 +26,7 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
-<pre><textarea id="code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
+<pre><textarea id="test-code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
 
 <script>
     let startEditLine = ${testEditor.editableLinesStart};
@@ -85,7 +85,24 @@
         autocompleteList =  Array.from(set);
     };
 
-    CodeMirror.commands.autocomplete = function (cm) {
+    let editorTest = CodeMirror.fromTextArea(document.getElementById("test-code"), {
+        lineNumbers: true,
+        indentUnit: 4,
+        smartIndent: true,
+        matchBrackets: true,
+        mode: "text/x-java",
+        autoCloseBrackets: true,
+        styleActiveLine: true,
+        extraKeys: {
+            "Ctrl-Space": "autocomplete",
+            "Tab": "insertSoftTab"
+        },
+        keyMap: "${login.user.keyMap.CMName}",
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+    });
+    
+    
+    editorTest.commands.autocomplete = function (cm) {
         cm.showHint({
             hint: function (editor) {
                 let reg = /[a-zA-Z][a-zA-Z0-9]*/;
@@ -110,22 +127,6 @@
             }
         });
     };
-
-    let editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
-        lineNumbers: true,
-        indentUnit: 4,
-        smartIndent: true,
-        matchBrackets: true,
-        mode: "text/x-java",
-        autoCloseBrackets: true,
-        styleActiveLine: true,
-        extraKeys: {
-            "Ctrl-Space": "autocomplete",
-            "Tab": "insertSoftTab"
-        },
-        keyMap: "${login.user.keyMap.CMName}",
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
-    });
 
     editorTest.on('beforeChange', function (cm, change) {
         let text = cm.getValue();

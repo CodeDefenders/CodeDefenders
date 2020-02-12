@@ -25,15 +25,15 @@
     The CSS is located in error_highlighting.css.
 --%>
 
-<jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
-<% if(errorHighlighting.hasErrorLines()) { %>
+<% if(mutantErrorHighlighting.hasErrorLines()) { %>
 <script>
     /* Wrap in a function so it has it's own scope. Inspired by game_highlighting.jsp*/
     (function () {
 
         /* Game highlighting data. */
-        const errorLines = JSON.parse('${errorHighlighting.errorLinesJSON}');
+        const errorLines = JSON.parse('${mutantErrorHighlighting.errorLinesJSON}');
 
         /**
          * Highlights errors on the given CodeMirror instance.
@@ -41,13 +41,13 @@
          * See: https://creativewebspecialist.co.uk/2013/07/15/highlight-errors-in-codemirror/
          */
         const highlightErrors = function (codeMirror) {
-            for (const errorLine of errorLines) {
+            for (const errorLine in errorLines) {
             	// Maybe we need to remove the
                 codeMirror.addLineClass(errorLine - 1, 'background', 'line-error');
             }
         };
 
-        const codeMirror = $('${errorHighlighting.codeDivSelector}').find('.CodeMirror')[0].CodeMirror;
+        const codeMirror = $('${mutantErrorHighlighting.codeDivSelector}').find('.CodeMirror')[0].CodeMirror;
         codeMirror.highlightErrors = function () { highlightErrors(this) };
         codeMirror.highlightErrors();
     }());

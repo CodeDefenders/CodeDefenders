@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -28,10 +29,13 @@
     @param MutliplayerGame game
         The game to be displayed.
 --%>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
+    
+    final User user = login.getUser();
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
@@ -81,7 +85,7 @@
 
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
-    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+    mutantAccordion.setMutantAccordionData(cut, user, game.getAliveMutants(), game.getKilledMutants(),
             game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(true);
@@ -130,7 +134,7 @@
             <input type="hidden" name="gameId" value="<%= game.getId() %>" />
         </form>
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
-        <jsp:include page="/jsp/game_components/error_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 </div>
 

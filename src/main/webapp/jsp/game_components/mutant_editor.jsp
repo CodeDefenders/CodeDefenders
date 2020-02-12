@@ -28,41 +28,41 @@
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 
 <script>
-    let startEditLine = ${mutantEditor.editableLinesStart};
-    let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
+    let mutantStartEditLine = ${mutantEditor.editableLinesStart};
+    let mutantmutantReadOnlyLinesStart = Array.from(new Array(mutantStartEditLine - 1).keys());
 
-    let endEditLine = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
+    let mutantEndEditLine = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
 
-    let getReadOnlyLinesEnd = function(lines) {
-        if (endEditLine == null) {
+    let mutantGetmutantReadOnlyLinesEnd = function(lines) {
+        if (mutantEndEditLine == null) {
             return [];
         }
-        let readOnlyLines = [];
+        let mutantReadOnlyLines = [];
 
         // You don't want the end line to be editable even when a user removes above lines.
-        // So the endEditLine isn't a static hard limit, but an indicator that
-        // totalLines - endEditLine many lines from the bottom are read only.
-        for (let i = 1; i <= getReadOnlyBottomNumber(lines); i++) {
-            readOnlyLines.push(lines.length - i)
+        // So the mutantEndEditLine isn't a static hard limit, but an indicator that
+        // totalLines - mutantEndEditLine many lines from the bottom are read only.
+        for (let i = 1; i <= mutantGetReadOnlyBottomNumber(lines); i++) {
+            mutantReadOnlyLines.push(lines.length - i)
         }
-        return readOnlyLines;
+        return mutantReadOnlyLines;
     };
 
-    let numberOfReadOnlyLinesFromBottom = null;
-    let getReadOnlyBottomNumber = function(lines) {
-        if (endEditLine != null && numberOfReadOnlyLinesFromBottom == null) {
-            numberOfReadOnlyLinesFromBottom = lines.length - endEditLine;
+    let numberOfmutantReadOnlyLinesFromBottom = null;
+    let mutantGetReadOnlyBottomNumber = function(lines) {
+        if (mutantEndEditLine != null && numberOfmutantReadOnlyLinesFromBottom == null) {
+            numberOfmutantReadOnlyLinesFromBottom = lines.length - mutantEndEditLine;
         }
-        return numberOfReadOnlyLinesFromBottom;
+        return numberOfmutantReadOnlyLinesFromBottom;
 
     };
 
-    filterOutComments = function (text) {
+    mutantFilterOutComments = function (text) {
         let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
         return text.replace(commentRegex, "");
     };
 
-    let updateAutocompleteList = function () {
+    let mutantUpdateAutocompleteList = function () {
         let wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
         let set = new Set();
 
@@ -74,7 +74,7 @@
         }
 
         texts.forEach(function (text) {
-            text = filterOutComments(text);
+            text = mutantFilterOutComments(text);
             let m;
             while ((m = wordRegex.exec(text)) !== null) {
                 if (m.index === wordRegex.lastIndex) {
@@ -88,6 +88,7 @@
 
         autocompleteList = Array.from(set);
     };
+    // NOTE: Is this safe or this will change all the code mirros in the page?
     CodeMirror.commands.autocomplete = function (cm) {
         cm.showHint({
             hint: function (editor) {
@@ -119,11 +120,11 @@
 <%
     if (!mutantEditor.hasDependencies()) { // no dependencies -> no tabs
 %>
-<pre style="margin-top: 10px;"><textarea id="code" name="mutant" title="mutant" cols="80"
+<pre style="margin-top: 10px;"><textarea id="mutant-code" name="mutant" title="mutant" cols="80"
                                          rows="50">${mutantEditor.mutantCode}</textarea></pre>
 
 <script>
-    let editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
+    let editorMutant = CodeMirror.fromTextArea(document.getElementById("mutant-code"), {
         lineNumbers: true,
         indentUnit: 4,
         smartIndent: true,
@@ -145,17 +146,17 @@
         let text = cm.getValue();
         let lines = text.split(/\r|\r\n|\n/);
 
-        let readOnlyLinesEnd = getReadOnlyLinesEnd(lines);
-        if (~readOnlyLinesStart.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
+        let mutantReadOnlyLinesEnd = mutantGetmutantReadOnlyLinesEnd(lines);
+        if (~mutantmutantReadOnlyLinesStart.indexOf(change.from.line) || ~mutantReadOnlyLinesEnd.indexOf(change.to.line)) {
             change.cancel();
         }
     });
 
-	// All the lines which are not between startEditLine and endEditLine() must be greyed out
+	// All the lines which are not between mutantStartEditLine and mutantEndEditLine() must be greyed out
 	// https://stackoverflow.com/questions/1720320/how-to-dynamically-create-css-class-in-javascript-and-apply
 	// https://stackoverflow.com/questions/5081690/how-to-gray-out-a-html-element
 	// Define the Grayout style
-    if(endEditLine != null) {
+    if(mutantEndEditLine != null) {
         var style = document.createElement('style');
         style.type = 'text/css';
         style.innerHTML = '.grayout { opacity: 0.5; filter: alpha(opacity = 50);}';
@@ -163,7 +164,7 @@
         // Apply the gray out style to the non-editable lines
         var count = editorMutant.lineCount();
         for (i = 0; i < count; i++) {
-            if ((i + 1) < startEditLine || (i + 1) > endEditLine) {
+            if ((i + 1) < mutantStartEditLine || (i + 1) > mutantEndEditLine) {
                 editorMutant.addLineClass(i, "text", "grayout");
             }
         }
@@ -187,10 +188,10 @@
 
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="${mutantEditor.className}" data-toggle="tab">
-            <pre><textarea id="code" name="mutant" title="mutant" cols="80"
+            <pre><textarea id="mutant-code" name="mutant" title="mutant" cols="80"
                                                      rows="50">${mutantEditor.mutantCode}</textarea></pre>
             <script>
-                let editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
+                let editorMutant = CodeMirror.fromTextArea(document.getElementById("mutant-code"), {
                     lineNumbers: true,
                     indentUnit: 4,
                     smartIndent: true,
@@ -212,8 +213,8 @@
                     let text = cm.getValue();
                     let lines = text.split(/\r|\r\n|\n/);
 
-                    let readOnlyLinesEnd = getReadOnlyLinesEnd(lines);
-                    if (~readOnlyLinesStart.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
+                    let mutantReadOnlyLinesEnd = mutantGetmutantReadOnlyLinesEnd(lines);
+                    if (~mutantmutantReadOnlyLinesStart.indexOf(change.from.line) || ~mutantReadOnlyLinesEnd.indexOf(change.to.line)) {
                         change.cancel();
                     }
                 });
@@ -268,12 +269,12 @@
 %>
 <script>
     editorMutant.on('focus', function () {
-        updateAutocompleteList();
+        mutantUpdateAutocompleteList();
     });
     editorMutant.on('keyHandled', function (cm, name, event) {
         // 9 == Tab, 13 == Enter
         if ([9, 13].includes(event.keyCode)) {
-            updateAutocompleteList();
+            mutantUpdateAutocompleteList();
         }
     });
 </script>

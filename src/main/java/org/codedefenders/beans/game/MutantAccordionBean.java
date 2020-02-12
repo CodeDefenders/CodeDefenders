@@ -12,6 +12,7 @@ import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.model.User;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JSONUtils;
 
@@ -66,6 +67,8 @@ public class MutantAccordionBean {
     private List<Mutant> flaggedMutants;
     private List<MutantAccordionCategory> categories;
 
+    private User user;
+
     public MutantAccordionBean() {
         enableFlagging = null;
         gameMode = null;
@@ -77,14 +80,17 @@ public class MutantAccordionBean {
         equivalentMutants = null;
         flaggedMutants = null;
         categories = null;
+        user = null;
     }
 
     public void setMutantAccordionData(GameClass cut,
+                                       User user,
                                        List<Mutant> aliveMutants,
                                        List<Mutant> killedMutants,
                                        List<Mutant> equivalentMutants,
                                        List<Mutant> flaggedMutants) {
         this.cut = cut;
+        this.user = user;
         this.aliveMutants = Collections.unmodifiableList(aliveMutants);
         this.killedMutants = Collections.unmodifiableList(killedMutants);
         this.equivalentMutants = Collections.unmodifiableList(equivalentMutants);
@@ -179,7 +185,7 @@ public class MutantAccordionBean {
     }
 
     public Boolean canFlag() {
-        return enableFlagging && gameMode == GameMode.PARTY;
+        return enableFlagging && ( gameMode == GameMode.PARTY || gameMode == GameMode.MELEE );
     }
 
     public Integer getGameId() {
@@ -195,19 +201,19 @@ public class MutantAccordionBean {
         List<MutantAccordionMutantDTO> mutants = new ArrayList<>();
         mutants.addAll(aliveMutants
                 .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.ALIVE))
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.ALIVE, this.user))
                 .collect(Collectors.toList()));
         mutants.addAll(killedMutants
                 .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.KILLED))
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.KILLED, this.user))
                 .collect(Collectors.toList()));
         mutants.addAll(equivalentMutants
                 .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.EQUIVALENT))
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.EQUIVALENT, this.user))
                 .collect(Collectors.toList()));
         mutants.addAll(flaggedMutants
                 .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.FLAGGED))
+                .map(x -> new MutantAccordionMutantDTO(x, MutantState.FLAGGED, this.user))
                 .collect(Collectors.toList()));
         return mutants;
     }
@@ -267,16 +273,16 @@ public class MutantAccordionBean {
         Map<Integer, MutantAccordionMutantDTO> mutants = new HashMap<>();
 
         for (Mutant mutant : aliveMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE, this.user));
         }
         for (Mutant mutant : killedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.KILLED));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.KILLED, this.user));
         }
         for (Mutant mutant : flaggedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.FLAGGED));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.FLAGGED, this.user));
         }
         for (Mutant mutant : equivalentMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT, this.user));
         }
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
@@ -377,11 +383,12 @@ public class MutantAccordionBean {
         @Expose
         private final String description;
 
-        public MutantAccordionMutantDTO(Mutant mutant, MutantState state) {
+        public MutantAccordionMutantDTO(Mutant mutant, MutantState state, User user) {
             id = mutant.getId();
             creatorName = mutant.getCreatorName();
             points = mutant.getScore();
             this.state = state;
+
             covered = mutant.isCovered();
             description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout()
                     .stream()
@@ -399,8 +406,10 @@ public class MutantAccordionBean {
 
             lines = mutant.getLines();
             lineString = lines.stream().map(String::valueOf).collect(Collectors.joining(","));
+
             canMarkEquivalent = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
                     && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                    && mutant.getCreatorId() != user.getId()
                     && mutant.getLines().size() >= 1;
             canView = state == MutantState.KILLED || state == MutantState.EQUIVALENT;
         }

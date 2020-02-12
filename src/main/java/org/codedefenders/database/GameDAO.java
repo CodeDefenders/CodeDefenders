@@ -143,4 +143,10 @@ public class GameDAO {
         String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
     }
+
+    // TODO Will this return null if the game is not there?
+    public static String getGameType(int gameId) {
+        String query = "SELECT Mode FROM games WHERE ID = ?";
+        return DB.executeQueryReturnValue(query, rs -> rs.getString("Mode"), DatabaseValue.of(gameId));
+    }
 }

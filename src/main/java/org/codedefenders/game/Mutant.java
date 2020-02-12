@@ -48,6 +48,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -304,7 +305,12 @@ public class Mutant implements Serializable {
     }
 
     public boolean isCovered() {
+        // Return valid tests for DEFENDERS or PLAYERS in the GAME. Cannot exist both at the same time
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
+        // Filter the tests that were created by the same user that created the mutant
+        tests = tests.stream().filter( t -> t.getPlayerId() == this.getPlayerId() ).collect( Collectors.toList());
+        //
+        TestDAO.getValidTestsForClass(classId);
         for (Test t : tests) {
             if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines())) {
                 return true;

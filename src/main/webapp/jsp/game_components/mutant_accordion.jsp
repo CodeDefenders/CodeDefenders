@@ -146,7 +146,7 @@
                 case "ALIVE":
                     if (row.canMarkEquivalent) {
                         if (row.covered) {
-                            return '<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
+                            return '<form id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
                                     '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
                                     '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
                                     '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
