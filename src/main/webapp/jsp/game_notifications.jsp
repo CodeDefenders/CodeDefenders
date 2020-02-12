@@ -18,18 +18,33 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.game.multiplayer.MeleeGame"%>
 <%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
+<%@page import="org.codedefenders.game.AbstractGame"%>
 <%@page import="org.codedefenders.util.Paths"%>
 <%@ page import="org.codedefenders.game.Role"%>
 <%@ page import="org.codedefenders.model.NotificationType"%>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean"
+	scope="request" />
 
 <%
     {
-				MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+				AbstractGame game = (AbstractGame) request.getAttribute("game");
 				int gameId = game.getId();
-				Role role = game.getRole(login.getUserId()); // required for header_game, too
+				Role role = Role.NONE;
+				boolean isChatEnabled = false;
+				/*
+					TODO This suggests that between Multiplayer and Melee and AbstractGame there
+						might be another level of hierachy
+				*/
+				if (game instanceof MultiplayerGame) {
+					role = ((MultiplayerGame) game).getRole(login.getUserId()); // required for header_game, too
+					isChatEnabled = ((MultiplayerGame) game).isChatEnabled();
+				} else if (game instanceof MeleeGame) {
+					role = ((MeleeGame) game).getRole(login.getUserId()); // required for header_game, too
+					isChatEnabled = ((MeleeGame) game).isChatEnabled();
+				}
 %>
 <script>
     var receivedMessage = []
@@ -180,7 +195,7 @@
 
 
 <%
-    if (game.isChatEnabled()) {
+    if (isChatEnabled) {
 %>
 <div id="game-notification-bar"
 	class="min<%if (role.equals(Role.OBSERVER)) {%> creator<%}%>">

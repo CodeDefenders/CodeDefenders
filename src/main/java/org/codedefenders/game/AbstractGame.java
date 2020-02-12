@@ -41,6 +41,7 @@ import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
  * Abstract class for games of different modes.
  *
  * @see MultiplayerGame
+ * @see MeleeGame
  * @see PuzzleGame
  */
 public abstract class AbstractGame {

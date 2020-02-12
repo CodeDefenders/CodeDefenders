@@ -42,7 +42,7 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
     // TODO Having "Injectable" game controllers would be a nice solution to
     // decouple request dispatching and game-state-logic
 
-    private static final Logger logger = LoggerFactory.getLogger(MeleeGameManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(EquivalenceDuelDispatcher.class);
 
     @Inject
     private GameManagingUtils gameManagingUtils;
@@ -88,7 +88,10 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
         switch (action) {
 
         case "claimEquivalent":
-            dispatchEquivalenceClaim(request, response, gameId);
+        case "resolveEquivalence":
+        case "acceptEquivalent":
+        case "rejectEquivalent":
+            forwardEquivalenceAction(request, response, gameId);
             return;
         default:
             logger.info("Action not recognised: {}", action);
@@ -96,7 +99,7 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
         }
     }
 
-    private void dispatchEquivalenceClaim(HttpServletRequest request, HttpServletResponse response, int gameId)
+    private void forwardEquivalenceAction(HttpServletRequest request, HttpServletResponse response, int gameId)
             throws IOException, ServletException {
         final String gameType = GameDAO.getGameType(gameId);
 

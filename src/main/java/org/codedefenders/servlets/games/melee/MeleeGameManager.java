@@ -188,12 +188,25 @@ public class MeleeGameManager extends HttpServlet {
 
         // check is there is a pending equivalence duel for this user.
         final int _playerId = playerId;
-        game.getMutantsMarkedEquivalentPending().stream().filter(m -> m.getPlayerId() == _playerId).findFirst()
+        game.getMutantsMarkedEquivalentPending()
+                .stream()
+                .filter(m -> m.getPlayerId() == _playerId)
+                .findFirst()
                 .ifPresent(mutant -> {
+                    // TODO Check if this is really based on role...
+                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
+                    User defender = UserDAO.getUserForPlayer(defenderId);
+                    // TODO This should be a better name
+                    request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
 
+        request.setAttribute("game", game);
+        request.setAttribute("playerId", playerId);
+
+        
+        
         // Set the data for the game view page
         request.setAttribute("game", game);
         //
