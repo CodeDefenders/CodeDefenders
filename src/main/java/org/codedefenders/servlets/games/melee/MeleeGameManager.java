@@ -18,24 +18,41 @@
  */
 package org.codedefenders.servlets.games.melee;
 
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
-import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-//import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES_IN_MUTANT;
-//import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES_IN_TEST;
-//import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-//import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.IntentionDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestSmellsDAO;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.tcs.ITestCaseSelector;
+import org.codedefenders.model.AttackerIntention;
+import org.codedefenders.model.DefenderIntention;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.User;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
+import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.ValidationMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -59,57 +76,37 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.IntentionDAO;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.database.PlayerDAO;
-import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.tcs.ITestCaseSelector;
-import org.codedefenders.model.AttackerIntention;
-import org.codedefenders.model.DefenderIntention;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
-import org.codedefenders.notification.INotificationService;
-import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.code.ValidationMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
+import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+
+// TODO Alessio 18/02/2020: Differentiate between errorLines in the mutants and errorLines in the tests in the UI.
+//  See: https://gitlab.infosun.fim.uni-passau.de/se2/codedefenders/CodeDefenders/merge_requests/505#note_17170
 
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for
  * {@link MeleeGame} games.
- * <p>
- * {@code GET} requests allow accessing melee games and {@code POST} requests
+ *
+ * <p>{@code GET} requests allow accessing melee games and {@code POST} requests
  * handle starting and ending games, creation of tests, mutants and resolving
  * equivalences.
- * <p>
- * Serves under {@code /meleegame}.
+ *
+ * <p>Serves under {@code /meleegame}.
  *
  * @see org.codedefenders.util.Paths#MELEE_GAME
  */
-@WebServlet("/meleegame")
+@WebServlet(Paths.MELEE_GAME)
 public class MeleeGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameManager.class);
@@ -163,14 +160,7 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        int playerId = -1;
-        List<Integer> playerIdsForUser = PlayerDAO.getPlayersIdForUserAndGame(userId, game.getId());
-
-        for (Player player : game.getPlayers()) {
-            if (playerIdsForUser.contains(player.getId())) {
-                playerId = player.getId();
-            }
-        }
+        final int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
 
         if (game.getCreatorId() != userId && playerId == -1) {
             // Something odd with the registration - TODO
@@ -179,18 +169,10 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        // TODO There must be a better way to undestand the role, like we do in the jsp?
-        Role userRole = Role.NONE;
-        if (game.getCreatorId() == userId && playerId == -1) {
-            // The creator is CAN NOT playing the game
-            userRole = Role.OBSERVER;
-        }
-
-        // check is there is a pending equivalence duel for this user.
-        final int _playerId = playerId;
+        // Check is there is a pending equivalence duel for this user.
         game.getMutantsMarkedEquivalentPending()
                 .stream()
-                .filter(m -> m.getPlayerId() == _playerId)
+                .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
@@ -204,10 +186,6 @@ public class MeleeGameManager extends HttpServlet {
 
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
-
-        
-        
-        // Set the data for the game view page
         request.setAttribute("game", game);
         //
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_VIEW_JSP);
@@ -241,15 +219,7 @@ public class MeleeGameManager extends HttpServlet {
         final String action = ServletUtils.formType(request);
         final User user = UserDAO.getUserById(login.getUserId());
 
-        int playerId = -1;
-
-        List<Integer> playerIdsForUser = PlayerDAO.getPlayersIdForUserAndGame(login.getUserId(), game.getId());
-
-        for (Player player : game.getPlayers()) {
-            if (playerIdsForUser.contains(player.getId())) {
-                playerId = player.getId();
-            }
-        }
+        final int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         if (playerId == -1) {
             // Something odd with the registration - TODO
@@ -259,36 +229,36 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         switch (action) {
-        case "createMutant": {
-            createMutant(request, response, user, game, playerId);
-            triggerAutomaticMutantEquivalenceForGame(game);
-            return;
-        }
-        case "createTest": {
-            createTest(request, response, user, game);
-            // After a test is submitted, there's the chance that one or more mutants
-            // already survived enough tests
-            triggerAutomaticMutantEquivalenceForGame(game);
-            return;
-        }
-        case "reset": {
-            final HttpSession session = request.getSession();
-            // TODO Why those are commented out?
-//            session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
-            return;
-        }
-        case "claimEquivalent": {
-            claimEquivalent(request, response, gameId, game, playerId);
-            return;
-        }
-        case "resolveEquivalence": {
-            resolveEquivalence(request, response, gameId, game, playerId);
-            return;
-        }
-        default:
-            logger.info("Action not recognised: {}", action);
-            Redirect.redirectBack(request, response);
+            case "createMutant": {
+                createMutant(request, response, user, game, playerId);
+                triggerAutomaticMutantEquivalenceForGame(game);
+                return;
+            }
+            case "createTest": {
+                createTest(request, response, user, game);
+                // After a test is submitted, there's the chance that one or more mutants
+                // already survived enough tests
+                triggerAutomaticMutantEquivalenceForGame(game);
+                return;
+            }
+            case "reset": {
+                final HttpSession session = request.getSession();
+                // TODO Why those are commented out?
+    //            session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+                response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                return;
+            }
+            case "claimEquivalent": {
+                claimEquivalent(request, response, gameId, game, playerId);
+                return;
+            }
+            case "resolveEquivalence": {
+                resolveEquivalence(request, response, gameId, game, playerId);
+                return;
+            }
+            default:
+                logger.info("Action not recognised: {}", action);
+                Redirect.redirectBack(request, response);
         }
     }
 
@@ -311,8 +281,8 @@ public class MeleeGameManager extends HttpServlet {
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
                 // Send the notification about the flagged mutant to attacker
-                int mutantOwnerID = aliveMutant.getPlayerId();
-                Event event = new Event(-1, game.getId(), mutantOwnerID,
+                int mutantOwnerId = aliveMutant.getPlayerId();
+                Event event = new Event(-1, game.getId(), mutantOwnerId,
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
                                 + "tests so it was automatically claimed as equivalent.",
@@ -486,7 +456,7 @@ public class MeleeGameManager extends HttpServlet {
 
     /**
      * Return the line numbers mentioned in the error message of the compiler
-     * 
+     *
      * @param message
      * @return
      */

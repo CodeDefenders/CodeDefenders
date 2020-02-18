@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -221,7 +220,7 @@ public class NotificationsHandler extends HttpServlet {
             timestamp = Long.parseLong(timestampString);
         } catch (NumberFormatException e) {
             response.setStatus(400);
-            logger.error("User Event: Error trying to format timestamp." + e );
+            logger.error("User Event: Error trying to format timestamp.", e);
             return;
         }
 

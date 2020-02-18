@@ -304,7 +304,7 @@ public class MultiplayerGame extends AbstractGame {
         return automaticMutantEquivalenceThreshold;
     }
 
-public Role getRole(int userId) {
+    public Role getRole(int userId) {
         if (getDefenderPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.DEFENDER;
         } else if (getAttackerPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
