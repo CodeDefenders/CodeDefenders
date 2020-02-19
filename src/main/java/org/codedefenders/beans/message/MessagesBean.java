@@ -1,9 +1,8 @@
 package org.codedefenders.beans.message;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,11 +14,11 @@ import java.util.List;
  * This bean is session-scoped so messages can be kept over multiple request when PGR (post redirect get) is applied.
  * The messages are cleared whenever they are rendered in the JSP (see messages.jsp).
  * </p>
- * <p>Bean Name: {@code messages}</p>
  */
 // TODO: Find a way to make this request scoped, so messages are not mixed when multiple tabs are used.
 @ManagedBean
 @SessionScoped
+@Named("messages")
 public class MessagesBean implements Serializable {
     private long currentId;
     private List<Message> messages;
@@ -35,6 +34,7 @@ public class MessagesBean implements Serializable {
      */
     public synchronized List<Message> getMessages() {
         return new ArrayList<>(messages);
+
     }
 
     /**
@@ -52,12 +52,19 @@ public class MessagesBean implements Serializable {
      * @return The newly created message.
      */
     public synchronized Message add(String text) {
-        // text = StringEscapeUtils.escapeHtml(text);
-        // TODO: we should escape this, but error messages embed <a> tags
-        //      -> add a add(void) method and a unescapedText(String) builder method?
         Message message = new Message(text, currentId++);
         messages.add(message);
         return message;
+    }
+
+    /**
+     * Returns if the messages should fade out or not.
+     * @return If the messages should fade out or not.
+     */
+    // TODO: make individual messages fade out instead of all of the messages
+    //      -> we need to check which messages are not marked as fadeOut(false) even though they shouldn't fade out
+    public synchronized boolean isFadeOut() {
+        return messages.stream().allMatch(Message::isFadeOut);
     }
 
     /**

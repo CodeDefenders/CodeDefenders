@@ -1,5 +1,7 @@
 package org.codedefenders.beans.message;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import java.io.Serializable;
 
 /**
@@ -9,6 +11,7 @@ public class Message implements Serializable {
     private long id;
     private String text;
     private boolean fadeOut;
+    private boolean escape;
 
     /**
      * Constructs a new message with the given text. Use {@link MessagesBean#add(String)} instead of calling the
@@ -19,6 +22,7 @@ public class Message implements Serializable {
         this.id = id;
         this.text = text;
         this.fadeOut = true;
+        this.escape = true;
     }
 
     /**
@@ -30,11 +34,23 @@ public class Message implements Serializable {
     }
 
     /**
-     * Returns the text of the message.
+     * Returns the escaped or unescaped text of the message, depending on if the message is set to escape the text.
      * @return The text of the message.
      */
     public String getText() {
-        return text;
+        if (isEscape()) {
+            return StringEscapeUtils.escapeHtml(text);
+        } else {
+            return text;
+        }
+    }
+
+    /**
+     * Returns if the message should be HTML-escaped.
+     * @return If the message should be HTML-escaped.
+     */
+    public boolean isEscape() {
+        return escape;
     }
 
     /**
@@ -49,5 +65,9 @@ public class Message implements Serializable {
 
     public void fadeOut(boolean fadeOut) {
         this.fadeOut = fadeOut;
+    }
+
+    public void escape(boolean escape) {
+        this.escape = escape;
     }
 }
