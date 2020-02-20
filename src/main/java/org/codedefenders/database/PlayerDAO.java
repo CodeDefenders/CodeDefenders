@@ -18,16 +18,14 @@
  */
 package org.codedefenders.database;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Optional;
 
 /**
  * This class handles the database logic for players.
@@ -135,31 +133,5 @@ public class PlayerDAO {
         return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS,
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId));
-    }
-
-    public static List<Integer> getPlayersIdForUserAndGame(int userId, int gameId) {
-        String query = String.join("\n",
-                "SELECT players.ID",
-                "FROM players",
-                "WHERE User_ID = ?",
-                "  AND Game_ID = ?");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(gameId)
-        };
-        // TODO I have not idea why this returns null:
-        
-        List<Integer> playersIdForUserAndGame = DB.executeQueryReturnValue(query, PlayerDAO::listOfPlayerIdsFromRS, values);
-        return (playersIdForUserAndGame != null )? playersIdForUserAndGame : new ArrayList<>();
-    }
-    
-    static List<Integer> listOfPlayerIdsFromRS(ResultSet rs) throws SQLException {
-        List<Integer> playersID = new ArrayList<Integer>();
-        // No idea why we need to enforce this
-        rs.beforeFirst();
-        while ( rs.next() ){
-            playersID.add( rs.getInt("ID") );
-        }
-        return playersID;
     }
 }

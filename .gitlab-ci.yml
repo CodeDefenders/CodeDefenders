@@ -22,6 +22,7 @@ build:
 test:
   stage: test
   script:
+    - apt update && apt-get -y install libncurses5
     - touch config.properties
     - mvn --no-transfer-progress test checkstyle:checkstyle
     - |

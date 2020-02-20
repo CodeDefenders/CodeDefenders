@@ -18,34 +18,6 @@
  */
 package org.codedefenders.servlets.games.melee;
 
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.formType;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
-import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
@@ -80,6 +52,32 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.formType;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
+import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+
 /**
  * This {@link HttpServlet} handles selection of {@link MeleeGame games}.
  *
@@ -90,18 +88,16 @@ import org.slf4j.LoggerFactory;
  *
  * @see org.codedefenders.util.Paths#MELEE_SELECTION
  */
-@WebServlet("/melee/games")
+@WebServlet(Paths.MELEE_SELECTION)
 public class MeleeGameSelectionManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameSelectionManager.class);
-
-    private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
     @Inject
     private MessagesBean messages;
 
     @Inject
     private LoginBean login;
-    
+
     @Inject
     private INotificationService notificationService;
 
@@ -143,7 +139,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        
+
         String contextPath = request.getContextPath();
 
         HttpSession session = request.getSession();
@@ -205,7 +201,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
 
         int dummyPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
-       
 
         // this mutant map links the uploaded mutants and the once generated from them here
         // This implements bookkeeping for killmap
@@ -257,15 +252,15 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 for (Test uploadedTest : uploadedTests) {
                     // Does the test kill the mutant?
                     for (KillMapEntry entry : killmap) {
-                        if (entry.mutant.getId() == uploadedMutant.getId() &&
-                                entry.test.getId() == uploadedTest.getId() &&
-                                entry.status.equals(KillMapEntry.Status.KILL)) {
+                        if (entry.mutant.getId() == uploadedMutant.getId()
+                                && entry.test.getId() == uploadedTest.getId()
+                                && entry.status.equals(KillMapEntry.Status.KILL)) {
 
                             // If the mutant was not yet killed by some other test increment the kill count for the test
                             // and kill the mutant, otherwise continue
                             // We need this because the killmap gives us all the possible combinations !
-                            if( mutantMap.get(uploadedMutant).isAlive() ){
-                                testMap.get( uploadedTest).killMutant();
+                            if (mutantMap.get(uploadedMutant).isAlive()) {
+                                testMap.get(uploadedTest).killMutant();
                                 mutantMap.get(uploadedMutant).kill();
                             }
                             alive = false;
@@ -285,7 +280,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
         GameCreatedEvent gce = new GameCreatedEvent();
         gce.setGameId(nGame.getId());
         notificationService.post(gce);
-
 
         // Redirect to admin interface
         if (request.getParameter("fromAdmin").equals("true")) {
@@ -321,34 +315,34 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        if ( game.hasUserJoined( login.getUserId() ) ) {
+        if (game.hasUserJoined(login.getUserId())) {
             logger.info("User {} already in the requested game.", login.getUserId());
             return;
         }
         if (game.addPlayer(login.getUserId())) {
-                logger.info("User {} joined game {}.", login.getUserId(), gameId);
+            logger.info("User {} joined game {}.", login.getUserId(), gameId);
 
-                /*
-                 * Publish the event about the user
-                 */
-                GameJoinedEvent gje = new GameJoinedEvent();
-                gje.setGameId(game.getId());
-                gje.setUserId(login.getUserId());
-                gje.setUserName(login.getUser().getUsername());
-                notificationService.post(gje);
-                
-                final EventType notifType = EventType.GAME_PLAYER_JOINED;
-                final String message = "You successfully joined the game.";
-                final EventStatus eventStatus = EventStatus.NEW;
-                final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-                notif.insert();
+            /*
+             * Publish the event about the user
+             */
+            GameJoinedEvent gje = new GameJoinedEvent();
+            gje.setGameId(game.getId());
+            gje.setUserId(login.getUserId());
+            gje.setUserName(login.getUser().getUsername());
+            notificationService.post(gje);
 
-                response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
-            } else {
-                logger.info("User {} failed to join game {}.", login.getUserId(), gameId);
-                response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
-            }
+            final EventType notifType = EventType.GAME_PLAYER_JOINED;
+            final String message = "You successfully joined the game.";
+            final EventStatus eventStatus = EventStatus.NEW;
+            final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
+            notif.insert();
+
+            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
+        } else {
+            logger.info("User {} failed to join game {}.", login.getUserId(), gameId);
+            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+        }
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -397,7 +391,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
         gle.setUserName(login.getUser().getUsername());
 
         notificationService.post(gle);
-
 
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
     }

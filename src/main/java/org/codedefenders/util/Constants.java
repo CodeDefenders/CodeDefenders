@@ -71,11 +71,6 @@ public class Constants {
     // Configuration variable names
     public static final String BLOCK_ATTACKER = "codedefenders/block.attacker";
 
-    // Game types
-    public static final String BATTLEGROUND = "PARTY";
-    public static final String MELEE = "MELEE";
-    public static final String PUZZLE = "PUZZLE";
-    
     // Dummy game
     public static final int DUMMY_GAME_ID = -1;
 

@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
@@ -144,9 +145,15 @@ public class GameDAO {
         return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
     }
 
-    // TODO Will this return null if the game is not there?
-    public static String getGameType(int gameId) {
+    /**
+     * Returns a game's mode for given game identifier.
+     *
+     * @param gameId the identifier of the game.
+     * @return the game mode of the queried game.
+     */
+    public static GameMode getGameMode(int gameId) {
         String query = "SELECT Mode FROM games WHERE ID = ?";
-        return DB.executeQueryReturnValue(query, rs -> rs.getString("Mode"), DatabaseValue.of(gameId));
+        return DB.executeQueryReturnValue(query, rs -> GameMode.valueOf(rs.getString("Mode")),
+                DatabaseValue.of(gameId));
     }
 }

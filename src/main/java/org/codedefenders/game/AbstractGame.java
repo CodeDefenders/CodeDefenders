@@ -22,6 +22,7 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
@@ -120,12 +121,12 @@ public abstract class AbstractGame {
     public List<Test> getTests() {
         return getTests(false);
     }
-    
+
     // NOTE: I do not want to break compatibility so I define yet another method...
     public List<Test> getAllTests() {
         return TestDAO.getValidTestsForGame(this.id, false);
     }
-    
+
 
     public List<Test> getTests(boolean defendersOnly) {
         // TODO Why we cache this result?
