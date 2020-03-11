@@ -124,7 +124,7 @@
         const testModals = new Map();
 
         /* Functions to generate table columns. */
-        const genId = row => '<span class="ma-mutant-link btn-link" style="padding: 0">Mutant ' + row.id + '</span> <span class="ma-column-name>  by  </span> ' + row.creatorName + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
+        const genId = row => '<span class="ma-mutant-link btn-link" style="padding: 0">Mutant ' + row.id + '</span> <span class="ma-column-name">  by  </span> ' + row.creatorName + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
         const genPoints = row => '<span class="ma-column-name">Points:</span> ' + row.points;
         const genLines = row => row.description;
         const genIcon = row => {
