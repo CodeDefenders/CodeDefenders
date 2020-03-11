@@ -411,7 +411,7 @@ public class MutantAccordionBean {
                     && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                     && mutant.getCreatorId() != user.getId()
                     && mutant.getLines().size() >= 1;
-            canView = state == MutantState.KILLED || state == MutantState.EQUIVALENT;
+            canView = state == MutantState.KILLED || state == MutantState.EQUIVALENT || mutant.getCreatorId() == user.getId();
         }
     }
 
