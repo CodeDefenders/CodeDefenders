@@ -308,7 +308,9 @@ public class Mutant implements Serializable {
         // Return valid tests for DEFENDERS or PLAYERS in the GAME. Cannot exist both at the same time
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
         // Filter the tests that were created by the same user that created the mutant
-        tests = tests.stream().filter( t -> t.getPlayerId() == this.getPlayerId() ).collect( Collectors.toList());
+        tests = tests.stream()
+                .filter( t -> t.getPlayerId() != this.getPlayerId() )
+                .collect( Collectors.toList());
         //
         TestDAO.getValidTestsForClass(classId);
         for (Test t : tests) {
