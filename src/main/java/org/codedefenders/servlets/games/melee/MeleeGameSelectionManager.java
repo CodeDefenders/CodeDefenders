@@ -331,7 +331,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             gje.setUserName(login.getUser().getUsername());
             notificationService.post(gje);
 
-            final EventType notifType = EventType.GAME_PLAYER_JOINED;
+            final EventType notifType = EventType.PLAYER_JOINED;
             final String message = "You successfully joined the game.";
             final EventStatus eventStatus = EventStatus.NEW;
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());

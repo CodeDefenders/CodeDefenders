@@ -51,7 +51,7 @@ public class MeleeGame extends AbstractGame {
 
     /*
      * Inherited from AbstractGame
-     * 
+     *
      * protected GameClass cut; protected int id; protected int classId; protected
      * int creatorId; protected GameState state; protected GameLevel level;
      * protected GameMode mode; protected ArrayList<Event> events; protected
@@ -313,10 +313,10 @@ public class MeleeGame extends AbstractGame {
         if (canJoinGame(userId) && addPlayerForce(userId, Role.PLAYER)) {
             User u = UserDAO.getUserById(userId);
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event e = new Event(-1, id, userId, u.getUsername() + " joined melee game", EventType.GAME_PLAYER_JOINED,
+            Event e = new Event(-1, id, userId, u.getUsername() + " joined melee game", EventType.PLAYER_JOINED,
                     EventStatus.GAME, timestamp);
             e.insert();
-            Event notif = new Event(-1, id, userId, "You joined melee game", EventType.GAME_PLAYER_JOINED,
+            Event notif = new Event(-1, id, userId, "You joined melee game", EventType.PLAYER_JOINED,
                     EventStatus.NEW, timestamp);
             notif.insert();
             //
@@ -345,10 +345,10 @@ public class MeleeGame extends AbstractGame {
     }
 
     /**
-     * 
+     *
      * TODO This most likely need an update to account for the fact that the same
      * user plays attack and defense !
-     * 
+     *
      * This method calculates the mutant score for every attacker in the game. The
      * result is a mapping of playerId to player score.
      *
@@ -434,13 +434,13 @@ public class MeleeGame extends AbstractGame {
     }
 
     /**
-     * 
+     *
      * TODO This most likely need an update to account for the fact that the same
      * user plays attack and defense !
-     * 
+     *
      * This method calculates the test score for every defender in the game. The
      * result is a mapping of playerId to player score.
-     * 
+     *
      *
      * @return mapping from playerId to player score.
      */
