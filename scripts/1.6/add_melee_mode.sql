@@ -20,3 +20,21 @@ INSERT INTO `event_messages` VALUES
 ('PLAYER_TEST_ERROR','@event_user created a test that errored'),
 ('PLAYER_TEST_READY','Test by @event_user is ready'),
 ('GAME_MESSAGE_PLAYER','@event_user: @chat_message');
+
+
+CREATE OR REPLACE VIEW `view_melee_games` AS
+SELECT games.*,
+       classes.Name,
+       classes.JavaFile,
+       classes.ClassFile,
+       classes.Alias,
+       classes.RequireMocking,
+       classes.TestingFramework,
+       classes.AssertionLibrary,
+       classes.Active,
+       classes.Puzzle,
+       classes.Parent_Class
+FROM games,
+     classes
+WHERE Mode = 'MELEE'
+  AND games.Class_ID = classes.Class_ID;
