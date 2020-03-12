@@ -185,7 +185,7 @@ public class MutantAccordionBean {
     }
 
     public Boolean canFlag() {
-        return enableFlagging && ( gameMode == GameMode.PARTY || gameMode == GameMode.MELEE );
+        return enableFlagging && (gameMode == GameMode.PARTY || gameMode == GameMode.MELEE);
     }
 
     public Integer getGameId() {
@@ -411,7 +411,9 @@ public class MutantAccordionBean {
                     && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                     && mutant.getCreatorId() != user.getId()
                     && mutant.getLines().size() >= 1;
-            canView = state == MutantState.KILLED || state == MutantState.EQUIVALENT || mutant.getCreatorId() == user.getId();
+            canView = state == MutantState.KILLED
+                    || state == MutantState.EQUIVALENT
+                    || mutant.getCreatorId() == user.getId();
         }
     }
 

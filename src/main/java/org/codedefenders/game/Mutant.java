@@ -66,7 +66,8 @@ public class Mutant implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
     // https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
-    public static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
+    public static String regex =
+            "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
     private int id;
     private int gameId;
@@ -135,11 +136,11 @@ public class Mutant implements Serializable {
     /**
      * Creates a mutant.
      *
-     * @param gameId
-     * @param javaFile
-     * @param classFile
-     * @param alive
-     * @param playerId
+     * @param gameId The ID of the game for which we generate the mutant.
+     * @param javaFile The path to the java file of the mutant.
+     * @param classFile The path to the class file with the compiled
+     * @param alive If the mutant is alive or not.
+     * @param playerId The ID of the player who submitted the mutant.
      */
     public Mutant(int gameId, int classId,  String javaFile, String classFile, boolean alive, int playerId) {
         this.gameId = gameId;
@@ -309,8 +310,8 @@ public class Mutant implements Serializable {
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
         // Filter the tests that were created by the same user that created the mutant
         tests = tests.stream()
-                .filter( t -> t.getPlayerId() != this.getPlayerId() )
-                .collect( Collectors.toList());
+                .filter(t -> t.getPlayerId() != this.getPlayerId())
+                .collect(Collectors.toList());
         //
         TestDAO.getValidTestsForClass(classId);
         for (Test t : tests) {
