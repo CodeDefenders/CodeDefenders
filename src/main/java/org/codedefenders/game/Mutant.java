@@ -138,7 +138,7 @@ public class Mutant implements Serializable {
      *
      * @param gameId The ID of the game for which we generate the mutant.
      * @param javaFile The path to the java file of the mutant.
-     * @param classFile The path to the class file with the compiled
+     * @param classFile The path to the class file with the compiled mutant.
      * @param alive If the mutant is alive or not.
      * @param playerId The ID of the player who submitted the mutant.
      */
