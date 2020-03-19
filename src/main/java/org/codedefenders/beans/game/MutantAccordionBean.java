@@ -286,16 +286,20 @@ public class MutantAccordionBean {
         Map<Integer, MutantAccordionMutantDTO> mutants = new HashMap<>();
 
         for (Mutant mutant : aliveMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE, this.user, playerCoverToClaim));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE, this.user,
+                    playerCoverToClaim));
         }
         for (Mutant mutant : killedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.KILLED, this.user, playerCoverToClaim));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.KILLED, this.user,
+                    playerCoverToClaim));
         }
         for (Mutant mutant : flaggedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.FLAGGED, this.user, playerCoverToClaim));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.FLAGGED, this.user,
+                    playerCoverToClaim));
         }
         for (Mutant mutant : equivalentMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT, this.user, playerCoverToClaim));
+            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT, this.user,
+                    playerCoverToClaim));
         }
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
