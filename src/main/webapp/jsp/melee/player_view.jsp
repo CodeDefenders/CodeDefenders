@@ -122,7 +122,7 @@
 	scope="request" />
 <%
     mutantAccordion.setMutantAccordionData(cut, user, game.getAliveMutants(), game.getKilledMutants(),
-					game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+					game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending(), true);
 			mutantAccordion.setFlaggingData(game.getMode(), game.getId());
 			mutantAccordion.setEnableFlagging(true);
 			mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
