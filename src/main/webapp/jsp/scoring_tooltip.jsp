@@ -28,10 +28,10 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-sm-6">
-                        <h2 class="text-center" style="color: #884466;">Attackers</h2>
+                        <h2 class="text-center fg-attacker">Attackers</h2>
                     </div>
                     <div class="col-sm-6">
-                        <h2 class="text-center" style="color: #446688;">Defenders</h2>
+                        <h2 class="text-center fg-defender">Defenders</h2>
                     </div>
                 </div>
                 <br/>

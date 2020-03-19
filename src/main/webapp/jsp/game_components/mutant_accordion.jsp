@@ -89,7 +89,7 @@
                        class="panel-title <%=category.getMutantIds().isEmpty() ? "" : "ma-covered"%>"
                        style="text-decoration: none;">
                         <% if (!category.getMutantIds().isEmpty()) { %>
-                        <span class="label label-primary ma-count"><%=category.getMutantIds().size()%></span>
+                        <span class="label bg-attacker ma-count"><%=category.getMutantIds().size()%></span>
                         <% } %>
                         <%=category.getDescription()%>
                     </a>
