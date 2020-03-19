@@ -19,16 +19,15 @@
 
 --%>
 
-<%@page import="org.codedefenders.util.Paths"%>
-<%@ page import="org.codedefenders.model.User"%>
-<%@ page import="org.codedefenders.game.Mutant"%>
-<%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
+<%@page import="org.codedefenders.game.GameClass"%>
 <%@ page import="org.codedefenders.game.GameLevel"%>
 <%@ page import="org.codedefenders.game.GameState"%>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
-<%@ page import="org.codedefenders.util.Constants"%>
+<%@ page import="org.codedefenders.game.Mutant"%>
+<%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
 <%@ page import="org.codedefenders.model.User"%>
-<%@ page import="org.codedefenders.game.GameClass"%>
+<%@ page import="org.codedefenders.util.Constants"%>
+<%@ page import="org.codedefenders.util.Paths"%>
+<%@ page import="java.util.stream.Collectors"%>
 
 <%--
     @param MeleeGame game
@@ -124,7 +123,14 @@
 <jsp:useBean id="testAccordion"
 	class="org.codedefenders.beans.game.TestAccordionBean" scope="request" />
 <%
-    testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants(), login.getUser());
+    // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
+    int userId = login.getUserId();
+    testAccordion.setTestAccordionData(cut,
+            game.getTests()
+                    .stream()
+                    .filter(t -> t.getPlayerId() == userId)
+                    .collect(Collectors.toList()),
+            game.getMutants());
 %>
 
 <jsp:useBean id="mutantProgressBar"
