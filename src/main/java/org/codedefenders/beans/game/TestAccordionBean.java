@@ -7,6 +7,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.TestAccordionDTO;
 import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
+import org.codedefenders.model.User;
 import org.codedefenders.util.JSONUtils;
 
 import javax.annotation.ManagedBean;
@@ -32,7 +33,11 @@ public class TestAccordionBean {
     }
 
     public void setTestAccordionData(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
-        testAccordionData = new TestAccordionDTO(cut, testsList, mutantsList);
+        setTestAccordionData(cut, testsList, mutantsList, null);
+    }
+
+    public void setTestAccordionData(GameClass cut, List<Test> testsList, List<Mutant> mutantsList, User user) {
+        testAccordionData = new TestAccordionDTO(cut, testsList, mutantsList, user);
     }
 
     // --------------------------------------------------------------------------------

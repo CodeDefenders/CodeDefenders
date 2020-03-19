@@ -124,7 +124,7 @@
 <jsp:useBean id="testAccordion"
 	class="org.codedefenders.beans.game.TestAccordionBean" scope="request" />
 <%
-    testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants());
+    testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants(), login.getUser());
 %>
 
 <jsp:useBean id="mutantProgressBar"
