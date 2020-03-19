@@ -23,11 +23,13 @@
 <%@ page import="org.codedefenders.game.GameLevel"%>
 <%@ page import="org.codedefenders.game.GameState"%>
 <%@ page import="org.codedefenders.game.Mutant"%>
+<%@ page import="org.codedefenders.game.Test"%>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
 <%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.util.Constants"%>
 <%@ page import="org.codedefenders.util.Paths"%>
 <%@ page import="java.util.stream.Collectors"%>
+<%@ page import="java.util.List" %>
 
 <%--
     @param MeleeGame game
@@ -47,6 +49,12 @@
 			User equivDefender = (User) request.getAttribute("equivDefender");
 
 			final User user = login.getUser();
+            // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
+            final int userId = login.getUserId();
+            final List<Test> playerTests = game.getTests()
+                    .stream()
+                    .filter(t -> t.getPlayerId() == userId)
+                    .collect(Collectors.toList());
 %>
 
 <jsp:useBean id="testPreviousSubmission"
@@ -80,7 +88,7 @@
 	class="org.codedefenders.beans.game.GameHighlightingBean"
 	scope="request" />
 <%
-    gameHighlighting.setGameData(game.getMutants(), game.getTests(), user);
+    gameHighlighting.setGameData(game.getMutants(), playerTests, user);
 			gameHighlighting.setFlaggingData(game.getMode(), game.getId());
 			gameHighlighting.setEnableFlagging(true);
 			// We should show game highlithing only inside the mutant editor
@@ -123,14 +131,7 @@
 <jsp:useBean id="testAccordion"
 	class="org.codedefenders.beans.game.TestAccordionBean" scope="request" />
 <%
-    // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
-    int userId = login.getUserId();
-    testAccordion.setTestAccordionData(cut,
-            game.getTests()
-                    .stream()
-                    .filter(t -> t.getPlayerId() == userId)
-                    .collect(Collectors.toList()),
-            game.getMutants());
+    testAccordion.setTestAccordionData(cut, playerTests, game.getMutants());
 %>
 
 <jsp:useBean id="mutantProgressBar"
