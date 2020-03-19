@@ -81,9 +81,9 @@
 	class="org.codedefenders.beans.game.GameHighlightingBean"
 	scope="request" />
 <%
-    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setGameData(game.getMutants(), game.getTests(), user);
 			gameHighlighting.setFlaggingData(game.getMode(), game.getId());
-			gameHighlighting.setEnableFlagging(false);
+			gameHighlighting.setEnableFlagging(true);
 			// We should show game highlithing only inside the mutant editor
 			gameHighlighting.setCodeDivSelector("#newmut-div");
 %>
@@ -242,7 +242,7 @@
 				<input type="hidden" name="gameId" value="<%=game.getId()%>">
 				<input type="hidden" id="equivMutantId" name="equivMutantId"
 					value="<%=equivMutant.getId()%>">
-				
+
 				<jsp:include page="/jsp/game_components/test_editor.jsp" />
 
 				<button class="btn btn-danger btn-left" name="acceptEquivalent"

@@ -109,7 +109,7 @@
             for (const mutantStatus in sortedMutants) {
                 /* Must be in one line, because it's in a pre.
                    Can't use template strings because JSP's EL syntax overrides it. */
-                icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '">' +
+                icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '"  can-claim="' + mutantsOnLine.some((element) => element.canClaim) + '">' +
                                '<img class="mutant-icon-image" src="' + Icons[mutantStatus] + '">' +
                                '<span class="mutant-icon-count">' + sortedMutants[mutantStatus].length + '</span>' +
                            '</div>');
@@ -179,6 +179,7 @@
          */
         const createPopoverContent = function () {
             const status = $(this).attr('mutant-status');
+            const canClaim = $(this).attr('can-claim');
             const line = Number($(this).attr('mutant-line'));
 
             const mutantsOnLine = mutantIdsPerLine.get(line)
@@ -219,6 +220,7 @@
             let button = '';
             if (enableFlagging
                 && status === MutantStatuses.ALIVE
+                && (canClaim === "true")
                 && testIdsPerLine.get(line)) {
                 button = createEquivalenceButton(line);
             }
