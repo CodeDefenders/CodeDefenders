@@ -28,6 +28,7 @@
 <pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80"
                                     rows="30">${classViewer.classCode}</textarea></pre>
 <script>
+(function () {
     let editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
         lineNumbers: true,
         matchBrackets: true,
@@ -40,6 +41,7 @@
     autocompletedClasses = {
         '${classViewer.className}': editorSUT.getTextArea().value
     }
+})();
 </script>
 <%
     } else { // dependencies exist -> tab system
@@ -61,6 +63,7 @@
             <pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80"
                                                 rows="30">${classViewer.classCode}</textarea></pre>
             <script>
+            (function () {
                 let editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
                     lineNumbers: true,
                     matchBrackets: true,
@@ -73,6 +76,7 @@
                 autocompletedClasses = {
                     '${classViewer.className}': editorSUT.getTextArea().value
                 }
+            })();
             </script>
         </div>
         <%
@@ -86,6 +90,7 @@
                                                 title="text-<%=depName%>" cols="80"
                                                 rows="30"><%=depCode%></textarea></pre>
             <script>
+            (function () {
                 let editor<%=depName%> = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
                     lineNumbers: true,
                     matchBrackets: true,
@@ -98,6 +103,7 @@
                 Object.assign(autocompletedClasses, {
                     '<%=depName%>': editor<%=depName%>.getTextArea().value
                 });
+            })();
             </script>
         </div>
         <%
