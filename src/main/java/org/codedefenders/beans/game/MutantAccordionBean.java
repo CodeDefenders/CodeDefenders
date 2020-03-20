@@ -407,7 +407,8 @@ public class MutantAccordionBean {
             this.state = state;
 
             if (playerCoverToClaim) {
-                covered = mutant.getCoveringTests().stream().anyMatch(t -> t.getPlayerId() == user.getId());
+                covered = mutant.getCoveringTests().stream()
+                        .anyMatch(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == user.getId());
             } else {
                 covered = mutant.isCovered();
             }
