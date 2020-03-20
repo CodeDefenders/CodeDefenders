@@ -32,11 +32,13 @@
 
 <%-- no dependencies -> no tabs --%>
 <% if (!mutantEditor.hasDependencies()) { %>
+
     <pre style="margin-top: 10px;"><textarea id="mutant-code" name="mutant" title="mutant" cols="80"
                                              rows="50">${mutantEditor.mutantCode}</textarea></pre>
 
 <%-- dependencies exist -> tab system --%>
 <% } else { %>
+
     <div>
         <ul class="nav nav-tabs" style="margin-top: 15px">
             <li role="presentation" class="active">
@@ -68,6 +70,7 @@
             <% } %>
         </div>
     </div>
+
 <% } %>
 
 
@@ -82,8 +85,6 @@
     let mutantReadOnlyLinesStart = Array.from(new Array(mutantStartEditLine - 1).keys());
 
     let mutantEndEditLine = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
-
-    let autocompletedClasses = undefined;
 
     let mutantGetMutantReadOnlyLinesEnd = function (lines) {
         if (mutantEndEditLine == null) {
@@ -118,8 +119,10 @@
         let set = new Set();
 
         let texts = [editorMutant.getValue()];
+
+        const autocompletedClasses = window.autocompletedClasses;
         if (typeof autocompletedClasses !== 'undefined') {
-            Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
+            Object.getOwnPropertyNames(autocompletedClasses).forEach(function (key) {
                 texts.push(autocompletedClasses[key]);
             });
         }
@@ -224,17 +227,18 @@
         }
     });
 
+    /* If global autocompletedClasses exists, get it, otherwise, create it. */
+    const autocompletedClasses = window.autocompletedClasses = window.autocompletedClasses || {};
+    autocompletedClasses['${mutantEditor.className}'] = editorMutant.getTextArea().value;
+
 
     /* ==================== Initialize dependency viewers ==================== */
 
     <%-- dependencies exist -> tab system --%>
     <% if (mutantEditor.hasDependencies()) { %>
-        autocompletedClasses = {
-            '${mutantEditor.className}': editorMutant.getTextArea().value
-        };
 
         <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
-                String depName = dependency.getKey(); %>
+            String depName = dependency.getKey(); %>
 
                 let editor<%=depName%> = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
                     lineNumbers: true,
@@ -245,10 +249,9 @@
                 editor<%=depName%>.setSize("100%", 500); // next to the test editor the cm editor would be too big
                 editor<%=depName%>.refresh();
 
-                Object.assign(autocompletedClasses, {
-                    '<%=depName%>': editor<%=depName%>.getTextArea().value
-                });
+                autocompletedClasses['<%=depName%>'] =  editor<%=depName%>.getTextArea().value;
         <% } %>
+
     <% } %>
 
 

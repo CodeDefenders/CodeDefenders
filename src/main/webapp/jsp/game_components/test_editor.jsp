@@ -29,6 +29,8 @@
 <pre><textarea id="test-code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
 
 <script>
+(function () {
+
     let startEditLine = ${testEditor.editableLinesStart};
     let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
 
@@ -49,7 +51,7 @@
         testMethods = testMethods.concat(mockitoMethods);
     <% } %>
 
-    var autocompleteList = [];
+    let autocompleteList = [];
 
     filterOutComments = function(text) {
         let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
@@ -64,6 +66,8 @@
         testClass.slice(startEditLine, testClass.length - 2);
         testClass = testClass.join("\n");
         let texts = [testClass];
+
+        const autocompletedClasses = window.autocompletedClasses;
         if (typeof autocompletedClasses !== 'undefined') {
             Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
                 texts.push(autocompletedClasses[key]);
@@ -94,15 +98,15 @@
         autoCloseBrackets: true,
         styleActiveLine: true,
         extraKeys: {
-            "Ctrl-Space": "autocomplete",
+            "Ctrl-Space": "autocompleteTest",
             "Tab": "insertSoftTab"
         },
         keyMap: "${login.user.keyMap.CMName}",
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
-    
-    
-    editorTest.commands.autocomplete = function (cm) {
+
+
+    CodeMirror.commands.autocompleteTest = function (cm) {
         cm.showHint({
             hint: function (editor) {
                 let reg = /[a-zA-Z][a-zA-Z0-9]*/;
@@ -150,4 +154,6 @@
     });
 
     editorTest.setSize("100%", 500);
+
+})();
 </script>
