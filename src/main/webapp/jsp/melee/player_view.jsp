@@ -30,6 +30,7 @@
 <%@ page import="org.codedefenders.util.Paths"%>
 <%@ page import="java.util.stream.Collectors"%>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 
 <%--
     @param MeleeGame game
@@ -53,7 +54,7 @@
             final int userId = login.getUserId();
             final List<Test> playerTests = game.getTests()
                     .stream()
-                    .filter(t -> t.getPlayerId() == userId)
+                    .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == userId)
                     .collect(Collectors.toList());
 %>
 
