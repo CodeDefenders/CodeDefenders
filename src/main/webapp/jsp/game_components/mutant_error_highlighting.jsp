@@ -41,7 +41,7 @@
          * See: https://creativewebspecialist.co.uk/2013/07/15/highlight-errors-in-codemirror/
          */
         const highlightErrors = function (codeMirror) {
-            for (const errorLine in errorLines) {
+            for (const errorLine of errorLines) {
             	// Maybe we need to remove the
                 codeMirror.addLineClass(errorLine - 1, 'background', 'line-error');
             }
