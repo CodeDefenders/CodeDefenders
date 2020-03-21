@@ -91,23 +91,13 @@ public class MutantAccordionBean {
                                        List<Mutant> killedMutants,
                                        List<Mutant> equivalentMutants,
                                        List<Mutant> flaggedMutants) {
-        setMutantAccordionData(cut, user, aliveMutants, killedMutants, equivalentMutants, flaggedMutants, false);
-    }
-
-    public void setMutantAccordionData(GameClass cut,
-                                       User user,
-                                       List<Mutant> aliveMutants,
-                                       List<Mutant> killedMutants,
-                                       List<Mutant> equivalentMutants,
-                                       List<Mutant> flaggedMutants,
-                                       boolean playerCoverToClaim) {
         this.cut = cut;
         this.user = user;
         this.aliveMutants = Collections.unmodifiableList(aliveMutants);
         this.killedMutants = Collections.unmodifiableList(killedMutants);
         this.equivalentMutants = Collections.unmodifiableList(equivalentMutants);
         this.flaggedMutants = Collections.unmodifiableList(flaggedMutants);
-        this.playerCoverToClaim = playerCoverToClaim;
+        this.playerCoverToClaim = false;
 
         categories = new ArrayList<>();
 
@@ -172,6 +162,10 @@ public class MutantAccordionBean {
                 mutantsWithoutMethod.addMutantId(mutant.getId());
             }
         }
+    }
+
+    public void setPlayerCoverToClaim(boolean playerCoverToClaim) {
+        this.playerCoverToClaim = playerCoverToClaim;
     }
 
     public void setEnableFlagging(boolean enableFlagging) {

@@ -37,9 +37,9 @@
     final GameClass cut = game.getCUT();
 
     boolean showTestAccordion = game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED);
-    
-    final User user = login.getUser(); 
-    
+
+    final User user = login.getUser();
+
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
