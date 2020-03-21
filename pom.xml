@@ -12,6 +12,7 @@
 	<version>1.7-SNAPSHOT</version>
 	<url>http://www.code-defenders.org/</url>
 	<inceptionYear>2016</inceptionYear>
+    <packaging>war</packaging>
 
 	<licenses>
           <license>
@@ -29,6 +30,18 @@
 		</filters>
 
 		<plugins>
+            <!-- Disables default deploy plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>none</phase>
+                    </execution>
+                </executions>
+            </plugin>
 			<!-- Execute the installer within maven without the need of packaging a jar for it -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -51,23 +64,33 @@
 				<artifactId>maven-enforcer-plugin</artifactId>
 				<version>3.0.0-M1</version>
 				<executions>
-					<execution>
-						<id>enforce-files-exist</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireFilesExist>
-									<files>
-										<file>${config.properties}</file>
-									</files>
-								</requireFilesExist>
-							</rules>
-							<fail>true</fail>
-						</configuration>
-					</execution>
+                    <execution>
+                        <id>enforce-deploy-properties-exist</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireProperty>
+                                    <property>tomcat.username</property>
+                                    <message>Tomcat username is missing</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>tomcat.password</property>
+                                    <message>Tomcat password is missing</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>tomcat.url</property>
+                                    <message>Tomcat manager api url is missing</message>
+                                </requireProperty>
+                                <requireProperty>
+                                    <property>tomcat.path</property>
+                                    <message>Tomcat deploy path is missing</message>
+                                </requireProperty>
+                            </rules>
+                        </configuration>
+                    </execution>
 				</executions>
 			</plugin>
 			<!-- Reads all the properties from ${config.properties} -->
@@ -98,14 +121,13 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- Print the properties. Maybe is enough to attach this to deploy instead -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.1</version>
 				<executions>
 					<execution>
-						<phase>validate</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
@@ -173,7 +195,6 @@
 				</configuration>
 			</plugin>
 			<!-- Deploys on tomcat reading the properties from ${configuration.properties} -->
-			<!-- FIXME Check that all the mandatory properties are there -->
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -183,11 +204,19 @@
 					<url>${tomcat.url}</url>
 					<username>${tomcat.username}</username>
 					<password>${tomcat.password}</password>
-					<!-- FIXME So far CodeDefenders must be deployed in Tomcat's root -->
 					<path>${tomcat.path}</path>
+                    <update>true</update>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
 				</configuration>
+                <executions>
+                    <execution>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-only</goal>
+                        </goals>
+                    </execution>
+                </executions>
 			</plugin>
 			<plugin>
 			  <groupId>com.mycila</groupId>

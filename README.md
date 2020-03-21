@@ -13,7 +13,8 @@ This is Code Defenders, a mutation testing game. Publicly available at [code-def
 
 ## Installation and Setup
 ### Configuration file
-Code Defenders requires a `config.properties` file for initial setup, building and deployment. All necessary configuration properties are listed. The file needs to be in the project root directory.
+Code Defenders requires a `config.properties` file for initial setup, building and deployment. The file needs to be in the project root directory.
+You can copy the `config.properties.example` file, which lists all necessary properties, over and update the sensible default values with your configuration.
 
 `config.properties` can hold confidential configuration data, so **please** do not include it into the repository.
 
@@ -93,19 +94,14 @@ All system configuration and privileged features are accessible for admin users 
 For successful deployment, both Tomcat and MySQL services must be running.
 Code Defenders is built and deployed with Maven using the following commands.
 
-### Deploy first time
-
-To deploy Code Defenders the _first time_, execute:
-
 ```bash
-mvn clean compile package install war:war tomcat7:deploy -DskipTests
+mvn clean deploy -DskipTests
 ```
 
-### Redeploy
-To redeploy instead use:
+If you want to deploy the `.war` file by yourself its enough to execute:
 
 ```bash
-mvn clean compile package install war:war tomcat7:redeploy -DskipTests
+mvn clean package -DskipTests
 ```
 
 ### System Tests
