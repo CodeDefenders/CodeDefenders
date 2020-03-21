@@ -91,16 +91,6 @@ public class GameHighlightingDTO {
     }
 
     /**
-     * Represents the status a mutant has in the game highlighting.
-     */
-    public enum GHMutantStatus {
-        ALIVE,
-        KILLED,
-        FLAGGED,
-        EQUIVALENT
-    }
-
-    /**
      * Represents a mutant for the game highlighting.
      */
     public static class GHMutantDTO {
@@ -108,24 +98,14 @@ public class GameHighlightingDTO {
         @Expose public int score;
         @Expose public String lines;
         @Expose public String creatorName;
-        @Expose public GHMutantStatus status;
+        @Expose public Mutant.State status;
 
         public GHMutantDTO(Mutant mutant) {
             this.id = mutant.getId();
             this.score = mutant.getScore();
             this.creatorName = mutant.getCreatorName();
             this.lines = mutant.getSummaryString();
-
-            Equivalence eq = mutant.getEquivalent();
-            if (eq == Equivalence.DECLARED_YES || eq == Equivalence.ASSUMED_YES) {
-                this.status = GHMutantStatus.EQUIVALENT;
-            } else if (eq == Equivalence.PENDING_TEST) {
-                this.status = GHMutantStatus.FLAGGED;
-            } else if (mutant.isAlive()) {
-                this.status = GHMutantStatus.ALIVE;
-            } else {
-                this.status = GHMutantStatus.KILLED;
-            }
+            this.status = mutant.getState();
         }
     }
 
