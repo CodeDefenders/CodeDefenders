@@ -60,12 +60,12 @@ public class TestAccordionDTO {
      * @param testsList The tests.
      * @param mutantsList The mutants.
      */
-    public TestAccordionDTO(GameClass cut, List<Test> testsList, List<Mutant> mutantsList, User user) {
+    public TestAccordionDTO(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
         tests = new HashMap<>();
         categories = new ArrayList<>();
 
         for (Test test : testsList) {
-            tests.put(test.getId(), new TestAccordionTestDTO(test, mutantsList, user));
+            tests.put(test.getId(), new TestAccordionTestDTO(test, mutantsList));
         }
 
         TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
@@ -182,13 +182,8 @@ public class TestAccordionDTO {
         @Expose private List<Integer> killedMutantIds;
         @Expose private int points;
         @Expose private List<String> smells;
-        @Expose private boolean canView;
 
         public TestAccordionTestDTO(Test test, List<Mutant> mutants) {
-            this(test, mutants, null);
-        }
-
-        public TestAccordionTestDTO(Test test, List<Mutant> mutants, User user) {
             User creator = UserDAO.getUserForPlayer(test.getPlayerId());
             this.id = test.getId();
             this.creatorName = creator.getUsername();
@@ -200,7 +195,6 @@ public class TestAccordionDTO {
                     .collect(Collectors.toList());
             this.points = test.getScore();
             this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
-            this.canView = user == null || test.getPlayerId() == user.getId();
         }
     }
 }
