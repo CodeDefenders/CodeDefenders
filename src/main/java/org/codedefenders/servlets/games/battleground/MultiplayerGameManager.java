@@ -480,6 +480,7 @@ public class MultiplayerGameManager extends HttpServlet {
         notificationService.post(ttme);
 
         // Clean up the session
+        previousSubmission.clear();
         session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
