@@ -56,7 +56,6 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -442,7 +441,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Store them in the session so they can be picked up later
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode(escapedHtml);
+            String decorate = decorateWithLinksToCode(escapedHtml, true, false);
             messages.add(decorate);
             //
             previousSubmission.setTestCode(testText);
@@ -508,15 +507,22 @@ public class MultiplayerGameManager extends HttpServlet {
      * decoration utility, and possibly the sanitize methods to some other
      * components.
      */
-    String decorateWithLinksToCode(String compilerOutput) {
+    String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
+        String jumpFunction = "";
+        if (forTest) {
+            jumpFunction = "jumpToTestLine";
+        } else if (forMutant) {
+            jumpFunction = "jumpToMutantLine";
+        }
+
         StringBuffer decorated = new StringBuffer();
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // Replace the entire line with a link to the source code
-                String replacedLine =
-                        "<a onclick=\"jumpToLine(" + m.group(1) + ")\" href=\"javascript:void(0);\">" + line + "</a>";
+                String replacedLine = "<a onclick=\"" + jumpFunction + "(" + m.group(1)
+                        + ")\" href=\"javascript:void(0);\">" + line + "</a>";
                 decorated.append(replacedLine).append("\n");
             } else {
                 decorated.append(line).append("\n");
@@ -651,7 +657,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 // Store them in the session so they can be picked up later
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
-                String decorate = decorateWithLinksToCode(escapedHtml);
+                String decorate = decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate);
 
             }

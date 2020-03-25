@@ -414,7 +414,7 @@ public class MeleeGameManager extends HttpServlet {
             // Store them in the session so they can be picked up later
 //            session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES_IN_TEST, errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode(escapedHtml);
+            String decorate = decorateWithLinksToCode(escapedHtml, true, false);
             messages.add(decorate);
             //
 //            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -478,15 +478,22 @@ public class MeleeGameManager extends HttpServlet {
      * decoration utility, and possibly the sanitize methods to some other
      * components.
      */
-    String decorateWithLinksToCode(String compilerOutput) {
+    String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
+        String jumpFunction = "";
+        if (forTest) {
+            jumpFunction = "jumpToTestLine";
+        } else if (forMutant) {
+            jumpFunction = "jumpToMutantLine";
+        }
+
         StringBuffer decorated = new StringBuffer();
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // Replace the entire line with a link to the source code
-                String replacedLine = "<a onclick=\"jumpToLine(" + m.group(1) + ")\" href=\"javascript:void(0);\">"
-                        + line + "</a>";
+                String replacedLine = "<a onclick=\"" + jumpFunction + "(" + m.group(1)
+                        + ")\" href=\"javascript:void(0);\">" + line + "</a>";
                 decorated.append(replacedLine).append("\n");
             } else {
                 decorated.append(line).append("\n");
@@ -583,7 +590,7 @@ public class MeleeGameManager extends HttpServlet {
                 // Store them in the session so they can be picked up later
 //                session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES_IN_MUTANT, errorLines);
                 // We introduce our decoration
-                String decorate = decorateWithLinksToCode(escapedHtml);
+                String decorate = decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate);
 
             }
