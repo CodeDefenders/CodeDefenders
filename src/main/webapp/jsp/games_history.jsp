@@ -226,8 +226,10 @@
     </tbody>
 </table>
 
-<script type="text/javascript">
-    $('.modal').on('shown.bs.modal', function() {
+<script>
+(function () {
+
+    $('.modal').on('shown.bs.modal', function () {
         let codeMirrorContainer = $(this).find(".CodeMirror")[0];
         if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
             codeMirrorContainer.CodeMirror.refresh();
@@ -235,11 +237,11 @@
             let textarea = $(this).find('textarea')[0];
             let editor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: false,
-            readOnly: true,
-            mode: "text/x-java"
-        });
-        editor.setSize("100%", 500);
-        ClassAPI.getAndSetEditorValue(textarea, editor);
+                readOnly: true,
+                mode: "text/x-java"
+            });
+            editor.setSize("100%", 500);
+            ClassAPI.getAndSetEditorValue(textarea, editor);
         }
     });
 
@@ -255,6 +257,8 @@
             $(id).show()
         }
     });
+
+})();
 </script>
 
 </div>

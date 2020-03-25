@@ -169,9 +169,7 @@
         </table>
 
         <script>
-            function reload() {
-                location.reload();
-            }
+        (function () {
 
             $(document).ready(function () {
                 $('[data-toggle="tooltip"]').tooltip();
@@ -189,8 +187,9 @@
                         "orderable": false
                     }]
                 });
-            })
-            ;
+            });
+
+        })();
         </script>
 
     </form>

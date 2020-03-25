@@ -110,5 +110,5 @@
     // connect <ul>, <li> and <a> elements
     intentionList.appendChild(unknownListItem);
     unknownListItem.appendChild(unknownMutant);
-}());
+})();
 </script>
