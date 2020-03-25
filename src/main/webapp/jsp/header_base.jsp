@@ -155,41 +155,6 @@
     <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
 
     <link href="css/modal_dialogs.css" rel="stylesheet" type="text/css" />
-
-    <script>
-        $(document).ready(function() {
-            $('.single-item').slick({
-                arrows: true,
-                infinite: true,
-                speed: 300,
-                draggable: false
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            try {
-                $('table.mutant-table').DataTable( {
-                    "pagingType": "full",
-                    "searching": true,
-                    "lengthChange": false,
-                    "ordering": false,
-                    "pageLength": 4,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Search...",
-                        info: "",
-                        sInfoEmpty: "",
-                        sInfoFiltered: ""
-                    }
-                } );
-            } catch (e) {
-                // statements to handle TypeError exceptions
-            }
-        } );
-    </script>
-
 </head>
 
 <body class="page-grid">
