@@ -34,7 +34,7 @@
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
-    
+
     final User user = login.getUser();
 %>
 
@@ -73,11 +73,11 @@
 %>
 
 
-<jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    errorHighlighting.setCodeDivSelector("#utest-div");
+    testErrorHighlighting.setCodeDivSelector("#utest-div");
     if (previousSubmission.hasErrorLines()) {
-        errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+        testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
         previousSubmission.clearErrorLines();
     }
 %>

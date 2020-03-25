@@ -37,9 +37,9 @@
     final GameClass cut = game.getCUT();
 
     boolean showTestAccordion = game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED);
-    
-    final User user = login.getUser(); 
-    
+
+    final User user = login.getUser();
+
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
@@ -70,11 +70,11 @@
 %>
 
 
-<jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    errorHighlighting.setCodeDivSelector("#newmut-div");
+    mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
     if (previousSubmission.hasErrorLines()) {
-        errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+        mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
         previousSubmission.clearErrorLines();
     }
 %>
