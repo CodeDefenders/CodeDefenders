@@ -36,6 +36,9 @@
 
 /* Mutant Popovers
 -------------------------------------------------- */
+.mutant-popover-body {
+    margin-right: -14px;
+}
 .mutant-popover-body > table {
     font-size: 14px;
 }

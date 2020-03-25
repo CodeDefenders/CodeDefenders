@@ -208,12 +208,14 @@
             }
 
             const table =
-                `<table class="table table-condensed">`
-                     + head +
-                    `<tbody>`
-                         + rows.join('\n') +
-                    `</tbody>
-                 </table>`;
+                `<div style="max-height: 400px; overflow: auto; padding-right: 14px;">
+                    <table class="table table-condensed">`
+                         + head +
+                        `<tbody>`
+                             + rows.join('\n') +
+                        `</tbody>
+                     </table>
+                </div>`;
 
             /* Create the button if it is supposed to be shown. */
             let button = '';
