@@ -186,8 +186,7 @@ public class MeleeGameManager extends HttpServlet {
 
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
-        request.setAttribute("game", game);
-        //
+
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_VIEW_JSP);
         dispatcher.forward(request, response);
     }
