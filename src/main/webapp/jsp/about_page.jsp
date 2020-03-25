@@ -67,7 +67,7 @@
 
             <h3>Source Code</h3>
             <p>
-            CodeDefenders is developed and maintained at the <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software Engineering II</a> at the University of Passau and the <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
+            CodeDefenders is developed and maintained at the <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software Engineering&nbspII</a> at the University of Passau and the <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
             </p>
             <p>
             Code Defenders is an open source project. See the <a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.
