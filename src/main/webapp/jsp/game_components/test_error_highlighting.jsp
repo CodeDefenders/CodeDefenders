@@ -50,6 +50,6 @@
         const codeMirror = $('${testErrorHighlighting.codeDivSelector}').find('.CodeMirror')[0].CodeMirror;
         codeMirror.highlightErrors = function () { highlightErrors(this) };
         codeMirror.highlightErrors();
-    }());
+    })();
 </script>
 <% } %>

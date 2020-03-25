@@ -333,6 +333,6 @@
         codeMirror.showMutants = function () { showMutants(this) };
         codeMirror.highlightCoverage();
         codeMirror.highlightMutants();
-    }());
+    })();
 </script>
 

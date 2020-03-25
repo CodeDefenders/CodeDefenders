@@ -43,10 +43,10 @@
         <div class="panel-body">
 
              <%
-                String version  = GameClass.class.getPackage().getImplementationVersion();
+                String version = GameClass.class.getPackage().getImplementationVersion();
 
                 // version may now be null: https://stackoverflow.com/questions/21907528/war-manifest-mf-and-version?rq=1
-                if (version==null) {
+                if (version == null) {
                     Properties prop = new Properties();
                     try {
                         prop.load(request.getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
@@ -55,15 +55,15 @@
                         // Ignore -- if we have no version, then we show no version section
                     }
                 }
-                if(version != null) {
-                    %>
-            <h3>Version</h3>
-            <p>
-                This is Code Defenders version <%= version%>.
-            </p>
-                <%
+                if (version != null) {
+            %>
+                <h3>Version</h3>
+                <p>
+                    This is Code Defenders version <%= version%>.
+                </p>
+            <%
                 }
-                %>
+            %>
 
             <h3>Source Code</h3>
             <p>
@@ -105,17 +105,17 @@
 
     <%
         String siteNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue();
-        if(!siteNotice.isEmpty()) {
-%>
-    <h2 style="text-align: center">Site Notice</h2>
-    <div class="panel panel-default" style="padding:25px">
-        <div class="panel-body">
-            <%=siteNotice%>
+        if (!siteNotice.isEmpty()) {
+    %>
+        <h2 style="text-align: center">Site Notice</h2>
+        <div class="panel panel-default" style="padding:25px">
+            <div class="panel-body">
+                <%=siteNotice%>
+            </div>
         </div>
-    </div>
-<%
-    }
-%>
+    <%
+        }
+    %>
 
 </div>
 
