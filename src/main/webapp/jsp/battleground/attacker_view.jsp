@@ -54,7 +54,6 @@
     mutantEditor.setDependenciesForClass(game.getCUT());
     if (previousSubmission.hasMutant()) {
         mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-        previousSubmission.clearMutant();
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }
@@ -75,7 +74,6 @@
     mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
     if (previousSubmission.hasErrorLines()) {
         mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
-        previousSubmission.clearErrorLines();
     }
 %>
 
@@ -105,6 +103,8 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+
+<% previousSubmission.clear(); %>
 
 <%-- -------------------------------------------------------------------------------- --%>
 

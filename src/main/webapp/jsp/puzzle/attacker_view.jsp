@@ -60,8 +60,6 @@
     mutantEditor.setEditableLinesForPuzzle(puzzle);
     if (previousSubmission.hasMutant()) {
         mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-        previousSubmission.clearMutant();
-        previousSubmission.clearErrorLines(); // TODO: move this to error highlighting bean
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }
@@ -102,6 +100,8 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+
+<% previousSubmission.clear(); %>
 
 <%-- -------------------------------------------------------------------------------- --%>
 

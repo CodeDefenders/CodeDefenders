@@ -50,13 +50,7 @@
 			final User user = login.getUser();
 %>
 
-<jsp:useBean id="testPreviousSubmission"
-	class="org.codedefenders.beans.game.PreviousSubmissionBean"
-	scope="request" />
-<jsp:useBean id="mutantPreviousSubmission"
-	class="org.codedefenders.beans.game.PreviousSubmissionBean"
-	scope="request" />
-<jsp:useBean id="testForEquivalenceDuelPreviousSubmission"
+<jsp:useBean id="previousSubmission"
 	class="org.codedefenders.beans.game.PreviousSubmissionBean"
 	scope="request" />
 
@@ -67,13 +61,12 @@
 	class="org.codedefenders.beans.game.MutantEditorBean" scope="request" />
 <%
     mutantEditor.setClassName(cut.getName());
-			mutantEditor.setDependenciesForClass(game.getCUT());
-			if (mutantPreviousSubmission.hasMutant()) {
-				mutantEditor.setPreviousMutantCode(mutantPreviousSubmission.getMutantCode());
-				mutantPreviousSubmission.clearMutant();
-			} else {
-				mutantEditor.setMutantCodeForClass(cut);
-			}
+	mutantEditor.setDependenciesForClass(game.getCUT());
+	if (previousSubmission.hasMutant()) {
+		mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
+	} else {
+		mutantEditor.setMutantCodeForClass(cut);
+	}
 %>
 
 
@@ -82,10 +75,10 @@
 	scope="request" />
 <%
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
-			gameHighlighting.setFlaggingData(game.getMode(), game.getId());
-			gameHighlighting.setEnableFlagging(false);
-			// We should show game highlithing only inside the mutant editor
-			gameHighlighting.setCodeDivSelector("#newmut-div");
+	gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+	gameHighlighting.setEnableFlagging(false);
+	// We should show game highlithing only inside the mutant editor
+	gameHighlighting.setCodeDivSelector("#newmut-div");
 %>
 
 <jsp:useBean id="testErrorHighlighting"
@@ -93,10 +86,9 @@
 	scope="request" />
 <%
     testErrorHighlighting.setCodeDivSelector("#utest-div");
-			if (testPreviousSubmission.hasErrorLines()) {
-				testErrorHighlighting.setErrorLines(testPreviousSubmission.getErrorLines());
-				testPreviousSubmission.clearErrorLines();
-			}
+	if (previousSubmission.hasTest() && previousSubmission.hasErrorLines()) {
+		testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+	}
 %>
 
 <jsp:useBean id="mutantErrorHighlighting"
@@ -104,10 +96,9 @@
 	scope="request" />
 <%
     mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
-			if (mutantPreviousSubmission.hasErrorLines()) {
-				mutantErrorHighlighting.setErrorLines(mutantPreviousSubmission.getErrorLines());
-				mutantPreviousSubmission.clearErrorLines();
-			}
+	if (previousSubmission.hasMutant() && previousSubmission.hasErrorLines()) {
+		mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+	}
 %>
 
 <jsp:useBean id="mutantAccordion"
@@ -116,9 +107,9 @@
 <%
     mutantAccordion.setMutantAccordionData(cut, user, game.getAliveMutants(), game.getKilledMutants(),
 					game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
-			mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-			mutantAccordion.setEnableFlagging(true);
-			mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
+	mutantAccordion.setFlaggingData(game.getMode(), game.getId());
+	mutantAccordion.setEnableFlagging(true);
+	mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
 %>
 
 <jsp:useBean id="testAccordion"
@@ -152,28 +143,33 @@
 <jsp:useBean id="testEditor"
 	class="org.codedefenders.beans.game.TestEditorBean" scope="request" />
 <%
-    testEditor.setEditableLinesForClass(cut);
-			testEditor.setMockingEnabled(cut.isMockingEnabled());
-			if (testPreviousSubmission.hasTest()) {
-				testEditor.setPreviousTestCode(testPreviousSubmission.getTestCode());
-				testPreviousSubmission.clearTest();
-			} else {
-				testEditor.setTestCodeForClass(cut);
-			}
+	if (!openEquivalenceDuel) {
+		testEditor.setEditableLinesForClass(cut);
+		testEditor.setMockingEnabled(cut.isMockingEnabled());
+		if (previousSubmission.hasTest()) {
+			testEditor.setPreviousTestCode(previousSubmission.getTestCode());
+		} else {
+			testEditor.setTestCodeForClass(cut);
+		}
+	}
 %>
 
 <jsp:useBean id="testEditorForEquivalenceDuel"
 	class="org.codedefenders.beans.game.TestEditorBean" scope="request" />
 <%
-    testEditorForEquivalenceDuel.setEditableLinesForClass(cut);
-			testEditorForEquivalenceDuel.setMockingEnabled(cut.isMockingEnabled());
-			if (testForEquivalenceDuelPreviousSubmission.hasTest()) {
-				testEditorForEquivalenceDuel
-						.setPreviousTestCode(testForEquivalenceDuelPreviousSubmission.getTestCode());
-			} else {
-				testEditorForEquivalenceDuel.setTestCodeForClass(cut);
-			}
+	if (openEquivalenceDuel) {
+		testEditorForEquivalenceDuel.setEditableLinesForClass(cut);
+		testEditorForEquivalenceDuel.setMockingEnabled(cut.isMockingEnabled());
+		if (previousSubmission.hasTest()) {
+			testEditorForEquivalenceDuel
+					.setPreviousTestCode(previousSubmission.getTestCode());
+		} else {
+			testEditorForEquivalenceDuel.setTestCodeForClass(cut);
+		}
+	}
 %>
+
+<% previousSubmission.clear(); %>
 
 
 <%-- All the views must be on the same row --%>
@@ -242,7 +238,7 @@
 				<input type="hidden" name="gameId" value="<%=game.getId()%>">
 				<input type="hidden" id="equivMutantId" name="equivMutantId"
 					value="<%=equivMutant.getId()%>">
-				
+
 				<jsp:include page="/jsp/game_components/test_editor.jsp" />
 
 				<button class="btn btn-danger btn-left" name="acceptEquivalent"

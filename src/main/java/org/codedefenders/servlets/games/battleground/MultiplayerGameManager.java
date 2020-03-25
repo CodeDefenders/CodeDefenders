@@ -323,7 +323,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> test = ServletUtils.getStringParameter(request, "test");
         if (!test.isPresent()) {
-            previousSubmission.clearTest();
+            previousSubmission.clear();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -552,7 +552,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
         if (!mutant.isPresent()) {
-            previousSubmission.clearMutant();
+            previousSubmission.clear();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -692,7 +692,7 @@ public class MultiplayerGameManager extends HttpServlet {
             collectAttackerIntentions(newMutant, intention);
         }
         // Clean the mutated code only if mutant is accepted
-        previousSubmission.clearMutant();
+        previousSubmission.clear();
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
@@ -784,7 +784,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Reject equivalence and submit killing test case
             final Optional<String> test = ServletUtils.getStringParameter(request, "test");
             if (!test.isPresent()) {
-                previousSubmission.clearTest();
+                previousSubmission.clear();
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }

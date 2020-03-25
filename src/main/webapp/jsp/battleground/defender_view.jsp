@@ -57,7 +57,6 @@
     testEditor.setMockingEnabled(cut.isMockingEnabled());
     if (previousSubmission.hasTest()) {
         testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-        previousSubmission.clearTest();
     } else {
         testEditor.setTestCodeForClass(cut);
     }
@@ -78,7 +77,6 @@
     testErrorHighlighting.setCodeDivSelector("#utest-div");
     if (previousSubmission.hasErrorLines()) {
         testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
-        previousSubmission.clearErrorLines();
     }
 %>
 
@@ -103,6 +101,9 @@
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<% previousSubmission.clear(); %>
 
 
 <%-- -------------------------------------------------------------------------------- --%>
