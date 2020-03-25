@@ -43,6 +43,7 @@
     final String description = puzzle.getDescription();
 %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
@@ -81,7 +82,7 @@
 
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
-    mutantAccordion.setMutantAccordionData(cut, game.getAliveMutants(), game.getKilledMutants(),
+    mutantAccordion.setMutantAccordionData(cut, login.getUser(), game.getAliveMutants(), game.getKilledMutants(),
             game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(false);
