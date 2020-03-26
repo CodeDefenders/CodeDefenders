@@ -25,7 +25,6 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
 <%@ page import="org.codedefenders.game.GameLevel"%>
 <%@ page import="org.codedefenders.game.GameState"%>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
 <%@ page import="org.codedefenders.util.Constants"%>
 <%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.game.GameClass"%>
@@ -143,29 +142,12 @@
 <jsp:useBean id="testEditor"
 	class="org.codedefenders.beans.game.TestEditorBean" scope="request" />
 <%
-	if (!openEquivalenceDuel) {
-		testEditor.setEditableLinesForClass(cut);
-		testEditor.setMockingEnabled(cut.isMockingEnabled());
-		if (previousSubmission.hasTest()) {
-			testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-		} else {
-			testEditor.setTestCodeForClass(cut);
-		}
-	}
-%>
-
-<jsp:useBean id="testEditorForEquivalenceDuel"
-	class="org.codedefenders.beans.game.TestEditorBean" scope="request" />
-<%
-	if (openEquivalenceDuel) {
-		testEditorForEquivalenceDuel.setEditableLinesForClass(cut);
-		testEditorForEquivalenceDuel.setMockingEnabled(cut.isMockingEnabled());
-		if (previousSubmission.hasTest()) {
-			testEditorForEquivalenceDuel
-					.setPreviousTestCode(previousSubmission.getTestCode());
-		} else {
-			testEditorForEquivalenceDuel.setTestCodeForClass(cut);
-		}
+	testEditor.setEditableLinesForClass(cut);
+	testEditor.setMockingEnabled(cut.isMockingEnabled());
+	if (previousSubmission.hasTest()) { // TODO: don't display the wron previous submission for equivalence duels
+		testEditor.setPreviousTestCode(previousSubmission.getTestCode());
+	} else {
+		testEditor.setTestCodeForClass(cut);
 	}
 %>
 
@@ -176,27 +158,21 @@
 
 <div class="row">
 
-	<%
-	    if (openEquivalenceDuel) {
-	%>
+<% if (openEquivalenceDuel) { %>
+
 	<%-- -------------------------------------------------------------------------------- --%>
 	<%-- Equivalence Duel view --%>
 	<%-- -------------------------------------------------------------------------------- --%>
+
 	<div class="col-md-6" id="equivmut-div">
 		<h3>
 			Mutant <%=equivMutant.getId()%>
 			<!-- check for automatically triggered equivalence duels -->
-			<%
-			    if (equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID) {
-			%>
+			<% if (equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID) { %>
 				automatically claimed equivalent
-			<%
-			    } else {
-			%>
+			<% } else { %>
 				claimed equivalent by <%=equivDefender.getUsername()%>
-			<%
-		    	}
-			%>
+			<% } %>
 		</h3>
 		<div
 			style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
@@ -209,24 +185,22 @@
 					title="mutdiff"><%=equivMutant.getHTMLEscapedPatchString()%></textarea>
 			</pre>
 			<script>
-				$('#diff-collapse').on(
-						'shown.bs.collapse',
-						function() {
-							var codeMirrorContainer = $(this).find(
-									".CodeMirror")[0];
-							if (codeMirrorContainer
-									&& codeMirrorContainer.CodeMirror) {
-								codeMirrorContainer.CodeMirror.refresh();
-							} else {
-								var showDiff = CodeMirror.fromTextArea(document
-										.getElementById('diff'), {
-									lineNumbers : false,
-									mode : "text/x-diff",
-									readOnly : true
-								});
-								showDiff.setSize("100%", 210);
-							}
+				$('#diff-collapse').on('shown.bs.collapse', function() {
+					var codeMirrorContainer = $(this).find(
+							".CodeMirror")[0];
+					if (codeMirrorContainer
+							&& codeMirrorContainer.CodeMirror) {
+						codeMirrorContainer.CodeMirror.refresh();
+					} else {
+						var showDiff = CodeMirror.fromTextArea(document
+								.getElementById('diff'), {
+							lineNumbers : false,
+							mode : "text/x-diff",
+							readOnly : true
 						});
+						showDiff.setSize("100%", 210);
+					}
+				});
 			</script>
 
 			<jsp:include page="/jsp/game_components/push_test_progress_bar.jsp" />
@@ -256,13 +230,20 @@
 		</div>
 	</div>
 
-	<%
-	    } else {
-	%>
+    <%-- TODO: What to show besides the test editor in the quivalence duel? --%>
+	<div class="col-md-6" id="cut-div">
+		<h3>Class Under Test</h3>
+		<jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+		<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+		<jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
+	</div>
+
+<% } else { %>
 
 	<%-- -------------------------------------------------------------------------------- --%>
 	<%-- Attacker view --%>
 	<%-- -------------------------------------------------------------------------------- --%>
+
 	<div class="col-md-6" id="newmut-div">
 		<div class="row" style="display: contents">
 			<h3 style="margin-bottom: 0; display: inline">Create a mutant
@@ -305,13 +286,6 @@
 			page="/jsp/game_components/editor_help_config_toolbar.jsp" />
 	</div>
 
-	<%
-	    }
-	%>
-
-
-
-
 	<%-- -------------------------------------------------------------------------------- --%>
 	<%-- Defender view --%>
 	<%-- -------------------------------------------------------------------------------- --%>
@@ -340,6 +314,9 @@
 		<!-- THE FOLLOWING IS DUPLICATED ! -->
 		<jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />
 	</div>
+
+<% } %>
+
 </div>
 
 </div>
