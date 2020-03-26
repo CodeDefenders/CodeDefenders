@@ -76,15 +76,23 @@
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
 	gameHighlighting.setFlaggingData(game.getMode(), game.getId());
 	gameHighlighting.setEnableFlagging(false);
-	// We should show game highlithing only inside the mutant editor
-	gameHighlighting.setCodeDivSelector("#newmut-div");
+	// We should show game highlighting only inside the mutant editor
+    if (!openEquivalenceDuel) {
+		gameHighlighting.setCodeDivSelector("#newmut-div");
+	} else {
+		gameHighlighting.setCodeDivSelector("#cut-div");
+	}
 %>
 
 <jsp:useBean id="testErrorHighlighting"
 	class="org.codedefenders.beans.game.ErrorHighlightingBean"
 	scope="request" />
 <%
-    testErrorHighlighting.setCodeDivSelector("#utest-div");
+	if (!openEquivalenceDuel) {
+		testErrorHighlighting.setCodeDivSelector("#utest-div");
+	} else {
+		testErrorHighlighting.setCodeDivSelector("#equivmut-div");
+	}
 	if (previousSubmission.hasTest() && previousSubmission.hasErrorLines()) {
 		testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
 	}
@@ -149,6 +157,12 @@
 	} else {
 		testEditor.setTestCodeForClass(cut);
 	}
+%>
+
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+	classViewer.setClassCode(game.getCUT());
+	classViewer.setDependenciesForClass(game.getCUT());
 %>
 
 <% previousSubmission.clear(); %>
