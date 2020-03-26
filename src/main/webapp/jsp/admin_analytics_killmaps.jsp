@@ -76,38 +76,41 @@
             </table>
         </div>
     </div>
-
-    <script>
-        var table;
-
-        $(document).ready(function() {
-            table = $('#tableKillmaps').DataTable({
-                "ajax": {
-                    "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_KILLMAP + "?fileType=json"%>",
-                    "dataSrc": "data"
-                },
-                "columns": [
-                    { "data": "userId" },
-                    { "data": "userName" },
-                    { "data": "classId" },
-                    { "data": "className" },
-                    { "data": "role" },
-                    { "data": "usefulMutants" },
-                    { "data": "usefulTests" },
-                    { "data":
-                            function(row, type, val, meta) {
-                                return row.usefulMutants + row.usefulTests;
-                            }
-                    }
-                ],
-                /* "columnDefs": [
-                    { className: "text-right", "targets": [0,2,5,6,7] },
-                ], */
-                "pageLength": 50,
-                "order": [[ 1, "asc" ]]
-            });
-        });
-    </script>
-
 </div>
+
+<script>
+(function () {
+
+    $(document).ready(function () {
+        const table = $('#tableKillmaps').DataTable({
+            "ajax": {
+                "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_KILLMAP + "?fileType=json"%>",
+                "dataSrc": "data"
+            },
+            "columns": [
+                {"data": "userId"},
+                {"data": "userName"},
+                {"data": "classId"},
+                {"data": "className"},
+                {"data": "role"},
+                {"data": "usefulMutants"},
+                {"data": "usefulTests"},
+                {
+                    "data":
+                        function (row, type, val, meta) {
+                            return row.usefulMutants + row.usefulTests;
+                        }
+                }
+            ],
+            /* "columnDefs": [
+                { className: "text-right", "targets": [0,2,5,6,7] },
+            ], */
+            "pageLength": 50,
+            "order": [[1, "asc"]]
+        });
+    });
+
+})();
+</script>
+
 <%@ include file="/jsp/footer.jsp" %>

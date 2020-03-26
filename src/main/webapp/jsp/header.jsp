@@ -31,6 +31,8 @@
 %>
 
 <script>
+(function () {
+
     //If the user is logged in, start receiving notifications
     var updateUserNotifications = function (url) {
         $.getJSON(url, function (r) {
@@ -80,6 +82,8 @@
             $('[data-toggle="tooltip"]').tooltip();
         }
     );
+
+})();
 </script>
 
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">

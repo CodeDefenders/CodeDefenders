@@ -52,12 +52,14 @@
             response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
             return;
         }
+
+        request.setAttribute("game", game);
     }
 
     final GameClass cut = game.getCUT();
     Role role = game.getRole(login.getUserId());
-    
-    final User user = login.getUser(); 
+
+    final User user = login.getUser();
 
 %>
 

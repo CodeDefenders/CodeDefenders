@@ -55,7 +55,9 @@
     String ticket = (String) request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME);
 %>
 
-<script type="text/javascript">
+<script>
+(function () {
+
     class PushSocket {
         constructor (url) {
             console.log('Setting up WebSocket at ' + url + '.');
@@ -224,4 +226,6 @@
     const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=login.getUserId()%>";
     window.PushSocket = PushSocket;
     window.pushSocket = new PushSocket(wsUri);
+
+})();
 </script>

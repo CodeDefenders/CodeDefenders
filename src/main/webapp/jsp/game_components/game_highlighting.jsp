@@ -208,12 +208,14 @@
             }
 
             const table =
-                `<table class="table table-condensed">`
-                     + head +
-                    `<tbody>`
-                         + rows.join('\n') +
-                    `</tbody>
-                 </table>`;
+                `<div>
+                    <table class="table table-condensed">`
+                         + head +
+                        `<tbody>`
+                             + rows.join('\n') +
+                        `</tbody>
+                     </table>
+                </div>`;
 
             /* Create the button if it is supposed to be shown. */
             let button = '';
@@ -333,6 +335,6 @@
         codeMirror.showMutants = function () { showMutants(this) };
         codeMirror.highlightCoverage();
         codeMirror.highlightMutants();
-    }());
+    })();
 </script>
 

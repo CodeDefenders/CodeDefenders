@@ -304,7 +304,7 @@
     </tr>
 <%
 		} // Closes FOR
-	
+
 		// Rendere Melee Games
 		for (UserMeleeGameInfo info : activeMeleeGames) {
             int gameId = info.gameId();
@@ -336,7 +336,7 @@
                 </div>
             </div>
         </td>
-        
+
         <td class="col-sm-2">
             <span><%=players.size()%></span>
             <%
@@ -380,7 +380,7 @@
                 }
             %>
         </td>
-        
+
         <td class="col-sm-1"><%=info.gameLevel().getFormattedString()%></td>
         <td class="col-sm-2">
             <%
@@ -402,7 +402,7 @@
 				    System.out.println("info.gameState() " + info.gameState());
 				    System.out.println("info.userRole() " + info.userRole());
                     switch (info.userRole()) {
-						case OBSERVER : 
+						case OBSERVER:
 						%>
 						    <a class="btn btn-sm btn-primary" id="<%="observe-"+gameId%>"
 				               href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">
@@ -410,8 +410,8 @@
 				            </a>
 				        <%
 							break;
-						case PLAYER :
-						    
+						case PLAYER:
+
 						    if (info.gameState() != GameState.CREATED) { // Game is already running, the user is a player, so she can play
 						        %>
 								<a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
@@ -435,8 +435,8 @@
 					        	}
 							}
 							break;
-						default : // The user is not yet a player, so she may join the game
-						    %> 
+						default: // The user is not yet a player, so she may join the game
+						    %>
 				            <a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
 				               style="background-color: #884466;border-color: #772233;"
 				               href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play</a>
@@ -666,7 +666,7 @@
         </tr>
 <%
         } // Closes FOR
-        
+
         // Render melee games
         for (UserMeleeGameInfo info : openMeleeGames) {
 %>
@@ -722,19 +722,21 @@
 	<%}%>
 
 	<script>
-		$(document).ready(function() {
-			$.fn.dataTable.moment( 'YY/MM/DD HH:mm' );
-			$('#tableMPGames').DataTable( {
-				"paging":   false,
-				"searching": false,
-				"order": [[ 5, "asc" ]],
-				"language": {
-					"info": ""
-				}
-			} );
-		} );
+    (function () {
 
-        $('.modal').on('shown.bs.modal', function() {
+        $(document).ready(function () {
+            $.fn.dataTable.moment('YY/MM/DD HH:mm');
+            $('#tableMPGames').DataTable({
+                "paging": false,
+                "searching": false,
+                "order": [[5, "asc"]],
+                "language": {
+                    "info": ""
+                }
+            });
+        });
+
+        $('.modal').on('shown.bs.modal', function () {
             let codeMirrorContainer = $(this).find(".CodeMirror")[0];
             if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
                 codeMirrorContainer.CodeMirror.refresh();
@@ -762,6 +764,8 @@
                 $(id).show()
             }
         });
+
+    })();
 	</script>
 
 </div>
