@@ -208,7 +208,7 @@
             }
 
             const table =
-                `<div style="max-height: 400px; overflow: auto; padding-right: 14px;">
+                `<div>
                     <table class="table table-condensed">`
                          + head +
                         `<tbody>`
