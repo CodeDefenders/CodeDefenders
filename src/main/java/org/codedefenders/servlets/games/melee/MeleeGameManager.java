@@ -43,6 +43,13 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
+import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
+import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
+import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -324,8 +331,12 @@ public class MeleeGameManager extends HttpServlet {
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
         }
-
         final String testText = test.get();
+
+        TestSubmittedEvent tse = new TestSubmittedEvent();
+        tse.setGameId(game.getId());
+        tse.setUserId(login.getUserId());
+        notificationService.post(tse);
 
         // TODO Where do we check that the test is not a duplicate ?!
 
@@ -333,6 +344,13 @@ public class MeleeGameManager extends HttpServlet {
         List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
                 game.getMaxAssertionsPerTest(), game.isForceHamcrest());
         boolean validationSuccess = validationMessages.isEmpty();
+
+        TestValidatedEvent tve = new TestValidatedEvent();
+        tve.setGameId(game.getId());
+        tve.setUserId(login.getUserId());
+        tve.setSuccess(validationSuccess);
+        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessages));
+        notificationService.post(tve);
 
         if (!validationSuccess) {
             messages.getBridge().addAll(validationMessages);
@@ -443,6 +461,11 @@ public class MeleeGameManager extends HttpServlet {
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
+        TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
+        ttme.setGameId(game.getId());
+        ttme.setUserId(login.getUserId());
+        notificationService.post(ttme);
+
         // Clean up the session
         previousSubmission.clear();
         session.removeAttribute("selected_lines");
@@ -536,20 +559,42 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
+        MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        mse.setGameId(game.getId());
+        mse.setUserId(login.getUserId());
+        notificationService.post(mse);
+
         // Do the validation even before creating the mutant
         CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(),
                 mutantText, codeValidatorLevel);
+        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 
-        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+        MutantValidatedEvent mve = new MutantValidatedEvent();
+        mve.setGameId(game.getId());
+        mve.setUserId(login.getUserId());
+        mve.setSuccess(validationSuccess);
+        notificationService.post(mve);
+
+        if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
         }
+
         Mutant existingMutant = gameManagingUtils.existingMutant(game.getId(), mutantText);
-        //
-        if (existingMutant != null && existingMutant.getCreatorId() == playerId) {
+        boolean duplicateCheckSuccess = existingMutant == null || existingMutant.getCreatorId() != playerId;
+        // TODO: Why allow duplicate mutants from different creators?
+
+        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
+        mdce.setGameId(game.getId());
+        mdce.setUserId(login.getUserId());
+        mdce.setSuccess(duplicateCheckSuccess);
+        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
+        notificationService.post(mdce);
+
+        if (!duplicateCheckSuccess) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant,
                     TargetExecution.Target.COMPILE_MUTANT);
@@ -561,6 +606,7 @@ public class MeleeGameManager extends HttpServlet {
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
         }
+
         // TODO There is a mistmatch. We pass the USER_ID while creating a mutant, but
         // then we get the PLAYER_ID when we get id of the mutants' creator?
         Mutant newMutant = gameManagingUtils.createMutant(game.getId(), game.getClassId(), mutantText, user.getId(),
@@ -606,8 +652,13 @@ public class MeleeGameManager extends HttpServlet {
         notif.insert();
 
         mutationTester.runAllTestsOnMeleeMutant(game, newMutant, messages.getBridge());
-
         game.update();
+
+        MutantTestedEvent mte = new MutantTestedEvent();
+        mte.setGameId(game.getId());
+        mte.setUserId(login.getUserId());
+        mte.setMutantId(newMutant.getId());
+        notificationService.post(mte);
 
         if (game.isCapturePlayersIntention()) {
             AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
@@ -688,6 +739,11 @@ public class MeleeGameManager extends HttpServlet {
             }
             final String testText = test.get();
 
+            TestSubmittedEvent tse = new TestSubmittedEvent();
+            tse.setGameId(gameId);
+            tse.setUserId(login.getUserId());
+            notificationService.post(tse);
+
             // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
@@ -695,6 +751,13 @@ public class MeleeGameManager extends HttpServlet {
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText,
                     game.getMaxAssertionsPerTest(), game.isForceHamcrest());
             boolean validationSuccess = validationMessage.isEmpty();
+
+            TestValidatedEvent tve = new TestValidatedEvent();
+            tve.setGameId(gameId);
+            tve.setUserId(login.getUserId());
+            tve.setSuccess(validationSuccess);
+            tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+            notificationService.post(tve);
 
             if (!validationSuccess) {
                 messages.getBridge().addAll(validationMessage);
@@ -828,6 +891,12 @@ public class MeleeGameManager extends HttpServlet {
                     messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
                 }
             }
+
+            TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
+            ttme.setGameId(gameId);
+            ttme.setUserId(login.getUserId());
+            ttme.setTestId(newTest.getId());
+            notificationService.post(ttme);
 
             newTest.update();
             game.update();

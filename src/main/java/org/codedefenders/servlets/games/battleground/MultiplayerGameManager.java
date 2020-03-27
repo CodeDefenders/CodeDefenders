@@ -592,7 +592,7 @@ public class MultiplayerGameManager extends HttpServlet {
         mve.setSuccess(validationSuccess);
         notificationService.post(mve);
 
-        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+        if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -673,6 +673,7 @@ public class MultiplayerGameManager extends HttpServlet {
         Event notif = new Event(-1, gameId, login.getUserId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
+
         mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
         game.update();
 
