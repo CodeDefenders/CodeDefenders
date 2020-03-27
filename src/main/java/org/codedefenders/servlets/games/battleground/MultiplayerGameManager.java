@@ -486,8 +486,10 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     /**
-     * Return the line numbers mentioned in the error message of the compiler.
-     * @return
+     * Returns the line numbers mentioned in the error message of the compiler.
+     *
+     * @param compilerOutput The compiler output.
+     * @return A list of (1-indexed) line numbers.
      */
     List<Integer> extractErrorLines(String compilerOutput) {
         List<Integer> errorLines = new ArrayList<>();
@@ -660,7 +662,6 @@ public class MultiplayerGameManager extends HttpServlet {
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate);
-
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -704,7 +705,6 @@ public class MultiplayerGameManager extends HttpServlet {
                                     int gameId,
                                     MultiplayerGame game) throws IOException {
         final String contextPath = ctx(request);
-        final HttpSession session = request.getSession();
 
         if (game.getRole(login.getUserId()) != Role.ATTACKER) {
             messages.add("Can only resolve equivalence duels if you are an Attacker!");
