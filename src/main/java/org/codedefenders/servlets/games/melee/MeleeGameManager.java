@@ -403,9 +403,8 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-            // We escape the content of the message for new tests since user can embed there
-            // anything
+            messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+            // We escape the content of the message for new tests since user can embed there anything
             String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
@@ -634,7 +633,6 @@ public class MeleeGameManager extends HttpServlet {
 
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
 
         if (game.getState() == GameState.FINISHED) {
@@ -696,8 +694,10 @@ public class MeleeGameManager extends HttpServlet {
             // TODO Here we need to account for #495
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText,
                     game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-            if (!validationMessage.isEmpty()) {
-                messages.addAll(validationMessage);
+            boolean validationSuccess = validationMessage.isEmpty();
+
+            if (!validationSuccess) {
+                messages.getBridge().addAll(validationMessage);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
                 return;
@@ -730,10 +730,19 @@ public class MeleeGameManager extends HttpServlet {
 
             if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
                 logger.debug("compileTestTarget: " + compileTestTarget);
-                messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+                messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+
                 if (compileTestTarget != null) {
-                    messages.add(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    // Extract the line numbers of the errors
+                    List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+                    // Store them in the session so they can be picked up later
+                    previousSubmission.setErrorLines(errorLines);
+                    // We introduce our decoration
+                    String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+                    messages.add(decorate);
                 }
+
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
                 return;
@@ -744,7 +753,7 @@ public class MeleeGameManager extends HttpServlet {
                 // (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) ||
                 // testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
                 logger.debug("testOriginalTarget: " + testOriginalTarget);
-                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
                 messages.add(testOriginalTarget.message);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
