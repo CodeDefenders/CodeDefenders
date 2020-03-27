@@ -849,9 +849,18 @@ public class MultiplayerGameManager extends HttpServlet {
             if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
                 logger.debug("compileTestTarget: " + compileTestTarget);
                 messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+
                 if (compileTestTarget != null) {
-                    messages.add(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    // Extract the line numbers of the errors
+                    List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+                    // Store them in the session so they can be picked up later
+                    previousSubmission.setErrorLines(errorLines);
+                    // We introduce our decoration
+                    String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+                    messages.add(decorate);
                 }
+
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
