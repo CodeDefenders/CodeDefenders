@@ -242,6 +242,7 @@
                     unsolved, you will lose points!</div>
             </form>
         </div>
+        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />
     </div>
 
     <%-- TODO: What to show besides the test editor in the quivalence duel? --%>
@@ -325,7 +326,6 @@
         </form>
         <jsp:include
                 page="/jsp/game_components/editor_help_config_toolbar.jsp" />
-        <!-- THE FOLLOWING IS DUPLICATED ! -->
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />
     </div>
 

@@ -486,8 +486,10 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     /**
-     * Return the line numbers mentioned in the error message of the compiler.
-     * @return
+     * Returns the line numbers mentioned in the error message of the compiler.
+     *
+     * @param compilerOutput The compiler output.
+     * @return A list of (1-indexed) line numbers.
      */
     List<Integer> extractErrorLines(String compilerOutput) {
         List<Integer> errorLines = new ArrayList<>();
@@ -590,7 +592,7 @@ public class MultiplayerGameManager extends HttpServlet {
         mve.setSuccess(validationSuccess);
         notificationService.post(mve);
 
-        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+        if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -660,7 +662,6 @@ public class MultiplayerGameManager extends HttpServlet {
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate);
-
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -672,6 +673,7 @@ public class MultiplayerGameManager extends HttpServlet {
         Event notif = new Event(-1, gameId, login.getUserId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
+
         mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
         game.update();
 
@@ -704,7 +706,6 @@ public class MultiplayerGameManager extends HttpServlet {
                                     int gameId,
                                     MultiplayerGame game) throws IOException {
         final String contextPath = ctx(request);
-        final HttpSession session = request.getSession();
 
         if (game.getRole(login.getUserId()) != Role.ATTACKER) {
             messages.add("Can only resolve equivalence duels if you are an Attacker!");
@@ -849,9 +850,18 @@ public class MultiplayerGameManager extends HttpServlet {
             if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
                 logger.debug("compileTestTarget: " + compileTestTarget);
                 messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+
                 if (compileTestTarget != null) {
-                    messages.add(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    // Extract the line numbers of the errors
+                    List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+                    // Store them in the session so they can be picked up later
+                    previousSubmission.setErrorLines(errorLines);
+                    // We introduce our decoration
+                    String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+                    messages.add(decorate);
                 }
+
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
