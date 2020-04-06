@@ -104,6 +104,8 @@ If you want to deploy the `.war` file by yourself its enough to execute:
 mvn clean package -DskipTests
 ```
 
+If you want to run the tests be sure the library `libncurses.so.5` is present on your system as the database tests depend on it.
+
 ### System Tests
 System tests work by deploying Code Defenders inside disposable Docker containers and interacting with it by means of Selenium, which is again, running inside a Docker container.
 This means that the DATA inside the DB are lost after the tests end.
