@@ -30,6 +30,6 @@
         <% if (pageInfo.hasPageTitle()) { %>
             <h2 class="full-width page-title" style="text-align: center;">${pageInfo.pageTitle}</h2>
         <% } %>
-        <div class="nest">
-            <div class="crow fly no-gutter">
-                <div class="crow fly no-gutter">
+        <div>
+            <div>
+                <div>

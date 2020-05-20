@@ -45,6 +45,7 @@
     final String description = puzzle.getDescription();
 %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
@@ -64,8 +65,6 @@
     testEditor.setMockingEnabled(false);
     if (previousSubmission.hasTest()) {
         testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-        previousSubmission.clearTest();
-        previousSubmission.clearErrorLines(); // TODO: move this to error highlighting bean
     } else {
         testEditor.setTestCodeForClass(cut);
     }
@@ -101,6 +100,9 @@
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<% previousSubmission.clear(); %>
 
 
 <%-- -------------------------------------------------------------------------------- --%>

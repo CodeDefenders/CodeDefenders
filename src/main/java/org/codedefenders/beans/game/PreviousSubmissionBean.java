@@ -38,17 +38,17 @@ public class PreviousSubmissionBean implements Serializable {
         this.errorLines = errorLines;
     }
 
-    public void clearMutant() {
-        mutantCode = null;
-    }
+    // public void clearMutant() {
+    //     mutantCode = null;
+    // }
 
-    public void clearTest() {
-        testCode = null;
-    }
+    // public void clearTest() {
+    //     testCode = null;
+    // }
 
-    public void clearErrorLines() {
-        errorLines = null;
-    }
+    // public void clearErrorLines() {
+    //     errorLines = null;
+    // }
 
     public void clear() {
         mutantCode = null;

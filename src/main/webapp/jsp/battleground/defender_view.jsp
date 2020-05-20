@@ -34,7 +34,7 @@
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
-    
+
     final User user = login.getUser();
 %>
 
@@ -57,7 +57,6 @@
     testEditor.setMockingEnabled(cut.isMockingEnabled());
     if (previousSubmission.hasTest()) {
         testEditor.setPreviousTestCode(previousSubmission.getTestCode());
-        previousSubmission.clearTest();
     } else {
         testEditor.setTestCodeForClass(cut);
     }
@@ -73,12 +72,11 @@
 %>
 
 
-<jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    errorHighlighting.setCodeDivSelector("#utest-div");
+    testErrorHighlighting.setCodeDivSelector("#utest-div");
     if (previousSubmission.hasErrorLines()) {
-        errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
-        previousSubmission.clearErrorLines();
+        testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
 %>
 
@@ -103,6 +101,9 @@
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
+
+<% previousSubmission.clear(); %>
 
 
 <%-- -------------------------------------------------------------------------------- --%>

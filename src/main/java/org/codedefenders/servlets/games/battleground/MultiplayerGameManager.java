@@ -56,7 +56,6 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -324,7 +323,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> test = ServletUtils.getStringParameter(request, "test");
         if (!test.isPresent()) {
-            previousSubmission.clearTest();
+            previousSubmission.clear();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -442,7 +441,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Store them in the session so they can be picked up later
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode(escapedHtml);
+            String decorate = decorateWithLinksToCode(escapedHtml, true, false);
             messages.add(decorate);
             //
             previousSubmission.setTestCode(testText);
@@ -481,13 +480,16 @@ public class MultiplayerGameManager extends HttpServlet {
         notificationService.post(ttme);
 
         // Clean up the session
+        previousSubmission.clear();
         session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
 
     /**
-     * Return the line numbers mentioned in the error message of the compiler.
-     * @return
+     * Returns the line numbers mentioned in the error message of the compiler.
+     *
+     * @param compilerOutput The compiler output.
+     * @return A list of (1-indexed) line numbers.
      */
     List<Integer> extractErrorLines(String compilerOutput) {
         List<Integer> errorLines = new ArrayList<>();
@@ -508,15 +510,22 @@ public class MultiplayerGameManager extends HttpServlet {
      * decoration utility, and possibly the sanitize methods to some other
      * components.
      */
-    String decorateWithLinksToCode(String compilerOutput) {
+    String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
+        String jumpFunction = "";
+        if (forTest) {
+            jumpFunction = "jumpToTestLine";
+        } else if (forMutant) {
+            jumpFunction = "jumpToMutantLine";
+        }
+
         StringBuffer decorated = new StringBuffer();
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // Replace the entire line with a link to the source code
-                String replacedLine =
-                        "<a onclick=\"jumpToLine(" + m.group(1) + ")\" href=\"javascript:void(0);\">" + line + "</a>";
+                String replacedLine = "<a onclick=\"" + jumpFunction + "(" + m.group(1)
+                        + ")\" href=\"javascript:void(0);\">" + line + "</a>";
                 decorated.append(replacedLine).append("\n");
             } else {
                 decorated.append(line).append("\n");
@@ -546,7 +555,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Get the text submitted by the user.
         final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
         if (!mutant.isPresent()) {
-            previousSubmission.clearMutant();
+            previousSubmission.clear();
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
@@ -583,7 +592,7 @@ public class MultiplayerGameManager extends HttpServlet {
         mve.setSuccess(validationSuccess);
         notificationService.post(mve);
 
-        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+        if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -651,9 +660,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 // Store them in the session so they can be picked up later
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
-                String decorate = decorateWithLinksToCode(escapedHtml);
+                String decorate = decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate);
-
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -665,6 +673,7 @@ public class MultiplayerGameManager extends HttpServlet {
         Event notif = new Event(-1, gameId, login.getUserId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
+
         mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
         game.update();
 
@@ -686,7 +695,7 @@ public class MultiplayerGameManager extends HttpServlet {
             collectAttackerIntentions(newMutant, intention);
         }
         // Clean the mutated code only if mutant is accepted
-        previousSubmission.clearMutant();
+        previousSubmission.clear();
         logger.info("Successfully created mutant {} ", newMutant.getId());
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
@@ -697,7 +706,6 @@ public class MultiplayerGameManager extends HttpServlet {
                                     int gameId,
                                     MultiplayerGame game) throws IOException {
         final String contextPath = ctx(request);
-        final HttpSession session = request.getSession();
 
         if (game.getRole(login.getUserId()) != Role.ATTACKER) {
             messages.add("Can only resolve equivalence duels if you are an Attacker!");
@@ -778,7 +786,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Reject equivalence and submit killing test case
             final Optional<String> test = ServletUtils.getStringParameter(request, "test");
             if (!test.isPresent()) {
-                previousSubmission.clearTest();
+                previousSubmission.clear();
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
@@ -842,9 +850,18 @@ public class MultiplayerGameManager extends HttpServlet {
             if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
                 logger.debug("compileTestTarget: " + compileTestTarget);
                 messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
+
                 if (compileTestTarget != null) {
-                    messages.add(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    // Extract the line numbers of the errors
+                    List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+                    // Store them in the session so they can be picked up later
+                    previousSubmission.setErrorLines(errorLines);
+                    // We introduce our decoration
+                    String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+                    messages.add(decorate);
                 }
+
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;

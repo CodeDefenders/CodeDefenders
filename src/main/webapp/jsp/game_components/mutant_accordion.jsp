@@ -345,5 +345,5 @@
                 $("#cut-div, #newmut-div")[0].scrollIntoView();
             });
         }
-    }());
+    })();
 </script>

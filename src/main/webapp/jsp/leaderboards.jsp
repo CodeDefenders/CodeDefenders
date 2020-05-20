@@ -59,16 +59,20 @@
 	</table>
 
 	<script>
-		$(document).ready(function() {
-			$.fn.dataTable.moment( 'DD/MM/YY HH:mm' );
-			$('#tableMPLeaderboard').DataTable( {
-				"order": [[ 6, "desc" ]],
+	(function () {
+
+		$(document).ready(function () {
+			$.fn.dataTable.moment('DD/MM/YY HH:mm');
+			$('#tableMPLeaderboard').DataTable({
+				"order": [[6, "desc"]],
 				"columnDefs": [
-					{ "searchable": false, "targets": [1,2,3,4,5,6] }
+					{"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
 				],
 				"pageLength": 50
-			} );
-		} );
+			});
+		});
+
+	})();
 	</script>
 
 </div>

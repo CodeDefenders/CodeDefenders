@@ -239,193 +239,196 @@
             </div>
         </div>
     <% } %>
+</div>
 
-    <script>
-        const postIds = function (idsString, formType, killmapType) {
-            const form = $(
-                  '<form method="post">'
-                +     '<input type="hidden" name="formType" value="' + formType + '">'
-                +     '<input type="hidden" name="killmapType" value="' + killmapType + '">'
-                + '</form>'
-            );
+<script>
+(function () {
 
-            /* Construct form field with ids like this so we dont have to sanitize the ids. */
-            const idsField = $('<input type="hidden" name="ids" value="">');
-            idsField.val(idsString);
-            form.append(idsField);
+    const postIds = function (idsString, formType, killmapType) {
+        const form = $(
+              '<form method="post">'
+            +     '<input type="hidden" name="formType" value="' + formType + '">'
+            +     '<input type="hidden" name="killmapType" value="' + killmapType + '">'
+            + '</form>'
+        );
 
-            $('body').append(form);
-            form.submit();
-        };
-    </script>
+        /* Construct form field with ids like this so we dont have to sanitize the ids. */
+        const idsField = $('<input type="hidden" name="ids" value="">');
+        idsField.val(idsString);
+        form.append(idsField);
 
-    <% if (currentPage == KillmapPage.MANUAL) { %>
-        <script>
-            $(document).ready(function() {
-                $('#queue-ids-classes').on('click',  () => postIds($("#class-ids").val(), 'submitKillMapJobs', 'class'));
-                $('#queue-ids-games').on('click',    () => postIds($("#game-ids").val(), 'submitKillMapJobs', 'game'));
+        $('body').append(form);
+        form.submit();
+    };
 
-                $('#delete-ids-classes').on('click', () => {
-                    if (confirm('Are you sure you want to delete the specified killmaps?'))
-                        postIds($("#class-ids").val(), 'deleteKillMaps', 'class');
-                });
-                $('#delete-ids-games').on('click', () => {
-                    if (confirm('Are you sure you want to delete the specified killmaps?'))
-                        postIds($("#game-ids").val(), 'deleteKillMaps', 'game');
-                });
-            });
-        </script>
+<% if (currentPage == KillmapPage.MANUAL) { %>
 
-    <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
-        <script>
-            const postTable = function (table, formType, killmapType) {
-                const data = table.data();
-                const ids = [];
+    $(document).ready(function() {
+        $('#queue-ids-classes').on('click',  () => postIds($("#class-ids").val(), 'submitKillMapJobs', 'class'));
+        $('#queue-ids-games').on('click',    () => postIds($("#game-ids").val(), 'submitKillMapJobs', 'game'));
 
-                for (let i = 0; i < data.length; i++) {
-                    const node = table.row(i).node();
-                    const checkbox = $(node).find('input');
+        $('#delete-ids-classes').on('click', () => {
+            if (confirm('Are you sure you want to delete the specified killmaps?'))
+                postIds($("#class-ids").val(), 'deleteKillMaps', 'class');
+        });
+        $('#delete-ids-games').on('click', () => {
+            if (confirm('Are you sure you want to delete the specified killmaps?'))
+                postIds($("#game-ids").val(), 'deleteKillMaps', 'game');
+        });
+    });
 
-                    if (checkbox.is(':checked')) {
-                        ids.push(data[i][killmapType + 'Id']);
-                    }
-                }
+<% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
 
-                postIds(JSON.stringify(ids), formType, killmapType);
-            };
+    const postTable = function (table, formType, killmapType) {
+        const data = table.data();
+        const ids = [];
 
-            const colorRow = function () {
-                const data = this.data();
-                const node = this.node();
-                let percentage;
+        for (let i = 0; i < data.length; i++) {
+            const node = table.row(i).node();
+            const checkbox = $(node).find('input');
 
-                const expectedNrEntries = (data.nrTests * data.nrMutants);
-                if (expectedNrEntries !== 0) {
-                    percentage = ((data.nrEntries * 100) / expectedNrEntries).toFixed(0);
-                } else {
-                    percentage = 0;
-                }
+            if (checkbox.is(':checked')) {
+                ids.push(data[i][killmapType + 'Id']);
+            }
+        }
 
-                node.style.background = 'linear-gradient(to right, '
-                    + 'rgba(41, 182, 246, 0.15) ' + percentage + '%, '
-                    + 'transparent ' + percentage + '%)';
-            };
+        postIds(JSON.stringify(ids), formType, killmapType);
+    };
 
-            const uncolorRow = function () {
-                const node = this.node();
-                node.style.background = null;
-            };
+    const colorRow = function () {
+        const data = this.data();
+        const node = this.node();
+        let percentage;
 
-            const invertSelection = function (table) {
-                const data = table.data();
+        const expectedNrEntries = (data.nrTests * data.nrMutants);
+        if (expectedNrEntries !== 0) {
+            percentage = ((data.nrEntries * 100) / expectedNrEntries).toFixed(0);
+        } else {
+            percentage = 0;
+        }
 
-                for (let i = 0; i < data.length; i++) {
-                    const node = table.row(i).node();
-                    const checkbox = $(node).find('input');
-                    checkbox.prop('checked', (_, checked) => !checked);
-                }
-            };
+        node.style.background = 'linear-gradient(to right, '
+            + 'rgba(41, 182, 246, 0.15) ' + percentage + '%, '
+            + 'transparent ' + percentage + '%)';
+    };
 
-            const progressFromRow = function (row) {
-                const expectedNrEntries = (row.nrTests * row.nrMutants);
-                if (expectedNrEntries !== 0) {
-                    return ((row.nrEntries * 100) / expectedNrEntries).toFixed(0) + '%';
-                } else {
-                    return 'NA';
-                }
-            };
+    const uncolorRow = function () {
+        const node = this.node();
+        node.style.background = null;
+    };
 
-            const classNameFromRow = function (row) {
-                if (row.className === row.classAlias) {
-                    return row.className;
-                } else {
-                    return row.className + ' (alias ' + row.classAlias + ')';
-                }
-            };
+    const invertSelection = function (table) {
+        const data = table.data();
 
-            let emptyClassTableMessage;
-            let emptyGameTableMessage;
+        for (let i = 0; i < data.length; i++) {
+            const node = table.row(i).node();
+            const checkbox = $(node).find('input');
+            checkbox.prop('checked', (_, checked) => !checked);
+        }
+    };
 
-            <% if (currentPage == KillmapPage.AVAILABLE) { %>
-                emptyClassTableMessage = 'No classes available.';
-                emptyGameTableMessage = 'No games available.';
-            <% } else { %>
-                emptyClassTableMessage = 'No classes queued for killmap computation.';
-                emptyGameTableMessage = 'No games queued for killmap computation.';
-            <% } %>
+    const progressFromRow = function (row) {
+        const expectedNrEntries = (row.nrTests * row.nrMutants);
+        if (expectedNrEntries !== 0) {
+            return ((row.nrEntries * 100) / expectedNrEntries).toFixed(0) + '%';
+        } else {
+            return 'NA';
+        }
+    };
 
-            $(document).ready(function() {
-                const classTable = $('#table-classes').DataTable({
-                    ajax: {
-                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json',
-                        dataSrc: 'data'
-                    },
-                    columns: [
-                        { data: null,             defaultContent: '<input type="checkbox" class="select-for-queue">' },
-                        { data: 'classId',        title: 'Class' },
-                        { data: classNameFromRow, title: 'Name' },
-                        { data: 'nrMutants',      title: 'Mutants' },
-                        { data: 'nrTests',        title: 'Tests' },
-                        { data: progressFromRow,  title: 'Computed' },
-                    ],
-                    scrollY: '400px',
-                    scrollCollapse: true,
-                    paging: false,
-                    dom: 't',
-                    language: {emptyTable: emptyClassTableMessage}
-                });
+    const classNameFromRow = function (row) {
+        if (row.className === row.classAlias) {
+            return row.className;
+        } else {
+            return row.className + ' (alias ' + row.classAlias + ')';
+        }
+    };
 
-                const gameTable = $('#table-games').DataTable({
-                    ajax: {
-                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json',
-                        dataSrc: 'data'
-                    },
-                    columns: [
-                        { data: null,            defaultContent: '<input type="checkbox" class="select-for-queue">' },
-                        { data: 'gameId',        title: 'Game' },
-                        { data: 'gameMode',      title: 'Mode' },
-                        { data: 'nrMutants',     title: 'Mutants' },
-                        { data: 'nrTests',       title: 'Tests' },
-                        { data: progressFromRow, title: 'Computed' },
-                    ],
-                    scrollY: '400px',
-                    scrollCollapse: true,
-                    paging: false,
-                    dom: 't',
-                    language: {emptyTable: emptyGameTableMessage}
-                });
+    let emptyClassTableMessage;
+    let emptyGameTableMessage;
 
-                $('#toggle-progress-classes').on('change', function () {
-                    const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
-                    classTable.rows().every(colorFun);
-                });
-                $('#toggle-progress-games').on('change', function () {
-                    const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
-                    gameTable.rows().every(colorFun);
-                });
-
-                $('#search-classes').on('keyup', function () { classTable.search(this.value).draw(); });
-                $('#search-games').on('keyup',   function () { gameTable.search(this.value).draw(); });
-
-                $('#invert-selection-classes').on('click', () => invertSelection(classTable));
-                $('#invert-selection-games').on('click',   () => invertSelection(gameTable));
-
-                $('#queue-selection-classes').on('click',  () => postTable(classTable, 'submitKillMapJobs', 'class'));
-                $('#queue-selection-games').on('click',    () => postTable(gameTable, 'submitKillMapJobs', 'game'));
-                $('#cancel-selection-classes').on('click', () => postTable(classTable, 'cancelKillMapJobs', 'class'));
-                $('#cancel-selection-games').on('click',   () => postTable(gameTable, 'cancelKillMapJobs', 'game'));
-
-                $('#delete-selection-classes').on('click', () => {
-                    if (confirm('Are you sure you want to delete the selected killmaps?'))
-                        postTable(classTable, 'deleteKillMaps', 'class')
-                });
-                $('#delete-selection-games').on('click', () => {
-                    if (confirm('Are you sure you want to delete the selected killmaps?'))
-                        postTable(gameTable, 'deleteKillMaps', 'game')
-                });
-            });
-        </script>
+    <% if (currentPage == KillmapPage.AVAILABLE) { %>
+        emptyClassTableMessage = 'No classes available.';
+        emptyGameTableMessage = 'No games available.';
+    <% } else { %>
+        emptyClassTableMessage = 'No classes queued for killmap computation.';
+        emptyGameTableMessage = 'No games queued for killmap computation.';
     <% } %>
 
-</div>
+    $(document).ready(function() {
+        const classTable = $('#table-classes').DataTable({
+            ajax: {
+                url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json',
+                dataSrc: 'data'
+            },
+            columns: [
+                { data: null,             defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                { data: 'classId',        title: 'Class' },
+                { data: classNameFromRow, title: 'Name' },
+                { data: 'nrMutants',      title: 'Mutants' },
+                { data: 'nrTests',        title: 'Tests' },
+                { data: progressFromRow,  title: 'Computed' },
+            ],
+            scrollY: '400px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: {emptyTable: emptyClassTableMessage}
+        });
+
+        const gameTable = $('#table-games').DataTable({
+            ajax: {
+                url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json',
+                dataSrc: 'data'
+            },
+            columns: [
+                { data: null,            defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                { data: 'gameId',        title: 'Game' },
+                { data: 'gameMode',      title: 'Mode' },
+                { data: 'nrMutants',     title: 'Mutants' },
+                { data: 'nrTests',       title: 'Tests' },
+                { data: progressFromRow, title: 'Computed' },
+            ],
+            scrollY: '400px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: {emptyTable: emptyGameTableMessage}
+        });
+
+        $('#toggle-progress-classes').on('change', function () {
+            const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
+            classTable.rows().every(colorFun);
+        });
+        $('#toggle-progress-games').on('change', function () {
+            const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
+            gameTable.rows().every(colorFun);
+        });
+
+        $('#search-classes').on('keyup', function () { classTable.search(this.value).draw(); });
+        $('#search-games').on('keyup',   function () { gameTable.search(this.value).draw(); });
+
+        $('#invert-selection-classes').on('click', () => invertSelection(classTable));
+        $('#invert-selection-games').on('click',   () => invertSelection(gameTable));
+
+        $('#queue-selection-classes').on('click',  () => postTable(classTable, 'submitKillMapJobs', 'class'));
+        $('#queue-selection-games').on('click',    () => postTable(gameTable, 'submitKillMapJobs', 'game'));
+        $('#cancel-selection-classes').on('click', () => postTable(classTable, 'cancelKillMapJobs', 'class'));
+        $('#cancel-selection-games').on('click',   () => postTable(gameTable, 'cancelKillMapJobs', 'game'));
+
+        $('#delete-selection-classes').on('click', () => {
+            if (confirm('Are you sure you want to delete the selected killmaps?'))
+                postTable(classTable, 'deleteKillMaps', 'class')
+        });
+        $('#delete-selection-games').on('click', () => {
+            if (confirm('Are you sure you want to delete the selected killmaps?'))
+                postTable(gameTable, 'deleteKillMaps', 'game')
+        });
+    });
+
+<% } %>
+
+})();
+</script>
+
 <%@ include file="/jsp/footer.jsp" %>

@@ -1,5 +1,7 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 <script>
+(function () {
+
     class PuzzleAPI {
         static async fetchPuzzleData() {
             return await fetch(`<%=request.getContextPath() + Paths.API_ADMIN_PUZZLES_ALL%>`, {
@@ -82,4 +84,8 @@
             });
         }
     }
+
+    window.PuzzleAPI = PuzzleAPI;
+
+})();
 </script>
