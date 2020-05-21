@@ -398,9 +398,6 @@
             </form>
             <%
                 } else {
-                    System.out.println("User Games View");
-				    System.out.println("info.gameState() " + info.gameState());
-				    System.out.println("info.userRole() " + info.userRole());
                     switch (info.userRole()) {
 						case OBSERVER:
 						%>
