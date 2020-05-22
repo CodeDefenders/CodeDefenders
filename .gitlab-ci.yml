@@ -12,6 +12,7 @@ stages:
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   SAST_DISABLE_DIND: "true"
+  DS_DISABLE_DIND: "true"
 
 cache:
   paths:
