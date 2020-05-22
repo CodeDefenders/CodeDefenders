@@ -24,10 +24,7 @@ cache:
 
 
 spotbugs-sast:
-  cache:
-    paths:
-      - .m2/repository/
-      - ./config.properties
+  cache: {}
   script:
     - touch config.properties
     - /analyzer run
