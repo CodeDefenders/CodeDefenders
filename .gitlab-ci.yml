@@ -11,7 +11,6 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  SAST_EXCLUDED_PATHS: "target/"
   SAST_DISABLE_DIND: "true"  
   SAST_DEFAULT_ANALYZERS: "spotbugs, secrets"
   DS_DISABLE_DIND: "true"
@@ -25,6 +24,10 @@ cache:
 
 
 spotbugs-sast:
+  cache:
+    paths:
+      - .m2/repository/
+      - ./config.properties
   script:
     - touch config.properties
     - /analyzer run
