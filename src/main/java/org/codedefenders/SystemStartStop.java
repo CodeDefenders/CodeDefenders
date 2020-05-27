@@ -24,6 +24,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
@@ -40,6 +41,9 @@ public class SystemStartStop implements ServletContextListener {
 
     @Inject
     private ThreadPoolManager mgr;
+
+    @Inject
+    private Configuration config;
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -62,6 +66,7 @@ public class SystemStartStop implements ServletContextListener {
                 throw new RuntimeException("Deployment failed. Reason: ", e);
             }
             mgr.register("test-executor").withMax(4).withCore(2).add();
+            logger.info(config.toString());
         }
     }
 

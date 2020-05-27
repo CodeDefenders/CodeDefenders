@@ -18,20 +18,18 @@
  */
 package org.codedefenders.execution;
 
-import org.codedefenders.configuration.Property;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
-
-import java.util.concurrent.ExecutorService;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+import java.util.concurrent.ExecutorService;
 
 public class MutationTesterProducer {
 
     @Inject
-    @Property("parallelize")
-    private boolean enableParalleExecution;
+    private Configuration config;
 
     @Inject
     private BackendExecutorService backend;
@@ -41,19 +39,15 @@ public class MutationTesterProducer {
     private ExecutorService testExecutorThreadPool;
 
     @Inject
-    @Property("mutant.coverage")
-    private boolean useMutantCoverage;
-
-    @Inject
     private EventDAO eventDAO;
-    
+
     @Produces
     @RequestScoped
     public IMutationTester getMutationTester() {
-        if (enableParalleExecution) {
-            return new ParallelMutationTester(backend, eventDAO, useMutantCoverage, testExecutorThreadPool);
+        if (config.isParallelize()) {
+            return new ParallelMutationTester(backend, eventDAO, config.isMutantCoverage(), testExecutorThreadPool);
         } else {
-            return new MutationTester(backend, eventDAO, useMutantCoverage);
+            return new MutationTester(backend, eventDAO, config.isMutantCoverage());
         }
     }
 

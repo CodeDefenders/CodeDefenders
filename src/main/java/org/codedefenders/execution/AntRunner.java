@@ -21,7 +21,7 @@ package org.codedefenders.execution;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.codedefenders.configuration.Property;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -33,6 +33,8 @@ import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.ManagedBean;
+import javax.inject.Inject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -42,13 +44,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
-
-import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
-import static org.codedefenders.util.Constants.CUTS_DIR;
-import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
+import static org.codedefenders.util.Constants.*;
 
 /**
  * @author Jose Rojas
@@ -64,34 +60,14 @@ public class AntRunner implements //
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
     @Inject
-    @Property("ant.home")
-    private String antHome;
-
-    @Inject
-    @Property("cluster.mode")
-    private boolean clusterEnabled;
-
-    @Inject
-    @Property("force.local.execution")
-    private boolean forceLocalExecution;
-
-    @Inject
-    @Property("cluster.java.home")
-    private String clusterJavaHome;
-
-    @Inject
-    @Property("cluster.reservation.name")
-    private String clusterReservationName;
-
-    @Inject
-    @Property("cluster.timeout")
-    private String clusterTimeOutMinutes;
+    private Configuration config;
 
 
     /**
      * {@inheritDoc}
      */
     public boolean testKillsMutant(Mutant mutant, Test test) {
+        config.isForceLocalExecution();
         GameClass cut = GameClassDAO.getClassForGameId(mutant.getGameId());
 
         AntProcessResult result = runAntTarget("test-mutant", mutant.getDirectory(), test.getDirectory(),
@@ -191,7 +167,7 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception {
-        AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName, forceLocalExecution);
+        AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName, config.isForceLocalExecution());
 
         if (result.hasFailure() || result.hasError()) {
             if (result.hasFailure()) {
@@ -214,7 +190,7 @@ public class AntRunner implements //
         GameClass cut = GameClassDAO.getClassForGameId(t.getGameId());
 
         AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(),
-                cut, t.getFullyQualifiedClassName(), forceLocalExecution);
+                cut, t.getFullyQualifiedClassName(), config.isForceLocalExecution());
 
         // add coverage information
         final LineCoverage coverage = LineCoverageGenerator.generate(cut, Paths.get(t.getJavaFile()));
@@ -244,7 +220,7 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public String compileCUT(GameClass cut) throws CompileException {
-        AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, forceLocalExecution);
+        AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, config.isForceLocalExecution());
 
         logger.info("Compile New CUT, Compilation result: {}", result);
 
@@ -275,7 +251,7 @@ public class AntRunner implements //
 
         // Gets the classname for the mutant from the game it is in
         AntProcessResult result = runAntTarget("compile-mutant", dir.getAbsolutePath(), null,
-                cut, null, forceLocalExecution);
+                cut, null, config.isForceLocalExecution());
 
         logger.info("Compilation result: {}", result);
 
@@ -317,7 +293,7 @@ public class AntRunner implements //
         //public static int compileTest(ServletContext context, Test t) {
 
         AntProcessResult result = runAntTarget("compile-test", null, dir.getAbsolutePath(),
-                cut, null, forceLocalExecution);
+                cut, null, config.isForceLocalExecution());
 
         int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
 
@@ -406,10 +382,10 @@ public class AntRunner implements //
          * code-defender working dir is on the NFS.
          */
 
-        if (clusterEnabled && !forcedLocally) {
+        if (config.isClusterModeEnabled() && !forcedLocally) {
             logger.info("Clustered Execution");
-            if (clusterJavaHome != null) {
-                env.put("JAVA_HOME", clusterJavaHome);
+            if (config.getClusterJavaHome() != null) {
+                env.put("JAVA_HOME", config.getClusterJavaHome());
             }
 
             env.put("CLASSPATH", Constants.TEST_CLASSPATH);
@@ -417,24 +393,24 @@ public class AntRunner implements //
             command.add("srun");
 
             // Select reservation cluster
-            if (clusterReservationName != null) {
-                command.add("--reservation=" + clusterReservationName);
+            if (config.getClusterReservationName() != null) {
+                command.add("--reservation=" + config.getClusterReservationName());
             }
 
             // Timeout. Note that there's a plus 10 minutes of grace period
             // anyway
             // TODO This is unsafe we need to check this is a valid integer
-            if (clusterTimeOutMinutes != null) {
-                command.add("--time=" + clusterTimeOutMinutes);
+            if (config.getClusterTimeout() > -1) {
+                command.add("--time=" + config.getClusterTimeout());
             }
             //
             command.add("ant");
         } else {
             logger.debug("Local Execution");
-            env.put("CLASSPATH","lib/hamcrest-all-1.3.jar" + File.pathSeparator + "lib/junit-4.12.jar"
+            env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar" + File.pathSeparator + "lib/junit-4.12.jar"
                     + File.pathSeparator + "lib/mockito-all-1.9.5.jar");
 
-            String command_ = antHome + "/bin/ant";
+            String command_ = config.getAntHome() + "/bin/ant";
 
             if (System.getProperty("os.name").toLowerCase().contains("windows")) {
                 command_ += ".bat";
