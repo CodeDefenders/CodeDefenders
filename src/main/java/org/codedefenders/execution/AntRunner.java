@@ -44,7 +44,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.codedefenders.util.Constants.*;
+import static org.codedefenders.util.Constants.AI_DIR;
+import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
+import static org.codedefenders.util.Constants.CUTS_DIR;
+import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 /**
  * @author Jose Rojas
@@ -167,7 +170,8 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception {
-        AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName, config.isForceLocalExecution());
+        AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName,
+                config.isForceLocalExecution());
 
         if (result.hasFailure() || result.hasError()) {
             if (result.hasFailure()) {
@@ -258,7 +262,8 @@ public class AntRunner implements //
         Mutant newMutant;
         // If the input stream returned a 'successful build' message, the mutant compiled correctly
         if (result.compiled()) {
-            // Create and insert a new target execution recording successful compile, with no message to report, and return its ID
+            // Create and insert a new target execution recording successful compile,
+            // with no message to report, and return its ID
             // Locate .class file
             final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
             final LinkedList<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(
@@ -299,7 +304,8 @@ public class AntRunner implements //
 
         // If the input stream returned a 'successful build' message, the test compiled correctly
         if (result.compiled()) {
-            // Create and insert a new target execution recording successful compile, with no message to report, and return its ID
+            // Create and insert a new target execution recording successful compile,
+            // with no message to report, and return its ID
             // Locate .class file
             final String compiledClassName = FilenameUtils.getBaseName(javaFile) + JAVA_CLASS_EXT;
             final List<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(
@@ -346,7 +352,8 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public boolean compileGenTestSuite(final GameClass cut) {
-        AntProcessResult result = runAntTarget("compile-gen-tests", null, null, cut, cut.getName() + Constants.SUITE_EXT);
+        AntProcessResult result = runAntTarget("compile-gen-tests", null, null, cut,
+                cut.getName() + Constants.SUITE_EXT);
 
         // Return true iff compilation succeeds
         return result.compiled();

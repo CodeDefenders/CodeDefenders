@@ -18,14 +18,22 @@
  */
 package org.codedefenders.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.util.Properties;
 
 @ApplicationScoped
 class PropertiesFileConfiguration extends Configuration {
+    private static final Logger logger = LoggerFactory.getLogger(PropertiesFileConfiguration.class);
 
     @PostConstruct
     private void readConfig() {
@@ -68,7 +76,9 @@ class PropertiesFileConfiguration extends Configuration {
             } else if (t == Integer.class) {
                 field.set(this, Integer.parseInt(prop));
             }
-        } catch (IllegalAccessException ignored) {
+        } catch (IllegalAccessException e) {
+            logger.error("Can't set field " + field.getName() + " on Configuration class");
+            logger.error(e.toString());
         }
     }
 }

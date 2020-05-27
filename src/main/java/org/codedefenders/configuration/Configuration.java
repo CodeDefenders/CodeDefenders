@@ -22,6 +22,11 @@ import com.google.common.base.CaseFormat;
 
 import java.io.File;
 
+/**
+ * The Configuration class acts as interface for typesafe access to configuration properties.
+ *
+ * @author degenhart
+ */
 public abstract class Configuration {
     protected String dataDir = "/srv/codedefenders";
     protected String antHome = "/usr/share/ant";
