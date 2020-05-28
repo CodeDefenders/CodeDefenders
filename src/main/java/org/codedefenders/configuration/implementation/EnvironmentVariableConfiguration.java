@@ -16,54 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.configuration;
 
+package org.codedefenders.configuration.implementation;
+
+import com.google.common.base.CaseFormat;
+import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import javax.enterprise.inject.Alternative;
+import javax.inject.Singleton;
 import java.lang.reflect.Field;
-import java.util.Properties;
 
-@ApplicationScoped
-class PropertiesFileConfiguration extends Configuration {
+@Priority(50)
+@Alternative
+@Singleton
+public class EnvironmentVariableConfiguration extends Configuration {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesFileConfiguration.class);
 
     @PostConstruct
-    private void readConfig() {
-
-        Properties properties = readProperties();
-
+    private void init() {
         Field[] fields = this.getClass().getSuperclass().getDeclaredFields();
         for (Field f : fields) {
-            String name = formatLowerDot(f.getName());
-            String prop = properties.getProperty(name);
+            String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, f.getName());
+            String prop = System.getenv(name);
             if (prop != null) {
                 setField(f, prop);
             }
         }
 
         validate();
-
-    }
-
-    private Properties readProperties() {
-        Properties properties = new Properties();
-
-        String confPath = System.getProperty("catalina.base") + "/conf/codedefenders.properties";
-
-        try (Reader reader = new InputStreamReader(new FileInputStream(new File(confPath)))) {
-            properties.load(reader);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return properties;
     }
 
     private void setField(Field field, String prop) {
@@ -82,3 +67,4 @@ class PropertiesFileConfiguration extends Configuration {
         }
     }
 }
+

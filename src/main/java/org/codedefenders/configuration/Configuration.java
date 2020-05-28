@@ -18,8 +18,8 @@
  */
 package org.codedefenders.configuration;
 
-import com.google.common.base.CaseFormat;
-
+import javax.enterprise.inject.Alternative;
+import javax.inject.Singleton;
 import java.io.File;
 
 /**
@@ -27,7 +27,9 @@ import java.io.File;
  *
  * @author degenhart
  */
-public abstract class Configuration {
+@Alternative
+@Singleton
+public class Configuration {
     protected String dataDir = "/srv/codedefenders";
     protected String antHome = "/usr/share/ant";
 
@@ -57,11 +59,6 @@ public abstract class Configuration {
         if (clusterMode) {
             // TODO: Validate clusterOptions
         }
-
-    }
-
-    protected String formatLowerDot(String input) {
-        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, input).replace('-', '.');
     }
 
     public File getDataDir() {
@@ -114,5 +111,26 @@ public abstract class Configuration {
 
     public boolean isMutantCoverage() {
         return mutantCoverage;
+    }
+
+    @Override
+    public String toString() {
+        return "Configuration{" +
+                "dataDir='" + dataDir + '\'' +
+                ", antHome='" + antHome + '\'' +
+                ", dbHost='" + dbHost + '\'' +
+                ", dbPort=" + dbPort +
+                ", dbName='" + dbName + '\'' +
+                ", dbUsername='" + dbUsername + '\'' +
+                ", dbPassword='" + dbPassword + '\'' +
+                ", clusterMode=" + clusterMode +
+                ", clusterJavaHome='" + clusterJavaHome + '\'' +
+                ", clusterReservationName='" + clusterReservationName + '\'' +
+                ", clusterTimeout=" + clusterTimeout +
+                ", forceLocalExecution=" + forceLocalExecution +
+                ", parallelize=" + parallelize +
+                ", blockAttacker=" + blockAttacker +
+                ", mutantCoverage=" + mutantCoverage +
+                '}';
     }
 }

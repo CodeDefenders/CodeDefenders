@@ -18,11 +18,6 @@
  */
 package org.codedefenders;
 
-import javax.inject.Inject;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
-
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.ConnectionPool;
@@ -30,6 +25,10 @@ import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
