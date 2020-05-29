@@ -17,25 +17,19 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.configuration.implementation.configfileresolver;
+package org.codedefenders.configuration.configfileresolver;
 
-import org.codedefenders.configuration.implementation.ConfigFileResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
 import java.io.Reader;
 
-public class TomcatConfigFileResolver extends ConfigFileResolver {
-    private static final Logger logger = LoggerFactory.getLogger(TomcatConfigFileResolver.class);
-
+/**
+ * Reads the file path from an environment variable.
+ *
+ * @author degenhart
+ */
+public class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
     @Override
     public Reader getConfigFile(String filename) {
-        String tomcatRoot = System.getProperty("catalina.base");
-        if (tomcatRoot == null || tomcatRoot.length() == 0) {
-            return null;
-        }
-        File folder = new File(tomcatRoot, "conf");
-        return getConfigFileImpl(folder.getAbsolutePath(), filename);
+        return getConfigFileImpl(System.getenv("CODEDEFENDERS_CONFIG"), filename);
     }
 }
+

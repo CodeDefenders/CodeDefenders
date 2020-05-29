@@ -17,16 +17,16 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.configuration.implementation.configfileresolver;
-
-import org.codedefenders.configuration.implementation.ConfigFileResolver;
+package org.codedefenders.configuration.configfileresolver;
 
 import java.io.Reader;
 
-public class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
+/**
+ * @author degenhart
+ */
+public class SystemPropertyConfigFileLoader extends ConfigFileResolver {
     @Override
     public Reader getConfigFile(String filename) {
-        return getConfigFileImpl(System.getenv("CODEDEFENDERS_CONFIG"), filename);
+        return getConfigFileImpl(System.getProperty("codedefenders.config"), filename);
     }
 }
-

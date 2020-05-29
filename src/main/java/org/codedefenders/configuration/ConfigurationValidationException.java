@@ -17,29 +17,11 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.configuration.implementation;
+package org.codedefenders.configuration;
 
-import com.google.common.base.CaseFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class ConfigurationValidationException extends Exception {
 
-import javax.annotation.Priority;
-import javax.enterprise.inject.Alternative;
-import javax.inject.Singleton;
-
-/**
- * @author degenhart
- */
-@Priority(10)
-@Alternative
-@Singleton
-public class SystemPropertyConfiguration extends DefaultConfiguration {
-    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyConfiguration.class);
-
-    @Override
-    protected String resolveAttribute(String camelCaseName) {
-        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
-        return System.getProperty(name);
+    public ConfigurationValidationException(String errorMessage) {
+        super(errorMessage);
     }
 }
-

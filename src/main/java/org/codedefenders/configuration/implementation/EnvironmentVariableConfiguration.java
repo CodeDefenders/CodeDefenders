@@ -20,51 +20,28 @@
 package org.codedefenders.configuration.implementation;
 
 import com.google.common.base.CaseFormat;
-import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Priority;
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
-import java.lang.reflect.Field;
 
+/**
+ * Reads configuration values from environment variables after converting the attribute name to UPPER_UNDERSCORE format.
+ *
+ * @author degenhart
+ */
 @Priority(50)
 @Alternative
 @Singleton
-public class EnvironmentVariableConfiguration extends Configuration {
-    private static final Logger logger = LoggerFactory.getLogger(PropertiesFileConfiguration.class);
+public class EnvironmentVariableConfiguration extends DefaultConfiguration {
+    private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableConfiguration.class);
 
-    @PostConstruct
-    private void init() {
-        Field[] fields = this.getClass().getSuperclass().getDeclaredFields();
-        for (Field f : fields) {
-            String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, f.getName());
-            String prop = System.getenv(name);
-            if (prop != null) {
-                setField(f, prop);
-            }
-        }
-
-        validate();
-    }
-
-    private void setField(Field field, String prop) {
-        Class<?> t = field.getType();
-        try {
-            if (t == String.class) {
-                field.set(this, prop);
-            } else if (t == Boolean.class) {
-                field.set(this, Boolean.parseBoolean(prop));
-            } else if (t == Integer.class) {
-                field.set(this, Integer.parseInt(prop));
-            }
-        } catch (IllegalAccessException e) {
-            logger.error("Can't set field " + field.getName() + " on Configuration class");
-            logger.error(e.toString());
-        }
+    @Override
+    protected String resolveAttribute(String camelCaseName) {
+        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
+        return System.getenv(name);
     }
 }
 

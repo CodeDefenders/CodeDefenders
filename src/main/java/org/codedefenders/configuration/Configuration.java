@@ -16,121 +16,46 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.codedefenders.configuration;
 
-import javax.enterprise.inject.Alternative;
-import javax.inject.Singleton;
 import java.io.File;
 
 /**
- * The Configuration class acts as interface for typesafe access to configuration properties.
+ * The Configuration interface offers a typesafe way to access configured values.
  *
  * @author degenhart
  */
-@Alternative
-@Singleton
-public class Configuration {
-    protected String dataDir = "/srv/codedefenders";
-    protected String antHome = "/usr/share/ant";
+public interface Configuration {
+    void validate() throws ConfigurationValidationException;
 
-    protected String dbHost = "127.0.0.1";
-    protected Integer dbPort = 3306;
-    protected String dbName = "codedefenders";
-    protected String dbUsername = "codedefenders";
-    protected String dbPassword = "test";
+    File getDataDir();
 
-    protected Boolean clusterMode = false;
-    protected String clusterJavaHome;
-    protected String clusterReservationName;
-    protected Integer clusterTimeout = 2;
+    File getAntHome();
 
-    protected Boolean forceLocalExecution = true;
+    String getDbUrl();
 
-    protected Boolean parallelize = true;
-    protected Boolean blockAttacker = true;
-    protected Boolean mutantCoverage = true;
+    String getDbUsername();
 
+    String getDbPassword();
 
-    protected void validate() {
-        // TODO: Do something useful here
-        assert getAntHome().isDirectory();
-        assert getDataDir().isDirectory();
+    boolean isClusterModeEnabled();
 
-        if (clusterMode) {
-            // TODO: Validate clusterOptions
-        }
-    }
+    String getClusterJavaHome();
 
-    public File getDataDir() {
-        return new File(dataDir);
-    }
+    String getClusterReservationName();
 
-    public File getAntHome() {
-        return new File(antHome);
-    }
+    int getClusterTimeout();
 
-    public String getDbUrl() {
-        return "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
-    }
+    boolean isForceLocalExecution();
 
-    public String getDbUsername() {
-        return dbUsername;
-    }
+    boolean isParallelize();
 
-    public String getDbPassword() {
-        return dbPassword;
-    }
+    boolean isBlockAttacker();
 
-    public boolean isClusterModeEnabled() {
-        return clusterMode;
-    }
+    boolean isMutantCoverage();
 
-    public String getClusterJavaHome() {
-        return clusterJavaHome;
-    }
-
-    public String getClusterReservationName() {
-        return clusterReservationName;
-    }
-
-    public int getClusterTimeout() {
-        return clusterTimeout;
-    }
-
-    public boolean isForceLocalExecution() {
-        return forceLocalExecution;
-    }
-
-    public boolean isParallelize() {
-        return parallelize;
-    }
-
-    public boolean isBlockAttacker() {
-        return blockAttacker;
-    }
-
-    public boolean isMutantCoverage() {
-        return mutantCoverage;
-    }
-
-    @Override
-    public String toString() {
-        return "Configuration{" +
-                "dataDir='" + dataDir + '\'' +
-                ", antHome='" + antHome + '\'' +
-                ", dbHost='" + dbHost + '\'' +
-                ", dbPort=" + dbPort +
-                ", dbName='" + dbName + '\'' +
-                ", dbUsername='" + dbUsername + '\'' +
-                ", dbPassword='" + dbPassword + '\'' +
-                ", clusterMode=" + clusterMode +
-                ", clusterJavaHome='" + clusterJavaHome + '\'' +
-                ", clusterReservationName='" + clusterReservationName + '\'' +
-                ", clusterTimeout=" + clusterTimeout +
-                ", forceLocalExecution=" + forceLocalExecution +
-                ", parallelize=" + parallelize +
-                ", blockAttacker=" + blockAttacker +
-                ", mutantCoverage=" + mutantCoverage +
-                '}';
+    default boolean test() {
+        return true;
     }
 }

@@ -17,33 +17,27 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.configuration.implementation;
+package org.codedefenders.configuration.configfileresolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
-public abstract class ConfigFileResolver {
-    private static final Logger logger = LoggerFactory.getLogger(ConfigFileResolver.class);
+/**
+ * @author degenhart
+ */
+public class TomcatConfigFileResolver extends ConfigFileResolver {
+    private static final Logger logger = LoggerFactory.getLogger(TomcatConfigFileResolver.class);
 
-    public abstract Reader getConfigFile(String filename);
-
-    protected Reader getConfigFileImpl(String folder, String filename) {
-        if (folder == null || folder.length() == 0) {
+    @Override
+    public Reader getConfigFile(String filename) {
+        String tomcatRoot = System.getProperty("catalina.base");
+        if (tomcatRoot == null || tomcatRoot.length() == 0) {
             return null;
         }
-        File file = new File(folder, filename);
-
-        try {
-            return new InputStreamReader(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            logger.info("Couldn't open file at " + file.getAbsolutePath());
-            return null;
-        }
+        File folder = new File(tomcatRoot, "conf");
+        return getConfigFileImpl(folder.getAbsolutePath(), filename);
     }
 }

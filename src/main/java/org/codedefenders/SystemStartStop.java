@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2020 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -20,6 +20,7 @@ package org.codedefenders;
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
@@ -65,7 +66,12 @@ public class SystemStartStop implements ServletContextListener {
                 throw new RuntimeException("Deployment failed. Reason: ", e);
             }
             mgr.register("test-executor").withMax(4).withCore(2).add();
-            logger.info(config.toString());
+        }
+        try {
+            config.validate();
+        } catch (ConfigurationValidationException e) {
+            logger.error(e.getMessage());
+            throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
     }
 

@@ -17,25 +17,21 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.configuration.implementation.configfileresolver;
+package org.codedefenders.configuration.implementation;
 
-import org.codedefenders.configuration.implementation.ConfigFileResolver;
+import javax.inject.Qualifier;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.io.Reader;
-import java.io.StringReader;
-
-public class MockedConfigFileResolver extends ConfigFileResolver {
-    @Override
-    public Reader getConfigFile(String filename) {
-        String config;
-        if (filename.endsWith(".properties")) {
-            config = "db.name = codedefenders\n";
-        } else if (filename.endsWith(".properties.yml")){
-            config =  "db:\n"
-                    + "  name: codedefenders";
-        } else {
-            return null;
-        }
-        return new StringReader(config);
-    }
+/**
+ * Indicates the class containing all the configuration class attributes.
+ *
+ * @author degenhart
+ */
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.PARAMETER, ElementType.TYPE})
+public @interface DefaultConfig {
 }

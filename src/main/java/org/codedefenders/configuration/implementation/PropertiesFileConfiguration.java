@@ -19,57 +19,56 @@
 package org.codedefenders.configuration.implementation;
 
 import com.google.common.base.CaseFormat;
-import org.codedefenders.configuration.Configuration;
-import org.codedefenders.configuration.implementation.configfileresolver.ClasspathConfigFileResolver;
-import org.codedefenders.configuration.implementation.configfileresolver.EnvironmentVariableConfigFileResolver;
-import org.codedefenders.configuration.implementation.configfileresolver.SystemPropertyConfigFileLoader;
-import org.codedefenders.configuration.implementation.configfileresolver.TomcatConfigFileResolver;
+import org.codedefenders.configuration.configfileresolver.ClasspathConfigFileResolver;
+import org.codedefenders.configuration.configfileresolver.ConfigFileResolver;
+import org.codedefenders.configuration.configfileresolver.EnvironmentVariableConfigFileResolver;
+import org.codedefenders.configuration.configfileresolver.SystemPropertyConfigFileLoader;
+import org.codedefenders.configuration.configfileresolver.TomcatConfigFileResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.Reader;
-import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
+/**
+ * @author degenhart
+ */
 @Priority(20)
 @Alternative
 @Singleton
-class PropertiesFileConfiguration extends Configuration {
+class PropertiesFileConfiguration extends DefaultConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesFileConfiguration.class);
 
-    @PostConstruct
-    private void readConfig() {
+    private final Properties properties;
 
-        Properties properties = readProperties();
-
-        Field[] fields = this.getClass().getSuperclass().getDeclaredFields();
-        for (Field f : fields) {
-            String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, f.getName()).replace('-', '.');
-            String prop = properties.getProperty(name);
-            if (prop != null) {
-                setField(f, prop);
-            }
-        }
-
-        validate();
-
-    }
-
-    private Properties readProperties() {
-        Properties properties = new Properties();
-
-        // TODO: Can we add these per Constructor injection to enable mocking?
-        ConfigFileResolver[] loaders = new ConfigFileResolver[]{
-                new SystemPropertyConfigFileLoader(),
+    PropertiesFileConfiguration() {
+        this(new SystemPropertyConfigFileLoader(),
                 new EnvironmentVariableConfigFileResolver(),
                 new TomcatConfigFileResolver(),
-                new ClasspathConfigFileResolver()
-        };
+                new ClasspathConfigFileResolver());
+    }
+
+    PropertiesFileConfiguration(ConfigFileResolver configFileResolver, ConfigFileResolver... otherConfigFileResolvers) {
+        super();
+        List<ConfigFileResolver> cfrs = Arrays.asList(configFileResolver);
+        cfrs.addAll(Arrays.asList(otherConfigFileResolvers));
+        properties = readProperties(cfrs);
+    }
+
+    @Override
+    protected String resolveAttribute(String camelCaseName) {
+        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
+        return properties.getProperty(name);
+    }
+
+    private Properties readProperties(List<ConfigFileResolver> loaders) {
+        Properties properties = new Properties();
 
         for (ConfigFileResolver loader : loaders) {
             try {
@@ -86,22 +85,5 @@ class PropertiesFileConfiguration extends Configuration {
             }
         }
         return properties;
-    }
-
-    // TODO Can this be part of the superClass?
-    private void setField(Field field, String prop) {
-        Class<?> t = field.getType();
-        try {
-            if (t == String.class) {
-                field.set(this, prop);
-            } else if (t == Boolean.class) {
-                field.set(this, Boolean.parseBoolean(prop) || prop.equals("enabled"));
-            } else if (t == Integer.class) {
-                field.set(this, Integer.parseInt(prop));
-            }
-        } catch (IllegalAccessException e) {
-            logger.error("Can't set field " + field.getName() + " on Configuration class");
-            logger.error(e.toString());
-        }
     }
 }

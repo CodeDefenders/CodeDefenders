@@ -18,83 +18,66 @@
  */
 package org.codedefenders.configuration.implementation;
 
-import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @author degenhart
+ */
 @Priority(100)
 @Alternative
 @Singleton
-class TieredConfiguration extends Configuration {
+class TieredConfiguration extends DefaultConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(TieredConfiguration.class);
 
-    List<Configuration> config;
+    private final DefaultConfiguration defaultConfig;
+
+    private final List<DefaultConfiguration> config;
 
     @Inject
-    TieredConfiguration(SystemPropertyConfiguration sysPropConf,
+    TieredConfiguration(@DefaultConfig DefaultConfiguration defaultCnfg,
+                        SystemPropertyConfiguration sysPropConf,
                         EnvironmentVariableConfiguration envVarConf,
                         PropertiesFileConfiguration propFileConf) {
-        config = new ArrayList<>();
-        config.add(sysPropConf);
-        config.add(envVarConf);
-        config.add(propFileConf);
+        this(defaultCnfg,
+                (DefaultConfiguration) sysPropConf,
+                envVarConf,
+                propFileConf);
     }
 
-    @PostConstruct
-    private void readConfig() {
-        logger.info("Assembling configuration");
-
-        logger.info("System Properties: " + config.get(0).toString());
-        logger.info("Environment Variables: " + config.get(1).toString());
-        logger.info("Property File: " + config.get(2).toString());
-
-
-        config.forEach(this::merge);
-
-        logger.info("Tiered Configuration: " + this.toString());
-
-        validate();
+    TieredConfiguration(DefaultConfiguration defaultConfiguration, DefaultConfiguration... configurations) {
+        super();
+        defaultConfig = defaultConfiguration;
+        config = Arrays.asList(configurations);
     }
 
-    private void merge(Configuration otherConfig) {
+    @Override
+    protected Object resolveAttribute(String camelCaseName) {
+        Object result = null;
         try {
-            Field[] fields = this.getClass().getSuperclass().getDeclaredFields();
-            Configuration defaultConfig = (Configuration) this.getClass().getSuperclass().newInstance();
-            for (Field f : fields) {
-                f.setAccessible(true);
-                try {
-                    // TODO Resolve superclass fields on other way?
-                    Field otherConfField = otherConfig.getClass().getSuperclass().getDeclaredField(f.getName());
-                    otherConfField.setAccessible(true);
-                    Field defaultConfField = defaultConfig.getClass().getDeclaredField(f.getName());
-                    defaultConfField.setAccessible(true);
-
-                    Object otherConf = otherConfField.get(otherConfig);
-                    String otherConfName = otherConfField.getName();
-                    Object defaultConf = defaultConfField.get(defaultConfig);
-                    String defaultConfName = defaultConfField.getName();
-                    if (otherConf != null && defaultConf != null && otherConfName.equals(defaultConfName) && !otherConf.equals(defaultConf)) {
-                        logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + f.getName());
-                        f.set(this, otherConfField.get(otherConfig));
-                    }
-                } catch (IllegalAccessException e) {
-                    logger.info("Could not access field " + f.getName());
-                } catch (NoSuchFieldException e) {
-                    logger.info("Could not access nonexistent field " + f.getName() );
+            Field field = getDefaultConfigClass().getDeclaredField(camelCaseName);
+            field.setAccessible(true);
+            Object defaultConf = field.get(defaultConfig);
+            for (DefaultConfiguration otherConfig : config) {
+                Object otherConf = field.get(otherConfig);
+                if (otherConf != null && defaultConf != null && !otherConf.equals(defaultConf)) {
+                    logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
+                    result = otherConf;
                 }
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (NoSuchFieldException e) {
+            logger.info("Could not access nonexistent field " + e.getMessage());
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+        return result;
     }
-
 }

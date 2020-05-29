@@ -17,23 +17,19 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.configuration.implementation.configfileresolver;
+package org.codedefenders.configuration.configfileresolver;
 
-import org.codedefenders.configuration.implementation.ConfigFileResolver;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 
-public class ClasspathConfigFileResolver extends ConfigFileResolver {
+/**
+ * @author degenhart
+ */
+public class MockedConfigFileResolver extends ConfigFileResolver {
+    public String configFileContent;
+
     @Override
-    public Reader getConfigFile(String file) {
-        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
-
-        if (inputStream == null) {
-            return null;
-        }
-
-        return new InputStreamReader(inputStream);
+    public Reader getConfigFile(String filename) {
+        return new StringReader(configFileContent);
     }
 }
