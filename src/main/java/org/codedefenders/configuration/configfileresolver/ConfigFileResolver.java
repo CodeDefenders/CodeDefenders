@@ -44,11 +44,15 @@ public abstract class ConfigFileResolver {
         }
         File file = new File(folder, filename);
 
-        try {
-            return new InputStreamReader(new FileInputStream(file));
-        } catch (FileNotFoundException e) {
-            logger.info("Couldn't open file at " + file.getAbsolutePath());
+        if (!file.exists()) {
             return null;
+        } else {
+            try {
+                return new InputStreamReader(new FileInputStream(file));
+            } catch (FileNotFoundException e) {
+                logger.info("Couldn't open file at " + file.getAbsolutePath());
+                return null;
+            }
         }
     }
 }
