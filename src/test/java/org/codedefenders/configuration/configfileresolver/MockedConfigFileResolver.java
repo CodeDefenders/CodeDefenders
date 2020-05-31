@@ -23,13 +23,19 @@ import java.io.Reader;
 import java.io.StringReader;
 
 /**
+ *
+ *
  * @author degenhart
  */
 public class MockedConfigFileResolver extends ConfigFileResolver {
-    public String configFileContent;
+    private String configFileContent;
 
     @Override
     public Reader getConfigFile(String filename) {
         return new StringReader(configFileContent);
+    }
+
+    public void setConfigFileContent(String configFileContent) {
+        this.configFileContent = configFileContent;
     }
 }
