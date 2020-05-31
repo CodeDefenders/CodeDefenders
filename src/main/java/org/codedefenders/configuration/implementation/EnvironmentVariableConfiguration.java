@@ -39,9 +39,13 @@ public class EnvironmentVariableConfiguration extends DefaultConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableConfiguration.class);
 
     @Override
+    protected String resolveAttributeName(String camelCaseName) {
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
+    }
+
+    @Override
     protected String resolveAttribute(String camelCaseName) {
-        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
-        return System.getenv(name);
+        return System.getenv(resolveAttributeName(camelCaseName));
     }
 }
 

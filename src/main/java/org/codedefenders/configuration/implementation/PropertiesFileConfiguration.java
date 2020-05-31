@@ -62,9 +62,13 @@ class PropertiesFileConfiguration extends DefaultConfiguration {
     }
 
     @Override
+    protected String resolveAttributeName(String camelCaseName) {
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
+    }
+
+    @Override
     protected String resolveAttribute(String camelCaseName) {
-        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
-        return properties.getProperty(name);
+        return properties.getProperty(resolveAttributeName(camelCaseName));
     }
 
     private Properties readProperties(List<ConfigFileResolver> loaders) {

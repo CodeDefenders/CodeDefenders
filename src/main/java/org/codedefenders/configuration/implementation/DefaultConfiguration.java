@@ -31,6 +31,8 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class is the heart of the configuration process.
@@ -52,7 +54,7 @@ import java.lang.reflect.Field;
 @Singleton
 @DefaultConfig
 public class DefaultConfiguration implements Configuration {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultConfiguration.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected String dataDir = "/srv/codedefenders";
     protected String antHome = "/usr/share/ant";
@@ -76,20 +78,28 @@ public class DefaultConfiguration implements Configuration {
 
     @Override
     public void validate() throws ConfigurationValidationException {
+        Set<String> validationErrors = new HashSet<>();
 
         // TODO: Do something useful here
-        assert getAntHome().isDirectory();
-        assert getDataDir().isDirectory();
+        // assert getAntHome().isDirectory();
+        // assert getDataDir().isDirectory();
 
         //noinspection UnstableApiUsage
         if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
-            throw new ConfigurationValidationException("dbHost is neither a valid ip address nor a valid hostname");
+            validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
+                    + " is neither a valid ip address nor a valid hostname");
+        }
+        if (dbPort <= 0 || dbPort > 65535) {
+            validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort
+                    + " is not a valid port number");
         }
 
-        if (clusterMode) {
-            // TODO: Validate clusterOptions
+        //if (clusterMode) {
+        //    // TODO: Validate clusterOptions
+        //}
+        if (!validationErrors.isEmpty()) {
+            throw new ConfigurationValidationException(validationErrors);
         }
-
     }
 
     @Override
@@ -181,9 +191,11 @@ public class DefaultConfiguration implements Configuration {
     protected final void init() {
         Field[] fields = getDefaultConfigClass().getDeclaredFields();
         for (Field f : fields) {
-            Object prop = resolveAttribute(f.getName());
-            if (prop != null) {
-                setField(f, prop);
+            if (!f.getName().startsWith("$")) {
+                Object prop = resolveAttribute(f.getName());
+                if (prop != null) {
+                    setField(f, prop);
+                }
             }
         }
 
@@ -192,6 +204,10 @@ public class DefaultConfiguration implements Configuration {
         } catch (ConfigurationValidationException e) {
             logger.warn(e.getMessage());
         }
+    }
+
+    protected String resolveAttributeName(String camelCaseName) {
+        return camelCaseName;
     }
 
     protected Object resolveAttribute(String camelCaseName) {

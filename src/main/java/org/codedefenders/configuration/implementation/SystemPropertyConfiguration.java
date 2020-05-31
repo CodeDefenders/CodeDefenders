@@ -37,9 +37,13 @@ public class SystemPropertyConfiguration extends DefaultConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(SystemPropertyConfiguration.class);
 
     @Override
+    protected String resolveAttributeName(String camelCaseName) {
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
+    }
+
+    @Override
     protected String resolveAttribute(String camelCaseName) {
-        String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
-        return System.getProperty(name);
+        return System.getProperty(resolveAttributeName(camelCaseName));
     }
 }
 
