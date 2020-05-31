@@ -40,7 +40,7 @@ public class EnvironmentVariableConfiguration extends BaseConfiguration {
 
     @Override
     protected String resolveAttributeName(String camelCaseName) {
-        return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
+        return "CODEDEFENDERS_" + CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, camelCaseName);
     }
 
     @Override
