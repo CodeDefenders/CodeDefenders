@@ -19,7 +19,6 @@
 
 package org.codedefenders.configuration.implementation;
 
-import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.configfileresolver.MockedConfigFileResolver;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +37,7 @@ public class TieredConfigurationTest {
         configFile1.setConfigFileContent(
                 "cluster.timeout=4\n"
                         + "cluster.mode=enabled\n"
+                        + "db.name=otherName\n"
                         + "force.local.execution=false");
         PropertiesFileConfiguration configPart1 = new PropertiesFileConfiguration(configFile1);
         configPart1.init();
@@ -45,14 +45,13 @@ public class TieredConfigurationTest {
         MockedConfigFileResolver configFile2 = new MockedConfigFileResolver();
         configFile2.setConfigFileContent(
                 "cluster.timeout=8\n"
+                        + "db.name=codedefenders\n"
                         + "db.username=testDatabaseUser\n"
                         + "force.local.execution=false");
         PropertiesFileConfiguration configPart2 = new PropertiesFileConfiguration(configFile2);
         configPart2.init();
 
-        Configuration defaultConfig = new Configuration();
-
-        config = new TieredConfiguration(defaultConfig, configPart1, configPart2);
+        config = new TieredConfiguration(configPart1, configPart2);
         config.init();
     }
 
@@ -70,5 +69,11 @@ public class TieredConfigurationTest {
     public void accessLoadedBooleanProperty() {
         assertTrue(config.isClusterModeEnabled());
         assertFalse(config.isForceLocalExecution());
+    }
+
+    @Test
+    public void overwriteWithDefaultValue() {
+        // TODO: Could we make this more independent from our default values?
+        assertEquals("jdbc:mysql://127.0.0.1:3306/codedefenders", config.getDbUrl());
     }
 }

@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is the heart of the configuration reading process.
@@ -43,6 +45,8 @@ import java.lang.reflect.Field;
  */
 public abstract class BaseConfiguration extends Configuration {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    protected List<String> attributeSet = new ArrayList<>();
 
     @PostConstruct
     protected final void init() {
@@ -72,12 +76,16 @@ public abstract class BaseConfiguration extends Configuration {
             //   e.g.: Having a field type Class and a prop SubClassOfClass?
             if (t == prop.getClass()) {
                 field.set(this, prop);
+                attributeSet.add(field.getName());
             } else if (prop.getClass() == String.class) {
                 String value = (String) prop;
                 if (t == Boolean.class) {
+                    // TODO: Maybe only parse true, false, enabled, disabled and ignore the others?
                     field.set(this, Boolean.parseBoolean(value) || prop.equals("enabled"));
+                    attributeSet.add(field.getName());
                 } else if (t == Integer.class) {
                     field.set(this, Integer.parseInt(value));
+                    attributeSet.add(field.getName());
                 } else {
                     logger.warn("Couldn't match property " + prop + " to field " + field.getName()
                             + " with Type " + t.getTypeName());

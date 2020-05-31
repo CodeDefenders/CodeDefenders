@@ -39,24 +39,19 @@ import java.util.List;
 class TieredConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(TieredConfiguration.class);
 
-    private final Configuration defaultConfig;
-
     private final List<BaseConfiguration> config;
 
     @Inject
-    TieredConfiguration(@DefaultConfig Configuration defaultCnfg,
-                        SystemPropertyConfiguration sysPropConf,
+    TieredConfiguration(SystemPropertyConfiguration sysPropConf,
                         EnvironmentVariableConfiguration envVarConf,
                         PropertiesFileConfiguration propFileConf) {
-        this(defaultCnfg,
-                (BaseConfiguration) sysPropConf,
+        this((BaseConfiguration) sysPropConf,
                 envVarConf,
                 propFileConf);
     }
 
-    TieredConfiguration(Configuration defaultConfiguration, BaseConfiguration... configurations) {
+    TieredConfiguration(BaseConfiguration... configurations) {
         super();
-        defaultConfig = defaultConfiguration;
         config = Arrays.asList(configurations);
     }
 
@@ -66,10 +61,9 @@ class TieredConfiguration extends BaseConfiguration {
         try {
             Field field = Configuration.class.getDeclaredField(camelCaseName);
             field.setAccessible(true);
-            Object defaultConf = field.get(defaultConfig);
             for (BaseConfiguration otherConfig : config) {
                 Object otherConf = field.get(otherConfig);
-                if (otherConf != null && defaultConf != null && !otherConf.equals(defaultConf)) {
+                if (otherConf != null && otherConfig.attributeSet.contains(field.getName())) {
                     logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
                     result = otherConf;
                 }
