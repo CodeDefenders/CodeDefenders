@@ -69,7 +69,9 @@ class TieredConfiguration extends BaseConfiguration {
                 }
             }
         } catch (NoSuchFieldException e) {
-            logger.info("Could not access nonexistent field " + e.getMessage());
+            logger.info("Could not access nonexistent field ", e);
+            // TODO Is this really impossible?
+            throw new AssertionError("This shouldn't be possible!");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
