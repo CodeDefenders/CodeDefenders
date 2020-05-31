@@ -22,7 +22,7 @@ import com.google.common.base.CaseFormat;
 import org.codedefenders.configuration.configfileresolver.ClasspathConfigFileResolver;
 import org.codedefenders.configuration.configfileresolver.ConfigFileResolver;
 import org.codedefenders.configuration.configfileresolver.EnvironmentVariableConfigFileResolver;
-import org.codedefenders.configuration.configfileresolver.SystemPropertyConfigFileLoader;
+import org.codedefenders.configuration.configfileresolver.SystemPropertyConfigFileResolver;
 import org.codedefenders.configuration.configfileresolver.TomcatConfigFileResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +32,7 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -48,7 +49,7 @@ class PropertiesFileConfiguration extends DefaultConfiguration {
     private final Properties properties;
 
     PropertiesFileConfiguration() {
-        this(new SystemPropertyConfigFileLoader(),
+        this(new SystemPropertyConfigFileResolver(),
                 new EnvironmentVariableConfigFileResolver(),
                 new TomcatConfigFileResolver(),
                 new ClasspathConfigFileResolver());
@@ -56,7 +57,8 @@ class PropertiesFileConfiguration extends DefaultConfiguration {
 
     PropertiesFileConfiguration(ConfigFileResolver configFileResolver, ConfigFileResolver... otherConfigFileResolvers) {
         super();
-        List<ConfigFileResolver> cfrs = Arrays.asList(configFileResolver);
+        List<ConfigFileResolver> cfrs = new ArrayList<>();
+        cfrs.add(configFileResolver);
         cfrs.addAll(Arrays.asList(otherConfigFileResolvers));
         properties = readProperties(cfrs);
     }
@@ -80,8 +82,6 @@ class PropertiesFileConfiguration extends DefaultConfiguration {
                     if (reader != null) {
                         logger.info("Loaded properties file found by " + loader.getClass().getSimpleName());
                         properties.load(reader);
-                    } else {
-                        logger.info(loader.getClass().getSimpleName() + " Didn't provided a reader!");
                     }
                 }
             } catch (IOException e) {

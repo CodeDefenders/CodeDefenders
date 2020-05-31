@@ -19,12 +19,17 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Reader;
 
 /**
  * @author degenhart
  */
-public class SystemPropertyConfigFileLoader extends ConfigFileResolver {
+public class SystemPropertyConfigFileResolver extends ConfigFileResolver {
+    private static final Logger logger = LoggerFactory.getLogger(SystemPropertyConfigFileResolver.class);
+
     @Override
     public Reader getConfigFile(String filename) {
         return getConfigFileImpl(System.getProperty("codedefenders.config"), filename);
