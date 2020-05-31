@@ -19,6 +19,9 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -29,6 +32,8 @@ import java.io.Reader;
  * @author degenhart
  */
 public class ClasspathConfigFileResolver extends ConfigFileResolver {
+    private static final Logger logger = LoggerFactory.getLogger(ClasspathConfigFileResolver.class);
+
     @Override
     public Reader getConfigFile(String file) {
         InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(file);
