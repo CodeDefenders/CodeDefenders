@@ -33,7 +33,7 @@ import javax.inject.Singleton;
 @Priority(10)
 @Alternative
 @Singleton
-public class SystemPropertyConfiguration extends DefaultConfiguration {
+public class SystemPropertyConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(SystemPropertyConfiguration.class);
 
     @Override

@@ -19,6 +19,7 @@
 
 package org.codedefenders.configuration.implementation;
 
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.configfileresolver.MockedConfigFileResolver;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class TieredConfigurationTest {
         PropertiesFileConfiguration configPart2 = new PropertiesFileConfiguration(configFile2);
         configPart2.init();
 
-        DefaultConfiguration defaultConfig = new DefaultConfiguration();
+        Configuration defaultConfig = new Configuration();
 
         config = new TieredConfiguration(defaultConfig, configPart1, configPart2);
         config.init();

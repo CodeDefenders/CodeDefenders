@@ -18,6 +18,7 @@
  */
 package org.codedefenders.configuration.implementation;
 
+import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,25 +36,25 @@ import java.util.List;
 @Priority(100)
 @Alternative
 @Singleton
-class TieredConfiguration extends DefaultConfiguration {
+class TieredConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(TieredConfiguration.class);
 
-    private final DefaultConfiguration defaultConfig;
+    private final Configuration defaultConfig;
 
-    private final List<DefaultConfiguration> config;
+    private final List<BaseConfiguration> config;
 
     @Inject
-    TieredConfiguration(@DefaultConfig DefaultConfiguration defaultCnfg,
+    TieredConfiguration(@DefaultConfig Configuration defaultCnfg,
                         SystemPropertyConfiguration sysPropConf,
                         EnvironmentVariableConfiguration envVarConf,
                         PropertiesFileConfiguration propFileConf) {
         this(defaultCnfg,
-                (DefaultConfiguration) sysPropConf,
+                (BaseConfiguration) sysPropConf,
                 envVarConf,
                 propFileConf);
     }
 
-    TieredConfiguration(DefaultConfiguration defaultConfiguration, DefaultConfiguration... configurations) {
+    TieredConfiguration(Configuration defaultConfiguration, BaseConfiguration... configurations) {
         super();
         defaultConfig = defaultConfiguration;
         config = Arrays.asList(configurations);
@@ -63,10 +64,10 @@ class TieredConfiguration extends DefaultConfiguration {
     protected Object resolveAttribute(String camelCaseName) {
         Object result = null;
         try {
-            Field field = getDefaultConfigClass().getDeclaredField(camelCaseName);
+            Field field = Configuration.class.getDeclaredField(camelCaseName);
             field.setAccessible(true);
             Object defaultConf = field.get(defaultConfig);
-            for (DefaultConfiguration otherConfig : config) {
+            for (BaseConfiguration otherConfig : config) {
                 Object otherConf = field.get(otherConfig);
                 if (otherConf != null && defaultConf != null && !otherConf.equals(defaultConf)) {
                     logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());

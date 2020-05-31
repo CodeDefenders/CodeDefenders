@@ -43,7 +43,7 @@ import java.util.Properties;
 @Priority(20)
 @Alternative
 @Singleton
-class PropertiesFileConfiguration extends DefaultConfiguration {
+class PropertiesFileConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(PropertiesFileConfiguration.class);
 
     private final Properties properties;

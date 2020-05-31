@@ -19,43 +19,149 @@
 
 package org.codedefenders.configuration;
 
+import com.google.common.net.InetAddresses;
+import com.google.common.net.InternetDomainName;
+import org.codedefenders.configuration.implementation.DefaultConfig;
+
+import javax.annotation.Priority;
+import javax.enterprise.inject.Alternative;
+import javax.inject.Singleton;
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * The Configuration interface offers a typesafe way to access configured values.
+ * This class is the central place for accessing and defining the configuration for this application.
+ *
+ * <p>To add configuration values which can be set by the end user simply add one ore more attributes (best with default
+ * value)and one ore more access methods which return/use the attributes to this class.
+ *
+ * <p>Attribute names have to be in camelCase format, as most implementations reformat the attribute name and split the
+ * name on the capitalized letters.
+ * So the {@link org.codedefenders.configuration.implementation.EnvironmentVariableConfiguration} would try to resolve
+ * the {@code dbName} variable by looking for the environment variable {@code CODEDEFENDERS_DB_NAME}.
  *
  * @author degenhart
  */
-public interface Configuration {
-    void validate() throws ConfigurationValidationException;
+@Priority(10)
+@Alternative
+@Singleton
+@DefaultConfig
+public class Configuration {
+    protected String dataDir = "/srv/codedefenders";
+    protected String antHome = "/usr/share/ant";
+    protected String dbHost = "127.0.0.1";
+    protected Integer dbPort = 3306;
+    protected String dbName = "codedefenders";
+    protected String dbUsername = "codedefenders";
+    protected String dbPassword = "test";
+    protected Boolean clusterMode = false;
+    protected String clusterJavaHome;
+    protected String clusterReservationName;
+    protected Integer clusterTimeout = 2;
+    protected Boolean forceLocalExecution = true;
+    protected Boolean parallelize = true;
+    protected Boolean blockAttacker = true;
+    protected Boolean mutantCoverage = true;
 
-    File getDataDir();
+    public void validate() throws ConfigurationValidationException {
+        Set<String> validationErrors = new HashSet<>();
 
-    File getAntHome();
+        // TODO: Do something useful here
+        // assert getAntHome().isDirectory();
+        // assert getDataDir().isDirectory();
 
-    String getDbUrl();
+        //noinspection UnstableApiUsage
+        if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
+            validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
+                    + " is neither a valid ip address nor a valid hostname");
+        }
+        if (dbPort <= 0 || dbPort > 65535) {
+            validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort
+                    + " is not a valid port number");
+        }
 
-    String getDbUsername();
+        //if (clusterMode) {
+        //    // TODO: Validate clusterOptions
+        //}
+        if (!validationErrors.isEmpty()) {
+            throw new ConfigurationValidationException(validationErrors);
+        }
+    }
 
-    String getDbPassword();
+    public File getDataDir() {
+        return new File(dataDir);
+    }
 
-    boolean isClusterModeEnabled();
+    public File getAntHome() {
+        return new File(antHome);
+    }
 
-    String getClusterJavaHome();
+    public String getDbUrl() {
+        return "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
+    }
 
-    String getClusterReservationName();
+    public String getDbUsername() {
+        return dbUsername;
+    }
 
-    int getClusterTimeout();
+    public String getDbPassword() {
+        return dbPassword;
+    }
 
-    boolean isForceLocalExecution();
+    public boolean isClusterModeEnabled() {
+        return clusterMode;
+    }
 
-    boolean isParallelize();
+    public String getClusterJavaHome() {
+        return clusterJavaHome;
+    }
 
-    boolean isBlockAttacker();
+    public String getClusterReservationName() {
+        return clusterReservationName;
+    }
 
-    boolean isMutantCoverage();
+    public int getClusterTimeout() {
+        return clusterTimeout;
+    }
 
-    default boolean test() {
-        return true;
+    public boolean isForceLocalExecution() {
+        return forceLocalExecution;
+    }
+
+    public boolean isParallelize() {
+        return parallelize;
+    }
+
+    public boolean isBlockAttacker() {
+        return blockAttacker;
+    }
+
+    public boolean isMutantCoverage() {
+        return mutantCoverage;
+    }
+
+    @Override
+    public String toString() {
+        return "Configuration: \n"
+                + "  dataDir='" + dataDir + "'\n"
+                + "  antHome='" + antHome + "'\n"
+                + "  dbHost='" + dbHost + "'\n"
+                + "  dbPort=" + dbPort + "\n"
+                + "  dbName='" + dbName + "'\n"
+                + "  dbUsername='" + dbUsername + "'\n"
+                + "  dbPassword='" + dbPassword + "'\n"
+                + "  clusterMode=" + clusterMode + "\n"
+                + "  clusterJavaHome='" + clusterJavaHome + "'\n"
+                + "  clusterReservationName='" + clusterReservationName + "'\n"
+                + "  clusterTimeout=" + clusterTimeout + "\n"
+                + "  forceLocalExecution=" + forceLocalExecution + "\n"
+                + "  parallelize=" + parallelize + "\n"
+                + "  blockAttacker=" + blockAttacker + "\n"
+                + "  mutantCoverage=" + mutantCoverage;
+    }
+
+    protected String resolveAttributeName(String camelCaseName) {
+        return camelCaseName;
     }
 }

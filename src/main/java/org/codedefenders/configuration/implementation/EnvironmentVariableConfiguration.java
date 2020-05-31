@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Priority(50)
 @Alternative
 @Singleton
-public class EnvironmentVariableConfiguration extends DefaultConfiguration {
+public class EnvironmentVariableConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableConfiguration.class);
 
     @Override
