@@ -28,7 +28,8 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 
 /**
- * Reads configuration values from environment variables after converting the attribute name to UPPER_UNDERSCORE format.
+ * Reads configuration values from environment variables after converting the attribute name to UPPER_UNDERSCORE format
+ * and prefixing them with {@code CODEDEFENDERS_}.
  *
  * @author degenhart
  */

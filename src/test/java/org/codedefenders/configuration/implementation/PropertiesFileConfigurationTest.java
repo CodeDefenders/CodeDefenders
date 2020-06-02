@@ -20,7 +20,7 @@
 package org.codedefenders.configuration.implementation;
 
 import org.codedefenders.configuration.ConfigurationValidationException;
-import org.codedefenders.configuration.configfileresolver.MockedConfigFileResolver;
+import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,7 +34,7 @@ public class PropertiesFileConfigurationTest {
 
     @Before
     public void prepareObjects() {
-        MockedConfigFileResolver mCfgFileResolver = new MockedConfigFileResolver();
+        StubConfigFileResolver mCfgFileResolver = new StubConfigFileResolver();
         mCfgFileResolver.setConfigFileContent(
                 "cluster.timeout=4\n"
                         + "db.username=testDatabaseUser\n"
@@ -63,7 +63,7 @@ public class PropertiesFileConfigurationTest {
 
     @Test(expected = ConfigurationValidationException.class)
     public void loadInvalidConfig() throws ConfigurationValidationException {
-        MockedConfigFileResolver mCfgFileResolver = new MockedConfigFileResolver();
+        StubConfigFileResolver mCfgFileResolver = new StubConfigFileResolver();
         mCfgFileResolver.setConfigFileContent("db.host=157.1646846.456.568\n"
                 + "db.port=65537");
 

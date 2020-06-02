@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Merges other {@link BaseConfiguration}s in the order they are specified and then resolves attributes on the result.
+ *
  * @author degenhart
  */
 @Priority(100)

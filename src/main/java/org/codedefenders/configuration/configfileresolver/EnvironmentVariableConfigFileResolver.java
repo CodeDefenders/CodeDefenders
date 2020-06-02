@@ -25,7 +25,8 @@ import org.slf4j.LoggerFactory;
 import java.io.Reader;
 
 /**
- * Reads the file path from an environment variable.
+ * The EnvironmentVariableConfigFileResolver looks up a path from an EnvironmentVariable and and tries to read the named
+ * config file from this directory path.
  *
  * @author degenhart
  */

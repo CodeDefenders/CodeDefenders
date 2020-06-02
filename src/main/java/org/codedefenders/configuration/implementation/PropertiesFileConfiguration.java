@@ -38,6 +38,9 @@ import java.util.List;
 import java.util.Properties;
 
 /**
+ * Loads the properties files found by the {@link ConfigFileResolver}s, merges them and then resolves the attributes by
+ * looking the lower.dot.separated attribute names up in the merged properties.
+ *
  * @author degenhart
  */
 @Priority(20)
@@ -48,6 +51,7 @@ class PropertiesFileConfiguration extends BaseConfiguration {
 
     private final Properties properties;
 
+    // Maybe we could replace this in the future with injecting a list of ConfigFileResolver
     PropertiesFileConfiguration() {
         this(new SystemPropertyConfigFileResolver(),
                 new EnvironmentVariableConfigFileResolver(),
@@ -76,17 +80,21 @@ class PropertiesFileConfiguration extends BaseConfiguration {
     private Properties readProperties(List<ConfigFileResolver> loaders) {
         Properties properties = new Properties();
 
+        boolean noFileFound = true;
+
         for (ConfigFileResolver loader : loaders) {
-            try {
-                try (Reader reader = loader.getConfigFile("codedefenders.properties")) {
-                    if (reader != null) {
-                        logger.info("Loaded properties file found by " + loader.getClass().getSimpleName());
-                        properties.load(reader);
-                    }
+            try (Reader reader = loader.getConfigFile("codedefenders.properties")) {
+                if (reader != null) {
+                    noFileFound = false;
+                    logger.info("Loaded properties file found by " + loader.getClass().getSimpleName());
+                    properties.load(reader);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+        if (noFileFound) {
+            logger.warn("No properties file found");
         }
         return properties;
     }

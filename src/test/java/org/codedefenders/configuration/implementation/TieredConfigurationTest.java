@@ -19,7 +19,7 @@
 
 package org.codedefenders.configuration.implementation;
 
-import org.codedefenders.configuration.configfileresolver.MockedConfigFileResolver;
+import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class TieredConfigurationTest {
 
     @Before
     public void prepareObjects() {
-        MockedConfigFileResolver configFile1 = new MockedConfigFileResolver();
+        StubConfigFileResolver configFile1 = new StubConfigFileResolver();
         configFile1.setConfigFileContent(
                 "cluster.timeout=4\n"
                         + "cluster.mode=enabled\n"
@@ -42,7 +42,7 @@ public class TieredConfigurationTest {
         PropertiesFileConfiguration configPart1 = new PropertiesFileConfiguration(configFile1);
         configPart1.init();
 
-        MockedConfigFileResolver configFile2 = new MockedConfigFileResolver();
+        StubConfigFileResolver configFile2 = new StubConfigFileResolver();
         configFile2.setConfigFileContent(
                 "cluster.timeout=8\n"
                         + "db.name=codedefenders\n"

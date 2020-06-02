@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.Reader;
 
 /**
+ * The TomcatConfigFileResolver tries to read the named configuration file from the tomcat config directory which
+ * resides in {@code $CATALINA_BASE/config}.
+ *
  * @author degenhart
  */
 public class TomcatConfigFileResolver extends ConfigFileResolver {

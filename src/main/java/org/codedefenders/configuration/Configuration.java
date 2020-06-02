@@ -22,7 +22,6 @@ package org.codedefenders.configuration;
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
 
-import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 import java.io.File;
@@ -30,10 +29,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class is the central place for accessing and defining the configuration for this application.
+ * This class is the central place for accessing and defining the configuration for this application.<br><br>
  *
- * <p>To add configuration values which can be set by the end user simply add one ore more attributes (best with default
- * value)and one ore more access methods which return/use the attributes to this class.
+ * <p>It forms an adapter between the internal accessible configuration and the values configured by the user.
+ * This provides us a typesafe way to access the configuration and also allows us to easily change the internal api
+ * while keeping the external API (the user configured values) stable.
+ * This additionally be used to provide internal configuration or feature switches which shouldn't be accessible to the
+ * user at the moment, but could be published for usage at a later point in time. (This would be implemented by a method
+ * which has no baking variable and returns a constant value.)<br><br>
+ *
+ * <h3>Usage</h3>
+ *
+ * <p>To add configuration values which can be set by the end user simply add one ore more attributes (best with a
+ * sensible default value) and one ore more access methods which return/use the attributes to this class.<br><br>
  *
  * <p>Attribute names have to be in camelCase format, as most implementations reformat the attribute name and split the
  * name on the capitalized letters.
@@ -42,7 +50,6 @@ import java.util.Set;
  *
  * @author degenhart
  */
-@Priority(10)
 @Alternative
 @Singleton
 public class Configuration {
@@ -62,6 +69,11 @@ public class Configuration {
     protected Boolean blockAttacker = true;
     protected Boolean mutantCoverage = true;
 
+    /**
+     * Validates the currently configured Configuration.
+     *
+     * @throws ConfigurationValidationException This lists all the reasons why the validation failed.
+     */
     public void validate() throws ConfigurationValidationException {
         Set<String> validationErrors = new HashSet<>();
 
@@ -141,24 +153,32 @@ public class Configuration {
 
     @Override
     public String toString() {
+        // This could potentially be simplified maybe override this in BaseConfiguration with iterating over the attrs.
         return "Configuration: \n"
-                + "  dataDir='" + dataDir + "'\n"
-                + "  antHome='" + antHome + "'\n"
-                + "  dbHost='" + dbHost + "'\n"
-                + "  dbPort=" + dbPort + "\n"
-                + "  dbName='" + dbName + "'\n"
-                + "  dbUsername='" + dbUsername + "'\n"
-                + "  dbPassword='" + dbPassword + "'\n"
-                + "  clusterMode=" + clusterMode + "\n"
-                + "  clusterJavaHome='" + clusterJavaHome + "'\n"
-                + "  clusterReservationName='" + clusterReservationName + "'\n"
-                + "  clusterTimeout=" + clusterTimeout + "\n"
-                + "  forceLocalExecution=" + forceLocalExecution + "\n"
-                + "  parallelize=" + parallelize + "\n"
-                + "  blockAttacker=" + blockAttacker + "\n"
-                + "  mutantCoverage=" + mutantCoverage;
+                + "  " + resolveAttributeName("dataDir") + "= '" + dataDir + "'\n"
+                + "  " + resolveAttributeName("antHome") + "= '" + antHome + "'\n "
+                + "  " + resolveAttributeName("dbHost") + "= '" + dbHost + "'\n"
+                + "  " + resolveAttributeName("dbPort") + "= " + dbPort + "\n"
+                + "  " + resolveAttributeName("dbName") + "= '" + dbName + "'\n"
+                + "  " + resolveAttributeName("dbUsername") + "= '" + dbUsername + "'\n"
+                + "  " + resolveAttributeName("dbPassword") + "= '" + dbPassword + "'\n"
+                + "  " + resolveAttributeName("clusterMode") + "= " + clusterMode + "\n"
+                + "  " + resolveAttributeName("clusterJavaHome") + "= '" + clusterJavaHome + "'\n"
+                + "  " + resolveAttributeName("clusterReservationName") + "= '" + clusterReservationName
+                + "'\n"
+                + "  " + resolveAttributeName("clusterTimeout") + "= " + clusterTimeout + "\n"
+                + "  " + resolveAttributeName("forceLocalExecution") + "= " + forceLocalExecution + "\n"
+                + "  " + resolveAttributeName("parallelize") + "= " + parallelize + "\n"
+                + "  " + resolveAttributeName("blockAttacker") + "= " + blockAttacker + "\n"
+                + "  " + resolveAttributeName("mutantCoverage") + "= " + mutantCoverage;
     }
 
+    /**
+     * This transforms an attribute name from camelCase to the format in which its actually looked up.
+     *
+     * @param camelCaseName The attribute name in camelCaseFormat
+     * @return The attribute name in the format it is looked up.
+     */
     protected String resolveAttributeName(String camelCaseName) {
         return camelCaseName;
     }

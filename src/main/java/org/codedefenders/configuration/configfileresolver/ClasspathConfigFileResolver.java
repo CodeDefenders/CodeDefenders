@@ -27,7 +27,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
- * Resolves configuration files through classpath search.
+ * The ClassPathConfigFileResolver searches the named config file with a classpath search.
  *
  * @author degenhart
  */

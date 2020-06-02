@@ -31,15 +31,9 @@ import java.util.List;
 /**
  * This class is the heart of the configuration reading process.
  *
- * <p>To add a configuration value which can be set by the user simply add a access method to the {@link Configuration}
- * Interface and one ore more class attributes to this file, which are used by the access method to return the
- * configuration value.
- *
- * <p>Attribute names have to be in camelCase format, as most subclasses reformat the attribute name and split the name
- * on the capitalized letters.
- *
- * <p>The subclasses of this file resolve the class attributes of this file with their implementation of the
- * {@link BaseConfiguration#resolveAttribute(String)} method.
+ * <p>It does the heavy lifting: Iterating over all the attributes of the {@link Configuration} class, trying to resolve
+ * them with the {@link BaseConfiguration#resolveAttribute(String)} method which has to be implemented by the subclasses
+ * and then the Type matching/converting.
  *
  * @author degenhart
  */

@@ -25,6 +25,9 @@ import org.slf4j.LoggerFactory;
 import java.io.Reader;
 
 /**
+ * The SystemPropertyConfigFileResolver looks up a path from a system property and and tries to read the named config
+ * file from this directory path.
+ *
  * @author degenhart
  */
 public class SystemPropertyConfigFileResolver extends ConfigFileResolver {

@@ -28,6 +28,8 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 
 /**
+ * Reads configuration values from system properties after converting the attribute name to lower.dot.separated format.
+ *
  * @author degenhart
  */
 @Priority(10)

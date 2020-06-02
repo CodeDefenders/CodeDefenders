@@ -29,7 +29,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
- * The ConfigFileResolver implements an algorithm for finding a reader for the specified filename.
+ * The ConfigFileResolver is the base class for a strategy pattern with the purpose of abstracting the process of
+ * finding and accessing a file with a specified name.
  *
  * @author degenhart
  */
