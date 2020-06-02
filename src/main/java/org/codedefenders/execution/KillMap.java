@@ -19,6 +19,7 @@
 package org.codedefenders.execution;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
@@ -31,7 +32,6 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.lang.annotation.Annotation;
@@ -68,38 +68,23 @@ public class KillMap {
     // @Inject // This does not work for static classes
     private static BackendExecutorService backend;
 
-    // TODO Replace this and the next 25 lines with Configuration
-    private static boolean USE_COVERAGE = true;
-    private static boolean PARALLELIZE = true;
-    private static final int NUM_THREADS = 40;
-    /* TODO: Put this into config.properties? MutationTester also has hard-coded number of threads. */
+    private static boolean USE_COVERAGE;
+    private static boolean PARALLELIZE;
+    private static int NUM_THREADS;
 
     static {
-        /* Get settings if they are set, otherwise use defaults. */
-        try {
-            InitialContext initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-            Object parallelizeObj = environmentContext.lookup("codedefenders/parallelize");
-            PARALLELIZE = (parallelizeObj == null) ? PARALLELIZE : "enabled".equals(parallelizeObj);
-        } catch (NamingException e) {
-            logger.error("Encountered missing option", e);
-        }
-        try {
-            InitialContext initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-            Object useCoverageObj = environmentContext.lookup("codedefenders/mutant.coverage");
-            USE_COVERAGE = (useCoverageObj == null) ? USE_COVERAGE : "enabled".equals(useCoverageObj);
-        } catch (NamingException e) {
-            logger.error("Encountered missing option", e);
-        }
-
-        /* Get the BackendExecutorService since dependency injection does not work on this class. */
+        /* Get the BackendExecutorService and Configuration since dependency injection does not work on this class. */
         try {
             InitialContext initialContext = new InitialContext();
             BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
-            Bean bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
-            CreationalContext ctx = bm.createCreationalContext(bean);
+            Bean<?> bean = bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
+            CreationalContext<?> ctx = bm.createCreationalContext(bean);
             backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
+            Bean<?> configBean = bm.getBeans(Configuration.class, new Annotation[0]).iterator().next();
+            Configuration config = (Configuration) bm.getReference(configBean, Configuration.class, ctx);
+            USE_COVERAGE = config.isMutantCoverage();
+            PARALLELIZE = config.isParallelize();
+            NUM_THREADS = config.getNumberOfThreads();
         } catch (NamingException e) {
             logger.error("Could not acquire BeanManager", e);
         }

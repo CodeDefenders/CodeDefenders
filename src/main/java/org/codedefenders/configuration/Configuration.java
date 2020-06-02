@@ -155,6 +155,10 @@ public class Configuration {
         return mutantCoverage;
     }
 
+    public int getNumberOfThreads() {
+        return 40;
+    }
+
     public int getJavaMajorVersion() {
         String version = System.getProperty("java.version");
         if (version.startsWith("1.")) {
