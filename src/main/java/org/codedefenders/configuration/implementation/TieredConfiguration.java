@@ -63,10 +63,12 @@ class TieredConfiguration extends BaseConfiguration {
             Field field = Configuration.class.getDeclaredField(camelCaseName);
             field.setAccessible(true);
             for (BaseConfiguration otherConfig : config) {
-                Object otherConf = field.get(otherConfig);
-                if (otherConf != null && otherConfig.attributeSet.contains(field.getName())) {
-                    logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
-                    result = otherConf;
+                if (otherConfig.attributeSet.contains(field.getName())) {
+                    Object otherConf = field.get(otherConfig);
+                    if (otherConf != null) {
+                        logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
+                        result = otherConf;
+                    }
                 }
             }
         } catch (NoSuchFieldException e) {

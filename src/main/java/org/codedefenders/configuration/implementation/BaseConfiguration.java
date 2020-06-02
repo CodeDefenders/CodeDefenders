@@ -63,12 +63,18 @@ public abstract class BaseConfiguration extends Configuration {
 
     protected abstract Object resolveAttribute(String camelCaseName);
 
+    /**
+     * Tries to set the specified field on this object to the specified Object/Value.
+     *
+     * <p>This makes some basic type checking and conversion between string and other types.
+     *
+     * @param field The field on this object to set
+     * @param prop The value the field should be set
+     */
     protected final void setField(Field field, Object prop) {
         Class<?> t = field.getType();
         try {
-            // TODO: Does this break when loading subclass objects through context lookups?
-            //   e.g.: Having a field type Class and a prop SubClassOfClass?
-            if (t == prop.getClass()) {
+            if (t.isInstance(prop) ) {
                 field.set(this, prop);
                 attributeSet.add(field.getName());
             } else if (prop.getClass() == String.class) {
