@@ -34,6 +34,8 @@ import javax.naming.NamingException;
  */
 public class Constants {
 
+    // TODO Get rid of the next ~30 lines, maybe do some BeanManager magic in the transition period.
+    // I like how well this behavior is documented, does this require compatibility workarounds/transition period in Configuration?
     // TODO Cannot be injected in static context
     public static final String DATA_DIR;
 
@@ -61,6 +63,7 @@ public class Constants {
             if (System.getProperty("os.name").toLowerCase().contains("windows")) {
                 dataHome = System.getProperty("codedefenders.data", "C:/codedefenders-data");
             } else {
+                // I would prefer defaulting to /srv/codedefenders to keep codedefenders out of package manager space
                 dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
             }
         }

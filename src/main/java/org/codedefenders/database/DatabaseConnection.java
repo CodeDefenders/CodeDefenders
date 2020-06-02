@@ -29,6 +29,7 @@ public class DatabaseConnection {
     public static Connection getConnection()  throws SQLException, NamingException {
         Context initialContext = new InitialContext();
         Context environmentContext = (Context) initialContext.lookup("java:comp/env");
+        // TODO: Maybe rebuild this as ConnectionFactory and build the DataSource object here from the Configuration
         String dataResourceName = "jdbc/codedefenders";
         DataSource dataSource = (DataSource) environmentContext.lookup(dataResourceName);
         return dataSource.getConnection();

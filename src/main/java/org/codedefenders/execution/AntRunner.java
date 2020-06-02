@@ -430,7 +430,7 @@ public class AntRunner implements //
         // Add additional command parameters
         command.add(target); // "-v", "-d", for verbose, debug
         // This ensures that ant actually uses the data dir we setup
-        command.add("-Dcodedef.home=" + Constants.DATA_DIR);
+        command.add("-Dcodedef.home=" + config.getDataDir().getAbsolutePath());
 
         command.add("-Dmutant.file=" + mutantDir);
         command.add("-Dtest.file=" + testDir);
@@ -460,11 +460,11 @@ public class AntRunner implements //
         // Execute whichever command was build
         pb.command(command);
 
-        String buildFileDir = Constants.DATA_DIR;
-        pb.directory(new File(buildFileDir));
+        pb.directory(config.getDataDir());
         pb.redirectErrorStream(true);
 
-        logger.info("Executing Ant Command {} from directory {}", pb.command().toString(), buildFileDir);
+        logger.info("Executing Ant Command {} from directory {}", pb.command().toString(),
+                config.getDataDir().getAbsolutePath());
 
         return runAntProcess(pb);
     }
