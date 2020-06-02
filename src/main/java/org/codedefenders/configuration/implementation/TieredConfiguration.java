@@ -45,11 +45,10 @@ class TieredConfiguration extends BaseConfiguration {
 
     @Inject
     TieredConfiguration(SystemPropertyConfiguration sysPropConf,
+                        ContextConfiguration contextConf,
                         EnvironmentVariableConfiguration envVarConf,
                         PropertiesFileConfiguration propFileConf) {
-        this((BaseConfiguration) sysPropConf,
-                envVarConf,
-                propFileConf);
+        this((BaseConfiguration) envVarConf, propFileConf, contextConf, sysPropConf);
     }
 
     TieredConfiguration(BaseConfiguration... configurations) {
