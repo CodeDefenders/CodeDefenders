@@ -21,7 +21,6 @@ package org.codedefenders.configuration;
 
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
-import org.codedefenders.configuration.implementation.DefaultConfig;
 
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
@@ -46,7 +45,6 @@ import java.util.Set;
 @Priority(10)
 @Alternative
 @Singleton
-@DefaultConfig
 public class Configuration {
     protected String dataDir = "/srv/codedefenders";
     protected String antHome = "/usr/share/ant";
