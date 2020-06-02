@@ -74,7 +74,7 @@ public abstract class BaseConfiguration extends Configuration {
     protected final void setField(Field field, Object prop) {
         Class<?> t = field.getType();
         try {
-            if (t.isInstance(prop) ) {
+            if (t.isInstance(prop)) {
                 field.set(this, prop);
                 attributeSet.add(field.getName());
             } else if (prop.getClass() == String.class) {

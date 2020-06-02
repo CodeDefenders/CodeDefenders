@@ -28,6 +28,12 @@ import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
@@ -42,13 +48,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.NO_KILL;
@@ -117,20 +116,34 @@ public class KillMap {
         }
     }
 
-    /** The tests the killmap is computed for. */
+    /**
+     * The tests the killmap is computed for.
+     */
     private List<Test> tests;
-    /** The mutants the killmap is computed for. */
+    /**
+     * The mutants the killmap is computed for.
+     */
     private List<Mutant> mutants;
-    /** ID of the class the killmap is computed for. */
+    /**
+     * ID of the class the killmap is computed for.
+     */
     private int classId;
-    /** Maps each test to it's index in {@link KillMap#tests}. */
+    /**
+     * Maps each test to it's index in {@link KillMap#tests}.
+     */
     private Map<Test, Integer> indexOfTest;
-    /** Maps each mutant to it's index in {@link KillMap#mutants}. */
+    /**
+     * Maps each mutant to it's index in {@link KillMap#mutants}.
+     */
     private Map<Mutant, Integer> indexOfMutant;
 
-    /** The killmap data, as a list of "test vs. mutant" execution results. */
+    /**
+     * The killmap data, as a list of "test vs. mutant" execution results.
+     */
     private List<KillMapEntry> entries;
-    /** The killmap data, as matrix between tests and mutants. */
+    /**
+     * The killmap data, as matrix between tests and mutants.
+     */
     private KillMapEntry[][] matrix;
 
 

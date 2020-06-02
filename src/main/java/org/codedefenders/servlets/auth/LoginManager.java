@@ -32,22 +32,17 @@ import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Random;
-
 import javax.inject.Inject;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Random;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.REQUIRE_MAIL_VALIDATION;
@@ -263,8 +258,7 @@ public class LoginManager extends HttpServlet {
         return (ip == null)
                 || (ip.length() == 0)
                 || ("unknown".equalsIgnoreCase(ip))
-                || ("0:0:0:0:0:0:0:1".equals(ip)
-        );
+                || ("0:0:0:0:0:0:0:1".equals(ip));
     }
 
     /**
