@@ -7,8 +7,7 @@
 
 	<property name="policyfile" location="security.policy" />
 	<property name="mutOp" value=":ALL"/>
-	<!-- data.dir will be evaluated by the resources and filtering plugin of maven -->
-	<property name="codedef.home" value="${data.dir}"/>
+
 	<property name="major.home" value="${codedef.home}/lib/major"/>
 	<property name="evosuite.home" value="${codedef.home}/lib/evosuite"/>
 	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
