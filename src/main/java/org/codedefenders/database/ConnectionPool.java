@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.NamingException;
-
 /**
  * This class manages database connection by collecting connections in a pool which can be queried.
  * Queried connections have to be released to the pool again, otherwise the pool is leaking.
@@ -90,7 +88,7 @@ public final class ConnectionPool {
                 conn.close();
                 // If we managed to connect, we can proceed. Otherwise, we retry
                 break;
-            } catch (NamingException | SQLException e) {
+            } catch (SQLException e) {
                 logger.warn("Cannot connect to the Database" + e.getMessage());
                 if (i == MAX_RETRIES) {
                     logger.warn("Give up and fail deployment");
@@ -203,12 +201,15 @@ public final class ConnectionPool {
     }
 
     private Connection refreshConnection() throws SQLException {
-        try {
+        //try {
             return DatabaseConnection.getConnection();
+            /*
         } catch (NamingException e) {
             logger.warn("JDBC Driver not found.", e);
             throw new UncheckedSQLException("Could not update database connection.");
         }
+
+             */
     }
 
     /**

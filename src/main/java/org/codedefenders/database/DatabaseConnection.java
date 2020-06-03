@@ -18,20 +18,11 @@
  */
 package org.codedefenders.database;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
+import javax.enterprise.inject.spi.CDI;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 public class DatabaseConnection {
-    public static Connection getConnection()  throws SQLException, NamingException {
-        Context initialContext = new InitialContext();
-        Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-        // TODO: Maybe rebuild this as ConnectionFactory and build the DataSource object here from the Configuration
-        String dataResourceName = "jdbc/codedefenders";
-        DataSource dataSource = (DataSource) environmentContext.lookup(dataResourceName);
-        return dataSource.getConnection();
+    public static Connection getConnection() {
+        return CDI.current().select(Connection.class).get();
     }
 }
