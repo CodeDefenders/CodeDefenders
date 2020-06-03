@@ -18,13 +18,15 @@
  */
 package org.codedefenders.util;
 
-import java.io.File;
-import java.nio.file.Paths;
-import java.util.Map;
+import org.codedefenders.configuration.Configuration;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.nio.file.Paths;
 
 /**
  * This class contains most constants used in Code Defenders.
@@ -40,35 +42,11 @@ public class Constants {
     public static final String DATA_DIR;
 
     static {
-        // First check the Web abb context
-        InitialContext initialContext;
-        String dataHome = null;
-        try {
-            initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-            dataHome = (String) environmentContext.lookup("codedefenders/data.dir");
-
-        } catch (NamingException e) {
-            // e.printStackTrace();
-        }
-
-        // Check Env
-        if (dataHome == null) {
-            ProcessBuilder pb = new ProcessBuilder();
-            Map<String, String> env = pb.environment();
-            dataHome = env.get("CODEDEFENDERS_DATA");
-        }
-        // Check System properties
-        if (dataHome == null) {
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-                dataHome = System.getProperty("codedefenders.data", "C:/codedefenders-data");
-            } else {
-                // I would prefer defaulting to /srv/codedefenders to keep codedefenders out of package manager space
-                dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
-            }
-        }
-
-        DATA_DIR = dataHome;
+        BeanManager bm = CDI.current().getBeanManager();
+        Bean<?> configBean = bm.getBeans(Configuration.class, new Annotation[0]).iterator().next();
+        CreationalContext<?> ctx = bm.createCreationalContext(configBean);
+        Configuration config = (Configuration) bm.getReference(configBean, Configuration.class, ctx);
+        DATA_DIR = config.getDataDir().getAbsolutePath();
     }
 
     // Dummy game
