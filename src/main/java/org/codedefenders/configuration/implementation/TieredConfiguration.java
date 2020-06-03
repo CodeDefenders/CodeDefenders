@@ -48,7 +48,7 @@ class TieredConfiguration extends BaseConfiguration {
                         ContextConfiguration contextConf,
                         EnvironmentVariableConfiguration envVarConf,
                         PropertiesFileConfiguration propFileConf) {
-        this((BaseConfiguration) envVarConf, propFileConf, contextConf, sysPropConf);
+        this((BaseConfiguration) propFileConf, contextConf, envVarConf, sysPropConf);
     }
 
     TieredConfiguration(BaseConfiguration... configurations) {

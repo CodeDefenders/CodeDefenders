@@ -53,10 +53,10 @@ class PropertiesFileConfiguration extends BaseConfiguration {
 
     // Maybe we could replace this in the future with injecting a list of ConfigFileResolver
     PropertiesFileConfiguration() {
-        this(new SystemPropertyConfigFileResolver(),
-                new EnvironmentVariableConfigFileResolver(),
+        this(new ClasspathConfigFileResolver(),
                 new TomcatConfigFileResolver(),
-                new ClasspathConfigFileResolver());
+                new EnvironmentVariableConfigFileResolver(),
+                new SystemPropertyConfigFileResolver());
     }
 
     PropertiesFileConfiguration(ConfigFileResolver configFileResolver, ConfigFileResolver... otherConfigFileResolvers) {
