@@ -159,7 +159,7 @@ public class Configuration {
         return 40;
     }
 
-    public int getJavaMajorVersion() {
+    private int getJavaMajorVersion() {
         String version = System.getProperty("java.version");
         if (version.startsWith("1.")) {
             version = version.substring(2);
