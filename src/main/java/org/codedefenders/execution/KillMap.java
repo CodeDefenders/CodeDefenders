@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import java.lang.annotation.Annotation;
@@ -75,18 +76,17 @@ public class KillMap {
     static {
         /* Get the BackendExecutorService and Configuration since dependency injection does not work on this class. */
         try {
-            InitialContext initialContext = new InitialContext();
-            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
+            BeanManager bm = CDI.current().getBeanManager();
             Bean<?> bean = bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
             CreationalContext<?> ctx = bm.createCreationalContext(bean);
             backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
             Bean<?> configBean = bm.getBeans(Configuration.class, new Annotation[0]).iterator().next();
-            Configuration config = (Configuration) bm.getReference(configBean, Configuration.class, ctx);
+            Configuration config =  CDI.current().select(Configuration.class).get();
             USE_COVERAGE = config.isMutantCoverage();
             PARALLELIZE = config.isParallelize();
             NUM_THREADS = config.getNumberOfThreads();
-        } catch (NamingException e) {
-            logger.error("Could not acquire BeanManager", e);
+        } catch (IllegalStateException e) {
+            // TODO
         }
         /*
          * If we are running this outside a container, DI must be done manually by looking up the JNDI resource.

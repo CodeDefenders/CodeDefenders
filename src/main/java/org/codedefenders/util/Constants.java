@@ -20,12 +20,8 @@ package org.codedefenders.util;
 
 import org.codedefenders.configuration.Configuration;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import java.io.File;
-import java.lang.annotation.Annotation;
 import java.nio.file.Paths;
 
 /**
@@ -36,18 +32,8 @@ import java.nio.file.Paths;
  */
 public class Constants {
 
-    // TODO Get rid of the next ~30 lines, maybe do some BeanManager magic in the transition period.
-    // I like how well this behavior is documented, does this require compatibility workarounds/transition period in Configuration?
-    // TODO Cannot be injected in static context
-    public static final String DATA_DIR;
-
-    static {
-        BeanManager bm = CDI.current().getBeanManager();
-        Bean<?> configBean = bm.getBeans(Configuration.class, new Annotation[0]).iterator().next();
-        CreationalContext<?> ctx = bm.createCreationalContext(configBean);
-        Configuration config = (Configuration) bm.getReference(configBean, Configuration.class, ctx);
-        DATA_DIR = config.getDataDir().getAbsolutePath();
-    }
+    // TODO Cannot be injected in static context !! Needs to be refactored !!
+    public static final String DATA_DIR = CDI.current().select(Configuration.class).get().getDataDir().getAbsolutePath();
 
     // Dummy game
     public static final int DUMMY_GAME_ID = -1;
