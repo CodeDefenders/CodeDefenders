@@ -18,13 +18,22 @@
  */
 package org.codedefenders.notification.web;
 
-import java.io.IOException;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.ITicketingService;
+import org.codedefenders.notification.events.EventNames;
+import org.codedefenders.notification.events.client.ClientEvent;
+import org.codedefenders.notification.events.server.ServerEvent;
+import org.codedefenders.notification.handling.ClientEventHandler;
+import org.codedefenders.notification.handling.ServerEventHandlerContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.enterprise.inject.spi.CDI;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.EncodeException;
@@ -35,18 +44,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
-import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.ITicketingService;
-import org.codedefenders.notification.events.client.ClientEvent;
-import org.codedefenders.notification.events.server.ServerEvent;
-import org.codedefenders.notification.handling.ClientEventHandler;
-import org.codedefenders.notification.events.EventNames;
-import org.codedefenders.notification.handling.ServerEventHandlerContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
 
 /**
  * <p>
@@ -107,24 +105,18 @@ public class PushSocket {
     private Session session;
 
     public PushSocket() {
-        try {
-            // Since @Inject does not work with WebSocket ...
-            InitialContext initialContext = new InitialContext();
-            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
-            Bean bean;
-            CreationalContext ctx;
+        // Since @Inject does not work with WebSocket ...
+        BeanManager bm = CDI.current().getBeanManager();
+        Bean bean;
+        CreationalContext ctx;
 
-            bean = bm.getBeans(INotificationService.class).iterator().next();
-            ctx = bm.createCreationalContext(bean);
-            notificationService = (INotificationService) bm.getReference(bean, INotificationService.class, ctx);
+        bean = bm.getBeans(INotificationService.class).iterator().next();
+        ctx = bm.createCreationalContext(bean);
+        notificationService = (INotificationService) bm.getReference(bean, INotificationService.class, ctx);
 
-            bean = bm.getBeans(ITicketingService.class).iterator().next();
-            ctx = bm.createCreationalContext(bean);
-            ticketingServices = (ITicketingService) bm.getReference(bean, ITicketingService.class, ctx);
-
-        } catch (NamingException e) {
-            e.printStackTrace();
-        }
+        bean = bm.getBeans(ITicketingService.class).iterator().next();
+        ctx = bm.createCreationalContext(bean);
+        ticketingServices = (ITicketingService) bm.getReference(bean, ITicketingService.class, ctx);
 
         open = false;
     }

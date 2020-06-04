@@ -282,15 +282,6 @@ public class Installer {
             ic.bind("java:comp/env/codedefenders/" + propName, configurations.get(propName));
         }
 
-        ic.createSubcontext("java:comp/env/jdbc");
-
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(configurations.getProperty("db.url"));
-        dataSource.setUser(configurations.getProperty("db.username"));
-        dataSource.setPassword(configurations.getProperty("db.password"));
-
-        ic.bind("java:comp/env/jdbc/codedefenders", dataSource);
-
         // Maybe there's a way to provide the beans definition directly here...
         Weld weld = new Weld();
         WeldContainer container = weld.initialize();
