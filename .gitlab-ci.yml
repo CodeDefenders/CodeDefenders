@@ -29,11 +29,13 @@ spotbugs-sast:
       - .m2/repository/
       - ./config.properties
   script:
+    - apt update && apt-get -y install libncurses5
     - touch config.properties
     - /analyzer run
 
 gemnasium-maven-dependency_scanning:
   script:
+    - apt update && apt-get -y install libncurses5
     - touch config.properties
     - /analyzer run
 
