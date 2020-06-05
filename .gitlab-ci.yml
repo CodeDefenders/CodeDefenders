@@ -9,8 +9,6 @@ stages:
   - test
 
 variables:
-  MAVEN_CLI_OPTS: "--no-transfer-progress"
-  MAVEN_REPO_PATH: ".m2/repository"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   SAST_DISABLE_DIND: "true"
   SAST_DEFAULT_ANALYZERS: "spotbugs, secrets"
@@ -43,14 +41,14 @@ build:
   stage: build
   script:
     - touch config.properties
-    - mvn $MAVEN_CLI_OPTS clean compile
+    - mvn --no-transfer-progress clean compile
 
 test:
   stage: test
   script:
     - apt update && apt-get -y install libncurses5
     - touch config.properties
-    - mvn $MAVEN_CLI_OPTS test checkstyle:checkstyle
+    - mvn --no-transfer-progress test checkstyle:checkstyle
     - |
       file="";
       first=1;
