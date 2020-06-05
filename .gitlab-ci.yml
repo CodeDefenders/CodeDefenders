@@ -10,7 +10,6 @@ stages:
 
 variables:
   MAVEN_CLI_OPTS: "--no-transfer-progress"
-  MAVEN_REPO_PATH: ".m2/repository"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   SAST_DISABLE_DIND: "true"
   SAST_DEFAULT_ANALYZERS: "spotbugs, secrets"
