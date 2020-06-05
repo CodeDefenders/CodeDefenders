@@ -33,7 +33,7 @@
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 	final GameClass cut = game.getCUT();
 
-	final User user = login.getUser(); 
+	final User user = login.getUser();
 %>
 
 

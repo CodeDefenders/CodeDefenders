@@ -19,15 +19,19 @@
 
 --%>
 
-<%@page import="org.codedefenders.util.Paths"%>
-<%@ page import="org.codedefenders.model.User"%>
-<%@ page import="org.codedefenders.game.Mutant"%>
-<%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
+<%@page import="org.codedefenders.game.GameClass"%>
 <%@ page import="org.codedefenders.game.GameLevel"%>
 <%@ page import="org.codedefenders.game.GameState"%>
+<%@ page import="org.codedefenders.game.Mutant"%>
+<%@ page import="org.codedefenders.game.Test"%>
+<%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
 <%@ page import="org.codedefenders.util.Constants"%>
 <%@ page import="org.codedefenders.model.User"%>
-<%@ page import="org.codedefenders.game.GameClass"%>
+<%@ page import="org.codedefenders.util.Constants"%>
+<%@ page import="org.codedefenders.util.Paths"%>
+<%@ page import="java.util.stream.Collectors"%>
+<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 
 <%--
     @param MeleeGame game
@@ -46,7 +50,13 @@
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
     User equivDefender = (User) request.getAttribute("equivDefender");
 
-    final User user = login.getUser();
+	final User user = login.getUser();
+    // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
+    final int userId = login.getUserId();
+    final List<Test> playerTests = game.getTests()
+            .stream()
+            .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == userId)
+            .collect(Collectors.toList());
 %>
 
 <jsp:useBean id="previousSubmission"
@@ -73,9 +83,9 @@
              class="org.codedefenders.beans.game.GameHighlightingBean"
              scope="request" />
 <%
-    gameHighlighting.setGameData(game.getMutants(), game.getTests());
+    gameHighlighting.setGameData(game.getMutants(), playerTests, user);
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
-    gameHighlighting.setEnableFlagging(false);
+    gameHighlighting.setEnableFlagging(true);
     // We should show game highlighting only inside the mutant editor
     if (!openEquivalenceDuel) {
         gameHighlighting.setCodeDivSelector("#newmut-div");
@@ -114,6 +124,7 @@
 <%
     mutantAccordion.setMutantAccordionData(cut, user, game.getAliveMutants(), game.getKilledMutants(),
             game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setPlayerCoverToClaim(true);
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(true);
     mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
@@ -122,7 +133,7 @@
 <jsp:useBean id="testAccordion"
              class="org.codedefenders.beans.game.TestAccordionBean" scope="request" />
 <%
-    testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants());
+    testAccordion.setTestAccordionData(cut, playerTests, game.getMutants());
 %>
 
 <jsp:useBean id="mutantProgressBar"

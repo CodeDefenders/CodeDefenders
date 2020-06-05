@@ -6,6 +6,7 @@ import org.codedefenders.game.GameHighlightingDTO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.model.User;
 import org.codedefenders.util.JSONUtils;
 
 import javax.annotation.ManagedBean;
@@ -57,7 +58,11 @@ public class GameHighlightingBean {
     }
 
     public void setGameData(List<Mutant> mutants, List<Test> tests) {
-        gameHighlightingData = new GameHighlightingDTO(mutants, tests);
+        this.setGameData(mutants, tests, null);
+    }
+
+    public void setGameData(List<Mutant> mutants, List<Test> tests, User user) {
+        gameHighlightingData = new GameHighlightingDTO(mutants, tests, user);
     }
 
     public void setCodeDivSelector(String codeDivSelector) {
