@@ -1,7 +1,6 @@
 include:
   - template: Dependency-Scanning.gitlab-ci.yml
   - template: SAST.gitlab-ci.yml
-  - template: License-Scanning.gitlab-ci.yml
 
 image: maven:3-jdk-8
 
@@ -11,7 +10,7 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  SAST_DISABLE_DIND: "true"  
+  SAST_DISABLE_DIND: "true"
   SAST_DEFAULT_ANALYZERS: "spotbugs, secrets"
   DS_DISABLE_DIND: "true"
   DS_DEFAULT_ANALYZERS: "gemnasium-maven"
