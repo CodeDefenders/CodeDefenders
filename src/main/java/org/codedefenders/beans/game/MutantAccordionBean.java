@@ -212,8 +212,8 @@ public class MutantAccordionBean {
 
     public String jsonMutants() {
         Map<Integer, MutantAccordionMutantDTO> mutants =
-        mutantList.stream().collect( Collectors.toMap(Mutant::getId,
-                m -> new MutantAccordionMutantDTO(m, user, playerCoverToClaim)));
+                mutantList.stream().collect(Collectors.toMap(Mutant::getId,
+                        m -> new MutantAccordionMutantDTO(m, user, playerCoverToClaim)));
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()
