@@ -43,9 +43,8 @@ import javax.servlet.http.HttpServletResponse;
  * messages are stored as {@link Event Events}.
  *
  * <p>Serves on path: {@code /api/messages}.
- * @see org.codedefenders.util.Paths#API_MESSAGES
  */
-@WebServlet("/api/messages")
+@WebServlet(org.codedefenders.util.Paths.API_MESSAGES)
 public class MessageManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);
 

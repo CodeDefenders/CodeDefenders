@@ -42,10 +42,8 @@ import javax.servlet.http.HttpServletResponse;
  * This {@link HttpServlet} handles admin requests for managing {@link org.codedefenders.game.GameClass GameClasses}.
  *
  * <p>Serves on path: {@code /admin/classes}.
- *
- * @see Paths#ADMIN_CLASSES
  */
-@WebServlet("/admin/classes")
+@WebServlet(Paths.ADMIN_CLASSES)
 public class AdminClassesManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminClassesManagement.class);
 

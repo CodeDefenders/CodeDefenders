@@ -206,6 +206,25 @@ public class Mutant implements Serializable {
         }
     }
 
+    public State getState() {
+        if (equivalent == Equivalence.DECLARED_YES || equivalent == Equivalence.ASSUMED_YES) {
+            return State.EQUIVALENT;
+        } else if (equivalent == Equivalence.PENDING_TEST) {
+            return State.FLAGGED;
+        } else if (isAlive()) {
+            return State.ALIVE;
+        } else {
+            return State.KILLED;
+        }
+    }
+
+    public enum State {
+        ALIVE,
+        KILLED,
+        FLAGGED,
+        EQUIVALENT
+    }
+
     public String getClassFile() {
         return classFile;
     }

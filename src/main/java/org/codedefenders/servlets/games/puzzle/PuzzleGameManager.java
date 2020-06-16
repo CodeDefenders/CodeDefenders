@@ -100,9 +100,8 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameSelectionManager
  * @see PuzzleGame
- * @see org.codedefenders.util.Paths#PUZZLE_GAME
  */
-@WebServlet("/puzzlegame")
+@WebServlet(org.codedefenders.util.Paths.PUZZLE_GAME)
 public class PuzzleGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleGameManager.class);
 

@@ -80,8 +80,7 @@
 
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
-    mutantAccordion.setMutantAccordionData(cut, user, game.getAliveMutants(), game.getKilledMutants(),
-            game.getMutantsMarkedEquivalent(), game.getMutantsMarkedEquivalentPending());
+    mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(false);
     mutantAccordion.setViewDiff(true);

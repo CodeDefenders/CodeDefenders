@@ -19,13 +19,11 @@
 package org.codedefenders;
 
 import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.slf4j.Logger;
 
 import java.io.File;

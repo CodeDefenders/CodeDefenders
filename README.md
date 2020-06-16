@@ -13,7 +13,8 @@ This is Code Defenders, a mutation testing game. Publicly available at [code-def
 
 ## Installation and Setup
 ### Configuration file
-Code Defenders requires a `config.properties` file for initial setup, building and deployment. All necessary configuration properties are listed. The file needs to be in the project root directory.
+Code Defenders requires a `config.properties` file for initial setup, building and deployment. The file needs to be in the project root directory.
+You can copy the `config.properties.example` file, which lists all necessary properties, over and update the sensible default values with your configuration.
 
 `config.properties` can hold confidential configuration data, so **please** do not include it into the repository.
 
@@ -45,7 +46,7 @@ tomcat.path=...
 
 ### Installation script
 
-To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input. 
+To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input.
 
 ```bash
 cd installation
@@ -93,20 +94,17 @@ All system configuration and privileged features are accessible for admin users 
 For successful deployment, both Tomcat and MySQL services must be running.
 Code Defenders is built and deployed with Maven using the following commands.
 
-### Deploy first time
-
-To deploy Code Defenders the _first time_, execute:
-
 ```bash
-mvn clean compile package install war:war tomcat7:deploy -DskipTests
+mvn clean deploy -DskipTests
 ```
 
-### Redeploy
-To redeploy instead use:
+If you want to deploy the `.war` file by yourself its enough to execute:
 
 ```bash
-mvn clean compile package install war:war tomcat7:redeploy -DskipTests
+mvn clean package -DskipTests
 ```
+
+If you want to run the tests be sure the library `libncurses.so.5` is present on your system as the database tests depend on it.
 
 ### System Tests
 System tests work by deploying Code Defenders inside disposable Docker containers and interacting with it by means of Selenium, which is again, running inside a Docker container.
@@ -118,7 +116,7 @@ Since we use Docker containers which are not (yet) registered in any Docker publ
 mvn clean compile package war:war integration-test -PST
 ```
 
-This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). Finally, it runs all tests, which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for Code Defenders (one for the backend and on one for the front-end) and one docker instance for Selenium. 
+This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). Finally, it runs all tests, which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for Code Defenders (one for the backend and on one for the front-end) and one docker instance for Selenium.
 When containers are ready, the test code send the commands to the Selenium instance which must necessarily run on port 4444. When a test ends, all containers are disposed.
 
 There's few catches. Since we use selenium-standalone we can run ONLY one system test at the time. The alternative (not in place) is to start a selenium-hub.
@@ -149,9 +147,9 @@ docker-compose up
 
 This command will build the required containers by cloning the git repo and by invoking the expected maven commands. As a consequence, the first time you run docker-compose it might take a while.
 
-**Note** On the console, you will see outputs like: 
+**Note** On the console, you will see outputs like:
 ```
-db_1: mbind: Operation not allowed 
+db_1: mbind: Operation not allowed
 ```
 You can ignore them.
 

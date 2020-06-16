@@ -57,7 +57,8 @@ import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
  * @see PuzzleGameManager
  * @see PuzzleGame
  */
-@WebServlet("/puzzle/games")
+// TODO Phil 23/01/2020: Seems like this servlet is never called, only the static createGame method
+@WebServlet(Paths.PUZZLE_GAME_SELECTION)
 public class PuzzleGameSelectionManager extends HttpServlet {
     private static Logger logger = LoggerFactory.getLogger(PuzzleGameSelectionManager.class);
 

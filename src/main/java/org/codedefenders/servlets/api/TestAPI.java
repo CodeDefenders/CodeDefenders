@@ -45,9 +45,8 @@ import javax.servlet.http.HttpServletResponse;
  * <p>Serves on path: {@code /api/test}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see org.codedefenders.util.Paths#API_TEST
  */
-@WebServlet("/api/test")
+@WebServlet(org.codedefenders.util.Paths.API_TEST)
 public class TestAPI extends HttpServlet {
 
     @Override

@@ -89,7 +89,7 @@
                                 class="panel-title <%=category.getTestIds().isEmpty() ? "" : "ta-covered"%>"
                                 style="text-decoration: none;">
                             <% if (!category.getTestIds().isEmpty()) { %>
-                                <span class="label label-primary ta-count"><%=category.getTestIds().size()%></span>
+                                <span class="label bg-defender ta-count"><%=category.getTestIds().size()%></span>
                             <% } %>
                             <%=category.getDescription()%>
                         </a>

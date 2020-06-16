@@ -85,7 +85,7 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
-@WebServlet({"/admin/api/puzzles", "/admin/api/puzzles/puzzle", "/admin/api/puzzles/chapter"})
+@WebServlet({Paths.API_ADMIN_PUZZLES_ALL, Paths.API_ADMIN_PUZZLE, Paths.API_ADMIN_PUZZLECHAPTER})
 public class AdminPuzzleAPI extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleAPI.class);
 

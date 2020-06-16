@@ -45,9 +45,8 @@ import javax.servlet.http.HttpServletResponse;
  * <p>Serves on path: {@code /api/class}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see org.codedefenders.util.Paths#API_CLASS
  */
-@WebServlet("/api/class")
+@WebServlet(org.codedefenders.util.Paths.API_CLASS)
 public class GameClassAPI extends HttpServlet {
 
     @Override

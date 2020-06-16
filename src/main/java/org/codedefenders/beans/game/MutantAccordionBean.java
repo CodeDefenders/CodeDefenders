@@ -61,10 +61,7 @@ public class MutantAccordionBean {
     private Boolean viewDiff;
 
     private GameClass cut;
-    private List<Mutant> aliveMutants;
-    private List<Mutant> killedMutants;
-    private List<Mutant> equivalentMutants;
-    private List<Mutant> flaggedMutants;
+    private List<Mutant> mutantList;
     private List<MutantAccordionCategory> categories;
 
     private User user;
@@ -77,26 +74,17 @@ public class MutantAccordionBean {
         gameId = null;
         viewDiff = null;
         cut = null;
-        aliveMutants = null;
-        killedMutants = null;
-        equivalentMutants = null;
-        flaggedMutants = null;
+        mutantList = null;
         categories = null;
         user = null;
     }
 
     public void setMutantAccordionData(GameClass cut,
                                        User user,
-                                       List<Mutant> aliveMutants,
-                                       List<Mutant> killedMutants,
-                                       List<Mutant> equivalentMutants,
-                                       List<Mutant> flaggedMutants) {
+                                       List<Mutant> mutants) {
         this.cut = cut;
         this.user = user;
-        this.aliveMutants = Collections.unmodifiableList(aliveMutants);
-        this.killedMutants = Collections.unmodifiableList(killedMutants);
-        this.equivalentMutants = Collections.unmodifiableList(equivalentMutants);
-        this.flaggedMutants = Collections.unmodifiableList(flaggedMutants);
+        this.mutantList = Collections.unmodifiableList(mutants);
         this.playerCoverToClaim = false;
 
         categories = new ArrayList<>();
@@ -204,25 +192,8 @@ public class MutantAccordionBean {
     }
 
     public List<MutantAccordionMutantDTO> getMutants() {
-        // TODO Why do mutants don't have this simple attribute?
-        List<MutantAccordionMutantDTO> mutants = new ArrayList<>();
-        mutants.addAll(aliveMutants
-                .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.ALIVE, this.user, playerCoverToClaim))
-                .collect(Collectors.toList()));
-        mutants.addAll(killedMutants
-                .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.KILLED, this.user, playerCoverToClaim))
-                .collect(Collectors.toList()));
-        mutants.addAll(equivalentMutants
-                .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.EQUIVALENT, this.user, playerCoverToClaim))
-                .collect(Collectors.toList()));
-        mutants.addAll(flaggedMutants
-                .stream()
-                .map(x -> new MutantAccordionMutantDTO(x, MutantState.FLAGGED, this.user, playerCoverToClaim))
-                .collect(Collectors.toList()));
-        return mutants;
+        return mutantList.stream().map(m -> new MutantAccordionMutantDTO(m, user, playerCoverToClaim))
+                .collect(Collectors.toList());
     }
 
     public List<MutantAccordionCategory> getCategories() {
@@ -230,44 +201,7 @@ public class MutantAccordionBean {
     }
 
     public List<Mutant> getAllMutants() {
-        List<Mutant> mutants = new ArrayList<>();
-        mutants.addAll(aliveMutants);
-        mutants.addAll(killedMutants);
-        mutants.addAll(equivalentMutants);
-        mutants.addAll(flaggedMutants);
-        return mutants;
-    }
-
-    public List<Mutant> getAliveMutants() {
-        return aliveMutants;
-    }
-
-    public List<Mutant> getKilledMutants() {
-        return killedMutants;
-    }
-
-    public List<Mutant> getEquivalentMutants() {
-        return equivalentMutants;
-    }
-
-    public List<Mutant> getFlaggedMutants() {
-        return flaggedMutants;
-    }
-
-    public boolean hasAliveMutants() {
-        return !aliveMutants.isEmpty();
-    }
-
-    public boolean hasKilledMutants() {
-        return !killedMutants.isEmpty();
-    }
-
-    public boolean hasEquivalentMutants() {
-        return !equivalentMutants.isEmpty();
-    }
-
-    public boolean hasFlaggedMutants() {
-        return !flaggedMutants.isEmpty();
+        return mutantList;
     }
 
     public String jsonFromCategories() {
@@ -277,24 +211,9 @@ public class MutantAccordionBean {
     }
 
     public String jsonMutants() {
-        Map<Integer, MutantAccordionMutantDTO> mutants = new HashMap<>();
-
-        for (Mutant mutant : aliveMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.ALIVE, this.user,
-                    playerCoverToClaim));
-        }
-        for (Mutant mutant : killedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.KILLED, this.user,
-                    playerCoverToClaim));
-        }
-        for (Mutant mutant : flaggedMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.FLAGGED, this.user,
-                    playerCoverToClaim));
-        }
-        for (Mutant mutant : equivalentMutants) {
-            mutants.put(mutant.getId(), new MutantAccordionMutantDTO(mutant, MutantState.EQUIVALENT, this.user,
-                    playerCoverToClaim));
-        }
+        Map<Integer, MutantAccordionMutantDTO> mutants =
+        mutantList.stream().collect( Collectors.toMap(Mutant::getId,
+                m -> new MutantAccordionMutantDTO(m, user, playerCoverToClaim)));
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()
@@ -373,7 +292,7 @@ public class MutantAccordionBean {
         @Expose
         private final String creatorName;
         @Expose
-        private final MutantState state;
+        private final Mutant.State state;
         @Expose
         private final int points;
         @Expose
@@ -394,11 +313,11 @@ public class MutantAccordionBean {
         @Expose
         private final String description;
 
-        public MutantAccordionMutantDTO(Mutant mutant, MutantState state, User user, boolean playerCoverToClaim) {
+        public MutantAccordionMutantDTO(Mutant mutant, User user, boolean playerCoverToClaim) {
             id = mutant.getId();
             creatorName = mutant.getCreatorName();
             points = mutant.getScore();
-            this.state = state;
+            state = mutant.getState();
 
             if (playerCoverToClaim) {
                 covered = mutant.getCoveringTests().stream()
@@ -427,17 +346,9 @@ public class MutantAccordionBean {
                     && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                     && mutant.getCreatorId() != user.getId()
                     && mutant.getLines().size() >= 1;
-            canView = state == MutantState.KILLED
-                    || state == MutantState.EQUIVALENT
+            canView = state == Mutant.State.KILLED
+                    || state == Mutant.State.EQUIVALENT
                     || mutant.getCreatorId() == user.getId();
         }
-    }
-
-    // TODO: Do we have this already somwhere?
-    public enum MutantState {
-        KILLED,
-        ALIVE,
-        EQUIVALENT,
-        FLAGGED
     }
 }

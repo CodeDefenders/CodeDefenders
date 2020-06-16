@@ -18,15 +18,14 @@
  */
 package org.codedefenders.servlets.games;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorException;
+
+import java.io.File;
+import java.io.IOException;
 
 public interface IGameManagingUtils {
 
@@ -71,7 +70,6 @@ public interface IGameManagingUtils {
      * Calls {@link #createTest(int, int, String, int, String, int)},but with the default number
      * of assertions specified in {@link CodeValidator#DEFAULT_NB_ASSERTIONS}.
      */
-    Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
-            throws IOException, CodeValidatorException;
+    Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory) throws IOException;
 
 }
