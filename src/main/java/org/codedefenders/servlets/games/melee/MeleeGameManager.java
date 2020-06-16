@@ -638,7 +638,7 @@ public class MeleeGameManager extends HttpServlet {
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate);
+                messages.add(decorate).escape(false);
 
             }
             previousSubmission.setMutantCode(mutantText);
@@ -805,7 +805,7 @@ public class MeleeGameManager extends HttpServlet {
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
                     String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-                    messages.add(decorate);
+                    messages.add(decorate).escape(false);
                 }
 
                 previousSubmission.setTestCode(testText);
