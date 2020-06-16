@@ -159,14 +159,14 @@ public abstract class AbstractGame {
     public List<Mutant> getMutantsMarkedEquivalent() {
         return getMutants()
                 .stream()
-                .filter(mutant -> mutant.getState() == Mutant.State.FLAGGED)
+                .filter(mutant -> mutant.getState() == Mutant.State.EQUIVALENT)
                 .collect(Collectors.toList());
     }
 
     public List<Mutant> getMutantsMarkedEquivalentPending() {
         return getMutants()
                 .stream()
-                .filter(mutant -> mutant.getState() == Mutant.State.EQUIVALENT)
+                .filter(mutant -> mutant.getState() == Mutant.State.FLAGGED)
                 .collect(Collectors.toList());
     }
 
