@@ -98,9 +98,11 @@
                 <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
 					title="Export as a Gradle project to import into an IDE."
 					class="btn btn-default btn-diff" id="btnProjectExport"> Export</a>
+                    <%-- TODO: Enable this if we have a scoreboard
                 <a href="#" class="btn btn-default btn-diff" id="btnScoreboard"
 					data-toggle="modal" data-target="#scoreboard">Scoreboard</a>
-                    <%--
+					--%>
+                    <%-- TODO: Enable this if we can collect feedback for melee mode
                 <a href="#" class="btn btn-default btn-diff" id="btnFeedback"
 					data-toggle="modal" data-target="#playerFeedback"> Feedback </a>
 					--%>
