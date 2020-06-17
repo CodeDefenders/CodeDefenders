@@ -84,7 +84,7 @@ public class KillMap {
             Configuration config =  CDI.current().select(Configuration.class).get();
             USE_COVERAGE = config.isMutantCoverage();
             PARALLELIZE = config.isParallelize();
-            NUM_THREADS = config.getNumberOfThreads();
+            NUM_THREADS = config.getNumberOfKillmapThreads();
         } catch (IllegalStateException e) {
             // TODO
         }

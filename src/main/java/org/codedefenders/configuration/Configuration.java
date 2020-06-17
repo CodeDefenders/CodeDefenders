@@ -155,7 +155,7 @@ public class Configuration {
         return mutantCoverage;
     }
 
-    public int getNumberOfThreads() {
+    public int getNumberOfKillmapThreads() {
         return 40;
     }
 
