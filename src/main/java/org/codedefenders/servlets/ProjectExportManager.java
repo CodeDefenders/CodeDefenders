@@ -54,9 +54,8 @@ import javax.servlet.http.HttpServletResponse;
  * <p>Serves on path: {@code /project-export}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
- * @see org.codedefenders.util.Paths#PROJECT_EXPORT
  */
-@WebServlet("/project-export")
+@WebServlet(org.codedefenders.util.Paths.PROJECT_EXPORT)
 public class ProjectExportManager extends HttpServlet {
 
     private static final Path mainDir = Paths.get("src/main/java");

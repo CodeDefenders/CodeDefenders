@@ -144,32 +144,29 @@ public abstract class AbstractGame {
     }
 
     public List<Mutant> getAliveMutants() {
-        return getMutants().stream().filter(mutant -> mutant.isAlive()
-                && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                && mutant.getClassFile() != null).collect(Collectors.toList());
+        return getMutants().stream()
+                .filter(mutant -> mutant.getState() == Mutant.State.ALIVE)
+                .collect(Collectors.toList());
     }
 
     public List<Mutant> getKilledMutants() {
         return getMutants()
                 .stream()
-                .filter(mutant -> !mutant.isAlive()
-                        && (mutant.getEquivalent().equals(ASSUMED_NO)
-                        || mutant.getEquivalent().equals(PROVEN_NO)) && (mutant.getClassFile() != null))
+                .filter(mutant -> mutant.getState() == Mutant.State.KILLED)
                 .collect(Collectors.toList());
     }
 
     public List<Mutant> getMutantsMarkedEquivalent() {
         return getMutants()
                 .stream()
-                .filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES)
-                        || mutant.getEquivalent().equals(DECLARED_YES))
+                .filter(mutant -> mutant.getState() == Mutant.State.EQUIVALENT)
                 .collect(Collectors.toList());
     }
 
     public List<Mutant> getMutantsMarkedEquivalentPending() {
         return getMutants()
                 .stream()
-                .filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST))
+                .filter(mutant -> mutant.getState() == Mutant.State.FLAGGED)
                 .collect(Collectors.toList());
     }
 

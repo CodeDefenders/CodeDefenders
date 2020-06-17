@@ -119,7 +119,7 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  *
  * @see org.codedefenders.util.Paths#BATTLEGROUND_GAME
  */
-@WebServlet("/multiplayergame")
+@WebServlet(org.codedefenders.util.Paths.BATTLEGROUND_GAME)
 public class MultiplayerGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
@@ -442,7 +442,7 @@ public class MultiplayerGameManager extends HttpServlet {
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-            messages.add(decorate);
+            messages.add(decorate).escape(false);
             //
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -661,7 +661,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate);
+                messages.add(decorate).escape(false);
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);

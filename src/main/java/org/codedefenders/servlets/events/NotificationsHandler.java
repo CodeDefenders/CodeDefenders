@@ -51,10 +51,8 @@ import javax.servlet.http.HttpSession;
  * <p>In this servlet, all {@link NotificationType NotificationTypes} are handled.
  *
  * <p>Serves on path: {@code /api/notifications}.
- *
- * @see org.codedefenders.util.Paths#API_NOTIFICATION
  */
-@WebServlet("/api/notifications")
+@WebServlet(org.codedefenders.util.Paths.API_NOTIFICATION)
 public class NotificationsHandler extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(NotificationsHandler.class);
     private static final Gson gson = new Gson();

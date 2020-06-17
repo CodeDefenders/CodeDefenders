@@ -37,6 +37,26 @@ import java.util.stream.Collectors;
  * @see PuzzleGame
  */
 public class GameDAO {
+
+    /**
+     * Retrieves a game for which we don't know the type yet.
+     *
+     * @param gameId The game ID we want to query a game.
+     * @return The {@link AbstractGame} with the given ID or null if no game found.
+     */
+    public static AbstractGame getGame(int gameId) {
+        switch (getGameMode(gameId)) {
+            case PARTY:
+                return MultiplayerGameDAO.getMultiplayerGame(gameId);
+            case MELEE:
+                return MeleeGameDAO.getMeleeGame(gameId);
+            case PUZZLE:
+                return PuzzleDAO.getPuzzleGameForId(gameId);
+            default:
+                return null;
+        }
+    }
+
     /**
      * Adds a player with the given user ID and {@link Role} to the game.
      * If user is already a player in the game, the {@link Role} is updated.

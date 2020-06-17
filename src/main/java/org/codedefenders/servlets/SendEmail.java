@@ -36,9 +36,8 @@ import javax.servlet.http.HttpServletResponse;
  * using {@link EmailUtils#sendEmailToSelf(String, String, String)}.
  *
  * <p>Serves on path: {@code /api/sendmail}.
- * @see Paths#API_SEND_EMAIL
  */
-@WebServlet("/api/sendmail")
+@WebServlet(Paths.API_SEND_EMAIL)
 public class SendEmail extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(SendEmail.class);
 

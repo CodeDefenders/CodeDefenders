@@ -1,0 +1,37 @@
+.bg-attacker {
+    background-color: #884466;
+}
+
+.bg-defender {
+    background-color: #446688;
+}
+
+.fg-attacker {
+    color: #884466;
+}
+
+.fg-defender {
+    color: #446688;
+}
+
+.btn-attacker {
+    color: #ffffff;
+    background-color: #884466;
+    border-color: #772233;
+}
+.btn-attacker:hover {
+    color: #ffffff;
+    background-color: #713d57;
+    border-color: #64222f;
+}
+
+.btn-defender {
+    color: #ffffff;
+    background-color: #446688;
+    border-color: #225577;
+}
+.btn-defender:hover {
+    color: #ffffff;
+    background-color: #3d546c;
+    border-color: #21455e;
+}

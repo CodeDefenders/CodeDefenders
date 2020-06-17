@@ -27,6 +27,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.KillmapDAO.KillMapProgress;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/admin/api/killmapmanagement")
+@WebServlet(Paths.API_KILLMAP_MANAGEMENT)
 public class AdminKillmapManagementApi extends HttpServlet {
     private static Logger logger = LoggerFactory.getLogger(AdminKillmapManagementApi.class);
 

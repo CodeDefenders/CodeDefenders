@@ -584,8 +584,10 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         Mutant existingMutant = gameManagingUtils.existingMutant(game.getId(), mutantText);
-        boolean duplicateCheckSuccess = existingMutant == null || existingMutant.getCreatorId() != playerId;
+        boolean duplicateCheckSuccess = existingMutant == null; //|| existingMutant.getPlayerId() != playerId;
         // TODO: Why allow duplicate mutants from different creators?
+        //  Currently not possible because of database constraint
+        //  See also: Issue #675
 
         MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
         mdce.setGameId(game.getId());
@@ -636,7 +638,7 @@ public class MeleeGameManager extends HttpServlet {
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate);
+                messages.add(decorate).escape(false);
 
             }
             previousSubmission.setMutantCode(mutantText);
@@ -803,7 +805,7 @@ public class MeleeGameManager extends HttpServlet {
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
                     String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-                    messages.add(decorate);
+                    messages.add(decorate).escape(false);
                 }
 
                 previousSubmission.setTestCode(testText);

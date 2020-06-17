@@ -53,9 +53,8 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleOverview
- * @see org.codedefenders.util.Paths#GAMES_OVERVIEW
  */
-@WebServlet("/games/overview")
+@WebServlet(org.codedefenders.util.Paths.GAMES_OVERVIEW)
 public class GamesOverview extends HttpServlet {
 
     @Inject

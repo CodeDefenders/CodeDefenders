@@ -120,8 +120,7 @@
                         case ATTACKER:
                             if (info.gameState() != GameState.CREATED) {
             %>
-            <a class="btn btn-sm btn-primary" id="<%="attack-"+gameId%>"
-               style="background-color: #884466;border-color: #772233;"
+            <a class="btn btn-sm btn-attacker" id="<%="attack-"+gameId%>"
                href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Attack</a>
             <%
                             } else {
@@ -143,8 +142,7 @@
                         case DEFENDER:
                     if (info.gameState() != GameState.CREATED) {
             %>
-            <a class="btn btn-sm btn-primary" id="<%="defend-"+gameId%>"
-               style="background-color: #446688;border-color: #225577"
+            <a class="btn btn-sm btn-defender" id="<%="defend-"+gameId%>"
                href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Defend</a>
             <%
             } else {
@@ -519,8 +517,8 @@
                     <input type="hidden" name="gameId" value=<%=info.gameId()%>>
                     <input type="hidden" name="attacker" value=1>
                     <%=attackers.size()%>
-                    <button type="submit" id="<%="join-attacker-"+info.gameId()%>" class="btn btn-primary btn-sm"
-                            style="background-color: #884466;border-color: #772233; margin: 0 0 0 5px; padding: 3px 7px;"
+                    <button type="submit" id="<%="join-attacker-"+info.gameId()%>" class="btn btn-sm btn-attacker"
+                            style="margin: 0 0 0 5px; padding: 3px 7px;"
                             value="Join as Attacker">Join
                     </button>
                 </form>
@@ -532,8 +530,8 @@
                     <input type="hidden" name="gameId" value=<%=gameId%>>
                     <input type="hidden" name="defender" value=1>
                     <%=defenders.size() %>
-                    <button type="submit" id="<%="join-defender-"+gameId%>" class="btn btn-primary btn-sm"
-                            style="background-color: #446688;border-color: #225577; margin: 0 0 0 5px; padding: 3px 7px;"
+                    <button type="submit" id="<%="join-defender-"+gameId%>" class="btn btn-sm btn-defender"
+                            style="margin: 0 0 0 5px; padding: 3px 7px;"
                             value="Join as Defender">Join
                     </button>
                 </form>

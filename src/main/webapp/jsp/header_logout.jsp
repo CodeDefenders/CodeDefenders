@@ -58,7 +58,8 @@
 
                     <li class="col-md-4"><a
                             class="text-white button tab-link bg-minus-1"
-                            href="#research" style="width:100%; margin-right: 60px">Research</a></li>
+                            href="#research" style="width:100%; margin-right: 60px"
+                            onclick="openResearchBox()">Research</a></li>
                     <li class="col-md-4"><a class="text-white button tab-link bg-minus-1"
                                                href="help" style="width:100%; margin-right: 90px">Help</a></li>
                 </ul>
@@ -66,5 +67,15 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    function openResearchBox() {
+        $('#researchBox').collapse('show')
+        var toggle = document.getElementById('researchBoxToggle');
+        var newClass = 'glyphicon glyphicon-chevron-up';
+        toggle.setAttribute('class', newClass);
+    }
+</script>
 
 <jsp:include page="/jsp/messages.jsp"/>

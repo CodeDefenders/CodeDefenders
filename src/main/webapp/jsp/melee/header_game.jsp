@@ -94,14 +94,18 @@
 					data-toggle="modal" data-target="#scoringTooltip"
 					style="color: black; font-size: 18px; padding: 5px;"> <span
 					class="glyphicon glyphicon-question-sign"></span>
-				</a> <a
-					href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
+                </a>
+                <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
 					title="Export as a Gradle project to import into an IDE."
-					class="btn btn-default btn-diff" id="btnProjectExport"> Export
-				</a> <a href="#" class="btn btn-default btn-diff" id="btnScoreboard"
-					data-toggle="modal" data-target="#scoreboard">Scoreboard</a> <a
-					href="#" class="btn btn-default btn-diff" id="btnFeedback"
+					class="btn btn-default btn-diff" id="btnProjectExport"> Export</a>
+                    <%-- TODO: Enable this if we have a scoreboard
+                <a href="#" class="btn btn-default btn-diff" id="btnScoreboard"
+					data-toggle="modal" data-target="#scoreboard">Scoreboard</a>
+					--%>
+                    <%-- TODO: Enable this if we can collect feedback for melee mode
+                <a href="#" class="btn btn-default btn-diff" id="btnFeedback"
 					data-toggle="modal" data-target="#playerFeedback"> Feedback </a>
+					--%>
 			</div>
 		</div>
 	</nav>

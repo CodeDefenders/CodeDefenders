@@ -27,6 +27,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.database.AnalyticsDAO;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/admin/api/classes")
+@WebServlet(Paths.API_ANALYTICS_CLASSES)
 public class AdminAnalyticsClassesApi extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsClassesApi.class);
 
