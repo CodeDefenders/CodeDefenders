@@ -53,12 +53,6 @@ public abstract class BaseConfiguration extends Configuration {
                 }
             }
         }
-
-        try {
-            validate();
-        } catch (ConfigurationValidationException e) {
-            logger.warn(e.getMessage());
-        }
     }
 
     protected abstract Object resolveAttribute(String camelCaseName);
