@@ -40,7 +40,7 @@ public class SystemPropertyConfiguration extends BaseConfiguration {
 
     @Override
     protected String resolveAttributeName(String camelCaseName) {
-        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
+        return "codedefenders." + CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, camelCaseName).replace('-', '.');
     }
 
     @Override
