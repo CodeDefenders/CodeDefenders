@@ -24,6 +24,10 @@ import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +45,7 @@ public class PropertiesFileConfigurationTest {
                         + "cluster.mode=enabled\n"
                         + "force.local.execution=false");
 
-        config = new PropertiesFileConfiguration(mCfgFileResolver);
+        config = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(mCfgFileResolver)));
         config.init();
     }
 
@@ -67,7 +71,7 @@ public class PropertiesFileConfigurationTest {
         mCfgFileResolver.setConfigFileContent("db.host=157.1646846.456.568\n"
                 + "db.port=65537");
 
-        config = new PropertiesFileConfiguration(mCfgFileResolver);
+        config = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(mCfgFileResolver)));
         config.init();
         config.validate();
     }

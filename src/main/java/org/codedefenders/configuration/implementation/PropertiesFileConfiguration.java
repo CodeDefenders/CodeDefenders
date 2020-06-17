@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.io.Reader;
@@ -52,19 +53,10 @@ class PropertiesFileConfiguration extends BaseConfiguration {
     private final Properties properties;
 
     // Maybe we could replace this in the future with injecting a list of ConfigFileResolver
-    PropertiesFileConfiguration() {
-        this(new ClasspathConfigFileResolver(),
-                new TomcatConfigFileResolver(),
-                new EnvironmentVariableConfigFileResolver(),
-                new SystemPropertyConfigFileResolver());
-    }
-
-    PropertiesFileConfiguration(ConfigFileResolver configFileResolver, ConfigFileResolver... otherConfigFileResolvers) {
+    @Inject
+    PropertiesFileConfiguration(List<ConfigFileResolver> configFileResolvers) {
         super();
-        List<ConfigFileResolver> cfrs = new ArrayList<>();
-        cfrs.add(configFileResolver);
-        cfrs.addAll(Arrays.asList(otherConfigFileResolvers));
-        properties = readProperties(cfrs);
+        properties = readProperties(configFileResolvers);
     }
 
     @Override
@@ -94,7 +86,7 @@ class PropertiesFileConfiguration extends BaseConfiguration {
             }
         }
         if (noFileFound) {
-            logger.warn("No properties file found");
+            logger.info("No properties files found");
         }
         return properties;
     }

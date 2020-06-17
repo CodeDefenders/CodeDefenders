@@ -23,6 +23,9 @@ import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -39,7 +42,7 @@ public class TieredConfigurationTest {
                         + "cluster.mode=enabled\n"
                         + "db.name=otherName\n"
                         + "force.local.execution=false");
-        PropertiesFileConfiguration configPart1 = new PropertiesFileConfiguration(configFile1);
+        PropertiesFileConfiguration configPart1 = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(configFile1)));
         configPart1.init();
 
         StubConfigFileResolver configFile2 = new StubConfigFileResolver();
@@ -48,10 +51,10 @@ public class TieredConfigurationTest {
                         + "db.name=codedefenders\n"
                         + "db.username=testDatabaseUser\n"
                         + "force.local.execution=false");
-        PropertiesFileConfiguration configPart2 = new PropertiesFileConfiguration(configFile2);
+        PropertiesFileConfiguration configPart2 = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(configFile2)));
         configPart2.init();
 
-        config = new TieredConfiguration(configPart1, configPart2);
+        config = new TieredConfiguration(new ArrayList<>(Arrays.asList(configPart1, configPart2)));
         config.init();
     }
 

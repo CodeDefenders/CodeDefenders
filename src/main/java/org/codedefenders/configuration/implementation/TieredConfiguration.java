@@ -44,16 +44,9 @@ class TieredConfiguration extends BaseConfiguration {
     private final List<BaseConfiguration> config;
 
     @Inject
-    TieredConfiguration(SystemPropertyConfiguration sysPropConf,
-                        ContextConfiguration contextConf,
-                        EnvironmentVariableConfiguration envVarConf,
-                        PropertiesFileConfiguration propFileConf) {
-        this((BaseConfiguration) propFileConf, contextConf, envVarConf, sysPropConf);
-    }
-
-    TieredConfiguration(BaseConfiguration... configurations) {
+    TieredConfiguration(List<BaseConfiguration> configurations) {
         super();
-        config = Arrays.asList(configurations);
+        config = configurations;
     }
 
     @Override
