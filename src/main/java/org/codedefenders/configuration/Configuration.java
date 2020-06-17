@@ -59,7 +59,7 @@ public class Configuration {
     protected Integer dbPort = 3306;
     protected String dbName = "codedefenders";
     protected String dbUsername = "codedefenders";
-    protected String dbPassword = "test";
+    protected String dbPassword;
     protected Boolean clusterMode = false;
     protected String clusterJavaHome;
     protected String clusterReservationName;
