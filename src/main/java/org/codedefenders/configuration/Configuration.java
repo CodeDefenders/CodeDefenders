@@ -74,7 +74,7 @@ public class Configuration {
      *
      * @throws ConfigurationValidationException This lists all the reasons why the validation failed.
      */
-    public void validate() throws ConfigurationValidationException {
+    public final void validate() throws ConfigurationValidationException {
         Set<String> validationErrors = new HashSet<>();
 
         // TODO: Do something useful here
