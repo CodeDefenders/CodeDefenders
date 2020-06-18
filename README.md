@@ -12,38 +12,25 @@ This is Code Defenders, a mutation testing game. Publicly available at [code-def
 - MySQL (e.g. [MariaDB](https://mariadb.org/))
 
 ## Installation and Setup
-### Configuration file
-Code Defenders requires a `config.properties` file for initial setup, building and deployment. The file needs to be in the project root directory.
-You can copy the `config.properties.example` file, which lists all necessary properties, over and update the sensible default values with your configuration.
+### Configuration
 
-`config.properties` can hold confidential configuration data, so **please** do not include it into the repository.
+CodeDefenders can be configured in multiple places. You can choose between a `codedefenders.properties`, container context,
+environment variables or system properties.
 
-Following properties are required:
+### codedefenders.properties file
 
-```bash
-# The main Code Defenders folder. E.g. /var/lib/codefenders
-data.dir=...
+The maybe simplest option is to place a `codedefenders.properties` file in `CATAlINA_BASE/config`. (In debian 10 this defaults to `/var/lib/tomcat9/config` which is a symlink to `/etc/tomcat9/`)
 
-# Location of Ant command
-ant.home=...
+You can copy the `codedefenders.properties.example` file, which lists all available properties together with their sensible default value.
+To overwrite a value simply uncomment the line and change the value.
 
-# MySQL database URL and credential to access it
-db.url=...
-db.username=...
-db.password=...
-
-# Tomcat credentials with <manager-script> role.
-tomcat.username=...
-tomcat.password=...
-# Deployment URL ,looks like http://<domain>:<port>/manager/text
-tomcat.url=...
-# Path to Tomcat executable
-tomcat.path=...
-```
 
 ### Database
-`config.properties` requires a URL to an existing database. The database needs to be created before installation.
 
+The MySQL or MariaDB database and the user to access the database have to be created before the first run.
+
+
+<!-- TODO This section (and the install script) needs updates -->
 ### Installation script
 
 To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input.

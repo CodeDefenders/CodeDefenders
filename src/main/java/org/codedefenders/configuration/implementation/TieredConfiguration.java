@@ -27,7 +27,6 @@ import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 /**
