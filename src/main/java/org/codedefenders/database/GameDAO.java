@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
@@ -36,6 +37,26 @@ import java.util.stream.Collectors;
  * @see PuzzleGame
  */
 public class GameDAO {
+
+    /**
+     * Retrieves a game for which we don't know the type yet.
+     *
+     * @param gameId The game ID we want to query a game.
+     * @return The {@link AbstractGame} with the given ID or null if no game found.
+     */
+    public static AbstractGame getGame(int gameId) {
+        switch (getGameMode(gameId)) {
+            case PARTY:
+                return MultiplayerGameDAO.getMultiplayerGame(gameId);
+            case MELEE:
+                return MeleeGameDAO.getMeleeGame(gameId);
+            case PUZZLE:
+                return PuzzleDAO.getPuzzleGameForId(gameId);
+            default:
+                return null;
+        }
+    }
+
     /**
      * Adds a player with the given user ID and {@link Role} to the game.
      * If user is already a player in the game, the {@link Role} is updated.
@@ -142,5 +163,17 @@ public class GameDAO {
         String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
         String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
+    }
+
+    /**
+     * Returns a game's mode for given game identifier.
+     *
+     * @param gameId the identifier of the game.
+     * @return the game mode of the queried game.
+     */
+    public static GameMode getGameMode(int gameId) {
+        String query = "SELECT Mode FROM games WHERE ID = ?";
+        return DB.executeQueryReturnValue(query, rs -> GameMode.valueOf(rs.getString("Mode")),
+                DatabaseValue.of(gameId));
     }
 }

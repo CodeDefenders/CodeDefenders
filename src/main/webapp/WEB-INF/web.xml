@@ -162,6 +162,16 @@
     </servlet>
     <!-- Misc end-->
 
+    <!-- Melee mode servlets start -->
+    <servlet-mapping>
+        <servlet-name>MeleeCreatePage</servlet-name>
+        <url-pattern>/melee/create</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>MeleeCreatePage</servlet-name>
+        <jsp-file>/jsp/melee/create_game_view.jsp</jsp-file>
+    </servlet>
+    <!--  -->
     <!-- Battleground mode servlets start -->
 
     <servlet-mapping>

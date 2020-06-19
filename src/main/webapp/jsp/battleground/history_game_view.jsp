@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.Optional" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
@@ -51,10 +52,15 @@
             response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
             return;
         }
+
+        request.setAttribute("game", game);
     }
 
     final GameClass cut = game.getCUT();
     Role role = game.getRole(login.getUserId());
+
+    final User user = login.getUser();
+
 %>
 
 
@@ -79,7 +85,7 @@
 
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
-    mutantAccordion.setMutantAccordionData(cut, game.getMutants());
+    mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(false);
     mutantAccordion.setViewDiff(true);

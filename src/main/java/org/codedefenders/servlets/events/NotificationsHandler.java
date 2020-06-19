@@ -22,7 +22,6 @@ import com.google.gson.Gson;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -223,15 +222,22 @@ public class NotificationsHandler extends HttpServlet {
             return;
         }
 
-        // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need for extra check
-        final List<Event> events = DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp)
-                .stream()
-                .peek(event -> event.setCurrentUserName(login.getUser().getUsername()))
-                .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
-                .collect(Collectors.toList());
+        try {
+            // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need
+            // for extra check
+            final List<Event> events = DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp).stream()
+                    .peek(event -> event.setCurrentUserName(login.getUser().getUsername()))
+                    .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
+                    .collect(Collectors.toList());
 
-        PrintWriter out = response.getWriter();
-        out.print(gson.toJson(events));
-        out.flush();
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(events));
+            out.flush();
+        } catch (NullPointerException e) {
+            logger.info("" + DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp));
+            logger.error("NPE: " + e);
+
+        }
+
     }
 }

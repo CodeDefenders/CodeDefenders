@@ -116,6 +116,7 @@ public class Constants {
     public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
+    public static final String MELEE_GAME_VIEW_JSP = "/jsp/melee/game_view.jsp";
 
 
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";

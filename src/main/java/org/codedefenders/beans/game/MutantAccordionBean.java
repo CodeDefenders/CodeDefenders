@@ -12,6 +12,7 @@ import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.model.User;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JSONUtils;
 
@@ -63,6 +64,10 @@ public class MutantAccordionBean {
     private List<Mutant> mutantList;
     private List<MutantAccordionCategory> categories;
 
+    private User user;
+
+    private boolean playerCoverToClaim;
+
     public MutantAccordionBean() {
         enableFlagging = null;
         gameMode = null;
@@ -71,12 +76,16 @@ public class MutantAccordionBean {
         cut = null;
         mutantList = null;
         categories = null;
+        user = null;
     }
 
     public void setMutantAccordionData(GameClass cut,
+                                       User user,
                                        List<Mutant> mutants) {
         this.cut = cut;
+        this.user = user;
         this.mutantList = Collections.unmodifiableList(mutants);
+        this.playerCoverToClaim = false;
 
         categories = new ArrayList<>();
 
@@ -143,6 +152,10 @@ public class MutantAccordionBean {
         }
     }
 
+    public void setPlayerCoverToClaim(boolean playerCoverToClaim) {
+        this.playerCoverToClaim = playerCoverToClaim;
+    }
+
     public void setEnableFlagging(boolean enableFlagging) {
         this.enableFlagging = enableFlagging;
     }
@@ -167,7 +180,7 @@ public class MutantAccordionBean {
     }
 
     public Boolean canFlag() {
-        return enableFlagging && gameMode == GameMode.PARTY;
+        return enableFlagging && (gameMode == GameMode.PARTY || gameMode == GameMode.MELEE);
     }
 
     public Integer getGameId() {
@@ -179,7 +192,7 @@ public class MutantAccordionBean {
     }
 
     public List<MutantAccordionMutantDTO> getMutants() {
-        return mutantList.stream().map(MutantAccordionMutantDTO::new)
+        return mutantList.stream().map(m -> new MutantAccordionMutantDTO(m, user, playerCoverToClaim))
                 .collect(Collectors.toList());
     }
 
@@ -199,7 +212,8 @@ public class MutantAccordionBean {
 
     public String jsonMutants() {
         Map<Integer, MutantAccordionMutantDTO> mutants =
-        mutantList.stream().collect( Collectors.toMap(Mutant::getId,MutantAccordionMutantDTO::new));
+                mutantList.stream().collect(Collectors.toMap(Mutant::getId,
+                        m -> new MutantAccordionMutantDTO(m, user, playerCoverToClaim)));
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()
@@ -299,12 +313,18 @@ public class MutantAccordionBean {
         @Expose
         private final String description;
 
-        public MutantAccordionMutantDTO(Mutant mutant) {
+        public MutantAccordionMutantDTO(Mutant mutant, User user, boolean playerCoverToClaim) {
             id = mutant.getId();
             creatorName = mutant.getCreatorName();
             points = mutant.getScore();
             state = mutant.getState();
-            covered = mutant.isCovered();
+
+            if (playerCoverToClaim) {
+                covered = mutant.getCoveringTests().stream()
+                        .anyMatch(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == user.getId());
+            } else {
+                covered = mutant.isCovered();
+            }
             description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout()
                     .stream()
                     .filter(Objects::nonNull).collect(Collectors.joining("<br>")));
@@ -321,10 +341,14 @@ public class MutantAccordionBean {
 
             lines = mutant.getLines();
             lineString = lines.stream().map(String::valueOf).collect(Collectors.joining(","));
+
             canMarkEquivalent = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
                     && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                    && mutant.getCreatorId() != user.getId()
                     && mutant.getLines().size() >= 1;
-            canView = state == Mutant.State.KILLED || state == Mutant.State.EQUIVALENT;
+            canView = state == Mutant.State.KILLED
+                    || state == Mutant.State.EQUIVALENT
+                    || mutant.getCreatorId() == user.getId();
         }
     }
 }

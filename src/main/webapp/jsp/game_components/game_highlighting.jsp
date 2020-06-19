@@ -109,7 +109,7 @@
             for (const mutantStatus in sortedMutants) {
                 /* Must be in one line, because it's in a pre.
                    Can't use template strings because JSP's EL syntax overrides it. */
-                icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '">' +
+                icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '"  can-claim="' + mutantsOnLine.some((element) => element.canClaim) + '">' +
                                '<img class="mutant-icon-image" src="' + Icons[mutantStatus] + '">' +
                                '<span class="mutant-icon-count">' + sortedMutants[mutantStatus].length + '</span>' +
                            '</div>');
@@ -179,6 +179,7 @@
          */
         const createPopoverContent = function () {
             const status = $(this).attr('mutant-status');
+            const canClaim = $(this).attr('can-claim');
             const line = Number($(this).attr('mutant-line'));
 
             const mutantsOnLine = mutantIdsPerLine.get(line)
@@ -208,17 +209,20 @@
             }
 
             const table =
-                `<table class="table table-condensed">`
-                     + head +
-                    `<tbody>`
-                         + rows.join('\n') +
-                    `</tbody>
-                 </table>`;
+                `<div>
+                    <table class="table table-condensed">`
+                         + head +
+                        `<tbody>`
+                             + rows.join('\n') +
+                        `</tbody>
+                     </table>
+                </div>`;
 
             /* Create the button if it is supposed to be shown. */
             let button = '';
             if (enableFlagging
                 && status === MutantStatuses.ALIVE
+                && (canClaim === "true")
                 && testIdsPerLine.get(line)) {
                 button = createEquivalenceButton(line);
             }
@@ -236,8 +240,8 @@
          * @return {string} The equivalence button.
          */
         const createEquivalenceButton = function (line) {
-            <% if (gameHighlighting.getGameMode() == GameMode.PARTY) { %>
-                return `<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
+            <% if (gameHighlighting.getGameMode() == GameMode.PARTY || gameHighlighting.getGameMode() == GameMode.MELEE ) { %>
+                return `<form id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
                             <input type="hidden" name="formType" value="claimEquivalent">
                             <input type="hidden" name="equivLines" value="` + line + `">
                             <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
@@ -333,6 +337,6 @@
         codeMirror.showMutants = function () { showMutants(this) };
         codeMirror.highlightCoverage();
         codeMirror.highlightMutants();
-    }());
+    })();
 </script>
 

@@ -124,7 +124,7 @@
         const testModals = new Map();
 
         /* Functions to generate table columns. */
-        const genId = row => '<span class="ma-mutant-link btn-link" style="padding: 0">Mutant ' + row.id + '</span> <span class="ma-column-name>  by  </span> ' + row.creatorName + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
+        const genId = row => '<span class="ma-mutant-link btn-link" style="padding: 0">Mutant ' + row.id + '</span> <span class="ma-column-name">  by  </span> ' + row.creatorName + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
         const genPoints = row => '<span class="ma-column-name">Points:</span> ' + row.points;
         const genLines = row => row.description;
         const genIcon = row => {
@@ -146,7 +146,7 @@
                 case "ALIVE":
                     if (row.canMarkEquivalent) {
                         if (row.covered) {
-                            return '<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
+                            return '<form id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
                                     '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
                                     '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
                                     '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
@@ -345,5 +345,5 @@
                 $("#cut-div, #newmut-div")[0].scrollIntoView();
             });
         }
-    }());
+    })();
 </script>

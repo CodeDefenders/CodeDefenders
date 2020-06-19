@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 public interface IMutationTester {
@@ -30,6 +31,27 @@ public interface IMutationTester {
     void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages);
 
     void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages);
+
+    // TODO Note that we need duplicate methods because the basic runAll methods use
+    // AbstractGame !
+    /**
+     * Execute the test against all the other players' mutants
+     * 
+     * @param game
+     * @param newMutant
+     * @param messages
+     */
+    void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages);
+
+    /**
+     * Execute all the tests registered from all the other players against the
+     * provided mutant, using a random scheduling of test execution.
+     * 
+     * @param game
+     * @param newMutant
+     * @param messages
+     */
+    void runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant, ArrayList<String> messages);
 
     /**
      * Execute all the tests registered for the defenders against the provided
@@ -43,8 +65,7 @@ public interface IMutationTester {
 
     /**
      * Execute all the tests registered for the defenders against the provided
-     * mutant, using a the given TestScheduler for ordering the execution of
-     * tests.
+     * mutant, using a the given TestScheduler for ordering the execution of tests.
      *
      * @param game
      * @param mutant
@@ -54,8 +75,9 @@ public interface IMutationTester {
     void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages, TestScheduler scheduler);
 
     /**
-     * Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent.
-     * Kills mutant either with ASSUMED_YES if test passes on the mutant or with PROVEN_NO otherwise
+     * Runs an equivalence test using an attacker supplied test and a mutant thought
+     * to be equivalent. Kills mutant either with ASSUMED_YES if test passes on the
+     * mutant or with PROVEN_NO otherwise
      *
      * @param test   attacker-created test
      * @param mutant a mutant

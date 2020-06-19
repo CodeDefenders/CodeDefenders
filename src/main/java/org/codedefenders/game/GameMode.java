@@ -34,6 +34,7 @@ public enum GameMode {
      * Also referred as <b>Battleground</b> mode.
      */
     PARTY,
+    MELEE,
     UTESTING,
     PUZZLE;
 }

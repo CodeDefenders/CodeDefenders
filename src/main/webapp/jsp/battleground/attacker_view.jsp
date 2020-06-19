@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
@@ -29,11 +30,16 @@
         The game to be displayed.
 --%>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
 
     boolean showTestAccordion = game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED);
+
+    final User user = login.getUser();
+
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
@@ -48,7 +54,6 @@
     mutantEditor.setDependenciesForClass(game.getCUT());
     if (previousSubmission.hasMutant()) {
         mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-        previousSubmission.clearMutant();
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }
@@ -64,19 +69,18 @@
 %>
 
 
-<jsp:useBean id="errorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 <%
-    errorHighlighting.setCodeDivSelector("#newmut-div");
+    mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
     if (previousSubmission.hasErrorLines()) {
-        errorHighlighting.setErrorLines(previousSubmission.getErrorLines());
-        previousSubmission.clearErrorLines();
+        mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
 %>
 
 
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
-    mutantAccordion.setMutantAccordionData(cut, game.getMutants());
+    mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(false);
     mutantAccordion.setViewDiff(true);
@@ -98,6 +102,8 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+
+<% previousSubmission.clear(); %>
 
 <%-- -------------------------------------------------------------------------------- --%>
 
@@ -147,7 +153,7 @@
 
             <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-            <jsp:include page="/jsp/game_components/error_highlighting.jsp"/>
+            <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
         </form>
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>

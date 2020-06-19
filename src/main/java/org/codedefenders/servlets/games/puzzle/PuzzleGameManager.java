@@ -330,7 +330,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-        previousSubmission.clearTest();
+        previousSubmission.clear();
 
         mutationTester.runTestOnAllMutants(game, newTest, messages.getBridge());
 
@@ -505,7 +505,7 @@ public class PuzzleGameManager extends HttpServlet {
         }
 
         messages.add(MUTANT_COMPILED_MESSAGE);
-        previousSubmission.clearMutant();
+        previousSubmission.clear();
         mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
 
         MutantTestedEvent mte = new MutantTestedEvent();

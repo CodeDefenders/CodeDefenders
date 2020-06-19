@@ -19,11 +19,11 @@
 package org.codedefenders.database;
 
 import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.leaderboard.Entry;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -223,7 +223,7 @@ public class DatabaseAccess {
         final Role role = DB.executeQueryReturnValue(query, mapper, values);
 
         if (role == null) {
-            MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+            AbstractGame game = GameDAO.getGame(gameId);
             if (game != null && game.getCreatorId() == userId) {
                 return Role.OBSERVER;
             }

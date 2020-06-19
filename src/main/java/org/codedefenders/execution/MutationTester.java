@@ -25,6 +25,7 @@ import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.scoring.Scorer;
 import org.codedefenders.model.Event;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.enterprise.inject.Alternative;
 
@@ -59,9 +61,10 @@ import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
  * relevant ant target. Since execution is related to single request, we use a
  * Request Scope.
  *
- * <p>We inject instances using {@link MutationTesterProducer}
+ * <p>We inject instances using {@link MutationTesterProducer}.
  */
-@Alternative // This disable the automatic injection so we pass dependencies via the constructor
+@Alternative // This disable the automatic injection so we pass dependencies via the
+             // constructor
 public class MutationTester implements IMutationTester {
     private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
@@ -107,7 +110,7 @@ public class MutationTester implements IMutationTester {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         mutants.addAll(game.getMutantsMarkedEquivalentPending());
-        List<Mutant> killedMutants = new ArrayList<Mutant>();
+        List<Mutant> killedMutants = new ArrayList<>();
 
         // Acquire and release the connection
         User u = UserDAO.getUserForPlayer(test.getPlayerId());
@@ -127,7 +130,7 @@ public class MutationTester implements IMutationTester {
 
         for (Mutant mutant : mutants) {
             if (mutant.isAlive()) {
-                ArrayList<Test> missedTests = new ArrayList<Test>();
+                ArrayList<Test> missedTests = new ArrayList<>();
 
                 for (int lm : mutant.getLines()) {
                     boolean found = false;
@@ -176,10 +179,91 @@ public class MutationTester implements IMutationTester {
     }
 
     @Override
+    public void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages) {
+
+        int testOwnerPlayerId = test.getPlayerId();
+        User u = UserDAO.getUserForPlayer(testOwnerPlayerId);
+
+        List<Mutant> mutants = game.getAliveMutants()
+                .stream()
+                .filter(m -> m.getPlayerId() != testOwnerPlayerId)
+                .collect(Collectors.toList());
+
+        List<Mutant> mutantsMarkedEquivalent = game.getMutantsMarkedEquivalentPending().stream()
+                .filter(m -> m.getPlayerId() != testOwnerPlayerId).collect(Collectors.toList());
+
+        mutants.addAll(mutantsMarkedEquivalent);
+
+        int killed = 0;
+        List<Mutant> killedMutants = new ArrayList<>();
+
+        for (Mutant mutant : mutants) {
+            if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+                // System.out.println("Skipping non-covered mutant "
+                // + mutant.getId() + ", test " + test.getId());
+                continue;
+            }
+
+            if (testVsMutant(test, mutant)) {
+                killed++;
+                killedMutants.add(mutant);
+            }
+        }
+
+        for (Mutant mutant : mutants) {
+            if (mutant.isAlive()) {
+                ArrayList<Test> missedTests = new ArrayList<>();
+
+                for (int lm : mutant.getLines()) {
+                    boolean found = false;
+                    for (int lc : test.getLineCoverage().getLinesCovered()) {
+                        if (lc == lm) {
+                            found = true;
+                            missedTests.add(test);
+                        }
+                    }
+                    if (found) {
+                        break;
+                    }
+                }
+                // TODO Scoring a Melee Game is still open ?
+//                mutant.incrementScore(Scorer.score(game, mutant, missedTests));
+            }
+        }
+
+        // TODO Scoring a Melee Game is still open ?
+//        test.incrementScore(Scorer.score(game, test, killedMutants));
+
+        if (killed == 0) {
+            if (mutants.size() == 0) {
+                messages.add(TEST_SUBMITTED_MESSAGE);
+            } else {
+                messages.add(TEST_KILLED_ZERO_MESSAGE);
+            }
+        } else {
+            Event notif = new Event(-1, game.getId(), u.getId(),
+                    u.getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
+                    EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+            notif.insert();
+            if (killed == 1) {
+                if (mutants.size() == 1) {
+                    messages.add(TEST_KILLED_LAST_MESSAGE);
+                } else {
+                    messages.add(TEST_KILLED_ONE_MESSAGE);
+                }
+            } else {
+                messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
+            }
+        }
+    }
+
+    @Override
     public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
         runAllTestsOnMutant(game, mutant, messages, new RandomTestScheduler());
     }
 
+    // TODO This clashes with our abstraction as for melee games we need to double
+    // check tests and mutants do not belong to the same user
     @Override
     public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages,
             TestScheduler scheduler) {
@@ -198,7 +282,7 @@ public class MutationTester implements IMutationTester {
                 logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
                 messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
                 if (game instanceof MultiplayerGame) {
-                    ArrayList<Mutant> mlist = new ArrayList<Mutant>();
+                    ArrayList<Mutant> mlist = new ArrayList<>();
                     mlist.add(mutant);
                     // test.setScore(Scorer.score((MultiplayerGame) game, test,
                     // mlist));
@@ -218,7 +302,7 @@ public class MutationTester implements IMutationTester {
         // TODO In the original implementation (see commit
         // 4fbdc78304374ee31a06d56f8ce67ca80309e24c for example)
         // the first block and the second one are swapped. Why ?
-        ArrayList<Test> missedTests = new ArrayList<Test>();
+        ArrayList<Test> missedTests = new ArrayList<>();
         if (game instanceof MultiplayerGame) {
             for (Test t : tests) {
                 if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines())) {
@@ -250,8 +334,7 @@ public class MutationTester implements IMutationTester {
      *
      * @param test
      * @param mutant
-     * @return {@code true} if the test killed the mutant, {@code false}
-     *         otherwise
+     * @return {@code true} if the test killed the mutant, {@code false} otherwise
      */
     public boolean testVsMutant(Test test, Mutant mutant) {
         if (TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant.getId()) != null) {
@@ -307,7 +390,8 @@ public class MutationTester implements IMutationTester {
                 mutant.setKillMessage(executedTarget.message);
                 MutantDAO.updateMutantKillMessageForMutant(mutant);
             } else {
-                logger.info("Test {} would have killed Mutant {} and resolve equivalence,"
+                logger.info(
+                        "Test {} would have killed Mutant {} and resolve equivalence,"
                                 + "but Mutant {} was alredy dead. No need to resolve equivalence.!",
                         test.getId(), mutant.getId(), mutant.getId());
             }
@@ -317,6 +401,75 @@ public class MutationTester implements IMutationTester {
             // Avoid killing, let player accept as equivalent instead
             // mutant.kill(ASSUMED_YES);
         }
+    }
+
+    @Override
+    public void runAllTestsOnMeleeMutant(MeleeGame game, Mutant mutant, ArrayList<String> messages) {
+        runAllTestsOnMeleeMutant(game, mutant, messages, new RandomTestScheduler());
+    }
+
+    private void runAllTestsOnMeleeMutant(MeleeGame game, Mutant mutant, ArrayList<String> messages,
+            TestScheduler scheduler) {
+
+        int mutantOwnerPlayerId = mutant.getPlayerId();
+        User u = UserDAO.getUserForPlayer(mutantOwnerPlayerId);
+
+        // Get all the tests from the game which DO NOT belong to mutantOwnerPlayerId
+        // Note we need to return the test for all the roles to include PLAYER
+        List<Test> testsToExecute = game.getAllTests().stream().filter(t -> t.getPlayerId() != mutantOwnerPlayerId)
+                .collect(Collectors.toList());
+        List<Test> tests = scheduler.scheduleTests(testsToExecute);
+
+        /// Follows duplicate code
+
+        for (Test test : tests) {
+            if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+                logger.info("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
+                continue;
+            }
+
+            if (testVsMutant(test, mutant)) {
+                logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
+                messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
+                ArrayList<Mutant> mlist = new ArrayList<>();
+                mlist.add(mutant);
+                // TODO Scoring MeleeGames is still open
+//                test.incrementScore(Scorer.score(game, test, mlist));
+
+                Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
+                        u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis()));
+                notif.insert();
+
+                return; // return as soon as the first test kills the mutant
+            }
+        }
+
+        // TODO In the original implementation (see commit
+        // 4fbdc78304374ee31a06d56f8ce67ca80309e24c for example)
+        // the first block and the second one are swapped. Why ?
+        ArrayList<Test> missedTests = new ArrayList<>();
+        for (Test t : tests) {
+            if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines())) {
+                missedTests.add(t);
+            }
+//            TODO Scoring MeleeGames is still open
+//            mutant.incrementScore(1 + Scorer.score(game, mutant, missedTests));
+        }
+
+        int nbRelevantTests = missedTests.size();
+        // Mutant survived
+        if (nbRelevantTests == 0) {
+            messages.add(MUTANT_SUBMITTED_MESSAGE);
+        } else if (nbRelevantTests <= 1) {
+            messages.add(MUTANT_ALIVE_1_MESSAGE);
+        } else {
+            messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests));
+        }
+        Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
+                EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+        notif.insert();
+
     }
 
 }

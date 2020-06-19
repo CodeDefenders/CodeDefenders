@@ -50,8 +50,9 @@ public class SystemStartStop implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         logger.info("Java version: " + System.getProperty("java.version"));
         if (getJavaMajorVersion() > 9) {
-            logger.error("Unsupported java version! CodeDefenders needs at most Java 9");
-            throw new Error("");
+            String errorMsg = "Unsupported java version! CodeDefenders needs at most Java 9";
+            logger.error(errorMsg);
+            throw new Error(errorMsg);
         } else {
             try {
                 ConnectionPool.instance();

@@ -38,7 +38,7 @@
 
     <table id="tableClasses"
                class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
-            <thead>
+        <thead>
             <tr>
                 <th>ID</th>
                 <th>Name</th>
@@ -46,8 +46,8 @@
                 <th>Games w/ class</th>
                 <th>Delete / Set as inactive</th>
             </tr>
-            </thead>
-            <tbody>
+        </thead>
+        <tbody>
 
             <%
                 if (allClasses.isEmpty()) {
@@ -147,25 +147,30 @@
                     }
                 }
             %>
-            </tbody>
-        </table>
-
-        <script>
-            $('.modal').on('shown.bs.modal', function() {
-                let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-                if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                    codeMirrorContainer.CodeMirror.refresh();
-                } else {
-                    let textarea = $(this).find('textarea')[0];
-                    let editor = CodeMirror.fromTextArea(textarea, {
-                        lineNumbers: false,
-                        readOnly: true,
-                        mode: "text/x-java"
-                    });
-                    editor.setSize("100%", 500);
-                    ClassAPI.getAndSetEditorValue(textarea, editor);
-                }
-            });
-        </script>
+        </tbody>
+    </table>
 </div>
+
+<script>
+(function () {
+
+    $('.modal').on('shown.bs.modal', function () {
+        let codeMirrorContainer = $(this).find(".CodeMirror")[0];
+        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+            codeMirrorContainer.CodeMirror.refresh();
+        } else {
+            let textarea = $(this).find('textarea')[0];
+            let editor = CodeMirror.fromTextArea(textarea, {
+                lineNumbers: false,
+                readOnly: true,
+                mode: "text/x-java"
+            });
+            editor.setSize("100%", 500);
+            ClassAPI.getAndSetEditorValue(textarea, editor);
+        }
+    });
+
+})();
+</script>
+
 <%@ include file="/jsp/footer.jsp" %>

@@ -158,7 +158,7 @@
                     <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
                             data-size="medium">
                         <%for (Role role : Role.values()) {
-                            if (role != Role.NONE) { %>
+                            if (role != Role.NONE && role != Role.PLAYER) { %>
                         <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
                             <%=role.getFormattedString()%>
                         </option>

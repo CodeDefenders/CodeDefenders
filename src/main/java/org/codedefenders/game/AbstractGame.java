@@ -22,6 +22,7 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
@@ -41,6 +42,7 @@ import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
  * Abstract class for games of different modes.
  *
  * @see MultiplayerGame
+ * @see MeleeGame
  * @see PuzzleGame
  */
 public abstract class AbstractGame {
@@ -120,7 +122,14 @@ public abstract class AbstractGame {
         return getTests(false);
     }
 
+    // NOTE: I do not want to break compatibility so I define yet another method...
+    public List<Test> getAllTests() {
+        return TestDAO.getValidTestsForGame(this.id, false);
+    }
+
+
     public List<Test> getTests(boolean defendersOnly) {
+        // TODO Why we cache this result?
         if (tests == null) {
             tests = TestDAO.getValidTestsForGame(this.id, defendersOnly);
         }
@@ -150,14 +159,14 @@ public abstract class AbstractGame {
     public List<Mutant> getMutantsMarkedEquivalent() {
         return getMutants()
                 .stream()
-                .filter(mutant -> mutant.getState() == Mutant.State.FLAGGED)
+                .filter(mutant -> mutant.getState() == Mutant.State.EQUIVALENT)
                 .collect(Collectors.toList());
     }
 
     public List<Mutant> getMutantsMarkedEquivalentPending() {
         return getMutants()
                 .stream()
-                .filter(mutant -> mutant.getState() == Mutant.State.EQUIVALENT)
+                .filter(mutant -> mutant.getState() == Mutant.State.FLAGGED)
                 .collect(Collectors.toList());
     }
 

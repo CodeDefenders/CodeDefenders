@@ -21,6 +21,7 @@
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
+<%@ page import="org.codedefenders.model.UserMeleeGameInfo" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="java.util.Map" %>
@@ -30,9 +31,11 @@
 <%
     // Games active for this user (Created or joined)
     List<UserMultiplayerGameInfo> activeGames = ((List<UserMultiplayerGameInfo>) request.getAttribute("activeGames"));
+    List<UserMeleeGameInfo> activeMeleeGames = ((List<UserMeleeGameInfo>) request.getAttribute("activeMeleeGames"));
 
     // Games open for this user (not created or joined, and enough space for one player)
     List<UserMultiplayerGameInfo> openGames = ((List<UserMultiplayerGameInfo>) request.getAttribute("openGames"));
+    List<UserMeleeGameInfo> openMeleeGames = ((List<UserMeleeGameInfo>) request.getAttribute("openMeleeGames"));
 
     boolean gamesJoinable = (boolean) request.getAttribute("gamesJoinable");
     boolean gamesCreatable = (boolean) request.getAttribute("gamesCreatable");
@@ -51,7 +54,8 @@
 		<th></th>
 	</tr>
 <%
-	if (activeGames.isEmpty()) {
+	// TODO Possibly lift this into AbstractGames?
+	if (activeGames.isEmpty() && activeMeleeGames.isEmpty()) {
 %>
 	<tr><td colspan="100%"> You are currently not active in any game.</td></tr>
 <%
@@ -298,6 +302,148 @@
     </tr>
 <%
 		} // Closes FOR
+
+		// Rendere Melee Games
+		for (UserMeleeGameInfo info : activeMeleeGames) {
+            int gameId = info.gameId();
+            List<Player> players = info.players();
+%>
+    <tr id="<%="game-"+gameId%>">
+        <td class="col-sm-1"><%= gameId %></td>
+        <td class="col-sm-1"><%=info.creatorName()%></td>
+        <td class="col-sm-2">
+            <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=info.cutAlias()%></a>
+            <div id="modalCUTFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title"><%=info.cutAlias()%></h4>
+                        </div>
+                        <div class="modal-body">
+                            <pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
+                                                                id="sut<%=gameId%>"
+                                                                name="cut<%=gameId%>" cols="80"
+                                                                rows="30"><%=info.cutSource()%></textarea></pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+
+        <td class="col-sm-2">
+            <span><%=players.size()%></span>
+            <%
+                if (!players.isEmpty()) {
+            %>
+            <br>
+            <a href="#" data-toggle="modal" data-target="#modalPlayersFor<%=gameId%>">(Details)</a>
+            <div id="modalPlayersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Players</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table id="game-<%=gameId%>-players" class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Points</th>
+                                </tr>
+                            <%
+                                for (Player player : players) {
+                            %>
+                                <tr>
+                                    <td class="col-sm-1"><%=player.getUser().getUsername()%></td>
+                                    <td class="col-sm-1"><%=player.getPoints()%></td>
+                                </tr>
+                            <%
+                                }
+                            %>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%
+                }
+            %>
+        </td>
+
+        <td class="col-sm-1"><%=info.gameLevel().getFormattedString()%></td>
+        <td class="col-sm-2">
+            <%
+                if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
+            %>
+            <%-- THE CREATOR CAN START A GAME  --%>
+            <form id="adminStartBtn-<%=gameId%>" action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>"
+                  method="post">
+                <button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=gameId%>"
+                        form="adminStartBtn-<%=gameId%>">
+                    Start Game
+                </button>
+                <input type="hidden" name="formType" value="startGame">
+                <input type="hidden" name="gameId" value="<%= gameId %>"/>
+            </form>
+            <%
+                } else {
+                    switch (info.userRole()) {
+						case OBSERVER:
+						%>
+						    <a class="btn btn-sm btn-primary" id="<%="observe-"+gameId%>"
+				               href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">
+				                Observe
+				            </a>
+				        <%
+							break;
+						case PLAYER:
+
+						    if (info.gameState() != GameState.CREATED) { // Game is already running, the user is a player, so she can play
+						        %>
+								<a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
+								style="background-color: #884466;border-color: #772233;"
+								href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play</a>
+            					<%
+						    } else { // The game is not running, but the user is a player, she has to wait to the game to start
+						        // TODO Somehow this is never shown ?
+					            %>
+					            Joined
+					            <% if (gamesJoinable) { %>
+						            <form id="leave" action="<%= request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post">
+						                <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+						                <input type="hidden" name="gameId" value="<%=gameId%>">
+						                <button class="btn btn-sm btn-danger" id="<%="leave-"+gameId%>" type="submit" form="leave"
+						                        value="Leave">
+						                    Leave
+						                </button>
+						            </form>
+					            <%
+					        	}
+							}
+							break;
+						default: // The user is not yet a player, so she may join the game
+						    %>
+				            <a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
+				               style="background-color: #884466;border-color: #772233;"
+				               href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play</a>
+						    <%
+							break;
+					}
+                }
+            %>
+        </td>
+    </tr>
+<%
+        } // Closes FOR - Melee
 	} // Closes ELSE
 %>
 
@@ -307,6 +453,7 @@
 
 	<%if (gamesCreatable) { %>
 	<a id="createBattleground" class = "btn btn-primary" href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>">Create Battleground</a>
+	<a id="createMelee" class = "btn btn-primary" href="<%=request.getContextPath() + Paths.MELEE_CREATE%>">Create Melee</a>
 	<%}%>
 
 <%if (gamesJoinable) { %>
@@ -321,7 +468,7 @@
 		<th>Level</th>
 	</tr>
 <%
-	if (openGames.isEmpty()) {
+	if (openGames.isEmpty() && openMeleeGames.isEmpty() ) {
 %>
 	<tr><td colspan="100%"> There are currently no open games. </td></tr>
 <%
@@ -514,25 +661,77 @@
         </tr>
 <%
         } // Closes FOR
+
+        // Render melee games
+        for (UserMeleeGameInfo info : openMeleeGames) {
+%>
+        <tr id="<%="game-"+info.gameId()%>">
+            <td class="col-sm-1"><%= info.gameId() %></td>
+            <td class="col-sm-1"><%=info.creatorName()%></td>
+            <td class="col-sm-2">
+                <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=info.gameId()%>">
+                    <%=info.cutAlias()%>
+                </a>
+                <div id="modalCUTFor<%=info.gameId()%>" class="modal fade" role="dialog" style="text-align: left;" >
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title"><%=info.cutAlias()%></h4>
+                            </div>
+                            <div class="modal-body">
+                                <pre class="readonly-pre"><textarea
+                                        class="readonly-textarea classPreview"
+                                        id="sut<%=info.gameId()%>"
+                                        name="cut<%=info.gameId()%>" cols="80"
+                                        rows="30"><%=info.cutSource()%></textarea></pre>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <%
+                int players = info.players().size();
+            %>
+            <td class="col-sm-2"><%=players %></td>
+            <td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
+            <td class="col-sm-2">
+                <form id="joinGameForm_player_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>" method="post">
+                    <input type="hidden" name="formType" value="joinGame">
+                    <input type="hidden" name="gameId" value=<%=info.gameId()%>>
+                    <input type="hidden" name="player" value=1>
+                    <button type="submit" id="<%="join-"+info.gameId()%>" class="btn btn-primary btn-sm" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;" value="Join">Join</button>
+                </form>
+            </td>
+        </tr>
+<%
+		// TODO How do we rendere MeleeGames here?
+        } // Closes FOR
     } // Closes ELSE
 %>
 	</table>
 	<%}%>
 
 	<script>
-		$(document).ready(function() {
-			$.fn.dataTable.moment( 'YY/MM/DD HH:mm' );
-			$('#tableMPGames').DataTable( {
-				"paging":   false,
-				"searching": false,
-				"order": [[ 5, "asc" ]],
-				"language": {
-					"info": ""
-				}
-			} );
-		} );
+    (function () {
 
-        $('.modal').on('shown.bs.modal', function() {
+        $(document).ready(function () {
+            $.fn.dataTable.moment('YY/MM/DD HH:mm');
+            $('#tableMPGames').DataTable({
+                "paging": false,
+                "searching": false,
+                "order": [[5, "asc"]],
+                "language": {
+                    "info": ""
+                }
+            });
+        });
+
+        $('.modal').on('shown.bs.modal', function () {
             let codeMirrorContainer = $(this).find(".CodeMirror")[0];
             if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
                 codeMirrorContainer.CodeMirror.refresh();
@@ -560,6 +759,8 @@
                 $(id).show()
             }
         });
+
+    })();
 	</script>
 
 </div>

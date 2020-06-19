@@ -46,6 +46,7 @@
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
 %>
 
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
@@ -59,8 +60,6 @@
     mutantEditor.setEditableLinesForPuzzle(puzzle);
     if (previousSubmission.hasMutant()) {
         mutantEditor.setPreviousMutantCode(previousSubmission.getMutantCode());
-        previousSubmission.clearMutant();
-        previousSubmission.clearErrorLines(); // TODO: move this to error highlighting bean
     } else {
         mutantEditor.setMutantCodeForClass(cut);
     }
@@ -78,7 +77,7 @@
 
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
-    mutantAccordion.setMutantAccordionData(cut, game.getMutants());
+    mutantAccordion.setMutantAccordionData(cut, login.getUser(), game.getMutants());
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(false);
     mutantAccordion.setViewDiff(true);
@@ -100,6 +99,8 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+
+<% previousSubmission.clear(); %>
 
 <%-- -------------------------------------------------------------------------------- --%>
 

@@ -320,5 +320,5 @@
                     : 'This test does not have any smells.'
             );
         }
-    }());
+    })();
 </script>

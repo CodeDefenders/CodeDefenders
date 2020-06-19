@@ -156,7 +156,7 @@ public class TestDAO {
                 "FROM view_valid_tests t",
                 (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
                 "WHERE t.Game_ID=?",
-                (defendersOnly ? "AND pl.Role='DEFENDER';" : ";")
+                (defendersOnly ? "AND (pl.Role='DEFENDER' OR pl.Role='PLAYER');" : ";")
         );
         result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId)));
 

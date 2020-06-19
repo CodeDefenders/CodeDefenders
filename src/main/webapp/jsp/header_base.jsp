@@ -104,32 +104,6 @@
         https://stackoverflow.com/questions/11715646/scroll-automatically-to-the-bottom-of-the-page
         https://stackoverflow.com/questions/10575343/codemirror-is-it-possible-to-scroll-to-a-line-so-that-it-is-in-the-middle-of-w/10725768
     --%>
-    <!-- Function to link compiler error messages to code mirror -->
-    <script type="text/javascript">
-    function jumpToLine(i) {
-        var editor = document.querySelector('#code').nextSibling.CodeMirror;
-            // This is to scrool down the view to the form containing the code.
-            var form = document.getElementById("atk")
-            if (form == null ){
-                form = document.getElementById("def")
-            }
-            if (form == null ){
-                // We are not in a game page since there's no attacker or defender form
-                return;
-            }
-            form.scrollIntoView()
-
-            // This highlights the selected line
-            editor.setCursor(i-1);
-            // This simulate scrolling down inside code mirror view
-            window.setTimeout(function() {
-                editor.addLineClass(i-1, null, "center-me");
-                var line = $('.CodeMirror-lines .center-me');
-                var h = line.parent();
-                $('.CodeMirror-scroll').scrollTop(0).scrollTop(line.offset().top - $('.CodeMirror-scroll').offset().top - Math.round($('.CodeMirror-scroll').height()/2));
-           }, 200);
-        }
-    </script>
 
 
     <!-- Table sorter -->
@@ -156,41 +130,6 @@
     <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
 
     <link href="css/modal_dialogs.css" rel="stylesheet" type="text/css" />
-
-    <script>
-        $(document).ready(function() {
-            $('.single-item').slick({
-                arrows: true,
-                infinite: true,
-                speed: 300,
-                draggable: false
-            });
-        });
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            try {
-                $('table.mutant-table').DataTable( {
-                    "pagingType": "full",
-                    "searching": true,
-                    "lengthChange": false,
-                    "ordering": false,
-                    "pageLength": 4,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Search...",
-                        info: "",
-                        sInfoEmpty: "",
-                        sInfoFiltered: ""
-                    }
-                } );
-            } catch (e) {
-                // statements to handle TypeError exceptions
-            }
-        } );
-    </script>
-
 </head>
 
 <body class="page-grid">

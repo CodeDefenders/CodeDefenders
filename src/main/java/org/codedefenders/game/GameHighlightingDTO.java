@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 
 import com.google.gson.annotations.Expose;
 import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.model.User;
+import org.codedefenders.util.Constants;
 
 /**
  * Saves data for the game highlighting in order to convert it to JSON.
@@ -58,7 +60,7 @@ public class GameHighlightingDTO {
      * @param mutants The mutants in the game.
      * @param tests The tests in the game.
      */
-    public GameHighlightingDTO(List<Mutant> mutants, List<Test> tests) {
+    public GameHighlightingDTO(List<Mutant> mutants, List<Test> tests, User user) {
         this.mutantIdsPerLine = new TreeMap<>();
         this.testIdsPerLine = new TreeMap<>();
         this.mutants = new TreeMap<>();
@@ -81,7 +83,7 @@ public class GameHighlightingDTO {
 
         /* Construct the mutant maps. */
         for (Mutant mutant : mutants) {
-            this.mutants.put(mutant.getId(), new GHMutantDTO(mutant));
+            this.mutants.put(mutant.getId(), new GHMutantDTO(mutant, user));
             List<Integer> lines = mutant.getLines();
             for (Integer line : lines) {
                 List<Integer> list = mutantIdsPerLine.computeIfAbsent(line, key -> new LinkedList<>());
@@ -99,13 +101,18 @@ public class GameHighlightingDTO {
         @Expose public String lines;
         @Expose public String creatorName;
         @Expose public Mutant.State status;
+        @Expose public boolean canClaim;
 
-        public GHMutantDTO(Mutant mutant) {
+        public GHMutantDTO(Mutant mutant, User user) {
             this.id = mutant.getId();
             this.score = mutant.getScore();
             this.creatorName = mutant.getCreatorName();
             this.lines = mutant.getSummaryString();
             this.status = mutant.getState();
+            this.canClaim = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                    && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                    && (user == null || mutant.getCreatorId() != user.getId())
+                    && mutant.getLines().size() >= 1;
         }
     }
 

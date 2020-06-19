@@ -76,6 +76,15 @@
 %>
 
 
+<jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<%
+    testErrorHighlighting.setCodeDivSelector("#equivmut-div");
+    if (previousSubmission.hasTest() && previousSubmission.hasErrorLines()) {
+        testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+    }
+%>
+
+
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 <% testProgressBar.setGameId(game.getId()); %>
 
@@ -83,6 +92,8 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
+
+<% previousSubmission.clear(); %>
 
 <%-- -------------------------------------------------------------------------------- --%>
 
@@ -145,6 +156,7 @@
         <h3>Class Under Test</h3>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 

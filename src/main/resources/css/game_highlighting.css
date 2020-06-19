@@ -36,6 +36,12 @@
 
 /* Mutant Popovers
 -------------------------------------------------- */
+.mutant-popover-body {
+    margin-right: -14px;
+    padding-right: 14px;
+    max-height: 400px;
+    overflow: auto;
+}
 .mutant-popover-body > table {
     font-size: 14px;
 }

@@ -21,6 +21,7 @@
 <%@ page import="org.codedefenders.game.GameState" %>
 
 <script>
+(function () {
     var attackButton = document.getElementById('submitMutant');
     var theForm = document.getElementById('atk');
 
@@ -109,4 +110,5 @@
     // connect <ul>, <li> and <a> elements
     intentionList.appendChild(unknownListItem);
     unknownListItem.appendChild(unknownMutant);
+})();
 </script>
