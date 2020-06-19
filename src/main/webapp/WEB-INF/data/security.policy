@@ -81,7 +81,7 @@ grant {
   permission java.util.logging.LoggingPermission "control";
   permission java.awt.AWTPermission "*";
   permission java.io.FilePermission "<<ALL FILES>>", "read";
-  permission java.io.FilePermission "${data.dir}/-", "write";
+  permission java.io.FilePermission "${codedef.home}/-", "write";
   permission java.util.PropertyPermission "*", "read,write";
 
 };
