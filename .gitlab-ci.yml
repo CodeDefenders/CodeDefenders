@@ -1,3 +1,7 @@
+include:
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: SAST.gitlab-ci.yml
+
 image: maven:3-jdk-8
 
 stages:
@@ -6,12 +10,32 @@ stages:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  SAST_DISABLE_DIND: "true"
+  SAST_DEFAULT_ANALYZERS: "spotbugs, secrets"
+  DS_DISABLE_DIND: "true"
+  DS_DEFAULT_ANALYZERS: "gemnasium-maven"
 
 cache:
   paths:
     - .m2/repository/
     - target/
     - ./config.properties
+
+
+spotbugs-sast:
+  cache:
+    paths:
+      - .m2/repository/
+      - ./config.properties
+  script:
+    - touch config.properties
+    - /analyzer run
+
+gemnasium-maven-dependency_scanning:
+  script:
+    - touch config.properties
+    - /analyzer run
+
 
 build:
   stage: build
