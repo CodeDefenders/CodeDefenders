@@ -18,14 +18,14 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Optional;
+
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Optional;
 
 /**
  * This class handles the database logic for players.
@@ -56,17 +56,18 @@ public class PlayerDAO {
     /**
      * Constructs a player from a {@link ResultSet} entry.
      *
-     * <p>Requires the user information to have the following column names.
-     * Naming these columns should be done with SQL aliasing.
+     * <p>
+     * Requires the user information to have the following column names. Naming
+     * these columns should be done with SQL aliasing.
      *
      * <ul>
-     *     <li>{@code usersPassword}</li>
-     *     <li>{@code usersUsername}</li>
-     *     <li>{@code usersEmail}</li>
-     *     <li>{@code usersValidated}</li>
-     *     <li>{@code usersActive}</li>
-     *     <li>{@code usersAllowContact}</li>
-     *     <li>{@code usersKeyMap}</li>
+     * <li>{@code usersPassword}</li>
+     * <li>{@code usersUsername}</li>
+     * <li>{@code usersEmail}</li>
+     * <li>{@code usersValidated}</li>
+     * <li>{@code usersActive}</li>
+     * <li>{@code usersAllowContact}</li>
+     * <li>{@code usersKeyMap}</li>
      * </ul>
      *
      * @param rs The {@link ResultSet}.
@@ -95,25 +96,33 @@ public class PlayerDAO {
     }
 
     /**
-     * Retrieves the identifier of a player of a given user in a given game.
-     * // TODO: Return Integer instead of int, and null instead of -1?
+     * Retrieves the identifier of a player of a given user in a given game. //
+     * TODO: Return Integer instead of int, and null instead of -1?
      *
      * @param userId the user identifier as an {@code int}.
      * @param gameId the game identifier as an {@code int}.
      * @return the playerId for a user in a game.
      */
     public static int getPlayerIdForUserAndGame(int userId, int gameId) {
-        String query = String.join("\n",
-                "SELECT players.ID",
-                "FROM players",
-                "WHERE User_ID = ?",
-                "  AND Game_ID = ?");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(gameId)
-        };
+        String query = String.join("\n", "SELECT players.ID", "FROM players", "WHERE User_ID = ?", "  AND Game_ID = ?");
+        DatabaseValue[] values = new DatabaseValue[] { DatabaseValue.of(userId), DatabaseValue.of(gameId) };
         final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
         return Optional.ofNullable(id).orElse(-1);
+    }
+
+    /**
+     * Retrieves a player given its id
+     * 
+     * TODO What happens if the player does not exist?
+     *
+     * @param playerId the player identifier as an {@code int}.
+     * @return player instance
+     */
+    public static Player getPlayer(int playerId) {
+        String query = String.join("\n", "SELECT *", "FROM view_players_with_userdata", "WHERE ID = ?;");
+
+        return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(playerId));
+
     }
 
     /**
@@ -124,14 +133,9 @@ public class PlayerDAO {
      * @return The player for a user in a game.
      */
     public static Player getPlayerForUserAndGame(int userId, int gameId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM view_players_with_userdata",
-                "WHERE Game_ID = ?",
-                "  AND User_ID = ?",
-                "  AND Active=TRUE;");
-        return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS,
-                DatabaseValue.of(gameId),
+        String query = String.join("\n", "SELECT *", "FROM view_players_with_userdata", "WHERE Game_ID = ?",
+                "  AND User_ID = ?", "  AND Active=TRUE;");
+        return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId),
                 DatabaseValue.of(userId));
     }
 }

@@ -35,10 +35,11 @@
     playerFeedback.setPlayerInfo(login.getUser(), role);
 %>
 
-<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
+<jsp:useBean id="meeleScoreboard" class="org.codedefenders.beans.game.MeeleScoreboardBean" scope="request"/>
 <%
-    scoreboard.setGameId(game.getId());
-    scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+	meeleScoreboard.setGameId(game.getId());
+	meeleScoreboard.setScores(game.getMutantScores(), game.getTestScores());
+	meeleScoreboard.setPlayers(game.getPlayers());
 %>
 
 <jsp:include page="/jsp/melee/header_game.jsp"/>
@@ -52,7 +53,8 @@
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <%-- <jsp:include page="/jsp/player_feedback.jsp"/> --%>
-<%-- <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/> --%>
+<jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
+
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <div class="crow fly no-gutter up">
