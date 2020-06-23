@@ -148,7 +148,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedClassID, mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedClassID, mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         Patch p = m.getDifferences();
 
@@ -215,7 +215,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         Patch p = m.getDifferences();
 
@@ -275,7 +275,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         Patch p = m.getDifferences();
 
@@ -336,7 +336,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         Patch p = m.getDifferences();
 
@@ -398,7 +398,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         Patch p = m.getDifferences();
 
@@ -476,7 +476,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getLines());
         System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
@@ -544,7 +544,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         Patch p = m.getDifferences();
 
@@ -609,7 +609,7 @@ public class MutantTest {
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
         Patch p = m.getDifferences();
 
