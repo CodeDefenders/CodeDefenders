@@ -40,6 +40,7 @@ public class PlayerScore {
         return mutantKillInformation;
     }
 
+    // TODO What's this?
     public void setMutantKillInformation(String mutantKillInformation) {
         this.mutantKillInformation = mutantKillInformation;
     }
@@ -48,6 +49,7 @@ public class PlayerScore {
         return duelInformation;
     }
 
+    // TODO What's this?
     public void setDuelInformation(String duelInformation) {
         this.duelInformation = duelInformation;
     }
@@ -68,10 +70,12 @@ public class PlayerScore {
         return quantity;
     }
 
+    // TODO What's this?
     public void increaseTotalScore(int score) {
         this.totalScore += score;
     }
 
+    // TODO What's this? Quantity of what?
     public void increaseQuantity() {
         quantity++;
     }

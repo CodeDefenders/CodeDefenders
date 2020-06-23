@@ -23,6 +23,7 @@ import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -221,7 +222,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         mutant.getJavaFile(),
                         mutant.getClassFile(),
                         true, // Alive be default
-                        dummyAttackerPlayerId);
+                        dummyAttackerPlayerId,
+                        GameDAO.getCurrentRound(newGame.getId()));
                 newMutant.insert();
                 mutantMap.put(mutant.getId(), newMutant);
             }

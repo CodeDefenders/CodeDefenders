@@ -28,14 +28,10 @@
 <%@ page import="org.codedefenders.model.User"%>
 <%@ page import="java.util.Map"%>
 
-<!-- This bean instance is shared with game_view.jsp -->
-<jsp:useBean id="meeleScoreboard"
-	class="org.codedefenders.beans.game.MeeleScoreboardBean"
-	scope="request" />
+<jsp:useBean id="meleeScoreboardBean" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
 
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean"
-	scope="request" />
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
 
 <div id="scoreboard" class="modal fade" role="dialog"
 	style="z-index: 10000; position: absolute;">
@@ -48,36 +44,27 @@
 				<h4 class="modal-title">Scoreboard</h4>
 			</div>
 			<div class="modal-body">
-				<div class="scoreBanner"></div>
-				<table class="scoreboard">
-					<!-- TODO Define proper formatting using melee class -->
-					<thead class="thead-dark">
+				<table class="table">
+					<thead >
 						<th>User</th>
 						<th>Attack</th>
 						<th>Defense</th>
 						<th>Total Points</th>
 					</thead>
 					<!--  Use the tag library to go over the players instead of using java snippets -->
-					<!-- TODO Sort by Total Score -->
-					<!-- TODO Highglight current player -->
 					<%
-					    for (ScoreItem scoreItem : meeleScoreboard.getScoreItems()) {
-					        // Highlight the row of the current player
+					    for (ScoreItem scoreItem : meleeScoreboardBean.getSortedScoreItems()) {
+					        // Highlight the row of the current player. Apparently, embedding the rendering in the class tag breaks it ?
 					        if (login.getUserId() == scoreItem.getUser().getId()) {
+					            %><tr class="bg-info"><% 
+					        } else {
+					            %><tr><%
+					        }
 					%>
-					<tr class="table-active">
-						<%
-						    } else {
-						%>
-					
-					<tr>
-						<%
-						    }
-						%>
-						<td><%=scoreItem.getUser().getUsername()%></td>
-						<td><%=scoreItem.getAttackScore().getTotalScore()%></td>
-						<td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
-						<td><%=scoreItem.getAttackScore().getTotalScore() + scoreItem.getDefenseScore().getTotalScore()%></td>
+					<td><%=scoreItem.getUser().getUsername()%></td>
+					<td><%=scoreItem.getAttackScore().getTotalScore()%></td>
+					<td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
+					<td><%=scoreItem.getAttackScore().getTotalScore() + scoreItem.getDefenseScore().getTotalScore()%></td>
 					</tr>
 					<%
 					    }

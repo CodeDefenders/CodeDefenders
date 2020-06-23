@@ -19,7 +19,9 @@
 package org.codedefenders.servlets.games.melee;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.game.ScoreCalculator;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
@@ -105,11 +107,13 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  * This {@link HttpServlet} handles retrieval and in-game management for
  * {@link MeleeGame} games.
  *
- * <p>{@code GET} requests allow accessing melee games and {@code POST} requests
+ * <p>
+ * {@code GET} requests allow accessing melee games and {@code POST} requests
  * handle starting and ending games, creation of tests, mutants and resolving
  * equivalences.
  *
- * <p>Serves under {@code /meleegame}.
+ * <p>
+ * Serves under {@code /meleegame}.
  *
  * @see org.codedefenders.util.Paths#MELEE_GAME
  */
@@ -141,6 +145,11 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private PreviousSubmissionBean previousSubmission;
+
+    // TODO If we need different ways to calculater scores, Puzzle, battleground, we need
+    // a qualifier annotation here or a parameter
+    @Inject
+    private ScoreCalculator scoreCalculator;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -177,10 +186,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         // Check is there is a pending equivalence duel for this user.
-        game.getMutantsMarkedEquivalentPending()
-                .stream()
-                .filter(m -> m.getPlayerId() == playerId)
-                .findFirst()
+        game.getMutantsMarkedEquivalentPending().stream().filter(m -> m.getPlayerId() == playerId).findFirst()
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
@@ -193,6 +199,19 @@ public class MeleeGameManager extends HttpServlet {
 
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
+
+        // Compute the score and pass along the ScoreBoard bean?
+        scoreCalculator.setGame(game);
+
+        MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean();
+        // Why ID is necessary here?
+        meleeScoreboardBean.setGameId(game.getId());
+        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(), scoreCalculator.getTestScores());
+        meleeScoreboardBean.setPlayers(game.getPlayers());
+        // Make sure that components down the line see this? The alternative is to make
+        // scoreboard.jsp smart to handle querying and the like, which would be against
+        // separating visualization and business logic
+        request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_VIEW_JSP);
         dispatcher.forward(request, response);
@@ -235,34 +254,34 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         switch (action) {
-            case "createMutant": {
-                createMutant(request, response, user, game, playerId);
-                triggerAutomaticMutantEquivalenceForGame(game);
-                return;
-            }
-            case "createTest": {
-                createTest(request, response, user, game);
-                // After a test is submitted, there's the chance that one or more mutants
-                // already survived enough tests
-                triggerAutomaticMutantEquivalenceForGame(game);
-                return;
-            }
-            case "reset": {
-                previousSubmission.clear();
-                response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
-                return;
-            }
-            case "claimEquivalent": {
-                claimEquivalent(request, response, gameId, game, playerId);
-                return;
-            }
-            case "resolveEquivalence": {
-                resolveEquivalence(request, response, gameId, game, playerId);
-                return;
-            }
-            default:
-                logger.info("Action not recognised: {}", action);
-                Redirect.redirectBack(request, response);
+        case "createMutant": {
+            createMutant(request, response, user, game, playerId);
+            triggerAutomaticMutantEquivalenceForGame(game);
+            return;
+        }
+        case "createTest": {
+            createTest(request, response, user, game);
+            // After a test is submitted, there's the chance that one or more mutants
+            // already survived enough tests
+            triggerAutomaticMutantEquivalenceForGame(game);
+            return;
+        }
+        case "reset": {
+            previousSubmission.clear();
+            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            return;
+        }
+        case "claimEquivalent": {
+            claimEquivalent(request, response, gameId, game, playerId);
+            return;
+        }
+        case "resolveEquivalence": {
+            resolveEquivalence(request, response, gameId, game, playerId);
+            return;
+        }
+        default:
+            logger.info("Action not recognised: {}", action);
+            Redirect.redirectBack(request, response);
         }
     }
 
@@ -422,7 +441,8 @@ public class MeleeGameManager extends HttpServlet {
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
-            // We escape the content of the message for new tests since user can embed there anything
+            // We escape the content of the message for new tests since user can embed there
+            // anything
             String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
@@ -584,10 +604,10 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         Mutant existingMutant = gameManagingUtils.existingMutant(game.getId(), mutantText);
-        boolean duplicateCheckSuccess = existingMutant == null; //|| existingMutant.getPlayerId() != playerId;
+        boolean duplicateCheckSuccess = existingMutant == null; // || existingMutant.getPlayerId() != playerId;
         // TODO: Why allow duplicate mutants from different creators?
-        //  Currently not possible because of database constraint
-        //  See also: Issue #675
+        // Currently not possible because of database constraint
+        // See also: Issue #675
 
         MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
         mdce.setGameId(game.getId());
@@ -942,7 +962,8 @@ public class MeleeGameManager extends HttpServlet {
                             // Keep only the mutants which containts the claimed line
                             .filter(m -> m.getLines().contains(line)
                                     && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
-                            // Keep only the mutant that do not belong to the user. TODO Sometimes creator refers to player and sometimes to user?
+                            // Keep only the mutant that do not belong to the user. TODO Sometimes creator
+                            // refers to player and sometimes to user?
                             .filter(m -> m.getCreatorId() != login.getUserId()).forEach(m -> {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();

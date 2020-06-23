@@ -22,6 +22,7 @@ import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -429,7 +430,9 @@ public class AdminCreateGames extends HttpServlet {
                         // Alive be default
                         true,
                         //
-                        dummyAttackerPlayerId);
+                        dummyAttackerPlayerId,
+                        GameDAO.getCurrentRound(gameId)
+                        );
                 // insert this into the DB and link the mutant to the game
                 newMutant.insert();
                 // BookKeeping

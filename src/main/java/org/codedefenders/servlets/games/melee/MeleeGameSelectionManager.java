@@ -18,11 +18,39 @@
  */
 package org.codedefenders.servlets.games.melee;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.formType;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
+import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.codedefenders.beans.game.ScoreCalculator;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -52,39 +80,16 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.formType;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
-import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-
 /**
  * This {@link HttpServlet} handles selection of {@link MeleeGame games}.
  *
- * <p>{@code GET} requests redirect to the game overview page and {@code POST} requests handle creating, joining
- * and entering {@link MultiplayerGame battleground games}.
+ * <p>
+ * {@code GET} requests redirect to the game overview page and {@code POST}
+ * requests handle creating, joining and entering {@link MultiplayerGame
+ * battleground games}.
  *
- * <p>Serves under {@code /melee/games}.
+ * <p>
+ * Serves under {@code /melee/games}.
  *
  * @see org.codedefenders.util.Paths#MELEE_SELECTION
  */
@@ -101,6 +106,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
     @Inject
     private INotificationService notificationService;
 
+    @Inject
+    private ScoreCalculator scoringBean;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
@@ -110,32 +118,33 @@ public class MeleeGameSelectionManager extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final String action = formType(request);
         switch (action) {
-            case "createGame":
-                createGame(request, response);
-                return;
-            case "joinGame":
-                joinGame(request, response);
-                return;
-            case "leaveGame":
-                leaveGame(request, response);
-                return;
-            case "startGame":
-                startGame(request, response);
-                return;
-            case "endGame":
-                endGame(request, response);
-                return;
-            default:
-                logger.info("Action not recognised: {}", action);
-                Redirect.redirectBack(request, response);
-                break;
+        case "createGame":
+            createGame(request, response);
+            return;
+        case "joinGame":
+            joinGame(request, response);
+            return;
+        case "leaveGame":
+            leaveGame(request, response);
+            return;
+        case "startGame":
+            startGame(request, response);
+            return;
+        case "endGame":
+            endGame(request, response);
+            return;
+        default:
+            logger.info("Action not recognised: {}", action);
+            Redirect.redirectBack(request, response);
+            break;
         }
     }
 
     private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
         if (!canCreateGames) {
-            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.", login.getUserId());
+            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
+                    login.getUserId());
             Redirect.redirectBack(request, response);
             return;
         }
@@ -156,7 +165,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
             forceHamcrest = parameterThenOrOther(request, "forceHamcrest", true, false);
             automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
-            mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel").map(CodeValidatorLevel::valueOrNull).get();
+            mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel")
+                    .map(CodeValidatorLevel::valueOrNull).get();
             // If we select "player in the UI this should not result in a null value
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).orElse(Role.NONE);
         } catch (NoSuchElementException e) {
@@ -171,20 +181,17 @@ public class MeleeGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
+        // TODO Should this be created with MeleeGameDAO ?!
         MeleeGame nGame = new MeleeGame.Builder(classId, login.getUserId(), maxAssertionsPerTest, forceHamcrest)
-                .level(level)
-                .chatEnabled(chatEnabled)
-                .capturePlayersIntention(capturePlayersIntention)
-                .lineCoverage(lineCoverage)
-                .mutantCoverage(mutantCoverage)
-                .mutantValidatorLevel(mutantValidatorLevel)
-                .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
-                .build();
+                .level(level).chatEnabled(chatEnabled).capturePlayersIntention(capturePlayersIntention)
+                .lineCoverage(lineCoverage).mutantCoverage(mutantCoverage).mutantValidatorLevel(mutantValidatorLevel)
+                .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger).build();
 
+        // TODO Shouldn't this handled by MeleeGameDAO?
         if (nGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event event = new Event(-1, nGame.getId(), login.getUserId(), "Game Created",
-                    EventType.GAME_CREATED, EventStatus.GAME, timestamp);
+            Event event = new Event(-1, nGame.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
+                    EventStatus.GAME, timestamp);
             event.insert();
         }
 
@@ -195,14 +202,16 @@ public class MeleeGameSelectionManager extends HttpServlet {
         // Always add system player to send mutants and tests at runtime!
         nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER);
 
-        // Add selected role to game if the creator participates as non-observer (i.e., player)
+        // Add selected role to game if the creator participates as non-observer (i.e.,
+        // player)
         if (selectedRole.equals(Role.NONE)) {
             nGame.addPlayer(login.getUserId(), Role.PLAYER);
         }
 
         int dummyPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
 
-        // this mutant map links the uploaded mutants and the once generated from them here
+        // this mutant map links the uploaded mutants and the once generated from them
+        // here
         // This implements bookkeeping for killmap
         Map<Mutant, Mutant> mutantMap = new HashMap<>();
         Map<Test, Test> testMap = new HashMap<>();
@@ -216,13 +225,11 @@ public class MeleeGameSelectionManager extends HttpServlet {
             // Link the mutants to the game
             for (Mutant mutant : uploadedMutants) {
 //                          final String mutantCode = new String(Files.readAllBytes();
-                Mutant newMutant = new Mutant(nGame.getId(), classId,
-                        mutant.getJavaFile(),
-                        mutant.getClassFile(),
+                Mutant newMutant = new Mutant(nGame.getId(), classId, mutant.getJavaFile(), mutant.getClassFile(),
                         // Alive be default
                         true,
                         //
-                        dummyPlayerId);
+                        dummyPlayerId, GameDAO.getCurrentRound(nGame.getId()));
                 // insert this into the DB and link the mutant to the game
                 newMutant.insert();
                 // BookKeeping
@@ -235,8 +242,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
             // TODO
             for (Test test : uploadedTests) {
                 // At this point we need to fill in all the details
-                Test newTest = new Test(-1, classId, nGame.getId(), test.getJavaFile(),
-                        test.getClassFile(), 0, 0, dummyPlayerId, test.getLineCoverage().getLinesCovered(),
+                Test newTest = new Test(-1, classId, nGame.getId(), test.getJavaFile(), test.getClassFile(), 0, 0,
+                        dummyPlayerId, test.getLineCoverage().getLinesCovered(),
                         test.getLineCoverage().getLinesUncovered(), 0);
                 newTest.insert();
                 testMap.put(test, newTest);
@@ -252,11 +259,11 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 for (Test uploadedTest : uploadedTests) {
                     // Does the test kill the mutant?
                     for (KillMapEntry entry : killmap) {
-                        if (entry.mutant.getId() == uploadedMutant.getId()
-                                && entry.test.getId() == uploadedTest.getId()
+                        if (entry.mutant.getId() == uploadedMutant.getId() && entry.test.getId() == uploadedTest.getId()
                                 && entry.status.equals(KillMapEntry.Status.KILL)) {
 
-                            // If the mutant was not yet killed by some other test increment the kill count for the test
+                            // If the mutant was not yet killed by some other test increment the kill count
+                            // for the test
                             // and kill the mutant, otherwise continue
                             // We need this because the killmap gives us all the possible combinations !
                             if (mutantMap.get(uploadedMutant).isAlive()) {
@@ -291,7 +298,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final boolean canJoinGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
+        final boolean canJoinGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING)
+                .getBoolValue();
         if (!canJoinGames) {
             logger.warn("User {} tried to join a melee game, but joining games is not permitted.", login.getUserId());
             Redirect.redirectBack(request, response);

@@ -29,18 +29,8 @@
     Role role = game.getRole(login.getUserId());
 %>
 
-<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
-<%
-    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
-    playerFeedback.setPlayerInfo(login.getUser(), role);
-%>
 
-<jsp:useBean id="meeleScoreboard" class="org.codedefenders.beans.game.MeeleScoreboardBean" scope="request"/>
-<%
-	meeleScoreboard.setGameId(game.getId());
-	meeleScoreboard.setScores(game.getMutantScores(), game.getTestScores());
-	meeleScoreboard.setPlayers(game.getPlayers());
-%>
+<!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
 <jsp:include page="/jsp/melee/header_game.jsp"/>
 
@@ -52,7 +42,7 @@
 <%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
-<%-- <jsp:include page="/jsp/player_feedback.jsp"/> --%>
+
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
