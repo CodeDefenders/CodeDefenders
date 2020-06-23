@@ -22,7 +22,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import org.codedefenders.beans.game.ScoreCalculator;
+import javax.inject.Inject;
+
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -34,6 +36,7 @@ import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -61,13 +64,11 @@ public class MeleeGame extends AbstractGame {
         this.scoringBean = scoringBean;
     }
 
-//    @Inject
-    private GameDAO gameDAO;
-
-    public void setGameDAO(GameDAO gameDAO) {
-        this.gameDAO = gameDAO;
+//    @Inject 
+    private EventDAO eventDAO;
+    public void setEventDAO(EventDAO eventDAO) {
+        this.eventDAO = eventDAO;
     }
-
 //    @Inject
     private MeleeGameDAO meleeGameDAO;
 
@@ -328,7 +329,7 @@ public class MeleeGame extends AbstractGame {
      * Every user has two players, one as defender and one as attacker
      */
     public List<Player> getPlayers() {
-        List<Player> players = gameDAO.getPlayersForGame(getId(), Role.PLAYER);
+        List<Player> players = GameDAO.getPlayersForGame(getId(), Role.PLAYER);
         return players;
     }
 
@@ -342,10 +343,10 @@ public class MeleeGame extends AbstractGame {
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event e = new Event(-1, id, userId, u.getUsername() + " joined melee game", EventType.PLAYER_JOINED,
                     EventStatus.GAME, timestamp);
-            e.insert();
+            eventDAO.insert(e);
             Event notif = new Event(-1, id, userId, "You joined melee game", EventType.PLAYER_JOINED, EventStatus.NEW,
                     timestamp);
-            notif.insert();
+            eventDAO.insert(notif);
             //
             return true;
         } else {
@@ -357,7 +358,7 @@ public class MeleeGame extends AbstractGame {
         if (state == GameState.FINISHED) {
             return false;
         }
-        if (!gameDAO.addPlayerToGame(id, userId, role)) {
+        if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
 
@@ -366,14 +367,14 @@ public class MeleeGame extends AbstractGame {
 
     public boolean removePlayer(int userId) {
         if (state == GameState.CREATED) {
-            return gameDAO.removeUserFromGame(id, userId);
+            return GameDAO.removeUserFromGame(id, userId);
         }
         return false;
     }
 
     // We do not check that the user is in both roles !!
     public boolean hasUserJoined(int userId) {
-        for (Player p : gameDAO.getAllPlayersForGame(this.getId())) {
+        for (Player p : GameDAO.getAllPlayersForGame(this.getId())) {
             if (p.getUser().getId() == userId) {
                 return true;
             }
@@ -436,7 +437,7 @@ public class MeleeGame extends AbstractGame {
         for (Player player : getPlayers()) {
             Event notif = new Event(-1, id, player.getUser().getId(), message, et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
-            notif.insert();
+            eventDAO.insert(notif);
         }
     }
 
@@ -444,14 +445,14 @@ public class MeleeGame extends AbstractGame {
         // Event for game log: started
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.NEW,
                 new Timestamp(System.currentTimeMillis()));
-        notif.insert();
+        eventDAO.insert(notif);
     }
 
     private void notifyGame(String message, EventType et) {
         // Event for game log: started
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis()));
-        notif.insert();
+        eventDAO.insert(notif);
     }
 
     public boolean addPlayer(int userId, Role role) {

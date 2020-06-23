@@ -28,6 +28,7 @@ import java.util.List;
  * This implementation of a {@link Scorer} calculates the score based on how many
  * mutants were killed by a test or tests were passed by a mutant.
  */
+@Deprecated
 public class SizeScorer extends Scorer {
 
     /**

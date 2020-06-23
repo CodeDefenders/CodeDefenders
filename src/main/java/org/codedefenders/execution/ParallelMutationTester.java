@@ -18,19 +18,15 @@
  */
 package org.codedefenders.execution;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.scoring.Scorer;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_SUBMITTED_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_LAST_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_N_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -46,15 +42,20 @@ import java.util.concurrent.FutureTask;
 
 import javax.enterprise.inject.Alternative;
 
-import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_SUBMITTED_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_LAST_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_N_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
+import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.scoring.Scorer;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a parallel implementation of IMutationTester. Parallelism is achieved
@@ -68,8 +69,9 @@ public class ParallelMutationTester extends MutationTester //
         implements IMutationTester {
     private ExecutorService testExecutorThreadPool;
 
-    public ParallelMutationTester(BackendExecutorService backend, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
-        super(backend, useMutantCoverage);
+    // TODO Move the Executor service before useMutantCoverage
+    public ParallelMutationTester(BackendExecutorService backend, EventDAO eventDAO, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
+        super(backend, eventDAO, useMutantCoverage);
         this.testExecutorThreadPool = testExecutorThreadPool;
     }
 
@@ -173,7 +175,7 @@ public class ParallelMutationTester extends MutationTester //
             Event notif = new Event(-1, game.getId(), u.getId(),
                     u.getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
                     EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-            notif.insert();
+            eventDAO.insert(notif);
             if (killed == 1) {
                 if (mutants.size() == 1) {
                     messages.add(TEST_KILLED_LAST_MESSAGE);
@@ -271,7 +273,7 @@ public class ParallelMutationTester extends MutationTester //
                     Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
                             u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
                             EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-                    notif.insert();
+                    eventDAO.insert(notif);
 
                     // Early return. No need to check for the other executions.
                     return;
@@ -311,7 +313,7 @@ public class ParallelMutationTester extends MutationTester //
         }
         Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-        notif.insert();
+        eventDAO.insert(notif);
     }
 
 }

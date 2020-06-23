@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -421,5 +422,23 @@ public class MeleeGameDAO {
                 DatabaseValue.of(creatorId)
         };
         return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS, values);
+    }
+
+    /**
+     * Retrieves the game in which the player plays
+     * 
+     * @param playerId
+     * @return
+     */
+    public static AbstractGame getGameWherePlayerPlays(int playerId) {
+        String query = String.join("\n",
+                "SELECT DISTINCT m.*",
+                "FROM view_melee_games AS m",
+                "LEFT JOIN players AS p",
+                "  ON p.Game_ID = m.ID \n",
+                "WHERE (p.ID = ?);");
+
+        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
+        return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
     }
 }

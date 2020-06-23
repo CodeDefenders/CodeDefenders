@@ -29,6 +29,7 @@ import java.util.List;
  *
  * <p>This class also offers static methods, which call the {@link SizeScorer} implementation.
  */
+@Deprecated
 public abstract class Scorer {
 
     protected abstract int scoreTest(MultiplayerGame game, Test test, List<Mutant> killedMutants);

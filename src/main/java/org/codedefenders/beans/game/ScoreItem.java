@@ -10,11 +10,13 @@ public class ScoreItem {
     // PlayerScore contains the player id
     final private PlayerScore attackScore;
     final private PlayerScore defenseScore;
+    final private PlayerScore duelScore;
 
-    public ScoreItem(User user, PlayerScore attackScore, PlayerScore defenseScore) {
+    public ScoreItem(User user, PlayerScore attackScore, PlayerScore defenseScore, PlayerScore duelScore) {
         this.user = user;
         this.attackScore = attackScore;
         this.defenseScore = defenseScore;
+        this.duelScore = duelScore;
     }
 
     public PlayerScore getAttackScore() {
@@ -23,6 +25,10 @@ public class ScoreItem {
 
     public PlayerScore getDefenseScore() {
         return defenseScore;
+    }
+
+    public PlayerScore getDuelScore() {
+        return duelScore;
     }
 
     public User getUser() {

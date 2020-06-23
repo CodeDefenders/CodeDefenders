@@ -18,10 +18,38 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.formType;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
+import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -54,33 +82,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.formType;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
-import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
 /**
  * This {@link HttpServlet} handles selection of {@link MultiplayerGame battleground games}.
  *
@@ -102,6 +103,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     @Inject
     private INotificationService notificationService;
 
+    @Inject
+    private EventDAO eventDAO;
+    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
@@ -185,7 +189,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event event = new Event(-1, newGame.getId(), login.getUserId(), "Game Created",
                     EventType.GAME_CREATED, EventStatus.GAME, timestamp);
-            event.insert();
+            eventDAO.insert(event);
         }
 
         // Mutants and tests uploaded with the class are already stored in the DB
@@ -382,7 +386,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         final EventStatus eventStatus = EventStatus.NEW;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-        notif.insert();
+        eventDAO.insert(notif);
 
         logger.info("User {} successfully left game {}", login.getUserId(), gameId);
 

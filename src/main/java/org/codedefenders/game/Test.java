@@ -152,7 +152,7 @@ public class Test {
         logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
     }
 
-    @Deprecated()
+    @Deprecated
     public void setScore(int store) {
         score = store;
     }
@@ -225,6 +225,7 @@ public class Test {
     }
 
     public Set<Mutant> getKilledMutants() {
+        // TODO This does not recover the points of the mutant... why not?
         return DatabaseAccess.getKilledMutantsForTestId(id);
     }
 

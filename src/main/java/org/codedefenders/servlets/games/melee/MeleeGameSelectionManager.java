@@ -44,11 +44,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.codedefenders.beans.game.ScoreCalculator;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -64,6 +64,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -107,8 +108,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private INotificationService notificationService;
 
     @Inject
-    private ScoreCalculator scoringBean;
-
+    private EventDAO eventDAO;
+    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
@@ -192,7 +193,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event event = new Event(-1, nGame.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
                     EventStatus.GAME, timestamp);
-            event.insert();
+//            eventDAO.insert(event);
         }
 
         // Mutants and tests uploaded with the class are already stored in the DB
@@ -317,6 +318,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
+        // TODO Replace this with project CDI inside MeleeGameDAO !
+        game.setEventDAO(eventDAO);
+        
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -344,7 +348,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             final EventStatus eventStatus = EventStatus.NEW;
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-            notif.insert();
+            eventDAO.insert(notif);
 
             response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
         } else {
@@ -366,6 +370,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
+        game.setEventDAO(eventDAO);
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -386,7 +391,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final EventStatus eventStatus = EventStatus.NEW;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-        notif.insert();
+        eventDAO.insert(notif);
 
         logger.info("User {} successfully left game {}", login.getUserId(), gameId);
 
@@ -413,6 +418,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
+        game.setEventDAO(eventDAO);
+        
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -444,6 +451,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
+        game.setEventDAO(eventDAO);
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);

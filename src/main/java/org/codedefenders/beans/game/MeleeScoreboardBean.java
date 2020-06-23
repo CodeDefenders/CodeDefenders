@@ -11,7 +11,6 @@ import java.util.Set;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.multiplayer.PlayerScore;
@@ -45,6 +44,7 @@ public class MeleeScoreboardBean {
     private Set<Player> players;
     private Map<Integer, PlayerScore> mutantsScores;
     private Map<Integer, PlayerScore> testsScores;
+    private Map<Integer, PlayerScore> duelsScores;
 
     // Is this really needed ?
     public MeleeScoreboardBean() {
@@ -57,9 +57,11 @@ public class MeleeScoreboardBean {
         this.gameId = gameId;
         this.mutantsScores = new HashMap<Integer, PlayerScore>();
         this.testsScores = new HashMap<Integer, PlayerScore>();
+        this.duelsScores = new HashMap<Integer, PlayerScore>();
     }
 
-    public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testsScores) {
+    public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testsScores,
+            Map<Integer, PlayerScore> duelsScores) {
         for (PlayerScore playerScore : mutantsScores.values()) {
             Player p = PlayerDAO.getPlayer(playerScore.getPlayerId());
             if (p != null) {
@@ -73,6 +75,14 @@ public class MeleeScoreboardBean {
                 this.testsScores.put(p.getUser().getId(), playerScore);
             }
         }
+
+        for (PlayerScore playerScore : duelsScores.values()) {
+            Player p = PlayerDAO.getPlayer(playerScore.getPlayerId());
+            if (p != null) {
+                this.duelsScores.put(p.getUser().getId(), playerScore);
+            }
+        }
+
     }
 
     public void setPlayers(List<Player> players) {
@@ -98,8 +108,8 @@ public class MeleeScoreboardBean {
             @Override
             public int compare(ScoreItem o1, ScoreItem o2) {
                 // We need to reverse the sorting, the higher number is above
-                int diff = (o2.getAttackScore().getTotalScore() + o2.getDefenseScore().getTotalScore())
-                        - (o1.getAttackScore().getTotalScore() + o1.getDefenseScore().getTotalScore());
+                int diff = (o2.getAttackScore().getTotalScore() + o2.getDefenseScore().getTotalScore() + o2.getDuelScore().getTotalScore())
+                        - (o1.getAttackScore().getTotalScore() + o1.getDefenseScore().getTotalScore() + o1.getDuelScore().getTotalScore());
 
                 if (diff == 0) {
                     return o1.getUser().getUsername().compareTo(o2.getUser().getUsername());
@@ -128,7 +138,13 @@ public class MeleeScoreboardBean {
             if (defenseScore == null) {
                 defenseScore = new PlayerScore(playerId);
             }
-            currentScore.add(new ScoreItem(user, attackScore, defenseScore));
+            
+            PlayerScore duelScores = duelsScores.get(user.getId());
+            if (duelScores == null) {
+                duelScores = new PlayerScore(playerId);
+            }
+            
+            currentScore.add(new ScoreItem(user, attackScore, defenseScore, duelScores));
         }
 
         return currentScore;

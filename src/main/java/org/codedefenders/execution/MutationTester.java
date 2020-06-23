@@ -19,6 +19,7 @@
 package org.codedefenders.execution;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
@@ -32,6 +33,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +63,8 @@ import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
  * relevant ant target. Since execution is related to single request, we use a
  * Request Scope.
  *
- * <p>We inject instances using {@link MutationTesterProducer}.
+ * <p>
+ * We inject instances using {@link MutationTesterProducer}.
  */
 @Alternative // This disable the automatic injection so we pass dependencies via the
              // constructor
@@ -69,10 +72,13 @@ public class MutationTester implements IMutationTester {
     private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
     protected BackendExecutorService backend;
+    protected EventDAO eventDAO;
+
     protected boolean useMutantCoverage;
 
-    public MutationTester(BackendExecutorService backend, boolean useMutantCoverage) {
+    public MutationTester(BackendExecutorService backend, EventDAO eventDAO, boolean useMutantCoverage) {
         this.backend = backend;
+        this.eventDAO = eventDAO;
         this.useMutantCoverage = useMutantCoverage;
     }
 
@@ -164,7 +170,9 @@ public class MutationTester implements IMutationTester {
             Event notif = new Event(-1, game.getId(), u.getId(),
                     u.getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
                     EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-            notif.insert();
+
+            eventDAO.insert(notif);
+
             if (killed == 1) {
                 if (mutants.size() == 1) {
                     messages.add(TEST_KILLED_LAST_MESSAGE);
@@ -184,9 +192,7 @@ public class MutationTester implements IMutationTester {
         int testOwnerPlayerId = test.getPlayerId();
         User u = UserDAO.getUserForPlayer(testOwnerPlayerId);
 
-        List<Mutant> mutants = game.getAliveMutants()
-                .stream()
-                .filter(m -> m.getPlayerId() != testOwnerPlayerId)
+        List<Mutant> mutants = game.getAliveMutants().stream().filter(m -> m.getPlayerId() != testOwnerPlayerId)
                 .collect(Collectors.toList());
 
         List<Mutant> mutantsMarkedEquivalent = game.getMutantsMarkedEquivalentPending().stream()
@@ -199,14 +205,23 @@ public class MutationTester implements IMutationTester {
 
         for (Mutant mutant : mutants) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-                // System.out.println("Skipping non-covered mutant "
-                // + mutant.getId() + ", test " + test.getId());
                 continue;
             }
 
+            // Notify each and every mutant killed and survived
             if (testVsMutant(test, mutant)) {
                 killed++;
                 killedMutants.add(mutant);
+                Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
+                        test.getId() + ":" + mutant.getId()//
+                        , EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+                eventDAO.insert(scoreEvent);
+            } else {
+                Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
+                        test.getId() + ":" + mutant.getId()//
+                        , EventType.PLAYER_MUTANT_SURVIVED, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis()));
+                eventDAO.insert(scoreEvent);
             }
         }
 
@@ -226,13 +241,8 @@ public class MutationTester implements IMutationTester {
                         break;
                     }
                 }
-                // TODO Scoring a Melee Game is still open ?
-//                mutant.incrementScore(Scorer.score(game, mutant, missedTests));
             }
         }
-
-        // TODO Scoring a Melee Game is still open ?
-//        test.incrementScore(Scorer.score(game, test, killedMutants));
 
         if (killed == 0) {
             if (mutants.size() == 0) {
@@ -244,7 +254,9 @@ public class MutationTester implements IMutationTester {
             Event notif = new Event(-1, game.getId(), u.getId(),
                     u.getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
                     EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-            notif.insert();
+
+            eventDAO.insert(notif);
+
             if (killed == 1) {
                 if (mutants.size() == 1) {
                     messages.add(TEST_KILLED_LAST_MESSAGE);
@@ -293,7 +305,7 @@ public class MutationTester implements IMutationTester {
                 Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
                         u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
-                notif.insert();
+                eventDAO.insert(notif);
 
                 return; // return as soon as the first test kills the mutant we return
             }
@@ -326,7 +338,7 @@ public class MutationTester implements IMutationTester {
         }
         Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-        notif.insert();
+        eventDAO.insert(notif);
     }
 
     /**
@@ -344,10 +356,15 @@ public class MutationTester implements IMutationTester {
 
         final TargetExecution executedTarget = backend.testMutant(mutant, test);
 
+        Integer gameId = test.getGameId();
+        String scoringMessage = String.join(":", new String[] { "" + test.getId(), "" + mutant.getId() });
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
         // If the test did NOT pass, the mutant was detected and should be
         // killed.
         if (!executedTarget.status.equals(FAIL) && !executedTarget.status.equals(ERROR)) {
             logger.debug("Test {} did not kill Mutant {}", test.getId(), mutant.getId());
+            // Mutant survived
             return false;
         }
         if (!mutant.kill(ASSUMED_NO)) {
@@ -360,6 +377,7 @@ public class MutationTester implements IMutationTester {
         test.killMutant();
         mutant.setKillMessage(executedTarget.message);
         MutantDAO.updateMutantKillMessageForMutant(mutant);
+
         return true;
     }
 
@@ -437,11 +455,23 @@ public class MutationTester implements IMutationTester {
 //                test.incrementScore(Scorer.score(game, test, mlist));
 
                 Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
-                        u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
+                        u.getUsername() + "&#39;s mutant is killed", EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
-                notif.insert();
+                eventDAO.insert(notif);
+
+                Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
+                        test.getId() + ":" + mutant.getId()//
+                        , EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+                eventDAO.insert(scoreEvent);
 
                 return; // return as soon as the first test kills the mutant
+            } else {
+                // Notify mutant survived for each test !
+                Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
+                        test.getId() + ":" + mutant.getId()//
+                        , EventType.PLAYER_MUTANT_SURVIVED, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis()));
+                eventDAO.insert(scoreEvent);
             }
         }
 
@@ -453,8 +483,6 @@ public class MutationTester implements IMutationTester {
             if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines())) {
                 missedTests.add(t);
             }
-//            TODO Scoring MeleeGames is still open
-//            mutant.incrementScore(1 + Scorer.score(game, mutant, missedTests));
         }
 
         int nbRelevantTests = missedTests.size();
@@ -468,7 +496,7 @@ public class MutationTester implements IMutationTester {
         }
         Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-        notif.insert();
+        eventDAO.insert(notif);
 
     }
 

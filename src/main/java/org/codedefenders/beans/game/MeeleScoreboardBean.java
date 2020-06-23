@@ -47,6 +47,7 @@ public class MeeleScoreboardBean {
     private Set<Player> players;
     private Map<Integer, PlayerScore> mutantsScores;
     private Map<Integer, PlayerScore> testsScores;
+    private Map<Integer, PlayerScore> duelsScores;
 
     // Is this really needed ?
     public MeeleScoreboardBean() {
@@ -59,10 +60,12 @@ public class MeeleScoreboardBean {
         this.gameId = gameId;
         this.mutantsScores = new HashMap<Integer, PlayerScore>();
         this.testsScores = new HashMap<Integer, PlayerScore>();
+        this.duelsScores = new HashMap<Integer, PlayerScore>();
     }
 
     // TODO Somehow I get scores for players with -1 as id ?
-    public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testsScores) {
+    public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testsScores,
+            Map<Integer, PlayerScore> duelsScores) {
         for (PlayerScore playerScore : mutantsScores.values()) {
             Player p = PlayerDAO.getPlayer(playerScore.getPlayerId());
             if (p != null) {
@@ -74,6 +77,13 @@ public class MeeleScoreboardBean {
             Player p = PlayerDAO.getPlayer(playerScore.getPlayerId());
             if (p != null) {
                 this.testsScores.put(p.getUser().getId(), playerScore);
+            }
+        }
+
+        for (PlayerScore playerScore : duelsScores.values()) {
+            Player p = PlayerDAO.getPlayer(playerScore.getPlayerId());
+            if (p != null) {
+                this.duelsScores.put(p.getUser().getId(), playerScore);
             }
         }
     }
@@ -104,7 +114,13 @@ public class MeeleScoreboardBean {
             if (defenseScore == null) {
                 defenseScore = new PlayerScore(playerId);
             }
-            currentScore.add(new ScoreItem(user, attackScore, defenseScore));
+
+            PlayerScore duelScore = duelsScores.get(user.getId());
+            if (duelScore == null) {
+                duelScore = new PlayerScore(playerId);
+            }
+
+            currentScore.add(new ScoreItem(user, attackScore, defenseScore, duelScore));
         }
 
         return currentScore;

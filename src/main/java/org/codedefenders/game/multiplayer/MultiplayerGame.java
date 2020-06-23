@@ -19,6 +19,7 @@
 package org.codedefenders.game.multiplayer;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -87,6 +88,13 @@ public class MultiplayerGame extends AbstractGame {
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
+//  @Inject 
+    private EventDAO eventDAO;
+
+    public void setEventDAO(EventDAO eventDAO) {
+        this.eventDAO = eventDAO;
+    }    
+    
     public static class Builder {
         // mandatory values
         private final int classId;
@@ -347,10 +355,10 @@ public class MultiplayerGame extends AbstractGame {
 
         Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role,
                 et, EventStatus.GAME, timestamp);
-        e.insert();
+        eventDAO.insert(e);
 
         Event notif = new Event(-1, id, userId, "You joined a game as " + role, et, EventStatus.NEW, timestamp);
-        notif.insert();
+        eventDAO.insert(notif);
 
         return true;
     }
@@ -647,7 +655,7 @@ public class MultiplayerGame extends AbstractGame {
                     message,
                     et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
-            notif.insert();
+            eventDAO.insert(notif);
         }
     }
 
@@ -658,7 +666,7 @@ public class MultiplayerGame extends AbstractGame {
                     message,
                     et, EventStatus.NEW,
                     new Timestamp(System.currentTimeMillis()));
-            notif.insert();
+            eventDAO.insert(notif);
         }
     }
 
@@ -669,7 +677,7 @@ public class MultiplayerGame extends AbstractGame {
                 message,
                 et, EventStatus.NEW,
                 new Timestamp(System.currentTimeMillis()));
-        notif.insert();
+        eventDAO.insert(notif);
     }
 
     private void notifyGame(String message, EventType et) {
@@ -679,7 +687,7 @@ public class MultiplayerGame extends AbstractGame {
                 message,
                 et, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis()));
-        notif.insert();
+        eventDAO.insert(notif);
     }
 
 }
