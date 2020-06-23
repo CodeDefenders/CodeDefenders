@@ -49,6 +49,7 @@
 						<th>User</th>
 						<th>Attack</th>
 						<th>Defense</th>
+						<th>Duels</th>
 						<th>Total Points</th>
 					</thead>
 					<!--  Use the tag library to go over the players instead of using java snippets -->
@@ -64,7 +65,8 @@
 					<td><%=scoreItem.getUser().getUsername()%></td>
 					<td><%=scoreItem.getAttackScore().getTotalScore()%></td>
 					<td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
-					<td><%=scoreItem.getAttackScore().getTotalScore() + scoreItem.getDefenseScore().getTotalScore()%></td>
+					<td><%=scoreItem.getDuelScore().getTotalScore()%></td>
+					<td><%=scoreItem.getAttackScore().getTotalScore() + scoreItem.getDefenseScore().getTotalScore() + scoreItem.getDuelScore().getTotalScore()%></td>
 					</tr>
 					<%
 					    }
