@@ -18,7 +18,11 @@
  */
 package org.codedefenders.game;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
@@ -28,15 +32,6 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 /**
  * Abstract class for games of different modes.
@@ -67,7 +62,13 @@ public abstract class AbstractGame {
 
     public abstract boolean update();
 
-
+    // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
+    // Consider to move this into a setEvents method instead !
+    protected EventDAO eventDAO;
+    public void setEventDAO(EventDAO eventDAO) {
+        this.eventDAO = eventDAO;
+    }
+    
     public int getId() {
         return id;
     }
@@ -78,7 +79,7 @@ public abstract class AbstractGame {
 
     public List<Event> getEvents() {
         if (events == null) {
-            events = DatabaseAccess.getEventsForGame(getId());
+            events = eventDAO.getEventsForGame(getId());
         }
         return events;
     }

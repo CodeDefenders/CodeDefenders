@@ -64,11 +64,14 @@ public class MeleeGame extends AbstractGame {
         this.scoringBean = scoringBean;
     }
 
+    // Injection done at AbstractGame level?
 //    @Inject 
-    private EventDAO eventDAO;
-    public void setEventDAO(EventDAO eventDAO) {
-        this.eventDAO = eventDAO;
-    }
+//    private EventDAO eventDAO;
+//
+//    public void setEventDAO(EventDAO eventDAO) {
+//        this.eventDAO = eventDAO;
+//    }
+
 //    @Inject
     private MeleeGameDAO meleeGameDAO;
 

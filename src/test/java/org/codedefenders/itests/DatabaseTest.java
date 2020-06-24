@@ -498,10 +498,10 @@ public class DatabaseTest {
         EventDAO eventDAO = null;
         assertTrue(eventDAO.insert(ev));
         
-        assertEquals(DatabaseAccess.getEventsForGame(multiplayerGame.getId()).size(), 2);
-        assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
-        assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
-        assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
+        assertEquals(eventDAO.getEventsForGame(multiplayerGame.getId()).size(), 2);
+        assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
+        assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
+        assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
     }
 
     @Test

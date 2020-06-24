@@ -109,7 +109,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
-    
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
@@ -320,7 +320,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
         // TODO Replace this with project CDI inside MeleeGameDAO !
         game.setEventDAO(eventDAO);
-        
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -343,12 +343,17 @@ public class MeleeGameSelectionManager extends HttpServlet {
             gje.setUserName(login.getUser().getUsername());
             notificationService.post(gje);
 
-            final EventType notifType = EventType.PLAYER_JOINED;
-            final String message = "You successfully joined the game.";
-            final EventStatus eventStatus = EventStatus.NEW;
-            final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-            eventDAO.insert(notif);
+            // TODO The following notification is duplicated as MeleeGame.addPlayer also
+            // trigger that.
+            // I leave it here because I believe the problem is having notifications inside
+            // DataObjects like MeleeGame.
+            // Note that MeleeGame has more than one notification.
+//            final EventType notifType = EventType.PLAYER_JOINED;
+//            final String message = "You successfully joined the game.";
+//            final EventStatus eventStatus = EventStatus.NEW;
+//            final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+//            Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
+//            eventDAO.insert(notif);
 
             response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
         } else {
@@ -419,7 +424,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
         game.setEventDAO(eventDAO);
-        
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);

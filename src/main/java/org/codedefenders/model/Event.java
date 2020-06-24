@@ -152,7 +152,6 @@ public class Event {
     }
 
     public void parse(HashMap<String, String> replacements, boolean emphasise) {
-
         this.parsedMessage = parse(replacements, message, emphasise);
     }
 

@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -63,6 +64,9 @@ public class NotificationsHandler extends HttpServlet {
 
     @Inject
     private LoginBean login;
+    
+    @Inject
+    private EventDAO eventDAO;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -191,15 +195,22 @@ public class NotificationsHandler extends HttpServlet {
         }
 
         final Role role = DatabaseAccess.getRole(login.getUserId(), gameId);
-        final ArrayList<Event> events = new ArrayList<>(DatabaseAccess.getNewEventsForGame(gameId, timestamp, role));
+        final ArrayList<Event> events = new ArrayList<>(eventDAO.getNewEventsForGame(gameId, timestamp, role));
+        
+        
+        
 
         for (Event e : events) {
 
             if (e.getUser().getId() == Constants.DUMMY_CREATOR_USER_ID) {
                 continue;
             }
+
+            // Make sure we do not trigger NPE
+            if (e.getMessage() != null) {
+                e.parse(e.getEventStatus() == EventStatus.GAME);
+            }
             e.setCurrentUserName(login.getUser().getUsername());
-            e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
         PrintWriter out = response.getWriter();

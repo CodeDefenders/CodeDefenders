@@ -81,7 +81,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
         // Process the event log to compute the score of each entity
         for (Event event : eventLog) {
             if (event.getUser().getId() == Constants.DUMMY_CREATOR_USER_ID) {
-                System.out.println("DefaultScoringPolicy.computeScoreForGame() Processing Event " + event);
                 // Extract Message Payload
                 Integer testId = Integer.parseInt(event.getMessage().split(":")[0]);
                 // The first field of the message is overloaded for lost equivalence duels
@@ -96,8 +95,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                     // Book-keeping that this mutant is flagged as equivalent by a user...
                     Integer playerClaimingEquivalenceId = Integer.parseInt(event.getMessage().split(":")[0]);
                     flaggedMutants.put(mutantId, playerClaimingEquivalenceId);
-                    System.out.println("DefaultScoringPolicy.computeScoreForGame() Player "
-                            + playerClaimingEquivalenceId + " flagged mutant " + mutantId);
                     break;
                 case PLAYER_KILLED_MUTANT:
                 case DEFENDER_KILLED_MUTANT:
@@ -105,8 +102,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                     // the mutant
                     testScore = testScore + mutantScore + 1;
                     testsScore.put(testId, testScore);
-                    System.out.println("DefaultScoringPolicy.computeScoreForGame() Increment score test " + testId
-                            + " to: " + testScore);
                     break;
                 case PLAYER_MUTANT_SURVIVED:
                 case ATTACKER_MUTANT_SURVIVED:
@@ -114,7 +109,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                     // We need +1 for each test that misses this mutant
                     mutantScore = mutantScore + 1;
                     mutantsScore.put(mutantId, mutantScore);
-                    System.out.println("Mutant " + mutantId + " survived a test: " + mutantScore);
                     break;
                 case PLAYER_WON_EQUIVALENT_DUEL:
                 case ATTACKER_MUTANT_KILLED_EQUIVALENT:
@@ -123,7 +117,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                     // Update score of the mutant
                     mutantScore = mutantScore + 1;
                     mutantsScore.put(mutantId, mutantScore);
-                    System.out.println("Mutant " + mutantId + " survived a duel: " + mutantScore);
                     break;
                 case PLAYER_LOST_EQUIVALENT_DUEL:
                 case DEFENDER_MUTANT_EQUIVALENT:
@@ -139,8 +132,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                     int duelScore = duelsScore.getOrDefault(playerId, 0);
                     duelScore = duelScore + 1;
                     duelsScore.put(playerId, duelScore);
-                    System.out.println("Mutant " + mutantId + " was proven equivalent. Player " + playerId
-                            + " gain a point " + duelScore);
                     break;
                 }
             }
@@ -153,8 +144,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
             // Refresh Game Scoring
             computeScoreForGame(test.getGameId());
         }
-        System.out.println(
-                "DefaultScoringPolicy.scoreTest() " + test + " --> " + testsScore.getOrDefault(test.getId(), 0));
         test.setScore(testsScore.getOrDefault(test.getId(), 0));
     }
 
@@ -164,8 +153,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
 //        Refresh Game Scoring
             computeScoreForGame(mutant.getGameId());
         }
-        System.out.println(
-                "DefaultScoringPolicy.scoreMutant()" + mutant + " --> " + mutantsScore.getOrDefault(mutant.getId(), 0));
         mutant.setScore(mutantsScore.getOrDefault(mutant.getId(), 0));
     }
 
@@ -180,8 +167,6 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                 return;
             }
         }
-        System.out.println("DefaultScoringPolicy.scoreDuels()" + duelScore.getPlayerId() + " --> "
-                + duelsScore.getOrDefault(duelScore.getPlayerId(), 0));
         duelScore.increaseTotalScore(duelsScore.getOrDefault(duelScore.getPlayerId(), 0));
     }
 }
