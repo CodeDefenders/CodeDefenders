@@ -46,13 +46,7 @@ public class MeleeScoreboardBean {
     private Map<Integer, PlayerScore> testsScores;
     private Map<Integer, PlayerScore> duelsScores;
 
-    // Is this really needed ?
-    public MeleeScoreboardBean() {
-        gameId = null;
-    }
-
     // Load data
-
     public void setGameId(int gameId) {
         this.gameId = gameId;
         this.mutantsScores = new HashMap<Integer, PlayerScore>();

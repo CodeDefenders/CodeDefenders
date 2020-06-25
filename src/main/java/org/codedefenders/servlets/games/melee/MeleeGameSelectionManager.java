@@ -182,13 +182,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
-        // TODO Should this be created with MeleeGameDAO ?!
         MeleeGame nGame = new MeleeGame.Builder(classId, login.getUserId(), maxAssertionsPerTest, forceHamcrest)
                 .level(level).chatEnabled(chatEnabled).capturePlayersIntention(capturePlayersIntention)
                 .lineCoverage(lineCoverage).mutantCoverage(mutantCoverage).mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger).build();
 
-        // TODO Shouldn't this handled by MeleeGameDAO?
+        // TODO This should be handled by MeleeGameDAO. See #687
         if (nGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event event = new Event(-1, nGame.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
