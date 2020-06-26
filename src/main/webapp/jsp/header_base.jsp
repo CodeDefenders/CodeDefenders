@@ -38,8 +38,8 @@
     <script src="js/jquery.js" type="text/javascript" ></script>
 
     <!-- Slick -->
-    <link href="css/slick_1.5.9.css" rel="stylesheet" type="text/css" />
-    <script src="js/slick_1.5.9.min.js" type="text/javascript" ></script>
+    <link href="webjars/slick-carousel/1.5.8/slick/slick.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/slick-carousel/1.5.8/slick/slick.min.js" type="text/javascript" ></script>
 
 	<!-- Favicon.ico -->
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
