@@ -430,7 +430,7 @@ public class MeleeGameManager extends HttpServlet {
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-            messages.add(decorate);
+            messages.add(decorate).escape(false);
 
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
