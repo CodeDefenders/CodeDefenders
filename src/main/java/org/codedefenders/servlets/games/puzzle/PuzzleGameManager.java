@@ -54,6 +54,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.EventDAO;
@@ -366,7 +367,9 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = false;
-            messages.add(generateWinningMessage(request, game, isAnAttackGame));
+            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame));
+            message.escape(false);
+            message.fadeOut(false);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -545,7 +548,9 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = true;
-            messages.add(generateWinningMessage(request, game, isAnAttackGame)).fadeOut(false);
+            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame));
+            message.fadeOut(false);
+            message.escape(false);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
