@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
@@ -96,6 +97,32 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                     Integer playerClaimingEquivalenceId = Integer.parseInt(event.getMessage().split(":")[0]);
                     flaggedMutants.put(mutantId, playerClaimingEquivalenceId);
                     break;
+                case PLAYER_WON_EQUIVALENT_DUEL:
+                case ATTACKER_MUTANT_KILLED_EQUIVALENT:
+                    // Remove the mutant from the flagged mutants
+                    flaggedMutants.remove(mutantId);
+                    // Mutant is killed: we keep the mutant's points and we get an extra point as duels point
+                    int mutantOwnerPlayerId = MutantDAO.getMutantById(mutantId).getPlayerId();
+                    // Give one point to the player claiming the equivalence
+                    int duelScoreWin = duelsScore.getOrDefault(mutantOwnerPlayerId, 0);
+                    duelScoreWin = duelScoreWin + 1;
+                    duelsScore.put(mutantOwnerPlayerId, duelScoreWin);
+                    break;
+                case PLAYER_LOST_EQUIVALENT_DUEL:
+                case DEFENDER_MUTANT_EQUIVALENT:
+                    // Remove the mutant from the flagged mutants but keep the playerId that flagged
+                    // it
+                    Integer playerId = flaggedMutants.remove(mutantId);
+
+                    // Remove the points from the equivalent mutant
+                    mutantScore = 0;
+                    mutantsScore.put(mutantId, mutantScore);
+
+                    // Give one point to the player claiming the equivalence
+                    int duelScoreLost = duelsScore.getOrDefault(playerId, 0);
+                    duelScoreLost = duelScoreLost + 1;
+                    duelsScore.put(playerId, duelScoreLost);
+                    break;
                 case PLAYER_KILLED_MUTANT:
                 case DEFENDER_KILLED_MUTANT:
                     // We need +1 for killing the mutant +mutantScore for earning the points from
@@ -110,29 +137,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                     mutantScore = mutantScore + 1;
                     mutantsScore.put(mutantId, mutantScore);
                     break;
-                case PLAYER_WON_EQUIVALENT_DUEL:
-                case ATTACKER_MUTANT_KILLED_EQUIVALENT:
-                    // Remove the mutant from the flagged mutants
-                    flaggedMutants.remove(mutantId);
-                    // Update score of the mutant
-                    mutantScore = mutantScore + 1;
-                    mutantsScore.put(mutantId, mutantScore);
-                    break;
-                case PLAYER_LOST_EQUIVALENT_DUEL:
-                case DEFENDER_MUTANT_EQUIVALENT:
-                    // Remove the mutant from the flagged mutants but keep the playerId that flagged
-                    // it
-                    Integer playerId = flaggedMutants.remove(mutantId);
 
-                    // Remove the points from the equivalent mutant
-                    mutantScore = 0;
-                    mutantsScore.put(mutantId, mutantScore);
-
-                    // Give one point to the player claiming the equivalence
-                    int duelScore = duelsScore.getOrDefault(playerId, 0);
-                    duelScore = duelScore + 1;
-                    duelsScore.put(playerId, duelScore);
-                    break;
                 }
             }
         }
