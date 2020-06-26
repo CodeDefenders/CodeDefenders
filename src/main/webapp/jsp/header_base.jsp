@@ -73,30 +73,30 @@
     <script type="text/javascript" src="js/script.js"></script>
 
     <!-- Codemirror -->
-    <script src="codemirror/lib/codemirror.js" type="text/javascript" ></script>
-    <script src="codemirror/mode/clike/clike.js" type="text/javascript" ></script>
-    <script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/dialog/dialog.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/searchcursor.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/search.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/scroll/annotatescrollbar.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/matchesonscrollbar.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/jump-to-line.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/selection/active-line.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/edit/matchbrackets.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/edit/closebrackets.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/hint/show-hint.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/hint/anyword-hint.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/mode/clike/clike.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/mode/diff/diff.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/dialog/dialog.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/searchcursor.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/search.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/scroll/annotatescrollbar.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/jump-to-line.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/selection/active-line.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/edit/matchbrackets.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/edit/closebrackets.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/hint/show-hint.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/hint/anyword-hint.js" type="text/javascript" ></script>
 
-    <script src="codemirror/keymap/emacs.js" type="text/javascript" ></script>
-    <script src="codemirror/keymap/sublime.js" type="text/javascript" ></script>
-    <script src="codemirror/keymap/vim.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/keymap/emacs.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/keymap/sublime.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/keymap/vim.js" type="text/javascript" ></script>
 
-    <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
-    <!-- <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" > -->
-    <link href="codemirror/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
-    <link href="codemirror/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
-    <link href="codemirror/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/codemirror/5.22.0/lib/codemirror.css" rel="stylesheet" type="text/css" />
+
+    <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
 
     <%-- This function shall be loaded on any page in which we compile the mutant --%>
     <%-- Sources:
