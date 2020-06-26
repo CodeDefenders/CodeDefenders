@@ -35,7 +35,7 @@
     <base href="${pageContext.request.contextPath}/">
 
     <!-- jQuery -->
-    <script src="js/jquery.js" type="text/javascript" ></script>
+    <script src="webjars/jquery/3.3.1-2/jquery.min.js" type="text/javascript" ></script>
 
     <!-- Slick -->
     <link href="webjars/slick-carousel/1.5.8/slick/slick.css" rel="stylesheet" type="text/css" />
@@ -57,8 +57,8 @@
     <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- JQuery UI -->
-    <script src="js/jquery-ui.min.js" type="text/javascript" ></script>
-    <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/jquery-ui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+    <link href="webjars/jquery-ui/1.12.1/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 
     <link href="webjars/bootstrap-toggle/2.2.1/css/bootstrap-toggle.min.css" rel="stylesheet" type="text/css" />
     <script src="webjars/bootstrap-toggle/2.2.1/js/bootstrap-toggle.min.js" type="text/javascript" ></script>
