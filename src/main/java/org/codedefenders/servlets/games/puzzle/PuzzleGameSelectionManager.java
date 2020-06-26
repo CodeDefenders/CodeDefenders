@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.games.puzzle;
 
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
@@ -65,6 +66,9 @@ public class PuzzleGameSelectionManager extends HttpServlet {
     @Inject
     private LoginBean login;
 
+    @Inject
+    private EventDAO eventDAO;
+    
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -100,7 +104,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      * @param response the response to the request.
      * @throws IOException when redirecting fails.
      */
-    static void createGame(int userId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void createGame(int userId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
         if (!puzzleId.isPresent()) {
             logger.error("Failed to retrieve puzzleId from request.");
@@ -117,7 +121,10 @@ public class PuzzleGameSelectionManager extends HttpServlet {
             return;
         }
 
+        // TODO How we should handle dependency injection here?
         final PuzzleGame game = PuzzleGame.createPuzzleGame(puzzle, userId);
+        game.setEventDAO(eventDAO);
+        
         if (game == null) {
             logger.error("Failed to create puzzle game for puzzleId: {} and userId: {}.", puzzleId, userId);
             response.setStatus(SC_BAD_REQUEST);
@@ -152,7 +159,10 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
+        // TODO Should he make PuzzleDAO inject dependencies instead
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
+        game.setEventDAO(eventDAO);
+        
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}.", gameId);
             response.setStatus(SC_BAD_REQUEST);
