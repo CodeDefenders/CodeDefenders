@@ -20,6 +20,7 @@ cache:
     - .m2/repository/
     - target/
     - ./config.properties
+  key: default
 
 
 spotbugs-sast:
@@ -27,6 +28,7 @@ spotbugs-sast:
     paths:
       - .m2/repository/
       - ./config.properties
+    key: spotbugs
   script:
     - touch config.properties
     - /analyzer run
