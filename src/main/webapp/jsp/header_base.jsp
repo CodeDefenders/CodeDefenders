@@ -60,8 +60,8 @@
     <script src="js/jquery-ui.min.js" type="text/javascript" ></script>
     <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 
-    <link href="css/bootstrap-toggle_2.2.0.min.css" rel="stylesheet" type="text/css" />
-    <script src="js/bootstrap-toggle_2.2.0.min.js" type="text/javascript" ></script>
+    <link href="webjars/bootstrap-toggle/2.2.1/css/bootstrap-toggle.min.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/bootstrap-toggle/2.2.1/js/bootstrap-toggle.min.js" type="text/javascript" ></script>
     <!-- select -->
     <link href="css/bootstrap-select_1.9.3.min.css" rel="stylesheet" type="text/css" />
     <script src="js/bootstrap-select_1.9.3.min.js" type="text/javascript" ></script>
