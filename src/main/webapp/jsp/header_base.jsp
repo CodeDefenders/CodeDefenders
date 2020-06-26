@@ -53,8 +53,8 @@
     -->
 
     <!-- Bootstrap -->
-    <script src="js/bootstrap.min.js" type="text/javascript" ></script>
-    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- JQuery UI -->
     <script src="js/jquery-ui.min.js" type="text/javascript" ></script>
