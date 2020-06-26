@@ -137,13 +137,14 @@ public class PuzzleGameManager extends HttpServlet {
             final int gameId = gameIdOpt.get();
             // TODO Should he make PuzzleDAO inject dependencies instead
             game = PuzzleDAO.getPuzzleGameForId(gameId);
-            game.setEventDAO(eventDAO);
-            
+
             if (game == null) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database"
                         + "for gameId: {}.", gameId);
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
+            } else {
+                game.setEventDAO(eventDAO);
             }
             if (game.getCreatorId() != login.getUserId()) {
                 logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.",
@@ -161,7 +162,6 @@ public class PuzzleGameManager extends HttpServlet {
             final int puzzleId = puzzleIdOpt.get();
             // TODO Should he make PuzzleDAO inject dependencies instead
             game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
-            game.setEventDAO(eventDAO);
             if (game == null) {
                 logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}",
                         puzzleId, login.getUserId());
@@ -169,6 +169,8 @@ public class PuzzleGameManager extends HttpServlet {
 //                PuzzleGameSelectionManager.createGame(login.getUserId(), request, response);
                 new PuzzleGameSelectionManager().createGame(login.getUserId(), request, response);
                 return;
+            } else {
+                game.setEventDAO(eventDAO);
             }
         }
 
@@ -239,15 +241,16 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
         final int gameId = gameIdOpt.get();
-        
+
         // TODO Should he make PuzzleDAO inject dependencies instead
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
-        game.setEventDAO(eventDAO);
-        
+
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            game.setEventDAO(eventDAO);
         }
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit test to non-puzzle game {}.", gameId);
@@ -399,12 +402,13 @@ public class PuzzleGameManager extends HttpServlet {
 
         // TODO Should he make PuzzleDAO inject dependencies instead
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
-        game.setEventDAO(eventDAO);
-        
+
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}. Aborting.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            game.setEventDAO(eventDAO);
         }
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit mutant to non-puzzle game {}. Aborting.", gameId);
@@ -584,8 +588,7 @@ public class PuzzleGameManager extends HttpServlet {
                     // TODO Should he make PuzzleDAO inject dependencies instead
                     PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
                             login.getUserId());
-                    playedGame.setEventDAO(eventDAO);
-                    
+
                     // Not yet played this puzzle
                     if (playedGame == null
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
@@ -601,6 +604,8 @@ public class PuzzleGameManager extends HttpServlet {
                                 .append(Paths.PUZZLE_GAME)
                                 .append(">Puzzle Overview</a>.");
                         return message.toString();
+                    } else {
+                        playedGame.setEventDAO(eventDAO);
                     }
                 }
             }
