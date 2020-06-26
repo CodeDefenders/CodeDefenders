@@ -5,6 +5,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<powermock.version>1.6.1</powermock.version>
+        <tomcat.version>9.0.35</tomcat.version>
 		<config.properties>config.properties</config.properties>
 	</properties>
 	<groupId>codedefenders</groupId>
@@ -519,13 +520,26 @@
 	</profiles>
 
 	<dependencies>
-    	<!-- Web Socket API -->
-	   <dependency>
-		  <groupId>org.apache.tomcat</groupId>
-    		<artifactId>tomcat-websocket</artifactId>
-	   	   <version>8.5.23</version>
-		  <scope>provided</scope>
-	   </dependency>
+        <!-- Tomcat dependencies -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-catalina</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Web Socket API -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-websocket</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jasper-el</artifactId>
+            <version>${tomcat.version}</version>
+            <scope>test</scope>
+        </dependency>
 
 
 	    <!-- Context and Dependency Injection (CDI) -->
@@ -569,24 +583,11 @@
 			<version>0.8.9</version>
 		</dependency>
 
-		<dependency>
-    		<groupId>org.apache.tomcat</groupId>
-    		<artifactId>tomcat-catalina</artifactId>
-    		<version>9.0.13</version>
-		</dependency>
-
 		<!-- Server side validation -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>6.0.10.Final</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jasper-el</artifactId>
-			<version>9.0.16</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- Servlet Spec -->
