@@ -313,13 +313,14 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-        // TODO Replace this with project CDI inside MeleeGameDAO !
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Replace this with project CDI inside MeleeGameDAO !
+            game.setEventDAO(eventDAO);
         }
 
         if (game.hasUserJoined(login.getUserId())) {
@@ -370,11 +371,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-        game.setEventDAO(eventDAO);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            game.setEventDAO(eventDAO);
         }
         final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
@@ -418,12 +421,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            game.setEventDAO(eventDAO);
         }
         if (game.getState() == GameState.CREATED) {
             logger.info("Starting melee game {} (Setting state to ACTIVE)", gameId);
@@ -451,11 +455,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-        game.setEventDAO(eventDAO);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            game.setEventDAO(eventDAO);
         }
         if (game.getState() == GameState.ACTIVE) {
             logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);

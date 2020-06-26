@@ -298,14 +298,15 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
 
         Role role = game.getRole(login.getUserId());
@@ -370,14 +371,15 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
@@ -418,14 +420,15 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         if (game.getState() == GameState.CREATED) {
             logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", gameId);
@@ -452,14 +455,15 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         if (game.getState() == GameState.ACTIVE) {
             logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);

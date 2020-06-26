@@ -164,12 +164,13 @@ public class MeleeGameManager extends HttpServlet {
         int gameId = gameIdOpt.get();
 
         MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.error("Could not find melee game {}", gameId);
             response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
             return;
+        } else {
+            game.setEventDAO(eventDAO);
         }
         int userId = login.getUserId();
 
@@ -228,12 +229,13 @@ public class MeleeGameManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         final MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-        game.setEventDAO(eventDAO);
 
         if (game == null) {
             logger.warn("Could not retrieve game from database for gameId: {}", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            game.setEventDAO(eventDAO);
         }
 
         if (!game.hasUserJoined(login.getUserId())) {

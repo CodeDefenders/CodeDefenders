@@ -148,7 +148,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private PreviousSubmissionBean previousSubmission;
-    
+
     @Inject
     private EventDAO eventDAO;
 
@@ -163,14 +163,15 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         int gameId = gameIdOpt.get();
 
-        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-        game.setEventDAO( eventDAO );
-        
+
         if (game == null) {
             logger.error("Could not find multiplayer game {}", gameId);
             response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
@@ -211,14 +212,15 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         final MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-        game.setEventDAO(eventDAO);
-        
+
         if (game == null) {
             logger.debug("Could not retrieve game from database for gameId: {}", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
 
         final String action = ServletUtils.formType(request);
@@ -1092,7 +1094,7 @@ public class MultiplayerGameManager extends HttpServlet {
      * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled
      * which cover the mutant but belongs to other games and executes them against the mutant.
      *
-     * @param mutantToValidate
+     * @param mutantToValidate The mutant why try to find a killing test for
      * @return whether the mutant is killable or not/cannot be validated
      */
     boolean isMutantKillableByOtherTests(Mutant mutantToValidate) {

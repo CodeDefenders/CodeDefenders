@@ -18,40 +18,6 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
-import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
-import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
-import static org.codedefenders.game.puzzle.solving.MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
-import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
-import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.Message;
@@ -90,6 +56,39 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
+import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
+import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
+import static org.codedefenders.game.puzzle.solving.MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
+import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link PuzzleGame PuzzleGames}.
@@ -136,7 +135,6 @@ public class PuzzleGameManager extends HttpServlet {
         boolean fromGameId = gameIdOpt.isPresent(); // else from puzzleId
         if (fromGameId) {
             final int gameId = gameIdOpt.get();
-            // TODO Should he make PuzzleDAO inject dependencies instead
             game = PuzzleDAO.getPuzzleGameForId(gameId);
 
             if (game == null) {
@@ -145,6 +143,7 @@ public class PuzzleGameManager extends HttpServlet {
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
             } else {
+                // TODO Should he make PuzzleDAO inject dependencies instead
                 game.setEventDAO(eventDAO);
             }
             if (game.getCreatorId() != login.getUserId()) {
@@ -161,7 +160,6 @@ public class PuzzleGameManager extends HttpServlet {
                 return;
             }
             final int puzzleId = puzzleIdOpt.get();
-            // TODO Should he make PuzzleDAO inject dependencies instead
             game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
             if (game == null) {
                 logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}",
@@ -171,6 +169,7 @@ public class PuzzleGameManager extends HttpServlet {
                 new PuzzleGameSelectionManager().createGame(login.getUserId(), request, response);
                 return;
             } else {
+                // TODO Should he make PuzzleDAO inject dependencies instead
                 game.setEventDAO(eventDAO);
             }
         }
@@ -243,7 +242,6 @@ public class PuzzleGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        // TODO Should he make PuzzleDAO inject dependencies instead
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
 
         if (game == null) {
@@ -251,6 +249,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         } else {
+            // TODO Should he make PuzzleDAO inject dependencies instead
             game.setEventDAO(eventDAO);
         }
         if (game.getMode() != GameMode.PUZZLE) {
@@ -403,7 +402,6 @@ public class PuzzleGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
-        // TODO Should he make PuzzleDAO inject dependencies instead
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
 
         if (game == null) {
@@ -411,6 +409,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         } else {
+            // TODO Should he make PuzzleDAO inject dependencies instead
             game.setEventDAO(eventDAO);
         }
         if (game.getMode() != GameMode.PUZZLE) {
@@ -609,9 +608,8 @@ public class PuzzleGameManager extends HttpServlet {
                                 .append(Paths.PUZZLE_GAME)
                                 .append(">Puzzle Overview</a>.");
                         return message.toString();
-                    } else {
-                        playedGame.setEventDAO(eventDAO);
                     }
+                    playedGame.setEventDAO(eventDAO);
                 }
             }
         }
