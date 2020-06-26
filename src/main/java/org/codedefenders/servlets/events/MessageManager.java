@@ -20,6 +20,7 @@ package org.codedefenders.servlets.events;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -50,6 +51,9 @@ public class MessageManager extends HttpServlet {
 
     @Inject
     private LoginBean login;
+
+    @Inject
+    private EventDAO eventDAO;
 
     /**
      * Checks for a given request whether it holds the required parameters.
@@ -101,7 +105,7 @@ public class MessageManager extends HttpServlet {
             final Event e = new Event(0, gameId, login.getUserId(), message, eventType, status, timestamp);
             e.setChatMessage(DatabaseAccess.sanitise(chatMessage));
 
-            if (e.insert()) {
+            if (eventDAO.insert(e)) {
                 logger.debug("Event {} saved in game {}.", eventType, gameId);
                 out.print("{'status':'Success'}");
                 out.flush();

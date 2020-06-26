@@ -18,28 +18,22 @@
  */
 package org.codedefenders.model;
 
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseValue;
+import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.HashMap;
+
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.util.Comparator;
-import java.util.HashMap;
 
 /**
  * Created by thomas on 06/03/2017.
  */
 public class Event {
 
-    private static final HashMap<Role, String> ROLE_COLORS =
-            new HashMap<>();
+    private static final HashMap<Role, String> ROLE_COLORS = new HashMap<>();
     protected static final Logger logger = LoggerFactory.getLogger(Event.class);
-
 
     static {
         ROLE_COLORS.put(Role.ATTACKER, "#FF0000");
@@ -49,7 +43,7 @@ public class Event {
 
     @Override
     public String toString() {
-        return "Event " + getEventType() + " " + getEventStatus() + //" from user " + getUser().getId() +
+        return "Event " + getEventType() + " " + getEventStatus() + // " from user " + getUser().getId() +
                 " with message " + getMessage();
     }
 
@@ -87,14 +81,14 @@ public class Event {
 
     private Role role;
 
-    public Event(int eventId, int gameId, int userId, String message, String eventType,
-                 String eventStatus, Timestamp timestamp) {
-        this(eventId, gameId, userId, message, EventType.valueOf(eventType),
-                EventStatus.valueOf(eventStatus), timestamp);
+    public Event(int eventId, int gameId, int userId, String message, String eventType, String eventStatus,
+            Timestamp timestamp) {
+        this(eventId, gameId, userId, message, EventType.valueOf(eventType), EventStatus.valueOf(eventStatus),
+                timestamp);
     }
 
-    public Event(int eventId, int gameId, int userId, String message, EventType eventType,
-                 EventStatus eventStatus, Timestamp timestamp) {
+    public Event(int eventId, int gameId, int userId, String message, EventType eventType, EventStatus eventStatus,
+            Timestamp timestamp) {
         String eventString = eventType.toString();
         if (eventString.contains("ATTACKER")) {
             role = Role.ATTACKER;
@@ -119,8 +113,17 @@ public class Event {
         chatMessage = message;
     }
 
-    public String parse(HashMap<String, String> replacements, String message,
-                        boolean emphasise) {
+    public String getChatMessage() {
+        if (chatMessage == null) {
+            return "";
+        }
+        if (parsedChatMessage == null) {
+            parsedChatMessage = parse(new HashMap<>(), chatMessage, false);
+        }
+        return parsedChatMessage;
+    }
+
+    public String parse(HashMap<String, String> replacements, String message, boolean emphasise) {
 
         String procMessage = message;
 
@@ -131,39 +134,24 @@ public class Event {
         if (procMessage.contains("@event_user")) {
             User user = getUser();
 
-            String userLabel = (user == null) ? "Unknown" :
-                    (user.getUsername().equals(currentUserName)) ? "You" : user.getUsername();
+            String userLabel = (user == null) ? "Unknown"
+                    : (user.getUsername().equals(currentUserName)) ? "You" : user.getUsername();
             String color = (user == null) ? "#000000" : ROLE_COLORS.get(role);
 
-            procMessage = procMessage.replace("@event_user", "<span style='color: " + color + "'>@"
-                    + userLabel + "</span>");
+            procMessage = procMessage.replace("@event_user",
+                    "<span style='color: " + color + "'>@" + userLabel + "</span>");
         }
 
         if (procMessage.contains("@chat_message")) {
-            procMessage = procMessage.replace("@chat_message",
-                    getChatMessage());
+            procMessage = procMessage.replace("@chat_message", getChatMessage());
         } else if (emphasise) {
-            procMessage = "<span style='font-style: italic; font-weight: "
-                    + "bold;'>" + procMessage
-                    + "</span>";
+            procMessage = "<span style='font-style: italic; font-weight: " + "bold;'>" + procMessage + "</span>";
         }
 
         return procMessage;
     }
 
-    public String getChatMessage() {
-        if (chatMessage == null) {
-            return "";
-        }
-        if (parsedChatMessage == null) {
-            parsedChatMessage = parse(new HashMap<>(),
-                    chatMessage, false);
-        }
-        return parsedChatMessage;
-    }
-
     public void parse(HashMap<String, String> replacements, boolean emphasise) {
-
         this.parsedMessage = parse(replacements, message, emphasise);
     }
 
@@ -203,67 +191,17 @@ public class Event {
         eventStatus = e;
     }
 
-    public boolean insert() {
-        Connection conn = DB.getConnection();
-        String query;
-        DatabaseValue[] valueList;
-
-        if (eventType.equals(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT)
-                || eventType.equals(EventType.DEFENDER_MUTANT_EQUIVALENT)
-                || eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT)) {
-            query = String.join("\n",
-                    "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
-                    "VALUES (?, ?, ?, ?, ?);");
-            valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
-                    DatabaseValue.of(userId),
-                    DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(eventStatus.toString()),
-                    DatabaseValue.of(message)};
-        } else {
-            query = String.join("\n",
-                    "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)",
-                    "VALUES (?, ?, ?, ?);");
-            valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
-                    DatabaseValue.of(userId),
-                    DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(eventStatus.toString())};
-        }
-
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        eventId = DB.executeUpdateGetKeys(stmt, conn);
-        if (eventId >= 0) {
-            if (chatMessage != null) {
-                conn = DB.getConnection();
-                query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
-                valueList = new DatabaseValue[]{DatabaseValue.of(eventId),
-                        DatabaseValue.of(chatMessage)};
-                stmt = DB.createPreparedStatement(conn, query, valueList);
-                DB.executeUpdate(stmt, conn);
-            }
-        }
-        return eventId >= 0;
-    }
-
-
-    public boolean update() {
-        Connection conn = DB.getConnection();
-        String query = String.join("\n",
-                "UPDATE events",
-                "SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?)",
-                "WHERE Event_ID=?");
-        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
-                DatabaseValue.of(userId),
-                DatabaseValue.of(eventType.toString()),
-                DatabaseValue.of(eventStatus.toString()),
-                DatabaseValue.of((Long) time.getTime()),
-                DatabaseValue.of(eventId)};
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        return DB.executeUpdate(stmt, conn);
-    }
-
     public static final Comparator<Event> MAX_ID_COMPARATOR = Comparator.comparingInt(o -> o.eventId);
 
     public int getId() {
         return this.eventId;
+    }
+
+    public Integer gameId() {
+        return this.gameId;
+    }
+
+    public Long getTimestamp() {
+        return time.getTime();
     }
 }

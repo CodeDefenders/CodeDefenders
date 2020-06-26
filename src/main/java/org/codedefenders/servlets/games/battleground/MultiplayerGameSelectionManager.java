@@ -22,7 +22,9 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -53,6 +55,12 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -60,13 +68,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
@@ -100,6 +101,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Inject
     private INotificationService notificationService;
+
+    @Inject
+    private EventDAO eventDAO;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -180,11 +184,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .build();
 
+        newGame.setEventDAO(eventDAO);
+
+
         if (newGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event event = new Event(-1, newGame.getId(), login.getUserId(), "Game Created",
                     EventType.GAME_CREATED, EventStatus.GAME, timestamp);
-            event.insert();
+            eventDAO.insert(event);
         }
 
         // Mutants and tests uploaded with the class are already stored in the DB
@@ -221,7 +228,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         mutant.getJavaFile(),
                         mutant.getClassFile(),
                         true, // Alive be default
-                        dummyAttackerPlayerId);
+                        dummyAttackerPlayerId,
+                        GameDAO.getCurrentRound(newGame.getId()));
                 newMutant.insert();
                 mutantMap.put(mutant.getId(), newMutant);
             }
@@ -291,10 +299,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
 
         Role role = game.getRole(login.getUserId());
@@ -360,10 +372,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
@@ -380,7 +396,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         final EventStatus eventStatus = EventStatus.NEW;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
-        notif.insert();
+        eventDAO.insert(notif);
 
         logger.info("User {} successfully left game {}", login.getUserId(), gameId);
 
@@ -405,10 +421,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         if (game.getState() == GameState.CREATED) {
             logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", gameId);
@@ -436,10 +456,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         if (game.getState() == GameState.ACTIVE) {
             logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);

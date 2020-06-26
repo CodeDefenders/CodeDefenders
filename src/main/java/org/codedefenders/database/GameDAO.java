@@ -58,6 +58,28 @@ public class GameDAO {
     }
 
     /**
+     * Retrieves a game for which we don't know the type yet, from the playerID.
+     *
+     * @param playerId The id of the player for who we want to query a game.
+     * @return The {@link AbstractGame} with the given ID or null if no game found.
+     */
+    public static AbstractGame getGameWherePlayerPlays(int playerId) {
+        // TODO This can be improved
+        AbstractGame game = MultiplayerGameDAO.getGameWherePlayerPlays(playerId);
+        if (game != null) {
+            return game;
+        }
+        game = MeleeGameDAO.getGameWherePlayerPlays(playerId);
+        if (game != null) {
+            return game;
+        }
+        // Not sure we need to check for PUzzle games
+        return null;
+
+    }
+
+
+    /**
      * Adds a player with the given user ID and {@link Role} to the game.
      * If user is already a player in the game, the {@link Role} is updated.
      *
@@ -164,6 +186,7 @@ public class GameDAO {
         String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
     }
+
 
     /**
      * Returns a game's mode for given game identifier.

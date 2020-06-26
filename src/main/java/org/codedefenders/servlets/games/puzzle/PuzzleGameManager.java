@@ -20,8 +20,10 @@ package org.codedefenders.servlets.games.puzzle;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.IMutationTester;
@@ -55,11 +57,6 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -67,6 +64,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
@@ -123,6 +123,9 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private PreviousSubmissionBean previousSubmission;
 
+    @Inject
+    private EventDAO  eventDAO;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -139,6 +142,9 @@ public class PuzzleGameManager extends HttpServlet {
                         + "for gameId: {}.", gameId);
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
+            } else {
+                // TODO Should he make PuzzleDAO inject dependencies instead
+                game.setEventDAO(eventDAO);
             }
             if (game.getCreatorId() != login.getUserId()) {
                 logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.",
@@ -155,12 +161,16 @@ public class PuzzleGameManager extends HttpServlet {
             }
             final int puzzleId = puzzleIdOpt.get();
             game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
-
             if (game == null) {
                 logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}",
                         puzzleId, login.getUserId());
-                PuzzleGameSelectionManager.createGame(login.getUserId(), request, response);
+                // TODO Really ?!
+//                PuzzleGameSelectionManager.createGame(login.getUserId(), request, response);
+                new PuzzleGameSelectionManager().createGame(login.getUserId(), request, response);
                 return;
+            } else {
+                // TODO Should he make PuzzleDAO inject dependencies instead
+                game.setEventDAO(eventDAO);
             }
         }
 
@@ -233,10 +243,14 @@ public class PuzzleGameManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
+
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Should he make PuzzleDAO inject dependencies instead
+            game.setEventDAO(eventDAO);
         }
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit test to non-puzzle game {}.", gameId);
@@ -352,7 +366,9 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = false;
-            messages.add(generateWinningMessage(request, game, isAnAttackGame));
+            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame));
+            message.escape(false);
+            message.fadeOut(false);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -387,10 +403,14 @@ public class PuzzleGameManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
+
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}. Aborting.", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Should he make PuzzleDAO inject dependencies instead
+            game.setEventDAO(eventDAO);
         }
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit mutant to non-puzzle game {}. Aborting.", gameId);
@@ -527,7 +547,9 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = true;
-            messages.add(generateWinningMessage(request, game, isAnAttackGame)).fadeOut(false);
+            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame));
+            message.fadeOut(false);
+            message.escape(false);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -567,8 +589,10 @@ public class PuzzleGameManager extends HttpServlet {
                         continue;
                     }
                     // Skip already solved puzzles
+                    // TODO Should he make PuzzleDAO inject dependencies instead
                     PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(),
                             login.getUserId());
+
                     // Not yet played this puzzle
                     if (playedGame == null
                             || (playedGame.getState() != GameState.SOLVED) // played but not yet solved.
@@ -585,6 +609,7 @@ public class PuzzleGameManager extends HttpServlet {
                                 .append(">Puzzle Overview</a>.");
                         return message.toString();
                     }
+                    playedGame.setEventDAO(eventDAO);
                 }
             }
         }

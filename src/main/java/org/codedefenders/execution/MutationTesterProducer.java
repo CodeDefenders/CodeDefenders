@@ -19,6 +19,7 @@
 package org.codedefenders.execution;
 
 import org.codedefenders.configuration.Property;
+import org.codedefenders.database.EventDAO;
 
 import java.util.concurrent.ExecutorService;
 
@@ -43,13 +44,16 @@ public class MutationTesterProducer {
     @Property("mutant.coverage")
     private boolean useMutantCoverage;
 
+    @Inject
+    private EventDAO eventDAO;
+    
     @Produces
     @RequestScoped
     public IMutationTester getMutationTester() {
         if (enableParalleExecution) {
-            return new ParallelMutationTester(backend, useMutantCoverage, testExecutorThreadPool);
+            return new ParallelMutationTester(backend, eventDAO, useMutantCoverage, testExecutorThreadPool);
         } else {
-            return new MutationTester(backend, useMutantCoverage);
+            return new MutationTester(backend, eventDAO, useMutantCoverage);
         }
     }
 

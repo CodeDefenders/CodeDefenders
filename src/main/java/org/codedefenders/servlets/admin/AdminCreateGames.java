@@ -21,7 +21,9 @@ package org.codedefenders.servlets.admin;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -75,6 +77,9 @@ public class AdminCreateGames extends HttpServlet {
 
     @Inject
     private LoginBean login;
+    
+    @Inject
+    private EventDAO eventDAO;
 
     public enum RoleAssignmentMethod {
         RANDOM,
@@ -390,7 +395,7 @@ public class AdminCreateGames extends HttpServlet {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event event = new Event(-1, gameId, multiplayerGame.getCreatorId(), "Game Created",
                     EventType.GAME_CREATED, EventStatus.GAME, timestamp);
-            event.insert();
+            eventDAO.insert(event);
         } else {
             // TODO What to do if the insert did not work !?
             logger.warn("Cannot create game !");
@@ -429,7 +434,9 @@ public class AdminCreateGames extends HttpServlet {
                         // Alive be default
                         true,
                         //
-                        dummyAttackerPlayerId);
+                        dummyAttackerPlayerId,
+                        GameDAO.getCurrentRound(gameId)
+                        );
                 // insert this into the DB and link the mutant to the game
                 newMutant.insert();
                 // BookKeeping

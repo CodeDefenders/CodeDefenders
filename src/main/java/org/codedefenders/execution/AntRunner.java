@@ -23,6 +23,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.configuration.Property;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -283,7 +284,7 @@ public class AntRunner implements //
             assert (!matchingFiles.isEmpty()) : "if compilation was successful, .class file must exist";
             String classFile = matchingFiles.get(0).getAbsolutePath();
             int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
-            newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId);
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, classFile, true, playerId, GameDAO.getCurrentRound(gameId));
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
                     TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.SUCCESS, null);
@@ -294,7 +295,7 @@ public class AntRunner implements //
             String message = result.getCompilerOutput();
             logger.error("Failed to compile mutant {}: {}", javaFile, message);
             int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
-            newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId);
+            newMutant = new Mutant(gameId, cut.getId(), javaFile, null, false, playerId, GameDAO.getCurrentRound(gameId));
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(),
                     TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.FAIL, message);

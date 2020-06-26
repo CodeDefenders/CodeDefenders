@@ -59,23 +59,6 @@ public class DatabaseAccess {
         return s;
     }
 
-    public static List<Event> getEventsForGame(int gameId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM events ",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type",
-                "LEFT JOIN event_chat AS ec",
-                "  ON events.Event_Id = ec.Event_Id ",
-                "WHERE Game_ID=? ",
-                "  AND Event_Status=?");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(EventStatus.GAME.toString())
-        };
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
-    }
-
     public static void removePlayerEventsForGame(int gameId, int playerId) {
         String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=?";
         DatabaseValue[] values = new DatabaseValue[]{
@@ -83,31 +66,6 @@ public class DatabaseAccess {
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(playerId)};
         DB.executeUpdateQuery(query, values);
-    }
-
-    public static List<Event> getNewEventsForGame(int gameId, long time, Role role) {
-        String query = String.join("\n",
-                "SELECT *",
-                        "FROM events",
-                        "LEFT JOIN event_messages AS em",
-                        "  ON events.Event_Type = em.Event_Type ",
-                        "LEFT JOIN event_chat AS ec",
-                        "  ON events.Event_Id = ec.Event_Id",
-                        "WHERE Game_ID=?",
-                        "  AND Event_Status=? ",
-                        "  AND Timestamp >= FROM_UNIXTIME(?)");
-        if (role.equals(Role.ATTACKER)) {
-            query += " AND events.Event_Type!='DEFENDER_MESSAGE'";
-        } else if (role.equals(Role.DEFENDER)) {
-            query += " AND events.Event_Type!='ATTACKER_MESSAGE'";
-        }
-
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(EventStatus.GAME.toString()),
-                DatabaseValue.of(time)};
-
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
     }
 
     /**

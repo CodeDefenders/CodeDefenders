@@ -24,6 +24,7 @@ import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -148,6 +149,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private PreviousSubmissionBean previousSubmission;
 
+    @Inject
+    private EventDAO eventDAO;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -160,10 +164,14 @@ public class MultiplayerGameManager extends HttpServlet {
         int gameId = gameIdOpt.get();
 
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+
         if (game == null) {
             logger.error("Could not find multiplayer game {}", gameId);
             response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
         int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
@@ -205,10 +213,14 @@ public class MultiplayerGameManager extends HttpServlet {
         final int gameId = gameIdOpt.get();
 
         final MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+
         if (game == null) {
             logger.debug("Could not retrieve game from database for gameId: {}", gameId);
             Redirect.redirectBack(request, response);
             return;
+        } else {
+            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
+            game.setEventDAO(eventDAO);
         }
 
         final String action = ServletUtils.formType(request);
@@ -285,7 +297,7 @@ public class MultiplayerGameManager extends HttpServlet {
                         // TODO it might make sense to specify a new event type?
                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                         new Timestamp(System.currentTimeMillis()));
-                event.insert();
+                eventDAO.insert(event);
                 /*
                  * Register the event to DB
                  */
@@ -298,7 +310,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
                         EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
-                gameEvent.insert();
+                eventDAO.insert(gameEvent);
             }
         }
     }
@@ -468,7 +480,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         final Event notif = new Event(-1, gameId, login.getUserId(), message, EventType.DEFENDER_TEST_CREATED,
                 EventStatus.GAME, timestamp);
-        notif.insert();
+        eventDAO.insert(notif);
 
         mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages.getBridge());
         game.update();
@@ -672,7 +684,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final String notificationMsg = login.getUser().getUsername() + " created a mutant.";
         Event notif = new Event(-1, gameId, login.getUserId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
-        notif.insert();
+        eventDAO.insert(notif);
 
         mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
         game.update();
@@ -760,7 +772,7 @@ public class MultiplayerGameManager extends HttpServlet {
                             notification,
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
-                    notifEquiv.insert();
+                    eventDAO.insert(notifEquiv);
 
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
@@ -770,7 +782,7 @@ public class MultiplayerGameManager extends HttpServlet {
                         Event notifDefenderEquiv = new Event(-1, game.getId(), defenderId, notification,
                                 EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
-                        notifDefenderEquiv.insert();
+                        eventDAO.insert(notifDefenderEquiv);
                     }
 
 
@@ -899,7 +911,7 @@ public class MultiplayerGameManager extends HttpServlet {
                             EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT,EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis())
                     );
-                    notif.insert();
+                    eventDAO.insert(notif);
                     if (mutPending.getId() == mutantId) {
                         killedClaimed = true;
                     } else {
@@ -924,7 +936,7 @@ public class MultiplayerGameManager extends HttpServlet {
                         Event notif = new Event(-1, gameId, login.getUserId(), notification,
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
-                        notif.insert();
+                        eventDAO.insert(notif);
 
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent",
@@ -1018,7 +1030,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));
-                                event.insert();
+                                eventDAO.insert(event);
 
                                 DatabaseAccess.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
@@ -1038,7 +1050,7 @@ public class MultiplayerGameManager extends HttpServlet {
             Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
                     EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                     new Timestamp(System.currentTimeMillis()));
-            event.insert();
+            eventDAO.insert(event);
         }
 
         String flaggingMessage = numClaimed == 0
@@ -1082,7 +1094,7 @@ public class MultiplayerGameManager extends HttpServlet {
      * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled
      * which cover the mutant but belongs to other games and executes them against the mutant.
      *
-     * @param mutantToValidate
+     * @param mutantToValidate The mutant why try to find a killing test for
      * @return whether the mutant is killable or not/cannot be validated
      */
     boolean isMutantKillableByOtherTests(Mutant mutantToValidate) {

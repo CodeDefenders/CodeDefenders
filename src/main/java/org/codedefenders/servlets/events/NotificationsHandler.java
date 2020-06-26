@@ -19,22 +19,16 @@
 package org.codedefenders.servlets.events;
 
 import com.google.gson.Gson;
-
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.NotificationType;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -43,10 +37,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * This {@link HttpServlet} handles notification requests. Notifications are logged and
- * stored server side. Clients request their most recent notifications.
+ * This {@link HttpServlet} handles notification requests. Notifications are
+ * logged and stored server side. Clients request their most recent
+ * notifications.
  *
  * <p>In this servlet, all {@link NotificationType NotificationTypes} are handled.
  *
@@ -59,6 +60,9 @@ public class NotificationsHandler extends HttpServlet {
 
     @Inject
     private LoginBean login;
+
+    @Inject
+    private EventDAO eventDAO;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -92,7 +96,8 @@ public class NotificationsHandler extends HttpServlet {
      * Checks for a given request whether it holds the required parameters.
      *
      * @param request the given request as a {@link HttpServletRequest}.
-     * @return {@code true} if request has required parameters, {@code false} otherwise.
+     * @return {@code true} if request has required parameters, {@code false}
+     *         otherwise.
      */
     private boolean hasParameters(HttpServletRequest request) {
         final String type = request.getParameter("type");
@@ -102,9 +107,10 @@ public class NotificationsHandler extends HttpServlet {
     /**
      * Handles a push event request, which requires the following URL parameters:
      * <ul>
-     *     <li><code>gameId</code></li>
+     * <li><code>gameId</code></li>
      * </ul>
-     * If parameters are valid, responds with a JSON list of most recent {@link Event Events}.
+     * If parameters are valid, responds with a JSON list of most recent
+     * {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
     private void handlePushEventRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response)
@@ -127,8 +133,8 @@ public class NotificationsHandler extends HttpServlet {
         final Object lastMsg1 = request.getSession().getAttribute("lastMsg");
         final int lastMessageId = lastMsg1 != null ? (Integer) lastMsg1 : 0;
 
-        final ArrayList<Event> events =
-                new ArrayList<>(DatabaseAccess.getNewEquivalenceDuelEventsForGame(gameId, lastMessageId));
+        final ArrayList<Event> events = new ArrayList<>(
+                DatabaseAccess.getNewEquivalenceDuelEventsForGame(gameId, lastMessageId));
         if (!events.isEmpty()) {
             int lastMsg = Collections.max(events, Event.MAX_ID_COMPARATOR).getId();
             session.setAttribute("lastMsg", lastMsg);
@@ -147,14 +153,14 @@ public class NotificationsHandler extends HttpServlet {
     /**
      * Handles a game event request, which requires the following URL parameters:
      * <ul>
-     *     <li><code>gameId</code></li>
-     *     <li><code>timestamp</code></li>
+     * <li><code>gameId</code></li>
+     * <li><code>timestamp</code></li>
      * </ul>
-     * If parameters are valid, responds with a JSON list of most recent game {@link Event Events}.
+     * If parameters are valid, responds with a JSON list of most recent game
+     * {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String timestampString = request.getParameter("timestamp");
         if (timestampString == null) {
             response.setStatus(400);
@@ -185,11 +191,22 @@ public class NotificationsHandler extends HttpServlet {
         }
 
         final Role role = DatabaseAccess.getRole(login.getUserId(), gameId);
-        final ArrayList<Event> events = new ArrayList<>(DatabaseAccess.getNewEventsForGame(gameId, timestamp, role));
+        final ArrayList<Event> events = new ArrayList<>(eventDAO.getNewEventsForGame(gameId, timestamp, role));
+
+
+
 
         for (Event e : events) {
+
+            if (e.getUser().getId() == Constants.DUMMY_CREATOR_USER_ID) {
+                continue;
+            }
+
+            // Make sure we do not trigger NPE
+            if (e.getMessage() != null) {
+                e.parse(e.getEventStatus() == EventStatus.GAME);
+            }
             e.setCurrentUserName(login.getUser().getUsername());
-            e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
         PrintWriter out = response.getWriter();
@@ -200,13 +217,13 @@ public class NotificationsHandler extends HttpServlet {
     /**
      * Handles a user event request, which requires the following URL parameters:
      * <ul>
-     *     <li><code>timestamp</code></li>
+     * <li><code>timestamp</code></li>
      * </ul>
-     * If parameters are valid, responds with a JSON list of most recent user {@link Event Events}.
+     * If parameters are valid, responds with a JSON list of most recent user
+     * {@link Event Events}.
      */
     @SuppressWarnings("Duplicates")
-    private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+    private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String timestampString = request.getParameter("timestamp");
         if (timestampString == null) {
             response.setStatus(400);

@@ -142,10 +142,10 @@ public class Mutant implements Serializable {
      * @param alive If the mutant is alive or not.
      * @param playerId The ID of the player who submitted the mutant.
      */
-    public Mutant(int gameId, int classId,  String javaFile, String classFile, boolean alive, int playerId) {
+    public Mutant(int gameId, int classId,  String javaFile, String classFile, boolean alive, int playerId, int roundCreated) {
         this.gameId = gameId;
         this.classId = classId;
-        this.roundCreated = GameDAO.getCurrentRound(gameId);
+        this.roundCreated = roundCreated;
         this.javaFile = javaFile;
         this.classFile = classFile;
         this.alive = alive;
@@ -155,7 +155,7 @@ public class Mutant implements Serializable {
 
     public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
                   int roundCreated, int roundKilled, int playerId) {
-        this(gid, classId, javaFile, classFile, alive, playerId);
+        this(gid, classId, javaFile, classFile, alive, playerId, roundCreated);
         this.id = mid;
         this.equivalent = equiv;
         this.roundCreated = roundCreated;
