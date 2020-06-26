@@ -9,8 +9,7 @@ stages:
   - test
 
 variables:
-  MAVEN_CLI_OPTS: "--no-transfer-progress"
-  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
   SAST_DISABLE_DIND: "true"
   SAST_DEFAULT_ANALYZERS: "spotbugs, secrets"
   DS_DISABLE_DIND: "true"
