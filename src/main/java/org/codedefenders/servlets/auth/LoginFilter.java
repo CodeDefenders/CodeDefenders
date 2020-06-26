@@ -120,7 +120,7 @@ public class LoginFilter implements Filter {
             return false;
         }
 
-        Pattern excludeUrls = Pattern.compile("^.*/(css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
+        Pattern excludeUrls = Pattern.compile("^.*/(webjars|css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
         Matcher m = excludeUrls.matcher(path);
         return !m.matches();
     }
