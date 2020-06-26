@@ -184,6 +184,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .build();
+        
+        newGame.setEventDAO(eventDAO);
+
 
         if (newGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -296,7 +299,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
+        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        game.setEventDAO(eventDAO);
+        
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -365,7 +371,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
+        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        game.setEventDAO(eventDAO);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -410,7 +419,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
+        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        game.setEventDAO(eventDAO);
+        
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -441,7 +453,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
+        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        game.setEventDAO(eventDAO);
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);

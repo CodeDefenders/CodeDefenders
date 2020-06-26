@@ -484,7 +484,9 @@ public class DatabaseTest {
         assertEquals(te.testId, teFromDB.testId);
     }
 
-    @Ignore // TODO Inject dependency in test, probably can be done with a rule?
+    // TODO Fix this by injecting the dependency in test. See
+    //  https://github.com/weld/weld-junit/blob/master/junit4/README.md
+    @Ignore 
     @Test
     public void testEvents() throws Exception { // TODO figure out why table events does not have foreign keys
 

@@ -163,7 +163,10 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         int gameId = gameIdOpt.get();
 
+        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        game.setEventDAO( eventDAO );
+        
         if (game == null) {
             logger.error("Could not find multiplayer game {}", gameId);
             response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
@@ -208,7 +211,10 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final int gameId = gameIdOpt.get();
 
+        // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         final MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        game.setEventDAO(eventDAO);
+        
         if (game == null) {
             logger.debug("Could not retrieve game from database for gameId: {}", gameId);
             Redirect.redirectBack(request, response);
