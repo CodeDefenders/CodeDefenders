@@ -463,7 +463,7 @@ public class MeleeGameManager extends HttpServlet {
                 TargetExecution.Target.TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-            messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
+            messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message)).escape(false);
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
