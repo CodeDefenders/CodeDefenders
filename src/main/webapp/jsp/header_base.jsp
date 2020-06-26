@@ -44,14 +44,6 @@
 	<!-- Favicon.ico -->
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 
-    <!-- File Input -->
-    <!--
-    <script src="js/fileinput.min.js" type="text/javascript"></script>
-    -->
-    <!--
-    <link href="css/fileinput.min.css" rel="stylesheet" type="text/css" />
-    -->
-
     <!-- Bootstrap -->
     <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
