@@ -48,16 +48,14 @@ public class BeanFilter implements Filter {
             throws IOException, ServletException {
         request.setAttribute("login", login);
         request.setAttribute("previousSubmission", previousSubmission);
-        
+
         // Configure the GameProducer with the game associated to this request if any
-        if( request instanceof HttpServletRequest) {
+        if (request instanceof HttpServletRequest) {
             Optional<Integer> possiblyGameId = ServletUtils.gameId((HttpServletRequest)request);
-            if( possiblyGameId.isPresent() ) {
-                gameProducer.setTheGame( possiblyGameId.get());
-            }
+            possiblyGameId.ifPresent(integer -> gameProducer.setTheGame(integer));
         }
-        
-        
+
+
         chain.doFilter(request, response);
     }
 

@@ -18,14 +18,6 @@
  */
 package org.codedefenders.game.puzzle;
 
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -45,6 +37,14 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * Represents an instance of a {@link Puzzle puzzle}, which is played by one
@@ -383,23 +383,23 @@ public class PuzzleGame extends AbstractGame {
     @Override
     public boolean addPlayer(int userId, Role role) {
         switch (userId) {
-        case DUMMY_ATTACKER_USER_ID:
-            if (role != Role.ATTACKER) {
-                logger.warn("Tried adding dummy attacker to puzzle game with wrong role: " + role);
-                return false;
-            }
-            break;
-        case DUMMY_DEFENDER_USER_ID:
-            if (role != Role.DEFENDER) {
-                logger.warn("Tried adding dummy defender to puzzle game with wrong role: " + role);
-                return false;
-            }
-            break;
-        default:
-            if (role != activeRole) {
-                logger.warn("Tried adding player to puzzle game with wrong role: " + role);
-                return false;
-            }
+            case DUMMY_ATTACKER_USER_ID:
+                if (role != Role.ATTACKER) {
+                    logger.warn("Tried adding dummy attacker to puzzle game with wrong role: " + role);
+                    return false;
+                }
+                break;
+            case DUMMY_DEFENDER_USER_ID:
+                if (role != Role.DEFENDER) {
+                    logger.warn("Tried adding dummy defender to puzzle game with wrong role: " + role);
+                    return false;
+                }
+                break;
+            default:
+                if (role != activeRole) {
+                    logger.warn("Tried adding player to puzzle game with wrong role: " + role);
+                    return false;
+                }
         }
 
         return GameDAO.addPlayerToGame(id, userId, role);

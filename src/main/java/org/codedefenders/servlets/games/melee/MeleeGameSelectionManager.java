@@ -18,32 +18,6 @@
  */
 package org.codedefenders.servlets.games.melee;
 
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.formType;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
-import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
@@ -64,7 +38,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -81,16 +54,39 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.formType;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
+import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+
 /**
  * This {@link HttpServlet} handles selection of {@link MeleeGame games}.
  *
- * <p>
- * {@code GET} requests redirect to the game overview page and {@code POST}
+ * <p>{@code GET} requests redirect to the game overview page and {@code POST}
  * requests handle creating, joining and entering {@link MultiplayerGame
  * battleground games}.
  *
- * <p>
- * Serves under {@code /melee/games}.
+ * <p>Serves under {@code /melee/games}.
  *
  * @see org.codedefenders.util.Paths#MELEE_SELECTION
  */
@@ -119,25 +115,25 @@ public class MeleeGameSelectionManager extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final String action = formType(request);
         switch (action) {
-        case "createGame":
-            createGame(request, response);
-            return;
-        case "joinGame":
-            joinGame(request, response);
-            return;
-        case "leaveGame":
-            leaveGame(request, response);
-            return;
-        case "startGame":
-            startGame(request, response);
-            return;
-        case "endGame":
-            endGame(request, response);
-            return;
-        default:
-            logger.info("Action not recognised: {}", action);
-            Redirect.redirectBack(request, response);
-            break;
+            case "createGame":
+                createGame(request, response);
+                return;
+            case "joinGame":
+                joinGame(request, response);
+                return;
+            case "leaveGame":
+                leaveGame(request, response);
+                return;
+            case "startGame":
+                startGame(request, response);
+                return;
+            case "endGame":
+                endGame(request, response);
+                return;
+            default:
+                logger.info("Action not recognised: {}", action);
+                Redirect.redirectBack(request, response);
+                break;
         }
     }
 

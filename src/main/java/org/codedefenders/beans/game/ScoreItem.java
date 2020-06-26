@@ -6,11 +6,11 @@ import org.codedefenders.model.User;
 // DTO for the score board
 public class ScoreItem {
 
-    final private User user;
+    private final User user;
     // PlayerScore contains the player id
-    final private PlayerScore attackScore;
-    final private PlayerScore defenseScore;
-    final private PlayerScore duelScore;
+    private final PlayerScore attackScore;
+    private final PlayerScore defenseScore;
+    private final PlayerScore duelScore;
 
     public ScoreItem(User user, PlayerScore attackScore, PlayerScore defenseScore, PlayerScore duelScore) {
         this.user = user;

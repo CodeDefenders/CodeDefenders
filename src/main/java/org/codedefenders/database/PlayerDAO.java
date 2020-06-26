@@ -56,8 +56,7 @@ public class PlayerDAO {
     /**
      * Constructs a player from a {@link ResultSet} entry.
      *
-     * <p>
-     * Requires the user information to have the following column names. Naming
+     * <p>Requires the user information to have the following column names. Naming
      * these columns should be done with SQL aliasing.
      *
      * <ul>
@@ -111,9 +110,9 @@ public class PlayerDAO {
     }
 
     /**
-     * Retrieves a player given its id
-     * 
-     * TODO What happens if the player does not exist?
+     * Retrieves a player given its id.
+     *
+     * <p>TODO What happens if the player does not exist?
      *
      * @param playerId the player identifier as an {@code int}.
      * @return player instance

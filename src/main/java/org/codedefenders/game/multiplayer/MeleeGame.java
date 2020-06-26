@@ -18,13 +18,6 @@
  */
 package org.codedefenders.game.multiplayer;
 
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
-import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -44,6 +37,10 @@ import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+
 public class MeleeGame extends AbstractGame {
 
     /*
@@ -57,7 +54,7 @@ public class MeleeGame extends AbstractGame {
     private List<Player> players;
 
     // TODO Does it make sense to have injection inside data objects ?
-//    @Inject
+    //@Inject
     private ScoreCalculator scoringBean;
 
     public void setScoringBean(ScoreCalculator scoringBean) {
@@ -65,14 +62,14 @@ public class MeleeGame extends AbstractGame {
     }
 
     // Injection done at AbstractGame level?
-//    @Inject 
-//    private EventDAO eventDAO;
-//
-//    public void setEventDAO(EventDAO eventDAO) {
-//        this.eventDAO = eventDAO;
-//    }
+    //@Inject
+    //private EventDAO eventDAO;
+    //
+    //public void setEventDAO(EventDAO eventDAO) {
+    //    this.eventDAO = eventDAO;
+    //}
 
-//    @Inject
+    //@Inject
     private MeleeGameDAO meleeGameDAO;
 
     public void setMeleeGameDAO(MeleeGameDAO meleeGameDAO) {
@@ -357,6 +354,10 @@ public class MeleeGame extends AbstractGame {
         }
     }
 
+    public boolean addPlayer(int userId, Role role) {
+        return canJoinGame(userId) && addPlayerForce(userId, role);
+    }
+
     public boolean addPlayerForce(int userId, Role role) {
         if (state == GameState.FINISHED) {
             return false;
@@ -390,50 +391,41 @@ public class MeleeGame extends AbstractGame {
         List<Event> events = getEvents();
 
         switch (state) {
-        case ACTIVE:
-            if (!listContainsEvent(events, EventType.GAME_STARTED)) {
-                EventType et = EventType.GAME_STARTED;
-                notifyPlayers("Game has started. Attack and Defend now!", et);
-                notifyCreator("Your game as started!", et);
-                notifyGame("The game has started!", et);
-            }
-            break;
-        case GRACE_ONE:
-            if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)) {
-                EventType et = EventType.GAME_GRACE_ONE;
-                notifyPlayers("A game has entered Grace One.", et);
-                notifyCreator("Your game has entered Grace One", et);
-                notifyGame("The game as entered Grace Period One", et);
-            }
-            break;
-        case GRACE_TWO:
-            if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)) {
-                EventType et = EventType.GAME_GRACE_TWO;
-                notifyPlayers("A game has entered Grace Two.", et);
-                notifyCreator("Your game has entered Grace Two", et);
-                notifyGame("The game as entered Grace Period Two", et);
-            }
-            break;
-        case FINISHED:
-            if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
-                EventType et = EventType.GAME_FINISHED;
-                notifyPlayers("A game has finished.", et);
-                notifyCreator("Your game has finished.", et);
-                notifyGame("The game has ended.", et);
-            }
-            break;
-        default:
-            // ignored
+            case ACTIVE:
+                if (events.stream().map(Event::getEventType).noneMatch(e -> e ==  EventType.GAME_STARTED)) {
+                    EventType et = EventType.GAME_STARTED;
+                    notifyPlayers("Game has started. Attack and Defend now!", et);
+                    notifyCreator("Your game as started!", et);
+                    notifyGame("The game has started!", et);
+                }
+                break;
+            case GRACE_ONE:
+                if (events.stream().map(Event::getEventType).noneMatch(e -> e ==  EventType.GAME_GRACE_ONE)) {
+                    EventType et = EventType.GAME_GRACE_ONE;
+                    notifyPlayers("A game has entered Grace One.", et);
+                    notifyCreator("Your game has entered Grace One", et);
+                    notifyGame("The game as entered Grace Period One", et);
+                }
+                break;
+            case GRACE_TWO:
+                if (events.stream().map(Event::getEventType).noneMatch(e -> e ==  EventType.GAME_GRACE_TWO)) {
+                    EventType et = EventType.GAME_GRACE_TWO;
+                    notifyPlayers("A game has entered Grace Two.", et);
+                    notifyCreator("Your game has entered Grace Two", et);
+                    notifyGame("The game as entered Grace Period Two", et);
+                }
+                break;
+            case FINISHED:
+                if (events.stream().map(Event::getEventType).noneMatch(e -> e == EventType.GAME_FINISHED)) {
+                    EventType et = EventType.GAME_FINISHED;
+                    notifyPlayers("A game has finished.", et);
+                    notifyCreator("Your game has finished.", et);
+                    notifyGame("The game has ended.", et);
+                }
+                break;
+            default:
+                // ignored
         }
-    }
-
-    private boolean listContainsEvent(List<Event> events, EventType et) {
-        for (Event e : events) {
-            if (e.getEventType().equals(et)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void notifyPlayers(String message, EventType et) {
@@ -456,10 +448,6 @@ public class MeleeGame extends AbstractGame {
         Event notif = new Event(-1, id, creatorId, message, et, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
-    }
-
-    public boolean addPlayer(int userId, Role role) {
-        return canJoinGame(userId) && addPlayerForce(userId, role);
     }
 
     public boolean insert() {

@@ -124,9 +124,9 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private PreviousSubmissionBean previousSubmission;
 
-    @Inject 
+    @Inject
     private EventDAO  eventDAO;
-    
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {

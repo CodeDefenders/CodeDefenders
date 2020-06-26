@@ -54,6 +54,7 @@ public class MessageManager extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
+
     /**
      * Checks for a given request whether it holds the required parameters.
      * Required parameters are {@code gameId}, {@code message} and {@code target}.

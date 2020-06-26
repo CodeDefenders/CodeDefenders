@@ -113,6 +113,16 @@ public class Event {
         chatMessage = message;
     }
 
+    public String getChatMessage() {
+        if (chatMessage == null) {
+            return "";
+        }
+        if (parsedChatMessage == null) {
+            parsedChatMessage = parse(new HashMap<>(), chatMessage, false);
+        }
+        return parsedChatMessage;
+    }
+
     public String parse(HashMap<String, String> replacements, String message, boolean emphasise) {
 
         String procMessage = message;
@@ -139,16 +149,6 @@ public class Event {
         }
 
         return procMessage;
-    }
-
-    public String getChatMessage() {
-        if (chatMessage == null) {
-            return "";
-        }
-        if (parsedChatMessage == null) {
-            parsedChatMessage = parse(new HashMap<>(), chatMessage, false);
-        }
-        return parsedChatMessage;
     }
 
     public void parse(HashMap<String, String> replacements, boolean emphasise) {

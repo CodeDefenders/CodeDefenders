@@ -32,11 +32,11 @@ public class MeleeScoreboardBean {
      * TODO This can be uniformed by defining the Team abstraction: - Team has
      * players and name - Regular game has 2 teams: - 1 defenders team - 1 attackers
      * team
-     * 
+     *
      * - Single Player has 1 team:
-     * 
+     *
      * - Meele game has N teams
-     * 
+     *
      */
 
     private Integer gameId;
@@ -90,10 +90,9 @@ public class MeleeScoreboardBean {
     }
 
     /**
-     * 
-     * Sorts the items by their total score and uses alphabetic order for ties
-     * 
-     * @return
+     * Sorts the items by their total score and uses alphabetic order for ties.
+     *
+     * @return The sorted score items
      */
     public List<ScoreItem> getSortedScoreItems() {
         List<ScoreItem> scoreItems = getScoreItems();
@@ -132,12 +131,12 @@ public class MeleeScoreboardBean {
             if (defenseScore == null) {
                 defenseScore = new PlayerScore(playerId);
             }
-            
+
             PlayerScore duelScores = duelsScores.get(user.getId());
             if (duelScores == null) {
                 duelScores = new PlayerScore(playerId);
             }
-            
+
             currentScore.add(new ScoreItem(user, attackScore, defenseScore, duelScores));
         }
 

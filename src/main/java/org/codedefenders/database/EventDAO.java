@@ -1,19 +1,18 @@
 package org.codedefenders.database;
 
+import org.codedefenders.game.Role;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+
+import javax.annotation.ManagedBean;
+import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
-
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
-
-import org.codedefenders.game.Role;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
 
 // TODO Probably this should expose some specific functions, like handleChatEvent, handle gameEvent, and the like
 @ManagedBean
@@ -39,8 +38,7 @@ public class EventDAO {
             valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage()) };
-        } else // Melee Games
-        if (eventType.equals(EventType.PLAYER_LOST_EQUIVALENT_DUEL)
+        } else if (eventType.equals(EventType.PLAYER_LOST_EQUIVALENT_DUEL) // Melee Game
                 || eventType.equals(EventType.PLAYER_WON_EQUIVALENT_DUEL)
                 || eventType.equals(EventType.PLAYER_KILLED_MUTANT)
                 || eventType.equals(EventType.PLAYER_MUTANT_SURVIVED)
@@ -48,15 +46,15 @@ public class EventDAO {
             query = String.join("\n",
                     "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
                     "VALUES (?, ?, ?, ?, ?);");
-            valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
+            valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage()) };
+                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
         } else {
             query = String.join("\n", "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)",
                     "VALUES (?, ?, ?, ?);");
-            valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
+            valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(event.getEventStatus().toString()) };
+                    DatabaseValue.of(event.getEventStatus().toString())};
         }
 
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);

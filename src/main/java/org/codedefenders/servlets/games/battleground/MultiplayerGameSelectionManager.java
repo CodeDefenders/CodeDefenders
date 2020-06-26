@@ -18,33 +18,6 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.formType;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
-import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
@@ -82,6 +55,32 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.formType;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
+import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+
 /**
  * This {@link HttpServlet} handles selection of {@link MultiplayerGame battleground games}.
  *
@@ -105,7 +104,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
-    
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
@@ -184,7 +183,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .build();
-        
+
         newGame.setEventDAO(eventDAO);
 
 
@@ -302,7 +301,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
         game.setEventDAO(eventDAO);
-        
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);
@@ -422,7 +421,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
         game.setEventDAO(eventDAO);
-        
+
         if (game == null) {
             logger.error("No game found for gameId={}. Aborting request.", gameId);
             Redirect.redirectBack(request, response);

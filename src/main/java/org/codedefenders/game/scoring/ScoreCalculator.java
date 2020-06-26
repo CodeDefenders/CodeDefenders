@@ -20,9 +20,9 @@ import org.codedefenders.model.Player;
 /**
  * This class uses a ScoringPolicy to compute each players' attacking/mutants
  * and defending/tests score.
- * 
- * Ideally Gmae
- * 
+ *
+ * <p>Ideally Gmae
+ *
  * @author gambi
  *
  */

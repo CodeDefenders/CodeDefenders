@@ -152,8 +152,8 @@ public class MeleeGameDAO {
         GameLevel level = game.getLevel();
         float prize = game.getPrize();
 
-//        int defenderValue = game.getDefenderValue();
-//        int attackerValue = game.getAttackerValue();
+        //int defenderValue = game.getDefenderValue();
+        //int attackerValue = game.getAttackerValue();
         int defenderValue = 0;
         int attackerValue = 0;
 
@@ -229,8 +229,8 @@ public class MeleeGameDAO {
         GameLevel level = game.getLevel();
         float prize = game.getPrize();
 
-//        int defenderValue = game.getDefenderValue();
-//        int attackerValue = game.getAttackerValue();
+        //int defenderValue = game.getDefenderValue();
+        //int attackerValue = game.getAttackerValue();
         int defenderValue = 0;
         int attackerValue = 0;
 
@@ -425,9 +425,9 @@ public class MeleeGameDAO {
     }
 
     /**
-     * Retrieves the game in which the player plays
-     * 
-     * @param playerId
+     * Retrieves the game in which the player plays.
+     *
+     * @param playerId The id of the player we get the game for.
      * @return
      */
     public static AbstractGame getGameWherePlayerPlays(int playerId) {

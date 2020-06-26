@@ -65,6 +65,14 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -77,15 +85,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
@@ -109,13 +108,11 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  * This {@link HttpServlet} handles retrieval and in-game management for
  * {@link MeleeGame} games.
  *
- * <p>
- * {@code GET} requests allow accessing melee games and {@code POST} requests
+ * <p>{@code GET} requests allow accessing melee games and {@code POST} requests
  * handle starting and ending games, creation of tests, mutants and resolving
  * equivalences.
  *
- * <p>
- * Serves under {@code /meleegame}.
+ * <p>Serves under {@code /meleegame}.
  *
  * @see org.codedefenders.util.Paths#MELEE_GAME
  */
@@ -210,7 +207,8 @@ public class MeleeGameManager extends HttpServlet {
         MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean();
         // Why ID is necessary here?
         meleeScoreboardBean.setGameId(game.getId());
-        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(), scoreCalculator.getTestScores(), scoreCalculator.getDuelScores());
+        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(), scoreCalculator.getTestScores(),
+                scoreCalculator.getDuelScores());
         meleeScoreboardBean.setPlayers(game.getPlayers());
         // Set the preconditions for the score board
         request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
@@ -257,34 +255,34 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         switch (action) {
-        case "createMutant": {
-            createMutant(request, response, user, game, playerId);
-            triggerAutomaticMutantEquivalenceForGame(game);
-            return;
-        }
-        case "createTest": {
-            createTest(request, response, user, game);
-            // After a test is submitted, there's the chance that one or more mutants
-            // already survived enough tests
-            triggerAutomaticMutantEquivalenceForGame(game);
-            return;
-        }
-        case "reset": {
-            previousSubmission.clear();
-            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
-            return;
-        }
-        case "claimEquivalent": {
-            claimEquivalent(request, response, gameId, game, playerId);
-            return;
-        }
-        case "resolveEquivalence": {
-            resolveEquivalence(request, response, gameId, game, playerId);
-            return;
-        }
-        default:
-            logger.info("Action not recognised: {}", action);
-            Redirect.redirectBack(request, response);
+            case "createMutant": {
+                createMutant(request, response, user, game, playerId);
+                triggerAutomaticMutantEquivalenceForGame(game);
+                return;
+            }
+            case "createTest": {
+                createTest(request, response, user, game);
+                // After a test is submitted, there's the chance that one or more mutants
+                // already survived enough tests
+                triggerAutomaticMutantEquivalenceForGame(game);
+                return;
+            }
+            case "reset": {
+                previousSubmission.clear();
+                response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                return;
+            }
+            case "claimEquivalent": {
+                claimEquivalent(request, response, gameId, game, playerId);
+                return;
+            }
+            case "resolveEquivalence": {
+                resolveEquivalence(request, response, gameId, game, playerId);
+                return;
+            }
+            default:
+                logger.info("Action not recognised: {}", action);
+                Redirect.redirectBack(request, response);
         }
     }
 
@@ -748,7 +746,7 @@ public class MeleeGameManager extends HttpServlet {
 
                     // We need this to pass the mutation information along
                     Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
-                            // Here we care only about the mutantID. 
+                            // Here we care only about the mutantID.
                             "-1" + ":" + m.getId(),
                             EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
@@ -877,7 +875,7 @@ public class MeleeGameManager extends HttpServlet {
                 // TODO: Doesnt distinguish between failing because the test didnt run at all
                 // and failing because it detected the mutant
                 mutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
-                
+
                 if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(),
                             mPending.getId());
@@ -905,8 +903,8 @@ public class MeleeGameManager extends HttpServlet {
                 } else { // ASSUMED_YES
                     if (mPending.getId() == mutantId) {
                         // only kill the one mutant that was claimed
-                        logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent", newTest.getId(),
-                                mPending.getId());
+                        logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
+                                newTest.getId(), mPending.getId());
                         mPending.kill(ASSUMED_YES);
                         final String message = UserDAO.getUserById(login.getUserId()).getUsername()
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
@@ -953,8 +951,8 @@ public class MeleeGameManager extends HttpServlet {
             logger.info("Resolving equivalence was handled successfully");
             response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
         } else {
-            logger.info(
-                    "Rejecting resolving equivalence request. Missing parameters 'acceptEquivalent' or 'rejectEquivalent'.");
+            logger.info("Rejecting resolving equivalence request. "
+                    + "Missing parameters 'acceptEquivalent' or 'rejectEquivalent'.");
             Redirect.redirectBack(request, response);
         }
     }
@@ -1003,18 +1001,19 @@ public class MeleeGameManager extends HttpServlet {
                                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(event);
-                                
+
                                 // Retrieve an user for the player in this game
                                 Player claimingPlayer = PlayerDAO.getPlayerForUserAndGame(login.getUserId(), gameId);
-                                
+
                                 // TODO We need a score event to hackishly include data about mutants and tests
                                 Event scoreEvent = new Event(-1, gameId, Constants.DUMMY_CREATOR_USER_ID,
-                                        claimingPlayer.getId()+ ":" + m.getId(), EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT,
+                                        claimingPlayer.getId() + ":" + m.getId(),
+                                        EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT,
                                         EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(scoreEvent);
 
-                                
-                                
+
+
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
                                 DatabaseAccess.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();

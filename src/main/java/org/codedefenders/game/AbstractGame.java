@@ -65,10 +65,11 @@ public abstract class AbstractGame {
     // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
     // Consider to move this into a setEvents method instead !
     protected EventDAO eventDAO;
+
     public void setEventDAO(EventDAO eventDAO) {
         this.eventDAO = eventDAO;
     }
-    
+
     public int getId() {
         return id;
     }
@@ -123,12 +124,6 @@ public abstract class AbstractGame {
         return getTests(false);
     }
 
-    // NOTE: I do not want to break compatibility so I define yet another method...
-    public List<Test> getAllTests() {
-        return TestDAO.getValidTestsForGame(this.id, false);
-    }
-
-
     public List<Test> getTests(boolean defendersOnly) {
         // TODO Why we cache this result?
         if (tests == null) {
@@ -136,6 +131,12 @@ public abstract class AbstractGame {
         }
         return tests;
     }
+
+    // NOTE: I do not want to break compatibility so I define yet another method...
+    public List<Test> getAllTests() {
+        return TestDAO.getValidTestsForGame(this.id, false);
+    }
+
 
     public List<Mutant> getMutants() {
         if (mutants == null) {
