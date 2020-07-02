@@ -218,7 +218,7 @@ public final class ConnectionPool {
      * @param connection to be released.
      */
     synchronized void releaseDBConnection(Connection connection) {
-        if (connection != null) {
+        if (connection != null && !availableConnections.contains(connection)) {
             availableConnections.add(connection);
             notifyAll();
         }
