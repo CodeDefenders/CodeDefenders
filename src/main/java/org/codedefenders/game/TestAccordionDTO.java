@@ -22,10 +22,8 @@ import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
 import com.google.gson.annotations.Expose;
-import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.GameClass.MethodDescription;
-import org.codedefenders.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Computes and saves data for the test accordion.
@@ -47,17 +44,20 @@ public class TestAccordionDTO {
      * One category containing all tests and one category for each method of the class,
      * containing the tests that cover the method.
      */
-    @Expose private List<TestAccordionCategory> categories;
+    @Expose
+    private List<TestAccordionCategory> categories;
 
     /**
      * Maps test ids to tests.
      */
-    @Expose private Map<Integer, TestAccordionTestDTO> tests;
+    @Expose
+    private Map<Integer, TestDTO> tests;
 
     /**
      * Constructs the test accordion data.
-     * @param cut The class the tests and mutants belong to.
-     * @param testsList The tests.
+     *
+     * @param cut         The class the tests and mutants belong to.
+     * @param testsList   The tests.
      * @param mutantsList The mutants.
      */
     public TestAccordionDTO(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
@@ -65,7 +65,7 @@ public class TestAccordionDTO {
         categories = new ArrayList<>();
 
         for (Test test : testsList) {
-            tests.put(test.getId(), new TestAccordionTestDTO(test, mutantsList));
+            tests.put(test.getId(), new TestDTO(test, mutantsList));
         }
 
         TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
@@ -112,7 +112,7 @@ public class TestAccordionDTO {
                 if (entry == null) {
                     lastRange = beforeFirst;
 
-                /* Line belongs to a method. */
+                    /* Line belongs to a method. */
                 } else {
                     lastRange = entry.getKey();
                     entry.getValue().addTestId(test.getId());
@@ -123,6 +123,7 @@ public class TestAccordionDTO {
 
     /**
      * Returns the categories of the test accordion.
+     *
      * @return The categories of the test accordion.
      */
     public List<TestAccordionCategory> getCategories() {
@@ -133,11 +134,14 @@ public class TestAccordionDTO {
      * Represents a category (accordion section) of the test accordion.
      */
     public static class TestAccordionCategory {
-        @Expose private String description;
+        @Expose
+        private String description;
         private Integer startLine;
         private Integer endLine;
-        @Expose private Set<Integer> testIds;
-        @Expose private String id;
+        @Expose
+        private Set<Integer> testIds;
+        @Expose
+        private String id;
 
         public TestAccordionCategory(String description, String id) {
             this.description = description;
@@ -169,32 +173,6 @@ public class TestAccordionDTO {
 
         public String getId() {
             return id;
-        }
-    }
-
-    /**
-     * Represents a test for the test accordion.
-     */
-    public static class TestAccordionTestDTO {
-        @Expose private int id;
-        @Expose private String creatorName;
-        @Expose private List<Integer> coveredMutantIds;
-        @Expose private List<Integer> killedMutantIds;
-        @Expose private int points;
-        @Expose private List<String> smells;
-
-        public TestAccordionTestDTO(Test test, List<Mutant> mutants) {
-            User creator = UserDAO.getUserForPlayer(test.getPlayerId());
-            this.id = test.getId();
-            this.creatorName = creator.getUsername();
-            this.coveredMutantIds = test.getCoveredMutants(mutants).stream()
-                    .map(Mutant::getId)
-                    .collect(Collectors.toList());
-            this.killedMutantIds = test.getKilledMutants().stream()
-                    .map(Mutant::getId)
-                    .collect(Collectors.toList());
-            this.points = test.getScore();
-            this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
         }
     }
 }
