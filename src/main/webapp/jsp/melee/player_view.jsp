@@ -18,27 +18,27 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@page import="org.codedefenders.game.GameClass"%>
-<%@ page import="org.codedefenders.game.GameLevel"%>
-<%@ page import="org.codedefenders.game.GameState"%>
-<%@ page import="org.codedefenders.game.Mutant"%>
-<%@ page import="org.codedefenders.game.Test"%>
-<%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
-<%@ page import="org.codedefenders.util.Constants"%>
-<%@ page import="org.codedefenders.model.User"%>
-<%@ page import="org.codedefenders.util.Constants"%>
-<%@ page import="org.codedefenders.util.Paths"%>
-<%@ page import="java.util.stream.Collectors"%>
+<%@page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%--
     @param MeleeGame game
         The game to be displayed.
 --%>
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean"
-             scope="request" />
+             scope="request"/>
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
@@ -50,7 +50,7 @@
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
     User equivDefender = (User) request.getAttribute("equivDefender");
 
-	final User user = login.getUser();
+    final User user = login.getUser();
     // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
     final int userId = login.getUserId();
     final List<Test> playerTests = game.getTests()
@@ -61,13 +61,13 @@
 
 <jsp:useBean id="previousSubmission"
              class="org.codedefenders.beans.game.PreviousSubmissionBean"
-             scope="request" />
+             scope="request"/>
 
 <%-- -------------------------------------------------------------------------------- --%>
 
 <%-- Mutant editor in player mode is the same as class viewer in defender --%>
 <jsp:useBean id="mutantEditor"
-             class="org.codedefenders.beans.game.MutantEditorBean" scope="request" />
+             class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 <%
     mutantEditor.setClassName(cut.getName());
     mutantEditor.setDependenciesForClass(game.getCUT());
@@ -81,7 +81,7 @@
 
 <jsp:useBean id="gameHighlighting"
              class="org.codedefenders.beans.game.GameHighlightingBean"
-             scope="request" />
+             scope="request"/>
 <%
     gameHighlighting.setGameData(game.getMutants(), playerTests, user);
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
@@ -96,7 +96,7 @@
 
 <jsp:useBean id="testErrorHighlighting"
              class="org.codedefenders.beans.game.ErrorHighlightingBean"
-             scope="request" />
+             scope="request"/>
 <%
     if (!openEquivalenceDuel) {
         testErrorHighlighting.setCodeDivSelector("#utest-div");
@@ -110,41 +110,42 @@
 
 <jsp:useBean id="mutantErrorHighlighting"
              class="org.codedefenders.beans.game.ErrorHighlightingBean"
-             scope="request" />
+             scope="request"/>
 <%
     mutantErrorHighlighting.setCodeDivSelector("#newmut-div");
     if (previousSubmission.hasMutant() && previousSubmission.hasErrorLines()) {
         mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
 %>
-
+<%--
 <jsp:useBean id="mutantAccordion"
              class="org.codedefenders.beans.game.MutantAccordionBean"
-             scope="request" />
+             scope="request"/>
 <%
+    mutantAccordion.setGame(game);
     mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
-    mutantAccordion.setPlayerCoverToClaim(true);
     mutantAccordion.setFlaggingData(game.getMode(), game.getId());
     mutantAccordion.setEnableFlagging(true);
     mutantAccordion.setViewDiff(game.getLevel() == GameLevel.EASY);
 %>
+--%>
 
 <jsp:useBean id="testAccordion"
-             class="org.codedefenders.beans.game.TestAccordionBean" scope="request" />
+             class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <%
     testAccordion.setTestAccordionData(cut, playerTests, game.getMutants());
 %>
 
 <jsp:useBean id="mutantProgressBar"
              class="org.codedefenders.beans.game.MutantProgressBarBean"
-             scope="request" />
+             scope="request"/>
 <%
     mutantProgressBar.setGameId(game.getId());
 %>
 
 <jsp:useBean id="testProgressBar"
              class="org.codedefenders.beans.game.TestProgressBarBean"
-             scope="request" />
+             scope="request"/>
 <%
     testProgressBar.setGameId(game.getId());
 %>
@@ -152,13 +153,13 @@
 
 <jsp:useBean id="mutantExplanation"
              class="org.codedefenders.beans.game.MutantExplanationBean"
-             scope="request" />
+             scope="request"/>
 <%
     mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel());
 %>
 
 <jsp:useBean id="testEditor"
-             class="org.codedefenders.beans.game.TestEditorBean" scope="request" />
+             class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 <%
     testEditor.setEditableLinesForClass(cut);
     testEditor.setMockingEnabled(cut.isMockingEnabled());
@@ -200,7 +201,8 @@
         </h3>
         <div
                 style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
-            <p><%=String.join("\n", equivMutant.getHTMLReadout())%></p>
+            <p><%=String.join("\n", equivMutant.getHTMLReadout())%>
+            </p>
             <a class="btn btn-default" data-toggle="collapse"
                href="#diff-collapse">Show Diff</a>
             <p></p>
@@ -209,25 +211,25 @@
                           title="mutdiff"><%=equivMutant.getHTMLEscapedPatchString()%></textarea>
 			</pre>
             <script>
-                $('#diff-collapse').on('shown.bs.collapse', function() {
+                $('#diff-collapse').on('shown.bs.collapse', function () {
                     var codeMirrorContainer = $(this).find(
-                        ".CodeMirror")[0];
+                            ".CodeMirror")[0];
                     if (codeMirrorContainer
-                        && codeMirrorContainer.CodeMirror) {
+                            && codeMirrorContainer.CodeMirror) {
                         codeMirrorContainer.CodeMirror.refresh();
                     } else {
                         var showDiff = CodeMirror.fromTextArea(document
-                            .getElementById('diff'), {
-                            lineNumbers : false,
-                            mode : "text/x-diff",
-                            readOnly : true
+                                .getElementById('diff'), {
+                            lineNumbers: false,
+                            mode: "text/x-diff",
+                            readOnly: true
                         });
                         showDiff.setSize("100%", 210);
                     }
                 });
             </script>
 
-            <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp" />
+            <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
             <h3>Not equivalent? Write a killing test here:</h3>
             <form id="equivalenceForm"
                   action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>"
@@ -237,22 +239,26 @@
                 <input type="hidden" id="equivMutantId" name="equivMutantId"
                        value="<%=equivMutant.getId()%>">
 
-                <jsp:include page="/jsp/game_components/test_editor.jsp" />
+                <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                 <button class="btn btn-danger btn-left" name="acceptEquivalent"
                         type="submit"
-                        onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept
-                    Equivalence</button>
+                        onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">
+                    Accept
+                    Equivalence
+                </button>
                 <button class="btn btn-primary btn-game btn-right"
                         name="rejectEquivalent" type="submit"
                         onclick="testProgressBar(); return true;">Submit Killing
-                    Test</button>
+                    Test
+                </button>
 
                 <div>Note: If the game finishes with this equivalence
-                    unsolved, you will lose points!</div>
+                    unsolved, you will lose points!
+                </div>
             </form>
         </div>
-        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />
+        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 
     <%-- TODO: What to show besides the test editor in the quivalence duel? --%>
@@ -274,23 +280,25 @@
             <h3 style="margin-bottom: 0; display: inline">Create a mutant
                 here</h3>
 
-            <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp" />
+            <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
             <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
             <button type="submit" class="btn btn-primary btn-game btn-right"
                     id="submitMutant" form="atk"
                     onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
                     style="float: right; margin-right: 5px"
                     <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
-                Attack!</button>
+                Attack!
+            </button>
 
             <!-- Reset button -->
             <form id="reset"
                   action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
                   method="post" style="float: right; margin-right: 5px">
                 <button class="btn btn-primary btn-warning btn-game btn-right"
-                        id="btnReset">Reset</button>
+                        id="btnReset">Reset
+                </button>
                 <input type="hidden" name="formType" value="reset"> <input
-                    type="hidden" name="gameId" value="<%=game.getId()%>" />
+                    type="hidden" name="gameId" value="<%=game.getId()%>"/>
             </form>
         </div>
 
@@ -298,17 +306,17 @@
               action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
               method="post">
             <input type="hidden" name="formType" value="createMutant"> <input
-                type="hidden" name="gameId" value="<%=game.getId()%>" />
+                type="hidden" name="gameId" value="<%=game.getId()%>"/>
 
-            <jsp:include page="/jsp/game_components/mutant_editor.jsp" />
-            <jsp:include page="/jsp/game_components/game_highlighting.jsp" />
+            <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
+            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
             <!-- THE FOLLOWING IS DUPLICATED ! -->
             <jsp:include
-                    page="/jsp/game_components/mutant_error_highlighting.jsp" />
+                    page="/jsp/game_components/mutant_error_highlighting.jsp"/>
         </form>
-        <jsp:include page="/jsp/game_components/mutant_explanation.jsp" />
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         <jsp:include
-                page="/jsp/game_components/editor_help_config_toolbar.jsp" />
+                page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
 
     <%-- -------------------------------------------------------------------------------- --%>
@@ -317,26 +325,27 @@
 
     <div class="col-md-6" id="utest-div">
 
-        <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp" />
+        <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
         <h3>
             Write a new JUnit test here
             <button type="submit" class="btn btn-primary btn-game btn-right"
                     id="submitTest" form="def"
                     onClick="window.testProgressBar(); this.form.submit(); this.disabled = true; this.value = 'Defending...';"
                     <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
-                Defend!</button>
+                Defend!
+            </button>
         </h3>
 
         <form id="def"
               action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
               method="post">
-            <jsp:include page="/jsp/game_components/test_editor.jsp" />
+            <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             <input type="hidden" name="formType" value="createTest"> <input
-                type="hidden" name="gameId" value="<%=game.getId()%>" />
+                type="hidden" name="gameId" value="<%=game.getId()%>"/>
         </form>
         <jsp:include
-                page="/jsp/game_components/editor_help_config_toolbar.jsp" />
-        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />
+                page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
+        <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 
     <% } %>
@@ -349,12 +358,12 @@
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6" id="mutants-div">
         <h3>Existing Mutants</h3>
-        <jsp:include page="/jsp/game_components/mutant_accordion.jsp" />
+        <t:mutant_accordion/>
     </div>
 
     <div class="col-md-6">
         <h3>JUnit tests</h3>
-        <jsp:include page="/jsp/game_components/test_accordion.jsp" />
+        <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
     </div>
 </div>
 

@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -77,7 +79,7 @@
     }
 %>
 
-
+<%--
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
     mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
@@ -85,6 +87,7 @@
     mutantAccordion.setEnableFlagging(false);
     mutantAccordion.setViewDiff(true);
 %>
+--%>
 
 
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
@@ -113,7 +116,7 @@
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Existing Mutants</h3>
-            <jsp:include page="/jsp/game_components/mutant_accordion.jsp"/>
+            <t:mutant_accordion/>
         </div>
 
         <% if (showTestAccordion) { %>

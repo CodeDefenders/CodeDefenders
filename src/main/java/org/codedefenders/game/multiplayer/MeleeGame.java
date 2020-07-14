@@ -392,7 +392,7 @@ public class MeleeGame extends AbstractGame {
 
         switch (state) {
             case ACTIVE:
-                if (events.stream().map(Event::getEventType).noneMatch(e -> e ==  EventType.GAME_STARTED)) {
+                if (events.stream().map(Event::getEventType).noneMatch(e -> e == EventType.GAME_STARTED)) {
                     EventType et = EventType.GAME_STARTED;
                     notifyPlayers("Game has started. Attack and Defend now!", et);
                     notifyCreator("Your game as started!", et);
@@ -400,7 +400,7 @@ public class MeleeGame extends AbstractGame {
                 }
                 break;
             case GRACE_ONE:
-                if (events.stream().map(Event::getEventType).noneMatch(e -> e ==  EventType.GAME_GRACE_ONE)) {
+                if (events.stream().map(Event::getEventType).noneMatch(e -> e == EventType.GAME_GRACE_ONE)) {
                     EventType et = EventType.GAME_GRACE_ONE;
                     notifyPlayers("A game has entered Grace One.", et);
                     notifyCreator("Your game has entered Grace One", et);
@@ -408,7 +408,7 @@ public class MeleeGame extends AbstractGame {
                 }
                 break;
             case GRACE_TWO:
-                if (events.stream().map(Event::getEventType).noneMatch(e -> e ==  EventType.GAME_GRACE_TWO)) {
+                if (events.stream().map(Event::getEventType).noneMatch(e -> e == EventType.GAME_GRACE_TWO)) {
                     EventType et = EventType.GAME_GRACE_TWO;
                     notifyPlayers("A game has entered Grace Two.", et);
                     notifyCreator("Your game has entered Grace Two", et);

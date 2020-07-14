@@ -34,41 +34,35 @@ public class MutantDTO {
     @Expose
     private final int id;
     @Expose
-    private final String creatorName;
+    private UserDTO creator;
     @Expose
-    private final Mutant.State state;
+    private Mutant.State state;
     @Expose
-    private final int points;
+    private int points;
     @Expose
-    private final String lineString;
+    private String lineString;
     @Expose
-    private final Boolean covered;
+    private Boolean covered;
     @Expose
-    private final String killedByName;
+    private String killedByName;
     @Expose
-    private final boolean canMarkEquivalent;
+    private boolean canMarkEquivalent;
     @Expose
-    private final boolean canView;
-    private final List<Integer> lines;
+    private boolean canView = false;
+    private String sourceCode;
+    private List<Integer> lines;
     @Expose
-    private final int killedByTestId;
+    private int killedByTestId;
     @Expose
-    private final String killMessage;
+    private String killMessage;
     @Expose
-    private final String description;
+    private String description;
 
-    public MutantDTO(Mutant mutant, User user, boolean playerCoverToClaim) {
+    public MutantDTO(Mutant mutant) {
+        creator = new UserDTO(mutant.getCreatorId(), mutant.getCreatorName());
         id = mutant.getId();
-        creatorName = mutant.getCreatorName();
         points = mutant.getScore();
         state = mutant.getState();
-
-        if (playerCoverToClaim) {
-            covered = mutant.getCoveringTests().stream()
-                    .anyMatch(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == user.getId());
-        } else {
-            covered = mutant.isCovered();
-        }
         description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout()
                 .stream()
                 .filter(Objects::nonNull).collect(Collectors.joining("<br>")));
@@ -81,21 +75,56 @@ public class MutantDTO {
             killedByTestId = -1;
             killMessage = null;
         }
-
-
         lines = mutant.getLines();
         lineString = lines.stream().map(String::valueOf).collect(Collectors.joining(","));
+    }
 
-        canMarkEquivalent = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                && mutant.getCreatorId() != user.getId()
-                && mutant.getLines().size() >= 1;
-        canView = state == Mutant.State.KILLED
-                || state == Mutant.State.EQUIVALENT
-                || mutant.getCreatorId() == user.getId();
+    @Deprecated
+    public MutantDTO(Mutant mutant, User user, boolean playerCoverToClaim) {
+        this(mutant);
     }
 
     public int getId() {
         return id;
+    }
+
+    public MutantDTO setCovered(boolean covered) {
+        this.covered = covered;
+        return this;
+    }
+
+    public boolean isViewable() {
+        return canView;
+    }
+
+    public MutantDTO setCanView(boolean canView) {
+        this.canView = canView;
+        return this;
+    }
+
+    public String getSourceCode() {
+        if (canView) {
+            return sourceCode;
+        } else {
+            return null;
+        }
+    }
+
+    public MutantDTO setSourceCode(String sourceCode) {
+        this.sourceCode = sourceCode;
+        return this;
+    }
+
+    public boolean isCanMarkEquivalent() {
+        return canMarkEquivalent;
+    }
+
+    public MutantDTO setCanMarkEquivalent(boolean canMarkEquivalent) {
+        this.canMarkEquivalent = canMarkEquivalent;
+        return this;
+    }
+
+    public List<Integer> getLines() {
+        return lines;
     }
 }

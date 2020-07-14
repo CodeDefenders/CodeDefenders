@@ -6,15 +6,21 @@ import com.google.common.collect.TreeRangeMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.model.User;
+import org.codedefenders.service.MutantService;
 import org.codedefenders.util.JSONUtils;
 
-import javax.annotation.ManagedBean;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,9 +35,19 @@ import java.util.stream.Collectors;
  * <p>Provides data for the mutant accordion game component.</p>
  * <p>Bean Name: {@code mutantAccordion}</p>
  */
-@ManagedBean
+@Named(value = "mutantAccordion")
 @RequestScoped
 public class MutantAccordionBean {
+
+    @Inject
+    MutantService mutantService;
+
+    @Inject
+    LoginBean loginBean;
+
+    @Inject
+    AbstractGame game;
+
     /**
      * Show a button to flag a selected mutant as equivalent.
      */
@@ -52,10 +68,9 @@ public class MutantAccordionBean {
     /**
      * Enable viewing of the mutant diffs.
      */
-    private Boolean viewDiff;
+    private Boolean viewDiff = false;
 
-    private GameClass cut;
-    private List<Mutant> mutantList;
+    private List<MutantDTO> mutantList;
     private List<MutantAccordionCategory> categories;
 
     private User user;
@@ -66,20 +81,19 @@ public class MutantAccordionBean {
         enableFlagging = null;
         gameMode = null;
         gameId = null;
-        viewDiff = null;
-        cut = null;
         mutantList = null;
         categories = null;
         user = null;
     }
 
-    public void setMutantAccordionData(GameClass cut,
-                                       User user,
-                                       List<Mutant> mutants) {
-        this.cut = cut;
-        this.user = user;
-        this.mutantList = Collections.unmodifiableList(mutants);
-        this.playerCoverToClaim = false;
+    public void setGame(AbstractGame game) {
+        this.game = game;
+        setup();
+    }
+
+    @PostConstruct
+    public void setup() {
+        mutantList = mutantService.getMutantsForGame(loginBean.getUser(), game);
 
         categories = new ArrayList<>();
 
@@ -91,7 +105,7 @@ public class MutantAccordionBean {
                 new MutantAccordionCategory("Mutants outside methods", "noMethod");
         categories.add(mutantsWithoutMethod);
 
-        List<GameClass.MethodDescription> methodDescriptions = cut.getMethodDescriptions();
+        List<GameClass.MethodDescription> methodDescriptions = game.getCUT().getMethodDescriptions();
         List<MutantAccordionCategory> methodCategories = new ArrayList<>();
         for (int i = 0; i < methodDescriptions.size(); i++) {
             methodCategories.add(new MutantAccordionCategory(methodDescriptions.get(i), String.valueOf(i)));
@@ -111,8 +125,9 @@ public class MutantAccordionBean {
 
         Range<Integer> beforeFirst = Range.closedOpen(0, methodRanges.span().lowerEndpoint());
 
+
         /* For every test, go through all covered lines and find the methods that are covered by it. */
-        for (Mutant mutant : getAllMutants()) {
+        for (MutantDTO mutant : mutantList) {
 
             /* Save the last range a line number fell into to avoid checking a line number in the same method twice. */
             Range<Integer> lastRange = null;
@@ -146,19 +161,29 @@ public class MutantAccordionBean {
         }
     }
 
+    @Deprecated
+    public void setMutantAccordionData(GameClass cut,
+                                       User user,
+                                       List<Mutant> mutants) {
+        setGame(GameDAO.getGame(mutants.get(0).getGameId()));
+    }
+
     public void setPlayerCoverToClaim(boolean playerCoverToClaim) {
         this.playerCoverToClaim = playerCoverToClaim;
     }
 
+    @Deprecated
     public void setEnableFlagging(boolean enableFlagging) {
         this.enableFlagging = enableFlagging;
     }
 
+    @Deprecated
     public void setFlaggingData(GameMode gameMode, int gameId) {
         this.gameMode = gameMode;
         this.gameId = gameId;
     }
 
+    @Deprecated
     public void setViewDiff(boolean viewDiff) {
         this.viewDiff = viewDiff;
     }
@@ -186,8 +211,7 @@ public class MutantAccordionBean {
     }
 
     public List<MutantDTO> getMutants() {
-        return mutantList.stream().map(m -> new MutantDTO(m, user, playerCoverToClaim))
-                .collect(Collectors.toList());
+        return mutantList;
     }
 
     public List<MutantAccordionCategory> getCategories() {
@@ -195,7 +219,7 @@ public class MutantAccordionBean {
     }
 
     public List<Mutant> getAllMutants() {
-        return mutantList;
+        return null;
     }
 
     public String jsonFromCategories() {
@@ -205,9 +229,7 @@ public class MutantAccordionBean {
     }
 
     public String jsonMutants() {
-        Map<Integer, MutantDTO> mutants =
-                mutantList.stream().collect(Collectors.toMap(Mutant::getId,
-                        m -> new MutantDTO(m, user, playerCoverToClaim)));
+        Map<Integer, MutantDTO> mutants = this.mutantList.stream().collect(Collectors.toMap(MutantDTO::getId, m -> m));
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()
