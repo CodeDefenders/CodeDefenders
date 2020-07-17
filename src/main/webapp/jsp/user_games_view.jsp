@@ -337,7 +337,9 @@
                     List<Player> players = ((UserMeleeGameInfo) info).players();
                 %>
                 <tr id="<%="game-"+gameId%>">
-                    <td class="col-sm-1"><%= gameId %>
+                    <td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details">
+                        <span style="margin-right: 5px"
+                              class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span><%=gameId%>
                     </td>
                     <td class="col-sm-1"><%=info.creatorName()%>
                     </td>
@@ -370,49 +372,6 @@
 
                     <td class="col-sm-2">
                         <span><%=players.size()%> Players</span>
-                        <%
-                            if (!players.isEmpty()) {
-                        %>
-                        <a href="#" data-toggle="modal" data-target="#modalPlayersFor<%=gameId%>">(Details)</a>
-                        <div id="modalPlayersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;">
-                            <div class="modal-dialog">
-                                <!-- Modal content-->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <h4 class="modal-title">Players</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table id="game-<%=gameId%>-players"
-                                               class="table table-striped table-hover table-responsive table-paragraphs games-table">
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Points</th>
-                                            </tr>
-                                            <%
-                                                for (Player player : players) {
-                                            %>
-                                            <tr>
-                                                <td class="col-sm-1"><%=player.getUser().getUsername()%>
-                                                </td>
-                                                <td class="col-sm-1"><%=player.getPoints()%>
-                                                </td>
-                                            </tr>
-                                            <%
-                                                }
-                                            %>
-                                        </table>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <%
-                            }
-                        %>
                     </td>
 
                     <td class="col-sm-1"><%=info.gameLevel().getFormattedString()%>
@@ -479,6 +438,41 @@
                                 }
                             }
                         %>
+                    </td>
+                </tr>
+                <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+                    <td colspan="6">
+
+                        <table id="game-<%=gameId%>-players"
+                               class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                            <tr>
+                                <th>Name</th>
+                                <th>Points</th>
+                            </tr>
+                            <%
+                                if (players.isEmpty()) {
+                            %>
+                            <tr>
+                                <td colspan="4">
+                                    There are no players
+                                </td>
+                            </tr>
+                            <%
+                                }
+                            %>
+                            <%
+                                for (Player player : players) {
+                            %>
+                            <tr>
+                                <td class="col-sm-1"><%=player.getUser().getUsername()%>
+                                </td>
+                                <td class="col-sm-1"><%=player.getPoints()%>
+                                </td>
+                            </tr>
+                            <%
+                                }
+                            %>
+                        </table>
                     </td>
                 </tr>
                 <%
