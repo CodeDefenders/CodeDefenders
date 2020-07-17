@@ -14,7 +14,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.model.User;
-import org.codedefenders.service.MutantService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.JSONUtils;
 
 import javax.annotation.PostConstruct;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class MutantAccordionBean {
 
     @Inject
-    MutantService mutantService;
+    GameService gameService;
 
     @Inject
     LoginBean loginBean;
@@ -93,7 +93,7 @@ public class MutantAccordionBean {
 
     @PostConstruct
     public void setup() {
-        mutantList = mutantService.getMutantsForGame(loginBean.getUser(), game);
+        mutantList = gameService.getMutants(loginBean.getUser(), game);
 
         categories = new ArrayList<>();
 
