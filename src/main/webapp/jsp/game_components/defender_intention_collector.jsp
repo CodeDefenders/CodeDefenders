@@ -40,7 +40,7 @@
     //append to form element that you want .
     theForm.appendChild(input);
 
-    <!-- Update Left Code Mirror to enable line selection on gutter -->
+    // Update Left Code Mirror to enable line selection on gutter
     var editor = document.querySelector('#sut').nextSibling.CodeMirror;
 
     toggleIntentionClass();
