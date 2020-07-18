@@ -18,7 +18,7 @@ import java.util.Map;
  * <p>Provides data for the test accordion game component.</p>
  * <p>Bean Name: {@code testAccordion}</p>
  */
-@ManagedBean
+@ManagedBean(value = "testAccordion")
 @RequestScoped
 // TODO: Move code out of TestAccordionDTO and in here?
 public class TestAccordionBean {
