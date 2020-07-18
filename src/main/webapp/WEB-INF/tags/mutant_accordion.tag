@@ -22,10 +22,6 @@
 
 <%--@elvariable id="mutantAccordion" type="org.codedefenders.beans.game.MutantAccordionBean"--%>
 
-<%--
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
---%>
-
 <style type="text/css">
     <%-- Prefix all classes with "ta-" to avoid conflicts.
     We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
@@ -101,8 +97,10 @@
                         <a role="button" data-toggle="collapse" aria-expanded="false"
                            href="#ma-collapse-${category.id}"
                            aria-controls="ma-collapse-${category.id}"
+                            <%-- ${empty …} doesn't work with Set --%>
                            class="panel-title ${category.mutantIds.size() == 0 ? "" : 'ma-covered'}"
                            style="text-decoration: none;">
+                                <%-- ${empty …} doesn't work with Set --%>
                             <c:if test="${!(category.mutantIds.size() == 0)}">
                                 <span class="label bg-attacker ma-count">${category.mutantIds.size()}</span>
                             </c:if>
@@ -117,7 +115,6 @@
                         </div>
                     </div>
                 </div>
-
             </c:forEach>
         </div>
     </div>
@@ -138,23 +135,24 @@
         const testModals = new Map();
 
         /* Functions to generate table columns. */
-        const genId = row => '<span class="ma-mutant-link btn-link" style="padding: 0">Mutant ' + row.id + '</span> <span class="ma-column-name">  by  </span> ' + row.creator.name + (row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : '');
-        const genPoints = row => '<span class="ma-column-name">Points:</span> ' + row.points;
+        const genId = row => `<span class="ma-mutant-link btn-link">Mutant \${row.id}</span>
+                <span class="ma-column-name">  by  </span> \${row.creator.name}
+                \${row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : ''}`;
+        const genPoints = row => `<span class="ma-column-name">Points:</span> \${row.points}`;
         const genLines = row => row.description;
         const genIcon = row => {
             switch (row.state) {
                 case "ALIVE":
-                    return '<span class=\"mutantCUTImage mutantImageAlive\"></span>';
+                    return '<span class="mutantCUTImage mutantImageAlive"></span>';
                 case "KILLED":
-                    return '<span class=\"mutantCUTImage mutantImageKilled\"></span>';
+                    return '<span class="mutantCUTImage mutantImageKilled"></span>';
                 case "EQUIVALENT":
-                    return '<span class=\"mutantCUTImage mutantImageEquiv\"></span>';
+                    return '<span class="mutantCUTImage mutantImageEquiv"></span>';
                 case "FLAGGED":
-                    return '<span class=\"mutantCUTImage mutantImageFlagged\"></span>';
+                    return '<span class="mutantCUTImage mutantImageFlagged"></span>';
             }
         };
-        const genViewButton = row => (${mutantAccordion.viewDiff} || row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm btn-right">View</button>' : ''
-    )
+        const genViewButton = row => row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm btn-right">View</button>' : '';
 
         const genAdditionalButton = row => {
             switch (row.state) {
@@ -162,7 +160,7 @@
                 case "ALIVE":
                     if (row.canMarkEquivalent) {
                         if (row.covered) {
-                            return '<form id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
+                            return '<form id="equiv" action="${pageContext.request.contextPath + Paths.EQUIVALENCE_DUELS_GAME}" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
                                     '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
                                     '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
                                     '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
