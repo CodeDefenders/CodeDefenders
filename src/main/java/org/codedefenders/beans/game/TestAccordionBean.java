@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,5 +52,19 @@ public class TestAccordionBean {
                 .registerTypeAdapter(Map.class, new JSONUtils.MapSerializer())
                 .create();
         return gson.toJson(testAccordionData);
+    }
+
+    public String getCategoriesAsJSON() {
+        Gson gson = new GsonBuilder()
+                .create();
+        return gson.toJson(testAccordionData.getCategories());
+    }
+
+    public String getTestsAsJSON() {
+        Gson gson = new GsonBuilder()
+                // It is important that its HashMap.class, it doesn't work if I change it to Map.class …
+                .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
+                .create();
+        return gson.toJson(testAccordionData.getTests());
     }
 }

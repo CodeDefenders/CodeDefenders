@@ -130,6 +130,10 @@ public class TestAccordionDTO {
         return Collections.unmodifiableList(categories);
     }
 
+    public Map<Integer, TestDTO> getTests() {
+        return tests;
+    }
+
     /**
      * Represents a category (accordion section) of the test accordion.
      */

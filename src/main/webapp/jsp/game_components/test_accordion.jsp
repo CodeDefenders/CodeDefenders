@@ -119,14 +119,11 @@
     /* Wrap in a function so it has it's own scope. */
     (function () {
 
-        /** Test accordion data. */
-        const ta_data = JSON.parse('${testAccordion.JSON}');
-
         /** A description and list of test ids for each category (method). */
-        const categories = ta_data.categories;
+        const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
 
         /** Maps test ids to their DTO representation. */
-        const tests = new Map(ta_data.tests);
+        const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
 
         /** Maps test ids to modals that show the tests' code. */
         const testModals = new Map();
