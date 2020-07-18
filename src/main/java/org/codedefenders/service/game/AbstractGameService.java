@@ -26,6 +26,7 @@ import org.codedefenders.database.UserDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 
@@ -47,7 +48,7 @@ public abstract class AbstractGameService implements IGameService {
         AbstractGame game = GameDAO.getGame(mutant.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, mutant.getGameId());
         if (game != null) {
-            return convertMutant(mutant, player, game);
+            return convertMutant(mutant, player.getUser(), player, game);
         } else {
             return null;
         }
@@ -74,12 +75,30 @@ public abstract class AbstractGameService implements IGameService {
     public List<MutantDTO> getMutants(User user, AbstractGame game) {
         Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
         return game.getMutants().stream()
-                .map(mutant -> convertMutant(mutant, player, game))
+                .map(mutant -> convertMutant(mutant, user, player, game))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
     // NOTE: This could be split into several methods. Like: canFlag(Mutant mutant, Player player, AbstractGame game);
     //  So the actual building of the MutantDTO could happen in this class.
-    abstract protected MutantDTO convertMutant(Mutant mutant, Player player, AbstractGame game);
+    abstract protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game);
+
+    // TODO:
+    protected Role determineRole(User user, Player player, AbstractGame game) {
+        Role result = null;
+        if (game != null) {
+            if (player != null) {
+                result = player.getRole();
+            }
+            if (player == null || result == null) {
+                if (game.getCreatorId() == user.getId()) {
+                    result = Role.OBSERVER;
+                } else {
+                    result = Role.NONE;
+                }
+            }
+        }
+        return result;
+    }
 }

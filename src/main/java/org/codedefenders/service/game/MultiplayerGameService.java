@@ -35,39 +35,26 @@ import javax.enterprise.context.ApplicationScoped;
 public class MultiplayerGameService extends AbstractGameService {
 
     @Override
-    protected MutantDTO convertMutant(Mutant mutant, Player player, AbstractGame game) {
-        if (player == null) {
-            return new MutantDTO(mutant);
-        } else {
-            User user = player.getUser();
-            Role playerRole = player.getRole();
-            // TODO Remove this workaround
-            if (playerRole == null) {
-                if (game.getCreatorId() == user.getId()) {
-                    playerRole = Role.OBSERVER;
-                } else {
-                    playerRole = Role.NONE;
-                }
-            }
+    protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game) {
+        Role playerRole = determineRole(user, player, game);
 
-            return new MutantDTO(mutant)
-                    .setCovered(mutant.isCovered())
-                    // TODO: This could use some tests
-                    .setCanView(playerRole != Role.NONE // User must participate in the Game
-                            // Defender can see Mutants in easy Game
-                            && (game.getLevel() == GameLevel.EASY
-                            || (game.getLevel() == GameLevel.HARD
-                            // In Hard Games the User must either be an Attacker or Observer
-                            && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
-                            // Or the mutant must be killed or equivalent
-                            || mutant.getState().equals(Mutant.State.KILLED)
-                            || mutant.getState().equals(Mutant.State.EQUIVALENT)))))
-                    .setCanMarkEquivalent(game.getState().equals(GameState.ACTIVE)
-                            && mutant.getState().equals(Mutant.State.ALIVE)
-                            && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                            && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                            && mutant.getCreatorId() != user.getId()
-                            && mutant.getLines().size() >= 1);
-        }
+        return new MutantDTO(mutant)
+                .setCovered(mutant.isCovered())
+                // TODO: This could use some tests
+                .setViewable(playerRole != Role.NONE // User must participate in the Game
+                        // Defender can see Mutants in easy Game
+                        && (game.getLevel() == GameLevel.EASY
+                        || (game.getLevel() == GameLevel.HARD
+                        // In Hard Games the User must either be an Attacker or Observer
+                        && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
+                        // Or the mutant must be killed or equivalent
+                        || mutant.getState().equals(Mutant.State.KILLED)
+                        || mutant.getState().equals(Mutant.State.EQUIVALENT)))))
+                .setCanMarkEquivalent(game.getState().equals(GameState.ACTIVE)
+                        && mutant.getState().equals(Mutant.State.ALIVE)
+                        && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                        && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                        && mutant.getCreatorId() != user.getId()
+                        && mutant.getLines().size() >= 1);
     }
 }

@@ -7,13 +7,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameMode;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.model.User;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.JSONUtils;
 
@@ -48,48 +44,8 @@ public class MutantAccordionBean {
     @Inject
     AbstractGame game;
 
-    /**
-     * Show a button to flag a selected mutant as equivalent.
-     */
-    private Boolean enableFlagging;
-
-    /**
-     * The mode of the currently played game.
-     * Used to determine how to flag mutants.
-     */
-    private GameMode gameMode;
-
-    /**
-     * The game id of the currently played game.
-     * Used for URL parameters.
-     */
-    private Integer gameId;
-
-    /**
-     * Enable viewing of the mutant diffs.
-     */
-    private Boolean viewDiff = false;
-
     private List<MutantDTO> mutantList;
     private List<MutantAccordionCategory> categories;
-
-    private User user;
-
-    private boolean playerCoverToClaim;
-
-    public MutantAccordionBean() {
-        enableFlagging = null;
-        gameMode = null;
-        gameId = null;
-        mutantList = null;
-        categories = null;
-        user = null;
-    }
-
-    public void setGame(AbstractGame game) {
-        this.game = game;
-        setup();
-    }
 
     @PostConstruct
     public void setup() {
@@ -161,53 +117,8 @@ public class MutantAccordionBean {
         }
     }
 
-    @Deprecated
-    public void setMutantAccordionData(GameClass cut,
-                                       User user,
-                                       List<Mutant> mutants) {
-        setGame(GameDAO.getGame(mutants.get(0).getGameId()));
-    }
-
-    public void setPlayerCoverToClaim(boolean playerCoverToClaim) {
-        this.playerCoverToClaim = playerCoverToClaim;
-    }
-
-    @Deprecated
-    public void setEnableFlagging(boolean enableFlagging) {
-        this.enableFlagging = enableFlagging;
-    }
-
-    @Deprecated
-    public void setFlaggingData(GameMode gameMode, int gameId) {
-        this.gameMode = gameMode;
-        this.gameId = gameId;
-    }
-
-    @Deprecated
-    public void setViewDiff(boolean viewDiff) {
-        this.viewDiff = viewDiff;
-    }
-
-    // --------------------------------------------------------------------------------
-
-    public GameMode getGameMode() {
-        return gameMode;
-    }
-
-    public Boolean getEnableFlagging() {
-        return enableFlagging;
-    }
-
-    public Boolean canFlag() {
-        return enableFlagging && (gameMode == GameMode.PARTY || gameMode == GameMode.MELEE);
-    }
-
     public Integer getGameId() {
-        return gameId;
-    }
-
-    public boolean getViewDiff() {
-        return viewDiff;
+        return game.getId();
     }
 
     public List<MutantDTO> getMutants() {
@@ -216,10 +127,6 @@ public class MutantAccordionBean {
 
     public List<MutantAccordionCategory> getCategories() {
         return categories;
-    }
-
-    public List<Mutant> getAllMutants() {
-        return null;
     }
 
     public String jsonFromCategories() {

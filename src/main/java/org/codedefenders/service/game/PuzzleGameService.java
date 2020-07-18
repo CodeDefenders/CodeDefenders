@@ -24,6 +24,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.User;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -31,13 +32,13 @@ import javax.enterprise.context.ApplicationScoped;
 public class PuzzleGameService extends AbstractGameService {
 
     @Override
-    protected MutantDTO convertMutant(Mutant mutant, Player player, AbstractGame game) {
+    protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game) {
         if (player == null) {
             return new MutantDTO(mutant);
         } else {
             return new MutantDTO(mutant)
                     .setCovered(mutant.isCovered())
-                    .setCanView(player.getRole() != null && player.getRole() != Role.NONE);
+                    .setViewable(player.getRole() != null && player.getRole() != Role.NONE);
         }
     }
 }

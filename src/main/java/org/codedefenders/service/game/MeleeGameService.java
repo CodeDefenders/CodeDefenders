@@ -35,37 +35,25 @@ import javax.enterprise.context.ApplicationScoped;
 public class MeleeGameService extends AbstractGameService {
 
     @Override
-    protected MutantDTO convertMutant(Mutant mutant, Player player, AbstractGame game) {
-        if (player == null) {
-            return new MutantDTO(mutant);
-        } else {
-            User user = player.getUser();
-            Role playerRole = player.getRole();
-            // TODO Remove this workaround
-            if (playerRole == null) {
-                if (game.getCreatorId() == user.getId()) {
-                    playerRole = Role.OBSERVER;
-                } else {
-                    playerRole = Role.NONE;
-                }
-            }
+    protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game) {
+        Role playerRole = determineRole(user, player, game);
 
-            return new MutantDTO(mutant)
-                    .setCovered(mutant.getCoveringTests().stream()
-                            .anyMatch(t -> t.getPlayerId() == player.getId()))
-                    .setCanView(playerRole != Role.NONE
-                            && (game.getLevel() == GameLevel.EASY
-                            || (game.getLevel() == GameLevel.HARD
-                            && (mutant.getCreatorId() == user.getId()
-                            || playerRole.equals(Role.OBSERVER)
-                            || mutant.getState().equals(Mutant.State.KILLED)
-                            || mutant.getState().equals(Mutant.State.EQUIVALENT)))))
-                    .setCanMarkEquivalent(game.getState().equals(GameState.ACTIVE)
-                            && mutant.getState().equals(Mutant.State.ALIVE)
-                            && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                            && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                            && mutant.getCreatorId() != user.getId()
-                            && mutant.getLines().size() >= 1);
-        }
+        return new MutantDTO(mutant)
+                // Note: getCoveringTests will make a DB Query under the hood
+                .setCovered(mutant.getCoveringTests().stream()
+                        .anyMatch(t -> player != null && t.getPlayerId() == player.getId()))
+                .setViewable(playerRole != Role.NONE
+                        && (game.getLevel() == GameLevel.EASY
+                        || (game.getLevel() == GameLevel.HARD
+                        && (mutant.getCreatorId() == user.getId()
+                        || playerRole.equals(Role.OBSERVER)
+                        || mutant.getState().equals(Mutant.State.KILLED)
+                        || mutant.getState().equals(Mutant.State.EQUIVALENT)))))
+                .setCanMarkEquivalent(game.getState().equals(GameState.ACTIVE)
+                        && mutant.getState().equals(Mutant.State.ALIVE)
+                        && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                        && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                        && mutant.getCreatorId() != user.getId()
+                        && mutant.getLines().size() >= 1);
     }
 }

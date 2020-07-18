@@ -37,19 +37,14 @@ import java.util.List;
 @ApplicationScoped
 public class GameService implements IGameService {
 
+    @Inject
     MultiplayerGameService multiplayerGameService;
 
+    @Inject
     MeleeGameService meleeGameService;
 
-    PuzzleGameService puzzleGameService;
-
     @Inject
-    public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
-                       PuzzleGameService puzzleGameService) {
-        this.multiplayerGameService = multiplayerGameService;
-        this.meleeGameService = meleeGameService;
-        this.puzzleGameService = puzzleGameService;
-    }
+    PuzzleGameService puzzleGameService;
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {

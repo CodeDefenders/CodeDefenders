@@ -24,8 +24,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.model.User;
-import org.codedefenders.util.Constants;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -63,8 +64,7 @@ public class MutantDTO {
         id = mutant.getId();
         points = mutant.getScore();
         state = mutant.getState();
-        description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout()
-                .stream()
+        description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream()
                 .filter(Objects::nonNull).collect(Collectors.joining("<br>")));
         if (mutant.getKillingTest() != null) {
             killedByName = UserDAO.getUserForPlayer(mutant.getKillingTest().getPlayerId()).getUsername();
@@ -97,7 +97,7 @@ public class MutantDTO {
         return canView;
     }
 
-    public MutantDTO setCanView(boolean canView) {
+    public MutantDTO setViewable(boolean canView) {
         this.canView = canView;
         return this;
     }
@@ -126,5 +126,26 @@ public class MutantDTO {
 
     public List<Integer> getLines() {
         return lines;
+    }
+
+    public static class LineNumberComparator implements Comparator<MutantDTO> {
+
+        @Override
+        public int compare(MutantDTO o1, MutantDTO o2) {
+            List<Integer> lines1 = o1.lines;
+            List<Integer> lines2 = o2.lines;
+
+            if (lines1.isEmpty()) {
+                if (lines2.isEmpty()) {
+                    return 0;
+                } else {
+                    return -1;
+                }
+            } else if (lines2.isEmpty()) {
+                return 1;
+            }
+
+            return Collections.min(lines1) - Collections.min(lines2);
+        }
     }
 }
