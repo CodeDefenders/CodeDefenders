@@ -129,7 +129,7 @@
         <% if (showTestAccordion) { %>
         <div id="tests-div">
             <h3>JUnit tests</h3>
-            <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
+            <t:test_accordion/>
         </div>
         <% } %>
     </div>
