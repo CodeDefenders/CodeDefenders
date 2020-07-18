@@ -22,11 +22,14 @@ package org.codedefenders.service.game;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 
@@ -37,6 +40,15 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractGameService implements IGameService {
 
+    // TODO
+    // @Inject
+    // GameDAO gameDAO;
+    // @Inject
+    // PlayerDAO playerDAO;
+    // @Inject
+    // UserDAO userDAO;
+    // @Inject
+    // MutantDAO mutantDAO;
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
@@ -52,12 +64,6 @@ public abstract class AbstractGameService implements IGameService {
         } else {
             return null;
         }
-    }
-
-    @Override
-    public MutantDTO getMutant(int userId, int mutantId, int gameId) {
-        Mutant mutant = MutantDAO.getMutantById(mutantId);
-        return getMutant(userId, mutant);
     }
 
     @Override
@@ -83,6 +89,45 @@ public abstract class AbstractGameService implements IGameService {
     // NOTE: This could be split into several methods. Like: canFlag(Mutant mutant, Player player, AbstractGame game);
     //  So the actual building of the MutantDTO could happen in this class.
     abstract protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game);
+
+
+    @Override
+    public TestDTO getTest(int userId, int testId) {
+        return getTest(userId, TestDAO.getTestById(testId));
+    }
+
+    @Override
+    public TestDTO getTest(int userId, Test test) {
+        AbstractGame game = GameDAO.getGame(test.getGameId());
+        Player player = PlayerDAO.getPlayerForUserAndGame(userId, test.getGameId());
+        if (game != null) {
+            return convertTest(test, player.getUser(), player, game);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public List<TestDTO> getTests(int userId, int gameId) {
+        User user = UserDAO.getUserById(userId);
+        AbstractGame game = GameDAO.getGame(gameId);
+        if (game != null) {
+            return getTests(user, game);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<TestDTO> getTests(User user, AbstractGame game) {
+        Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
+        return game.getTests().stream()
+                .map(test -> convertTest(test, user, player, game))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    abstract protected TestDTO convertTest(Test test, User user, Player player, AbstractGame game);
 
     // TODO:
     protected Role determineRole(User user, Player player, AbstractGame game) {

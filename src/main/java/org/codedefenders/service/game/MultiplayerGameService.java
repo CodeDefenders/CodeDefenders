@@ -20,11 +20,13 @@
 package org.codedefenders.service.game;
 
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.util.Constants;
@@ -56,5 +58,17 @@ public class MultiplayerGameService extends AbstractGameService {
                         && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                         && mutant.getCreatorId() != user.getId()
                         && mutant.getLines().size() >= 1);
+    }
+
+    @Override
+    protected TestDTO convertTest(Test test, User user, Player player, AbstractGame game) {
+        Role playerRole = determineRole(user, player, game);
+
+        return new TestDTO(test)
+                .setMutantData(game.getMutants())
+                .setViewable(game.getState() == GameState.FINISHED
+                        || playerRole == Role.OBSERVER
+                        || playerRole == Role.DEFENDER
+                        || test.getPlayerId() == player.getId());
     }
 }

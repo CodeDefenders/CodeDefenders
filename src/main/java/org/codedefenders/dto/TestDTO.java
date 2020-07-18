@@ -33,31 +33,41 @@ public class TestDTO {
     @Expose
     private int id;
     @Expose
-    private String creatorName;
+    private UserDTO creator;
+    @Expose
+    private boolean canView = false;
     @Expose
     private List<Integer> coveredMutantIds;
     @Expose
     private List<Integer> killedMutantIds;
     @Expose
-    private int points;
+    private Integer points;
     @Expose
     private List<String> smells;
+    private Test test;
 
-    public TestDTO() {
+    public TestDTO(Test test) {
+        this.test = test;
+        this.id = test.getId();
+        User creator = UserDAO.getUserForPlayer(test.getPlayerId());
+        this.creator = new UserDTO(creator.getId(), creator.getUsername());
+        this.points = test.getScore();
+        this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
 
     }
 
-    public TestDTO(Test test, List<Mutant> mutants) {
-        User creator = UserDAO.getUserForPlayer(test.getPlayerId());
-        this.id = test.getId();
-        this.creatorName = creator.getUsername();
+    public TestDTO setViewable(boolean canView) {
+        this.canView = canView;
+        return this;
+    }
+
+    public TestDTO setMutantData(List<Mutant> mutants) {
         this.coveredMutantIds = test.getCoveredMutants(mutants).stream()
                 .map(Mutant::getId)
                 .collect(Collectors.toList());
         this.killedMutantIds = test.getKilledMutants().stream()
                 .map(Mutant::getId)
                 .collect(Collectors.toList());
-        this.points = test.getScore();
-        this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
+        return this;
     }
 }

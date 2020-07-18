@@ -20,8 +20,10 @@
 package org.codedefenders.service.game;
 
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 import org.codedefenders.model.User;
 
 import java.util.List;
@@ -32,9 +34,15 @@ public interface IGameService {
 
     MutantDTO getMutant(int userId, Mutant mutant);
 
-    MutantDTO getMutant(int userId, int mutantId, int gameId);
-
     List<MutantDTO> getMutants(int userId, int gameId);
 
     List<MutantDTO> getMutants(User user, AbstractGame game);
+
+    TestDTO getTest(int userId, int testId);
+
+    TestDTO getTest(int userId, Test test);
+
+    List<TestDTO> getTests(int userId, int gameId);
+
+    List<TestDTO> getTests(User user, AbstractGame game);
 }

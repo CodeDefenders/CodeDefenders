@@ -20,9 +20,11 @@
 package org.codedefenders.service.game;
 
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 
@@ -39,6 +41,17 @@ public class PuzzleGameService extends AbstractGameService {
             return new MutantDTO(mutant)
                     .setCovered(mutant.isCovered())
                     .setViewable(player.getRole() != null && player.getRole() != Role.NONE);
+        }
+    }
+
+    @Override
+    protected TestDTO convertTest(Test test, User user, Player player, AbstractGame game) {
+        if (player == null) {
+            return new TestDTO(test);
+        } else {
+            return new TestDTO(test)
+                    .setMutantData(game.getMutants())
+                    .setViewable(true);
         }
     }
 }

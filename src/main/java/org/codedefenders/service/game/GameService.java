@@ -21,10 +21,13 @@ package org.codedefenders.service.game;
 
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
@@ -48,7 +51,7 @@ public class GameService implements IGameService {
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
-        // I can't delegate this to the other services, as I don't know the game type yet.
+        // I can't delegate this to the other services, as the game type is still unknown.
         Mutant mutant = MutantDAO.getMutantById(mutantId);
         return getMutant(userId, mutant);
     }
@@ -58,16 +61,6 @@ public class GameService implements IGameService {
         IGameService gameService = getGameServiceForGameId(mutant.getGameId());
         if (gameService != null) {
             return gameService.getMutant(userId, mutant);
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public MutantDTO getMutant(int userId, int mutantId, int gameId) {
-        IGameService gameService = getGameServiceForGameId(gameId);
-        if (gameService != null) {
-            return gameService.getMutant(userId, mutantId, gameId);
         } else {
             return null;
         }
@@ -88,6 +81,43 @@ public class GameService implements IGameService {
         IGameService gameService = getGameServiceForGame(game);
         if (gameService != null) {
             return gameService.getMutants(user, game);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public TestDTO getTest(int userId, int testId) {
+        // I can't delegate this to the other services, as the game type is still unknown.
+        Test test = TestDAO.getTestById(testId);
+        return getTest(userId, test);
+    }
+
+    @Override
+    public TestDTO getTest(int userId, Test test) {
+        IGameService gameService = getGameServiceForGameId(test.getGameId());
+        if (gameService != null) {
+            return gameService.getTest(userId, test);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public List<TestDTO> getTests(int userId, int gameId) {
+        IGameService gameService = getGameServiceForGameId(gameId);
+        if (gameService != null) {
+            return gameService.getTests(userId, gameId);
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public List<TestDTO> getTests(User user, AbstractGame game) {
+        IGameService gameService = getGameServiceForGame(game);
+        if (gameService != null) {
+            return gameService.getTests(user, game);
         } else {
             return null;
         }
