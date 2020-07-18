@@ -2,15 +2,15 @@ package org.codedefenders.beans.game;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.TestAccordionDTO;
 import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
 import org.codedefenders.util.JSONUtils;
 
-import javax.annotation.ManagedBean;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +18,14 @@ import java.util.Map;
  * <p>Provides data for the test accordion game component.</p>
  * <p>Bean Name: {@code testAccordion}</p>
  */
-@ManagedBean(value = "testAccordion")
+@Named(value = "testAccordion")
 @RequestScoped
 // TODO: Move code out of TestAccordionDTO and in here?
 public class TestAccordionBean {
+
+    @Inject
+    AbstractGame game;
+
     /**
      * Contains the test and mutant information to be displayed in the accordion.
      */
@@ -31,8 +35,9 @@ public class TestAccordionBean {
         testAccordionData = null;
     }
 
-    public void setTestAccordionData(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
-        testAccordionData = new TestAccordionDTO(cut, testsList, mutantsList);
+    @PostConstruct
+    public void setup() {
+        testAccordionData = new TestAccordionDTO(game.getCUT(), game.getAllTests(), game.getMutants());
     }
 
     // --------------------------------------------------------------------------------

@@ -130,11 +130,13 @@
 %>
 --%>
 
+<%--
 <jsp:useBean id="testAccordion"
              class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <%
     testAccordion.setTestAccordionData(cut, playerTests, game.getMutants());
 %>
+--%>
 
 <jsp:useBean id="mutantProgressBar"
              class="org.codedefenders.beans.game.MutantProgressBarBean"

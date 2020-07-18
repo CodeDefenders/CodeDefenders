@@ -94,9 +94,10 @@
 %>
 --%>
 
+<%--
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
-
+--%>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>

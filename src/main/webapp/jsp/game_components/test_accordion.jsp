@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="testAccordion" type="org.codedefenders.beans.game.TestAccordionBean"--%>
+
 <%--
     Displays an accordion of tables of tests, grouped by which of the CUT's methods they cover.
 
@@ -27,7 +29,9 @@
     generated through JavaScript.
 --%>
 
+<%--
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+--%>
 
 <style type="text/css">
     <%-- Prefix all classes with "ta-" to avoid conflicts.
