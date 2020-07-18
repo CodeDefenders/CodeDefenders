@@ -32,7 +32,6 @@ import java.util.Set;
  */
 @Named(value = "testAccordion")
 @RequestScoped
-// TODO: Move code out of TestAccordionDTO and in here?
 public class TestAccordionBean {
 
     @Inject
