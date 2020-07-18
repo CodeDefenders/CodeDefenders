@@ -130,11 +130,11 @@
 
         /* Functions to generate table columns. */
         const genId             = row => 'Test ' + row.id;
-        const genCreator        = row => <%-- '<span class="ta-column-name">Creator:</span> ' + --%> row.creatorName;
+        const genCreator        = row => <%-- '<span class="ta-column-name">Creator:</span> ' + --%> row.creator.name;
         const genPoints         = row => '<span class="ta-column-name">Points:</span> '  + row.points;
         const genCoveredMutants = row => '<a class="ta-covered-link"><span class="ta-column-name">Covered:</span> ' + row.coveredMutantIds.length + '</a>';;
         const genKilledMutants  = row => '<a class="ta-killed-link"><span class="ta-column-name">Killed:</span> ' + row.killedMutantIds.length + '</a>';
-        const genViewButton     = row => '<button class="ta-view-button btn btn-ssm btn-primary">View</button>';
+        const genViewButton     = row => row.canView ? '<button class="ta-view-button btn btn-ssm btn-primary">View</button>' : '';
         const genSmells         = row => {
             const numSmells = row.smells.length;
             let smellLevel;

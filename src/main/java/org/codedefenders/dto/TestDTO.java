@@ -45,6 +45,7 @@ public class TestDTO {
     @Expose
     private List<String> smells;
     private Test test;
+    private List<Integer> linesCovered;
 
     public TestDTO(Test test) {
         this.test = test;
@@ -53,7 +54,16 @@ public class TestDTO {
         this.creator = new UserDTO(creator.getId(), creator.getUsername());
         this.points = test.getScore();
         this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
+        this.linesCovered = test.getLineCoverage().getLinesCovered();
 
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public List<Integer> getLinesCovered() {
+        return linesCovered;
     }
 
     public TestDTO setViewable(boolean canView) {

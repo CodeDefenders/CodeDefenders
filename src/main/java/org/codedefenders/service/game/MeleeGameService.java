@@ -68,6 +68,7 @@ public class MeleeGameService extends AbstractGameService {
                 .setViewable(game.getState() == GameState.FINISHED
                         || playerRole == Role.OBSERVER
                         || playerRole == Role.DEFENDER
+                        || game.getLevel() == GameLevel.EASY
                         || test.getPlayerId() == player.getId());
     }
 }

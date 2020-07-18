@@ -6,11 +6,11 @@ import com.google.common.collect.TreeRangeMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.JSONUtils;
 
 import javax.annotation.PostConstruct;
@@ -38,6 +38,12 @@ public class TestAccordionBean {
     @Inject
     AbstractGame game;
 
+    @Inject
+    GameService gameService;
+
+    @Inject
+    LoginBean login;
+
     /**
      * The categories of the test accordion, in sorted order.
      * One category containing all tests and one category for each method of the class,
@@ -53,14 +59,13 @@ public class TestAccordionBean {
     @PostConstruct
     public void setup() {
         GameClass cut = game.getCUT();
-        List<Test> testsList = game.getAllTests();
-        List<Mutant> mutantsList = game.getMutants();
+        List<TestDTO> testsList = gameService.getTests(login.getUser(), game);
 
         tests = new HashMap<>();
         categories = new ArrayList<>();
 
-        for (Test test : testsList) {
-            tests.put(test.getId(), new TestDTO(test, mutantsList));
+        for (TestDTO test : testsList) {
+            tests.put(test.getId(), test);
         }
 
         TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
@@ -89,12 +94,12 @@ public class TestAccordionBean {
         Range<Integer> beforeFirst = Range.closedOpen(0, methodRanges.span().lowerEndpoint());
 
         /* For every test, go through all covered lines and find the methods that are covered by it. */
-        for (Test test : testsList) {
+        for (TestDTO test : testsList) {
 
             /* Save the last range a line number fell into to avoid checking a line number in the same method twice. */
             Range<Integer> lastRange = null;
 
-            for (Integer line : test.getLineCoverage().getLinesCovered()) {
+            for (Integer line : test.getLinesCovered()) {
 
                 /* Skip if line falls into a method that was already considered. */
                 if (lastRange != null && lastRange.contains(line)) {
