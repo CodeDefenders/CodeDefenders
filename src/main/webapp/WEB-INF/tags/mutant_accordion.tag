@@ -76,6 +76,20 @@
     #mutants-accordion .ma-killed-link {
         color: inherit;
     }
+
+    #mutants-accordion .panel-heading a {
+        text-decoration: none;
+    }
+
+    #mutants-accordion .ma-mutant-link {
+        padding: 0
+    }
+
+    .modal.mutant-modal .modal-dialog {
+        width: max-content;
+        max-width: 90%;
+        min-width: 500px;
+    }
 </style>
 
 <div class="panel panel-default">
@@ -194,7 +208,7 @@
 
             modal = $(
                     `<div class="modal mutant-modal fade" role="dialog">
-                    <div class="modal-dialog" style="width: max-content; max-width: 90%; min-width: 500px;">
+                    <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -252,7 +266,7 @@
 
             modal = $(
                     `<div class="modal mutant-modal fade" role="dialog">
-                    <div class="modal-dialog" style="width: max-content; max-width: 90%; min-width: 500px;">
+                    <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
