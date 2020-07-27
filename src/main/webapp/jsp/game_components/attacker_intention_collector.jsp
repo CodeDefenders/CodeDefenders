@@ -21,20 +21,30 @@
 <%@ page import="org.codedefenders.game.GameState" %>
 
 <script>
+
+//To fix #638 I made this function global so it can be invoked by onClick. I do not like it but cannot find a better way to
+// make this happen... 
+function updateAttackForm(value){
+	// Probably we should use const here?
+    var attackButton = document.getElementById('submitMutant');
+	var theForm = document.getElementById('atk');
+	
+    document.getElementById("attacker_intention").value = value;
+ 	// Disabled for #638. This function might have been deleted/refactored in some other commit 
+    // progressBar();        
+ 	// Disabled for #490
+    /* registerMutantProgressBar(); */
+    theForm.submit();
+    attackButton.disabled = true;
+}
+
 (function () {
     var attackButton = document.getElementById('submitMutant');
     var theForm = document.getElementById('atk');
 
-    // Who calls this function ?
-    function updateAttackForm(value){
-        document.getElementById("attacker_intention").value = value;
-        progressBar();
-        // Disabled for #490
-        /* registerMutantProgressBar(); */
-        theForm.submit();
-        attackButton.disabled = true;
-    }
+    
 
+    // Add the attacker_intention hidden field to the atk form
     var input = document.createElement("input");
     input.setAttribute("type", "hidden");
     input.setAttribute("id", "attacker_intention");
@@ -42,11 +52,12 @@
     input.setAttribute("value", "");
     theForm.appendChild(input);
 
-    // Replace the submit button with the following code:
-    var originalAttachButton = document.getElementById("submitMutant");
+    // Replace the original submit button with the drop-down one
+    var originalAttackButton = document.getElementById("submitMutant");
 
     // Create the attackDropDown
     var attackDropDown = document.createElement('div');
+    
     attackDropDown.setAttribute("id", "attackDropDown");
     attackDropDown.setAttribute("class", "dropdown");
     attackDropDown.setAttribute("style", "float: right; margin-right: 5px");
@@ -61,15 +72,17 @@
     attackDropDownButton.setAttribute("aria-haspopup", "true");
     attackDropDownButton.setAttribute("aria-expanded", "false");
     attackDropDownButton.innerHTML="Attack <span class=\"glyphicon glyphicon-triangle-bottom\" style=\"font-size: small\"/></span>";
-    //
+    
+    
+    // Attach the button to the drop down
     attackDropDown.appendChild(attackDropDownButton)
 
     <% if (game.getState() != GameState.ACTIVE) { %>
     attackDropDownButton.disabled = true;
     <% } %>
 
-    // At this point we replace originalAttachButton
-    originalAttachButton.parentNode.replaceChild(attackDropDown, originalAttachButton);
+    // At this point we replace originalAttackButton with the new one
+    originalAttackButton.parentNode.replaceChild(attackDropDown, originalAttackButton);
 
     // Finally we adjust the id of the submitMutantTemp button
     attackDropDownButton.setAttribute("id", "submitMutant");
@@ -85,6 +98,7 @@
     var killableMutant = document.createElement('a');
     killableMutant.setAttribute("class", "dropdown-item");
     killableMutant.setAttribute("style", "cursor: pointer");
+    
     killableMutant.setAttribute("onclick", "updateAttackForm(\'KILLABLE\')");
     killableMutant.innerHTML = 'My mutant is killable';
     // connect <ul>, <li> and <a> elements
