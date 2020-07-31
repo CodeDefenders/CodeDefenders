@@ -194,6 +194,12 @@ public class AntRunner implements //
         AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName, forceLocalExecution);
 
         if (result.hasFailure() || result.hasError()) {
+            if (result.hasFailure()) {
+                logger.error(result.getJUnitMessage());
+            } else if (result.hasError()) {
+                logger.error(result.getErrorMessage());
+            }
+
             logger.error("Test {} failed to run against class under test", testClassName);
             throw new Exception("Test failed to run against class under test.");
         } else {
