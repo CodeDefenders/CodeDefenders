@@ -1,12 +1,5 @@
 package org.codedefenders.database;
 
-import org.codedefenders.game.Role;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,18 +7,24 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import javax.annotation.ManagedBean;
+
+import org.codedefenders.game.Role;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+
 // TODO Probably this should expose some specific functions, like handleChatEvent, handle gameEvent, and the like
 @ManagedBean
 public class EventDAO {
-
-    @Inject
-    private Connection conn;
 
     // Split this is possibly different calls, maybe there no need to expose Event
     // class to callers
     public boolean insert(Event event) {
         String query;
         DatabaseValue[] valueList;
+        Connection conn;
+        PreparedStatement stmt;
 
         EventType eventType = event.getEventType();
 
@@ -46,28 +45,33 @@ public class EventDAO {
             query = String.join("\n",
                     "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
                     "VALUES (?, ?, ?, ?, ?);");
-            valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
+            valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
+                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage()) };
         } else {
             query = String.join("\n", "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)",
                     "VALUES (?, ?, ?, ?);");
-            valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
+            valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(event.getEventStatus().toString())};
+                    DatabaseValue.of(event.getEventStatus().toString()) };
         }
 
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        conn = DB.getConnection();
+        stmt = DB.createPreparedStatement(conn, query, valueList);
+        // This closes the connection
         int eventId = DB.executeUpdateGetKeys(stmt, conn);
+
         if (eventId >= 0) {
             if (event.getChatMessage() != null) {
-                // TODO DO WE REALLY NEED A SECOND ONE AT THIS POINT?
-                Connection conn = DB.getConnection();
+                // We need to get a second connection as the execute* close them !
+                conn = DB.getConnection();
                 //
                 query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
                 valueList = new DatabaseValue[] { DatabaseValue.of(eventId), DatabaseValue.of(event.getChatMessage()) };
                 stmt = DB.createPreparedStatement(conn, query, valueList);
+                // This automatically clean up /release the connection
                 DB.executeUpdate(stmt, conn);
+
             }
         }
         return eventId >= 0;
@@ -83,6 +87,8 @@ public class EventDAO {
                 DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
                 DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of((Long) event.getTimestamp()),
                 DatabaseValue.of(event.getId()) };
+
+        Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
         return DB.executeUpdate(stmt, conn);
     }
