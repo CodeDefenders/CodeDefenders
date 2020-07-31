@@ -150,8 +150,9 @@
                     </a>
                 </td>
             </tr>
+            <%-- TODO Enable this after allowing users to join as player in melee mode
             <tr>
-           		<%-- TODO Would be unfair to have the observer also be a player? She can stop the game when she's winning ... --%>
+                <%-- TODO Would be unfair to have the observer also be a player? She can stop the game when she's winning ...
                 <td title="Chose your role for this game">
                     Role selection
                 </td>
@@ -164,6 +165,8 @@
                     </select>
                 </td>
             </tr>
+            --%>
+            <input type="hidden" name="roleSelection" value="OBSERVER">
             <tr>
                 <td title="Players can chat with their team and with all players in the game">
                     Chat
@@ -175,6 +178,7 @@
                 </td>
             </tr>
 
+            <%-- TODO Enable this after adding support for capturing players intention to melee games
             <tr>
                 <td>Enable Capturing Players Intention</td>
                 <td>
@@ -183,6 +187,8 @@
                            data-onstyle="primary" data-offstyle="">
                 </td>
             </tr>
+            --%>
+            <input type="hidden" name="capturePlayersIntention" value="No">
             <tr>
                 <td title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
                     Threshold for Auto. Equiv. Duels
