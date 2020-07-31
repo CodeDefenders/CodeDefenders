@@ -62,7 +62,6 @@
     <!-- Leaf -->
     <link href="css/base.css" rel="stylesheet">
     <link href="css/colors.css" rel="stylesheet">
-    <script type="text/javascript" src="js/script.js"></script>
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
