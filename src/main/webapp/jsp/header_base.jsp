@@ -100,7 +100,7 @@
     <!-- Table sorter -->
     <script type="text/javascript" src="webjars/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="webjars/momentjs/2.14.1/min/moment.min.js"></script> <!-- must come before datetime-moment -->
-    <script type="text/javascript" src="js/datetime-moment.js"></script> <!-- must come after moment -->
+    <script type="text/javascript" src="webjars/datatables-plugins/1.10.16/sorting/datetime-moment.js"></script> <!-- must come after moment -->
     <link href="webjars/datatables/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <link href="css/datatables-override.css" rel="stylesheet" type="text/css" />
 
