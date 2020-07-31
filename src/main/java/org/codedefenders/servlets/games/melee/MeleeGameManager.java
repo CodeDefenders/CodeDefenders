@@ -992,7 +992,8 @@ public class MeleeGameManager extends HttpServlet {
                                     && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
                             // Keep only the mutant that do not belong to the user. TODO Sometimes creator
                             // refers to player and sometimes to user?
-                            .filter(m -> m.getCreatorId() != login.getUserId()).forEach(m -> {
+                            .filter(m -> m.getCreatorId() != login.getUserId())
+                            .forEach(m -> {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 

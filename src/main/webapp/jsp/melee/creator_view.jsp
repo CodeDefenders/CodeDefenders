@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
@@ -52,7 +54,7 @@
 	gameHighlighting.setCodeDivSelector("#cut-div");
 %>
 
-
+<%--
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
 	mutantAccordion.setMutantAccordionData(cut, user, game.getMutants());
@@ -60,11 +62,12 @@
 	mutantAccordion.setEnableFlagging(false);
 	mutantAccordion.setViewDiff(true);
 %>
+--%>
 
-
+<%--
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
 <% testAccordion.setTestAccordionData(cut, game.getTests(), game.getMutants()); %>
-
+--%>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
@@ -78,12 +81,12 @@
 	<div class="col-md-6">
 		<div id="mutants-div">
 			<h3>Existing Mutants</h3>
-			<jsp:include page="/jsp/game_components/mutant_accordion.jsp"/>
+            <t:mutant_accordion/>
 		</div>
 
 		<div id="tests-div">
 			<h3>JUnit tests </h3>
-			<jsp:include page="/jsp/game_components/test_accordion.jsp"/>
+            <t:test_accordion/>
 		</div>
 	</div>
 

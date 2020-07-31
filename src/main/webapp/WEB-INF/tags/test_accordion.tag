@@ -18,7 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.TestAccordionDTO.TestAccordionCategory" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%--@elvariable id="testAccordion" type="org.codedefenders.beans.game.TestAccordionBean"--%>
 
 <%--
     Displays an accordion of tables of tests, grouped by which of the CUT's methods they cover.
@@ -27,7 +29,9 @@
     generated through JavaScript.
 --%>
 
+<%--
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
+--%>
 
 <style type="text/css">
     <%-- Prefix all classes with "ta-" to avoid conflicts.
@@ -36,12 +40,15 @@
     #tests-accordion {
         margin-bottom: 0;
     }
+
     #tests-accordion .panel-body {
         padding: 0;
     }
+
     #tests-accordion thead {
         display: none;
     }
+
     #tests-accordion .dataTables_scrollHead {
         display: none;
     }
@@ -50,6 +57,7 @@
         padding-top: .375em;
         padding-bottom: .375em;
     }
+
     #tests-accordion td {
         vertical-align: middle;
     }
@@ -57,9 +65,11 @@
     #tests-accordion .panel-title.ta-covered {
         color: black;
     }
+
     #tests-accordion .panel-title:not(.ta-covered) {
         color: #B0B0B0;
     }
+
     #tests-accordion .ta-column-name {
         color: #B0B0B0;
     }
@@ -78,33 +88,29 @@
 <div class="panel panel-default">
     <div class="panel-body" id="tests">
         <div class="panel-group" id="tests-accordion">
-            <%
-                for (TestAccordionCategory category : testAccordion.getCategories()) {
-            %>
+            <c:forEach var="category" items="${testAccordion.categories}">
                 <div class="panel panel-default">
-                    <div class="panel-heading" id="ta-heading-<%=category.getId()%>">
+                    <div class="panel-heading" id="ta-heading-${category.id}">
                         <a role="button" data-toggle="collapse" aria-expanded="false"
-                                href="#ta-collapse-<%=category.getId()%>"
-                                aria-controls="ta-collapse-<%=category.getId()%>"
-                                class="panel-title <%=category.getTestIds().isEmpty() ? "" : "ta-covered"%>"
-                                style="text-decoration: none;">
-                            <% if (!category.getTestIds().isEmpty()) { %>
-                                <span class="label bg-defender ta-count"><%=category.getTestIds().size()%></span>
-                            <% } %>
-                            <%=category.getDescription()%>
+                           href="#ta-collapse-${category.id}"
+                           aria-controls="ta-collapse-${category.id}"
+                           class="panel-title ${category.testIds.size() == 0 ? "" : "ta-covered"}"
+                           style="text-decoration: none;">
+                            <c:if test="${!(category.testIds.size() == 0)}">
+                                <span class="label bg-defender ta-count">${category.testIds.size()}</span>
+                            </c:if>
+                                ${category.description}
                         </a>
                     </div>
                     <div class="panel-collapse collapse" data-parent="#tests-accordion"
-                            id="ta-collapse-<%=category.getId()%>"
-                            aria-labelledby="ta-heading-<%=category.getId()%>">
+                         id="ta-collapse-${category.id}"
+                         aria-labelledby="ta-heading-${category.id}">
                         <div class="panel-body">
-                            <table id="ta-table-<%=category.getId()%>" class="table table-sm"></table>
+                            <table id="ta-table-${category.id}" class="table table-sm"></table>
                         </div>
                     </div>
                 </div>
-            <%
-                }
-            %>
+            </c:forEach>
         </div>
     </div>
 </div>
@@ -113,25 +119,22 @@
     /* Wrap in a function so it has it's own scope. */
     (function () {
 
-        /** Test accordion data. */
-        const ta_data = JSON.parse('${testAccordion.JSON}');
-
         /** A description and list of test ids for each category (method). */
-        const categories = ta_data.categories;
+        const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
 
         /** Maps test ids to their DTO representation. */
-        const tests = new Map(ta_data.tests);
+        const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
 
         /** Maps test ids to modals that show the tests' code. */
         const testModals = new Map();
 
         /* Functions to generate table columns. */
         const genId             = row => 'Test ' + row.id;
-        const genCreator        = row => <%-- '<span class="ta-column-name">Creator:</span> ' + --%> row.creatorName;
+        const genCreator        = row => <%-- '<span class="ta-column-name">Creator:</span> ' + --%> row.creator.name;
         const genPoints         = row => '<span class="ta-column-name">Points:</span> '  + row.points;
         const genCoveredMutants = row => '<a class="ta-covered-link"><span class="ta-column-name">Covered:</span> ' + row.coveredMutantIds.length + '</a>';;
         const genKilledMutants  = row => '<a class="ta-killed-link"><span class="ta-column-name">Killed:</span> ' + row.killedMutantIds.length + '</a>';
-        const genViewButton     = row => '<button class="ta-view-button btn btn-ssm btn-primary">View</button>';
+        const genViewButton     = row => row.canView ? '<button class="ta-view-button btn btn-ssm btn-primary">View</button>' : '';
         const genSmells         = row => {
             const numSmells = row.smells.length;
             let smellLevel;

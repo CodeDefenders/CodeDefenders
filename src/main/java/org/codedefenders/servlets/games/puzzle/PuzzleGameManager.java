@@ -48,6 +48,7 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -126,6 +127,9 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private EventDAO  eventDAO;
 
+    @Inject
+    private GameProducer gameProducer;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -135,6 +139,7 @@ public class PuzzleGameManager extends HttpServlet {
         boolean fromGameId = gameIdOpt.isPresent(); // else from puzzleId
         if (fromGameId) {
             final int gameId = gameIdOpt.get();
+            gameProducer.setTheGame(gameId);
             game = PuzzleDAO.getPuzzleGameForId(gameId);
 
             if (game == null) {
@@ -169,6 +174,7 @@ public class PuzzleGameManager extends HttpServlet {
                 new PuzzleGameSelectionManager().createGame(login.getUserId(), request, response);
                 return;
             } else {
+                gameProducer.setTheGame(game.getId());
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 game.setEventDAO(eventDAO);
             }
