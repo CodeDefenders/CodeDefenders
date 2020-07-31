@@ -188,7 +188,6 @@
                 </td>
             </tr>
             --%>
-            <input type="hidden" name="capturePlayersIntention" value="No">
             <tr>
                 <td title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
                     Threshold for Auto. Equiv. Duels
