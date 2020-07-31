@@ -46,12 +46,9 @@ public class DB {
             }
         } catch (SQLException se) {
             logger.error("SQL exception while closing statement!", se);
-        } catch (Throwable t) {
-            logger.error("Exception during cleanup.", t);
         } finally {
             connPool.releaseDBConnection(conn);
         }
-        
     }
 
     public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue... values) {

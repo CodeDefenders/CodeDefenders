@@ -1,5 +1,12 @@
 package org.codedefenders.database;
 
+import org.codedefenders.game.Role;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.ApplicationScoped;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,14 +14,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
-import javax.annotation.ManagedBean;
-
-import org.codedefenders.game.Role;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-
 // TODO Probably this should expose some specific functions, like handleChatEvent, handle gameEvent, and the like
+@ApplicationScoped
 @ManagedBean
 public class EventDAO {
 
@@ -23,8 +24,6 @@ public class EventDAO {
     public boolean insert(Event event) {
         String query;
         DatabaseValue[] valueList;
-        Connection conn;
-        PreparedStatement stmt;
 
         EventType eventType = event.getEventType();
 
@@ -34,9 +33,9 @@ public class EventDAO {
             query = String.join("\n",
                     "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
                     "VALUES (?, ?, ?, ?, ?);");
-            valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
+            valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage()) };
+                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
         } else if (eventType.equals(EventType.PLAYER_LOST_EQUIVALENT_DUEL) // Melee Game
                 || eventType.equals(EventType.PLAYER_WON_EQUIVALENT_DUEL)
                 || eventType.equals(EventType.PLAYER_KILLED_MUTANT)
@@ -45,32 +44,32 @@ public class EventDAO {
             query = String.join("\n",
                     "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
                     "VALUES (?, ?, ?, ?, ?);");
-            valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
+            valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage()) };
+                    DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
         } else {
             query = String.join("\n", "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)",
                     "VALUES (?, ?, ?, ?);");
-            valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
+            valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                     DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
-                    DatabaseValue.of(event.getEventStatus().toString()) };
+                    DatabaseValue.of(event.getEventStatus().toString())};
         }
 
-        conn = DB.getConnection();
-        stmt = DB.createPreparedStatement(conn, query, valueList);
-        // This closes the connection
-        int eventId = DB.executeUpdateGetKeys(stmt, conn);
+        final Connection conn1 = DB.getConnection();
+        final PreparedStatement stmt1 = DB.createPreparedStatement(conn1, query, valueList);
+        // The execute* returns the Connection to the ConnectionPool so we must not reuse it
+        int eventId = DB.executeUpdateGetKeys(stmt1, conn1);
 
         if (eventId >= 0) {
             if (event.getChatMessage() != null) {
-                // We need to get a second connection as the execute* close them !
-                conn = DB.getConnection();
-                //
                 query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
-                valueList = new DatabaseValue[] { DatabaseValue.of(eventId), DatabaseValue.of(event.getChatMessage()) };
-                stmt = DB.createPreparedStatement(conn, query, valueList);
-                // This automatically clean up /release the connection
-                DB.executeUpdate(stmt, conn);
+                valueList = new DatabaseValue[]{DatabaseValue.of(eventId), DatabaseValue.of(event.getChatMessage())};
+                // We need to get a second connection as the execute* returned the Connection to the ConnectionPool
+                // so we must not reuse it
+                final Connection conn = DB.getConnection();
+                final PreparedStatement stmt2 = DB.createPreparedStatement(conn, query, valueList);
+                // This automatically returns the connection to the ConnectionPool
+                DB.executeUpdate(stmt2, conn);
 
             }
         }
@@ -83,10 +82,10 @@ public class EventDAO {
         String query = String.join("\n", "UPDATE events",
                 "SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?)",
                 "WHERE Event_ID=?");
-        DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(event.gameId()),
+        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                 DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
                 DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of((Long) event.getTimestamp()),
-                DatabaseValue.of(event.getId()) };
+                DatabaseValue.of(event.getId())};
 
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -111,7 +110,7 @@ public class EventDAO {
     public List<Event> getEventsForGame(Integer gameId) {
         // TODO Use SOME VIEW INSTEAD OF EVENT TABLE?
         String query = String.join("\n", "SELECT * from events", "WHERE Game_ID=?");
-        DatabaseValue[] values = new DatabaseValue[] { DatabaseValue.of(gameId) };
+        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(gameId)};
         return DB.executeQueryReturnList(query, EventDAO::eventFromRS, values);
     }
 
@@ -126,8 +125,8 @@ public class EventDAO {
             query += " AND events.Event_Type!='ATTACKER_MESSAGE'";
         }
 
-        DatabaseValue[] values = new DatabaseValue[] { DatabaseValue.of(gameId),
-                DatabaseValue.of(EventStatus.GAME.toString()), DatabaseValue.of(timestamp) };
+        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(gameId),
+                DatabaseValue.of(EventStatus.GAME.toString()), DatabaseValue.of(timestamp)};
 
         return DB.executeQueryReturnList(query, EventDAO::eventFromRS, values);
     }
