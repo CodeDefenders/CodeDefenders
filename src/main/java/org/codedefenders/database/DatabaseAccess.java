@@ -190,27 +190,11 @@ public class DatabaseAccess {
         return Optional.ofNullable(role).orElse(Role.NONE);
     }
 
-    public static void increasePlayerPoints(int points, int player) {
-        String query = "UPDATE players SET Points=Points+? WHERE ID=?";
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(points),
-                DatabaseValue.of(player)
-        };
-        DB.executeUpdateQuery(query, values);
-    }
-
     public static int getEquivalentDefenderId(Mutant m) {
         String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
         final Integer id = DB.executeQueryReturnValue(query,
                 rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
         return Optional.ofNullable(id).orElse(-1);
-    }
-
-    public static int getPlayerPoints(int playerId) {
-        String query = "SELECT Points FROM players WHERE ID=?;";
-        final Integer points = DB.executeQueryReturnValue(query,
-                rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
-        return Optional.ofNullable(points).orElse(0);
     }
 
     public static boolean insertEquivalence(Mutant mutant, int defender) {
