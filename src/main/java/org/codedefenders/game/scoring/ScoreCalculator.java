@@ -1,21 +1,21 @@
 package org.codedefenders.game.scoring;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class uses a ScoringPolicy to compute each players' attacking/mutants
@@ -24,7 +24,6 @@ import org.codedefenders.model.Player;
  * <p>Ideally Gmae
  *
  * @author gambi
- *
  */
 @ManagedBean
 @RequestScoped
@@ -66,7 +65,6 @@ public class ScoreCalculator {
      * Calculate the score that the players gained by defending, i.e., killing
      * mutants with tests.
      *
-     *
      * @return mapping from playerId to player score.
      */
     public Map<Integer, PlayerScore> getTestScores() {
@@ -93,7 +91,6 @@ public class ScoreCalculator {
      * Calculate the score that the players gained by winning equivalence duels,
      * i.e., claiming equivalence
      *
-     *
      * @return mapping from playerId to player score.
      */
     public Map<Integer, PlayerScore> getDuelScores() {
@@ -108,5 +105,23 @@ public class ScoreCalculator {
         }
 
         return duelScores;
+    }
+
+    public void storeScoresToDB() {
+        for (Mutant mutant : MutantDAO.getValidMutantsForGame(game.getId())) {
+            // Compute the score for the mutant and store it inside the mutant object
+            scoringPolicy.scoreMutant(mutant);
+            MutantDAO.updateMutantScore(mutant);
+        }
+        for (Test test : TestDAO.getTestsForGame(game.getId())) {
+            // Compute the score for the test and store it inside the test object
+            scoringPolicy.scoreTest(test);
+            TestDAO.updateTest(test);
+        }
+        for (Player player : GameDAO.getAllPlayersForGame(game.getId())) {
+            PlayerScore playerScore = new PlayerScore(player.getId());
+            scoringPolicy.scoreDuels(playerScore);
+            PlayerDAO.setPlayerPoints(playerScore.getTotalScore(), player.getId());
+        }
     }
 }

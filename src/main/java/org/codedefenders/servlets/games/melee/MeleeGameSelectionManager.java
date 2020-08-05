@@ -38,6 +38,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -105,6 +106,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private ScoreCalculator scoreCalculator;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -470,6 +474,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
             if (updated) {
                 KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, gameId));
             }
+
+            scoreCalculator.storeScoresToDB();
 
             /*
              * Publish the event about the user

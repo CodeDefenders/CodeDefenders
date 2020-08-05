@@ -19,9 +19,9 @@
 package org.codedefenders.game.multiplayer;
 
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
@@ -89,13 +89,13 @@ public class MultiplayerGame extends AbstractGame {
     private int automaticMutantEquivalenceThreshold = 0;
 
     // Injection done at AbstractGame level
-//  @Inject 
+//  @Inject
 //    private EventDAO eventDAO;
 //
 //    public void setEventDAO(EventDAO eventDAO) {
 //        this.eventDAO = eventDAO;
 //    }    
-    
+
     public static class Builder {
         // mandatory values
         private final int classId;
@@ -539,7 +539,7 @@ public class MultiplayerGame extends AbstractGame {
             int teamKey = defendersTeamId;
 
             PlayerScore ps = testScores.get(playerId);
-            int playerScore = DatabaseAccess.getPlayerPoints(playerId);
+            int playerScore = PlayerDAO.getPlayerPoints(playerId);
             ps.increaseTotalScore(playerScore);
 
             PlayerScore ts = testScores.get(teamKey);

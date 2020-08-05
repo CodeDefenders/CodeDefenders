@@ -763,7 +763,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     // tests on the same class from different games
                     m.kill(Mutant.Equivalence.DECLARED_YES);
 
-                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
+                    PlayerDAO.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     messages.add(message);
 
                     // Notify the attacker

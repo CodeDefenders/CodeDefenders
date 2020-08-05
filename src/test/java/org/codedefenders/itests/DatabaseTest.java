@@ -279,9 +279,9 @@ public class DatabaseTest {
         assertTrue(playerID > 0);
         assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
         assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
-        assertEquals(DatabaseAccess.getPlayerPoints(playerID), 0);
-        DatabaseAccess.increasePlayerPoints(13, playerID);
-        assertEquals(DatabaseAccess.getPlayerPoints(playerID), 13);
+        assertEquals(PlayerDAO.getPlayerPoints(playerID), 0);
+        PlayerDAO.increasePlayerPoints(13, playerID);
+        assertEquals(PlayerDAO.getPlayerPoints(playerID), 13);
     }
 
     @Test
@@ -486,7 +486,7 @@ public class DatabaseTest {
 
     // TODO Fix this by injecting the dependency in test. See
     //  https://github.com/weld/weld-junit/blob/master/junit4/README.md
-    @Ignore 
+    @Ignore
     @Test
     public void testEvents() throws Exception { // TODO figure out why table events does not have foreign keys
 
@@ -495,11 +495,11 @@ public class DatabaseTest {
         Timestamp ts = Timestamp.valueOf("1995-03-27 12:08:00");
         Event ev = new Event(1, multiplayerGame.getId(), pid, "message", EventType.ATTACKER_MESSAGE, EventStatus.GAME,
                 ts);
-        
+
         // TODO Fix me with CDI
         EventDAO eventDAO = null;
         assertTrue(eventDAO.insert(ev));
-        
+
         assertEquals(eventDAO.getEventsForGame(multiplayerGame.getId()).size(), 2);
         assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
         assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);

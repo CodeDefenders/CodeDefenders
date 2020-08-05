@@ -137,4 +137,29 @@ public class PlayerDAO {
         return DB.executeQueryReturnValue(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId),
                 DatabaseValue.of(userId));
     }
+
+    public static void setPlayerPoints(int points, int player) {
+        String query = "UPDATE players SET Points=? WHERE ID=?";
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(points),
+                DatabaseValue.of(player)
+        };
+        DB.executeUpdateQuery(query, values);
+    }
+
+    public static void increasePlayerPoints(int points, int player) {
+        String query = "UPDATE players SET Points=Points+? WHERE ID=?";
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(points),
+                DatabaseValue.of(player)
+        };
+        DB.executeUpdateQuery(query, values);
+    }
+
+    public static int getPlayerPoints(int playerId) {
+        String query = "SELECT Points FROM players WHERE ID=?;";
+        final Integer points = DB.executeQueryReturnValue(query,
+                rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
+        return Optional.ofNullable(points).orElse(0);
+    }
 }
