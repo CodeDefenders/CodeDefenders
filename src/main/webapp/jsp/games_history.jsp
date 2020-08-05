@@ -253,8 +253,6 @@
             for (UserMeleeGameInfo g : meleeGames) {
                 int gameId = g.gameId();
                 List<Player> players = g.players();
-//                Map<Integer, PlayerScore> attackerScores = g.getMutantScores();
-//                Map<Integer, PlayerScore> defenderScores = g.getTestScores();
         %>
 
         <tr id="game-<%=gameId%>">
