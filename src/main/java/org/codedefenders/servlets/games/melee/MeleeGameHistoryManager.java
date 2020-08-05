@@ -21,6 +21,7 @@ package org.codedefenders.servlets.games.melee;
 
 import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.scoring.ScoreCalculator;
@@ -49,21 +50,21 @@ public class MeleeGameHistoryManager extends HttpServlet {
 
 
         MeleeGame game;
-        {
-            final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-            if (!gameIdOpt.isPresent()) {
-                response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
-                return;
-            }
-            game = MeleeGameDAO.getMeleeGame(gameIdOpt.get());
 
-            if (game == null || game.getState() != GameState.FINISHED) {
-                response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
-                return;
-            }
-
-            request.setAttribute("game", game);
+        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
+        if (!gameIdOpt.isPresent()) {
+            response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
+            return;
         }
+        game = MeleeGameDAO.getMeleeGame(gameIdOpt.get());
+
+        if (game == null || game.getState() != GameState.FINISHED) {
+            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            return;
+        }
+
+        request.setAttribute("game", game);
+
 
         // Compute the score and pass along the ScoreBoard bean?
         MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean();
