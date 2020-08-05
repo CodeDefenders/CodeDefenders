@@ -108,24 +108,20 @@ public class ScoreCalculator {
     }
 
     public void storeScoresToDB() {
-        final Map<Integer, Integer> playerScores = new HashMap<>();
-
-        final Map<Integer, PlayerScore> mutantScores = getMutantScores();
-        final Map<Integer, PlayerScore> testScores = getTestScores();
-        final Map<Integer, PlayerScore> duelScores = getDuelScores();
-
-        for (Player player : GameDAO.getAllPlayersForGame(game.getId())) {
-            int playerId = player.getId();
-            playerScores.merge(playerId, mutantScores.getOrDefault(playerId, new PlayerScore(playerId)).getTotalScore(),
-                    Integer::sum);
-            playerScores.merge(playerId, testScores.getOrDefault(playerId, new PlayerScore(playerId)).getTotalScore(),
-                    Integer::sum);
-            playerScores.merge(playerId, duelScores.getOrDefault(playerId, new PlayerScore(playerId)).getTotalScore(),
-                    Integer::sum);
+        for (Mutant mutant : MutantDAO.getValidMutantsForGame(game.getId())) {
+            // Compute the score for the mutant and store it inside the mutant object
+            scoringPolicy.scoreMutant(mutant);
+            MutantDAO.updateMutant(mutant);
         }
-
-        for (Map.Entry<Integer, Integer> entry : playerScores.entrySet()) {
-            PlayerDAO.setPlayerPoints(entry.getValue(), entry.getKey());
+        for (Test test : TestDAO.getTestsForGame(game.getId())) {
+            // Compute the score for the test and store it inside the test object
+            scoringPolicy.scoreTest(test);
+            TestDAO.updateTest(test);
+        }
+        for (Player player : GameDAO.getAllPlayersForGame(game.getId())) {
+            PlayerScore playerScore = new PlayerScore(player.getId());
+            scoringPolicy.scoreDuels(playerScore);
+            PlayerDAO.setPlayerPoints(playerScore.getTotalScore(), player.getId());
         }
     }
 }
