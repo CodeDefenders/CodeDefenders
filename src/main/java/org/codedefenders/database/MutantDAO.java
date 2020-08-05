@@ -265,7 +265,7 @@ public class MutantDAO {
                 "  Alive=?,",
                 "  RoundKilled=?,",
                 "  Points=?",
-                "WHERE Mutant_ID=? AND Alive=1;"
+                "WHERE Mutant_ID=?;"
         );
         DatabaseValue[] values = new DatabaseValue[]{
             DatabaseValue.of(equivalent.name()),
