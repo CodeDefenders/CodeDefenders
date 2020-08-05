@@ -265,7 +265,7 @@ public class MutantDAO {
                 "  Alive=?,",
                 "  RoundKilled=?,",
                 "  Points=?",
-                "WHERE Mutant_ID=?;"
+                "WHERE Mutant_ID=? AND Alive=1;"
         );
         DatabaseValue[] values = new DatabaseValue[]{
             DatabaseValue.of(equivalent.name()),
@@ -273,6 +273,25 @@ public class MutantDAO {
             DatabaseValue.of(roundKilled),
             DatabaseValue.of(score),
             DatabaseValue.of(mutantId)
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
+    public static boolean updateMutantScore(Mutant mutant) throws UncheckedSQLException {
+        int mutantId = mutant.getId();
+
+        int score = mutant.getScore();
+
+        String query = String.join("\n",
+                "UPDATE mutants",
+                "SET",
+                "  Points=?",
+                "WHERE Mutant_ID=?;"
+        );
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(score),
+                DatabaseValue.of(mutantId)
         };
 
         return DB.executeUpdateQuery(query, values);

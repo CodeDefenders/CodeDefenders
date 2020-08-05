@@ -111,7 +111,7 @@ public class ScoreCalculator {
         for (Mutant mutant : MutantDAO.getValidMutantsForGame(game.getId())) {
             // Compute the score for the mutant and store it inside the mutant object
             scoringPolicy.scoreMutant(mutant);
-            MutantDAO.updateMutant(mutant);
+            MutantDAO.updateMutantScore(mutant);
         }
         for (Test test : TestDAO.getTestsForGame(game.getId())) {
             // Compute the score for the test and store it inside the test object
