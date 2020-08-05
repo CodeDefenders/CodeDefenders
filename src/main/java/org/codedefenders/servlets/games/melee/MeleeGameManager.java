@@ -735,7 +735,6 @@ public class MeleeGameManager extends HttpServlet {
                 // This might be replaced by m.getCreatorId() == userId
                 if (m.getId() == mutantId && m.getPlayerId() == playerId) {
                     m.kill(Mutant.Equivalence.DECLARED_YES);
-                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
                     User eventUser = UserDAO.getUserById(login.getUserId());
