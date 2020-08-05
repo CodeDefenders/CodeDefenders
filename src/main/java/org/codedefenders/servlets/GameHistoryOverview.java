@@ -1,7 +1,9 @@
 package org.codedefenders.servlets;
 
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.util.Constants;
 
@@ -30,6 +32,8 @@ public class GameHistoryOverview extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         List<UserMultiplayerGameInfo> games = MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(login.getUserId());
         request.setAttribute("finishedBattlegroundGames", games);
+        List<UserMeleeGameInfo> meleeGames = MeleeGameDAO.getFinishedMeleeGamesForUser(login.getUserId());
+        request.setAttribute("finishedMeleeGames", meleeGames);
 
         request.getRequestDispatcher(Constants.GAMES_HISTORY_JSP).forward(request, response);
     }

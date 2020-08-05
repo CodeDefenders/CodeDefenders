@@ -117,6 +117,7 @@ public class Constants {
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
     public static final String MELEE_GAME_VIEW_JSP = "/jsp/melee/game_view.jsp";
+    public static final String MELEE_GAME_HISTORY_VIEW_JSP = "/jsp/melee/history_game_view.jsp";
 
 
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
