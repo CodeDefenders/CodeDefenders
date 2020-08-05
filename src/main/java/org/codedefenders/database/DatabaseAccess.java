@@ -224,10 +224,11 @@ public class DatabaseAccess {
 
     public static List<Entry> getLeaderboard() {
         String query = String.join("\n",
-                "SELECT U.username AS username, IFNULL(NMutants,0) AS NMutants, IFNULL(AScore,0) AS AScore, IFNULL(NTests,0) AS NTests, IFNULL(DScore,0) AS DScore, IFNULL(NKilled,0) AS NKilled, IFNULL(AScore,0)+IFNULL(DScore,0) AS TotalScore",
+                "SELECT U.username AS username, IFNULL(NMutants,0) AS NMutants, IFNULL(AScore,0) AS AScore, IFNULL(NTests,0) AS NTests, IFNULL(DScore,0) AS DScore, IFNULL(NKilled,0) AS NKilled, IFNULL(AScore,0)+IFNULL(DScore,0)+IFNULL(EScore,0) AS TotalScore",
                 "FROM view_valid_users U",
                 "LEFT JOIN (SELECT PA.user_id, count(M.Mutant_ID) AS NMutants, sum(M.Points) AS AScore FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID GROUP BY PA.user_id) AS Attacker ON U.user_id = Attacker.user_id",
-                "LEFT JOIN (SELECT PD.user_id, count(T.Test_ID) AS NTests, sum(T.Points) AS DScore, sum(T.MutantsKilled) AS NKilled FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID GROUP BY PD.user_id) AS Defender ON U.user_id = Defender.user_id");
+                "LEFT JOIN (SELECT PD.user_id, count(T.Test_ID) AS NTests, sum(T.Points) AS DScore, sum(T.MutantsKilled) AS NKilled FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID GROUP BY PD.user_id) AS Defender ON U.user_id = Defender.user_id",
+                "LEFT JOIN (SELECT PE.user_id, sum(PE.Points) AS EScore FROM players PE GROUP BY PE.user_id) AS Player ON U.User_ID = Player.User_ID");
         return DB.executeQueryReturnList(query, DatabaseAccess::entryFromRS);
     }
 
