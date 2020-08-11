@@ -1,5 +1,6 @@
 package org.codedefenders.beans;
 
+import org.codedefenders.beans.game.MeleeGameCoverageHighlightingBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.servlets.games.GameProducer;
@@ -33,6 +34,9 @@ public class BeanFilter implements Filter {
     private LoginBean login;
 
     @Inject
+    private MeleeGameCoverageHighlightingBean meleeGameCoverageHighlightingBean;
+
+    @Inject
     private PreviousSubmissionBean previousSubmission;
 
     @Inject
@@ -48,6 +52,7 @@ public class BeanFilter implements Filter {
             throws IOException, ServletException {
         request.setAttribute("login", login);
         request.setAttribute("previousSubmission", previousSubmission);
+        request.setAttribute("gameHighlightingSelection", meleeGameCoverageHighlightingBean);
 
         // Configure the GameProducer with the game associated to this request if any
         if (request instanceof HttpServletRequest) {

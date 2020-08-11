@@ -39,6 +39,8 @@
 --%>
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean"
              scope="request"/>
+<jsp:useBean id="gameHighlightingSelection" class="org.codedefenders.beans.game.MeleeGameCoverageHighlightingBean"
+             scope="request"/>
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
@@ -53,9 +55,10 @@
     final User user = login.getUser();
     // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
     final int userId = login.getUserId();
+    final boolean isCoverageLimitedToOwnMutants = gameHighlightingSelection.isCoverageLimitedToOwnMutants();
     final List<Test> playerTests = game.getTests()
             .stream()
-            .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == userId)
+            .filter(t -> isCoverageLimitedToOwnMutants == (UserDAO.getUserForPlayer(t.getPlayerId()).getId() == userId))
             .collect(Collectors.toList());
 %>
 
@@ -299,8 +302,24 @@
                 <button class="btn btn-primary btn-warning btn-game btn-right"
                         id="btnReset">Reset
                 </button>
-                <input type="hidden" name="formType" value="reset"> <input
-                    type="hidden" name="gameId" value="<%=game.getId()%>"/>
+                <input type="hidden" name="formType" value="reset">
+                <input type="hidden" name="gameId" value="<%=game.getId()%>"/>
+            </form>
+
+            <form id="switchHighlighting"
+                  action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
+                  method="post" style="float: right; margin-right: 5px">
+                <button class="btn btn-secondary btn-game btn-right">
+                    <% if (isCoverageLimitedToOwnMutants) { %>
+                    Showing my coverage
+                    <input type="hidden" name="coverage" value="enemy">
+                    <% } else { %>
+                    Showing enemy coverage
+                    <input type="hidden" name="coverage" value="my">
+                    <% } %>
+                </button>
+                <input type="hidden" name="formType" value="coverage">
+                <input type="hidden" name="gameId" value="<%=game.getId()%>"/>
             </form>
         </div>
 
