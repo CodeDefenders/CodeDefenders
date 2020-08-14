@@ -51,6 +51,8 @@
         const testIdsPerLine = new Map(gh_data.testIdsPerLine);
         const mutants = new Map(gh_data.mutants);
         const tests = new Map(gh_data.tests);
+        const alternativeTestIdsPerLine = new Map(gh_data.alternativeTestIdsPerLine);
+        const alternativeTests = new Map(gh_data.alternativeTests);
 
         const MutantStatuses = {
             ALIVE: 'ALIVE',
@@ -265,6 +267,13 @@
             }
         };
 
+        const highlightAlternativeCoverage = function (codeMirror) {
+            for (const [line, testIds] of alternativeTestIdsPerLine) {
+                const coveragePercent = (testIds.length * 100 / alternativeTests.size).toFixed(0);
+                codeMirror.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
+            }
+        };
+
         /**
          * Displays mutant icons on the given CodeMirror instance.
          * @param {object} codeMirror The CodeMirror instance.
@@ -278,7 +287,6 @@
             }
         };
 
-        <%--
         /**
          * Completely removes the coverage highlighting on the given CodeMirror instance.
          * If any lines were added and deleted in the editor, then clearing and re-applying the highlighting will
@@ -299,6 +307,7 @@
             });
         };
 
+        <%--
         /**
          * Completely removes the mutant icons on the given CodeMirror instance.
          * If any lines were added and deleted in the editor, then clearing and re-applying the highlighting will
@@ -330,8 +339,9 @@
 
         const codeMirror = $('${gameHighlighting.codeDivSelector}').find('.CodeMirror')[0].CodeMirror;
         codeMirror.highlightCoverage = function () { highlightCoverage(this) };
+        codeMirror.highlightAlternativeCoverage = function () { highlightAlternativeCoverage(this) };
         codeMirror.highlightMutants = function () { highlightMutants(this) };
-        <%--codeMirror.clearCoverage = function () { clearCoverage(this) };--%>
+        codeMirror.clearCoverage = function () { clearCoverage(this) };
         <%--codeMirror.clearMutants = function () { clearMutants(this) };--%>
         codeMirror.hideMutants = function () { hideMutants(this) };
         codeMirror.showMutants = function () { showMutants(this) };

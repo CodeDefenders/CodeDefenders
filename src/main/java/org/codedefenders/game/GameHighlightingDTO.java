@@ -55,6 +55,16 @@ public class GameHighlightingDTO {
     @Expose public Map<Integer, GHTestDTO> tests;
 
     /**
+     * Maps test ids to the alternative tests.
+     */
+    @Expose public Map<Integer, GHTestDTO> alternativeTests;
+
+    /**
+     * Maps line numbers to the test ids of the alternative tests that cover the line.
+     */
+    @Expose public Map<Integer, List<Integer>> alternativeTestIdsPerLine;
+
+    /**
      * Constructs the game highlighting data from the list of mutants and the list of tests in the game.
      * The object is ready to be converted to JSON after the constructor has been called.
      * @param mutants The mutants in the game.
@@ -88,6 +98,26 @@ public class GameHighlightingDTO {
             for (Integer line : lines) {
                 List<Integer> list = mutantIdsPerLine.computeIfAbsent(line, key -> new LinkedList<>());
                 list.add(mutant.getId());
+            }
+        }
+    }
+
+    public void setAlternativeTestData(List<Test> tests) {
+        this.alternativeTestIdsPerLine = new TreeMap<>();
+        this.alternativeTests = new TreeMap<>();
+
+        /* Construct the test maps. */
+        for (Test test : tests) {
+            this.alternativeTests.put(test.getId(), new GHTestDTO(test));
+            List<Integer> linesCovered = test
+                    .getLineCoverage()
+                    .getLinesCovered()
+                    .stream()
+                    .distinct()
+                    .collect(Collectors.toList());
+            for (Integer line : linesCovered) {
+                List<Integer> list = alternativeTestIdsPerLine.computeIfAbsent(line, key -> new LinkedList<>());
+                list.add(test.getId());
             }
         }
     }

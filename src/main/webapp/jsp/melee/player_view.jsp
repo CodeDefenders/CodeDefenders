@@ -22,7 +22,6 @@
 
 <%@page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
@@ -57,6 +56,10 @@
             .stream()
             .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == userId)
             .collect(Collectors.toList());
+    final List<Test> enemyTests = game.getTests()
+            .stream()
+            .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() != userId)
+            .collect(Collectors.toList());
 %>
 
 <jsp:useBean id="previousSubmission"
@@ -88,6 +91,7 @@
     gameHighlighting.setEnableFlagging(true);
     // We should show game highlighting only inside the mutant editor
     if (!openEquivalenceDuel) {
+        gameHighlighting.setAlternativeTests(enemyTests);
         gameHighlighting.setCodeDivSelector("#newmut-div");
     } else {
         gameHighlighting.setCodeDivSelector("#cut-div");
@@ -299,9 +303,31 @@
                 <button class="btn btn-primary btn-warning btn-game btn-right"
                         id="btnReset">Reset
                 </button>
-                <input type="hidden" name="formType" value="reset"> <input
-                    type="hidden" name="gameId" value="<%=game.getId()%>"/>
+                <input type="hidden" name="formType" value="reset">
+                <input type="hidden" name="gameId" value="<%=game.getId()%>"/>
             </form>
+
+            <div id="switchHighlightDiv"
+                 data-toggle="tooltip" data-placement="top" title="Switch between showing coverage of your and the enemy tests. If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant."
+                 style="float: right; margin-right: 5px">
+                <input id="switchHighlighting" type="checkbox" name="coverage" class="form-control"
+                       data-toggle="toggle" data-on="Enemy coverage" data-off="My coverage"
+                       data-onstyle="default" data-offstyle="default" data-width="150" <%-- <= Why? WTF --%>
+                       >
+                <script>
+                    (function () {
+                        $('#switchHighlighting').change(function () {
+                            const codeMirror = $('#newmut-div .CodeMirror')[0].CodeMirror;
+                            codeMirror.clearCoverage();
+                            if (this.checked) {
+                                codeMirror.highlightAlternativeCoverage();
+                            } else {
+                                codeMirror.highlightCoverage();
+                            }
+                        })
+                    })();
+                </script>
+            </div>
         </div>
 
         <form id="atk"
