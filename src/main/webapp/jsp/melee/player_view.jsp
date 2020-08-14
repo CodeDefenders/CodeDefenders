@@ -308,7 +308,7 @@
             </form>
 
             <div id="switchHighlightDiv"
-                 data-toggle="tooltip" data-placement="top" title="Switch between showing coverage of your and the enemy tests. If you added/removed lines of the CUT the coverage highlight will not be on the right lines."
+                 data-toggle="tooltip" data-placement="top" title="Switch between showing coverage of your and the enemy tests. If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant."
                  style="float: right; margin-right: 5px">
                 <input id="switchHighlighting" type="checkbox" name="coverage" class="form-control"
                        data-toggle="toggle" data-on="Enemy coverage" data-off="My coverage"
