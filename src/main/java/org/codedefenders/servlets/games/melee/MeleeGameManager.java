@@ -19,7 +19,6 @@
 package org.codedefenders.servlets.games.melee;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.beans.game.MeleeGameCoverageHighlightingBean;
 import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
@@ -89,7 +88,6 @@ import java.util.regex.Pattern;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
 import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
@@ -153,9 +151,6 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
-
-    @Inject
-    MeleeGameCoverageHighlightingBean coverageHighlightingBean;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -287,15 +282,6 @@ public class MeleeGameManager extends HttpServlet {
                 resolveEquivalence(request, response, gameId, game, playerId);
                 return;
             }
-            case "coverage":
-                Optional<String> coverage = getStringParameter(request, "coverage");
-                if (coverage.isPresent() && coverage.get().equals("enemy")) {
-                    coverageHighlightingBean.setCoverageLimitedToOwnMutants(false);
-                } else if (coverage.isPresent() && coverage.get().equals("my")) {
-                    coverageHighlightingBean.setCoverageLimitedToOwnMutants(true);
-                }
-                Redirect.redirectBack(request, response);
-                break;
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);

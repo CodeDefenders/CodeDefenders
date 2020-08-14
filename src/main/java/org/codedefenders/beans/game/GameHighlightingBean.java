@@ -65,6 +65,10 @@ public class GameHighlightingBean {
         gameHighlightingData = new GameHighlightingDTO(mutants, tests, user);
     }
 
+    public void setAlternativeTests(List<Test> tests) {
+        gameHighlightingData.setAlternativeTestData(tests);
+    }
+
     public void setCodeDivSelector(String codeDivSelector) {
         this.codeDivSelector = codeDivSelector;
     }
