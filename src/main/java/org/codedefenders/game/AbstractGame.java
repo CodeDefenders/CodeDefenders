@@ -18,10 +18,6 @@
  */
 package org.codedefenders.game;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
@@ -32,6 +28,9 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Abstract class for games of different modes.

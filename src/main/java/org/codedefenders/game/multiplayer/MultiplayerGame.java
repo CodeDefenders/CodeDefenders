@@ -88,14 +88,6 @@ public class MultiplayerGame extends AbstractGame {
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
-    // Injection done at AbstractGame level
-//  @Inject
-//    private EventDAO eventDAO;
-//
-//    public void setEventDAO(EventDAO eventDAO) {
-//        this.eventDAO = eventDAO;
-//    }    
-
     public static class Builder {
         // mandatory values
         private final int classId;
