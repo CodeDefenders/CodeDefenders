@@ -276,6 +276,12 @@ public class AdminCreateGames extends HttpServlet {
             gid = Integer.parseInt(gidString);
             mg = MultiplayerGameDAO.getMultiplayerGame(gid);
         }
+
+        if (!mg.hasEventDAO()) {
+            // Forcefully inject the DAO
+            mg.setEventDAO(eventDAO);
+        }
+
         if (mg.getCreatorId() == addedUserId) {
             messages.add("Cannot add user " + addedUserId + " to game " + gid + " because they are it's creator.");
         } else {
@@ -292,6 +298,8 @@ public class AdminCreateGames extends HttpServlet {
         }
     }
 
+    // TODO The name of this method might be misleading if we associate a user to an
+    // existing game, instead of creating the game...
     private void createGame(HttpServletResponse response, HttpServletRequest request, HttpSession session)
             throws IOException {
         String rowUserId = request.getParameter("userListButton");
@@ -389,7 +397,13 @@ public class AdminCreateGames extends HttpServlet {
                                   List<Integer> attackerIds, List<Integer> defenderIds) {
         // We need to take care of loading and setting system tests and mutants as well for this game
         // multiplayerGame.insert();
-        // XXX Code duplication: This is take from {@link MultiplayerGameSelectionManager}
+        // XXX Code duplication: This is take from {@link
+        // MultiplayerGameSelectionManager}
+
+        if (!multiplayerGame.hasEventDAO()) {
+            multiplayerGame.setEventDAO(eventDAO);
+        }
+
         final int gameId = multiplayerGame.getId();
         if (multiplayerGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -511,14 +525,18 @@ public class AdminCreateGames extends HttpServlet {
             defenderIds = getRandomUserList(selectedUserIds, selectedUserIds.size());
         }
 
-        List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
-                 cutId, login.getUserId(), gamesLevel, gamesState,
-                maxAssertionsPerTest, forceHamcrest, //
-                chatEnabled,
-                mutantValidatorLevel,
-                withTests, withMutants, //
-                capturePlayersIntention,
-                automaticEquivalenceTrigger);
+        // TODO Why static ?
+        List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame, cutId,
+                login.getUserId(), gamesLevel, gamesState, maxAssertionsPerTest, forceHamcrest, //
+                chatEnabled, mutantValidatorLevel, withTests, withMutants, //
+                capturePlayersIntention, automaticEquivalenceTrigger);
+
+        // Forcefully inject the DAO
+        for (MultiplayerGame newlyCreatedGame : newlyCreatedGames) {
+            if (!newlyCreatedGame.hasEventDAO()) {
+                newlyCreatedGame.setEventDAO(eventDAO);
+            }
+        }
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING)
                 || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
@@ -580,14 +598,12 @@ public class AdminCreateGames extends HttpServlet {
         return (int) Math.ceil((float) nbPlayers / (attackersPerGame + defendersPerGame));
     }
 
-    private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
-                                                     int cutId, int creatorId, GameLevel level, GameState state,
-                                                     int maxAssertionsPerTest, boolean forceHamcrest,
-                                                     boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
-                                                     boolean withTests, boolean withMutants, //
-                                                     boolean capturePlayersIntention, //
-                                                     int automaticEquivalenceTrigger
-                                                     ) {
+    // TODO Why static ?!
+    private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame, int cutId,
+            int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest, boolean forceHamcrest,
+            boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants, //
+            boolean capturePlayersIntention, //
+            int automaticEquivalenceTrigger) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame game = new MultiplayerGame.Builder(cutId, creatorId, maxAssertionsPerTest, forceHamcrest)

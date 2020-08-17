@@ -70,6 +70,12 @@ public abstract class AbstractGame {
         this.eventDAO = eventDAO;
     }
 
+    // This is mostly used to check whether or not the class has an EventDAO
+    // associated. TODO We need to make this happen by design, as class invariant
+    public boolean hasEventDAO() {
+        return eventDAO != null;
+    }
+
     public int getId() {
         return id;
     }
