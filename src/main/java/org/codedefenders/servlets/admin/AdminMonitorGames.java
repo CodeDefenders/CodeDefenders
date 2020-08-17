@@ -21,6 +21,7 @@ package org.codedefenders.servlets.admin;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -51,6 +52,9 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private EventDAO eventDAO;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
@@ -85,6 +89,10 @@ public class AdminMonitorGames extends HttpServlet {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
                 mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
+                if (!mg.hasEventDAO()) {
+                    // Forcefully inject the DAO
+                    mg.setEventDAO(eventDAO);
+                }
                 if (!mg.addPlayerForce(userId, newRole)) {
                     messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
                 }
