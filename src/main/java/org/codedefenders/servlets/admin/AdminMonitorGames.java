@@ -89,10 +89,7 @@ public class AdminMonitorGames extends HttpServlet {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
                 mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
-                if (!mg.hasEventDAO()) {
-                    // Forcefully inject the DAO
-                    mg.setEventDAO(eventDAO);
-                }
+                mg.setEventDAO(eventDAO);
                 if (!mg.addPlayerForce(userId, newRole)) {
                     messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
                 }

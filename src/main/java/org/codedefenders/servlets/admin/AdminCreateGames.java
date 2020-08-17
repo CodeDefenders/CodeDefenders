@@ -18,8 +18,8 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -47,6 +47,13 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -56,14 +63,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
@@ -77,7 +76,7 @@ public class AdminCreateGames extends HttpServlet {
 
     @Inject
     private LoginBean login;
-    
+
     @Inject
     private EventDAO eventDAO;
 
@@ -277,10 +276,7 @@ public class AdminCreateGames extends HttpServlet {
             mg = MultiplayerGameDAO.getMultiplayerGame(gid);
         }
 
-        if (!mg.hasEventDAO()) {
-            // Forcefully inject the DAO
-            mg.setEventDAO(eventDAO);
-        }
+        mg.setEventDAO(eventDAO);
 
         if (mg.getCreatorId() == addedUserId) {
             messages.add("Cannot add user " + addedUserId + " to game " + gid + " because they are it's creator.");
@@ -400,9 +396,7 @@ public class AdminCreateGames extends HttpServlet {
         // XXX Code duplication: This is take from {@link
         // MultiplayerGameSelectionManager}
 
-        if (!multiplayerGame.hasEventDAO()) {
-            multiplayerGame.setEventDAO(eventDAO);
-        }
+        multiplayerGame.setEventDAO(eventDAO);
 
         final int gameId = multiplayerGame.getId();
         if (multiplayerGame.insert()) {
@@ -450,7 +444,7 @@ public class AdminCreateGames extends HttpServlet {
                         //
                         dummyAttackerPlayerId,
                         GameDAO.getCurrentRound(gameId)
-                        );
+                );
                 // insert this into the DB and link the mutant to the game
                 newMutant.insert();
                 // BookKeeping
@@ -533,9 +527,7 @@ public class AdminCreateGames extends HttpServlet {
 
         // Forcefully inject the DAO
         for (MultiplayerGame newlyCreatedGame : newlyCreatedGames) {
-            if (!newlyCreatedGame.hasEventDAO()) {
-                newlyCreatedGame.setEventDAO(eventDAO);
-            }
+            newlyCreatedGame.setEventDAO(eventDAO);
         }
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING)
@@ -600,10 +592,10 @@ public class AdminCreateGames extends HttpServlet {
 
     // TODO Why static ?!
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame, int cutId,
-            int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest, boolean forceHamcrest,
-            boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants, //
-            boolean capturePlayersIntention, //
-            int automaticEquivalenceTrigger) {
+                                                     int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest, boolean forceHamcrest,
+                                                     boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants, //
+                                                     boolean capturePlayersIntention, //
+                                                     int automaticEquivalenceTrigger) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame game = new MultiplayerGame.Builder(cutId, creatorId, maxAssertionsPerTest, forceHamcrest)
