@@ -164,25 +164,6 @@
 					</archive>
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 					<webResources>
-						<resource>
-							<directory>src/main/resources</directory>
-							<includes>
-								<include>**/*.js</include>
-								<include>**/*.css</include>
-								<include>images/*.*</include>
-								<include>papers/*.*</include>
-                                <include>project-exporter/*</include>
-                                <include>project-exporter/gradle/wrapper/*</include>
-								<include>fonts/*.*</include>
-								<include>codemirror/**.*</include>
-								<include>codemirror/bin/*</include>
-								<include>**/*.html</include>
-								<include>**/*.jpg</include>
-								<include>**/*.png</include>
-								<include>**/*.sh</include>
-								<include>**/*.svg</include>
-							</includes>
-						</resource>
 						<!-- Enable reading props from config.file and setting all the files
 							in META-INF -->
 						<resource>
@@ -788,6 +769,65 @@
 			<artifactId>standard</artifactId>
 			<version>1.1.2</version>
 		</dependency>
+
+        <!--
+          Begin Client Side Dependencies
+        -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>3.3.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap-select</artifactId>
+            <version>1.9.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>bootstrap-toggle</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <!-- Do we still need this? -->
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>slick-carousel</artifactId>
+            <version>1.5.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>3.3.1-2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery-ui</artifactId>
+            <version>1.12.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>codemirror</artifactId>
+            <version>5.22.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>momentjs</artifactId>
+            <version>2.14.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>datatables</artifactId>
+            <version>1.10.16</version>
+        </dependency>
+        <!-- Provides datetime-moment.js -->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>datatables-plugins</artifactId>
+            <version>1.10.16</version>
+        </dependency>
+        <!--
+          End Client Side Dependencies
+        -->
 
 	</dependencies>
 

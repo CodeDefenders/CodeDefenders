@@ -42,3 +42,18 @@ They should not contain Java Code (Scriplets) instead they should use the JSTL (
 Most tag-files probably have some kind of backing Bean. This must NOT be included via the `<jsp:useBean>` tag, because afaik the creation/managment of this bean doesn't happen through WELD/CDI and all the CDI features are then not accessible in this class.
 Inside the EL tags (`${}`) CDI beans can simply be accessed by their name (either given through the `@Named` annotation or the class name starting with a lower case letter).
 To get IDE support (at least in Intellij) you can add a JSP comment specifying the type of the variable: `<%-- @elvariable id="className" type="java.lang.Boolean" --%>`
+
+### Client side dependencies
+
+Its rather easy to just copy-past needed js or css files into the git repository.
+The problems with this approach are:
+ - It is difficult to determine if the files in the repo and the upstream version differ or not.
+ - So everyone is afraid of updating these dependencies as things could break.
+ - Tracking versions/dependencies + updating is time consuming
+
+So we manage client side dependencies via maven and [WebJars](https://www.webjars.org/).
+To use a new dependency:
+ - Look at their website if there exists a webjar which packages the dependency.
+ - Add the corresponding maven dependency fragment to the `pom.xml`.
+ - Load it via `webjars/<artifact-name>/<version>/<path-to-file>`.
+   The path has in many cases similarities to the cdn url. In addition, Intellij IDEA has autocompletion for the path.

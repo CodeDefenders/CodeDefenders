@@ -23,10 +23,6 @@ import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import javax.inject.Inject;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -38,6 +34,9 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Checks if the user is logged in for pages that require login.
@@ -120,7 +119,8 @@ public class LoginFilter implements Filter {
             return false;
         }
 
-        Pattern excludeUrls = Pattern.compile("^.*/(css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
+        Pattern excludeUrls = Pattern.compile("^.*/(webjars|css|js|images|fonts|codemirror)/.*$",
+                Pattern.CASE_INSENSITIVE);
         Matcher m = excludeUrls.matcher(path);
         return !m.matches();
     }

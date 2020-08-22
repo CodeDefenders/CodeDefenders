@@ -35,68 +35,59 @@
     <base href="${pageContext.request.contextPath}/">
 
     <!-- jQuery -->
-    <script src="js/jquery.js" type="text/javascript" ></script>
+    <script src="webjars/jquery/3.3.1-2/jquery.min.js" type="text/javascript" ></script>
 
     <!-- Slick -->
-    <link href="css/slick_1.5.9.css" rel="stylesheet" type="text/css" />
-    <script src="js/slick_1.5.9.min.js" type="text/javascript" ></script>
+    <link href="webjars/slick-carousel/1.5.8/slick/slick.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/slick-carousel/1.5.8/slick/slick.min.js" type="text/javascript" ></script>
 
 	<!-- Favicon.ico -->
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 
-    <!-- File Input -->
-    <!--
-    <script src="js/fileinput.min.js" type="text/javascript"></script>
-    -->
-    <!--
-    <link href="css/fileinput.min.css" rel="stylesheet" type="text/css" />
-    -->
-
     <!-- Bootstrap -->
-    <script src="js/bootstrap.min.js" type="text/javascript" ></script>
-    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- JQuery UI -->
-    <script src="js/jquery-ui.min.js" type="text/javascript" ></script>
-    <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/jquery-ui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
+    <link href="webjars/jquery-ui/1.12.1/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 
-    <link href="css/bootstrap-toggle_2.2.0.min.css" rel="stylesheet" type="text/css" />
-    <script src="js/bootstrap-toggle_2.2.0.min.js" type="text/javascript" ></script>
+    <link href="webjars/bootstrap-toggle/2.2.1/css/bootstrap-toggle.min.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/bootstrap-toggle/2.2.1/js/bootstrap-toggle.min.js" type="text/javascript" ></script>
     <!-- select -->
-    <link href="css/bootstrap-select_1.9.3.min.css" rel="stylesheet" type="text/css" />
-    <script src="js/bootstrap-select_1.9.3.min.js" type="text/javascript" ></script>
+    <link href="webjars/bootstrap-select/1.9.4/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
+    <script src="webjars/bootstrap-select/1.9.4/js/bootstrap-select.min.js" type="text/javascript" ></script>
 
 
     <!-- Leaf -->
     <link href="css/base.css" rel="stylesheet">
     <link href="css/colors.css" rel="stylesheet">
-    <script type="text/javascript" src="js/script.js"></script>
 
     <!-- Codemirror -->
-    <script src="codemirror/lib/codemirror.js" type="text/javascript" ></script>
-    <script src="codemirror/mode/clike/clike.js" type="text/javascript" ></script>
-    <script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/dialog/dialog.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/searchcursor.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/search.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/scroll/annotatescrollbar.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/matchesonscrollbar.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/search/jump-to-line.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/selection/active-line.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/edit/matchbrackets.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/edit/closebrackets.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/hint/show-hint.js" type="text/javascript" ></script>
-    <script src="codemirror/addon/hint/anyword-hint.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/mode/clike/clike.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/mode/diff/diff.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/dialog/dialog.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/searchcursor.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/search.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/scroll/annotatescrollbar.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/search/jump-to-line.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/selection/active-line.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/edit/matchbrackets.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/edit/closebrackets.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/hint/show-hint.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/hint/anyword-hint.js" type="text/javascript" ></script>
 
-    <script src="codemirror/keymap/emacs.js" type="text/javascript" ></script>
-    <script src="codemirror/keymap/sublime.js" type="text/javascript" ></script>
-    <script src="codemirror/keymap/vim.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/keymap/emacs.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/keymap/sublime.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/keymap/vim.js" type="text/javascript" ></script>
 
-    <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
-    <!-- <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" > -->
-    <link href="codemirror/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
-    <link href="codemirror/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
-    <link href="codemirror/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/codemirror/5.22.0/lib/codemirror.css" rel="stylesheet" type="text/css" />
+
+    <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
 
     <%-- This function shall be loaded on any page in which we compile the mutant --%>
     <%-- Sources:
@@ -107,10 +98,10 @@
 
 
     <!-- Table sorter -->
-    <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="js/moment.min.js"></script> <!-- must come before datetime-moment -->
-    <script type="text/javascript" src="js/datetime-moment.js"></script> <!-- must come after moment -->
-    <link href="css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="webjars/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="webjars/momentjs/2.14.1/min/moment.min.js"></script> <!-- must come before datetime-moment -->
+    <script type="text/javascript" src="webjars/datatables-plugins/1.10.16/sorting/datetime-moment.js"></script> <!-- must come after moment -->
+    <link href="webjars/datatables/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
     <link href="css/datatables-override.css" rel="stylesheet" type="text/css" />
 
 

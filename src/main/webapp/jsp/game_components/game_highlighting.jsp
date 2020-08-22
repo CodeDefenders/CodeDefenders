@@ -69,11 +69,11 @@
         };
 
         const Icons = {
-            ALIVE: '<%=request.getContextPath()%>/images/mutant.png',
-            KILLED: '<%=request.getContextPath()%>/images/mutantKilled.png',
-            FLAGGED: '<%=request.getContextPath()%>/images/mutantFlagged.png',
-            EQUIVALENT: '<%=request.getContextPath()%>/images/mutantEquiv.png',
-            FLAG: '<%=request.getContextPath()%>/images/flag.png'
+            ALIVE: '<%=request.getContextPath()%>/images/ingameicons/mutant.png',
+            KILLED: '<%=request.getContextPath()%>/images/ingameicons/mutantKilled.png',
+            FLAGGED: '<%=request.getContextPath()%>/images/ingameicons/mutantFlagged.png',
+            EQUIVALENT: '<%=request.getContextPath()%>/images/ingameicons/mutantEquiv.png',
+            FLAG: '<%=request.getContextPath()%>/images/ingameicons/flag.png'
         };
 
         /*
