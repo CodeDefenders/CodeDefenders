@@ -123,6 +123,9 @@ public class MeleeGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameManager.class);
 
     @Inject
+    private Configuration config;
+
+    @Inject
     private GameManagingUtils gameManagingUtils;
 
     @Inject
