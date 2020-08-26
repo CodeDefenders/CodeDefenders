@@ -53,21 +53,21 @@ import java.util.Set;
 @Alternative
 @Singleton
 public class Configuration {
-    protected String dataDir = "/srv/codedefenders";
-    protected String antHome = "/usr/share/ant";
-    protected String dbHost = "127.0.0.1";
-    protected Integer dbPort = 3306;
-    protected String dbName = "codedefenders";
-    protected String dbUsername = "codedefenders";
+    protected String dataDir;
+    protected String antHome;
+    protected String dbHost;
+    protected Integer dbPort;
+    protected String dbName;
+    protected String dbUsername;
     protected String dbPassword;
-    protected Boolean clusterMode = false;
+    protected Boolean clusterMode;
     protected String clusterJavaHome;
     protected String clusterReservationName;
-    protected Integer clusterTimeout = 2;
-    protected Boolean forceLocalExecution = true;
-    protected Boolean parallelize = true;
-    protected Boolean blockAttacker = true;
-    protected Boolean mutantCoverage = true;
+    protected Integer clusterTimeout;
+    protected Boolean forceLocalExecution;
+    protected Boolean parallelize;
+    protected Boolean blockAttacker;
+    protected Boolean mutantCoverage;
 
     /**
      * Validates the currently configured Configuration.
