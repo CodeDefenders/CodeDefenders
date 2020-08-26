@@ -21,6 +21,8 @@ package org.codedefenders.configuration;
 
 import com.google.common.net.InetAddresses;
 import com.google.common.net.InternetDomainName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
@@ -53,6 +55,8 @@ import java.util.Set;
 @Alternative
 @Singleton
 public class Configuration {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     protected String dataDir;
     protected String antHome;
     protected String dbHost;

@@ -31,20 +31,23 @@ public class ConfigFileResolverProducer {
     TomcatConfigFileResolver tomcatCfr;
     EnvironmentVariableConfigFileResolver environmentVarCfr;
     SystemPropertyConfigFileResolver systemPropertyCfr;
+    ContextConfigFileResolver contextCfr;
 
     @Inject
     ConfigFileResolverProducer(ClasspathConfigFileResolver classpathCfr,
                                TomcatConfigFileResolver tomcatCfr,
                                EnvironmentVariableConfigFileResolver environmentVarCfr,
-                               SystemPropertyConfigFileResolver systemPropertyCfr) {
+                               SystemPropertyConfigFileResolver systemPropertyCfr,
+                               ContextConfigFileResolver contextCfr) {
         this.classpathCfr = classpathCfr;
         this.tomcatCfr = tomcatCfr;
         this.environmentVarCfr = environmentVarCfr;
         this.systemPropertyCfr = systemPropertyCfr;
+        this.contextCfr = contextCfr;
     }
 
     @Produces
     List<ConfigFileResolver> getConfigFileResolvers() {
-        return new ArrayList<>(Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr));
+        return new ArrayList<>(Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr));
     }
 }
