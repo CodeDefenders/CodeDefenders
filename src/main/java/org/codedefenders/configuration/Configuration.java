@@ -36,9 +36,9 @@ import java.util.Set;
  * <p>It forms an adapter between the internal accessible configuration and the values configured by the user.
  * This provides us a typesafe way to access the configuration and also allows us to easily change the internal api
  * while keeping the external API (the user configured values) stable.
- * This additionally be used to provide internal configuration or feature switches which shouldn't be accessible to the
- * user at the moment, but could be published for usage at a later point in time. (This would be implemented by a method
- * which has no baking variable and returns a constant value.)<br><br>
+ * This can additionally be used to provide internal configuration or feature switches which shouldn't be accessible to
+ * the user at the moment, but could be published for usage at a later point in time. (This would be implemented by a
+ * method which has no baking variable and returns a constant value.)<br><br>
  *
  * <h3>Usage</h3>
  *
