@@ -42,8 +42,11 @@ import java.util.Set;
  *
  * <h3>Usage</h3>
  *
- * <p>To add configuration values which can be set by the end user simply add one ore more attributes (best with a
- * sensible default value) and one ore more access methods which return/use the attributes to this class.<br><br>
+ * <p>To add configuration values which can be set by the end user simply add one ore more attributes and one ore more
+ * access methods which return/use the attributes to this class.<br>
+ * All class attributes <b>must be null initialized</b> objects and <b>must not be</b> primitives.<br>
+ * <b>Do not</b> add default values to the class attributes! If you want to provide a default value, set it through the
+ * `src/main/resources/codedefenders.properties` file.<br><br>
  *
  * <p>Attribute names have to be in camelCase format, as most implementations reformat the attribute name and split the
  * name on the capitalized letters.
@@ -57,6 +60,7 @@ import java.util.Set;
 public class Configuration {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    // All the attributes need to be initialized with a null value and therefore need to be objects
     protected String dataDir;
     protected String antHome;
     protected String dbHost;

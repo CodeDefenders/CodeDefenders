@@ -40,12 +40,12 @@ import java.util.List;
 class TieredConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(TieredConfiguration.class);
 
-    private final List<BaseConfiguration> config;
+    private final List<BaseConfiguration> configurations;
 
     @Inject
     TieredConfiguration(List<BaseConfiguration> configurations) {
         super();
-        config = configurations;
+        this.configurations = configurations;
     }
 
     @Override
@@ -54,13 +54,11 @@ class TieredConfiguration extends BaseConfiguration {
         try {
             Field field = Configuration.class.getDeclaredField(camelCaseName);
             field.setAccessible(true);
-            for (BaseConfiguration otherConfig : config) {
-                if (otherConfig.attributeSet.contains(field.getName())) {
-                    Object otherConf = field.get(otherConfig);
-                    if (otherConf != null) {
-                        logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
-                        result = otherConf;
-                    }
+            for (BaseConfiguration otherConfig : configurations) {
+                Object otherConf = field.get(otherConfig);
+                if (otherConf != null) {
+                    logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
+                    result = otherConf;
                 }
             }
         } catch (NoSuchFieldException e) {

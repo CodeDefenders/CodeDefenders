@@ -73,10 +73,4 @@ public class TieredConfigurationTest {
         assertTrue(config.isClusterModeEnabled());
         assertFalse(config.isForceLocalExecution());
     }
-
-    @Test
-    public void overwriteWithDefaultValue() {
-        // TODO: Could we make this more independent from our default values?
-        assertEquals("jdbc:mysql://127.0.0.1:3306/codedefenders", config.getDbUrl());
-    }
 }
