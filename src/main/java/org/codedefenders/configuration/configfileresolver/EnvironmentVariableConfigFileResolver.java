@@ -22,6 +22,7 @@ package org.codedefenders.configuration.configfileresolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.Reader;
 
 /**
@@ -35,7 +36,17 @@ public class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
 
     @Override
     public Reader getConfigFile(String filename) {
-        return getConfigFileImpl(System.getenv("CODEDEFENDERS_CONFIG"), filename);
+        String envVar = System.getenv("CODEDEFENDERS_CONFIG");
+        if (envVar == null) {
+            return null;
+        } else {
+            File path = new File(envVar);
+            if (path.isFile()) {
+                return getConfigFileImpl(path);
+            } else {
+                return getConfigFileImpl(new File(path, filename));
+            }
+        }
     }
 }
 

@@ -22,6 +22,7 @@ package org.codedefenders.configuration.configfileresolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.Reader;
 
 /**
@@ -35,6 +36,16 @@ public class SystemPropertyConfigFileResolver extends ConfigFileResolver {
 
     @Override
     public Reader getConfigFile(String filename) {
-        return getConfigFileImpl(System.getProperty("codedefenders.config"), filename);
+        String sysProp = System.getProperty("codedefenders.config");
+        if (sysProp == null) {
+            return null;
+        } else {
+            File path = new File(sysProp);
+            if (path.isFile()) {
+                return getConfigFileImpl(path);
+            } else {
+                return getConfigFileImpl(new File(path, filename));
+            }
+        }
     }
 }

@@ -35,17 +35,12 @@ import java.io.Reader;
  * @author degenhart
  */
 public abstract class ConfigFileResolver {
-    private static final Logger logger = LoggerFactory.getLogger(ConfigFileResolver.class);
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public abstract Reader getConfigFile(String filename);
 
-    protected Reader getConfigFileImpl(String folder, String filename) {
-        if (folder == null || folder.length() == 0) {
-            return null;
-        }
-        File file = new File(folder, filename);
-
-        if (!file.exists()) {
+    protected Reader getConfigFileImpl(File file) {
+        if (file == null || !file.exists()) {
             return null;
         } else {
             try {

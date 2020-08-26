@@ -41,6 +41,6 @@ public class TomcatConfigFileResolver extends ConfigFileResolver {
             return null;
         }
         File folder = new File(tomcatRoot, "conf");
-        return getConfigFileImpl(folder.getAbsolutePath(), filename);
+        return getConfigFileImpl(new File(folder, filename));
     }
 }

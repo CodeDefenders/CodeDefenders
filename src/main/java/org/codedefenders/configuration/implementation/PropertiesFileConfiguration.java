@@ -56,7 +56,8 @@ class PropertiesFileConfiguration extends BaseConfiguration {
     @Inject
     PropertiesFileConfiguration(List<ConfigFileResolver> configFileResolvers) {
         super();
-        properties = readProperties(configFileResolvers);
+        properties = new Properties();
+        readProperties(configFileResolvers, "codedefenders.properties");
     }
 
     @Override
@@ -69,13 +70,11 @@ class PropertiesFileConfiguration extends BaseConfiguration {
         return properties.getProperty(resolveAttributeName(camelCaseName));
     }
 
-    private Properties readProperties(List<ConfigFileResolver> loaders) {
-        Properties properties = new Properties();
-
+    private void readProperties(List<ConfigFileResolver> loaders, String configFileName) {
         boolean noFileFound = true;
 
         for (ConfigFileResolver loader : loaders) {
-            try (Reader reader = loader.getConfigFile("codedefenders.properties")) {
+            try (Reader reader = loader.getConfigFile(configFileName)) {
                 if (reader != null) {
                     noFileFound = false;
                     logger.info("Loaded properties file found by " + loader.getClass().getSimpleName());
@@ -88,6 +87,5 @@ class PropertiesFileConfiguration extends BaseConfiguration {
         if (noFileFound) {
             logger.info("No properties files found");
         }
-        return properties;
     }
 }
