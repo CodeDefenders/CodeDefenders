@@ -43,8 +43,15 @@ public class BaseConfigurationProducer {
         this.propFileConf = propFileConf;
     }
 
+    /**
+     * Get a list of Configuration classes.
+     * Configuration properties of classes further back in the list overwrite configuration properties of classes
+     * further ahead in the list.
+     *
+     * @return A list of Configuration classes sorted by ascending priority.
+     */
     @Produces
     public List<BaseConfiguration> getConfiguration() {
-        return new ArrayList<>(Arrays.asList(sysPropConf, contextConf, envVarConf, propFileConf));
+        return new ArrayList<>(Arrays.asList(propFileConf, envVarConf, sysPropConf, contextConf));
     }
 }

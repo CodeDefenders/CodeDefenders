@@ -46,6 +46,13 @@ public class ConfigFileResolverProducer {
         this.contextCfr = contextCfr;
     }
 
+    /**
+     * Get a list of ConfigFilResolver classes.
+     * Configuration properties of a file found by a ConfigFileResolver further back in the list overwrite configuration
+     * properties of file found by a ConfigFileResolver further ahead in the list.
+     *
+     * @return A list of ConfigFileResolver classes sorted by ascending priority.
+     */
     @Produces
     List<ConfigFileResolver> getConfigFileResolvers() {
         return new ArrayList<>(Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr));
