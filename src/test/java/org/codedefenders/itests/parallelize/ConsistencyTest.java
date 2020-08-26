@@ -54,6 +54,7 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidator;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -93,6 +94,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
+//FIXME
+@Ignore
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DatabaseConnection.class }) // , mutationTester.class })
