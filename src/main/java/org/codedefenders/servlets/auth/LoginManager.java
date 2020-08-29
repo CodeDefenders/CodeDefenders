@@ -18,19 +18,9 @@
  */
 package org.codedefenders.servlets.auth;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.EmailUtils;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN;
+import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
+import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
 import java.io.IOException;
 import java.util.Random;
@@ -49,10 +39,27 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN;
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.REQUIRE_MAIL_VALIDATION;
-import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
-import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.ExcessiveAttemptsException;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.LockedAccountException;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.EmailUtils;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet(Paths.LOGIN)
 public class LoginManager extends HttpServlet {
@@ -65,10 +72,8 @@ public class LoginManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
     private static final int PW_RESET_SECRET_LENGTH = 20;
-    private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n"
-            + "Change your password here: %s\n"
-            + "This link is only valid for %d hours.\n\n"
-            + "Greetings, your CodeDefenders team";
+    private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
+            + "This link is only valid for %d hours.\n\n" + "Greetings, your CodeDefenders team";
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -84,150 +89,178 @@ public class LoginManager extends HttpServlet {
         String formType = request.getParameter("formType");
 
         switch (formType) {
-            case "create":
-                String confirm = request.getParameter("confirm");
-                if (!(validUsername(username))) {
-                    // This check should be performed in the user interface too.
-                    messages.add("Could not create user. Invalid username.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                    dispatcher.forward(request, response);
-                } else if (!validPassword(password)) {
-                    // This check should be performed in the user interface too.
-                    messages.add("Could not create user. Invalid password.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                    dispatcher.forward(request, response);
-                } else if (!validEmailAddress(email)) {
-                    // This check should be performed in the user interface too.
-                    messages.add("Could not create user. Invalid E-Mail address.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                    dispatcher.forward(request, response);
-                } else if (!password.equals(confirm)) {
-                    // This check should be performed in the user interface too.
-                    messages.add("Could not create user. Password entries did not match.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                    dispatcher.forward(request, response);
-                } else if (UserDAO.getUserByName(username) != null) {
-                    messages.add("Could not create user. Username is already taken.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                    dispatcher.forward(request, response);
-                } else if (UserDAO.getUserByEmail(email) != null) {
-                    messages.add("Could not create user. Email has already been used. You can reset your password.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                    dispatcher.forward(request, response);
+        case "create":
+            String confirm = request.getParameter("confirm");
+            if (!(validUsername(username))) {
+                // This check should be performed in the user interface too.
+                messages.add("Could not create user. Invalid username.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+                dispatcher.forward(request, response);
+            } else if (!validPassword(password)) {
+                // This check should be performed in the user interface too.
+                messages.add("Could not create user. Invalid password.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+                dispatcher.forward(request, response);
+            } else if (!validEmailAddress(email)) {
+                // This check should be performed in the user interface too.
+                messages.add("Could not create user. Invalid E-Mail address.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+                dispatcher.forward(request, response);
+            } else if (!password.equals(confirm)) {
+                // This check should be performed in the user interface too.
+                messages.add("Could not create user. Password entries did not match.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+                dispatcher.forward(request, response);
+            } else if (UserDAO.getUserByName(username) != null) {
+                messages.add("Could not create user. Username is already taken.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+                dispatcher.forward(request, response);
+            } else if (UserDAO.getUserByEmail(email) != null) {
+                messages.add("Could not create user. Email has already been used. You can reset your password.");
+                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+                dispatcher.forward(request, response);
+            } else {
+                User newUser = new User(username, User.encodePassword(password), email);
+                if (newUser.insert()) {
+                    User insertedUser = UserDAO.getUserById(newUser.getId());
+                    login.loginUser(insertedUser);
+                    // Log user activity including the timestamp
+                    DatabaseAccess.logSession(newUser.getId(), getClientIpAddress(request));
+                    response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
                 } else {
-                    User newUser = new User(username, User.encodePassword(password), email);
-                    if (newUser.insert()) {
-                        User insertedUser = UserDAO.getUserById(newUser.getId());
-                        login.loginUser(insertedUser);
-                        // Log user activity including the timestamp
-                        DatabaseAccess.logSession(newUser.getId(), getClientIpAddress(request));
-                        response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
-                    } else {
-                        // TODO: How about some error handling?
-                        messages.add("Could not create a user for you, sorry!");
-                        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                        dispatcher.forward(request, response);
-                    }
+                    // TODO: How about some error handling?
+                    messages.add("Could not create a user for you, sorry!");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+                    dispatcher.forward(request, response);
                 }
-                break;
-            case "login":
+            }
+            break;
+        case "login":
+            // Use Shiro for authentication - This probably some hashed version of the
+            // password
+            UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+            Subject currentUser = SecurityUtils.getSubject();
+
+            try {
+
+                currentUser.login(token);
                 User activeUser = UserDAO.getUserByName(username);
-                if (activeUser == null) {
-                    messages.add("Username not found or password incorrect.");
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                    dispatcher.forward(request, response);
-                } else {
-                    String dbPassword = activeUser.getEncodedPassword();
-                    boolean requireValidation = AdminDAO.getSystemSetting(REQUIRE_MAIL_VALIDATION).getBoolValue();
-                    if (requireValidation && !activeUser.isValidated()) {
-                        messages.add("Account email is not validated.");
-                        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                        dispatcher.forward(request, response);
-                    } else {
-                        if (User.passwordMatches(password, dbPassword)) {
-                            if (activeUser.isActive()) {
-                                HttpSession session = request.getSession();
-                                // Log user activity including the timestamp
-                                DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
-                                login.loginUser(activeUser);
-
-                                storeApplicationDataInSession(session);
-
-                                if (login.isRedirectAfterLogin()) {
-                                    String redirectTarget = login.getRedirectURL();
-                                    login.clearRedirectAfterLogin();
-                                    response.sendRedirect(redirectTarget);
-                                } else {
-                                    // Default redirect page: Home
-                                    response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
-                                }
-                            } else {
-                                messages.add("Your account is inactive, login is only possible with an active"
-                                        + "account.");
-                                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                                dispatcher.forward(request, response);
-                            }
-                        } else {
-                            messages.add("Username not found or password incorrect.");
-                            RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                            dispatcher.forward(request, response);
-                        }
-                    }
+                HttpSession session = request.getSession();
+                // Log user activity including the timestamp
+                DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
+                login.loginUser(activeUser);
+                storeApplicationDataInSession(session);
+                
+            } catch (UnknownAccountException uae) {
+                messages.add("Username not found or password incorrect. " + uae.getMessage());
+            } catch (IncorrectCredentialsException ice) {
+                messages.add("Username not found or password incorrect. " + ice.getMessage());
+            } catch (LockedAccountException lae) {
+                messages.add("Username not found or password incorrect. " + lae.getMessage());
+            } catch (ExcessiveAttemptsException eae) {
+                messages.add("Username not found or password incorrect. " + eae.getMessage());
+            } catch (AuthenticationException ae) {
+                messages.add("Username not found or password incorrect. " + ae.getMessage());
+                // unexpected error?
+            }
+            // No problems, show authenticated view…
+//                User activeUser = UserDAO.getUserByName(username);
+//                if (activeUser == null) {
+//                    messages.add("Username not found or password incorrect.");
+//                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+//                    dispatcher.forward(request, response);
+//                } else {
+//                    String dbPassword = activeUser.getEncodedPassword();
+//                    boolean requireValidation = AdminDAO.getSystemSetting(REQUIRE_MAIL_VALIDATION).getBoolValue();
+//                    if (requireValidation && !activeUser.isValidated()) {
+//                        messages.add("Account email is not validated.");
+//                        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+//                        dispatcher.forward(request, response);
+//                    } else {
+//                        if (User.passwordMatches(password, dbPassword)) {
+//                            if (activeUser.isActive()) {
+//                                HttpSession session = request.getSession();
+//                                // Log user activity including the timestamp
+//                                DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
+//                                login.loginUser(activeUser);
+//
+//                                storeApplicationDataInSession(session);
+//
+//                                if (login.isRedirectAfterLogin()) {
+//                                    String redirectTarget = login.getRedirectURL();
+//                                    login.clearRedirectAfterLogin();
+//                                    response.sendRedirect(redirectTarget);
+//                                } else {
+//                                    // Default redirect page: Home
+//                                    response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+//                                }
+//                            } else {
+//                                messages.add("Your account is inactive, login is only possible with an active"
+//                                        + "account.");
+//                                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+//                                dispatcher.forward(request, response);
+//                            }
+//                        } else {
+//                            messages.add("Username not found or password incorrect.");
+//                            RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+//                            dispatcher.forward(request, response);
+//                        }
+//                    }
+//                }
+            break;
+        case "resetPassword":
+            email = request.getParameter("accountEmail");
+            username = request.getParameter("accountUsername");
+            User u = UserDAO.getUserByEmail(email);
+            if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
+                messages.add("No such User found or Email and Username do not match");
+            } else {
+                String resetPwSecret = generatePasswordResetSecret();
+                DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
+                String hostAddr = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                        + request.getContextPath();
+                String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
+                String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
+                        AdminDAO.getSystemSetting(PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
+                if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
+                    messages.add("A link for changing your password has been sent to " + email);
                 }
-                break;
-            case "resetPassword":
-                email = request.getParameter("accountEmail");
-                username = request.getParameter("accountUsername");
-                User u = UserDAO.getUserByEmail(email);
-                if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
-                    messages.add("No such User found or Email and Username do not match");
-                } else {
-                    String resetPwSecret = generatePasswordResetSecret();
-                    DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
-                    String hostAddr = request.getScheme() + "://" + request.getServerName() + ":"
-                            + request.getServerPort() + request.getContextPath();
-                    String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-                    String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
-                            AdminDAO.getSystemSetting(PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
-                    if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
-                        messages.add("A link for changing your password has been sent to " + email);
-                    }
-                }
-                response.sendRedirect(request.getContextPath() + Paths.LOGIN);
-                break;
+            }
+            response.sendRedirect(request.getContextPath() + Paths.LOGIN);
+            break;
 
-            case "changePassword":
-                String resetPwSecret = request.getParameter("resetPwSecret");
-                confirm = request.getParameter("inputConfirmPasswordChange");
-                password = request.getParameter("inputPasswordChange");
+        case "changePassword":
+            String resetPwSecret = request.getParameter("resetPwSecret");
+            confirm = request.getParameter("inputConfirmPasswordChange");
+            password = request.getParameter("inputPasswordChange");
 
-                String responseURL = request.getContextPath() + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-                int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
-                if (resetPwSecret != null && userId > -1) {
-                    if (!(validPassword(password))) {
-                        messages.add("Password not changed. Make sure it is valid.");
-                    } else if (password.equals(confirm)) {
-                        User user = UserDAO.getUserById(userId);
-                        user.setEncodedPassword(User.encodePassword(password));
-                        if (user.update()) {
-                            DatabaseAccess.setPasswordResetSecret(user.getId(), null);
-                            responseURL = request.getContextPath() + Paths.LOGIN;
-                            messages.add("Successfully changed your Password.");
-                        }
-                    } else {
-                        messages.add("Your Two Password Entries Did Not Match");
+            String responseURL = request.getContextPath() + Paths.LOGIN + "?resetPW=" + resetPwSecret;
+            int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
+            if (resetPwSecret != null && userId > -1) {
+                if (!(validPassword(password))) {
+                    messages.add("Password not changed. Make sure it is valid.");
+                } else if (password.equals(confirm)) {
+                    User user = UserDAO.getUserById(userId);
+                    user.setEncodedPassword(User.encodePassword(password));
+                    if (user.update()) {
+                        DatabaseAccess.setPasswordResetSecret(user.getId(), null);
+                        responseURL = request.getContextPath() + Paths.LOGIN;
+                        messages.add("Successfully changed your Password.");
                     }
                 } else {
-                    messages.add("Your Password reset link is not valid or has expired");
-                    responseURL = request.getContextPath() + Paths.LOGIN;
+                    messages.add("Your Two Password Entries Did Not Match");
                 }
-                response.sendRedirect(responseURL);
-                break;
-            default:
-                // ignored
+            } else {
+                messages.add("Your Password reset link is not valid or has expired");
+                responseURL = request.getContextPath() + Paths.LOGIN;
+            }
+            response.sendRedirect(responseURL);
+            break;
+        default:
+            // ignored
         }
-    }
 
+    }
 
     private static String generatePasswordResetSecret() {
         StringBuilder sb = new StringBuilder();
@@ -242,9 +275,10 @@ public class LoginManager extends HttpServlet {
     }
 
     /*
-     * This method collects all the app specific configurations and store them into the current user-session.
-     * This avoids to access Context directly from the JSP code which is a bad practice, since JSP are meant only
-     * for implementing rendering code.
+     * This method collects all the app specific configurations and store them into
+     * the current user-session. This avoids to access Context directly from the JSP
+     * code which is a bad practice, since JSP are meant only for implementing
+     * rendering code.
      */
     private void storeApplicationDataInSession(HttpSession session) {
         // First check the Web abb context
@@ -282,16 +316,12 @@ public class LoginManager extends HttpServlet {
     }
 
     private boolean invalidIP(String ip) {
-        return (ip == null)
-                || (ip.length() == 0)
-                || ("unknown".equalsIgnoreCase(ip))
-                || ("0:0:0:0:0:0:0:1".equals(ip)
-        );
+        return (ip == null) || (ip.length() == 0) || ("unknown".equalsIgnoreCase(ip)) || ("0:0:0:0:0:0:0:1".equals(ip));
     }
 
     /**
-     * Username must contain 3 to 20 alphanumeric characters,
-     * start with an alphabetic character, and have no whitespace or special character.
+     * Username must contain 3 to 20 alphanumeric characters, start with an
+     * alphabetic character, and have no whitespace or special character.
      *
      * @param username
      * @return true iff valid username
@@ -318,12 +348,13 @@ public class LoginManager extends HttpServlet {
     }
 
     /**
-     * Password must contain MIN_PASSWORD_LENGTH to 20 alphanumeric characters,
-     * with no whitespace or special character.
+     * Password must contain MIN_PASSWORD_LENGTH to 20 alphanumeric characters, with
+     * no whitespace or special character.
      */
     // TODO extract that method to a util class
     public static boolean validPassword(String password) {
-        // MIN_PASSWORD_LENGTH-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
+        // MIN_PASSWORD_LENGTH-10 alphanumeric characters (a-z, A-Z, 0-9) (no
+        // whitespaces)
         int minLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
         String pattern = "^[a-zA-Z0-9]{" + minLength + ",}$";
         return password != null && password.matches(pattern);

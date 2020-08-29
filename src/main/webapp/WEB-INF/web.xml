@@ -99,10 +99,37 @@
     </context-param>
 
     <!-- Filters - the order is important -->
-    <filter-mapping>
+    <listener>
+		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+	</listener>
+
+	<filter>
+		<filter-name>ShiroFilter</filter-name>
+		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+	</filter>
+	<!-- Avoid that EnvironmentLoaderListener loads the Ini Environment -->
+	<context-param>
+		<param-name>shiroEnvironmentClass</param-name>
+		<param-value>org.codedefenders.servlets.auth.CodeDefendersWebEnvironment</param-value>
+	</context-param>
+
+	<filter-mapping>
+		<filter-name>ShiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+    
+    
+    <!-- <filter-mapping>
         <filter-name>LoginFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    </filter-mapping> -->
+    
+    
+    
     <filter-mapping>
         <filter-name>TicketingFilter</filter-name>
         <url-pattern>/*</url-pattern>
