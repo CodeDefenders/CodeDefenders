@@ -18,7 +18,6 @@
  */
 package org.codedefenders.servlets.auth;
 
-import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN;
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
@@ -40,14 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.ExcessiveAttemptsException;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.LockedAccountException;
-import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
@@ -135,35 +126,49 @@ public class LoginManager extends HttpServlet {
                 }
             }
             break;
+
         case "login":
-            // Use Shiro for authentication - This probably some hashed version of the
-            // password
-            UsernamePasswordToken token = new UsernamePasswordToken(username, password);
-            Subject currentUser = SecurityUtils.getSubject();
+            /*
+             * Since we enabled Shiro this case will be hit ONLY if the authentication was
+             * not ok. So we can set the messages and redirect back to login page
+             */
+            // TODO Most likely we should be able to capture the original exception and do
+            // something about it
+            messages.add("Username not found or password incorrect.");
+            RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+            dispatcher.forward(request, response);
 
-            try {
-
-                currentUser.login(token);
-                User activeUser = UserDAO.getUserByName(username);
-                HttpSession session = request.getSession();
-                // Log user activity including the timestamp
-                DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
-                login.loginUser(activeUser);
-                storeApplicationDataInSession(session);
-                
-            } catch (UnknownAccountException uae) {
-                messages.add("Username not found or password incorrect. " + uae.getMessage());
-            } catch (IncorrectCredentialsException ice) {
-                messages.add("Username not found or password incorrect. " + ice.getMessage());
-            } catch (LockedAccountException lae) {
-                messages.add("Username not found or password incorrect. " + lae.getMessage());
-            } catch (ExcessiveAttemptsException eae) {
-                messages.add("Username not found or password incorrect. " + eae.getMessage());
-            } catch (AuthenticationException ae) {
-                messages.add("Username not found or password incorrect. " + ae.getMessage());
-                // unexpected error?
-            }
-            // No problems, show authenticated view…
+//            System.out.println("LoginManager.doPost() Called LOGIN on LoginManager");
+//            // Use Shiro for authentication - This probably some hashed version of the
+//            // password
+//            UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+//            Subject currentUser = SecurityUtils.getSubject();
+//
+//            try {
+//
+//                currentUser.login(token);
+//                User activeUser = UserDAO.getUserByName(username);
+//                HttpSession session = request.getSession();
+//                // Log user activity including the timestamp
+//                DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
+//                login.loginUser(activeUser);
+//                storeApplicationDataInSession(session);
+//                // This is the default, but what if the use requested a different URL before?
+//                response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+//
+//            } catch (UnknownAccountException uae) {
+//                messages.add("Username not found or password incorrect. " + uae.getMessage());
+//            } catch (IncorrectCredentialsException ice) {
+//                messages.add("Username not found or password incorrect. " + ice.getMessage());
+//            } catch (LockedAccountException lae) {
+//                messages.add("Username not found or password incorrect. " + lae.getMessage());
+//            } catch (ExcessiveAttemptsException eae) {
+//                messages.add("Username not found or password incorrect. " + eae.getMessage());
+//            } catch (AuthenticationException ae) {
+//                messages.add("Username not found or password incorrect. " + ae.getMessage());
+//                // unexpected error?
+//            }
+//             No problems, show authenticated view…
 //                User activeUser = UserDAO.getUserByName(username);
 //                if (activeUser == null) {
 //                    messages.add("Username not found or password incorrect.");
@@ -221,7 +226,8 @@ public class LoginManager extends HttpServlet {
                         + request.getContextPath();
                 String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
                 String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
-                        AdminDAO.getSystemSetting(PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
+                        AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
+                                .getIntValue());
                 if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
                     messages.add("A link for changing your password has been sent to " + email);
                 }
