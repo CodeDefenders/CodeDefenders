@@ -3,18 +3,22 @@ package org.codedefenders.servlets.auth;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.User;
@@ -26,7 +30,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
 
-    // TODO Not sure this is the correct form...
+    // TODO Move this into some utility method
     public <T> T getBeanFromCDI(Class<T> beanClass) {
         try {
             InitialContext initialContext = new InitialContext();
@@ -35,12 +39,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             CreationalContext ctx = bm.createCreationalContext(bean);
             return (T) bm.getReference(bean, beanClass, ctx);
 
-        }
-//            catch (NamingException e) {
-//            e.printStackTrace();
-//            System.out.println("CodeDefendersFormAuthenticationFilter Could not acquire BeanManager");
-//        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             System.out.println("CodeDefendersFormAuthenticationFilter Could not acquire Bean for " + beanClass);
         }
@@ -77,6 +76,16 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         storeApplicationDataInSession(session);
 
         return super.onLoginSuccess(token, subject, request, response);
+    }
+
+    @Override
+    protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
+            ServletResponse response) {
+        
+        MessagesBean messages = getBeanFromCDI(MessagesBean.class);
+        messages.add("Username not found or password incorrect.");
+        
+        return super.onLoginFailure(token, e, request, response);
     }
 
     /*

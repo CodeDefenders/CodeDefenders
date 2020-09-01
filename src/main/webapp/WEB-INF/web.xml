@@ -98,19 +98,11 @@
 		<param-value>***REMOVED***</param-value>
 	</context-param>
 
-	<!-- Make sure this one runs before ? -->
-	<!-- <listener> <listener-class>org.codedefenders.SystemStartStop</listener-class> 
-		</listener> -->
-
-	<!-- SHIRO IS NOT EVEN USING THIS ENVIRONMENT !!! -->
-	<!-- For some weird reason, maybe conflicting loading and handling of objects, 
-		subclassing this class will break shiro as the environment will be loaded 
-		to times -->
+	<!-- Shiro -->
 	<listener>
 		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
 	</listener>
 
-	<!-- Let us provide the environment to be loaded into Shiro -->
 	<context-param>
 		<param-name>shiroEnvironmentClass</param-name>
 		<param-value>org.codedefenders.servlets.auth.CodeDefendersWebEnvironment</param-value>
@@ -130,23 +122,20 @@
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
 
-
-	<!-- <filter-mapping> <filter-name>LoginFilter</filter-name> <url-pattern>/*</url-pattern> 
-		</filter-mapping> -->
-
-
+	<!-- CodeDefenders filters -->
 
 	<filter-mapping>
 		<filter-name>TicketingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+	
 	<filter-mapping>
 		<filter-name>BeanFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	<!-- Filters end -->
-
+	
 	<!-- Servlets -->
+	
 	<!-- Public sites -->
 	<servlet>
 		<servlet-name>HelpPage</servlet-name>
@@ -183,6 +172,17 @@
 		<servlet-name>StudyOverview</servlet-name>
 		<jsp-file>/jsp/study.jsp</jsp-file>
 	</servlet>
+
+	<!--  Login page -->
+	<servlet>
+    	<servlet-name>Login</servlet-name>
+    	<jsp-file>/jsp/login_view.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+    	<servlet-name>Login</servlet-name>
+    	<url-pattern>/login</url-pattern>
+	</servlet-mapping>
 
 	<!-- Misc start -->
 	<servlet-mapping>

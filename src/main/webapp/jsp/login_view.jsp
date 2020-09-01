@@ -66,6 +66,7 @@
     </form>
 </div>
 
+<!-- TODO ARE THOSE EVEN USED ? -->
 <% String resetPw = request.getParameter("resetPW");
     if (resetPw != null &&
             DatabaseAccess.getUserIDForPWResetSecret(resetPw) > 0) {
@@ -86,7 +87,7 @@
                 <h4 class="modal-title">Change your password</h4>
             </div>
             <div class="modal-body">
-                <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
+                <form action="<%=request.getContextPath()  + Paths.PASSWORD%>" method="post" class="form-signin">
                     <input type="hidden" name="resetPwSecret" id="resetPwSecret" value="<%=resetPw%>">
 
                     <input type="hidden" name="formType" value="changePassword">
@@ -135,7 +136,7 @@
                 <h4 class="modal-title">Reset your password</h4>
             </div>
             <div class="modal-body">
-                <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
+                <form action="<%=request.getContextPath()  + Paths.PASSWORD%>" method="post" class="form-signin">
                     <input type="hidden" name="formType" value="resetPassword">
                     <label for="inputUsername" class="sr-only">Username</label>
                     <input type="text" id="accountUsername" name="accountUsername" class="form-control"
@@ -169,7 +170,7 @@
             <%int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();%>
             <div class="modal-body">
                 <div id="create">
-                    <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
+                    <form action="<%=request.getContextPath()  + Paths.USER%>" method="post" class="form-signin">
                         <input type="hidden" name="formType" value="create">
                         <label for="inputUsername" class="sr-only">Username</label>
                         <span class="label label-danger" id="invalid_username_message" style="color: white;visibility: hidden">3-20 alphanumerics starting with a letter (a-z), no space or special characters.</span>
