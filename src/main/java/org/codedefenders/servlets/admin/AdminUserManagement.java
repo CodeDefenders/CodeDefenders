@@ -23,11 +23,11 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
-import org.codedefenders.servlets.auth.LoginManager;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +49,11 @@ import javax.servlet.http.HttpServletResponse;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
 /**
- * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
+ * This {@link HttpServlet} handles admin requests for managing {@link User
+ * Users}.
  *
- * <p>Serves on path: {@code /admin/users}.
+ * <p>
+ * Serves on path: {@code /admin/users}.
  */
 @WebServlet(org.codedefenders.util.Paths.ADMIN_USERS)
 public class AdminUserManagement extends HttpServlet {
@@ -68,8 +70,7 @@ public class AdminUserManagement extends HttpServlet {
             + "An account has been created for you with Username %s and Password %s.\n"
             + "You can log in at %s. \n\n Happy coding!";
     private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-    private static final String PASSWORD_RESET_MSG = "%s, \n\n"
-            + "your password has been reset to %s\n"
+    private static final String PASSWORD_RESET_MSG = "%s, \n\n" + "your password has been reset to %s\n"
             + "Please change it at your next convenience.";
 
     @Override
@@ -83,60 +84,58 @@ public class AdminUserManagement extends HttpServlet {
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
-            case "manageUsers": {
-                final Optional<Integer> userToReset = ServletUtils.getIntParameter(request, "resetPasswordButton");
-                if (userToReset.isPresent()) {
-                    messages.add(resetUserPW(userToReset.get()));
-                    break;
-                }
-                final Optional<Integer> userId = ServletUtils.getIntParameter(request, "setUserInactive");
-                if (userId.isPresent()) {
-                    final boolean success = setUserInactive(userId.get());
-                    if (success) {
-                        messages.add("Successfully set user with id " + userId.get() + " as inactive.");
-                    } else {
-                        logger.warn("Setting user as inactive failed.");
-                        messages.add("Failed to set user as inactive.");
-                    }
-                }
-                final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
-                if (userToEdit.isPresent()) {
-                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
-                            + "?editUser=" + userToEdit.get();
-                }
+        case "manageUsers": {
+            final Optional<Integer> userToReset = ServletUtils.getIntParameter(request, "resetPasswordButton");
+            if (userToReset.isPresent()) {
+                messages.add(resetUserPW(userToReset.get()));
                 break;
             }
-            case "createUsers": {
-                final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
-                if (!userList.isPresent()) {
-                    logger.error("Creating users failed. Missing parameter 'user_name_list'");
+            final Optional<Integer> userId = ServletUtils.getIntParameter(request, "setUserInactive");
+            if (userId.isPresent()) {
+                final boolean success = setUserInactive(userId.get());
+                if (success) {
+                    messages.add("Successfully set user with id " + userId.get() + " as inactive.");
                 } else {
-                    logger.info("Creating users....");
-                    createUserAccounts(request, userList.get());
-                    logger.info("Creating users succeeded.");
+                    logger.warn("Setting user as inactive failed.");
+                    messages.add("Failed to set user as inactive.");
                 }
-                break;
             }
-            case "editUser": {
-                // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
-                //  'userid' from the session attributes
-                final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
-                if (!userId.isPresent()) {
-                    logger.error("Creating users failed. Missing request parameter 'uid'");
-                } else {
-                    String successMsg = "Successfully updated info for User " + userId.get();
-                    String msg = editUser(userId.get(), request, successMsg);
-                    messages.add(msg);
-                    if (!msg.equals(successMsg)) {
-                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
-                                + "?editUser=" + userId.get();
-                    }
+            final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
+            if (userToEdit.isPresent()) {
+                responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEdit.get();
+            }
+            break;
+        }
+        case "createUsers": {
+            final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
+            if (!userList.isPresent()) {
+                logger.error("Creating users failed. Missing parameter 'user_name_list'");
+            } else {
+                logger.info("Creating users....");
+                createUserAccounts(request, userList.get());
+                logger.info("Creating users succeeded.");
+            }
+            break;
+        }
+        case "editUser": {
+            // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
+            // 'userid' from the session attributes
+            final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
+            if (!userId.isPresent()) {
+                logger.error("Creating users failed. Missing request parameter 'uid'");
+            } else {
+                String successMsg = "Successfully updated info for User " + userId.get();
+                String msg = editUser(userId.get(), request, successMsg);
+                messages.add(msg);
+                if (!msg.equals(successMsg)) {
+                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userId.get();
                 }
-                break;
             }
-            default:
-                logger.error("Action {" + formType + "} not recognised.");
-                break;
+            break;
+        }
+        default:
+            logger.error("Action {" + formType + "} not recognised.");
+            break;
         }
 
         response.sendRedirect(responsePath);
@@ -153,6 +152,9 @@ public class AdminUserManagement extends HttpServlet {
     }
 
     private String editUser(int userId, HttpServletRequest request, String successMsg) {
+
+        CodeDefendersValidator validator = new CodeDefendersValidator();
+
         User u = UserDAO.getUserById(userId);
         if (u == null) {
             return "Error. User " + userId + " cannot be retrieved from database.";
@@ -175,13 +177,13 @@ public class AdminUserManagement extends HttpServlet {
             return "Email " + email + " is already in use";
         }
 
-        if (!LoginManager.validEmailAddress(email)) {
+        if (!validator.validEmailAddress(email)) {
             return "Email Address is not valid";
         }
 
         if (!password.equals("")) {
             // we don't want to encode the already encoded password from the DB
-            if (!LoginManager.validPassword(password)) {
+            if (!validator.validPassword(password)) {
                 return "Password is not valid";
             }
             u.setEncodedPassword(User.encodePassword(password));
@@ -209,13 +211,17 @@ public class AdminUserManagement extends HttpServlet {
     /**
      * Creates a user for a given string, which has to be formatted like:
      *
-     * <p>{@code username,password}
+     * <p>
+     * {@code username,password}
      *
-     * <p>{@code username,password,email}
+     * <p>
+     * {@code username,password,email}
      *
-     * <p>Values can be separated by either ',' or ';'.
+     * <p>
+     * Values can be separated by either ',' or ';'.
      */
     private void createUserAccount(String userCredentials, boolean sendMail, String hostAddress) {
+        CodeDefendersValidator validator = new CodeDefendersValidator();
         // credentials have following form: username, password, email (optional)
         final String[] credentials = userCredentials.split("[,;]+");
         if (credentials.length < 2) {
@@ -234,14 +240,14 @@ public class AdminUserManagement extends HttpServlet {
             messages.add("Username '" + username + "' already in use.");
             return;
         }
-        if (!LoginManager.validUsername(username)) {
+        if (!validator.validUsername(username)) {
             logger.info("Failed to create user. Username invalid:" + username);
             messages.add("Username '" + username + "' invalid, user not created");
             return;
         }
 
         final String password = credentials[1].trim();
-        if (!LoginManager.validPassword(password)) {
+        if (!validator.validPassword(password)) {
             logger.info("Failed to create user. Password invalid:" + password);
             messages.add("Password for user " + username + " invalid, user not created");
             return;
@@ -289,7 +295,8 @@ public class AdminUserManagement extends HttpServlet {
 
     private String deleteUser(int uid) {
         return "Currently disabled!";
-        //return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error trying to delete user ") + uid + "!";
+        // return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error
+        // trying to delete user ") + uid + "!";
     }
 
     private String resetUserPW(int uid) {
@@ -319,9 +326,7 @@ public class AdminUserManagement extends HttpServlet {
         }
         char[] resultChars = sb.toString().toCharArray();
 
-        List<Integer> randomInts = Arrays
-                .stream(new IntRange(0, length - 1).toArray())
-                .boxed()
+        List<Integer> randomInts = Arrays.stream(new IntRange(0, length - 1).toArray()).boxed()
                 .collect(Collectors.toList());
         Collections.shuffle(randomInts);
 

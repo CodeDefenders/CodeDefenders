@@ -18,21 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.model.KeyMap;
-import org.codedefenders.model.User;
-import org.codedefenders.model.UserInfo;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.auth.LoginManager;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,6 +28,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.model.KeyMap;
+import org.codedefenders.model.User;
+import org.codedefenders.model.UserInfo;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
+import org.codedefenders.validation.input.CodeDefendersValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged in {@link User}.
@@ -162,11 +162,14 @@ public class UserProfileManager extends HttpServlet {
 
     private boolean updateUserInformation(User user, Optional<String> email,
                                           Optional<String> password, boolean allowContact) {
+        
+        CodeDefendersValidator validator = new CodeDefendersValidator();
+        
         if (user == null) {
             return false;
         }
         if (password.isPresent()) {
-            if (!LoginManager.validPassword(password.get())) {
+            if (!validator.validPassword(password.get())) {
                 return false;
             }
             user.setEncodedPassword(User.encodePassword(password.get()));
