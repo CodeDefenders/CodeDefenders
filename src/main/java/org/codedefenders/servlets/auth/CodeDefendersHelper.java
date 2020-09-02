@@ -1,5 +1,10 @@
 package org.codedefenders.servlets.auth;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.naming.InitialContext;
+
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.SecurityManager;
@@ -12,8 +17,7 @@ import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 
 /**
- * Shiro and WELD conflicts because both needs to manage their objects'
- * lifecycle. So we pretend injecting beans here by looking them up using JNDI
+ * This class configures Shiro
  * 
  * @author gambi
  *
@@ -22,6 +26,29 @@ public class CodeDefendersHelper {
 
     private static SecurityManager securityManager = null;
     private static FilterChainResolver filterChainResolver = null;
+
+    /**
+     * This method acts as a bridge between WELD and Shiro by letting Shiro managed
+     * objects to access WELD managed objects
+     * 
+     * @param <T>
+     * @param beanClass
+     * @return
+     */
+    public static <T> T getBeanFromCDI(Class<T> beanClass) {
+        try {
+            InitialContext initialContext = new InitialContext();
+            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
+            Bean bean = (Bean) bm.getBeans(beanClass).iterator().next();
+            CreationalContext ctx = bm.createCreationalContext(bean);
+            return (T) bm.getReference(bean, beanClass, ctx);
+
+        } catch (Throwable e) {
+            e.printStackTrace();
+            System.out.println("CodeDefendersFormAuthenticationFilter Could not acquire Bean for " + beanClass);
+        }
+        return null;
+    }
 
     public static SecurityManager getSecurityManager() {
 

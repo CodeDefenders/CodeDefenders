@@ -1,13 +1,8 @@
 package org.codedefenders.servlets.auth;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -29,22 +24,6 @@ import org.slf4j.LoggerFactory;
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
-
-    // TODO Move this into some utility method
-    public <T> T getBeanFromCDI(Class<T> beanClass) {
-        try {
-            InitialContext initialContext = new InitialContext();
-            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
-            Bean bean = (Bean) bm.getBeans(beanClass).iterator().next();
-            CreationalContext ctx = bm.createCreationalContext(bean);
-            return (T) bm.getReference(bean, beanClass, ctx);
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-            System.out.println("CodeDefendersFormAuthenticationFilter Could not acquire Bean for " + beanClass);
-        }
-        return null;
-    }
 
     @Override
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
@@ -68,7 +47,10 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         HttpSession session = httpRequest.getSession();
 //      // Log user activity including the timestamp
         DatabaseAccess.logSession(((User) subject.getPrincipal()).getId(), getClientIpAddress(httpRequest));
-        LoginBean login = getBeanFromCDI(LoginBean.class);
+        // This dependency must be inject this way (every-time) because the bean cannot
+        // be stored as instance variable of the filter, as it is session scoped
+        // while filter instances are shared among sessions
+        LoginBean login = CodeDefendersHelper.getBeanFromCDI(LoginBean.class);
         if (login != null) {
             login.loginUser((User) subject.getPrincipal());
         }
@@ -81,10 +63,15 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     @Override
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
             ServletResponse response) {
-        
-        MessagesBean messages = getBeanFromCDI(MessagesBean.class);
+
+        // This dependency must be inject this way (every-time) because the bean cannot
+        // be stored as instance variable of the filter, as it is session scoped
+        // while filter instances are shared among sessions
+        // If we do not LIKE this, we can let the filter go on and provide a servlet
+        // (where we can indeed inject stuff) that implements this code
+        MessagesBean messages = CodeDefendersHelper.getBeanFromCDI(MessagesBean.class);
         messages.add("Username not found or password incorrect.");
-        
+
         return super.onLoginFailure(token, e, request, response);
     }
 
