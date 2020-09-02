@@ -45,10 +45,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This {@link HttpServlet} handles requests for managing the currently logged in {@link User}.
- * This functionality may be disabled, e.g. in a class room setting. See {@link #checkEnabled()}.
+ * This {@link HttpServlet} handles requests for managing the currently logged
+ * in {@link User}. This functionality may be disabled, e.g. in a class room
+ * setting. See {@link #checkEnabled()}.
  *
- * <p>Serves on path: {@code /profile}.
+ * <p>
+ * Serves on path: {@code /profile}.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
@@ -69,16 +71,18 @@ public class UserProfileManager extends HttpServlet {
     /**
      * Checks whether users can view and update their profile information.
      *
-     * @return {@code true} when users can access their profile, {@code false} otherwise.
+     * @return {@code true} when users can access their profile, {@code false}
+     *         otherwise.
      */
     public static boolean checkEnabled() {
-        // please, in the name of the lord, can we change the way system settings are implemented?
+        // please, in the name of the lord, can we change the way system settings are
+        // implemented?
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
     }
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
             response.sendRedirect(ServletUtils.getBaseURL(request));
@@ -94,8 +98,8 @@ public class UserProfileManager extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
             response.sendRedirect(request.getContextPath());
@@ -106,49 +110,56 @@ public class UserProfileManager extends HttpServlet {
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
-            case "updateKeyMap": {
-                final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
-                final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
-                if (updateUserKeyMap(login.getUser(), editorKeyMap)) {
-                    login.getUser().setKeyMap(editorKeyMap);
-                    messages.add("Successfully updated editor preference.");
-                } else {
-                    logger.info("Failed to update editor preference for user {}.", login.getUserId());
-                    messages.add("Failed to update editor preference.");
-                }
-                Redirect.redirectBack(request, response);
-                return;
+        case "updateKeyMap": {
+            final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
+            final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
+            if (updateUserKeyMap(login.getUser(), editorKeyMap)) {
+                login.getUser().setKeyMap(editorKeyMap);
+                messages.add("Successfully updated editor preference.");
+            } else {
+                logger.info("Failed to update editor preference for user {}.", login.getUserId());
+                messages.add("Failed to update editor preference.");
             }
-            case "updateProfile": {
-                final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
-                final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
-                boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
-                final boolean success = updateUserInformation(login.getUser(), email, password, allowContact);
-                if (success) {
-                    messages.add("Successfully updated profile information.");
-                } else {
-                    logger.info("Failed to update profile information for user {}.", login.getUserId());
-                    messages.add("Failed to update profile information. Please contact the page administrator.");
-                }
-                response.sendRedirect(responsePath);
-                return;
+            Redirect.redirectBack(request, response);
+            return;
+        }
+        case "updateProfile": {
+            final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
+            final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
+            boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
+            final boolean success = updateUserInformation(login.getUser(), email, password, allowContact);
+            if (success) {
+                messages.add("Successfully updated profile information.");
+            } else {
+                logger.info("Failed to update profile information for user {}.", login.getUserId());
+                messages.add("Failed to update profile information. Please contact the page administrator.");
             }
-            case "deleteAccount": {
-                // Does not actually delete the account but pseudomizes it
-                final boolean success = removeUserInformation(login.getUser());
-                if (success) {
-                    logger.info("User {} successfully set themselves as inactive.", login.getUserId());
-                    messages.add("You successfully deleted your account. Sad to see you go. :(");
-                } else {
-                    logger.info("Failed to set user {} as inactive.", login.getUserId());
-                    messages.add("Failed to set your account as inactive. Please contact the page administrator.");
-                }
+            response.sendRedirect(responsePath);
+            return;
+        }
+        case "deleteAccount": {
+            // Does not actually delete the account but pseudomizes it
+            final boolean success = removeUserInformation(login.getUser());
+            if (success) {
+                logger.info("User {} successfully set themselves as inactive.", login.getUserId());
+                /*
+                 * Send the user to Paths.LOGOUT so we can correctly clean up session
+                 * information. Note that this will automatically take the user to LANDING_PAGE,
+                 * hence no confirmation messages will be shown (unless we make LANDING_PAGE do
+                 * so)
+                 */
+                // messages.add("You successfully deleted your account. Sad to see you go. :(");
+                response.sendRedirect(Paths.LOGOUT);
+            } else {
+                logger.info("Failed to set user {} as inactive.", login.getUserId());
+                messages.add("Failed to set your account as inactive. Please contact the page administrator.");
                 response.sendRedirect(responsePath);
-                return;
             }
-            default:
-                logger.error("Action {" + formType + "} not recognised.");
-                response.sendRedirect(responsePath);
+            return;
+        }
+        default:
+            logger.error("Action {" + formType + "} not recognised.");
+            response.sendRedirect(responsePath);
         }
     }
 
@@ -160,11 +171,11 @@ public class UserProfileManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean updateUserInformation(User user, Optional<String> email,
-                                          Optional<String> password, boolean allowContact) {
-        
+    private boolean updateUserInformation(User user, Optional<String> email, Optional<String> password,
+            boolean allowContact) {
+
         CodeDefendersValidator validator = new CodeDefendersValidator();
-        
+
         if (user == null) {
             return false;
         }
