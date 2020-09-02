@@ -87,17 +87,16 @@ public class CodeDefendersHelper {
             logout.setRedirectUrl(org.codedefenders.util.Paths.LANDING_PAGE);
 
             FilterChainManager fcMan = new DefaultFilterChainManager();
-            fcMan.addFilter(AUTHENTICATION, authc);
             fcMan.addFilter("logout", logout);
-
 //            org.codedefenders.util.Paths.LOGOUT = "/logout";
             fcMan.createChain(org.codedefenders.util.Paths.LOGOUT, "logout");
 
+            fcMan.addFilter(AUTHENTICATION, authc);
             /*
              * Note: this is necessary to make sure authc is applied also to login page,
              * otherwise the Authentication filter will not be invoked
              */
-            fcMan.createChain("/login", "authc");
+            fcMan.createChain("/login", AUTHENTICATION);
             /*
              * TODO This list might be incomplete.
              */
@@ -135,20 +134,20 @@ public class CodeDefendersHelper {
 //            org.codedefenders.util.Paths.BATTLEGROUND_HISTORY = "/multiplayer/history";
 //            org.codedefenders.util.Paths.BATTLEGROUND_SELECTION = "/multiplayer/games";
 //            org.codedefenders.util.Paths.BATTLEGROUND_CREATE = "/multiplayer/create";
-            fcMan.createChain("/multiplayer**", AUTHENTICATION);// TODO Will this work?
+            fcMan.createChain("/multiplayer**", AUTHENTICATION);
 
             // TODO Refactor URL as games/melee/** or at least "/melee/**"
 //            org.codedefenders.util.Paths.MELEE_GAME = "/meleegame";
 //            org.codedefenders.util.Paths.MELEE_HISTORY = "/meleegame/history";
 //            org.codedefenders.util.Paths.MELEE_SELECTION = "/melee/games";
 //            org.codedefenders.util.Paths.MELEE_CREATE = "/melee/create";
-            fcMan.createChain("/melee**", AUTHENTICATION);// TODO Will this work?
+            fcMan.createChain("/melee**", AUTHENTICATION);
 
             // TODO Refactor URL as games/puzzle/** or at least "/puzzle/**"
 //            org.codedefenders.util.Paths.PUZZLE_OVERVIEW = "/puzzles";
 //            org.codedefenders.util.Paths.PUZZLE_GAME = "/puzzlegame";
 //            org.codedefenders.util.Paths.PUZZLE_GAME_SELECTION = "/puzzle/games";
-            fcMan.createChain("/puzzle**", AUTHENTICATION);// Will this work?
+            fcMan.createChain("/puzzle**", AUTHENTICATION);
 
             // API URLs. I assume they require authentication, but I might be wrong. Maybe
             // they require a different type of authentication, e.g., if the are REST
