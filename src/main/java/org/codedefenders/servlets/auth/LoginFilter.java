@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 
 /**
  * 
- * TODO We do not use anymore this class, but I keep it here because thre might
+ * TODO We do not use anymore this class, but I keep it here because there might
  * be some configuration that we still need
  * 
  * 
