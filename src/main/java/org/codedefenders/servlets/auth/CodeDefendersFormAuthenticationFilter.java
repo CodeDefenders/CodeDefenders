@@ -51,9 +51,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         // be stored as instance variable of the filter, as it is session scoped
         // while filter instances are shared among sessions
         LoginBean login = CodeDefendersHelper.getBeanFromCDI(LoginBean.class);
-        if (login != null) {
-            login.loginUser((User) subject.getPrincipal());
-        }
+        login.loginUser((User) subject.getPrincipal());
 
         storeApplicationDataInSession(session);
 

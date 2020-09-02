@@ -14,19 +14,25 @@ import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
+/**
+ * Implements a Realm that uses the UserDAO for authenticating users. The logic
+ * to record the start of a session and the like has been moved inside the
+ * {@link CodeDefendersFormAuthenticationFilter#onLoginSuccess} method
+ * 
+ * @author gambi
+ *
+ */
+// TODO Once UserDAO and AdminDAO will be made Injectable instances, we need to use CodeDefendersHelper#getBean to "inject" WELD managed objects inside Shiro managed objects. 
 public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken authToken)
             throws AuthenticationException {
 
-        System.out.println("CodeDefendersAuthenticatingRealm. Authenticating " + authToken);
-
         UsernamePasswordToken token = (UsernamePasswordToken) authToken;
 
         User activeUser = UserDAO.getUserByName(token.getUsername());
 
-        System.out.println("CodeDefendersAuthenticatingRealm.doGetAuthenticationInfo() Found user " + activeUser);
         if (activeUser == null) {
             throw new UnknownAccountException("Username not found or password incorrect.");
         }
@@ -42,25 +48,13 @@ public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
 
         if (User.passwordMatches(new String(token.getPassword()), dbPassword)) {
             if (activeUser.isActive()) {
-                // TODO Is here that shall we setup the legacy login information?
-//                login.loginUser(activeUser);
-//                    storeApplicationDataInSession(session);
-                System.out.println("CodeDefendersAuthenticatingRealm.doGetAuthenticationInfo() Authenticated "
-                        + activeUser + " using realm " + getName());
                 return new SimpleAuthenticationInfo(activeUser, token.getPassword(), getName());
-
             } else {
                 throw new LockedAccountException(
                         "Your account is inactive, login is only possible with an active account.");
-//                    messages.add("Your account is inactive, login is only possible with an active" + "account.");
-//                    RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-//                    dispatcher.forward(request, response);
             }
         } else {
             throw new IncorrectCredentialsException("Username not found or password incorrect.");
-//                      messages.add("Username not found or password incorrect.");
-//                      RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-//                      dispatcher.forward(request, response);
         }
     }
 
