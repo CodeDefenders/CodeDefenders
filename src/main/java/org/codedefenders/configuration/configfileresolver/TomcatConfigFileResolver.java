@@ -41,6 +41,10 @@ public class TomcatConfigFileResolver extends ConfigFileResolver {
             return null;
         }
         File folder = new File(tomcatRoot, "conf");
-        return getConfigFileImpl(new File(folder, filename));
+        // Prohibit loading of configuration from a potentially `conf` file in the `catalina.base directory.
+        if (!folder.isDirectory()) {
+            return null;
+        }
+        return getConfigFileImpl(folder.getAbsolutePath(), filename);
     }
 }

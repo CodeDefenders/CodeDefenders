@@ -40,11 +40,6 @@ public class ContextConfigFileResolver extends ConfigFileResolver {
         } catch (NamingException e) {
             return null;
         }
-        File path = new File(filePath);
-        if (path.isFile()) {
-            return getConfigFileImpl(path);
-        } else {
-            return getConfigFileImpl(new File(path, filename));
-        }
+        return getConfigFileImpl(filePath, filename);
     }
 }

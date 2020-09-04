@@ -40,12 +40,7 @@ public class EnvironmentVariableConfigFileResolver extends ConfigFileResolver {
         if (envVar == null) {
             return null;
         } else {
-            File path = new File(envVar);
-            if (path.isFile()) {
-                return getConfigFileImpl(path);
-            } else {
-                return getConfigFileImpl(new File(path, filename));
-            }
+            return getConfigFileImpl(envVar, filename);
         }
     }
 }

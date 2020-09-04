@@ -40,12 +40,7 @@ public class SystemPropertyConfigFileResolver extends ConfigFileResolver {
         if (sysProp == null) {
             return null;
         } else {
-            File path = new File(sysProp);
-            if (path.isFile()) {
-                return getConfigFileImpl(path);
-            } else {
-                return getConfigFileImpl(new File(path, filename));
-            }
+            return getConfigFileImpl(sysProp, filename);
         }
     }
 }

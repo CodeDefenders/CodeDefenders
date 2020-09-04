@@ -39,10 +39,20 @@ public abstract class ConfigFileResolver {
 
     public abstract Reader getConfigFile(String filename);
 
-    protected Reader getConfigFileImpl(File file) {
-        if (file == null || !file.exists()) {
-            return null;
-        } else {
+    protected Reader getConfigFileImpl(String path, String filename) {
+        Reader result = null;
+        if (path != null) {
+            File file = new File(path);
+            result = getReader(file);
+            if (result == null) {
+                result = getReader(new File(path, filename));
+            }
+        }
+        return result;
+    }
+
+    private Reader getReader(File file) {
+        if (file.isFile()) {
             try {
                 return new InputStreamReader(new FileInputStream(file));
             } catch (FileNotFoundException e) {
@@ -50,5 +60,6 @@ public abstract class ConfigFileResolver {
                 return null;
             }
         }
+        return null;
     }
 }
