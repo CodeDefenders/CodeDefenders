@@ -19,14 +19,12 @@
 package org.codedefenders.configuration.implementation;
 
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.configuration.ConfigurationValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Modifier;
 
 /**
  * This class is the heart of the configuration reading process.
@@ -65,26 +63,27 @@ public abstract class BaseConfiguration extends Configuration {
      */
     protected final void setField(Field field, Object prop) {
         Class<?> t = field.getType();
-        try {
-            if (t.isInstance(prop)) {
-                field.set(this, prop);
-            } else if (prop.getClass() == String.class) {
-                String value = (String) prop;
-                if (t == Boolean.class) {
-                    // TODO: Maybe only parse true, false, enabled, disabled and ignore the others?
-                    field.set(this, Boolean.parseBoolean(value) || prop.equals("enabled"));
-                } else if (t == Integer.class) {
-                    field.set(this, Integer.parseInt(value));
+        if (!Modifier.isFinal(field.getModifiers()) && !Modifier.isStatic(field.getModifiers())) {
+            try {
+                if (t.isInstance(prop)) {
+                    field.set(this, prop);
+                } else if (prop.getClass() == String.class) {
+                    String value = (String) prop;
+                    if (t == Boolean.class) {
+                        // TODO: Maybe only parse true, false, enabled, disabled and ignore the others?
+                        field.set(this, Boolean.parseBoolean(value) || prop.equals("enabled"));
+                    } else if (t == Integer.class) {
+                        field.set(this, Integer.parseInt(value));
+                    } else {
+                        logger.warn("Couldn't match property " + prop + " to field " + field.getName()
+                                + " with Type " + t.getTypeName());
+                    }
                 } else {
-                    logger.warn("Couldn't match property " + prop + " to field " + field.getName()
-                            + " with Type " + t.getTypeName());
+                    logger.warn("Ignored property " + prop + " with unsupported type " + prop.getClass().getTypeName());
                 }
-            } else {
-                logger.warn("Ignored property " + prop + " with unsupported type " + prop.getClass().getTypeName());
+            } catch (IllegalAccessException e) {
+                logger.error("Can't set field " + field.getName() + " on Configuration class", e);
             }
-        } catch (IllegalAccessException e) {
-            logger.error("Can't set field " + field.getName() + " on Configuration class");
-            logger.error(e.toString());
         }
     }
 }
