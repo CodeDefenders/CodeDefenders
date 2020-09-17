@@ -17,16 +17,17 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.servlets.auth;
+package org.codedefenders.persistence.database;
 
-import org.apache.shiro.web.env.DefaultWebEnvironment;
+import javax.enterprise.context.ApplicationScoped;
 
-// How is this Managed ?!
-public class CodeDefendersWebEnvironment extends DefaultWebEnvironment {
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
 
-    public CodeDefendersWebEnvironment() {
-        super();
-        setSecurityManager(CodeDefendersHelper.getSecurityManager());
-        setFilterChainResolver(CodeDefendersHelper.getFilterChainResolver());
+@ApplicationScoped
+public class UserRepository {
+
+    public User getUserByName(String name) {
+        return UserDAO.getUserByName(name);
     }
 }

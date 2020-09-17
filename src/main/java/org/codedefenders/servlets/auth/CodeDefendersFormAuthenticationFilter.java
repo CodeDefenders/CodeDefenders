@@ -1,5 +1,7 @@
 package org.codedefenders.servlets.auth;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -17,14 +19,22 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.User;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.net.InetAddresses;
+
+@Singleton
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
+
+    @Inject
+    LoginBean login;
+
+    @Inject
+    MessagesBean messages;
 
     @Override
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
@@ -46,12 +56,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         // From LoginManager:login
         HttpSession session = httpRequest.getSession();
-//      // Log user activity including the timestamp
+        // Log user activity including the timestamp
         DatabaseAccess.logSession(((User) subject.getPrincipal()).getId(), getClientIpAddress(httpRequest));
-        // This dependency must be inject this way (every-time) because the bean cannot
-        // be stored as instance variable of the filter, as it is session scoped
-        // while filter instances are shared among sessions
-        LoginBean login = CDIUtil.getBeanFromCDI(LoginBean.class);
         login.loginUser((User) subject.getPrincipal());
 
         storeApplicationDataInSession(session);
@@ -63,12 +69,6 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
             ServletResponse response) {
 
-        // This dependency must be inject this way (every-time) because the bean cannot
-        // be stored as instance variable of the filter, as it is session scoped
-        // while filter instances are shared among sessions
-        // If we do not LIKE this, we can let the filter go on and provide a servlet
-        // (where we can indeed inject stuff) that implements this code
-        MessagesBean messages = CDIUtil.getBeanFromCDI(MessagesBean.class);
         messages.add("Username not found or password incorrect.");
 
         return super.onLoginFailure(token, e, request, response);
@@ -94,28 +94,25 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         session.setAttribute(Constants.BLOCK_ATTACKER, isAttackerBlocked);
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private String getClientIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
-        if (invalidIP(ip)) {
+        if (!InetAddresses.isInetAddress(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
-        if (invalidIP(ip)) {
+        if (!InetAddresses.isInetAddress(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
-        if (invalidIP(ip)) {
+        if (!InetAddresses.isInetAddress(ip)) {
             ip = request.getHeader("HTTP_CLIENT_IP");
         }
-        if (invalidIP(ip)) {
+        if (!InetAddresses.isInetAddress(ip)) {
             ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         }
-        if (invalidIP(ip)) {
+        if (!InetAddresses.isInetAddress(ip)) {
             ip = request.getRemoteAddr();
         }
         logger.debug("Client IP: " + ip);
         return ip;
-    }
-
-    private boolean invalidIP(String ip) {
-        return (ip == null) || (ip.length() == 0) || ("unknown".equalsIgnoreCase(ip)) || ("0:0:0:0:0:0:0:1".equals(ip));
     }
 }
