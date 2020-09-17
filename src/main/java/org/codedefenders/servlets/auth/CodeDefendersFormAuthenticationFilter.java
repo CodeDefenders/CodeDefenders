@@ -17,6 +17,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.User;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         // This dependency must be inject this way (every-time) because the bean cannot
         // be stored as instance variable of the filter, as it is session scoped
         // while filter instances are shared among sessions
-        LoginBean login = CodeDefendersHelper.getBeanFromCDI(LoginBean.class);
+        LoginBean login = CDIUtil.getBeanFromCDI(LoginBean.class);
         login.loginUser((User) subject.getPrincipal());
 
         storeApplicationDataInSession(session);
@@ -67,7 +68,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         // while filter instances are shared among sessions
         // If we do not LIKE this, we can let the filter go on and provide a servlet
         // (where we can indeed inject stuff) that implements this code
-        MessagesBean messages = CodeDefendersHelper.getBeanFromCDI(MessagesBean.class);
+        MessagesBean messages = CDIUtil.getBeanFromCDI(MessagesBean.class);
         messages.add("Username not found or password incorrect.");
 
         return super.onLoginFailure(token, e, request, response);
