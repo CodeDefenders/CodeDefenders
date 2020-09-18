@@ -14,7 +14,7 @@ ij_continuation_indent_size = 8
 indent_size = 2
 ij_continuation_indent_size = 2
 
-[*.{md,markdown}]
+[*.{md, markdown}]
 trim_trailing_whitespace = false
 
 [*.xml]

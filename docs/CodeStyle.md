@@ -1,5 +1,14 @@
 # Code style
 
+## TLDR
+
+Intellij IDEA automatically honors .editorconfig files, for Eclipse install the [editorconfig-eclipse](https://github.com/ncjones/editorconfig-eclipse) plugin.  
+For both IDE are plugins available to support checkstyle. Intellij IDEA: [checkstyle-idea](https://plugins.jetbrains.com/plugin/1065-checkstyle-idea/), Eclipse: [Eclipse Checkstyle Plugin](https://checkstyle.org/eclipse-cs). Use the `checkstyle-codedefenders.xml` file which is for version 8.26.  
+ To configure the import order:
+   - Eclipse: Tick `Project > Properties > Java Code Style > Organize Imports > Enable project specific settings` and `Import` the `docs/codestyle/eclipse.importorder` file.
+   - Intellij IDEA: `File > Settings > Editor > Code Style` and import the `docs/codestyle/intellij-importorder.xml` file with the settings button next to the `Schema` selector.
+
+
 ## .editorconfig
 
 We use a `.editorconfig` file to establish a base formatting between all editors.  
