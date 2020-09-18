@@ -63,7 +63,7 @@ public class AdminPuzzleUpload extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleUpload.class);
 
     @Inject
-    private BackendExecutorService backend;
+    private Installer installer;
 
     @Inject
     private MessagesBean messages;
@@ -154,7 +154,7 @@ public class AdminPuzzleUpload extends HttpServlet {
                     final ZipFile zip = ZipFileUtils.createZip(fileContentBytes);
                     final Path rootDirectory = ZipFileUtils.extractZipGetRootDir(zip, true);
 
-                    Installer.installPuzzles(rootDirectory, backend);
+                    installer.installPuzzles(rootDirectory);
 
                     FileUtils.forceDelete(rootDirectory.toFile());
 

@@ -19,11 +19,18 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
+
+import org.codedefenders.installer.Installer;
 
 public class ConfigFileResolverProducer {
 
@@ -35,10 +42,10 @@ public class ConfigFileResolverProducer {
 
     @Inject
     ConfigFileResolverProducer(ClasspathConfigFileResolver classpathCfr,
-                               TomcatConfigFileResolver tomcatCfr,
-                               EnvironmentVariableConfigFileResolver environmentVarCfr,
-                               SystemPropertyConfigFileResolver systemPropertyCfr,
-                               ContextConfigFileResolver contextCfr) {
+            TomcatConfigFileResolver tomcatCfr,
+            EnvironmentVariableConfigFileResolver environmentVarCfr,
+            SystemPropertyConfigFileResolver systemPropertyCfr,
+            ContextConfigFileResolver contextCfr) {
         this.classpathCfr = classpathCfr;
         this.tomcatCfr = tomcatCfr;
         this.environmentVarCfr = environmentVarCfr;
@@ -55,6 +62,20 @@ public class ConfigFileResolverProducer {
      */
     @Produces
     List<ConfigFileResolver> getConfigFileResolvers() {
-        return new ArrayList<>(Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr));
+        // If this attribute is set we run in standalone mode (when the Installer is called) 
+        if (Installer.configFile == null) {
+            return Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr);
+        } else {
+            return Arrays.asList(classpathCfr, new ConfigFileResolver() {
+                @Override
+                public Reader getConfigFile(String filename) {
+                    try {
+                        return new InputStreamReader(new FileInputStream(Installer.configFile));
+                    } catch (FileNotFoundException e) {
+                        return null;
+                    }
+                }
+            }, environmentVarCfr, systemPropertyCfr, contextCfr);
+        }
     }
 }
