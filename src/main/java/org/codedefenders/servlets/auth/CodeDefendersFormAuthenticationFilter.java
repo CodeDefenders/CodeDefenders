@@ -1,5 +1,6 @@
 package org.codedefenders.servlets.auth;
 
+import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.naming.Context;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.net.InetAddresses;
 
-@Singleton
+@Alternative
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);

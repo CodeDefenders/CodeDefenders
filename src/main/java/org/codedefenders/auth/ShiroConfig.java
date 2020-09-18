@@ -50,6 +50,26 @@ public class ShiroConfig {
         return securityManager;
     }
 
+    @Produces
+    @Singleton
+    public CodeDefendersFormAuthenticationFilter getAuthenticationFilter() {
+        CodeDefendersFormAuthenticationFilter authenticationFilter = new CodeDefendersFormAuthenticationFilter();
+        // org.codedefenders.util.Paths.LOGIN = "/login";
+        authenticationFilter.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
+        // Go to game overview page after successful login
+        authenticationFilter.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
+        return authenticationFilter;
+    }
+
+    @Produces
+    @Singleton
+    public LogoutFilter getLogoutFilter() {
+        LogoutFilter logout = new LogoutFilter();
+        // org.codedefenders.util.Paths.LOGOUT = "/logout";
+        logout.setRedirectUrl(org.codedefenders.util.Paths.LANDING_PAGE);
+        return logout;
+    }
+
     /**
      * Configure the filtering mechanism. This might be replaced by annotations only
      * if we find a way to let the tomcat process them. Otherwise, we can use some
@@ -59,22 +79,15 @@ public class ShiroConfig {
      */
     @Produces
     @Singleton
-    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc) {
+    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc,
+            LogoutFilter logout) {
         /*
          * This filter uses the form data to check the user given the configured realms
          */
         final String AUTHENTICATION = "authc";
-        // org.codedefenders.util.Paths.LOGIN = "/login";
-        authc.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
-        // Go to game overview page after successful login
-        authc.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
-
-        LogoutFilter logout = new LogoutFilter();
-        logout.setRedirectUrl(org.codedefenders.util.Paths.LANDING_PAGE);
 
         FilterChainManager fcMan = new DefaultFilterChainManager();
         fcMan.addFilter("logout", logout);
-//            org.codedefenders.util.Paths.LOGOUT = "/logout";
         fcMan.createChain(org.codedefenders.util.Paths.LOGOUT, "logout");
 
         fcMan.addFilter(AUTHENTICATION, authc);
