@@ -1,11 +1,7 @@
 package org.codedefenders.beans;
 
-import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.servlets.games.GameProducer;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -17,8 +13,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
-import java.io.IOException;
-import java.util.Optional;
+import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.servlets.games.GameProducer;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adds various beans to the request, so they can be shared between the application and the JSPs.

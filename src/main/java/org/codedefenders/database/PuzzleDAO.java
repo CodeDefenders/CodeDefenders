@@ -18,6 +18,12 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -29,12 +35,6 @@ import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.annotation.Nonnull;
 
 /**
  * This class handles the database logic for puzzles.

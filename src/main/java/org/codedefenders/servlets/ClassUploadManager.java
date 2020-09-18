@@ -18,13 +18,35 @@
  */
 package org.codedefenders.servlets;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.zip.ZipFile;
+
+import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -52,28 +74,6 @@ import org.codedefenders.util.ZipFileUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-import java.util.zip.ZipFile;
-
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;

@@ -1,5 +1,12 @@
 package org.codedefenders.beans.game;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
+
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameDAO;
@@ -8,12 +15,6 @@ import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
-
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Provides data for the player feedback game component.</p>

@@ -18,13 +18,13 @@
  */
 package org.codedefenders.model;
 
+import java.util.List;
+import java.util.Map;
+
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class contains information about a {@link MultiplayerGame} from the view of a single {@link User}.

@@ -18,30 +18,6 @@
  */
 package org.codedefenders.validation.code;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.ParseProblemException;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.expr.InstanceOfExpr;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.type.ReferenceType;
-import com.github.javaparser.ast.visitor.ModifierVisitor;
-import com.github.javaparser.ast.visitor.Visitable;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.game.Mutant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +41,29 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.game.Mutant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.ParseProblemException;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.expr.InstanceOfExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.type.ReferenceType;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.ast.visitor.Visitable;
+import com.github.javaparser.printer.PrettyPrinterConfiguration;
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;

@@ -18,15 +18,15 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.database.DB.RSMapper;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+
+import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 
 /**
  * This class handles the database logic for target executions.

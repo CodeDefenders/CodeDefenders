@@ -18,6 +18,11 @@
  */
 package org.codedefenders.database;
 
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
@@ -27,11 +32,6 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * This class handles the database logic for killmaps.

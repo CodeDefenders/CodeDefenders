@@ -1,9 +1,10 @@
 package org.codedefenders.beans.game;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
 import java.util.List;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.SessionScoped;
 
 /**
  * <p>Saves the previous mutant / test submission so the code of the previous submission can be displayed. </p>
@@ -13,9 +14,6 @@ import java.util.List;
 @SessionScoped
 // TODO: Put error message here and show it somewhere different than the messages?
 public class PreviousSubmissionBean implements Serializable {
-    /**
-     * The
-     */
     private String mutantCode;
     private String testCode;
     private List<Integer> errorLines;

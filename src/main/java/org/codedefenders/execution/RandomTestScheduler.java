@@ -18,12 +18,12 @@
  */
 package org.codedefenders.execution;
 
-import org.codedefenders.game.Test;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import org.codedefenders.game.Test;
 
 public class RandomTestScheduler implements TestScheduler {
 

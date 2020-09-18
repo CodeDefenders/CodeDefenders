@@ -18,6 +18,15 @@
  */
 package org.codedefenders.servlets.admin;
 
+import java.io.IOException;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
@@ -37,15 +46,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
-
-import java.io.IOException;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @WebServlet(Paths.ADMIN_MONITOR)
 public class AdminMonitorGames extends HttpServlet {

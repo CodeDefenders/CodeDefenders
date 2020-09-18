@@ -19,6 +19,11 @@
 
 package org.codedefenders.service.game;
 
+import java.util.List;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
@@ -32,10 +37,6 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.User;
-
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import java.util.List;
 
 @ApplicationScoped
 public class GameService implements IGameService {

@@ -18,6 +18,16 @@
  */
 package org.codedefenders.execution;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.jacoco.core.analysis.Analyzer;
@@ -30,16 +40,6 @@ import org.jacoco.core.tools.ExecFileLoader;
 import org.objectweb.asm.ClassReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * This class offers a static method {@link #generate(GameClass, Path) generate()}, which

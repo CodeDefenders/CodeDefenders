@@ -18,19 +18,6 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.apache.commons.lang.math.IntRange;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.EmailUtils;
-import org.codedefenders.util.Paths;
-import org.codedefenders.validation.input.CodeDefendersValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,11 +33,23 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.math.IntRange;
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.EmailUtils;
+import org.codedefenders.util.Paths;
+import org.codedefenders.validation.input.CodeDefendersValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
 /**
- * This {@link HttpServlet} handles admin requests for managing {@link User
- * Users}.
+ * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
  *
  * <p>Serves on path: {@code /admin/users}.
  */
@@ -69,7 +68,8 @@ public class AdminUserManagement extends HttpServlet {
             + "An account has been created for you with Username %s and Password %s.\n"
             + "You can log in at %s. \n\n Happy coding!";
     private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-    private static final String PASSWORD_RESET_MSG = "%s, \n\n" + "your password has been reset to %s\n"
+    private static final String PASSWORD_RESET_MSG = "%s, \n\n"
+            + "your password has been reset to %s\n"
             + "Please change it at your next convenience.";
 
     @Override
@@ -101,7 +101,8 @@ public class AdminUserManagement extends HttpServlet {
                 }
                 final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
                 if (userToEdit.isPresent()) {
-                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEdit.get();
+                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
+                            + "?editUser=" + userToEdit.get();
                 }
                 break;
             }
@@ -118,7 +119,7 @@ public class AdminUserManagement extends HttpServlet {
             }
             case "editUser": {
                 // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
-                // 'userid' from the session attributes
+                //  'userid' from the session attributes
                 final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
                 if (!userId.isPresent()) {
                     logger.error("Creating users failed. Missing request parameter 'uid'");
@@ -127,7 +128,8 @@ public class AdminUserManagement extends HttpServlet {
                     String msg = editUser(userId.get(), request, successMsg);
                     messages.add(msg);
                     if (!msg.equals(successMsg)) {
-                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userId.get();
+                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
+                                + "?editUser=" + userId.get();
                     }
                 }
                 break;

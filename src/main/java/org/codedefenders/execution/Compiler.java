@@ -18,11 +18,6 @@
  */
 package org.codedefenders.execution;
 
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.JavaFileObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -37,6 +32,11 @@ import java.util.function.BiPredicate;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.JavaFileObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.TEST_CLASSPATH;

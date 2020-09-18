@@ -18,13 +18,13 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.database.DB.RSMapper;
-import org.codedefenders.model.Dependency;
-import org.codedefenders.util.FileUtils;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
+import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.util.FileUtils;
 
 /**
  * This class handles the database logic for dependencies.

@@ -18,17 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.UserMeleeGameInfo;
-import org.codedefenders.model.UserMultiplayerGameInfo;
-import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
-import org.codedefenders.util.Constants;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -39,6 +28,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.UserMeleeGameInfo;
+import org.codedefenders.model.UserMultiplayerGameInfo;
+import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
+import org.codedefenders.util.Constants;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;

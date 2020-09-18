@@ -1,7 +1,8 @@
 package org.codedefenders.notification.events.client.chat;
 
-import com.google.gson.annotations.Expose;
 import org.codedefenders.notification.handling.ClientEventHandler;
+
+import com.google.gson.annotations.Expose;
 
 public class ClientGameChatEvent extends ClientChatEvent {
     @Expose private int gameId;

@@ -18,11 +18,6 @@
  */
 package org.codedefenders.util;
 
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Date;
 import java.util.Properties;
 
@@ -33,6 +28,11 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.DEBUG_MODE;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;

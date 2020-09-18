@@ -17,10 +17,12 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 package org.codedefenders.execution;
-import javax.enterprise.util.Nonbinding;
-import javax.inject.Qualifier;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import javax.enterprise.util.Nonbinding;
+import javax.inject.Qualifier;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;

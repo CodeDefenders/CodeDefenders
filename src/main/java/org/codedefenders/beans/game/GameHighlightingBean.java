@@ -1,7 +1,11 @@
 package org.codedefenders.beans.game;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
+
 import org.codedefenders.game.GameHighlightingDTO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
@@ -9,10 +13,8 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.User;
 import org.codedefenders.util.JSONUtils;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import java.util.List;
-import java.util.Map;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * <p>Provides data for the game highlighting game component.</p>

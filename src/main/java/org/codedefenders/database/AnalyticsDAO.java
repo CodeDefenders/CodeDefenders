@@ -18,13 +18,13 @@
  */
 package org.codedefenders.database;
 
+import java.util.List;
+
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.api.analytics.KillmapDataDTO;
 import org.codedefenders.api.analytics.UserDataDTO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
-
-import java.util.List;
 
 public class AnalyticsDAO {
     private static final  String ANALYTICS_USER_DATA_QUERY = String.join("\n",

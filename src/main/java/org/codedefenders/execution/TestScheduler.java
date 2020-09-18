@@ -18,10 +18,10 @@
  */
 package org.codedefenders.execution;
 
-import org.codedefenders.game.Test;
-
 import java.util.Collection;
 import java.util.List;
+
+import org.codedefenders.game.Test;
 
 public interface TestScheduler {
 

@@ -1,15 +1,15 @@
 package org.codedefenders.model;
 
+import java.util.List;
+
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 
-import java.util.List;
-
 /**
  * This class contains information about a {@link MeleeGame} from the view of a single {@link User}.
- * <p>
- * Additionally to the game itself, this class contains the user's identifier, his role in the game and
+ *
+ * <p>Additionally to the game itself, this class contains the user's identifier, his role in the game and
  * game creator's name. {@link Type} also specifies whether the user is already active in this game
  * ({@link Type#ACTIVE}) or can join this game ({@link Type#OPEN}).
  *

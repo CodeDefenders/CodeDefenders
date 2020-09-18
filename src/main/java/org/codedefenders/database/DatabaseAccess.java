@@ -18,6 +18,13 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
@@ -27,13 +34,6 @@ import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * This class handles database logic for functionality which has not

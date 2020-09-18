@@ -18,13 +18,6 @@
  */
 package org.codedefenders.database;
 
-import org.apache.commons.lang.StringUtils;
-import org.codedefenders.database.DB.RSMapper;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Mutant.Equivalence;
-import org.codedefenders.util.FileUtils;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -33,6 +26,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang.StringUtils;
+import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.util.FileUtils;
 
 /**
  * This class handles the database logic for mutants.

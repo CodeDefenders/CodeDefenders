@@ -18,6 +18,16 @@
  */
 package org.codedefenders.servlets.games;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -37,16 +47,6 @@ import org.codedefenders.util.MutantUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;

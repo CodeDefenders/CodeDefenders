@@ -18,6 +18,11 @@
  */
 package org.codedefenders.game.puzzle;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -37,11 +42,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;

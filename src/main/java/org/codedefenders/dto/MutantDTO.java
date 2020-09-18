@@ -19,17 +19,18 @@
 
 package org.codedefenders.dto;
 
-import com.google.gson.annotations.Expose;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.model.User;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.model.User;
+
+import com.google.gson.annotations.Expose;
 
 public class MutantDTO {
     @Expose

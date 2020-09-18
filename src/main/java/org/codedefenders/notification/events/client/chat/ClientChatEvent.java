@@ -1,7 +1,8 @@
 package org.codedefenders.notification.events.client.chat;
 
-import com.google.gson.annotations.Expose;
 import org.codedefenders.notification.events.client.ClientEvent;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * A chat message (from the in-game chat).
