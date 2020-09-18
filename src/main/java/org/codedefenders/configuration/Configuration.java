@@ -184,28 +184,6 @@ public class Configuration {
                 dotPos > -1 ? dotPos : dashPos > -1 ? dashPos : 1));
     }
 
-    @Override
-    public String toString() {
-        // This could potentially be simplified maybe override this in BaseConfiguration with iterating over the attrs.
-        return "Configuration: \n"
-                + "  " + resolveAttributeName("dataDir") + "= '" + dataDir + "'\n"
-                + "  " + resolveAttributeName("antHome") + "= '" + antHome + "'\n "
-                + "  " + resolveAttributeName("dbHost") + "= '" + dbHost + "'\n"
-                + "  " + resolveAttributeName("dbPort") + "= " + dbPort + "\n"
-                + "  " + resolveAttributeName("dbName") + "= '" + dbName + "'\n"
-                + "  " + resolveAttributeName("dbUsername") + "= '" + dbUsername + "'\n"
-                + "  " + resolveAttributeName("dbPassword") + "= '" + dbPassword + "'\n"
-                + "  " + resolveAttributeName("clusterMode") + "= " + clusterMode + "\n"
-                + "  " + resolveAttributeName("clusterJavaHome") + "= '" + clusterJavaHome + "'\n"
-                + "  " + resolveAttributeName("clusterReservationName") + "= '" + clusterReservationName
-                + "'\n"
-                + "  " + resolveAttributeName("clusterTimeout") + "= " + clusterTimeout + "\n"
-                + "  " + resolveAttributeName("forceLocalExecution") + "= " + forceLocalExecution + "\n"
-                + "  " + resolveAttributeName("parallelize") + "= " + parallelize + "\n"
-                + "  " + resolveAttributeName("blockAttacker") + "= " + blockAttacker + "\n"
-                + "  " + resolveAttributeName("mutantCoverage") + "= " + mutantCoverage;
-    }
-
     /**
      * This transforms an attribute name from camelCase to the format in which its actually looked up.
      *
