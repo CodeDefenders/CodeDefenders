@@ -1,8 +1,5 @@
 package org.codedefenders.servlets.auth;
 
-import javax.enterprise.inject.Alternative;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -26,16 +23,17 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.net.InetAddresses;
 
-@Alternative
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
 
-    @Inject
     LoginBean login;
-
-    @Inject
     MessagesBean messages;
+
+    public CodeDefendersFormAuthenticationFilter(LoginBean login, MessagesBean messages) {
+        this.login = login;
+        this.messages = messages;
+    }
 
     @Override
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,

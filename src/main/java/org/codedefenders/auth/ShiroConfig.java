@@ -31,6 +31,8 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 
 /**
@@ -52,13 +54,13 @@ public class ShiroConfig {
 
     @Produces
     @Singleton
-    public CodeDefendersFormAuthenticationFilter getAuthenticationFilter() {
-        CodeDefendersFormAuthenticationFilter authenticationFilter = new CodeDefendersFormAuthenticationFilter();
+    public CodeDefendersFormAuthenticationFilter getAuthenticationFilter(LoginBean login, MessagesBean messages) {
+        CodeDefendersFormAuthenticationFilter authFilter = new CodeDefendersFormAuthenticationFilter(login, messages);
         // org.codedefenders.util.Paths.LOGIN = "/login";
-        authenticationFilter.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
+        authFilter.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
         // Go to game overview page after successful login
-        authenticationFilter.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
-        return authenticationFilter;
+        authFilter.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
+        return authFilter;
     }
 
     @Produces
