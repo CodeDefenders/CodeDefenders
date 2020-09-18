@@ -88,7 +88,7 @@ test:
         - target/surefire-reports/TEST-*.xml
 
 metrics:
-  stage: test
+  stage: build
   script:
     - echo "files{language=\"java\"}" "$(find . -type f -name "*.java" | wc -l)" >> metrics.txt
     - echo "code_lines{language=\"java\"}" "$(find . -type f -name "*.java" | xargs cat | wc -l)" >> metrics.txt
