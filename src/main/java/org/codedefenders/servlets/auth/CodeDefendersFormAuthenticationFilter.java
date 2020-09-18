@@ -97,28 +97,31 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     @SuppressWarnings("UnstableApiUsage")
     private String getClientIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
-        // Ugly Patch
-        if (ip == null) {
+        if (invalidIP(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (invalidIP(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (invalidIP(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (invalidIP(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (invalidIP(ip)) {
             ip = request.getRemoteAddr();
-        } else {
-
-            if (!InetAddresses.isInetAddress(ip)) {
-                ip = request.getHeader("Proxy-Client-IP");
-            }
-            if (!InetAddresses.isInetAddress(ip)) {
-                ip = request.getHeader("WL-Proxy-Client-IP");
-            }
-            if (!InetAddresses.isInetAddress(ip)) {
-                ip = request.getHeader("HTTP_CLIENT_IP");
-            }
-            if (!InetAddresses.isInetAddress(ip)) {
-                ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-            }
-            if (!InetAddresses.isInetAddress(ip)) {
-                ip = request.getRemoteAddr();
-            }
         }
         logger.debug("Client IP: " + ip);
         return ip;
+    }
+
+    private boolean invalidIP(String ip) {
+        //noinspection UnstableApiUsage
+        return (ip == null)
+                || (ip.length() == 0)
+                || ("unknown".equalsIgnoreCase(ip))
+                || ("0:0:0:0:0:0:0:1".equals(ip))
+                || !InetAddresses.isInetAddress(ip);
     }
 }
