@@ -62,7 +62,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         storeApplicationDataInSession(session);
 
-        return super.onLoginSuccess(token, subject, request, response);
+        return true;//super.onLoginSuccess(token, subject, request, response);
     }
 
     @Override
@@ -97,20 +97,26 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     @SuppressWarnings("UnstableApiUsage")
     private String getClientIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
-        if (!InetAddresses.isInetAddress(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (!InetAddresses.isInetAddress(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (!InetAddresses.isInetAddress(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (!InetAddresses.isInetAddress(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (!InetAddresses.isInetAddress(ip)) {
+        // Ugly Patch
+        if (ip == null) {
             ip = request.getRemoteAddr();
+        } else {
+
+            if (!InetAddresses.isInetAddress(ip)) {
+                ip = request.getHeader("Proxy-Client-IP");
+            }
+            if (!InetAddresses.isInetAddress(ip)) {
+                ip = request.getHeader("WL-Proxy-Client-IP");
+            }
+            if (!InetAddresses.isInetAddress(ip)) {
+                ip = request.getHeader("HTTP_CLIENT_IP");
+            }
+            if (!InetAddresses.isInetAddress(ip)) {
+                ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+            }
+            if (!InetAddresses.isInetAddress(ip)) {
+                ip = request.getRemoteAddr();
+            }
         }
         logger.debug("Client IP: " + ip);
         return ip;
