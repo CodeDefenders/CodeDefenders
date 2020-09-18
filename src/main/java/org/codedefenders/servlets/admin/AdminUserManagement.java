@@ -38,7 +38,6 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
-import org.codedefenders.servlets.auth.LoginManager;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
