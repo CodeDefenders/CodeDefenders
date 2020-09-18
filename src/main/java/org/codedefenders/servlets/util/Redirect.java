@@ -18,13 +18,13 @@
  */
 package org.codedefenders.servlets.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Redirect {
     private static final Logger logger = LoggerFactory.getLogger(Redirect.class);

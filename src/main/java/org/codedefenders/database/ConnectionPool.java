@@ -18,11 +18,6 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -32,6 +27,11 @@ import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingException;
+
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class manages database connection by collecting connections in a pool which can be queried.

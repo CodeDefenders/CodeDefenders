@@ -1,14 +1,14 @@
 package org.codedefenders.game.tcs.impl;
 
-import org.codedefenders.game.Test;
-import org.codedefenders.game.tcs.ITestCaseSelector;
-
 import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.enterprise.inject.Alternative;
+
+import org.codedefenders.game.Test;
+import org.codedefenders.game.tcs.ITestCaseSelector;
 
 /**
  * Return a number of tests selected randomly.

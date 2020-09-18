@@ -18,6 +18,12 @@
  */
 package org.codedefenders.game.scoring;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -27,12 +33,6 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Event;
 import org.codedefenders.util.Constants;
-
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This implementation of a {@link IScoringPolicy} calculates the score based on

@@ -18,9 +18,6 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
@@ -28,6 +25,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 
 /**
  * This {@link HttpServlet} handles admin management of puzzles.

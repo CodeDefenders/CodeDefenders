@@ -18,6 +18,10 @@
  */
 package org.codedefenders.game.multiplayer;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -36,10 +40,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
 
 public class MeleeGame extends AbstractGame {
 

@@ -1,7 +1,8 @@
 package org.codedefenders.notification.events.server.test;
 
-import com.google.gson.annotations.Expose;
 import org.codedefenders.notification.events.server.ServerEvent;
+
+import com.google.gson.annotations.Expose;
 
 public abstract class TestLifecycleEvent extends ServerEvent {
     /* TODO: Tests don't have an Id until compiled, why not give them and Id before? */

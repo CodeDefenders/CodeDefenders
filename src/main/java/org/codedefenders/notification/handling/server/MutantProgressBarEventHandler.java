@@ -1,14 +1,16 @@
 package org.codedefenders.notification.handling.server;
 
-import com.google.common.eventbus.Subscribe;
+import java.io.IOException;
+import java.util.Objects;
+
+import javax.websocket.EncodeException;
+
 import org.codedefenders.notification.events.server.mutant.MutantLifecycleEvent;
 import org.codedefenders.notification.web.PushSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.websocket.EncodeException;
-import java.io.IOException;
-import java.util.Objects;
+import com.google.common.eventbus.Subscribe;
 
 public class MutantProgressBarEventHandler implements ServerEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(MutantProgressBarEventHandler.class);

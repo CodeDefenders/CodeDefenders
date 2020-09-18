@@ -1,13 +1,13 @@
 package org.codedefenders.notification.events.client.registration;
 
-import com.google.gson.annotations.Expose;
-
 import org.codedefenders.notification.events.server.test.TestCompiledEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * A message used to register for test progressbar events.

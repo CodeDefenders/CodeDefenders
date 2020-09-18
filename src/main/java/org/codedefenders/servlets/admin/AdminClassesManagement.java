@@ -18,15 +18,6 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -37,6 +28,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link org.codedefenders.game.GameClass GameClasses}.

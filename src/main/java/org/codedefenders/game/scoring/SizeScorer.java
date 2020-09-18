@@ -18,11 +18,11 @@
  */
 package org.codedefenders.game.scoring;
 
+import java.util.List;
+
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-
-import java.util.List;
 
 /**
  * This implementation of a {@link Scorer} calculates the score based on how many

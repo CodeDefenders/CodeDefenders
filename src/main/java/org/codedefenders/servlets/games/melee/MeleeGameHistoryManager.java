@@ -19,15 +19,8 @@
 
 package org.codedefenders.servlets.games.melee;
 
-import org.codedefenders.beans.game.MeleeScoreboardBean;
-import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.scoring.ScoreCalculator;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
+import java.io.IOException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -36,8 +29,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Optional;
+
+import org.codedefenders.beans.game.MeleeScoreboardBean;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.scoring.ScoreCalculator;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 
 @WebServlet(Paths.MELEE_HISTORY)
 public class MeleeGameHistoryManager extends HttpServlet {

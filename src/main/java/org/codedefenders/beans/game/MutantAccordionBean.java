@@ -1,22 +1,5 @@
 package org.codedefenders.beans.game;
 
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.dto.MutantDTO;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.service.game.GameService;
-import org.codedefenders.util.JSONUtils;
-
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +9,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.service.game.GameService;
+import org.codedefenders.util.JSONUtils;
+
+import com.google.common.collect.Range;
+import com.google.common.collect.RangeMap;
+import com.google.common.collect.TreeRangeMap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 /**
  * <p>Provides data for the mutant accordion game component.</p>

@@ -1,7 +1,8 @@
 package org.codedefenders.notification.events.server.mutant;
 
-import com.google.gson.annotations.Expose;
 import org.codedefenders.notification.events.server.ServerEvent;
+
+import com.google.gson.annotations.Expose;
 
 public abstract class MutantLifecycleEvent extends ServerEvent {
     /* TODO: Mutants don't have an Id until compiled, why not give them and Id before? */

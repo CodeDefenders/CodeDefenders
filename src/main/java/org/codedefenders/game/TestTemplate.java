@@ -18,9 +18,9 @@
  */
 package org.codedefenders.game;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import java.util.Set;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class TestTemplate {
     private String code;

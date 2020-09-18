@@ -18,8 +18,6 @@
  */
 package org.codedefenders.notification.impl;
 
-import org.codedefenders.notification.ITicketingService;
-
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,6 +25,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
+
+import org.codedefenders.notification.ITicketingService;
 
 import static java.time.temporal.ChronoUnit.HOURS;
 

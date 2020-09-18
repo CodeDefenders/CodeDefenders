@@ -1,10 +1,11 @@
 package org.codedefenders.beans.game;
 
-import com.google.gson.Gson;
+import java.util.List;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import java.util.List;
+
+import com.google.gson.Gson;
 
 /**
  * <p>Provides data for the error highlighting game component.</p>

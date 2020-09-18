@@ -18,18 +18,18 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.database.DB.RSMapper;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.Role;
-import org.codedefenders.model.KeyMap;
-import org.codedefenders.model.User;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Role;
+import org.codedefenders.model.KeyMap;
+import org.codedefenders.model.User;
 
 /**
  * This class handles the database logic for mutants.

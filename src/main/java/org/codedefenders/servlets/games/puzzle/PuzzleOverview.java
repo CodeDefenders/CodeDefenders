@@ -18,17 +18,6 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.game.puzzle.Puzzle;
-import org.codedefenders.game.puzzle.PuzzleChapter;
-import org.codedefenders.game.puzzle.PuzzleGame;
-import org.codedefenders.model.PuzzleChapterEntry;
-import org.codedefenders.model.PuzzleEntry;
-import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +32,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.model.PuzzleChapterEntry;
+import org.codedefenders.model.PuzzleEntry;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This {@link HttpServlet} handles to the overview page of {@link PuzzleGame}s.
