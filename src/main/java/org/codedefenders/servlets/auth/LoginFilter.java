@@ -39,13 +39,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 
  * TODO We do not use anymore this class, but I keep it here because there might
- * be some configuration that we still need
- * 
- * 
- * 
- * Checks if the user is logged in for pages that require login. If the user
+ *   be some configuration that we still need.
+ *
+ * <p>Checks if the user is logged in for pages that require login. If the user
  * accesses such a page and is not logged in, they are redirected to the login
  * page. If the user accesses such a page and is logged in, HTTP header fields
  * are set to disable caching.

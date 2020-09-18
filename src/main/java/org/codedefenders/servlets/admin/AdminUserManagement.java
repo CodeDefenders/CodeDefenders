@@ -52,8 +52,7 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
  * This {@link HttpServlet} handles admin requests for managing {@link User
  * Users}.
  *
- * <p>
- * Serves on path: {@code /admin/users}.
+ * <p>Serves on path: {@code /admin/users}.
  */
 @WebServlet(org.codedefenders.util.Paths.ADMIN_USERS)
 public class AdminUserManagement extends HttpServlet {
@@ -84,58 +83,58 @@ public class AdminUserManagement extends HttpServlet {
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
-        case "manageUsers": {
-            final Optional<Integer> userToReset = ServletUtils.getIntParameter(request, "resetPasswordButton");
-            if (userToReset.isPresent()) {
-                messages.add(resetUserPW(userToReset.get()));
+            case "manageUsers": {
+                final Optional<Integer> userToReset = ServletUtils.getIntParameter(request, "resetPasswordButton");
+                if (userToReset.isPresent()) {
+                    messages.add(resetUserPW(userToReset.get()));
+                    break;
+                }
+                final Optional<Integer> userId = ServletUtils.getIntParameter(request, "setUserInactive");
+                if (userId.isPresent()) {
+                    final boolean success = setUserInactive(userId.get());
+                    if (success) {
+                        messages.add("Successfully set user with id " + userId.get() + " as inactive.");
+                    } else {
+                        logger.warn("Setting user as inactive failed.");
+                        messages.add("Failed to set user as inactive.");
+                    }
+                }
+                final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
+                if (userToEdit.isPresent()) {
+                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEdit.get();
+                }
                 break;
             }
-            final Optional<Integer> userId = ServletUtils.getIntParameter(request, "setUserInactive");
-            if (userId.isPresent()) {
-                final boolean success = setUserInactive(userId.get());
-                if (success) {
-                    messages.add("Successfully set user with id " + userId.get() + " as inactive.");
+            case "createUsers": {
+                final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
+                if (!userList.isPresent()) {
+                    logger.error("Creating users failed. Missing parameter 'user_name_list'");
                 } else {
-                    logger.warn("Setting user as inactive failed.");
-                    messages.add("Failed to set user as inactive.");
+                    logger.info("Creating users....");
+                    createUserAccounts(request, userList.get());
+                    logger.info("Creating users succeeded.");
                 }
+                break;
             }
-            final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
-            if (userToEdit.isPresent()) {
-                responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEdit.get();
-            }
-            break;
-        }
-        case "createUsers": {
-            final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
-            if (!userList.isPresent()) {
-                logger.error("Creating users failed. Missing parameter 'user_name_list'");
-            } else {
-                logger.info("Creating users....");
-                createUserAccounts(request, userList.get());
-                logger.info("Creating users succeeded.");
-            }
-            break;
-        }
-        case "editUser": {
-            // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
-            // 'userid' from the session attributes
-            final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
-            if (!userId.isPresent()) {
-                logger.error("Creating users failed. Missing request parameter 'uid'");
-            } else {
-                String successMsg = "Successfully updated info for User " + userId.get();
-                String msg = editUser(userId.get(), request, successMsg);
-                messages.add(msg);
-                if (!msg.equals(successMsg)) {
-                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userId.get();
+            case "editUser": {
+                // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the
+                // 'userid' from the session attributes
+                final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
+                if (!userId.isPresent()) {
+                    logger.error("Creating users failed. Missing request parameter 'uid'");
+                } else {
+                    String successMsg = "Successfully updated info for User " + userId.get();
+                    String msg = editUser(userId.get(), request, successMsg);
+                    messages.add(msg);
+                    if (!msg.equals(successMsg)) {
+                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userId.get();
+                    }
                 }
+                break;
             }
-            break;
-        }
-        default:
-            logger.error("Action {" + formType + "} not recognised.");
-            break;
+            default:
+                logger.error("Action {" + formType + "} not recognised.");
+                break;
         }
 
         response.sendRedirect(responsePath);
@@ -211,14 +210,11 @@ public class AdminUserManagement extends HttpServlet {
     /**
      * Creates a user for a given string, which has to be formatted like:
      *
-     * <p>
-     * {@code username,password}
+     * <p>{@code username,password}
      *
-     * <p>
-     * {@code username,password,email}
+     * <p>{@code username,password,email}
      *
-     * <p>
-     * Values can be separated by either ',' or ';'.
+     * <p>Values can be separated by either ',' or ';'.
      */
     private void createUserAccount(String userCredentials, boolean sendMail, String hostAddress) {
         CodeDefendersValidator validator = new CodeDefendersValidator();

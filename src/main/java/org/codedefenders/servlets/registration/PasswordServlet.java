@@ -18,9 +18,6 @@ package org.codedefenders.servlets.registration;
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
-import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
-
 import java.io.IOException;
 import java.util.Random;
 
@@ -44,10 +41,11 @@ import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
+import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
+
 @WebServlet(Paths.PASSWORD)
 public class PasswordServlet extends HttpServlet {
-
-    private static final long serialVersionUID = -8266776993466064996L;
 
     @Inject
     private MessagesBean messages;
@@ -73,57 +71,57 @@ public class PasswordServlet extends HttpServlet {
         String confirm = request.getParameter("confirm");
 
         switch (formType) {
-        case "resetPassword":
-            email = request.getParameter("accountEmail");
-            username = request.getParameter("accountUsername");
-            User u = UserDAO.getUserByEmail(email);
-            if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
-                messages.add("No such User found or Email and Username do not match");
-            } else {
-                String resetPwSecret = generatePasswordResetSecret();
-                DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
-                String hostAddr = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-                        + request.getContextPath();
-                String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-                String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
-                        AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
-                                .getIntValue());
-                if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
-                    messages.add("A link for changing your password has been sent to " + email);
+            case "resetPassword":
+                email = request.getParameter("accountEmail");
+                username = request.getParameter("accountUsername");
+                User u = UserDAO.getUserByEmail(email);
+                if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
+                    messages.add("No such User found or Email and Username do not match");
+                } else {
+                    String resetPwSecret = generatePasswordResetSecret();
+                    DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
+                    String hostAddr = request.getScheme() + "://" + request.getServerName() + ":"
+                            + request.getServerPort() + request.getContextPath();
+                    String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
+                    String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
+                            AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
+                                    .getIntValue());
+                    if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
+                        messages.add("A link for changing your password has been sent to " + email);
+                    }
                 }
-            }
-            response.sendRedirect(request.getContextPath() + Paths.LOGIN);
-            break;
+                response.sendRedirect(request.getContextPath() + Paths.LOGIN);
+                break;
 
-        case "changePassword":
-            String resetPwSecret = request.getParameter("resetPwSecret");
-            confirm = request.getParameter("inputConfirmPasswordChange");
-            password = request.getParameter("inputPasswordChange");
+            case "changePassword":
+                String resetPwSecret = request.getParameter("resetPwSecret");
+                confirm = request.getParameter("inputConfirmPasswordChange");
+                password = request.getParameter("inputPasswordChange");
 
-            String responseURL = request.getContextPath() + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-            int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
-            if (resetPwSecret != null && userId > -1) {
-                if (!(validator.validPassword(password))) {
-                    messages.add("Password not changed. Make sure it is valid.");
-                } else if (password.equals(confirm)) {
-                    User user = UserDAO.getUserById(userId);
-                    user.setEncodedPassword(User.encodePassword(password));
-                    if (user.update()) {
-                        DatabaseAccess.setPasswordResetSecret(user.getId(), null);
-                        responseURL = request.getContextPath() + Paths.LOGIN;
-                        messages.add("Successfully changed your Password.");
+                String responseURL = request.getContextPath() + Paths.LOGIN + "?resetPW=" + resetPwSecret;
+                int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
+                if (resetPwSecret != null && userId > -1) {
+                    if (!(validator.validPassword(password))) {
+                        messages.add("Password not changed. Make sure it is valid.");
+                    } else if (password.equals(confirm)) {
+                        User user = UserDAO.getUserById(userId);
+                        user.setEncodedPassword(User.encodePassword(password));
+                        if (user.update()) {
+                            DatabaseAccess.setPasswordResetSecret(user.getId(), null);
+                            responseURL = request.getContextPath() + Paths.LOGIN;
+                            messages.add("Successfully changed your Password.");
+                        }
+                    } else {
+                        messages.add("Your Two Password Entries Did Not Match");
                     }
                 } else {
-                    messages.add("Your Two Password Entries Did Not Match");
+                    messages.add("Your Password reset link is not valid or has expired");
+                    responseURL = request.getContextPath() + Paths.LOGIN;
                 }
-            } else {
-                messages.add("Your Password reset link is not valid or has expired");
-                responseURL = request.getContextPath() + Paths.LOGIN;
-            }
-            response.sendRedirect(responseURL);
-            break;
-        default:
-            // ignored
+                response.sendRedirect(responseURL);
+                break;
+            default:
+                // ignored
         }
 
     }
@@ -132,7 +130,6 @@ public class PasswordServlet extends HttpServlet {
      * Password must contain MIN_PASSWORD_LENGTH to 20 alphanumeric characters, with
      * no whitespace or special character.
      */
-
     private static String generatePasswordResetSecret() {
         StringBuilder sb = new StringBuilder();
         char[] initialSet = LOWER;
@@ -144,50 +141,4 @@ public class PasswordServlet extends HttpServlet {
         }
         return sb.toString();
     }
-
-//    /*
-//     * This method collects all the app specific configurations and store them into
-//     * the current user-session. This avoids to access Context directly from the JSP
-//     * code which is a bad practice, since JSP are meant only for implementing
-//     * rendering code.
-//     */
-//    private void storeApplicationDataInSession(HttpSession session) {
-//        // First check the Web abb context
-//        boolean isAttackerBlocked = false;
-//        try {
-//            InitialContext initialContext = new InitialContext();
-//            Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
-//            isAttackerBlocked = "enabled".equals((String) environmentContext.lookup(Constants.BLOCK_ATTACKER));
-//        } catch (NamingException e) {
-//            logger.warn("Swallow Exception " + e);
-//            logger.info("Default " + Constants.BLOCK_ATTACKER + " to false");
-//        }
-//        session.setAttribute(Constants.BLOCK_ATTACKER, isAttackerBlocked);
-//    }
-//
-//    private String getClientIpAddress(HttpServletRequest request) {
-//        String ip = request.getHeader("X-Forwarded-For");
-//        if (invalidIP(ip)) {
-//            ip = request.getHeader("Proxy-Client-IP");
-//        }
-//        if (invalidIP(ip)) {
-//            ip = request.getHeader("WL-Proxy-Client-IP");
-//        }
-//        if (invalidIP(ip)) {
-//            ip = request.getHeader("HTTP_CLIENT_IP");
-//        }
-//        if (invalidIP(ip)) {
-//            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-//        }
-//        if (invalidIP(ip)) {
-//            ip = request.getRemoteAddr();
-//        }
-//        logger.debug("Client IP: " + ip);
-//        return ip;
-//    }
-//
-//    private boolean invalidIP(String ip) {
-//        return (ip == null) || (ip.length() == 0) || ("unknown".equalsIgnoreCase(ip)) || ("0:0:0:0:0:0:0:1".equals(ip));
-//    }
-
 }
