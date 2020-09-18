@@ -90,7 +90,7 @@ test:
 metrics:
   stage: test
   script:
-    - echo "todo_occurrences" "$(find . -type f | xargs grep NOTE | wc -l)" >> metrics.txt
+    - echo "todo_occurrences" "$(find . -type f | xargs grep TODO | wc -l)" >> metrics.txt
   artifacts:
     reports:
       metrics: metrics.txt
