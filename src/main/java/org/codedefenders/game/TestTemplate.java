@@ -18,9 +18,9 @@
  */
 package org.codedefenders.game;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import java.util.Set;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class TestTemplate {
     private String code;
@@ -96,7 +96,12 @@ public class TestTemplate {
         private static final String[] HAMCREST_ASSERTION_IMPORTS = new String[]{
                 "import static org.hamcrest.MatcherAssert.assertThat;\n",
                 "import static org.hamcrest.Matchers.*;\n"
+        };
 
+        private static final String[] GOOGLE_TRUTH_ASSERTION_IMPORTS = new String[]{
+                "import static com.google.common.truth.Truth.assertThat;\n",
+                "import static com.google.common.truth.Truth8.assertThat;\n",
+                "import static com.google.common.truth.Truth.assertWithMessage;\n"
         };
 
         private static final String[] MOCKITO_IMPORTS = new String[]{
@@ -210,6 +215,9 @@ public class TestTemplate {
                 case HAMCREST:
                     appendLines(HAMCREST_ASSERTION_IMPORTS);
                     break;
+                case GOOGLE_TRUTH:
+                    appendLines(GOOGLE_TRUTH_ASSERTION_IMPORTS);
+                    break;
                 case JUNIT4_HAMCREST:
                     appendLines(JUNIT4_ASSERTION_IMPORTS);
                     appendLines(HAMCREST_ASSERTION_IMPORTS);
@@ -217,6 +225,14 @@ public class TestTemplate {
                 case JUNIT5_HAMCREST:
                     appendLines(JUNIT5_ASSERTION_IMPORTS);
                     appendLines(HAMCREST_ASSERTION_IMPORTS);
+                    break;
+                case JUNIT4_GOOGLE_TRUTH:
+                    appendLines(JUNIT4_ASSERTION_IMPORTS);
+                    appendLines(GOOGLE_TRUTH_ASSERTION_IMPORTS);
+                    break;
+                case JUNIT5_GOOGLE_TRUTH:
+                    appendLines(JUNIT5_ASSERTION_IMPORTS);
+                    appendLines(GOOGLE_TRUTH_ASSERTION_IMPORTS);
                     break;
                 default:
                     throw new IllegalArgumentException("No imports implemented for " + assertionLibrary.name() + ".");

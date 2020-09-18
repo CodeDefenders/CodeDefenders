@@ -155,6 +155,17 @@ ${ant_home}/bin/ant -version > /dev/null
 echo "* Create folder structure under $data_dir"
 
 # Create the home folder and checks this worked
+
+if [ -e ${data_dir} ]; then
+  read -p "* Data DIR ${data_dir} Exists. Should I need to wipe that out? \
+    Continue (y/n)? " choice
+  case "$choice" in
+    y|Y ) rm -rfv  ${data_dir};;
+    n|N ) echo "no";;
+    * ) echo "Invalid. Abort"; exit 1;;
+  esac
+fi
+
 # Better safe than sorry.
 mkdir -vp "${data_dir}"
 

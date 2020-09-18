@@ -78,7 +78,7 @@ function register_student(){
   username=$1
   email=${username}@gw.uni-passau.de
   password=${2:-$(__private_generate_password)}
-  command="curl -s --data \"formType=create&username=${username}&email=${email}&password=${password}&confirm=${password}\" ${CODE_DEFENDER_URL}/login && echo \"SUCCESS!\" || echo \"FAILED TO REGISTER ${username} !\""
+  command="curl -s --data \"formType=create&username=${username}&email=${email}&password=${password}&confirm=${password}\" ${CODE_DEFENDER_URL}/user && echo \"SUCCESS!\" || echo \"FAILED TO REGISTER ${username} !\""
   
   echo "Creating ${username}"
   # echo ${command}
