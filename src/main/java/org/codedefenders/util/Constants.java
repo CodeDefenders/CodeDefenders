@@ -32,7 +32,12 @@ import java.nio.file.Paths;
  */
 public class Constants {
 
-    // TODO Cannot be injected in static context !! Needs to be refactored !!
+    /**
+     * Deprecated. TODO Cannot be injected in static context !! Needs to be refactored !!
+     *
+     * @deprecated Use {@link Configuration#getDataDir()} instead.
+     */
+    @Deprecated
     public static final String DATA_DIR = CDI.current().select(Configuration.class).get().getDataDir().getAbsolutePath();
 
     // Dummy game
@@ -43,6 +48,12 @@ public class Constants {
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
 
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getSourcesDir()} instead.
+     */
+    @Deprecated
     public static final String CUTS_DIR = Paths.get(DATA_DIR, "sources").toString();
     // dependencies, mutants and tests subdirectories for CUTs
     public static final String CUTS_DEPENDENCY_DIR = "dependencies";
@@ -53,8 +64,29 @@ public class Constants {
     public static final String MODE_PUZZLE_DIR = "puzzle";
     public static final String MODE_BATTLEGROUND_DIR = "mp";
 
+
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getMutantDir()} instead.
+     */
+    @Deprecated
     public static final String MUTANTS_DIR = Paths.get(DATA_DIR, "mutants").toString();
+
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getTestsDir()} instead.
+     */
+    @Deprecated
     public static final String TESTS_DIR = Paths.get(DATA_DIR, "tests").toString();
+
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getAiDir()} instead.
+     */
+    @Deprecated
     public static final String AI_DIR = Paths.get(DATA_DIR, "ai").toString();
 
     public static final String LIB_JUNIT = Paths.get(DATA_DIR, "lib", "junit-4.12.jar").toString();

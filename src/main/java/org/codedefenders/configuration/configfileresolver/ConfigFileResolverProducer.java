@@ -62,7 +62,7 @@ public class ConfigFileResolverProducer {
      */
     @Produces
     List<ConfigFileResolver> getConfigFileResolvers() {
-        // If this attribute is set we run in standalone mode (when the Installer is called) 
+        // If this attribute is set we run in standalone mode (when the Installer is called)
         if (Installer.configFile == null) {
             return Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr);
         } else {

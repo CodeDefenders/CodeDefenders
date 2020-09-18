@@ -115,6 +115,26 @@ public class Configuration {
         return new File(dataDir);
     }
 
+    public File getMutantDir() {
+        return new File(getDataDir(), "mutants");
+    }
+
+    public File getTestsDir() {
+        return new File(getDataDir(), "tests");
+    }
+
+    public File getSourcesDir() {
+        return new File(getDataDir(), "sources");
+    }
+
+    public File getLibraryDir() {
+        return new File(getDataDir(), "lib");
+    }
+
+    public File getAiDir() {
+        return new File(getDataDir(), "ai");
+    }
+
     public File getAntHome() {
         return new File(antHome);
     }
