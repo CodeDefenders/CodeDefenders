@@ -86,3 +86,13 @@ test:
         - checkstyle-report.json
       junit:
         - target/surefire-reports/TEST-*.xml
+
+metrics:
+  stage: build
+  script:
+    - echo "files{language=\"java\"}" "$(find . -type f -name "*.java" | wc -l)" >> metrics.txt
+    - echo "code_lines{language=\"java\"}" "$(find . -type f -name "*.java" | xargs cat | wc -l)" >> metrics.txt
+    - echo "todo_occurrences" "$(find . -type f | xargs grep TODO | wc -l)" >> metrics.txt
+  artifacts:
+    reports:
+      metrics: metrics.txt
