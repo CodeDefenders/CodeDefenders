@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<powermock.version>1.6.1</powermock.version>
-        <tomcat.version>9.0.35</tomcat.version>
+		<tomcat.version>9.0.35</tomcat.version>
 		<config.properties>config.properties</config.properties>
 	</properties>
 	<groupId>codedefenders</groupId>
@@ -13,37 +14,38 @@
 	<version>1.8-SNAPSHOT</version>
 	<url>http://www.code-defenders.org/</url>
 	<inceptionYear>2016</inceptionYear>
-    <packaging>war</packaging>
+	<packaging>war</packaging>
 
 	<licenses>
-          <license>
-            <name> GNU General Public License (GPL), version 3</name>
-            <url>http://www.gnu.org/licenses/gpl-3.0.en.html</url>
-            <distribution>repo</distribution>
-          </license>
+		<license>
+			<name> GNU General Public License (GPL), version 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.en.html</url>
+			<distribution>repo</distribution>
+		</license>
 	</licenses>
 
 	<build>
 		<filters>
-			<!-- This enables to read properties from this file and automagically
+			<!-- This enables to read properties from this file and automagically 
 				put their values in other files. For example, we use that to update: context.xml -->
 			<filter>${config.properties}</filter>
 		</filters>
 
 		<plugins>
-            <!-- Disables default deploy plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.7</version>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
-            </plugin>
-			<!-- Execute the installer within maven without the need of packaging a jar for it -->
+			<!-- Disables default deploy plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>default-deploy</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Execute the installer within maven without the need of packaging 
+				a jar for it -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -65,33 +67,33 @@
 				<artifactId>maven-enforcer-plugin</artifactId>
 				<version>3.0.0-M1</version>
 				<executions>
-                    <execution>
-                        <id>enforce-deploy-properties-exist</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>enforce</goal>
-                        </goals>
-                        <configuration>
-                            <rules>
-                                <requireProperty>
-                                    <property>tomcat.username</property>
-                                    <message>Tomcat username is missing</message>
-                                </requireProperty>
-                                <requireProperty>
-                                    <property>tomcat.password</property>
-                                    <message>Tomcat password is missing</message>
-                                </requireProperty>
-                                <requireProperty>
-                                    <property>tomcat.url</property>
-                                    <message>Tomcat manager api url is missing</message>
-                                </requireProperty>
-                                <requireProperty>
-                                    <property>tomcat.path</property>
-                                    <message>Tomcat deploy path is missing</message>
-                                </requireProperty>
-                            </rules>
-                        </configuration>
-                    </execution>
+					<execution>
+						<id>enforce-deploy-properties-exist</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireProperty>
+									<property>tomcat.username</property>
+									<message>Tomcat username is missing</message>
+								</requireProperty>
+								<requireProperty>
+									<property>tomcat.password</property>
+									<message>Tomcat password is missing</message>
+								</requireProperty>
+								<requireProperty>
+									<property>tomcat.url</property>
+									<message>Tomcat manager api url is missing</message>
+								</requireProperty>
+								<requireProperty>
+									<property>tomcat.path</property>
+									<message>Tomcat deploy path is missing</message>
+								</requireProperty>
+							</rules>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<!-- Reads all the properties from ${config.properties} -->
@@ -164,7 +166,7 @@
 					</archive>
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 					<webResources>
-						<!-- Enable reading props from config.file and setting all the files
+						<!-- Enable reading props from config.file and setting all the files 
 							in META-INF -->
 						<resource>
 							<directory>src/main/webapp/META-INF</directory>
@@ -187,99 +189,99 @@
 					<username>${tomcat.username}</username>
 					<password>${tomcat.password}</password>
 					<path>${tomcat.path}</path>
-                    <update>true</update>
+					<update>true</update>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
 				</configuration>
-                <executions>
-                    <execution>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy-only</goal>
-                        </goals>
-                    </execution>
-                </executions>
+				<executions>
+					<execution>
+						<phase>deploy</phase>
+						<goals>
+							<goal>deploy-only</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
-			  <groupId>com.mycila</groupId>
-			  <artifactId>license-maven-plugin</artifactId>
-			  <version>3.0</version>
-			  <configuration>
-			    <header>src/etc/header.txt</header>
-			    <useDefaultExcludes>true</useDefaultExcludes>
-              	<mapping>
-              	    <java>SLASHSTAR_STYLE</java>
-              	</mapping>
-			    <properties>
-                              <year>2016-2019</year>
-			    </properties>
-			    <excludes>
-                              <exclude>LICENSE.txt</exclude>
-                              <exclude>README.md</exclude>
-                              <exclude>**/.idea/**</exclude>
-                              <exclude>**/*.js</exclude>
-                              <exclude>**/*.css</exclude>
-                              <exclude>**/*.txt</exclude>
-                              <exclude>**/*.ts</exclude>
-                              <exclude>**/*.</exclude>
-                              <exclude>**/*.html</exclude>
-                              <exclude>**/*.sql</exclude>
-                              <exclude>**/*.xml</exclude>
-                              <exclude>docker/**</exclude>
-			      <exclude>config.properties</exclude>
-			      <exclude>src/test/resources/**</exclude>
-			      <exclude>installation/puzzles/**</exclude>
-			      <exclude>local-repo/**</exclude>
-			      <exclude>.editorconfig</exclude>
-			      <exclude>.gitlab-ci.yml</exclude>
-			      <exclude>src/main/resources/codemirror/**</exclude>
-			      <exclude>src/main/resources/js/libs/**</exclude>
-			    </excludes>
-			  </configuration>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<header>src/etc/header.txt</header>
+					<useDefaultExcludes>true</useDefaultExcludes>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+					</mapping>
+					<properties>
+						<year>2016-2019</year>
+					</properties>
+					<excludes>
+						<exclude>LICENSE.txt</exclude>
+						<exclude>README.md</exclude>
+						<exclude>**/.idea/**</exclude>
+						<exclude>**/*.js</exclude>
+						<exclude>**/*.css</exclude>
+						<exclude>**/*.txt</exclude>
+						<exclude>**/*.ts</exclude>
+						<exclude>**/*.</exclude>
+						<exclude>**/*.html</exclude>
+						<exclude>**/*.sql</exclude>
+						<exclude>**/*.xml</exclude>
+						<exclude>docker/**</exclude>
+						<exclude>config.properties</exclude>
+						<exclude>src/test/resources/**</exclude>
+						<exclude>installation/puzzles/**</exclude>
+						<exclude>local-repo/**</exclude>
+						<exclude>.editorconfig</exclude>
+						<exclude>.gitlab-ci.yml</exclude>
+						<exclude>src/main/resources/codemirror/**</exclude>
+						<exclude>src/main/resources/js/libs/**</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 		</plugins>
 
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>8.25</version>
-                        </dependency>
-                    </dependencies>
-                    <configuration>
-                        <configLocation>
-                            checkstyle-codedefenders.xml
-                        </configLocation>
-                    </configuration>
-                </plugin>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-checkstyle-plugin</artifactId>
+					<version>3.1.0</version>
+					<dependencies>
+						<dependency>
+							<groupId>com.puppycrawl.tools</groupId>
+							<artifactId>checkstyle</artifactId>
+							<version>8.25</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<configLocation>
+							checkstyle-codedefenders.xml
+						</configLocation>
+					</configuration>
+				</plugin>
 
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.8.2</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>org.apache.maven.doxia</groupId>
-                            <artifactId>doxia-site-renderer</artifactId>
-                            <version>1.9.1</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <version>3.0.0</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.8.2</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.doxia</groupId>
+							<artifactId>doxia-site-renderer</artifactId>
+							<version>1.9.1</version>
+						</dependency>
+						<dependency>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-project-info-reports-plugin</artifactId>
+							<version>3.0.0</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 
-        <finalName>${project.artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 	</build>
 
 	<profiles>
@@ -295,7 +297,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>2.22.2</version>
-						<!-- This forces to use the proper junit runner. Old versions do not
+						<!-- This forces to use the proper junit runner. Old versions do not 
 							support categories -->
 						<dependencies>
 							<dependency>
@@ -305,13 +307,13 @@
 							</dependency>
 						</dependencies>
 						<configuration>
-                            <!-- Sets the VM argument line used when unit tests are run. -->
-                            <argLine>${surefireArgLine}</argLine>
+							<!-- Sets the VM argument line used when unit tests are run. -->
+							<argLine>${surefireArgLine}</argLine>
 							<includes>
 								<include>**/*.class</include>
 							</includes>
 							<excludedGroups>org.codedefenders.itests.IntegrationTest,org.codedefenders.systemtests.SystemTest</excludedGroups>
-							<!-- Exclude resources for integration tests. Note that those are
+							<!-- Exclude resources for integration tests. Note that those are 
 								actual java and class files for mutants and tests -->
 							<excludes>
 								<exclude>**/itests/**/*.*</exclude>
@@ -319,48 +321,48 @@
 							</excludes>
 						</configuration>
 					</plugin>
-                    <plugin>
-                        <groupId>org.jacoco</groupId>
-                        <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.4</version>
-                        <configuration>
-                            <excludes>
-                                <exclude>target/classes/data/generated_mutants_2016.zip@**/*</exclude>
-                            </excludes>
-                        </configuration>
-                        <executions>
-                            <!-- Prepare the property pointing to the JaCoCo runtime agent which
-                            is passed as VM argument when Maven Surefire plugin is executed. -->
-                            <execution>
-                                <id>pre-unit-test</id>
-                                <goals>
-                                    <goal>prepare-agent</goal>
-                                </goals>
-                                <configuration>
-                                    <!-- Sets the path to the file which contains the execution data. -->
-                                    <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
-                                    <!-- Sets the name of the property containing the settings
-                                    for JaCoCo runtime agent. -->
-                                    <propertyName>surefireArgLine</propertyName>
-                                </configuration>
-                            </execution>
-                            <!-- Ensures that the code coverage report for unit tests is created after
-                            unit tests have been run. -->
-                            <execution>
-                                <id>post-unit-test</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>report</goal>
-                                </goals>
-                                <configuration>
-                                    <!-- Sets the path to the file which contains the execution data. -->
-                                    <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
-                                    <!-- Sets the output directory for the coverage report. -->
-                                    <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.4</version>
+						<configuration>
+							<excludes>
+								<exclude>target/classes/data/generated_mutants_2016.zip@**/*</exclude>
+							</excludes>
+						</configuration>
+						<executions>
+							<!-- Prepare the property pointing to the JaCoCo runtime agent which 
+								is passed as VM argument when Maven Surefire plugin is executed. -->
+							<execution>
+								<id>pre-unit-test</id>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+									<!-- Sets the name of the property containing the settings for JaCoCo 
+										runtime agent. -->
+									<propertyName>surefireArgLine</propertyName>
+								</configuration>
+							</execution>
+							<!-- Ensures that the code coverage report for unit tests is created 
+								after unit tests have been run. -->
+							<execution>
+								<id>post-unit-test</id>
+								<phase>test</phase>
+								<goals>
+									<goal>report</goal>
+								</goals>
+								<configuration>
+									<!-- Sets the path to the file which contains the execution data. -->
+									<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+									<!-- Sets the output directory for the coverage report. -->
+									<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -369,7 +371,7 @@
 			<id>IT</id>
 			<build>
 				<plugins>
-					<!-- Running integration tests require the lib folder to contains all
+					<!-- Running integration tests require the lib folder to contains all 
 						the libs -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -407,7 +409,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>2.22.2</version>
-						<!-- This forces to use the proper junit runner. Old versions do not
+						<!-- This forces to use the proper junit runner. Old versions do not 
 							support categories -->
 						<dependencies>
 							<dependency>
@@ -429,11 +431,11 @@
 				</plugins>
 			</build>
 		</profile>
-		<!-- System tests use Docker, Docker-Compose, Selenium and probably something
-			else. Before test we ensure the system is rebuild and repackage as war file
-			using config.properties@docker as config file. Not sure how this can be enforces
-			if not encoding the value of ${config.properties} Then we use surefire (not
-			failsafe) to execute the tests, but we bind this phase to integration-tests
+		<!-- System tests use Docker, Docker-Compose, Selenium and probably something 
+			else. Before test we ensure the system is rebuild and repackage as war file 
+			using config.properties@docker as config file. Not sure how this can be enforces 
+			if not encoding the value of ${config.properties} Then we use surefire (not 
+			failsafe) to execute the tests, but we bind this phase to integration-tests 
 			instead of regular unit-tests: https://stackoverflow.com/questions/1399240/how-do-i-get-my-maven-integration-tests-to-run?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa -->
 		<profile>
 			<id>ST</id>
@@ -479,7 +481,7 @@
 										<include>**/systemtests/*.class</include>
 									</includes>
 									<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
-									<!-- Exclude resources for integration tests. Note that those are
+									<!-- Exclude resources for integration tests. Note that those are 
 										actual java and class files for mutants and tests -->
 									<excludes>
 										<exclude>**/itests/**/*.*</exclude>
@@ -501,54 +503,75 @@
 	</profiles>
 
 	<dependencies>
-        <!-- Tomcat dependencies -->
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-catalina</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <!-- Web Socket API -->
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-websocket</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jasper-el</artifactId>
-            <version>${tomcat.version}</version>
-            <scope>test</scope>
-        </dependency>
+
+		<!-- Shiro Security -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+			<version>1.6.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-servlet-plugin</artifactId>
+			<version>1.6.0</version>
+		</dependency>
 
 
-	    <!-- Context and Dependency Injection (CDI) -->
-        <dependency>
-            <groupId>org.jboss.weld.servlet</groupId>
-            <artifactId>weld-servlet-shaded</artifactId>
-            <version>3.0.5.Final</version>
-        </dependency>
-        <!-- Not sure if this creates a conflict -->
-        <dependency>
-                <groupId>org.jboss.weld.se</groupId>
-                <artifactId>weld-se-core</artifactId>
-                <version>3.0.5.Final</version>
-        </dependency>
+		<!-- Tomcat dependencies -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Web Socket API -->
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-websocket</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jasper-el</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>test</scope>
+		</dependency>
 
-    	<dependency>
-                <groupId>org.jboss.weld</groupId>
-                <artifactId>weld-junit4</artifactId>
-                <version>2.0.0.Final</version>
-                <scope>test</scope>
-        </dependency>
 
-        <!-- EventBus implementation, but any EventBus or MOM might work as well -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>23.6-jre</version>
-        </dependency>
+		<!-- Context and Dependency Injection (CDI) -->
+		<dependency>
+			<groupId>org.jboss.weld.servlet</groupId>
+			<artifactId>weld-servlet-shaded</artifactId>
+			<version>3.0.5.Final</version>
+		</dependency>
+		<!-- Not sure if this creates a conflict -->
+		<dependency>
+			<groupId>org.jboss.weld.se</groupId>
+			<artifactId>weld-se-core</artifactId>
+			<version>3.0.5.Final</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.weld</groupId>
+			<artifactId>weld-junit4</artifactId>
+			<version>2.0.0.Final</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- EventBus implementation, but any EventBus or MOM might work as well -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>23.6-jre</version>
+		</dependency>
 
 		<!-- Test Smell Detector. Local dependency -->
 		<dependency>
@@ -749,7 +772,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Docker client to make assertions on docker containers. Ideally we
+		<!-- Docker client to make assertions on docker containers. Ideally we 
 			should use this in combination with Hamcrest -->
 		<dependency>
 			<groupId>com.spotify</groupId>
@@ -770,64 +793,60 @@
 			<version>1.1.2</version>
 		</dependency>
 
-        <!--
-          Begin Client Side Dependencies
-        -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>bootstrap</artifactId>
-            <version>3.3.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>bootstrap-select</artifactId>
-            <version>1.9.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars.bower</groupId>
-            <artifactId>bootstrap-toggle</artifactId>
-            <version>2.2.1</version>
-        </dependency>
-        <!-- Do we still need this? -->
-        <dependency>
-            <groupId>org.webjars.bower</groupId>
-            <artifactId>slick-carousel</artifactId>
-            <version>1.5.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jquery</artifactId>
-            <version>3.3.1-2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>jquery-ui</artifactId>
-            <version>1.12.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>codemirror</artifactId>
-            <version>5.22.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>momentjs</artifactId>
-            <version>2.14.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>datatables</artifactId>
-            <version>1.10.16</version>
-        </dependency>
-        <!-- Provides datetime-moment.js -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>datatables-plugins</artifactId>
-            <version>1.10.16</version>
-        </dependency>
-        <!--
-          End Client Side Dependencies
-        -->
+		<!-- Begin Client Side Dependencies -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>3.3.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap-select</artifactId>
+			<version>1.9.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>bootstrap-toggle</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		<!-- Do we still need this? -->
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>slick-carousel</artifactId>
+			<version>1.5.8</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>3.3.1-2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery-ui</artifactId>
+			<version>1.12.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>codemirror</artifactId>
+			<version>5.22.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>momentjs</artifactId>
+			<version>2.14.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>datatables</artifactId>
+			<version>1.10.16</version>
+		</dependency>
+		<!-- Provides datetime-moment.js -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>datatables-plugins</artifactId>
+			<version>1.10.16</version>
+		</dependency>
+		<!-- End Client Side Dependencies -->
 
 	</dependencies>
 
@@ -845,24 +864,24 @@
 		</repository>
 	</repositories>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.0</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>checkstyle</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-                <configuration>
-                    <consoleOutput>false</consoleOutput>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.1.0</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>checkstyle</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+				<configuration>
+					<consoleOutput>false</consoleOutput>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
 </project>

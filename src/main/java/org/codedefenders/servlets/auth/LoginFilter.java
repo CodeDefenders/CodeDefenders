@@ -39,10 +39,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Checks if the user is logged in for pages that require login.
- * If the user accesses such a page and is not logged in, they are redirected to the login page.
- * If the user accesses such a page and is logged in, HTTP header fields are set to disable caching.
+ * TODO We do not use anymore this class, but I keep it here because there might
+ *   be some configuration that we still need.
+ *
+ * <p>Checks if the user is logged in for pages that require login. If the user
+ * accesses such a page and is not logged in, they are redirected to the login
+ * page. If the user accesses such a page and is logged in, HTTP header fields
+ * are set to disable caching.
  */
+@Deprecated
 @WebFilter(filterName = "LoginFilter")
 public class LoginFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
@@ -68,8 +73,11 @@ public class LoginFilter implements Filter {
 
             if (login.isLoggedIn()) {
                 if (login.getUser().isActive()) {
-                    /* Disable caching in the HTTP header.
-                     * https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for-php-site */
+                    /*
+                     * Disable caching in the HTTP header.
+                     * https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for
+                     * -php-site
+                     */
                     httpResponse.setHeader("Pragma", "No-cache");
                     httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
                     httpResponse.setDateHeader("Expires", -1);
@@ -94,28 +102,23 @@ public class LoginFilter implements Filter {
         String context = request.getContextPath();
 
         /*
-         * Do not authenticate the requests to the WebSocket since the
-         * HttpSession is not visible from there. WebSocket authentication shall
-         * be handled in a different Filter.
+         * Do not authenticate the requests to the WebSocket since the HttpSession is
+         * not visible from there. WebSocket authentication shall be handled in a
+         * different Filter.
          *
-         * TODO Maybe there's a way already to route Ws requests into WsFilters,
-         * but for the moment we need to match their URL
+         * TODO Maybe there's a way already to route Ws requests into WsFilters, but for
+         * the moment we need to match their URL
          */
         if (path.matches("/notifications/.*/[0-9][0-9]*")) {
             logger.info("LoginFilter.loginRequired() " + request.getProtocol() + " " + path);
             return false;
         }
 
-        if ((path.endsWith(context + "/"))
-                || path.endsWith(context + "/favicon.ico")
-                || path.endsWith(context + Paths.LOGIN)
-                || path.endsWith(context + Paths.HELP_PAGE)
-                || path.endsWith(context + "/video")
-                || path.endsWith(context + "/video.mp4")
-                || path.contains(context + "/papers")
-                || path.endsWith(context + Paths.API_SEND_EMAIL)
-                || path.endsWith(context + Paths.ABOUT_PAGE)
-                || path.endsWith(context + Paths.CONTACT_PAGE)) {
+        if ((path.endsWith(context + "/")) || path.endsWith(context + "/favicon.ico")
+                || path.endsWith(context + Paths.LOGIN) || path.endsWith(context + Paths.HELP_PAGE)
+                || path.endsWith(context + "/video") || path.endsWith(context + "/video.mp4")
+                || path.contains(context + "/papers") || path.endsWith(context + Paths.API_SEND_EMAIL)
+                || path.endsWith(context + Paths.ABOUT_PAGE) || path.endsWith(context + Paths.CONTACT_PAGE)) {
             return false;
         }
 

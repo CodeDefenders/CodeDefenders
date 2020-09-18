@@ -80,7 +80,8 @@ function register_student(){
   password=${2:-$(__private_generate_password)}
   command="curl -s --data \"formType=create&username=${username}&email=${email}&password=${password}&confirm=${password}\" ${CODE_DEFENDER_URL}/login && echo \"SUCCESS!\" || echo \"FAILED TO REGISTER ${username} !\""
   
-  echo ${command}
+  echo "Creating ${username}"
+  # echo ${command}
   eval ${command} 
 }
 

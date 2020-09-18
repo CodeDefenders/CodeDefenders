@@ -18,21 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.model.KeyMap;
-import org.codedefenders.model.User;
-import org.codedefenders.model.UserInfo;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.auth.LoginManager;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,9 +29,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.model.KeyMap;
+import org.codedefenders.model.User;
+import org.codedefenders.model.UserInfo;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
+import org.codedefenders.validation.input.CodeDefendersValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
- * This {@link HttpServlet} handles requests for managing the currently logged in {@link User}.
- * This functionality may be disabled, e.g. in a class room setting. See {@link #checkEnabled()}.
+ * This {@link HttpServlet} handles requests for managing the currently logged
+ * in {@link User}. This functionality may be disabled, e.g. in a class room
+ * setting. See {@link #checkEnabled()}.
  *
  * <p>Serves on path: {@code /profile}.
  *
@@ -72,13 +73,14 @@ public class UserProfileManager extends HttpServlet {
      * @return {@code true} when users can access their profile, {@code false} otherwise.
      */
     public static boolean checkEnabled() {
-        // please, in the name of the lord, can we change the way system settings are implemented?
+        // please, in the name of the lord, can we change the way system settings are
+        // implemented?
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
     }
 
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
             response.sendRedirect(ServletUtils.getBaseURL(request));
@@ -94,8 +96,8 @@ public class UserProfileManager extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request,
-                          HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
             response.sendRedirect(request.getContextPath());
@@ -138,12 +140,19 @@ public class UserProfileManager extends HttpServlet {
                 final boolean success = removeUserInformation(login.getUser());
                 if (success) {
                     logger.info("User {} successfully set themselves as inactive.", login.getUserId());
-                    messages.add("You successfully deleted your account. Sad to see you go. :(");
+                    /*
+                     * Send the user to Paths.LOGOUT so we can correctly clean up session
+                     * information. Note that this will automatically take the user to LANDING_PAGE,
+                     * hence no confirmation messages will be shown (unless we make LANDING_PAGE do
+                     * so)
+                     */
+                    // messages.add("You successfully deleted your account. Sad to see you go. :(");
+                    response.sendRedirect(Paths.LOGOUT);
                 } else {
                     logger.info("Failed to set user {} as inactive.", login.getUserId());
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");
+                    response.sendRedirect(responsePath);
                 }
-                response.sendRedirect(responsePath);
                 return;
             }
             default:
@@ -160,13 +169,16 @@ public class UserProfileManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean updateUserInformation(User user, Optional<String> email,
-                                          Optional<String> password, boolean allowContact) {
+    private boolean updateUserInformation(User user, Optional<String> email, Optional<String> password,
+            boolean allowContact) {
+
+        CodeDefendersValidator validator = new CodeDefendersValidator();
+
         if (user == null) {
             return false;
         }
         if (password.isPresent()) {
-            if (!LoginManager.validPassword(password.get())) {
+            if (!validator.validPassword(password.get())) {
                 return false;
             }
             user.setEncodedPassword(User.encodePassword(password.get()));
