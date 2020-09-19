@@ -18,6 +18,28 @@
  */
 package org.codedefenders.itests.parallelize;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
 import org.codedefenders.MutationTesterUtilities;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -48,28 +70,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * This test shall evaluate how Mutation Tester handle concurrent updates.
@@ -117,6 +117,7 @@ public class MutationTesterTest {
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
         PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
+            @Override
             public Connection answer(InvocationOnMock invocation) throws SQLException {
                 // Return a new connection from the rule instead
                 return db.getConnection();
@@ -248,7 +249,7 @@ public class MutationTesterTest {
         // System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant()
         // Cut " + cut.getId());
         MultiplayerGame multiplayerGame = new MultiplayerGame
-                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
+                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
                 .state(GameState.ACTIVE)
                 .level(GameLevel.HARD)
                 .defenderValue(10)

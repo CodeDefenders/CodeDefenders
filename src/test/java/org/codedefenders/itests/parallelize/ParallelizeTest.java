@@ -18,6 +18,34 @@
  */
 package org.codedefenders.itests.parallelize;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -53,36 +81,8 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.List;
-
-import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
 import difflib.DiffUtils;
 import difflib.Patch;
-
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeThat;
-import static org.junit.Assume.assumeTrue;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -114,6 +114,7 @@ public class ParallelizeTest {
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
         PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
+            @Override
             public Connection answer(InvocationOnMock invocation) throws SQLException {
                 // Return a new connection from the rule instead
                 return db.getConnection();
@@ -242,17 +243,18 @@ public class ParallelizeTest {
         int classId = cut.getId();
         int creatorId = creator.getId();
         GameLevel level = GameLevel.HARD;
-        float prize = (float) 1;
+        float prize = 1;
         int defenderValue = 1;
         int attackerValue = 1;
 
         GameState status = GameState.ACTIVE;
         int maxAssertionsPerTest = 2;
         boolean forceHamcrest = false;
+        boolean forceGoogleTruth = false;
 
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
-        final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
+        final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest, forceGoogleTruth)
                 .state(status)
                 .level(level)
                 .prize(prize)
