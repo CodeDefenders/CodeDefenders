@@ -163,6 +163,7 @@ public class MultiplayerGameDAO {
         GameState state = game.getState();
         int maxAssertionsPerTest = game.getMaxAssertionsPerTest();
         boolean forceHamcrest = game.isForceHamcrest();
+        boolean forceGoogleTruth = game.isForceGoogleTruth();
         boolean chatEnabled = game.isChatEnabled();
         CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
@@ -183,11 +184,12 @@ public class MultiplayerGameDAO {
                 "Mode,",
                 "MaxAssertionsPerTest,",
                 "ForceHamcrest,",
+                "ForceGoogleTruth,",
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention,",
                 "EquivalenceThreshold)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -202,6 +204,7 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(mode.name()),
                 DatabaseValue.of(maxAssertionsPerTest),
                 DatabaseValue.of(forceHamcrest),
+                DatabaseValue.of(forceGoogleTruth),
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
                 DatabaseValue.of(capturePlayersIntention),

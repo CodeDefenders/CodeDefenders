@@ -18,6 +18,12 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -29,12 +35,6 @@ import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.annotation.Nonnull;
 
 /**
  * This class handles the database logic for puzzles.
@@ -224,6 +224,7 @@ public class PuzzleDAO {
                 "Level,",
                 "Max_Assertions,",
                 "Force_Hamcrest,",
+                "Force_GoogleTruth,",
                 "Mutant_Validator_Level,",
                 "Editable_Lines_Start,",
                 "Editable_Lines_End,",
@@ -232,7 +233,7 @@ public class PuzzleDAO {
                 "Title,",
                 "Description)",
 
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
@@ -241,6 +242,7 @@ public class PuzzleDAO {
                 DatabaseValue.of(puzzle.getLevel().toString()),
                 DatabaseValue.of(puzzle.getMaxAssertionsPerTest()),
                 DatabaseValue.of(puzzle.isForceHamcrest()),
+                DatabaseValue.of(puzzle.isForceGoogleTruth()),
                 DatabaseValue.of(puzzle.getMutantValidatorLevel().toString()),
                 DatabaseValue.of(puzzle.getEditableLinesStart()),
                 DatabaseValue.of(puzzle.getEditableLinesEnd()),
@@ -296,6 +298,7 @@ public class PuzzleDAO {
                 "Creator_ID,",
                 "MaxAssertionsPerTest,",
                 "ForceHamcrest,",
+                "ForceGoogleTruth,",
                 "MutantValidator,",
                 "State,",
                 "CurrentRound,",
@@ -303,7 +306,7 @@ public class PuzzleDAO {
                 "Mode,",
                 "Puzzle_ID)",
 
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
@@ -312,6 +315,7 @@ public class PuzzleDAO {
                 DatabaseValue.of(game.getCreatorId()),
                 DatabaseValue.of(game.getMaxAssertionsPerTest()),
                 DatabaseValue.of(game.isForceHamcrest()),
+                DatabaseValue.of(game.isForceGoogleTruth()),
                 DatabaseValue.of(game.getMutantValidatorLevel().toString()),
                 DatabaseValue.of(game.getState().toString()),
                 DatabaseValue.of(game.getCurrentRound()),
@@ -339,6 +343,7 @@ public class PuzzleDAO {
                 "    Description          = ?,",
                 "    Max_Assertions       = ?,",
                 "    Force_Hamcrest       = ?,",
+                "    Force_GoogleTruth    = ?,",
                 "    Editable_Lines_Start = ?,",
                 "    Editable_Lines_End   = ?",
                 "WHERE Puzzle_ID = ?;"
@@ -351,6 +356,7 @@ public class PuzzleDAO {
             DatabaseValue.of(puzzle.getDescription()),
             DatabaseValue.of(puzzle.getMaxAssertionsPerTest()),
             DatabaseValue.of(puzzle.isForceHamcrest()),
+            DatabaseValue.of(puzzle.isForceGoogleTruth()),
             DatabaseValue.of(puzzle.getEditableLinesStart()),
             DatabaseValue.of(puzzle.getEditableLinesEnd()),
 
@@ -401,6 +407,7 @@ public class PuzzleDAO {
                 "    Creator_ID = ?,",
                 "    MaxAssertionsPerTest = ?,",
                 "    ForceHamcrest = ?,",
+                "    ForceGoogleTruth = ?,",
                 "    MutantValidator = ?,",
                 "    State = ?,",
                 "    CurrentRound = ?,",
@@ -416,6 +423,7 @@ public class PuzzleDAO {
                 DatabaseValue.of(game.getCreatorId()),
                 DatabaseValue.of(game.getMaxAssertionsPerTest()),
                 DatabaseValue.of(game.isForceHamcrest()),
+                DatabaseValue.of(game.isForceGoogleTruth()),
                 DatabaseValue.of(game.getMutantValidatorLevel().toString()),
                 DatabaseValue.of(game.getState().toString()),
                 DatabaseValue.of(game.getCurrentRound()),
@@ -573,7 +581,9 @@ public class PuzzleDAO {
             GameLevel level = GameLevel.valueOf(rs.getString("puzzles.Level"));
 
             int maxAssertions = rs.getInt("puzzles.Max_Assertions");
+            // TODO Pay attention that the name of the column here follows a different format
             boolean forceHamcrest = rs.getBoolean("puzzles.Force_Hamcrest");
+            boolean forceGoogleTruth = rs.getBoolean("puzzles.Force_GoogleTruth");
 
             CodeValidatorLevel mutantValidatorLevel =
                     CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
@@ -588,7 +598,7 @@ public class PuzzleDAO {
                 editableLinesEnd = null;
             }
 
-            return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, forceHamcrest, mutantValidatorLevel,
+            return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, forceHamcrest, forceGoogleTruth, mutantValidatorLevel,
                     editableLinesStart, editableLinesEnd, chapterId, position, title, description);
         } catch (SQLException e) {
             logger.error("Caught SQL exception while checking ResultSet.", e);
@@ -611,6 +621,7 @@ public class PuzzleDAO {
             int creatorId = rs.getInt("games.Creator_ID");
             int maxAssertionsPerTest = rs.getInt("games.MaxAssertionsPerTest");
             boolean forceHamcrest = rs.getBoolean("games.ForceHamcrest");
+            boolean forceGoogleTruth= rs.getBoolean("games.ForceGoogleTruth");
             CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("games.MutantValidator"));
             GameState state = GameState.valueOf(rs.getString("games.State"));
             int currentRound = rs.getInt("games.CurrentRound");
@@ -618,7 +629,7 @@ public class PuzzleDAO {
             int puzzleId = rs.getInt("games.Puzzle_ID");
 
             return new PuzzleGame(cut, puzzleId, gameId, classId, level, creatorId,
-                maxAssertionsPerTest, forceHamcrest, mutantValidatorLevel, state, currentRound, activeRole);
+                maxAssertionsPerTest, forceHamcrest, forceGoogleTruth, mutantValidatorLevel, state, currentRound, activeRole);
         } catch (SQLException e) {
             logger.error("Caught SQL exception while checking ResultSet.", e);
             return null;
