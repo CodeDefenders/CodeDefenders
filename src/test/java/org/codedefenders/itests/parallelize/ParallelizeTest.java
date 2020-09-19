@@ -18,13 +18,6 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeThat;
-import static org.junit.Assume.assumeTrue;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -83,6 +76,13 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import difflib.DiffUtils;
 import difflib.Patch;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
