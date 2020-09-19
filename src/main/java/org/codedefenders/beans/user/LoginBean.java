@@ -1,13 +1,14 @@
 package org.codedefenders.beans.user;
 
+import java.io.Serializable;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.SessionScoped;
+
 import org.codedefenders.model.User;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.SessionScoped;
-import java.io.Serializable;
 
 /**
  * <p>Keeps track of the logged in user and other login information (URL to redirect to after login).</p>

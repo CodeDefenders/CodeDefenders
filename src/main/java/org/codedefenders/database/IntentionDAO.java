@@ -18,12 +18,12 @@
  */
 package org.codedefenders.database;
 
+import java.util.stream.Collectors;
+
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
-
-import java.util.stream.Collectors;
 
 /**
  * This class handles the database logic for player intentions.

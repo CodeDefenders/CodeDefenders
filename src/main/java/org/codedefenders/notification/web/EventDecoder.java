@@ -1,5 +1,19 @@
 package org.codedefenders.notification.web;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
+
+import javax.websocket.DecodeException;
+import javax.websocket.Decoder;
+import javax.websocket.EndpointConfig;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.codedefenders.notification.events.EventNames;
+import org.codedefenders.notification.events.client.ClientEvent;
+import org.springframework.util.ReflectionUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -9,18 +23,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.codedefenders.notification.events.EventNames;
-import org.codedefenders.notification.events.client.ClientEvent;
-import org.springframework.util.ReflectionUtils;
-
-import javax.websocket.DecodeException;
-import javax.websocket.Decoder;
-import javax.websocket.EndpointConfig;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
 
 /**
  * Decodes JSON strings with a "{type: string, data: {}}" format to client events.

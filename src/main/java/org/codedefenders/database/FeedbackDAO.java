@@ -18,10 +18,6 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.servlets.FeedbackManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,6 +25,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
+
+import org.codedefenders.servlets.FeedbackManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.model.Feedback.MAX_RATING;
 import static org.codedefenders.model.Feedback.MIN_RATING;

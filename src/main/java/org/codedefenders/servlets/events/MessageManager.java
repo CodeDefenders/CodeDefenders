@@ -18,16 +18,6 @@
  */
 package org.codedefenders.servlets.events;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.EventDAO;
-import org.codedefenders.game.Role;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
@@ -38,6 +28,16 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.EventDAO;
+import org.codedefenders.game.Role;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This {@link HttpServlet} handles uploading and storing new chat messages. Chat

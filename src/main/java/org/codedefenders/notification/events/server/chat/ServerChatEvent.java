@@ -1,8 +1,8 @@
 package org.codedefenders.notification.events.server.chat;
 
-import com.google.gson.annotations.Expose;
-import org.codedefenders.model.User;
 import org.codedefenders.notification.events.server.ServerEvent;
+
+import com.google.gson.annotations.Expose;
 
 public abstract class ServerChatEvent extends ServerEvent {
     @Expose private int senderId;

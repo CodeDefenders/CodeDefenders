@@ -18,15 +18,15 @@
  */
 package org.codedefenders.util.analysis;
 
-import org.apache.commons.lang3.Range;
-import org.codedefenders.game.GameClass.MethodDescription;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.Range;
+import org.codedefenders.game.GameClass.MethodDescription;
 
 /**
  * Container for lines or ranges of lines used for the {@link ClassCodeAnalyser}.

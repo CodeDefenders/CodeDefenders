@@ -18,12 +18,6 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.ConnectionPool;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -33,6 +27,12 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.ConnectionPool;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 
 @WebServlet(Paths.ADMIN_SETTINGS)
 // TODO Does this enable CDI using @Property@Inject ?

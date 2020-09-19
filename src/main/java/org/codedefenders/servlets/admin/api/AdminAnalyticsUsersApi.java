@@ -18,19 +18,6 @@
  */
 package org.codedefenders.servlets.admin.api;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.httpclient.HttpStatus;
-import org.codedefenders.api.analytics.UserDataDTO;
-import org.codedefenders.database.AnalyticsDAO;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +29,19 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.httpclient.HttpStatus;
+import org.codedefenders.api.analytics.UserDataDTO;
+import org.codedefenders.database.AnalyticsDAO;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 @WebServlet(Paths.API_ANALYTICS_USERS)
 public class AdminAnalyticsUsersApi extends HttpServlet {

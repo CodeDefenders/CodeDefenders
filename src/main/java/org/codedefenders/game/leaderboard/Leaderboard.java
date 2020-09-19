@@ -18,9 +18,9 @@
  */
 package org.codedefenders.game.leaderboard;
 
-import org.codedefenders.database.DatabaseAccess;
-
 import java.util.List;
+
+import org.codedefenders.database.DatabaseAccess;
 
 /**
  * Created by jmr on 11/07/2017.

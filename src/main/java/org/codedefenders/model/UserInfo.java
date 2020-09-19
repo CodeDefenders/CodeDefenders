@@ -18,9 +18,9 @@
  */
 package org.codedefenders.model;
 
-import org.codedefenders.game.Role;
-
 import java.sql.Timestamp;
+
+import org.codedefenders.game.Role;
 
 /**
  * This class serves as a container class for {@link User Users} and

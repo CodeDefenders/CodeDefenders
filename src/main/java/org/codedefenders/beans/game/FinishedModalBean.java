@@ -1,9 +1,9 @@
 package org.codedefenders.beans.game;
 
-import org.codedefenders.util.Constants;
-
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
+
+import org.codedefenders.util.Constants;
 
 /**
  * <p>Provides data for the finished modal game component.</p>

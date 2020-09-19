@@ -1,8 +1,8 @@
 package org.codedefenders.notification.events.server.chat;
 
-import com.google.gson.annotations.Expose;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.User;
+
+import com.google.gson.annotations.Expose;
 
 public class ServerGameChatEvent extends ServerChatEvent {
     /**

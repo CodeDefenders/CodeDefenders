@@ -96,14 +96,15 @@ public class PuzzleGame extends AbstractGame {
     private Puzzle puzzle;
 
     /**
-     * Creates a new {@link PuzzleGame} according to the given {@link Puzzle}.
-     * Adds the mapped tests and mutants from the {@link Puzzle puzzle}'s class to the game.
-     * Adds the user to the game as a player.
-     * If any error occurs during the preparation, {@code null} will be returned.
+     * Creates a new {@link PuzzleGame} according to the given {@link Puzzle}. Adds
+     * the mapped tests and mutants from the {@link Puzzle puzzle}'s class to the
+     * game. Adds the user to the game as a player. If any error occurs during the
+     * preparation, {@code null} will be returned.
      *
      * @param puzzle {@link Puzzle} to create a {@link PuzzleGame} for.
      * @param uid    User ID of the user who plays the puzzle.
-     * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or {@code null} if any error occurred.
+     * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or
+     *         {@code null} if any error occurred.
      */
     public static PuzzleGame createPuzzleGame(Puzzle puzzle, int uid) {
         String errorMsg = String.format("Error while preparing puzzle game for puzzle %d and user %d.",
@@ -141,15 +142,15 @@ public class PuzzleGame extends AbstractGame {
 
         /* Add the mutants from the puzzle. */
         for (Mutant mutant : mappedMutants) {
-            final Mutant newMutant = new Mutant(game.id, game.classId,
-                    mutant.getJavaFile(), mutant.getClassFile(), true, dummyAttackerId, GameDAO.getCurrentRound(game.id));
+            final Mutant newMutant = new Mutant(game.id, game.classId, mutant.getJavaFile(), mutant.getClassFile(),
+                    true, dummyAttackerId, GameDAO.getCurrentRound(game.id));
             newMutant.insert();
             mutantMap.put(mutant.getId(), newMutant);
         }
 
         if (!mutantMap.isEmpty() && !testMap.isEmpty()) {
-            for (TargetExecution targetExecution :
-                    TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.classId)) {
+            for (TargetExecution targetExecution : TargetExecutionDAO
+                    .getTargetExecutionsForUploadedWithClass(game.classId)) {
                 Test test = testMap.get(targetExecution.testId);
                 Mutant mutant = mutantMap.get(targetExecution.mutantId);
 
@@ -201,7 +202,7 @@ public class PuzzleGame extends AbstractGame {
         /* Other game attributes */
         this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
         this.forceHamcrest = puzzle.isForceHamcrest();
-        this.forceGoogleTruth= puzzle.isForceGoogleTruth();
+        this.forceGoogleTruth = puzzle.isForceGoogleTruth();
 
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
@@ -218,8 +219,7 @@ public class PuzzleGame extends AbstractGame {
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
             int maxAssertionsPerTest, //
             boolean forceHamcrest, boolean forceGoogleTruth, //
-            CodeValidatorLevel mutantValidatorLevel, GameState state,
-            int currentRound, Role activeRole) {
+            CodeValidatorLevel mutantValidatorLevel, GameState state, int currentRound, Role activeRole) {
         /* AbstractGame attributes */
         this.cut = cut;
         this.id = id;
@@ -392,23 +392,23 @@ public class PuzzleGame extends AbstractGame {
     @Override
     public boolean addPlayer(int userId, Role role) {
         switch (userId) {
-            case DUMMY_ATTACKER_USER_ID:
-                if (role != Role.ATTACKER) {
-                    logger.warn("Tried adding dummy attacker to puzzle game with wrong role: " + role);
-                    return false;
-                }
-                break;
-            case DUMMY_DEFENDER_USER_ID:
-                if (role != Role.DEFENDER) {
-                    logger.warn("Tried adding dummy defender to puzzle game with wrong role: " + role);
-                    return false;
-                }
-                break;
-            default:
-                if (role != activeRole) {
-                    logger.warn("Tried adding player to puzzle game with wrong role: " + role);
-                    return false;
-                }
+        case DUMMY_ATTACKER_USER_ID:
+            if (role != Role.ATTACKER) {
+                logger.warn("Tried adding dummy attacker to puzzle game with wrong role: " + role);
+                return false;
+            }
+            break;
+        case DUMMY_DEFENDER_USER_ID:
+            if (role != Role.DEFENDER) {
+                logger.warn("Tried adding dummy defender to puzzle game with wrong role: " + role);
+                return false;
+            }
+            break;
+        default:
+            if (role != activeRole) {
+                logger.warn("Tried adding player to puzzle game with wrong role: " + role);
+                return false;
+            }
         }
 
         return GameDAO.addPlayerToGame(id, userId, role);

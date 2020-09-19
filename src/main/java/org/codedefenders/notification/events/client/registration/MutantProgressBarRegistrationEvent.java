@@ -1,12 +1,12 @@
 package org.codedefenders.notification.events.client.registration;
 
-import com.google.gson.annotations.Expose;
-
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * A message used to register for mutant progressbar events.

@@ -19,14 +19,14 @@
 
 package org.codedefenders.service.game;
 
+import java.util.List;
+
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.User;
-
-import java.util.List;
 
 public interface IGameService {
 

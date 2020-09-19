@@ -18,14 +18,14 @@
  */
 package org.codedefenders.servlets.games;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.validation.code.CodeValidator;
-
-import java.io.File;
-import java.io.IOException;
 
 public interface IGameManagingUtils {
 

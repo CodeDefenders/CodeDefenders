@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -65,7 +65,7 @@
 
 	<build>
 		<filters>
-			<!-- This enables to read properties from this file and automagically 
+			<!-- This enables to read properties from this file and automagically
 				put their values in other files. For example, we use that to update: context.xml -->
 			<filter>${config.properties}</filter>
 		</filters>
@@ -150,7 +150,7 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<!-- <id>copy-dependencies</id> <phase>package</phase> <goals> <goal>copy-dependencies</goal> 
+						<!-- <id>copy-dependencies</id> <phase>package</phase> <goals> <goal>copy-dependencies</goal>
 							</goals> -->
 						<id>copy</id>
 						<phase>package</phase>
@@ -252,7 +252,7 @@
 							<outputDirectory>${data.dir}</outputDirectory>
 							<resources>
 								<resource>
-                                    <!-- Cannot do otherwise. Probably an ENV var like CD_HOME -->
+									<!-- Cannot do otherwise. Probably an ENV var like CD_HOME -->
 									<directory>../../../../../src/main/webapp/WEB-INF/data</directory>
 									<includes>
 										<include>build.xml</include>

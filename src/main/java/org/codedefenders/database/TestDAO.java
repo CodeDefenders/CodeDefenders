@@ -18,6 +18,14 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -26,14 +34,6 @@ import org.codedefenders.game.Test;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
@@ -123,7 +123,7 @@ public class TestDAO {
 
 
     /**
-     * Returns the {@link Test Tests} from the given game for the given player
+     * Returns the {@link Test Tests} from the given game for the given player.
      */
     public static List<Test> getTestsForGameAndPlayer(int gameId, int playerId)
             throws UncheckedSQLException, SQLMappingException {

@@ -1,8 +1,8 @@
 package org.codedefenders.beans.message;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import java.io.Serializable;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  * Represents a message shown on to a user on page load.
