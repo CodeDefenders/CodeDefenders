@@ -504,6 +504,8 @@
                 <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
                        id="maxAssertionsPerTest" min=1 required/>
             </div>
+        </div>
+        <div class="row"> <!--  Start: Force Assertions -->
             <div class="col-sm-2" id="forceHamcrestDiv">
                 <label class="label-normal" title="Force the use of Hamcrest for defining assertions in the game"
                        for="forceHamcrest">
