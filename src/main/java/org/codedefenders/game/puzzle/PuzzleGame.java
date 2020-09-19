@@ -18,6 +18,14 @@
  */
 package org.codedefenders.game.puzzle;
 
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -37,14 +45,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * Represents an instance of a {@link Puzzle puzzle}, which is played by one
@@ -67,6 +67,7 @@ public class PuzzleGame extends AbstractGame {
     private int maxAssertionsPerTest;
 
     private boolean forceHamcrest;
+    private boolean forceGoogleTruth;
 
     /**
      * Validation level used to check submitted mutants.
@@ -200,6 +201,7 @@ public class PuzzleGame extends AbstractGame {
         /* Other game attributes */
         this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
         this.forceHamcrest = puzzle.isForceHamcrest();
+        this.forceGoogleTruth= puzzle.isForceGoogleTruth();
 
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
@@ -214,7 +216,9 @@ public class PuzzleGame extends AbstractGame {
      * Constructor for reading a puzzle game from the database.
      */
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
-            int maxAssertionsPerTest, boolean forceHamcrest, CodeValidatorLevel mutantValidatorLevel, GameState state,
+            int maxAssertionsPerTest, //
+            boolean forceHamcrest, boolean forceGoogleTruth, //
+            CodeValidatorLevel mutantValidatorLevel, GameState state,
             int currentRound, Role activeRole) {
         /* AbstractGame attributes */
         this.cut = cut;
@@ -230,6 +234,7 @@ public class PuzzleGame extends AbstractGame {
         /* Other game attributes */
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.forceHamcrest = forceHamcrest;
+        this.forceGoogleTruth = forceGoogleTruth;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.currentRound = currentRound;
         this.activeRole = activeRole;
@@ -323,6 +328,10 @@ public class PuzzleGame extends AbstractGame {
 
     public boolean isForceHamcrest() {
         return forceHamcrest;
+    }
+
+    public boolean isForceGoogleTruth() {
+        return forceGoogleTruth;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {

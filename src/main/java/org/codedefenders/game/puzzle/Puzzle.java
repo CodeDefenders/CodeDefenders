@@ -55,7 +55,10 @@ public class Puzzle {
      * Maximum number of allowed assertions per submitted test.
      */
     private int maxAssertionsPerTest;
+
     private boolean forceHamcrest;
+    private boolean forceGoogleTruth;
+
     /**
      * Validation level used to check submitted mutants.
      */
@@ -117,7 +120,8 @@ public class Puzzle {
                   int classId,
                   Role activeRole,
                   GameLevel level,
-                  int maxAssertionsPerTest, boolean forceHamcrest,
+                  int maxAssertionsPerTest, //
+                  boolean forceHamcrest, boolean forceGoogleTruth,
                   CodeValidatorLevel mutantValidatorLevel,
                   Integer editableLinesStart,
                   Integer editableLinesEnd,
@@ -131,6 +135,7 @@ public class Puzzle {
         this.level = level;
         this.maxAssertionsPerTest = maxAssertionsPerTest;
         this.forceHamcrest = forceHamcrest;
+        this.forceGoogleTruth = forceGoogleTruth;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.editableLinesStart = editableLinesStart;
         this.editableLinesEnd = editableLinesEnd;
@@ -148,9 +153,11 @@ public class Puzzle {
                                        String description,
                                        int maxAssertionsPerTest,
                                        boolean forceHamcrest,
+                                       boolean forceGoogleTruth,
                                        Integer editableLinesStart,
                                        Integer editableLinesEnd) {
-        return new Puzzle(puzzleId, -1, null, null, maxAssertionsPerTest, forceHamcrest,
+        return new Puzzle(puzzleId, -1, null, null, maxAssertionsPerTest, //
+                forceHamcrest, forceGoogleTruth, //
             null, editableLinesStart, editableLinesEnd, chapterId, position, title, description);
     }
 
@@ -196,6 +203,10 @@ public class Puzzle {
 
     public boolean isForceHamcrest() {
         return this.forceHamcrest;
+    }
+
+    public boolean isForceGoogleTruth() {
+        return this.forceGoogleTruth;
     }
 
     public void setForceHamcrest(boolean forceHamcrest) {
