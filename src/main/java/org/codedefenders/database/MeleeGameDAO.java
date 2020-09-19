@@ -18,6 +18,10 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -28,10 +32,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * This class handles the database logic for melee games.
@@ -61,6 +61,7 @@ public class MeleeGameDAO {
         GameLevel level = GameLevel.valueOf(rs.getString("Level"));
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
         boolean forceHamcrest = rs.getBoolean("ForceHamcrest");
+        boolean forceGoogleTruth = rs.getBoolean("ForceGoogleTruth");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
         CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
@@ -74,7 +75,7 @@ public class MeleeGameDAO {
 
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
-        return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
+        return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest, forceGoogleTruth)
                 .cut(cut)
                 .id(id)
                 .state(state)

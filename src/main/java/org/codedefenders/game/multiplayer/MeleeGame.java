@@ -18,6 +18,10 @@
  */
 package org.codedefenders.game.multiplayer;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -36,10 +40,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
 
 public class MeleeGame extends AbstractGame {
 
@@ -88,6 +88,7 @@ public class MeleeGame extends AbstractGame {
     private boolean requiresValidation;
     private int maxAssertionsPerTest;
     private boolean forceHamcrest;
+    private boolean forceGoogleTruth;
 
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
@@ -108,6 +109,7 @@ public class MeleeGame extends AbstractGame {
         private final int creatorId;
         private final int maxAssertionsPerTest;
         private final boolean forceHamcrest;
+        private final boolean forceGoogleTruth;
 
         // optional values with default values
         private GameClass cut = null;
@@ -133,11 +135,12 @@ public class MeleeGame extends AbstractGame {
 
         private int automaticMutantEquivalenceThreshold = 0;
 
-        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest) {
+        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest, boolean forceGoogleTruth) {
             this.classId = classId;
             this.creatorId = creatorId;
             this.maxAssertionsPerTest = maxAssertionsPerTest;
             this.forceHamcrest = forceHamcrest;
+            this.forceGoogleTruth = forceGoogleTruth;
         }
 
         public Builder cut(GameClass cut) {
@@ -246,6 +249,7 @@ public class MeleeGame extends AbstractGame {
         this.requiresValidation = builder.requiresValidation;
         this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
         this.forceHamcrest = builder.forceHamcrest;
+        this.forceGoogleTruth = builder.forceGoogleTruth;
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
@@ -291,6 +295,10 @@ public class MeleeGame extends AbstractGame {
 
     public boolean isForceHamcrest() {
         return forceHamcrest;
+    }
+
+    public boolean isForceGoogleTruth() {
+        return forceGoogleTruth;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {
@@ -354,6 +362,7 @@ public class MeleeGame extends AbstractGame {
         }
     }
 
+    @Override
     public boolean addPlayer(int userId, Role role) {
         return canJoinGame(userId) && addPlayerForce(userId, role);
     }
@@ -450,6 +459,7 @@ public class MeleeGame extends AbstractGame {
         eventDAO.insert(notif);
     }
 
+    @Override
     public boolean insert() {
         try {
             this.id = meleeGameDAO.storeMeleeGame(this);
@@ -460,6 +470,7 @@ public class MeleeGame extends AbstractGame {
         }
     }
 
+    @Override
     public boolean update() {
         return meleeGameDAO.updateMeleeGame(this);
     }
