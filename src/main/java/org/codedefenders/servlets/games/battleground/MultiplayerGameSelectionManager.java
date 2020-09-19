@@ -159,7 +159,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             classId = getIntParameter(request, "class").get();
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
             forceHamcrest = parameterThenOrOther(request, "forceHamcrest", true, false);
-            forceGoogleTruth = parameterThenOrOther(request, "forceGoogleTruth ", true, false);
+            forceGoogleTruth = parameterThenOrOther(request, "forceGoogleTruth", true, false);
             automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel")
                     .map(CodeValidatorLevel::valueOrNull)

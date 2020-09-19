@@ -18,6 +18,43 @@
  */
 package org.codedefenders.servlets.games.melee;
 
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
+import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
@@ -64,42 +101,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
-import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 // TODO Alessio 18/02/2020: Differentiate between errorLines in the mutants and errorLines in the tests in the UI.
 //  See: https://gitlab.infosun.fim.uni-passau.de/se2/codedefenders/CodeDefenders/merge_requests/505#note_17170
@@ -364,7 +365,7 @@ public class MeleeGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
-                game.getMaxAssertionsPerTest(), game.isForceHamcrest());
+                game.getMaxAssertionsPerTest(), game.isForceHamcrest(), game.isForceGoogleTruth());
         boolean validationSuccess = validationMessages.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
@@ -781,7 +782,7 @@ public class MeleeGameManager extends HttpServlet {
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText,
-                    game.getMaxAssertionsPerTest(), game.isForceHamcrest());
+                    game.getMaxAssertionsPerTest(), game.isForceHamcrest(), game.isForceGoogleTruth());
             boolean validationSuccess = validationMessage.isEmpty();
 
             TestValidatedEvent tve = new TestValidatedEvent();
