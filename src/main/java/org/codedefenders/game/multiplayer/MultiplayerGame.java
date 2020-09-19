@@ -18,6 +18,15 @@
  */
 package org.codedefenders.game.multiplayer;
 
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
+
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -38,15 +47,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGame extends AbstractGame {
     /*
@@ -74,6 +74,7 @@ public class MultiplayerGame extends AbstractGame {
     private boolean requiresValidation;
     private int maxAssertionsPerTest;
     private boolean forceHamcrest;
+    private boolean forceGoogleTruth;
 
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
@@ -94,6 +95,7 @@ public class MultiplayerGame extends AbstractGame {
         private final int creatorId;
         private final int maxAssertionsPerTest;
         private final boolean forceHamcrest;
+        private final boolean forceGoogleTruth;
 
         // optional values with default values
         private GameClass cut = null;
@@ -117,11 +119,12 @@ public class MultiplayerGame extends AbstractGame {
 
         private int automaticMutantEquivalenceThreshold = 0;
 
-        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest) {
+        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest, boolean forceGoogleTruth) {
             this.classId = classId;
             this.creatorId = creatorId;
             this.maxAssertionsPerTest = maxAssertionsPerTest;
             this.forceHamcrest = forceHamcrest;
+            this.forceGoogleTruth = forceGoogleTruth;
         }
 
         public Builder cut(GameClass cut) {
@@ -238,6 +241,7 @@ public class MultiplayerGame extends AbstractGame {
         this.requiresValidation = builder.requiresValidation;
         this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
         this.forceHamcrest = builder.forceHamcrest;
+        this.forceGoogleTruth = builder.forceGoogleTruth;
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
@@ -293,6 +297,10 @@ public class MultiplayerGame extends AbstractGame {
         return forceHamcrest;
     }
 
+    public boolean isForceGoogleTruth() {
+        return forceGoogleTruth;
+    }
+
     public CodeValidatorLevel getMutantValidatorLevel() {
         return mutantValidatorLevel;
     }
@@ -331,6 +339,7 @@ public class MultiplayerGame extends AbstractGame {
         return attackers;
     }
 
+    @Override
     public boolean addPlayer(int userId, Role role) {
         return canJoinGame(userId) && addPlayerForce(userId, role);
     }
@@ -367,6 +376,7 @@ public class MultiplayerGame extends AbstractGame {
         return !requiresValidation || UserDAO.getUserById(userId).isValidated();
     }
 
+    @Override
     public boolean insert() {
         try {
             this.id = MultiplayerGameDAO.storeMultiplayerGame(this);
@@ -377,6 +387,7 @@ public class MultiplayerGame extends AbstractGame {
         }
     }
 
+    @Override
     public boolean update() {
         return MultiplayerGameDAO.updateMultiplayerGame(this);
     }

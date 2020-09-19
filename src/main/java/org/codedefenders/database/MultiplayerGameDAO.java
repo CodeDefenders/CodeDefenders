@@ -18,6 +18,11 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -27,12 +32,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import static org.codedefenders.database.DB.RSMapper;
 
 /**
  * This class handles the database logic for multiplayer games.
@@ -64,6 +63,7 @@ public class MultiplayerGameDAO {
         GameLevel level = GameLevel.valueOf(rs.getString("Level"));
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
         boolean forceHamcrest = rs.getBoolean("ForceHamcrest");
+        boolean forceGoogleTruth = rs.getBoolean("ForceGoogleTruth");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
         CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
@@ -75,7 +75,7 @@ public class MultiplayerGameDAO {
 
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
-        return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
+        return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest, forceGoogleTruth)
                 .cut(cut)
                 .id(id)
                 .state(state)
