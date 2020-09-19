@@ -513,6 +513,15 @@
                        class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
                        data-onstyle="primary" data-offstyle="">
             </div>
+            <div class="col-sm-2" id="forceGoogleTruthDiv">
+                <label class="label-normal" title="Force the use of Google Truth for defining assertions in the game"
+                       for="forceGoogleTruth">
+                    Force Use of Google Truth
+                </label>
+                <input type="checkbox" id="forceGoogleTruth" name="forceGoogleTruth"
+                       class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                       data-onstyle="primary" data-offstyle="">
+            </div>
         </div>
         <br>
         <div class="row"><!--  Start: Automatic Equivalence Duels Trigger -->

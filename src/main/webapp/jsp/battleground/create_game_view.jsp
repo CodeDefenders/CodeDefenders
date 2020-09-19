@@ -131,6 +131,16 @@
                 </td>
             </tr>
             <tr>
+                <td title="Force the use of Google Truth to define assertions">
+                    Force Use of Google Truth
+                </td>
+                <td id="forceGoogleTruthTd">
+                    <input type="checkbox" id="forceGoogleTruth" name="forceGoogleTruth"
+                           class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
+                           data-onstyle="primary" data-offstyle="">
+                </td>
+            </tr>
+            <tr>
                 <td title="Click the question sign for more information on the levels">
                     Mutant validator
                 </td>
