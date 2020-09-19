@@ -392,23 +392,23 @@ public class PuzzleGame extends AbstractGame {
     @Override
     public boolean addPlayer(int userId, Role role) {
         switch (userId) {
-        case DUMMY_ATTACKER_USER_ID:
-            if (role != Role.ATTACKER) {
-                logger.warn("Tried adding dummy attacker to puzzle game with wrong role: " + role);
-                return false;
-            }
-            break;
-        case DUMMY_DEFENDER_USER_ID:
-            if (role != Role.DEFENDER) {
-                logger.warn("Tried adding dummy defender to puzzle game with wrong role: " + role);
-                return false;
-            }
-            break;
-        default:
-            if (role != activeRole) {
-                logger.warn("Tried adding player to puzzle game with wrong role: " + role);
-                return false;
-            }
+            case DUMMY_ATTACKER_USER_ID:
+                if (role != Role.ATTACKER) {
+                    logger.warn("Tried adding dummy attacker to puzzle game with wrong role: " + role);
+                    return false;
+                }
+                break;
+            case DUMMY_DEFENDER_USER_ID:
+                if (role != Role.DEFENDER) {
+                    logger.warn("Tried adding dummy defender to puzzle game with wrong role: " + role);
+                    return false;
+                }
+                break;
+            default:
+                if (role != activeRole) {
+                    logger.warn("Tried adding player to puzzle game with wrong role: " + role);
+                    return false;
+                }
         }
 
         return GameDAO.addPlayerToGame(id, userId, role);
