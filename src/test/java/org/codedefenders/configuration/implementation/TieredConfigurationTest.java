@@ -19,16 +19,12 @@
 
 package org.codedefenders.configuration.implementation;
 
-import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver;
+import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class TieredConfigurationTest {
 
@@ -36,41 +32,61 @@ public class TieredConfigurationTest {
 
     @Before
     public void prepareObjects() {
-        StubConfigFileResolver configFile1 = new StubConfigFileResolver();
-        configFile1.setConfigFileContent(
-                "cluster.timeout=4\n"
-                        + "cluster.mode=enabled\n"
-                        + "db.name=otherName\n"
-                        + "force.local.execution=false");
-        PropertiesFileConfiguration configPart1 = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(configFile1)));
-        configPart1.init();
+        BaseConfiguration config1 = new BaseConfiguration() {
+            @Override
+            protected Object resolveAttribute(String camelCaseName) {
+                switch (camelCaseName) {
+                    case "clusterTimeout":
+                        return 2;
+                    case "dbUsername":
+                        return "testDatabaseUser";
+                    case "blockAttacker":
+                        return true;
+                    case "mutantCoverage":
+                        return false;
+                    default:
+                        return null;
+                }
+            }
+        };
+        config1.init();
 
-        StubConfigFileResolver configFile2 = new StubConfigFileResolver();
-        configFile2.setConfigFileContent(
-                "cluster.timeout=8\n"
-                        + "db.name=codedefenders\n"
-                        + "db.username=testDatabaseUser\n"
-                        + "force.local.execution=false");
-        PropertiesFileConfiguration configPart2 = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(configFile2)));
-        configPart2.init();
+        BaseConfiguration config2 = new BaseConfiguration() {
+            @Override
+            protected Object resolveAttribute(String camelCaseName) {
+                switch (camelCaseName) {
+                    case "clusterTimeout":
+                        return 4;
+                    case "dbPassword":
+                        return "123456789";
+                    case "blockAttacker":
+                        return false;
+                    case "mutantCoverage":
+                        return true;
+                    default:
+                        return null;
+                }
+            }
+        };
+        config2.init();
 
-        config = new TieredConfiguration(new ArrayList<>(Arrays.asList(configPart1, configPart2)));
+        config = new TieredConfiguration(Arrays.asList(config1, config2));
         config.init();
     }
 
     @Test
-    public void accessLoadedIntegerProperty() {
-        assertEquals(8, config.getClusterTimeout());
-    }
-
-    @Test
-    public void accessLoadedStringProperty() {
+    public void lowerOnlyPropertyAccess() {
         assertEquals("testDatabaseUser", config.getDbUsername());
     }
 
     @Test
-    public void accessLoadedBooleanProperty() {
-        assertTrue(config.isClusterModeEnabled());
-        assertFalse(config.isForceLocalExecution());
+    public void upperOnlyPropertyAccess() {
+        assertEquals("123456789", config.getDbPassword());
     }
+
+    @Test
+    public void overwrittenPropertyAccess() {
+        assertEquals(4, config.getClusterTimeout());
+    }
+
 }
