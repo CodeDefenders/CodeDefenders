@@ -22,7 +22,6 @@ package org.codedefenders.configuration;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
@@ -92,12 +91,24 @@ public class Configuration {
         // assert getAntHome().isDirectory();
         // assert getDataDir().isDirectory();
 
-        //noinspection UnstableApiUsage
-        basicValidation(validationErrors, dbHost, "dbHost",
-                h -> InetAddresses.isUriInetAddress(h) || InternetDomainName.isValid(h),
-                "is neither a valid ip nor a valid hostname");
+        if (dataDir == null) {
+            validationErrors.add("Property " + resolveAttributeName("dataDir") + "is missing");
+        }
 
-        basicValidation(validationErrors, dbPort, "dbPort", p -> p <= 0 | p > 65535, "is not a valid port number");
+        if (dbHost == null) {
+            validationErrors.add("Property " + resolveAttributeName("dbHost") + " is missing");
+        } else { //noinspection UnstableApiUsage
+            if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
+                validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
+                        + " is neither a valid ip nor a valid hostname");
+            }
+        }
+
+        if (dbPort == null) {
+            validationErrors.add("Property " + resolveAttributeName("dbPort") + " is missing");
+        } else if (dbPort <= 0 | dbPort > 65535) {
+            validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort + " is not a valid port number");
+        }
 
         if (getJavaMajorVersion() > 9) {
             validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 9");
@@ -106,27 +117,10 @@ public class Configuration {
         //if (clusterMode) {
         //    // TODO: Validate clusterOptions
         //}
+
+
         if (!validationErrors.isEmpty()) {
             throw new ConfigurationValidationException(validationErrors);
-        }
-    }
-
-    /**
-     * This method provides a common pattern for checking a configuration value, including a preceding null check.
-     *
-     * @param validationErrors The set with validation messages.
-     * @param variable         The variable to validate.
-     * @param variableName     The name of the variable in camelCase.
-     * @param isValid          A predicate which determines if the variable is valid.
-     * @param failureMessage   The message which will be attached to the validationErrors if isValid returns false.
-     * @param <T>              The type of the variable.
-     */
-    private <T> void basicValidation(Set<String> validationErrors, T variable, String variableName,
-            Predicate<T> isValid, String failureMessage) {
-        if (variable == null) {
-            validationErrors.add("Property " + resolveAttributeName(variableName) + " is missing");
-        } else if (!isValid.test(variable)) {
-            validationErrors.add(resolveAttributeName(variableName) + ": " + variable + " " + failureMessage);
         }
     }
 
@@ -183,7 +177,11 @@ public class Configuration {
     }
 
     public int getClusterTimeout() {
-        return clusterTimeout;
+        if (clusterTimeout == null) {
+            return -1;
+        } else {
+            return clusterTimeout;
+        }
     }
 
     public boolean isForceLocalExecution() {
