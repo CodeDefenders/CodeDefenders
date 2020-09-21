@@ -16,7 +16,7 @@ Properties are loaded from:
 5. A location specified in the `codedefenders.config` system property.
 6. A location specified in the `CODEDEFENDERS_CONFIG` environment.
 7. The `codedefenders.properties` file in the `$CATALINA_BASE/conf` directory
-8. The `codedefenders.properties` file in the classpath. (e.g.: `example.property`)  
+8. The `codedefenders.properties` file in the classpath.  
 (More precisely the `src/main/resources/codedefenders.properties` file which provides default values)
 
 
@@ -41,3 +41,38 @@ This enables the following migration schema:
   Removal of `old.property`.
   `new.property` now has the default value of `default`.
   The application is configured to use `new.property` with value `other`.
+
+
+## Running multiple instances of CodeDefenders on the same Tomcat server
+
+To have different configuration files for each instance you have to configure the file location via the `java:comp/env/codedefenders/config` JNDI attribute.  
+This can (in tomcat) be set on a per instance basis through a `.xml` file located at `$CATALINA_BASE/conf/[enginename]/[hostname]/[context path].xml`.
+
+For running two instances of codedefenders on a Debian 10 host with the context paths `/` and `test` you would deploy the following files:
+
+`/var/lib/conf/catalina/localhost/ROOT.xml`  
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Environment
+            name="codedefenders/config"
+            type="java.lang.String"
+            value="/var/lib/conf/codedefenders-prod.properties"/>
+</Context>
+```
+
+and 
+
+`/var/lib/conf/catalina/localhost/test.xml`  
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <Environment
+            name="codedefenders/config"
+            type="java.lang.String"
+            value="/var/lib/conf/codedefenders-test.properties"/>
+</Context>
+```
+
+and then configure them via the `/var/lib/conf/codedefenders-prod.properties` and `/var/lib/conf/codedefenders-test.properties` files.  
+Configuration common to both instances (like `ant.home`) can be configured through the default `/var/lib/conf/codedefenders.properties` file.

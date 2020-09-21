@@ -2,42 +2,47 @@
 
 This is Code Defenders, a mutation testing game. Publicly available at [code-defenders.org](<http://code-defenders.org>).
 
-# Installation
+## Installation & Configuration
 
-## Software Requirements
+### Software Requirements
 
-- Tomcat Server (Version 7 or later)
+- Java (Version 8) <!-- 9 Doesn't count as it is EOL-->
+- Tomcat Server (Version 9)
 - Apache Maven
 - Apache Ant
 - MySQL (e.g. [MariaDB](https://mariadb.org/))
 
-## Installation and Setup
-### Configuration
+### Setup
 
-CodeDefenders can be configured in multiple places. You can choose between a `codedefenders.properties`, container context,
-environment variables or system properties.
+This guide assumes:
+ - you are running Debian 10 as OS
+ - you installed all the required software
 
-### codedefenders.properties file
+#### Modify the configuration
 
-The maybe simplest option is to place a `codedefenders.properties` file in `CATAlINA_BASE/config`. (In debian 10 this defaults to `/var/lib/tomcat9/config` which is a symlink to `/etc/tomcat9/`)
+Copy the `codedefenders-example.properties` file to `/var/lib/tomcat9/conf/codedefenders.properties` and set the values to match your environment.  
+The only required value is `data.dir`, all other properties have sensible default values.
 
-You can copy the `codedefenders.properties.example` file, which lists all available properties together with their sensible default value.
-To overwrite a value simply uncomment the line and change the value.
+#### Adapt the systemd service
 
+On Debian 10 tomcat9 by default has only very limited write permissions.  
+To allow the `data.dir` to be located outside of the `/var/lib/tomcat9/webapps/` folder hierarchie you have to `systemctl edit tomcat9` and add the following code:  
+```ini
+[Service]
+ReadWritePaths="<data.dir path>"
+```
 
-### Database
+#### Setup the database
 
 The MySQL or MariaDB database and the user to access the database have to be created before the first run.
 
+#### Run the installation script
 
-<!-- TODO This section (and the install script) needs updates -->
-### Installation script
-
-To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input.
+To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `codedefenders.properties` file as input.
 
 ```bash
 cd installation
-./setup.sh ../config.properties
+./setup.sh /var/lib/tomcat9/conf/codedefenders.properties
 ```
 
 The script performs a basic availability check of required software. The data directory folder structure and database schema are created. All the required dependencies and files are automatically downloaded.
@@ -51,15 +56,7 @@ If any installation step fails, the installation process aborts and prints an er
 ```ERROR 1142 (42000) at line 183: INDEX command denied to user```
 
 
-### Tomcat User Management
-For deployment, Tomcat requires a user with `manager-script` role, which be be configured in `$CATALINA_HOME/conf/tomcat-users.xml` (`CATALINA_HOME` is the Tomcat installation directory).
-
-```xml
-<role rolename="manager-script"/>
-<user username="<MY_USER>" password="<MY_USER_PASSWORD>" roles="manager-script"/>
-```
-
-### Set up Code Defenders admin users
+#### Set up Code Defenders admin users
 Code Defenders relies on the Tomcat authentication system to identify admin users, who can access protected pages and customize Code Defenders settings.
 Access control is enforced through Tomcat using Basic Authentication in the browser.
 Adding a tomcat admin can be done by applying the `manager-gui` role to a user.
@@ -76,19 +73,29 @@ All system configuration and privileged features are accessible for admin users 
 * System settings: Customize technical aspects of Code Defenders and include several advanced settings.
 
 
-## Build and Deployment
+### Build and Deployment
 
 For successful deployment, both Tomcat and MySQL services must be running.
+
+To deploy you simply need to copy the `codedefenders.war` file to the tomcat `webapps` directory, with the context path as name.  
+E.g to deploy codedefenders at the tomcat root path (`http://localhost:8080/`) you can simply `cp target/codedefenders.war /var/lib/tomcat9/webapps/ROOT.war`
+
+You can either download the `codedefenders.war` file from the latest [release](https://github.com/CodeDefenders/CodeDefenders/releases/) or build it yourself with `mvn clean package -DskipTests`.
+
+
+Alternatively you can automatic deploy with maven. For this, Tomcat requires a user with `manager-script` role, which can be configured in `$CATALINA_BASE/conf/tomcat-users.xml` (`CATALINA_BASE` is the Tomcat installation directory).
+
+```xml
+<role rolename="manager-script"/>
+<user username="<MY_USER>" password="<MY_USER_PASSWORD>" roles="manager-script"/>
+```
+
+**Note:** This requires the tomcat manager application to be installed, which on Debian is provided by the `tomcat9-admin` package.
+
 Code Defenders is built and deployed with Maven using the following commands.
 
 ```bash
 mvn clean deploy -DskipTests
-```
-
-If you want to deploy the `.war` file by yourself its enough to execute:
-
-```bash
-mvn clean package -DskipTests
 ```
 
 If you want to run the tests be sure the library `libncurses.so.5` is present on your system as the database tests depend on it.
@@ -178,7 +185,7 @@ A minimum of reliability is guaranteed by automatically restarting the container
 If you need more instances or if you need to customize the deployment, you must update the Docker and various configurations files under the ```/docker``` folder. But at that point your are on your own.
 
 
-# Project Import
+## Project Import
 
 Code Defenders and most of its dependencies are handled via Maven. Code Defenders can also be imported into common IDEs (e.g., IntelliJ and Eclipse).
 
@@ -196,7 +203,7 @@ TODO: Do we really need this?
   - Run -> Edit Configurations... -> Add New Tomcat Server configuration -> Add \`Build artifact\` in \`Before launch\` panel and check On Update action: Redeploy. -> OK
 -->
 
-# FAQ
+## FAQ
 ### Q: When I try to create a BattleGround, I got a 500 error page
 Code Defenders requires Java 1.8 also to compile the JSP. This is not the default options in many tomcat versions, despite you run tomcat on Java 1.8+.
 
