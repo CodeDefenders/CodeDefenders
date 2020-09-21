@@ -19,14 +19,11 @@
 
 package org.codedefenders.configuration.implementation;
 
-import org.codedefenders.configuration.ConfigurationValidationException;
+import java.util.Arrays;
+
 import org.codedefenders.configuration.configfileresolver.StubConfigFileResolver;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -34,45 +31,67 @@ import static org.junit.Assert.assertTrue;
 
 public class PropertiesFileConfigurationTest {
 
-    private PropertiesFileConfiguration config;
+    private PropertiesFileConfiguration config1;
+    private PropertiesFileConfiguration config2;
+    private PropertiesFileConfiguration configMerged;
 
     @Before
     public void prepareObjects() {
-        StubConfigFileResolver mCfgFileResolver = new StubConfigFileResolver();
-        mCfgFileResolver.setConfigFileContent(
-                "cluster.timeout=4\n"
+        StubConfigFileResolver mCfgFileResolver1 = new StubConfigFileResolver();
+        mCfgFileResolver1.setConfigFileContent(
+                "cluster.timeout=2\n"
                         + "db.username=testDatabaseUser\n"
-                        + "cluster.mode=enabled\n"
-                        + "force.local.execution=false");
+                        + "block.attacker=true\n"
+                        + "mutant.coverage=false\n");
+        StubConfigFileResolver mCfgFileResolver2 = new StubConfigFileResolver();
+        mCfgFileResolver2.setConfigFileContent(
+                "cluster.timeout=4\n"
+                        + "db.password=123456789\n"
+                        + "block.attacker=disabled\n"
+                        + "mutant.coverage=enabled\n");
 
-        config = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(mCfgFileResolver)));
-        config.init();
+        config1 = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolver1));
+        config1.init();
+
+        config2 = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolver2));
+        config2.init();
+
+        configMerged = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolver1, mCfgFileResolver2));
+        configMerged.init();
     }
 
     @Test
-    public void accessLoadedIntegerProperty() {
-        assertEquals(4, config.getClusterTimeout());
+    public void lowerOnlyPropertyAccess() {
+        assertEquals("testDatabaseUser", configMerged.getDbUsername());
     }
 
     @Test
-    public void accessLoadedStringProperty() {
-        assertEquals("testDatabaseUser", config.getDbUsername());
+    public void upperOnlyPropertyAccess() {
+        assertEquals("123456789", configMerged.getDbPassword());
     }
 
     @Test
-    public void accessLoadedBooleanProperty() {
-        assertTrue(config.isClusterModeEnabled());
-        assertFalse(config.isForceLocalExecution());
+    public void overwrittenPropertyAccess() {
+        assertEquals(4, configMerged.getClusterTimeout());
     }
 
-    @Test(expected = ConfigurationValidationException.class)
-    public void loadInvalidConfig() throws ConfigurationValidationException {
-        StubConfigFileResolver mCfgFileResolver = new StubConfigFileResolver();
-        mCfgFileResolver.setConfigFileContent("db.host=157.1646846.456.568\n"
-                + "db.port=65537");
+    @Test
+    public void simpleBooleanParsingTrue() {
+        assertTrue(config1.isBlockAttacker());
+    }
 
-        config = new PropertiesFileConfiguration(new ArrayList<>(Arrays.asList(mCfgFileResolver)));
-        config.init();
-        config.validate();
+    @Test
+    public void simpleBooleanParsingFalse() {
+        assertFalse(config1.isMutantCoverage());
+    }
+
+    @Test
+    public void legacyBooleanParsingTrue() {
+        assertTrue(config2.isMutantCoverage());
+    }
+
+    @Test
+    public void legacyBooleanParsingFalse() {
+        assertFalse(config2.isBlockAttacker());
     }
 }
