@@ -42,6 +42,13 @@
     scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
+<jsp:useBean id="historyboard" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
+<%
+    scoreboard.setGameId(game.getId());
+    scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+    scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+%>
+
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
 
 <%-- Push notifications using WebSocket --%>
