@@ -19,16 +19,19 @@
 
 package org.codedefenders.configuration;
 
-import com.google.common.net.InetAddresses;
-import com.google.common.net.InternetDomainName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.inject.Alternative;
-import javax.inject.Singleton;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
+
+import javax.enterprise.inject.Alternative;
+import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.net.InetAddresses;
+import com.google.common.net.InternetDomainName;
 
 /**
  * This class is the central place for accessing and defining the configuration for this application.<br><br>
@@ -90,14 +93,11 @@ public class Configuration {
         // assert getDataDir().isDirectory();
 
         //noinspection UnstableApiUsage
-        if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
-            validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
-                    + " is neither a valid ip address nor a valid hostname");
-        }
-        if (dbPort <= 0 || dbPort > 65535) {
-            validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort
-                    + " is not a valid port number");
-        }
+        basicValidation(validationErrors, dbHost, "dbHost",
+                h -> InetAddresses.isUriInetAddress(h) || InternetDomainName.isValid(h),
+                "is neither a valid ip nor a valid hostname");
+
+        basicValidation(validationErrors, dbPort, "dbPort", p -> p <= 0 | p > 65535, "is not a valid port number");
 
         if (getJavaMajorVersion() > 9) {
             validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 9");
@@ -108,6 +108,25 @@ public class Configuration {
         //}
         if (!validationErrors.isEmpty()) {
             throw new ConfigurationValidationException(validationErrors);
+        }
+    }
+
+    /**
+     * This method provides a common pattern for checking a configuration value, including a preceding null check.
+     *
+     * @param validationErrors The set with validation messages.
+     * @param variable         The variable to validate.
+     * @param variableName     The name of the variable in camelCase.
+     * @param isValid          A predicate which determines if the variable is valid.
+     * @param failureMessage   The message which will be attached to the validationErrors if isValid returns false.
+     * @param <T>              The type of the variable.
+     */
+    private <T> void basicValidation(Set<String> validationErrors, T variable, String variableName,
+            Predicate<T> isValid, String failureMessage) {
+        if (variable == null) {
+            validationErrors.add("Property " + resolveAttributeName(variableName) + " is missing");
+        } else if (!isValid.test(variable)) {
+            validationErrors.add(resolveAttributeName(variableName) + ": " + variable + " " + failureMessage);
         }
     }
 
