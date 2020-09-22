@@ -1,18 +1,11 @@
 package org.codedefenders.beans.game;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.puzzle.Puzzle;
-import org.codedefenders.model.Dependency;
-import org.codedefenders.util.FileUtils;
-
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.puzzle.Puzzle;
 
 /**
  * <p>Provides data for the test editor game component.</p>

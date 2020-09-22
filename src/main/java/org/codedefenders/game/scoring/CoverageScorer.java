@@ -18,14 +18,14 @@
  */
 package org.codedefenders.game.scoring;
 
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 /**
  * Created by thoma on 07/07/2016.

@@ -19,15 +19,16 @@
 
 package org.codedefenders.dto;
 
-import com.google.gson.annotations.Expose;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.User;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.gson.annotations.Expose;
 
 public class TestDTO {
     @Expose

@@ -1,5 +1,8 @@
 package org.codedefenders.notification.handling;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang.NotImplementedException;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.Role;
@@ -18,9 +21,6 @@ import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.notification.web.PushSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Container for {@link ServerEventHandler ServerEventHandlers},

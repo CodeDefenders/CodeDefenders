@@ -18,13 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
@@ -39,6 +32,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 

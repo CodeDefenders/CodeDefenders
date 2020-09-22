@@ -18,14 +18,6 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.game.Role;
-import org.codedefenders.game.leaderboard.Entry;
-import org.codedefenders.model.User;
-import org.codedefenders.model.UserInfo;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
-import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -33,6 +25,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.codedefenders.game.Role;
+import org.codedefenders.game.leaderboard.Entry;
+import org.codedefenders.model.User;
+import org.codedefenders.model.UserInfo;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE;
 
 public class AdminDAO {
 

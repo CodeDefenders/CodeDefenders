@@ -18,6 +18,10 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -27,10 +31,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 
 import static org.codedefenders.database.DB.RSMapper;
 

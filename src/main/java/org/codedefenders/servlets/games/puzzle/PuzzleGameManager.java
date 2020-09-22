@@ -18,6 +18,18 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.Message;
@@ -57,17 +69,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;

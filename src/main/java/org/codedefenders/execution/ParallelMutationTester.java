@@ -18,6 +18,20 @@
  */
 package org.codedefenders.execution;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+
+import javax.enterprise.inject.Alternative;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.UserDAO;
@@ -32,19 +46,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.enterprise.inject.Alternative;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 
 import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;

@@ -18,12 +18,12 @@
  */
 package org.codedefenders.model;
 
-import org.codedefenders.game.puzzle.PuzzleChapter;
-import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
-
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
 
 /**
  * This class is a wrapper around {@link PuzzleChapter} and a sorted set of

@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.google.gson.annotations.Expose;
-import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.model.User;
 import org.codedefenders.util.Constants;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * Saves data for the game highlighting in order to convert it to JSON.

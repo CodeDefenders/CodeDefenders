@@ -18,16 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.FeedbackDAO;
-import org.codedefenders.model.Feedback;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +29,16 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.FeedbackDAO;
+import org.codedefenders.model.Feedback;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebServlet(Paths.API_FEEDBACK)
 public class FeedbackManager extends HttpServlet {

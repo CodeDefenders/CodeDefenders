@@ -18,15 +18,15 @@
  */
 package org.codedefenders.servlets.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class offers static methods, which offer functionality useful for {@link HttpServlet} implementations.

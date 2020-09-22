@@ -1,8 +1,9 @@
 package org.codedefenders.notification.events.client.registration;
 
-import com.google.gson.annotations.Expose;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * A message used to register for chat events.

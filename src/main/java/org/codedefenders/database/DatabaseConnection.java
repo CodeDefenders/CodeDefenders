@@ -18,11 +18,12 @@
  */
 package org.codedefenders.database;
 
-import javax.enterprise.inject.spi.CDI;
 import java.sql.Connection;
+
+import org.codedefenders.util.CDIUtil;
 
 public class DatabaseConnection {
     public static Connection getConnection() {
-        return CDI.current().select(Connection.class).get();
+        return CDIUtil.getBeanFromCDI(Connection.class);
     }
 }

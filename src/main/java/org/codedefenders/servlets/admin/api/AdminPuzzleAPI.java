@@ -18,28 +18,6 @@
  */
 package org.codedefenders.servlets.admin.api;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
-
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.puzzle.Puzzle;
-import org.codedefenders.game.puzzle.PuzzleChapter;
-import org.codedefenders.model.PuzzleInfo;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Path;
@@ -53,6 +31,28 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.model.PuzzleInfo;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
 /**
  * HTTP based JSON API for {@link Puzzle Puzzles} and {@link PuzzleChapter PuzzleChapters}.

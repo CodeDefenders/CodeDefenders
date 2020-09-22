@@ -18,6 +18,10 @@
  */
 package org.codedefenders.game.multiplayer;
 
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -38,10 +42,6 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;

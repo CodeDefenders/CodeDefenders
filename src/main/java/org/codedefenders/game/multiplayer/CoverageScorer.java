@@ -18,15 +18,15 @@
  */
 package org.codedefenders.game.multiplayer;
 
+import java.util.List;
+
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.scoring.Scorer;
 
-import java.util.List;
-
 /**
  * Created by thoma on 27/06/2016.
- * 
+ *
  */
 @Deprecated
 public class CoverageScorer extends Scorer {

@@ -1,17 +1,18 @@
 package org.codedefenders.beans.game;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
-
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>Provides data for the class viewer game component.</p>

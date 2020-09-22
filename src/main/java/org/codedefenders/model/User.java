@@ -18,15 +18,15 @@
  */
 package org.codedefenders.model;
 
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 
 public class User implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(User.class);

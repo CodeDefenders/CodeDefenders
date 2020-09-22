@@ -1,7 +1,8 @@
 package org.codedefenders.notification.events.client.registration;
 
-import com.google.gson.annotations.Expose;
 import org.codedefenders.notification.events.client.ClientEvent;
+
+import com.google.gson.annotations.Expose;
 
 /**
  * A message used to register for certain types of notifications events.

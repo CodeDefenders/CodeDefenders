@@ -18,10 +18,9 @@
  */
 package org.codedefenders.servlets.auth;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.util.Paths;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -34,9 +33,11 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * TODO We do not use anymore this class, but I keep it here because there might

@@ -18,16 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Role;
-import org.codedefenders.model.Dependency;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.ZipFileUtils;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,6 +36,16 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Role;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.ZipFileUtils;
 
 /**
  * This {@link HttpServlet} handles requests for exporting a {@link GameClass}

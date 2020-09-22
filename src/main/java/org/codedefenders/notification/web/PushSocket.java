@@ -18,17 +18,7 @@
  */
 package org.codedefenders.notification.web;
 
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
-import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.ITicketingService;
-import org.codedefenders.notification.events.EventNames;
-import org.codedefenders.notification.events.client.ClientEvent;
-import org.codedefenders.notification.events.server.ServerEvent;
-import org.codedefenders.notification.handling.ClientEventHandler;
-import org.codedefenders.notification.handling.ServerEventHandlerContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -44,7 +34,19 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
-import java.io.IOException;
+
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.ITicketingService;
+import org.codedefenders.notification.events.EventNames;
+import org.codedefenders.notification.events.client.ClientEvent;
+import org.codedefenders.notification.events.server.ServerEvent;
+import org.codedefenders.notification.handling.ClientEventHandler;
+import org.codedefenders.notification.handling.ServerEventHandlerContainer;
+import org.codedefenders.util.CDIUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -81,8 +83,8 @@ import java.io.IOException;
 // @RequestScoped -> TODO What's this?
 @ServerEndpoint(
         value = "/notifications/{ticket}/{userId}",
-        encoders = { EventEncoder.class },
-        decoders = { EventDecoder.class })
+        encoders = {EventEncoder.class},
+        decoders = {EventDecoder.class})
 public class PushSocket {
     // TODO Make an Inject for this
     private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
@@ -106,27 +108,20 @@ public class PushSocket {
 
     public PushSocket() {
         // Since @Inject does not work with WebSocket ...
-        BeanManager bm = CDI.current().getBeanManager();
-        Bean bean;
-        CreationalContext ctx;
 
-        bean = bm.getBeans(INotificationService.class).iterator().next();
-        ctx = bm.createCreationalContext(bean);
-        notificationService = (INotificationService) bm.getReference(bean, INotificationService.class, ctx);
+        notificationService = CDIUtil.getBeanFromCDI(INotificationService.class);
 
-        bean = bm.getBeans(ITicketingService.class).iterator().next();
-        ctx = bm.createCreationalContext(bean);
-        ticketingServices = (ITicketingService) bm.getReference(bean, ITicketingService.class, ctx);
+        ticketingServices = CDIUtil.getBeanFromCDI(ITicketingService.class);
 
         open = false;
     }
 
     @OnOpen
     public synchronized void open(Session session,
-                                  @PathParam("ticket") String ticket,
-                                  @PathParam("userId") Integer userId) throws IOException {
+            @PathParam("ticket") String ticket,
+            @PathParam("userId") Integer userId) throws IOException {
 
-        if (! ticketingServices.validateTicket(ticket, userId)) {
+        if (!ticketingServices.validateTicket(ticket, userId)) {
             logger.info("Invalid ticket " + ticket + " for session " + session);
             session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
             return;

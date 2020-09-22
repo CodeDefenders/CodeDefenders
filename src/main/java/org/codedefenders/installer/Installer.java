@@ -62,6 +62,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
@@ -96,7 +97,7 @@ public class Installer {
 
     /**
      * This exposes a File object when running in standalone mode, so the ConfigFileResolverProducer can consider this
-     *   when creating the config.
+     * when creating the config.
      */
     public static File configFile = null;
 
@@ -149,7 +150,7 @@ public class Installer {
         new Weld().initialize();
 
         // No need to create the zip file, we can directly use the "exploded" directory
-        Installer installer = CDI.current().select(Installer.class).get();
+        Installer installer = CDIUtil.getBeanFromCDI(Installer.class);
         installer.installPuzzles(commandLine.getBundleDirectory().toPath());
 
         // Weld will be automatically closed at system.exit

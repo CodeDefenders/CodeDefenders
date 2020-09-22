@@ -18,11 +18,11 @@
  */
 package org.codedefenders.execution;
 
+import java.io.File;
+
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-
-import java.io.File;
 
 public interface ClassCompilerService {
 

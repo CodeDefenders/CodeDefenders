@@ -18,6 +18,12 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
@@ -30,12 +36,6 @@ import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.codedefenders.database.DB.RSMapper;
 

@@ -19,6 +19,8 @@
 
 package org.codedefenders.service.game;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
@@ -27,8 +29,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
-
-import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class PuzzleGameService extends AbstractGameService {

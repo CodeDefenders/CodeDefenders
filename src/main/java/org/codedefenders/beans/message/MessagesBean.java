@@ -1,12 +1,13 @@
 package org.codedefenders.beans.message;
 
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.SessionScoped;
-import javax.inject.Named;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 
 /**
  * <p>Implements a container for messages that are displayed to the user on page load.</p>

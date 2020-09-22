@@ -18,14 +18,6 @@
  */
 package org.codedefenders.servlets.api;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-import org.apache.commons.httpclient.HttpStatus;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.servlets.util.ServletUtils;
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
@@ -35,6 +27,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.httpclient.HttpStatus;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.servlets.util.ServletUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 /**
  * This {@link HttpServlet} offers an API for {@link Mutant mutants}.

@@ -18,19 +18,19 @@
  */
 package org.codedefenders.notification.impl;
 
+import java.util.concurrent.Executors;
+
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 
-import com.google.common.eventbus.AsyncEventBus;
-import com.google.common.eventbus.SubscriberExceptionHandler;
-import com.google.gson.Gson;
 import org.codedefenders.notification.INotificationService;
-
-import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executors;
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.SubscriberExceptionHandler;
+import com.google.gson.Gson;
 
 /**
  * Notification Service implementation.

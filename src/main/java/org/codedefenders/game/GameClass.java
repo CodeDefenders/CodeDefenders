@@ -18,17 +18,6 @@
  */
 package org.codedefenders.game;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.Range;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.model.Dependency;
-import org.codedefenders.util.FileUtils;
-import org.codedefenders.util.analysis.ClassCodeAnalyser;
-import org.codedefenders.util.analysis.CodeAnalysisResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +29,17 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.Range;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.util.FileUtils;
+import org.codedefenders.util.analysis.ClassCodeAnalyser;
+import org.codedefenders.util.analysis.CodeAnalysisResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents a class under test. Games will be played with this class by

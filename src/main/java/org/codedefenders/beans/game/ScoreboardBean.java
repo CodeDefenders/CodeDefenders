@@ -1,13 +1,15 @@
 package org.codedefenders.beans.game;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-import org.codedefenders.game.multiplayer.PlayerScore;
-import org.codedefenders.model.Player;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import java.util.List;
-import java.util.Map;
+
+import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.model.Player;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * <p>Provides data for the scoreboard game component.</p>

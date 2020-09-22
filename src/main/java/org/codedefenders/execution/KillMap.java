@@ -18,23 +18,6 @@
  */
 package org.codedefenders.execution;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
@@ -49,6 +32,24 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.NO_KILL;
@@ -81,7 +82,7 @@ public class KillMap {
             CreationalContext<?> ctx = bm.createCreationalContext(bean);
             backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
             Bean<?> configBean = bm.getBeans(Configuration.class, new Annotation[0]).iterator().next();
-            Configuration config =  CDI.current().select(Configuration.class).get();
+            Configuration config = CDI.current().select(Configuration.class).get();
             USE_COVERAGE = config.isMutantCoverage();
             PARALLELIZE = config.isParallelize();
             NUM_THREADS = config.getNumberOfKillmapThreads();
@@ -135,7 +136,7 @@ public class KillMap {
     /**
      * Constructs a new killmap.
      *
-     * @param tests The tests of the killmap.
+     * @param tests   The tests of the killmap.
      * @param mutants The mutants of the killmap.
      * @param classId The id of the class the tests and mutants are for.
      * @param entries The already computed entries of the killmap. If no entries have been computed before, this can be
@@ -171,7 +172,7 @@ public class KillMap {
      * Computes the missing entries of the killmap.
      *
      * @throws InterruptedException If the computation is interrupted.
-     * @throws ExecutionException If an error occurred during an execution.
+     * @throws ExecutionException   If an error occurred during an execution.
      */
     private void compute(ExecutorService executor) throws InterruptedException, ExecutionException {
         Instant startTime = Instant.now();
@@ -222,7 +223,7 @@ public class KillMap {
      *
      * @param game The finished game to get the killmap for.
      * @throws InterruptedException If the computation is interrupted.
-     * @throws ExecutionException If an error occurred during an execution.
+     * @throws ExecutionException   If an error occurred during an execution.
      */
     public static KillMap forGame(AbstractGame game) throws InterruptedException, ExecutionException {
         List<Test> tests = game.getTests();
@@ -260,7 +261,7 @@ public class KillMap {
      *
      * @param classId The class to get the killmap for.
      * @throws InterruptedException If the computation is interrupted.
-     * @throws ExecutionException If an error occurred during an execution.
+     * @throws ExecutionException   If an error occurred during an execution.
      */
     public static KillMap forClass(int classId) throws InterruptedException, ExecutionException {
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
@@ -292,15 +293,15 @@ public class KillMap {
      * The tests and mutants must belong to the same class (with the same class id).
      * This operation is blocking and may take a long time,
      *
-     * @param tests The tests to get the killmap for. The list must not include a mutant twice.
+     * @param tests   The tests to get the killmap for. The list must not include a mutant twice.
      * @param mutants The mutants to get the killmap for. The list must not include a test twice.
      * @param classId The class id of the class the tests and mutants belong to.
      * @param entries Already computed entries for the killmap.
      * @throws InterruptedException If the computation is interrupted.
-     * @throws ExecutionException If an error occurred during an execution.
+     * @throws ExecutionException   If an error occurred during an execution.
      */
     public static KillMap forCustom(List<Test> tests, List<Mutant> mutants, int classId, List<KillMapEntry> entries)
-                                    throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         /* Synchronized, so only one killmap can be computed at a time. */
         synchronized (KillMap.class) {
             KillMap killmap = new KillMap(tests, mutants, classId, entries);
@@ -334,10 +335,9 @@ public class KillMap {
      *
      * <bf>This operation is blocking and may take a long time</bf>
      *
-     * @param tests The tests used for the validation.
-     * @param mutant The mutant to validate.
+     * @param tests   The tests used for the validation.
+     * @param mutant  The mutant to validate.
      * @param classId The class id of the class the tests and mutants belong to.
-     *
      */
     public static KillMap forMutantValidation(List<Test> tests, Mutant mutant, int classId) {
         List<KillMapEntry> entries = new ArrayList<>();
@@ -363,6 +363,7 @@ public class KillMap {
 
     /**
      * Returns the tests of the killmap.
+     *
      * @return The tests of the killmap.
      */
     public List<Test> getTests() {
@@ -371,6 +372,7 @@ public class KillMap {
 
     /**
      * Returns the mutants of the killmap.
+     *
      * @return The mutants of the killmap.
      */
     public List<Mutant> getMutants() {
@@ -379,6 +381,7 @@ public class KillMap {
 
     /**
      * Returns The results of all "test vs. mutant" executions.
+     *
      * @return The results of all "test vs. mutant" executions.
      */
     public List<KillMapEntry> getEntries() {
@@ -389,6 +392,7 @@ public class KillMap {
      * Returns a matrix that maps tests and mutants to their execution result.
      * The first dimension describes the tests, the second dimension describes the mutants.
      * {@link KillMap#indexOf(Test)} / {@link KillMap#indexOf(Mutant)} can be used to get the index of a test / mutant.
+     *
      * @return A matrix that maps tests and mutants to their execution result.
      */
     public KillMapEntry[][] getMatrix() {
@@ -397,6 +401,7 @@ public class KillMap {
 
     /**
      * Returns all "test vs. mutant" execution results for the given test.
+     *
      * @param test The given test.
      * @return All "test vs. mutant" execution results for the given test.
      */
@@ -406,6 +411,7 @@ public class KillMap {
 
     /**
      * Returns all "test vs. mutant" execution results for the given mutant.
+     *
      * @param mutant The given mutant.
      * @return All "test vs. mutant" execution results for the given mutant.
      */
@@ -422,7 +428,8 @@ public class KillMap {
 
     /**
      * Returns the "test vs. mutant" execution result for the given test and mutant.
-     * @param test The given test.
+     *
+     * @param test   The given test.
      * @param mutant The given mutant.
      * @return The "test vs. mutant" execution result for the given test and mutant.
      */
@@ -432,6 +439,7 @@ public class KillMap {
 
     /**
      * Returns the index of the given test in the matrix, or null if the mutant is not part of the matrix.
+     *
      * @param test The given test.
      * @return The index of the given test in the matrix, or null if the mutant is not part of the matrix.
      */
@@ -441,6 +449,7 @@ public class KillMap {
 
     /**
      * Returns the index of the given mutant in the matrix, or null if the mutant is not part of the matrix.
+     *
      * @param mutant The given mutant.
      * @return The index of the given mutant in the matrix, or null if the mutant is not part of the matrix.
      */
@@ -448,7 +457,9 @@ public class KillMap {
         return indexOfMutant.get(mutant);
     }
 
-    /** Executes a test against a mutant, inserts the result into the DB, and returns the result. */
+    /**
+     * Executes a test against a mutant, inserts the result into the DB, and returns the result.
+     */
     private static class TestVsMutantCallable implements Callable<KillMapEntry> {
         private Test test;
         private Mutant mutant;
@@ -497,24 +508,38 @@ public class KillMap {
         }
     }
 
-    /** The killmap types. Game or class killmap. */
+    /**
+     * The killmap types. Game or class killmap.
+     */
     public enum KillMapType {
         CLASS, GAME
     }
 
-    /** Represents a result of executing a test against a mutant. */
+    /**
+     * Represents a result of executing a test against a mutant.
+     */
     public static class KillMapEntry {
         public enum Status {
-            /** Test kills mutant. */
+            /**
+             * Test kills mutant.
+             */
             KILL,
-            /** Test covers mutant but doesn't kill it. */
+            /**
+             * Test covers mutant but doesn't kill it.
+             */
             NO_KILL,
-            /** Test doesn't cover mutant. Only used if "mutant.coverage" is enabled. */
+            /**
+             * Test doesn't cover mutant. Only used if "mutant.coverage" is enabled.
+             */
             NO_COVERAGE,
-            /** An error occurred during execution. If no errors occurred elsewhere, then this means,
-             *  that the test execution resulted in an exception (and the mutant was killed). */
+            /**
+             * An error occurred during execution. If no errors occurred elsewhere, then this means,
+             * that the test execution resulted in an exception (and the mutant was killed).
+             */
             ERROR,
-            /** Status is unknown. */
+            /**
+             * Status is unknown.
+             */
             UNKNOWN
         }
 

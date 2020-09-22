@@ -18,6 +18,10 @@
  */
 package org.codedefenders.database;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -28,10 +32,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * This class handles the database logic for melee games.

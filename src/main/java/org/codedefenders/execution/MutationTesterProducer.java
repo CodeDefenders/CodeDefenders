@@ -18,13 +18,14 @@
  */
 package org.codedefenders.execution;
 
-import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.EventDAO;
+import java.util.concurrent.ExecutorService;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import java.util.concurrent.ExecutorService;
+
+import org.codedefenders.configuration.Configuration;
+import org.codedefenders.database.EventDAO;
 
 public class MutationTesterProducer {
 
