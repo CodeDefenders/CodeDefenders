@@ -42,11 +42,11 @@
     scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
-<jsp:useBean id="historyboard" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
+<jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
-    scoreboard.setGameId(game.getId());
-    scoreboard.setScores(game.getMutantScores(), game.getTestScores());
-    scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+    history.setGameId(game.getId());
+    history.setScores(game.getMutantScores(), game.getTestScores());
+    history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
@@ -61,6 +61,7 @@
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
+<jsp:include page="/jsp/battleground/game_history.jsp"/>
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <div class="crow fly no-gutter up">
