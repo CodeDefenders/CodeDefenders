@@ -202,14 +202,13 @@ public final class ConnectionPool {
 
     private Connection refreshConnection() throws SQLException {
         //try {
-            return DatabaseConnection.getConnection();
-            /*
+        return DatabaseConnection.getConnection();
+        /*
         } catch (NamingException e) {
             logger.warn("JDBC Driver not found.", e);
             throw new UncheckedSQLException("Could not update database connection.");
         }
-
-             */
+        */
     }
 
     /**

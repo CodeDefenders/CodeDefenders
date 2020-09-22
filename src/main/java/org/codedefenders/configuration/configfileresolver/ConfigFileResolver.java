@@ -19,14 +19,14 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The ConfigFileResolver is the base class for a strategy pattern with the purpose of abstracting the process of

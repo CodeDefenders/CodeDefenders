@@ -19,12 +19,12 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The ClassPathConfigFileResolver searches the named config file with a classpath search.

@@ -19,16 +19,18 @@
 
 package org.codedefenders.database;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
-import org.codedefenders.configuration.Configuration;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
+
+import org.codedefenders.configuration.Configuration;
+
+import com.mysql.cj.jdbc.MysqlDataSource;
 
 @ApplicationScoped
 public class ConnectionFactory {

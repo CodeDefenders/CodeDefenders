@@ -18,11 +18,12 @@
  */
 package org.codedefenders.util;
 
-import org.codedefenders.configuration.Configuration;
-
-import javax.enterprise.inject.spi.CDI;
 import java.io.File;
 import java.nio.file.Paths;
+
+import javax.enterprise.inject.spi.CDI;
+
+import org.codedefenders.configuration.Configuration;
 
 /**
  * This class contains most constants used in Code Defenders.

@@ -19,13 +19,14 @@
 
 package org.codedefenders.configuration.implementation;
 
-import com.google.common.base.CaseFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.CaseFormat;
 
 /**
  * Reads configuration values from environment variables after converting the attribute name to UPPER_UNDERSCORE format

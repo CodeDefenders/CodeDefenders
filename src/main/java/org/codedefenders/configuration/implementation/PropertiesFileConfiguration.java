@@ -18,25 +18,21 @@
  */
 package org.codedefenders.configuration.implementation;
 
-import com.google.common.base.CaseFormat;
-import org.codedefenders.configuration.configfileresolver.ClasspathConfigFileResolver;
-import org.codedefenders.configuration.configfileresolver.ConfigFileResolver;
-import org.codedefenders.configuration.configfileresolver.EnvironmentVariableConfigFileResolver;
-import org.codedefenders.configuration.configfileresolver.SystemPropertyConfigFileResolver;
-import org.codedefenders.configuration.configfileresolver.TomcatConfigFileResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+
+import org.codedefenders.configuration.configfileresolver.ConfigFileResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.CaseFormat;
 
 /**
  * Loads the properties files found by the {@link ConfigFileResolver}s, merges them and then resolves the attributes by

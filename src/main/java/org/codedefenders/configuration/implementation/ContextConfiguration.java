@@ -19,16 +19,17 @@
 
 package org.codedefenders.configuration.implementation;
 
-import com.google.common.base.CaseFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.CaseFormat;
 
 /**
  * Reads configuration values from the context after converting the attribute name to lower.dot.separated format.

@@ -18,16 +18,17 @@
  */
 package org.codedefenders.configuration.implementation;
 
-import org.codedefenders.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.lang.reflect.Field;
+import java.util.List;
 
 import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.lang.reflect.Field;
-import java.util.List;
+
+import org.codedefenders.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Merges other {@link BaseConfiguration}s in the order they are specified and then resolves attributes on the result.

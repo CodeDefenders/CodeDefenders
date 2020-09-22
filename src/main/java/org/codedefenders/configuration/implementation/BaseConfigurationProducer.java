@@ -19,11 +19,12 @@
 
 package org.codedefenders.configuration.implementation;
 
-import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 
 public class BaseConfigurationProducer {
 
@@ -34,9 +35,9 @@ public class BaseConfigurationProducer {
 
     @Inject
     BaseConfigurationProducer(SystemPropertyConfiguration sysPropConf,
-                              ContextConfiguration contextConf,
-                              EnvironmentVariableConfiguration envVarConf,
-                              PropertiesFileConfiguration propFileConf) {
+            ContextConfiguration contextConf,
+            EnvironmentVariableConfiguration envVarConf,
+            PropertiesFileConfiguration propFileConf) {
         this.sysPropConf = sysPropConf;
         this.contextConf = contextConf;
         this.envVarConf = envVarConf;

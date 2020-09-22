@@ -19,11 +19,11 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.Reader;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The TomcatConfigFileResolver tries to read the named configuration file from the tomcat config directory which

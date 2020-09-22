@@ -19,11 +19,10 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
+import java.io.Reader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.Reader;
 
 /**
  * The SystemPropertyConfigFileResolver looks up a path from a system property and and tries to read the named config
