@@ -39,7 +39,7 @@ public class Constants {
      * @deprecated Use {@link Configuration#getDataDir()} instead.
      */
     @Deprecated
-    public static final String DATA_DIR = CDI.current().select(Configuration.class).get().getDataDir().getAbsolutePath();
+    public static final String DATA_DIR = CDIUtil.getBeanFromCDI(Configuration.class).getDataDir().getAbsolutePath();
 
     // Dummy game
     public static final int DUMMY_GAME_ID = -1;

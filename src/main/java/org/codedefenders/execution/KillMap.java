@@ -48,6 +48,7 @@ import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,12 +78,8 @@ public class KillMap {
     static {
         /* Get the BackendExecutorService and Configuration since dependency injection does not work on this class. */
         try {
-            BeanManager bm = CDI.current().getBeanManager();
-            Bean<?> bean = bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
-            CreationalContext<?> ctx = bm.createCreationalContext(bean);
-            backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
-            Bean<?> configBean = bm.getBeans(Configuration.class, new Annotation[0]).iterator().next();
-            Configuration config = CDI.current().select(Configuration.class).get();
+            backend = CDIUtil.getBeanFromCDI(BackendExecutorService.class);
+            Configuration config = CDIUtil.getBeanFromCDI(Configuration.class);
             USE_COVERAGE = config.isMutantCoverage();
             PARALLELIZE = config.isParallelize();
             NUM_THREADS = config.getNumberOfKillmapThreads();
