@@ -545,6 +545,11 @@
 			<version>${tomcat.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-dbcp</artifactId>
+			<version>${tomcat.version}</version>
+		</dependency>
 
 
 		<!-- Context and Dependency Injection (CDI) -->

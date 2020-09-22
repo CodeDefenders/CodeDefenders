@@ -19,11 +19,16 @@
 package org.codedefenders.database;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import org.codedefenders.util.CDIUtil;
 
 public class DatabaseConnection {
     public static Connection getConnection() {
-        return CDIUtil.getBeanFromCDI(Connection.class);
+        try {
+            return CDIUtil.getBeanFromCDI(ConnectionFactory.class).getConnection();
+        } catch (SQLException ignored) {
+            return null;
+        }
     }
 }

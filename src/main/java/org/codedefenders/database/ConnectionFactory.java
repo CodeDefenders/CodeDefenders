@@ -24,35 +24,44 @@ import java.sql.SQLException;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import javax.sql.DataSource;
 
+import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.codedefenders.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
+import com.mysql.cj.jdbc.Driver;
+
 
 @ApplicationScoped
 public class ConnectionFactory {
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
-    DataSource dataSource;
+    BasicDataSource dataSource;
 
     @Inject
     ConnectionFactory(Configuration config) {
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(config.getDbUrl());
-        dataSource.setUser(config.getDbUsername());
+        dataSource = new BasicDataSource();
+        try {
+            dataSource.setDriver(new Driver());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        dataSource.setUrl(config.getDbUrl());
+        dataSource.setUsername(config.getDbUsername());
         dataSource.setPassword(config.getDbPassword());
-        this.dataSource = dataSource;
     }
 
     @PreDestroy
     void shutdown() {
-        //
-        // dataSource.close();
+        try {
+            dataSource.close();
+        } catch (SQLException e) {
+            logger.error("Error in closing database connections", e);
+        }
     }
 
-    @Produces
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
