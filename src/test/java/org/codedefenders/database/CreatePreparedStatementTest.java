@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.util.CDIUtil;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +41,7 @@ import static org.mockito.BDDMockito.given;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ConnectionPool.class})
+@PrepareForTest({CDIUtil.class})
 public class CreatePreparedStatementTest {
     @Rule
     public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
@@ -49,8 +50,9 @@ public class CreatePreparedStatementTest {
     public void testCreatePreparedStatementSingle() throws Exception {
         try (Connection connection = db.getConnection()) {
 
-            PowerMockito.mockStatic(ConnectionPool.class);
-            given(ConnectionPool.instance()).willReturn(null); // ConnectionPool is not required for this test.
+            // ConnectionFactory is not required for this test.
+            PowerMockito.mockStatic(CDIUtil.class);
+            given(CDIUtil.getBeanFromCDI(ConnectionFactory.class)).willReturn(null);
 
             final String query = String.join("\n",
                     "SELECT User_ID",
@@ -73,8 +75,9 @@ public class CreatePreparedStatementTest {
     public void testCreatePreparedStatementMultiple() throws Exception {
         try (Connection connection = db.getConnection()) {
 
-            PowerMockito.mockStatic(ConnectionPool.class);
-            given(ConnectionPool.instance()).willReturn(null); // ConnectionPool is not required for this test.
+            // ConnectionFactory is not required for this test.
+            PowerMockito.mockStatic(CDIUtil.class);
+            given(CDIUtil.getBeanFromCDI(ConnectionFactory.class)).willReturn(null);
 
             final String query = String.join("\n",
                     "SELECT Username",

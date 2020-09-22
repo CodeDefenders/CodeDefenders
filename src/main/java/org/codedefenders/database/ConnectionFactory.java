@@ -23,8 +23,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.annotation.PreDestroy;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.codedefenders.configuration.Configuration;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.mysql.cj.jdbc.Driver;
 
 
-@ApplicationScoped
+@Singleton
 public class ConnectionFactory {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
@@ -64,5 +64,12 @@ public class ConnectionFactory {
 
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    public void updateSize(int maxTotalConnections) {
+        //dataSource.setMaxTotal(maxTotalConnections);
+    }
+
+    public void updateWaitingTime(int parseInt) {
     }
 }
