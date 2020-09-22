@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import javax.naming.NamingException;
 

@@ -71,7 +71,6 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public boolean testKillsMutant(Mutant mutant, Test test) {
-        config.isForceLocalExecution();
         GameClass cut = GameClassDAO.getClassForGameId(mutant.getGameId());
 
         AntProcessResult result = runAntTarget("test-mutant", mutant.getDirectory(), test.getDirectory(),
