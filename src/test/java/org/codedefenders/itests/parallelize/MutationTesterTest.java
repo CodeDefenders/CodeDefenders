@@ -116,12 +116,9 @@ public class MutationTesterTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -249,7 +246,7 @@ public class MutationTesterTest {
         // System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant()
         // Cut " + cut.getId());
         MultiplayerGame multiplayerGame = new MultiplayerGame
-                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut.getId(), observer.getId(), 2)
                 .state(GameState.ACTIVE)
                 .level(GameLevel.HARD)
                 .defenderValue(10)

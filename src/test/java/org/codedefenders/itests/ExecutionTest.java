@@ -210,7 +210,7 @@ public class ExecutionTest {
 
         // Observer creates a new MP game
         MultiplayerGame multiplayerGame = new MultiplayerGame
-                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut.getId(), observer.getId(), 2)
                 .state(GameState.ACTIVE)
                 .level(GameLevel.EASY)
                 .defenderValue(10)

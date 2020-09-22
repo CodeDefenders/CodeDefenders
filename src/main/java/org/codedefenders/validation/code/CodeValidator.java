@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.Mutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,10 +70,12 @@ import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 
+import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
+
 /**
  * This class offers static methods to validate code, primarily checking validity of tests and mutants.
  *
- * <p>Use {@link #validateTestCodeGetMessage(String, int, boolean)} to validate test code with a boolean result value.
+ * <p>Use {@link #validateTestCodeGetMessage(String, int, AssertionLibrary)} to validate test code with a boolean result value.
  *
  * <p>Use {@link #validateMutantGetMessage(String, String, CodeValidatorLevel)} to validate
  * mutants and get a {@link ValidationMessage} back.
@@ -85,9 +88,7 @@ public class CodeValidator {
 
     //Default configurations: number of max. allowed assertions for battleground games
     public static final int DEFAULT_NB_ASSERTIONS = 2;
-    public static final boolean DEFAULT_FORCE_HAMCREST = false;
-    public static final boolean DEFAULT_FORCE_GOOGLE_TRUTH = false;
-
+    public static final AssertionLibrary DEFAULT_ASSERTION_LIBRARY = JUNIT4_HAMCREST;
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
     public static final String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
@@ -115,11 +116,10 @@ public class CodeValidator {
     // TODO Cannot use ValidationMessage as that is an ENUM type...
     public static List<String> validateTestCodeGetMessage(String testCode,
                                                           int maxNumberOfAssertions,
-                                                          boolean forceHamcrest,
-                                                          boolean forceGoogleTruth) {
+                                                          AssertionLibrary assertionLibrary) {
         try {
             CompilationUnit cu = getCompilationUnitFromText(testCode);
-            return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, forceHamcrest, forceGoogleTruth);
+            return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, assertionLibrary);
         } catch (ParseException e) {
             // Pretend this never happened so we send back to the user the compiler error message
             // return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});

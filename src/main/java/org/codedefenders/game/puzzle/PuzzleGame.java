@@ -66,9 +66,6 @@ public class PuzzleGame extends AbstractGame {
      */
     private int maxAssertionsPerTest;
 
-    private boolean forceHamcrest;
-    private boolean forceGoogleTruth;
-
     /**
      * Validation level used to check submitted mutants.
      */
@@ -201,8 +198,6 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
-        this.forceHamcrest = puzzle.isForceHamcrest();
-        this.forceGoogleTruth = puzzle.isForceGoogleTruth();
 
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
@@ -217,9 +212,8 @@ public class PuzzleGame extends AbstractGame {
      * Constructor for reading a puzzle game from the database.
      */
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
-            int maxAssertionsPerTest, //
-            boolean forceHamcrest, boolean forceGoogleTruth, //
-            CodeValidatorLevel mutantValidatorLevel, GameState state, int currentRound, Role activeRole) {
+            int maxAssertionsPerTest, CodeValidatorLevel mutantValidatorLevel, GameState state, int currentRound,
+            Role activeRole) {
         /* AbstractGame attributes */
         this.cut = cut;
         this.id = id;
@@ -233,8 +227,6 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = maxAssertionsPerTest;
-        this.forceHamcrest = forceHamcrest;
-        this.forceGoogleTruth = forceGoogleTruth;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.currentRound = currentRound;
         this.activeRole = activeRole;
@@ -324,14 +316,6 @@ public class PuzzleGame extends AbstractGame {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
-    }
-
-    public boolean isForceHamcrest() {
-        return forceHamcrest;
-    }
-
-    public boolean isForceGoogleTruth() {
-        return forceGoogleTruth;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {

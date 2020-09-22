@@ -465,8 +465,6 @@ public class AdminPuzzleAPI extends HttpServlet {
                 .name("title").value(puzzle.getTitle())
                 .name("description").value(puzzle.getDescription())
                 .name("maxAssertionsPerTest").value(puzzle.getMaxAssertionsPerTest())
-                .name("forceHamcrest").value(puzzle.isForceHamcrest())
-                .name("forceGoogleTruth").value(puzzle.isForceGoogleTruth())
                 .name("editableLinesStart").value(puzzle.getEditableLinesStart())
                 .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
                 .name("chapterId").value(puzzle.getChapterId())
@@ -487,15 +485,12 @@ public class AdminPuzzleAPI extends HttpServlet {
             String title = json.get("title").getAsString();
             String description = json.get("description").getAsString();
             int maxAssertionsPerTest = json.get("maxAssertionsPerTest").getAsInt();
-            boolean forceHamcrest = json.get("forceHamcrest").getAsBoolean();
-            boolean forceGoogleTruth = json.get("forceGoogleTruth ").getAsBoolean();
             Integer editableLinesStart =
                     json.get("editableLinesStart").isJsonNull() ? null : json.get("editableLinesStart").getAsInt();
             Integer editableLinesEnd =
                     json.get("editableLinesEnd").isJsonNull() ? null : json.get("editableLinesEnd").getAsInt();
 
-            return Puzzle.forPuzzleInfo(puzzleId, chapterId, position, title, description, maxAssertionsPerTest,//
-                    forceHamcrest, forceGoogleTruth,//
+            return Puzzle.forPuzzleInfo(puzzleId, chapterId, position, title, description, maxAssertionsPerTest,
                     editableLinesStart, editableLinesEnd);
         }
     }

@@ -239,7 +239,6 @@ public class ParallelizeTest {
     }
 
     private MultiplayerGame createStandardBattlegroundStartItAndStoreInDB(GameClass cut, User creator) {
-        //
         int classId = cut.getId();
         int creatorId = creator.getId();
         GameLevel level = GameLevel.HARD;
@@ -249,12 +248,10 @@ public class ParallelizeTest {
 
         GameState status = GameState.ACTIVE;
         int maxAssertionsPerTest = 2;
-        boolean forceHamcrest = false;
-        boolean forceGoogleTruth = false;
 
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
-        final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest, forceGoogleTruth)
+        final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .state(status)
                 .level(level)
                 .prize(prize)

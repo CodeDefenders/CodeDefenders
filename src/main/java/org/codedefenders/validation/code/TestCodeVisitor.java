@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.codedefenders.game.AssertionLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,9 @@ import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
+
+import static org.codedefenders.game.AssertionLibrary.GOOGLE_TRUTH;
+import static org.codedefenders.game.AssertionLibrary.HAMCREST;
 
 /**
  * This class checks test code and checks whether the code is valid or not.
@@ -77,32 +81,24 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private int assertionCount = 0;
 
     // Per game configuration
-    private int maxNumberOfAssertions;
+    private final int maxNumberOfAssertions;
 
-    private boolean forceHamcrest;
-    private boolean forceGoogleTruth;
+    // Per class configuraion
+    private final AssertionLibrary assertionLibrary;
 
     /**
-     *
-     * @param cu
-     * @param maxNumberOfAssertions
-     * @param forceHamcrest
-     * @param forceGoogleTruth
      * @return A list of validation messages. If the list is empty, the validation passed
-     *
      */
-    static List<String> validFor(CompilationUnit cu,int maxNumberOfAssertions, //
-            boolean forceHamcrest, boolean forceGoogleTruth) {
-        TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions, forceHamcrest, forceGoogleTruth);
+    static List<String> validFor(CompilationUnit cu, int maxNumberOfAssertions, AssertionLibrary assertionLibrary) {
+        TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions, assertionLibrary);
         // Collect the observations first
         visitor.visit(cu, null);
         return visitor.buildValidationMessages();
     }
 
-    private TestCodeVisitor(int maxNumberOfAssertions, boolean forceHamcrest, boolean forceGoogleTruth) {
+    private TestCodeVisitor(int maxNumberOfAssertions, AssertionLibrary assertionLibrary) {
         this.maxNumberOfAssertions = maxNumberOfAssertions;
-        this.forceHamcrest = forceHamcrest;
-        this.forceGoogleTruth = forceGoogleTruth;
+        this.assertionLibrary = assertionLibrary;
     }
 
     public List<String> buildValidationMessages() {
@@ -288,11 +284,11 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
 
         /*
-         * If forced Hamcrest or Google Truth are on, then there must not be JUnit assertions
+         * If forced Hamcrest or Google Truth are on, then there must not be JUnit assertions.
          *
-         * TODO What if there's no assertions at all ?
+         * TODO What if there's no assertions at all?
          */
-        if ( (forceHamcrest  || forceGoogleTruth) && anyJunitAssertionMatch) {
+        if ((assertionLibrary == HAMCREST || assertionLibrary == GOOGLE_TRUTH) && anyJunitAssertionMatch) {
             messages.add("Test contains a JUnit assertion: " + stmt.toString());
             isValid = false;
             return;

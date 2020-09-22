@@ -110,7 +110,7 @@ public class DatabaseTest {
                 .create();
 
         multiplayerGame = new MultiplayerGame
-                .Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut1.getId(), creator.getId(), 5)
                 .level(GameLevel.EASY)
                 .defenderValue(10)
                 .attackerValue(4)
@@ -217,7 +217,7 @@ public class DatabaseTest {
         assumeTrue(cut1.insert());
 
         MultiplayerGame mg2 = new MultiplayerGame
-                .Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut1.getId(), creator.getId(), 2)
                 .state(GameState.ACTIVE)
                 .level(GameLevel.EASY)
                 .defenderValue(10)
@@ -230,7 +230,7 @@ public class DatabaseTest {
         assertTrue(mg2.update());
 
         MultiplayerGame mg3 = new MultiplayerGame
-                .Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut1.getId(), creator.getId(), 2)
                 .state(GameState.ACTIVE)
                 .level(GameLevel.EASY)
                 .defenderValue(10)
@@ -245,7 +245,7 @@ public class DatabaseTest {
         assumeTrue(mg3.update());
 
         MultiplayerGame mg4 = new MultiplayerGame
-                .Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut1.getId(), creator.getId(), 2)
                 .level(GameLevel.EASY)
                 .defenderValue(10)
                 .attackerValue(4)
@@ -357,7 +357,7 @@ public class DatabaseTest {
 
         // Creator must be there already
         multiplayerGame = new MultiplayerGame
-                .Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut1.getId(), creator.getId(), 5)
                 .level(GameLevel.EASY)
                 .defenderValue(10)
                 .attackerValue(4)

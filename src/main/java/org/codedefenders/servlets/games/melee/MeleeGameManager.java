@@ -366,7 +366,7 @@ public class MeleeGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
-                game.getMaxAssertionsPerTest(), game.isForceHamcrest(), game.isForceGoogleTruth());
+                game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessages.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
@@ -783,7 +783,7 @@ public class MeleeGameManager extends HttpServlet {
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText,
-                    game.getMaxAssertionsPerTest(), game.isForceHamcrest(), game.isForceGoogleTruth());
+                    game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
             boolean validationSuccess = validationMessage.isEmpty();
 
             TestValidatedEvent tve = new TestValidatedEvent();

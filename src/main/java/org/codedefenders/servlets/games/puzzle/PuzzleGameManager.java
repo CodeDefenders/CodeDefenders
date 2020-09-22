@@ -298,9 +298,7 @@ public class PuzzleGameManager extends HttpServlet {
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
                 testText,
                 game.getMaxAssertionsPerTest(),
-                game.isForceHamcrest(),
-                game.isForceGoogleTruth()
-        );
+                game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();

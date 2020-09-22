@@ -67,8 +67,6 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean requiresValidation;
     private int maxAssertionsPerTest;
-    private boolean forceHamcrest;
-    private boolean forceGoogleTruth;
 
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
@@ -88,8 +86,6 @@ public class MultiplayerGame extends AbstractGame {
         private final int classId;
         private final int creatorId;
         private final int maxAssertionsPerTest;
-        private final boolean forceHamcrest;
-        private final boolean forceGoogleTruth;
 
         // optional values with default values
         private GameClass cut = null;
@@ -113,13 +109,10 @@ public class MultiplayerGame extends AbstractGame {
 
         private int automaticMutantEquivalenceThreshold = 0;
 
-        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest,
-                boolean forceGoogleTruth) {
+        public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
             this.classId = classId;
             this.creatorId = creatorId;
             this.maxAssertionsPerTest = maxAssertionsPerTest;
-            this.forceHamcrest = forceHamcrest;
-            this.forceGoogleTruth = forceGoogleTruth;
         }
 
         public Builder cut(GameClass cut) {
@@ -235,8 +228,6 @@ public class MultiplayerGame extends AbstractGame {
         this.prize = builder.prize;
         this.requiresValidation = builder.requiresValidation;
         this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
-        this.forceHamcrest = builder.forceHamcrest;
-        this.forceGoogleTruth = builder.forceGoogleTruth;
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
@@ -286,14 +277,6 @@ public class MultiplayerGame extends AbstractGame {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
-    }
-
-    public boolean isForceHamcrest() {
-        return forceHamcrest;
-    }
-
-    public boolean isForceGoogleTruth() {
-        return forceGoogleTruth;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {

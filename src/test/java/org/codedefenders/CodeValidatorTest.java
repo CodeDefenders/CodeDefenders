@@ -428,7 +428,7 @@ public class CodeValidatorTest {
 	}
 
 	@Test
-	public void testMakingStringLiteralsDoesNotTriggersValidation() throws IOException{
+	public void testMakingStringLiteralsDoesNotTriggersValidation() throws IOException {
 		String originalCode = "" + "\n" +
 				" public class Test{"+ "\n" +
 				"	public final String[] getValues(String name) {" + "\n" +
@@ -727,7 +727,7 @@ public class CodeValidatorTest {
 				"		assertNotNull(x.getData());",
 				"	}",
 				"}");
-		assertTrue(CodeValidator.validateTestCodeGetMessage(code, CodeValidator.DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertTrue(CodeValidator.validateTestCodeGetMessage(code, CodeValidator.DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
@@ -743,57 +743,57 @@ public class CodeValidatorTest {
 				"	}",
 				"}"
 		);
-		assertTrue(CodeValidator.validateTestCodeGetMessage(code, CodeValidator.DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertTrue(CodeValidator.validateTestCodeGetMessage(code, CodeValidator.DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
 	public void testInvalidSuiteWithTwoClasses() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TwoClasses.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse("Should be invalid; file contains a two classes", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse("Should be invalid; file contains a two classes", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
 	public void testInvalidEmptyTest() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("EmptyTest.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse(CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse(CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
 	public void testInvalidTwoTests() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TwoTests.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse("Should be invalid; class contains two tests", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse("Should be invalid; class contains two tests", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
 	public void testInvalidTestWithTooManyAssertions() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithTooManyAssertions.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse("Should be invalid; test has too many assertions", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse("Should be invalid; test has too many assertions", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
 	public void testInvalidTestWithIf() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithIf.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse("Should be invalid; test contains if statement", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse("Should be invalid; test contains if statement", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
 	public void testInvalidTestWithSystemCalls() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithSystemCall.java");
 		final String code1 = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse("Should be invalid; test contains system call", CodeValidator.validateTestCodeGetMessage(code1, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse("Should be invalid; test contains system call", CodeValidator.validateTestCodeGetMessage(code1, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 
 		url = Thread.currentThread().getContextClassLoader().getResource("TestWithSystemCall2.java");
 		final String code2 = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse("Should be invalid; test contains system call", CodeValidator.validateTestCodeGetMessage(code2, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse("Should be invalid; test contains system call", CodeValidator.validateTestCodeGetMessage(code2, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 
 		url = Thread.currentThread().getContextClassLoader().getResource("TestWithSystemCall3.java");
 		final String code3 = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertFalse("Should be invalid; test contains system call", CodeValidator.validateTestCodeGetMessage(code3, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertFalse("Should be invalid; test contains system call", CodeValidator.validateTestCodeGetMessage(code3, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test
@@ -834,7 +834,7 @@ public class CodeValidatorTest {
 	public void testValidTest() throws IOException {
 		URL url = Thread.currentThread().getContextClassLoader().getResource("ValidTest.java");
 		final String code = new String(Files.readAllBytes(Paths.get(url.getPath())));
-		assertTrue("Should be valid", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH).isEmpty());
+		assertTrue("Should be valid", CodeValidator.validateTestCodeGetMessage(code, DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_ASSERTION_LIBRARY).isEmpty());
 	}
 
 	@Test

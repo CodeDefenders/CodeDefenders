@@ -206,7 +206,7 @@ public class CoverageTest {
         long endDate = System.currentTimeMillis() + 1000 * 3600;
         // Observer creates a new MP game
         final MultiplayerGame multiplayerGame = new MultiplayerGame
-                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut.getId(), observer.getId(), 2)
                 .defenderValue(10)
                 .attackerValue(4)
                 .state(GameState.ACTIVE)

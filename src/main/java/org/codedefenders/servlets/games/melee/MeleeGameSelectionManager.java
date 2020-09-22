@@ -157,8 +157,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         int classId;
         int maxAssertionsPerTest;
-        boolean forceHamcrest;
-        boolean forceGoogleTruth;
         int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
         Role selectedRole;
@@ -166,8 +164,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
         try {
             classId = getIntParameter(request, "class").get();
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
-            forceHamcrest = parameterThenOrOther(request, "forceHamcrest", true, false);
-            forceGoogleTruth = parameterThenOrOther(request, "forceGoogleTruth", true, false);
             automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel")
                     .map(CodeValidatorLevel::valueOrNull).get();
@@ -185,7 +181,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
-        MeleeGame nGame = new MeleeGame.Builder(classId, login.getUserId(), maxAssertionsPerTest, forceHamcrest, forceGoogleTruth)
+        MeleeGame nGame = new MeleeGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
                 .level(level).chatEnabled(chatEnabled).capturePlayersIntention(capturePlayersIntention)
                 .lineCoverage(lineCoverage).mutantCoverage(mutantCoverage).mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger).build();

@@ -74,7 +74,6 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -251,7 +250,7 @@ public class ConsistencyTest {
         System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Cut " + cut.getId());
 
         final MultiplayerGame multiplayerGame = new MultiplayerGame
-                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST, CodeValidator.DEFAULT_FORCE_GOOGLE_TRUTH)
+                .Builder(cut.getId(), observer.getId(), 2)
                 .state(GameState.ACTIVE)
                 .defenderValue(10)
                 .attackerValue(4)

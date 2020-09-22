@@ -112,8 +112,6 @@ public class AdminCreateGames extends HttpServlet {
     private MultiplayerGame mg;
     private boolean chatEnabled;
     private int maxAssertionsPerTest;
-    private boolean forceHamcrest;
-    private boolean forceGoogleTruth;
     private CodeValidatorLevel mutantValidatorLevel;
 
     private boolean withTests;
@@ -334,8 +332,6 @@ public class AdminCreateGames extends HttpServlet {
             gamesState = request.getParameter("gamesState")
                     .equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
             maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
-            forceHamcrest = request.getParameter("forceHamcrest") != null;
-            forceGoogleTruth = request.getParameter("forceGoogleTruth") != null;
             mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
             chatEnabled = request.getParameter("chatEnabled") != null;
 
@@ -525,7 +521,6 @@ public class AdminCreateGames extends HttpServlet {
         // TODO Why static ?
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame, cutId,
                 login.getUserId(), gamesLevel, gamesState, maxAssertionsPerTest, //
-                forceHamcrest, forceGoogleTruth, //
                 chatEnabled, mutantValidatorLevel, withTests, withMutants, //
                 capturePlayersIntention, automaticEquivalenceTrigger);
 
@@ -596,14 +591,13 @@ public class AdminCreateGames extends HttpServlet {
 
     // TODO Why static ?!
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame, int cutId,
-                                                     int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest, //
-                                                     boolean forceHamcrest, boolean forceGoogleTruth,//
-                                                     boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants, //
-                                                     boolean capturePlayersIntention, //
+                                                     int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest,
+                                                     boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants,
+                                                     boolean capturePlayersIntention,
                                                      int automaticEquivalenceTrigger) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
-            MultiplayerGame game = new MultiplayerGame.Builder(cutId, creatorId, maxAssertionsPerTest, forceHamcrest, forceGoogleTruth)
+            MultiplayerGame game = new MultiplayerGame.Builder(cutId, creatorId, maxAssertionsPerTest)
                     .level(level)
                     .state(state)
                     .chatEnabled(chatEnabled)
