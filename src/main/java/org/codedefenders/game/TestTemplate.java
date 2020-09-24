@@ -99,9 +99,8 @@ public class TestTemplate {
         };
 
         private static final String[] GOOGLE_TRUTH_ASSERTION_IMPORTS = new String[]{
-                "import static com.google.common.truth.Truth.assertThat;\n",
-                "import static com.google.common.truth.Truth8.assertThat;\n",
-                "import static com.google.common.truth.Truth.assertWithMessage;\n"
+                "import static com.google.common.truth.Truth.*;\n",
+                "import static com.google.common.truth.Truth8.*;\n",
         };
 
         private static final String[] MOCKITO_IMPORTS = new String[]{
