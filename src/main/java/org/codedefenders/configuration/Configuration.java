@@ -156,6 +156,10 @@ public class Configuration {
         return "jdbc:mysql://" + dbHost + ":" + dbPort + "/" + dbName;
     }
 
+    public String getDbName() {
+        return dbName;
+    }
+
     public String getDbUsername() {
         return dbUsername;
     }

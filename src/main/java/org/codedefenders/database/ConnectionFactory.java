@@ -48,7 +48,10 @@ public class ConnectionFactory {
     BasicDataSource dataSource;
 
     @Inject
-    ConnectionFactory(Configuration config) {
+    Configuration config;
+
+    @PostConstruct
+    void init() {
         dataSource = new BasicDataSource();
         try {
             dataSource.setDriver(new Driver());
@@ -58,10 +61,7 @@ public class ConnectionFactory {
         dataSource.setUrl(config.getDbUrl());
         dataSource.setUsername(config.getDbUsername());
         dataSource.setPassword(config.getDbPassword());
-    }
 
-    @PostConstruct
-    void init() {
         migrate();
     }
 
@@ -108,7 +108,8 @@ public class ConnectionFactory {
 
     private Map<String, Boolean> checkDatabase() {
         Map<String, Boolean> result = new HashMap<>();
-        result.put("databaseEmpty", checkDatabase(metaData -> metaData.getTables(null, null, null, null), true));
+        result.put("databaseEmpty",
+                checkDatabase(metaData -> metaData.getTables(config.getDbName(), null, null, null), true));
         result.put("flywayHistoryExists",
                 checkDatabase(metaData -> metaData.getTables(null, null, "flyway_schema_histry", null)));
         result.put("databaseBaseline1.6",
