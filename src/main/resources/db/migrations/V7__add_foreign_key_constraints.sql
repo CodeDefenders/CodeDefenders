@@ -1,0 +1,24 @@
+ALTER TABLE `killmapjob`
+    ADD CONSTRAINT FOREIGN KEY (Game_ID) REFERENCES `games` (ID);
+ALTER TABLE `killmapjob`
+    ADD CONSTRAINT FOREIGN KEY (Class_ID) REFERENCES `classes` (Class_ID);
+ALTER TABLE `test_smell`
+    ADD CONSTRAINT FOREIGN KEY (Test_ID) REFERENCES `tests` (Test_ID);
+ALTER TABLE `event_chat`
+    ADD CONSTRAINT FOREIGN KEY (Event_Id) REFERENCES `events` (Event_ID);
+ALTER TABLE `events`
+    ADD CONSTRAINT FOREIGN KEY (Game_ID) REFERENCES `games` (ID);
+ALTER TABLE `events`
+    ADD CONSTRAINT FOREIGN KEY (Player_ID) REFERENCES `players` (ID);
+ALTER TABLE `events`
+    ADD CONSTRAINT FOREIGN KEY (Event_Type) REFERENCES `event_messages` (Event_Type);
+ALTER TABLE `intention`
+    ADD CONSTRAINT FOREIGN KEY (Test_ID) REFERENCES `tests` (Test_ID);
+ALTER TABLE `intention`
+    ADD CONSTRAINT FOREIGN KEY (Mutant_ID) REFERENCES `mutants` (Mutant_ID);
+ALTER TABLE `intention`
+    ADD CONSTRAINT FOREIGN KEY (Game_ID) REFERENCES `games` (ID);
+ALTER TABLE `killmapjob`
+    ADD CONSTRAINT FOREIGN KEY (Game_ID) REFERENCES `games` (ID);
+ALTER TABLE `killmapjob`
+    ADD CONSTRAINT FOREIGN KEY (Class_ID) REFERENCES `classes` (Class_ID);

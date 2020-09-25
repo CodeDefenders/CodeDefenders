@@ -20,14 +20,21 @@
 package org.codedefenders.database;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.codedefenders.configuration.Configuration;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +60,11 @@ public class ConnectionFactory {
         dataSource.setPassword(config.getDbPassword());
     }
 
+    @PostConstruct
+    void init() {
+        migrate();
+    }
+
     @PreDestroy
     void shutdown() {
         try {
@@ -64,6 +76,63 @@ public class ConnectionFactory {
 
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    private void migrate() {
+        FluentConfiguration flywayConfig = Flyway.configure();
+        flywayConfig.dataSource(dataSource);
+        flywayConfig.locations("classpath:db/migrations");
+
+        Map<String, Boolean> check = checkDatabase();
+
+        if (!check.get("databaseEmpty") && !check.get("flywayHistoryExists")) {
+            if (check.get("databaseBaseline1.7")) {
+                flywayConfig.baselineVersion("3");
+                flywayConfig.baselineOnMigrate(true);
+            } else if (check.get("databaseBaseline1.6")) {
+                flywayConfig.baselineVersion("1");
+                flywayConfig.baselineOnMigrate(true);
+            } else {
+                throw new IllegalStateException("Unsupported database update! Please first update to 1.6");
+            }
+        }
+
+        Flyway flyway = flywayConfig.load();
+        flyway.migrate();
+    }
+
+    @FunctionalInterface
+    interface DataBaseCheck<T, R> {
+        R check(T input) throws SQLException;
+    }
+
+    private Map<String, Boolean> checkDatabase() {
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("databaseEmpty", checkDatabase(metaData -> metaData.getTables(null, null, null, null), true));
+        result.put("flywayHistoryExists",
+                checkDatabase(metaData -> metaData.getTables(null, null, "flyway_schema_histry", null)));
+        result.put("databaseBaseline1.6",
+                checkDatabase(metaData -> metaData.getColumns(null, null, "games", "ForceHamcrest")));
+        result.put("databaseBaseline1.7",
+                checkDatabase(metaData -> metaData.getColumns(null, null, "puzzles", "Active")));
+        return result;
+    }
+
+    private Boolean checkDatabase(DataBaseCheck<DatabaseMetaData, ResultSet> checkFunction) {
+        return checkDatabase(checkFunction, false);
+    }
+
+    private Boolean checkDatabase(DataBaseCheck<DatabaseMetaData, ResultSet> checkFunction, boolean noResult) {
+        Boolean result = null;
+        try (Connection conn = getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            try (ResultSet rs = checkFunction.check(metaData)) {
+                result = rs.next() == !noResult;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return result;
     }
 
     public void updateSize(int maxTotalConnections) {
