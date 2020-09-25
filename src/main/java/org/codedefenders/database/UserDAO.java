@@ -110,6 +110,7 @@ public class UserDAO {
                 "      SELECT DISTINCT players.User_ID",
                 "      FROM players, games",
                 "      WHERE players.Game_ID = games.ID",
+                "        AND games.Mode <> 'PUZZLE'",
                 "        AND (games.State = 'ACTIVE' OR games.State = 'CREATED')",
                 "        AND players.Role IN ('ATTACKER', 'DEFENDER')",
                 "        AND Active = TRUE",
