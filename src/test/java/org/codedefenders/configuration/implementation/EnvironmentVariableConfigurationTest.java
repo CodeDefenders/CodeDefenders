@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
 
 public class EnvironmentVariableConfigurationTest {
 
@@ -42,7 +43,7 @@ public class EnvironmentVariableConfigurationTest {
             config.init();
             assertEquals(newDbUser, config.getDbUsername());
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            assumeTrue(e.getMessage(), false);
             // This is bad!
         }
     }

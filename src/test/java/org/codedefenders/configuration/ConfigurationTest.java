@@ -32,8 +32,8 @@ public class ConfigurationTest {
     public void prepareObjects() {
         // Setup configuration which will pass
         config = new Configuration();
-        config.dbPort=3306;
-        config.dbHost="localhost";
+        config.dbPort = 3306;
+        config.dbHost = "localhost";
     }
 
     @Test()
@@ -42,6 +42,7 @@ public class ConfigurationTest {
 
         try {
             config.validate();
+            fail("Should throw exception.");
         } catch (ConfigurationValidationException e) {
             assertTrue(e.getMessage().contains("dbHost"));
         }
@@ -54,6 +55,7 @@ public class ConfigurationTest {
 
         try {
             config.validate();
+            fail("Should throw exception.");
         } catch (ConfigurationValidationException e) {
             assertTrue(e.getMessage().contains("dbPort"));
         }
