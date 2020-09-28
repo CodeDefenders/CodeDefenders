@@ -19,11 +19,9 @@
 
 package org.codedefenders.configuration;
 
-import java.util.Set;
-
 public class ConfigurationValidationException extends Exception {
 
-    public ConfigurationValidationException(Set<String> errorMessages) {
+    public ConfigurationValidationException(Iterable<String> errorMessages) {
         super("The following validation errors exist: \n - " + String.join("\n - ", errorMessages));
     }
 }

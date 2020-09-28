@@ -20,8 +20,8 @@
 package org.codedefenders.configuration;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
@@ -85,7 +85,7 @@ public class Configuration {
      * @throws ConfigurationValidationException This lists all the reasons why the validation failed.
      */
     public final void validate() throws ConfigurationValidationException {
-        Set<String> validationErrors = new HashSet<>();
+        List<String> validationErrors = new ArrayList<>();
 
         // TODO: Do something useful here
         // assert getAntHome().isDirectory();
