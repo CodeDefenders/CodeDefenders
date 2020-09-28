@@ -48,7 +48,6 @@ class PropertiesFileConfiguration extends BaseConfiguration {
 
     private final Properties properties;
 
-    // Maybe we could replace this in the future with injecting a list of ConfigFileResolver
     @Inject
     PropertiesFileConfiguration(List<ConfigFileResolver> configFileResolvers) {
         super();
