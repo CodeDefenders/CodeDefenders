@@ -27,30 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 
 import org.codedefenders.installer.Installer;
 
 public class ConfigFileResolverProducer {
-
-    ClasspathConfigFileResolver classpathCfr;
-    TomcatConfigFileResolver tomcatCfr;
-    EnvironmentVariableConfigFileResolver environmentVarCfr;
-    SystemPropertyConfigFileResolver systemPropertyCfr;
-    ContextConfigFileResolver contextCfr;
-
-    @Inject
-    ConfigFileResolverProducer(ClasspathConfigFileResolver classpathCfr,
-            TomcatConfigFileResolver tomcatCfr,
-            EnvironmentVariableConfigFileResolver environmentVarCfr,
-            SystemPropertyConfigFileResolver systemPropertyCfr,
-            ContextConfigFileResolver contextCfr) {
-        this.classpathCfr = classpathCfr;
-        this.tomcatCfr = tomcatCfr;
-        this.environmentVarCfr = environmentVarCfr;
-        this.systemPropertyCfr = systemPropertyCfr;
-        this.contextCfr = contextCfr;
-    }
 
     /**
      * Get a list of ConfigFilResolver classes.
@@ -60,7 +40,11 @@ public class ConfigFileResolverProducer {
      * @return A list of ConfigFileResolver classes sorted by ascending priority.
      */
     @Produces
-    List<ConfigFileResolver> getConfigFileResolvers() {
+    List<ConfigFileResolver> getConfigFileResolvers(ClasspathConfigFileResolver classpathCfr,
+            TomcatConfigFileResolver tomcatCfr,
+            EnvironmentVariableConfigFileResolver environmentVarCfr,
+            SystemPropertyConfigFileResolver systemPropertyCfr,
+            ContextConfigFileResolver contextCfr) {
         // If this attribute is set we run in standalone mode (when the Installer is called)
         if (Installer.configFile == null) {
             return Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr);

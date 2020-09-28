@@ -19,30 +19,12 @@
 
 package org.codedefenders.configuration.implementation;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 
 public class BaseConfigurationProducer {
-
-    SystemPropertyConfiguration sysPropConf;
-    ContextConfiguration contextConf;
-    EnvironmentVariableConfiguration envVarConf;
-    PropertiesFileConfiguration propFileConf;
-
-    @Inject
-    BaseConfigurationProducer(SystemPropertyConfiguration sysPropConf,
-            ContextConfiguration contextConf,
-            EnvironmentVariableConfiguration envVarConf,
-            PropertiesFileConfiguration propFileConf) {
-        this.sysPropConf = sysPropConf;
-        this.contextConf = contextConf;
-        this.envVarConf = envVarConf;
-        this.propFileConf = propFileConf;
-    }
 
     /**
      * Get a list of Configuration classes.
@@ -52,7 +34,10 @@ public class BaseConfigurationProducer {
      * @return A list of Configuration classes sorted by ascending priority.
      */
     @Produces
-    public List<BaseConfiguration> getConfiguration() {
-        return new ArrayList<>(Arrays.asList(propFileConf, envVarConf, sysPropConf, contextConf));
+    public List<BaseConfiguration> getConfiguration(SystemPropertyConfiguration sysPropConf,
+            ContextConfiguration contextConf,
+            EnvironmentVariableConfiguration envVarConf,
+            PropertiesFileConfiguration propFileConf) {
+        return Arrays.asList(propFileConf, envVarConf, sysPropConf, contextConf);
     }
 }
