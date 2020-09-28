@@ -39,7 +39,7 @@ import com.google.common.base.CaseFormat;
 @Priority(10)
 @Alternative
 @Singleton
-public class ContextConfiguration extends BaseConfiguration {
+class ContextConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(ContextConfiguration.class);
 
     @Override

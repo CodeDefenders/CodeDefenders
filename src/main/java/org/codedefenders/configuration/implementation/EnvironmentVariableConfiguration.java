@@ -37,7 +37,7 @@ import com.google.common.base.CaseFormat;
 @Priority(50)
 @Alternative
 @Singleton
-public class EnvironmentVariableConfiguration extends BaseConfiguration {
+class EnvironmentVariableConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentVariableConfiguration.class);
 
     @Override

@@ -36,7 +36,7 @@ import com.google.common.base.CaseFormat;
 @Priority(10)
 @Alternative
 @Singleton
-public class SystemPropertyConfiguration extends BaseConfiguration {
+class SystemPropertyConfiguration extends BaseConfiguration {
     private static final Logger logger = LoggerFactory.getLogger(SystemPropertyConfiguration.class);
 
     @Override

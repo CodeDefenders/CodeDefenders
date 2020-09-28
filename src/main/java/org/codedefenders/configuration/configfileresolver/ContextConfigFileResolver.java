@@ -28,7 +28,7 @@ import javax.naming.NamingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ContextConfigFileResolver extends ConfigFileResolver {
+class ContextConfigFileResolver extends ConfigFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(ContextConfigFileResolver.class);
 
     @Override

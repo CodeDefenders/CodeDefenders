@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author degenhart
  */
-public abstract class BaseConfiguration extends Configuration {
+abstract class BaseConfiguration extends Configuration {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @PostConstruct
