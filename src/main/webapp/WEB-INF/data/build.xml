@@ -7,8 +7,7 @@
 
 	<property name="policyfile" location="security.policy"/>
 	<property name="mutOp" value=":ALL"/>
-	<!-- data.dir will be evaluated by the resources and filtering plugin of maven -->
-	<property name="codedef.home" value="${data.dir}"/>
+
 	<property name="major.home" value="${codedef.home}/lib/major"/>
 	<property name="evosuite.home" value="${codedef.home}/lib/evosuite"/>
 	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
@@ -97,6 +96,7 @@
 	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
 		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec" dumponexit="true">
 			<junit printsummary="true" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
+                <sysproperty key="codedef.home" value="${codedef.home}" />
 				<classpath refid="test.cp"/>
 				<classpath location="${test.file}"/>
 				<test name="${testClassname}"/>
@@ -110,6 +110,7 @@
 	<!-- requires test, mutant, and the name of the class -->
 	<target name="test-mutant" description="run test on mutant to see if test fails">
 		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false">
+            <sysproperty key="codedef.home" value="${codedef.home}" />
 
 			<!-- Sets the content of the classpath to the mutant -->
 			<classpath refid="nocut.cp"/>
@@ -173,6 +174,7 @@
 			description="recompile the test using the mutant, and test the mutant to see if test fails"
 			depends="recompile-test-with-mutant">
 		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false">
+            <sysproperty key="codedef.home" value="${codedef.home}" />
 
 			<!-- Sets the content of the classpath to the mutant -->
 			<classpath refid="nocut.cp"/>

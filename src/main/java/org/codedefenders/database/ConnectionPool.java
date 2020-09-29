@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.NamingException;
-
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.slf4j.Logger;
@@ -90,7 +88,7 @@ public final class ConnectionPool {
                 conn.close();
                 // If we managed to connect, we can proceed. Otherwise, we retry
                 break;
-            } catch (NamingException | SQLException e) {
+            } catch (SQLException e) {
                 logger.warn("Cannot connect to the Database" + e.getMessage());
                 if (i == MAX_RETRIES) {
                     logger.warn("Give up and fail deployment");
@@ -203,12 +201,14 @@ public final class ConnectionPool {
     }
 
     private Connection refreshConnection() throws SQLException {
-        try {
-            return DatabaseConnection.getConnection();
+        //try {
+        return DatabaseConnection.getConnection();
+        /*
         } catch (NamingException e) {
             logger.warn("JDBC Driver not found.", e);
             throw new UncheckedSQLException("Could not update database connection.");
         }
+        */
     }
 
     /**

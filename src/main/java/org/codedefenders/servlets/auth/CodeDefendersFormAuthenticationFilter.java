@@ -1,8 +1,5 @@
 package org.codedefenders.servlets.auth;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +14,6 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.User;
-import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +55,6 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         DatabaseAccess.logSession(((User) subject.getPrincipal()).getId(), getClientIpAddress(httpRequest));
         login.loginUser((User) subject.getPrincipal());
 
-        storeApplicationDataInSession(session);
-
         return true;//super.onLoginSuccess(token, subject, request, response);
     }
 
@@ -71,26 +65,6 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         messages.add("Username not found or password incorrect.");
 
         return super.onLoginFailure(token, e, request, response);
-    }
-
-    /*
-     * This method collects all the app specific configurations and store them into
-     * the current user-session. This avoids to access Context directly from the JSP
-     * code which is a bad practice, since JSP are meant only for implementing
-     * rendering code.
-     */
-    private void storeApplicationDataInSession(HttpSession session) {
-        // First check the Web abb context
-        boolean isAttackerBlocked = false;
-        try {
-            InitialContext initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
-            isAttackerBlocked = "enabled".equals((String) environmentContext.lookup(Constants.BLOCK_ATTACKER));
-        } catch (NamingException e) {
-            logger.warn("Swallow Exception " + e);
-            logger.info("Default " + Constants.BLOCK_ATTACKER + " to false");
-        }
-        session.setAttribute(Constants.BLOCK_ATTACKER, isAttackerBlocked);
     }
 
     @SuppressWarnings("UnstableApiUsage")

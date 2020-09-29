@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.codedefenders.configuration.Property;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -64,28 +64,7 @@ public class AntRunner implements //
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
     @Inject
-    @Property("ant.home")
-    private String antHome;
-
-    @Inject
-    @Property("cluster.mode")
-    private boolean clusterEnabled;
-
-    @Inject
-    @Property("force.local.execution")
-    private boolean forceLocalExecution;
-
-    @Inject
-    @Property("cluster.java.home")
-    private String clusterJavaHome;
-
-    @Inject
-    @Property("cluster.reservation.name")
-    private String clusterReservationName;
-
-    @Inject
-    @Property("cluster.timeout")
-    private String clusterTimeOutMinutes;
+    private Configuration config;
 
 
     /**
@@ -191,7 +170,8 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception {
-        AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName, forceLocalExecution);
+        AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName,
+                config.isForceLocalExecution());
 
         if (result.hasFailure() || result.hasError()) {
             if (result.hasFailure()) {
@@ -214,7 +194,7 @@ public class AntRunner implements //
         GameClass cut = GameClassDAO.getClassForGameId(t.getGameId());
 
         AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(),
-                cut, t.getFullyQualifiedClassName(), forceLocalExecution);
+                cut, t.getFullyQualifiedClassName(), config.isForceLocalExecution());
 
         // add coverage information
         final LineCoverage coverage = LineCoverageGenerator.generate(cut, Paths.get(t.getJavaFile()));
@@ -244,7 +224,7 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public String compileCUT(GameClass cut) throws CompileException {
-        AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, forceLocalExecution);
+        AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, config.isForceLocalExecution());
 
         logger.info("Compile New CUT, Compilation result: {}", result);
 
@@ -275,14 +255,15 @@ public class AntRunner implements //
 
         // Gets the classname for the mutant from the game it is in
         AntProcessResult result = runAntTarget("compile-mutant", dir.getAbsolutePath(), null,
-                cut, null, forceLocalExecution);
+                cut, null, config.isForceLocalExecution());
 
         logger.info("Compilation result: {}", result);
 
         Mutant newMutant;
         // If the input stream returned a 'successful build' message, the mutant compiled correctly
         if (result.compiled()) {
-            // Create and insert a new target execution recording successful compile, with no message to report, and return its ID
+            // Create and insert a new target execution recording successful compile,
+            // with no message to report, and return its ID
             // Locate .class file
             final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
             final LinkedList<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(
@@ -317,13 +298,14 @@ public class AntRunner implements //
         //public static int compileTest(ServletContext context, Test t) {
 
         AntProcessResult result = runAntTarget("compile-test", null, dir.getAbsolutePath(),
-                cut, null, forceLocalExecution);
+                cut, null, config.isForceLocalExecution());
 
         int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameId);
 
         // If the input stream returned a 'successful build' message, the test compiled correctly
         if (result.compiled()) {
-            // Create and insert a new target execution recording successful compile, with no message to report, and return its ID
+            // Create and insert a new target execution recording successful compile,
+            // with no message to report, and return its ID
             // Locate .class file
             final String compiledClassName = FilenameUtils.getBaseName(javaFile) + JAVA_CLASS_EXT;
             final List<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(
@@ -370,7 +352,8 @@ public class AntRunner implements //
      * {@inheritDoc}
      */
     public boolean compileGenTestSuite(final GameClass cut) {
-        AntProcessResult result = runAntTarget("compile-gen-tests", null, null, cut, cut.getName() + Constants.SUITE_EXT);
+        AntProcessResult result = runAntTarget("compile-gen-tests", null, null, cut,
+                cut.getName() + Constants.SUITE_EXT);
 
         // Return true iff compilation succeeds
         return result.compiled();
@@ -406,10 +389,10 @@ public class AntRunner implements //
          * code-defender working dir is on the NFS.
          */
 
-        if (clusterEnabled && !forcedLocally) {
+        if (config.isClusterModeEnabled() && !forcedLocally) {
             logger.info("Clustered Execution");
-            if (clusterJavaHome != null) {
-                env.put("JAVA_HOME", clusterJavaHome);
+            if (config.getClusterJavaHome() != null) {
+                env.put("JAVA_HOME", config.getClusterJavaHome());
             }
 
             env.put("CLASSPATH", Constants.TEST_CLASSPATH);
@@ -417,24 +400,24 @@ public class AntRunner implements //
             command.add("srun");
 
             // Select reservation cluster
-            if (clusterReservationName != null) {
-                command.add("--reservation=" + clusterReservationName);
+            if (config.getClusterReservationName() != null) {
+                command.add("--reservation=" + config.getClusterReservationName());
             }
 
             // Timeout. Note that there's a plus 10 minutes of grace period
             // anyway
             // TODO This is unsafe we need to check this is a valid integer
-            if (clusterTimeOutMinutes != null) {
-                command.add("--time=" + clusterTimeOutMinutes);
+            if (config.getClusterTimeout() > -1) {
+                command.add("--time=" + config.getClusterTimeout());
             }
             //
             command.add("ant");
         } else {
             logger.debug("Local Execution");
-            env.put("CLASSPATH","lib/hamcrest-all-1.3.jar" + File.pathSeparator + "lib/junit-4.12.jar"
+            env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar" + File.pathSeparator + "lib/junit-4.12.jar"
                     + File.pathSeparator + "lib/mockito-all-1.9.5.jar");
 
-            String command_ = antHome + "/bin/ant";
+            String command_ = config.getAntHome() + "/bin/ant";
 
             if (System.getProperty("os.name").toLowerCase().contains("windows")) {
                 command_ += ".bat";
@@ -447,7 +430,7 @@ public class AntRunner implements //
         // Add additional command parameters
         command.add(target); // "-v", "-d", for verbose, debug
         // This ensures that ant actually uses the data dir we setup
-        command.add("-Dcodedef.home=" + Constants.DATA_DIR);
+        command.add("-Dcodedef.home=" + config.getDataDir().getAbsolutePath());
 
         command.add("-Dmutant.file=" + mutantDir);
         command.add("-Dtest.file=" + testDir);
@@ -477,11 +460,11 @@ public class AntRunner implements //
         // Execute whichever command was build
         pb.command(command);
 
-        String buildFileDir = Constants.DATA_DIR;
-        pb.directory(new File(buildFileDir));
+        pb.directory(config.getDataDir());
         pb.redirectErrorStream(true);
 
-        logger.info("Executing Ant Command {} from directory {}", pb.command().toString(), buildFileDir);
+        logger.info("Executing Ant Command {} from directory {}", pb.command().toString(),
+                config.getDataDir().getAbsolutePath());
 
         return runAntProcess(pb);
     }

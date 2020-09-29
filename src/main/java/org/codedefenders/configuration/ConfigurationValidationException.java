@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2020 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,14 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.database;
 
-import java.sql.Connection;
+package org.codedefenders.configuration;
 
-import org.codedefenders.util.CDIUtil;
+public class ConfigurationValidationException extends Exception {
 
-public class DatabaseConnection {
-    public static Connection getConnection() {
-        return CDIUtil.getBeanFromCDI(Connection.class);
+    public ConfigurationValidationException(Iterable<String> errorMessages) {
+        super("The following validation errors exist: \n - " + String.join("\n - ", errorMessages));
     }
 }

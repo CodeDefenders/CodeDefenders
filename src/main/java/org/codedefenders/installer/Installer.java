@@ -40,10 +40,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -64,19 +61,18 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.jboss.weld.environment.se.Weld;
-import org.jboss.weld.environment.se.WeldContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lexicalscope.jewel.cli.CliFactory;
 import com.lexicalscope.jewel.cli.Option;
-import com.mysql.cj.jdbc.MysqlDataSource;
 
 /**
  * This class allows adding {@link GameClass game classes (CUTs)}, {@link Mutant mutants},
@@ -96,7 +92,13 @@ public class Installer {
 
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
-    private BackendExecutorService backend;
+    private final BackendExecutorService backend;
+
+    /**
+     * This exposes a File object when running in standalone mode, so the ConfigFileResolverProducer can consider this
+     * when creating the config.
+     */
+    public static File configFile = null;
 
     @Inject
     public Installer(BackendExecutorService backend) {
@@ -139,18 +141,18 @@ public class Installer {
      * Inserts in order: game classes (CUTs), mutants, tests, puzzle chapters and puzzles.
      */
     public static void main(String[] args) throws IOException, NamingException {
+        // We have to do this before initializing the CDI so the PropertiesFileConfiguration can access the configFile.
         ParsingInterface commandLine = CliFactory.parseArguments(ParsingInterface.class, args);
-        Properties configurations = new Properties();
-        configurations.load(new FileInputStream(commandLine.getConfigurations()));
+        configFile = commandLine.getConfigurations();
 
-        setupInitialContext(configurations);
+        // Initialize CDI
+        new Weld().initialize();
 
-        // Get an instance of backend from the Context
-        InitialContext initialContext = new InitialContext();
-        BackendExecutorService backend =
-                (BackendExecutorService) initialContext.lookup("java:comp/env/codedefenders/backend");
         // No need to create the zip file, we can directly use the "exploded" directory
-        Installer.installPuzzles(commandLine.getBundleDirectory().toPath(), backend);
+        Installer installer = CDIUtil.getBeanFromCDI(Installer.class);
+        installer.installPuzzles(commandLine.getBundleDirectory().toPath());
+
+        // Weld will be automatically closed at system.exit
         // the exit
         System.exit(0);
     }
@@ -173,15 +175,14 @@ public class Installer {
      *
      * @param directory the directory puzzle related files are looked at.
      */
-    public static void installPuzzles(Path directory, BackendExecutorService backend) {
+    public void installPuzzles(Path directory) {
         final List<File> cuts = getFilesForDir(directory.resolve("cuts"), ".java");
         final List<File> mutants = getFilesForDir(directory.resolve("mutants"), ".java");
         final List<File> tests = getFilesForDir(directory.resolve("tests"), ".java");
         final List<File> puzzleChapterSpecs = getFilesForDir(directory.resolve("puzzleChapters"), ".properties");
         final List<File> puzzleSpecs = getFilesForDir(directory.resolve("puzzles"), ".properties");
 
-        Installer installer = new Installer(backend);
-        installer.run(cuts, mutants, tests, puzzleChapterSpecs, puzzleSpecs);
+        run(cuts, mutants, tests, puzzleChapterSpecs, puzzleSpecs);
     }
 
     /**
@@ -189,7 +190,7 @@ public class Installer {
      *
      * <p>Iterates through a maximal folder depth of 5.
      *
-     * @param directory the directory the files should be found in.
+     * @param directory     the directory the files should be found in.
      * @param fileExtension the extension of the to be found files.
      * @return a list of found files. Empty if none or an error occurred.
      */
@@ -214,7 +215,7 @@ public class Installer {
     }
 
     private void run(List<File> cuts, List<File> mutants, List<File> tests,
-                     List<File> puzzleChapterSpecs, List<File> puzzleSpecs) {
+            List<File> puzzleChapterSpecs, List<File> puzzleSpecs) {
         for (File cutFile : cuts) {
             try {
                 installCUT(cutFile);
@@ -254,50 +255,6 @@ public class Installer {
                 logger.error("Failed to install PUZZLE " + puzzleSpecFile, e);
             }
         }
-    }
-
-    /**
-     * Sets up the {@link InitialContext} for a given configuration.
-     *
-     * <p>Also adds the database {@link DataSource} to the initial context.
-     *
-     * @param configurations the configuration used to set the initial context.
-     * @throws NamingException when setting the initial context fails.
-     */
-    private static void setupInitialContext(Properties configurations) throws NamingException {
-        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
-        System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
-
-        InitialContext ic = new InitialContext();
-
-        ic.createSubcontext("java:");
-        ic.createSubcontext("java:comp");
-        ic.createSubcontext("java:comp/env");
-        ic.createSubcontext("java:comp/env/codedefenders");
-
-        // Alessio: Maybe there a better way to do it...
-        for (String propName : configurations.stringPropertyNames()) {
-            logger.info("Setting java:comp/env/codedefenders/" + propName + " = " + configurations.get(propName));
-            ic.bind("java:comp/env/codedefenders/" + propName, configurations.get(propName));
-        }
-
-        ic.createSubcontext("java:comp/env/jdbc");
-
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(configurations.getProperty("db.url"));
-        dataSource.setUser(configurations.getProperty("db.username"));
-        dataSource.setPassword(configurations.getProperty("db.password"));
-
-        ic.bind("java:comp/env/jdbc/codedefenders", dataSource);
-
-        // Maybe there's a way to provide the beans definition directly here...
-        Weld weld = new Weld();
-        WeldContainer container = weld.initialize();
-        // Manually load the dependencies and set the backend in the context,
-        // this is only because I cannot inject BeanManager
-        BackendExecutorService backend = container.instance().select(BackendExecutorService.class).get();
-        ic.bind("java:comp/env/codedefenders/backend", backend);
-        // Weld will be automatically closed at system.exit
     }
 
     /**
