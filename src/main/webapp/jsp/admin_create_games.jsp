@@ -80,7 +80,7 @@
                             <div class="col-sm-3" style="padding-top: 10px">Last Role</div>
                             <div class="col-sm-1" style="padding-top: 10px">Score</div>
                             <a id="togglePlayersCreated" class="btn btn-sm btn-default" style="float: right">
-                                <span id = "togglePlayersCreatedSpan" class="glyphicon glyphicon-alert"></span>
+                                <span id = "togglePlayersCreatedSpan" class="glyphicon glyphicon-eye-open"></span>
                             </a>
                         </div>
                     </th>
