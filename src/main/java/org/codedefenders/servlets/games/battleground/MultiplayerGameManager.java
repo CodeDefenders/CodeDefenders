@@ -355,8 +355,7 @@ public class MultiplayerGameManager extends HttpServlet {
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
                 testText,
                 game.getMaxAssertionsPerTest(),
-                game.isForceHamcrest()
-        );
+                game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
@@ -819,8 +818,7 @@ public class MultiplayerGameManager extends HttpServlet {
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
                     testText,
                     game.getMaxAssertionsPerTest(),
-                    game.isForceHamcrest()
-            );
+                    game.getCUT().getAssertionLibrary());
             boolean validationSuccess = validationMessage.isEmpty();
 
             TestValidatedEvent tve = new TestValidatedEvent();

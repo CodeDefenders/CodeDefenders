@@ -18,6 +18,9 @@
  */
 package org.codedefenders.servlets.admin;
 
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -65,9 +68,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
 @WebServlet(urlPatterns = {Paths.ADMIN_PAGE, Paths.ADMIN_GAMES})
 public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
@@ -112,7 +112,6 @@ public class AdminCreateGames extends HttpServlet {
     private MultiplayerGame mg;
     private boolean chatEnabled;
     private int maxAssertionsPerTest;
-    private boolean forceHamcrest;
     private CodeValidatorLevel mutantValidatorLevel;
 
     private boolean withTests;
@@ -333,7 +332,6 @@ public class AdminCreateGames extends HttpServlet {
             gamesState = request.getParameter("gamesState")
                     .equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
             maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
-            forceHamcrest = request.getParameter("forceHamcrest") != null;
             mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
             chatEnabled = request.getParameter("chatEnabled") != null;
 
@@ -522,7 +520,7 @@ public class AdminCreateGames extends HttpServlet {
 
         // TODO Why static ?
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame, cutId,
-                login.getUserId(), gamesLevel, gamesState, maxAssertionsPerTest, forceHamcrest, //
+                login.getUserId(), gamesLevel, gamesState, maxAssertionsPerTest, //
                 chatEnabled, mutantValidatorLevel, withTests, withMutants, //
                 capturePlayersIntention, automaticEquivalenceTrigger);
 
@@ -593,13 +591,13 @@ public class AdminCreateGames extends HttpServlet {
 
     // TODO Why static ?!
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame, int cutId,
-                                                     int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest, boolean forceHamcrest,
-                                                     boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants, //
-                                                     boolean capturePlayersIntention, //
+                                                     int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest,
+                                                     boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants,
+                                                     boolean capturePlayersIntention,
                                                      int automaticEquivalenceTrigger) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
-            MultiplayerGame game = new MultiplayerGame.Builder(cutId, creatorId, maxAssertionsPerTest, forceHamcrest)
+            MultiplayerGame game = new MultiplayerGame.Builder(cutId, creatorId, maxAssertionsPerTest)
                     .level(level)
                     .state(state)
                     .chatEnabled(chatEnabled)

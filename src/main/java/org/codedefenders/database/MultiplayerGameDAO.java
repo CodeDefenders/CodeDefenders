@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -31,8 +32,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-
-import static org.codedefenders.database.DB.RSMapper;
 
 /**
  * This class handles the database logic for multiplayer games.
@@ -63,7 +62,6 @@ public class MultiplayerGameDAO {
         GameState state = GameState.valueOf(rs.getString("State"));
         GameLevel level = GameLevel.valueOf(rs.getString("Level"));
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
-        boolean forceHamcrest = rs.getBoolean("ForceHamcrest");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
         CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
@@ -75,7 +73,7 @@ public class MultiplayerGameDAO {
 
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
-        return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
+        return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
                 .id(id)
                 .state(state)
@@ -162,7 +160,6 @@ public class MultiplayerGameDAO {
         int creatorId = game.getCreatorId();
         GameState state = game.getState();
         int maxAssertionsPerTest = game.getMaxAssertionsPerTest();
-        boolean forceHamcrest = game.isForceHamcrest();
         boolean chatEnabled = game.isChatEnabled();
         CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
@@ -182,12 +179,11 @@ public class MultiplayerGameDAO {
                 "State,",
                 "Mode,",
                 "MaxAssertionsPerTest,",
-                "ForceHamcrest,",
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention,",
                 "EquivalenceThreshold)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -201,7 +197,6 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(state.name()),
                 DatabaseValue.of(mode.name()),
                 DatabaseValue.of(maxAssertionsPerTest),
-                DatabaseValue.of(forceHamcrest),
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
                 DatabaseValue.of(capturePlayersIntention),

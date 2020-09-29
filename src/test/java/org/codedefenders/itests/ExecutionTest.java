@@ -18,34 +18,6 @@
  */
 package org.codedefenders.itests;
 
-import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.User;
-import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -64,6 +36,33 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
+
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.User;
+import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 //FIXME
 @Ignore
@@ -131,6 +130,7 @@ public class ExecutionTest {
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
         PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
+            @Override
             public Connection answer(InvocationOnMock invocation) throws SQLException {
                 // Return a new connection from the rule instead
                 return db.getConnection();
@@ -212,7 +212,7 @@ public class ExecutionTest {
 
         // Observer creates a new MP game
         MultiplayerGame multiplayerGame = new MultiplayerGame
-                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
+                .Builder(cut.getId(), observer.getId(), 2)
                 .state(GameState.ACTIVE)
                 .level(GameLevel.EASY)
                 .defenderValue(10)

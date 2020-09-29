@@ -60,7 +60,6 @@ public class MeleeGameDAO {
         GameState state = GameState.valueOf(rs.getString("State"));
         GameLevel level = GameLevel.valueOf(rs.getString("Level"));
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
-        boolean forceHamcrest = rs.getBoolean("ForceHamcrest");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
         CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
@@ -74,7 +73,7 @@ public class MeleeGameDAO {
 
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
-        return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
+        return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
                 .id(id)
                 .state(state)
@@ -162,7 +161,6 @@ public class MeleeGameDAO {
         int creatorId = game.getCreatorId();
         GameState state = game.getState();
         int maxAssertionsPerTest = game.getMaxAssertionsPerTest();
-        boolean forceHamcrest = game.isForceHamcrest();
         boolean chatEnabled = game.isChatEnabled();
         CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
@@ -182,12 +180,11 @@ public class MeleeGameDAO {
                 "State,",
                 "Mode,",
                 "MaxAssertionsPerTest,",
-                "ForceHamcrest,",
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention,",
                 "EquivalenceThreshold)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -201,7 +198,6 @@ public class MeleeGameDAO {
                 DatabaseValue.of(state.name()),
                 DatabaseValue.of(mode.name()),
                 DatabaseValue.of(maxAssertionsPerTest),
-                DatabaseValue.of(forceHamcrest),
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
                 DatabaseValue.of(capturePlayersIntention),

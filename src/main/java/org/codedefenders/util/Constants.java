@@ -93,9 +93,16 @@ public class Constants {
     public static final String LIB_JUNIT = Paths.get(DATA_DIR, "lib", "junit-4.12.jar").toString();
     public static final String LIB_HAMCREST = Paths.get(DATA_DIR, "lib", "hamcrest-all-1.3.jar").toString();
     public static final String LIB_MOCKITO = Paths.get(DATA_DIR, "lib", "mockito-all-1.9.5.jar").toString();
+    public static final String LIB_GOOGLE_TRUTH = Paths.get(DATA_DIR, "lib", "truth-1.0.1.jar").toString();
+    public static final String LIB_GOOGLE_TRUTH_EXTENSION = Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.0.1.jar").toString();
+    public static final String LIB_GUAVA_ANDROID = Paths.get(DATA_DIR, "lib", "guava-29.0-android.jar").toString();
 
+    // TODO Is this really necessary since we set the CP using build.xml?
     public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST
-            + File.pathSeparatorChar + Constants.LIB_MOCKITO;
+            + File.pathSeparatorChar + Constants.LIB_MOCKITO //
+            + File.pathSeparatorChar + Constants.LIB_GOOGLE_TRUTH //
+            + File.pathSeparatorChar + Constants.LIB_GOOGLE_TRUTH_EXTENSION //
+            + File.pathSeparatorChar + Constants.LIB_GUAVA_ANDROID;
 
     public static final String TEST_PREFIX = "Test";
     public static final String JAVA_SOURCE_EXT = ".java";
