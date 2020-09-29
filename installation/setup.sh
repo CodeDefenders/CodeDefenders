@@ -28,13 +28,13 @@ if [ "$#" -lt 1 ]; then
     exit 1
 else
     config_file=$1
-if [ "${config_file:0:1}" = "/" ]; then
-# absolute path
-echo "Absolute path"
+    if [ "${config_file:0:1}" = "/" ]; then
+        # absolute path
+        echo "Absolute path"
     else
-# relative path. Make it absolute
-echo "Relative path"
-config_file=$(pwd)/$config_file
+        # relative path. Make it absolute
+        echo "Relative path"
+        config_file=$(pwd)/$config_file
     fi
 fi
 
@@ -91,13 +91,13 @@ host="$(echo ${url/$user@/} | cut -d/ -f1)"
 port="$(echo $host | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
 
 if [[ $host = *":"* ]]; then
-  DB_HOST="-h ${host%:$port}"
+    DB_HOST="-h ${host%:$port}"
 else
-  DB_HOST="-h ${host}"
+    DB_HOST="-h ${host}"
 fi
 
 if [ ! -z "$port" ]; then
-  DB_PORT="-P $port"
+    DB_PORT="-P $port"
 fi
 
 # extract the path (if any)
@@ -123,9 +123,9 @@ fi
 
 #https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
 if [ -z "${db_password}" ]; then
-  DB_PASSWORD="" # Unset db_password
+    DB_PASSWORD="" # Unset db_password
 else
-  DB_PASSWORD="-p${db_password}"
+    DB_PASSWORD="-p${db_password}"
 fi
 
 mysql -u${db_username} ${DB_PASSWORD} ${DB_HOST} ${DB_PORT} -e "SELECT USER(),CURRENT_USER()" > /dev/null 2> /dev/null
@@ -139,9 +139,9 @@ read -p "* Setting up ${DB_NAME} as code-defenders DB. \
 This will delete any previous db named ${DB_NAME} from ${DB_HOST}. \
 Continue (y/n)? " choice
 case "$choice" in
-y|Y ) mysql -u${db_username} -p${db_password} ${DB_HOST} ${DB_PORT} ${DB_NAME} < ../src/main/resources/db/codedefenders.sql;;
-n|N ) echo "no";;
-* ) echo "invalid. Abort"; exit 1;;
+    y|Y ) mysql -u${db_username} -p${db_password} ${DB_HOST} ${DB_PORT} ${DB_NAME} < ../src/main/resources/db/codedefenders.sql;;
+    n|N ) echo "no";;
+    * ) echo "invalid. Abort"; exit 1;;
 esac
 
 
@@ -155,6 +155,16 @@ ${ant_home}/bin/ant -version > /dev/null
 echo "* Create folder structure under $data_dir"
 
 # Create the home folder and checks this worked
+
+if [ -e ${data_dir} ]; then
+    read -p "* Data DIR ${data_dir} exists. Do you want to wipe it out? Continue (y/n)? " choice
+    case "$choice" in
+        y|Y ) rm -rfv  ${data_dir};;
+        n|N ) echo "no";;
+        * ) echo "Invalid. Abort"; exit 1;;
+    esac
+fi
+
 # Better safe than sorry.
 mkdir -vp "${data_dir}"
 
@@ -164,7 +174,7 @@ if [ ! -d "${data_dir}" ]; then
 fi
 
 for FOLDER in "lib" "sources" "mutants" "tests" "ai"; do
-  mkdir -vp "${data_dir}"/${FOLDER}
+    mkdir -vp "${data_dir}"/${FOLDER}
 done
 
 # Currently, this downloads more dependencies than necessary.

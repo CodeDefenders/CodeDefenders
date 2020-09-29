@@ -28,6 +28,9 @@
 		<pathelement path="${codedef.home}/lib/junit-vintage-engine-5.5.2.jar"/>
 		<pathelement path="${codedef.home}/lib/mockito-all-1.9.5.jar"/>
 		<pathelement path="${codedef.home}/lib/opentest4j-1.2.0.jar"/>
+		<pathelement path="${codedef.home}/lib/truth-1.0.1.jar"/>
+		<pathelement path="${codedef.home}/lib/guava-29.0-android.jar"/>
+		<pathelement path="${codedef.home}/lib/truth-java8-extension-1.0.1.jar"/>
 		<pathelement path="${major.home}/config/config.jar"/>
 		<pathelement path="${cuts.deps}"/>
 	</path>
@@ -47,6 +50,9 @@
 		<pathelement path="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar"/>
 		<pathelement path="${codedef.home}/lib/org.jacoco.core-0.7.7.201606060606.jar"/>
 		<pathelement path="${codedef.home}/lib/org.jacoco.report-0.7.7.201606060606.jar"/>
+		<pathelement path="${codedef.home}/lib/truth-1.0.1.jar"/>
+		<pathelement path="${codedef.home}/lib/guava-29.0-android.jar"/>
+		<pathelement path="${codedef.home}/lib/truth-java8-extension-1.0.1.jar"/>
 		<pathelement path="${major.home}/config/config.jar"/>
 		<pathelement path="${cut.dir}"/>
 		<pathelement path="${cuts.deps}"/>

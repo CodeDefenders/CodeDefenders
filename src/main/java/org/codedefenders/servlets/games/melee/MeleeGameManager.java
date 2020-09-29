@@ -102,6 +102,7 @@ import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
+
 // TODO Alessio 18/02/2020: Differentiate between errorLines in the mutants and errorLines in the tests in the UI.
 //  See: https://gitlab.infosun.fim.uni-passau.de/se2/codedefenders/CodeDefenders/merge_requests/505#note_17170
 
@@ -365,7 +366,7 @@ public class MeleeGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         List<String> validationMessages = CodeValidator.validateTestCodeGetMessage(testText,
-                game.getMaxAssertionsPerTest(), game.isForceHamcrest());
+                game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessages.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
@@ -782,7 +783,7 @@ public class MeleeGameManager extends HttpServlet {
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText,
-                    game.getMaxAssertionsPerTest(), game.isForceHamcrest());
+                    game.getMaxAssertionsPerTest(), game.getCUT().getAssertionLibrary());
             boolean validationSuccess = validationMessage.isEmpty();
 
             TestValidatedEvent tve = new TestValidatedEvent();
