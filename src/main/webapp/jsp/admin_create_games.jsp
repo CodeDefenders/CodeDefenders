@@ -359,6 +359,7 @@
         <div class="row">
 
             <div class="col-sm-12 col-md-6" style="padding-left: 2em; padding-right: 2em;">
+                <h3>Game Settings</h3>
 
                 <div class="form-group" id="cutDiv">
                     <label for="cut_select" class="label-normal">CUT</label>
@@ -371,6 +372,104 @@
                     <br/>
                     <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?fromAdmin=true">Upload Class</a>
                 </div>
+
+                <div class="form-group">
+                    <label for="withMutants" class="label-normal">Include predefined mutants (if available)</label>
+                    <br/>
+                    <input type="checkbox" id="withMutants" name="withMutants"
+                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </div>
+
+                <div class="form-group">
+                    <label for="withTests" class="label-normal">Include predefined tests (if available)</label>
+                    <br/>
+                    <input type="checkbox" id="withTests" name="withTests"
+                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </div>
+
+                <div class="form-group">
+                    <label for="maxAssertionsPerTest" class="label-normal"
+                           title="Maximum number of assertions per test. Increase this for difficult to test classes.">Max.
+                        Assertions per Test</label>
+                    <br/>
+                    <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
+                           id="maxAssertionsPerTest" min=1 required/>
+                </div>
+
+                <div class="form-group" id="mutantValidatorLevelDiv">
+                    <label class="label-normal" title="Click the question sign for more information on the levels"
+                           for="mutantValidatorLevel">
+                        Mutant validator
+                        <a data-toggle="modal" href="#validatorExplanation" style="color:black">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                        </a>
+                    </label>
+                    <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
+                            data-size="medium">
+                        <%for (CodeValidatorLevel cvl : CodeValidatorLevel.values()) {%>
+                        <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                            <%=cvl.name().toLowerCase()%>
+                        </option>
+                        <%}%>
+                    </select>
+                </div>
+
+                <div class="form-group" id="chatEnabledDiv">
+                    <label class="label-normal" title="Players can chat with their team and with all players in the game"
+                           for="chatEnabled">
+                        Enable Game Chat
+                    </label>
+                    <br/>
+                    <input type="checkbox" id="chatEnabled" name="chatEnabled"
+                           class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                           data-onstyle="primary" data-offstyle="" checked>
+                </div>
+
+                <div class="form-group" id="capturePlayersIntentionDiv">
+                    <label class="label-normal" title="Enable Capturing Player Intention"
+                           for="capturePlayersIntention">
+                        Capture Players Intention
+                    </label>
+                    <br/>
+                    <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
+                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </div>
+
+                <div class="form-group">
+                    <label for="automaticEquivalenceTrigger" class="label-normal"
+                           title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
+                        Threshold for triggering equivalence duels automatically
+
+                        <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                        </a>
+                    </label>
+                    <input class="form-control" type="number" value="0" name="automaticEquivalenceTrigger"
+                           id="automaticEquivalenceTrigger" min=0 required/>
+                </div>
+                <div class="form-group">
+                    <label for="level_group" class="label-normal">Games Level</label>
+                    <div id="level_group">
+                        <div class="radio">
+                            <label class="label-normal"><input TYPE="radio" name="gamesLevel"
+                                                               VALUE="<%=GameLevel.HARD%>" checked="checked"/>
+                                Hard</label>
+                        </div>
+                        <div class="radio">
+                            <label class="label-normal"><input TYPE="radio" name="gamesLevel"
+                                                               value="<%=GameLevel.EASY%>"/>
+                                Easy</label>
+                        </div>
+                    </div>
+                </div>
+
+            </div> <%-- column --%>
+
+            <div class="col-sm-12 col-md-6" style="padding-left: 2em; padding-right: 2em;">
+                <h3>Game Management Settings</h3>
 
                 <div class="form-group">
                     <label for="roles_group" class="label-normal">Role Assignment</label>
@@ -425,22 +524,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="level_group" class="label-normal">Games Level</label>
-                    <div id="level_group">
-                        <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="gamesLevel"
-                                                               VALUE="<%=GameLevel.HARD%>" checked="checked"/>
-                                Hard</label>
-                        </div>
-                        <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="gamesLevel"
-                                                               value="<%=GameLevel.EASY%>"/>
-                                Easy</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="state_group" class="label-normal">Games State</label>
                     <div id="state_group">
                         <div class="radio">
@@ -458,268 +541,185 @@
 
             </div> <%-- column --%>
 
-            <div class="col-sm-12 col-md-6" style="padding-left: 2em; padding-right: 2em;">
-
-                <div class="form-group">
-                    <label for="" class="label-normal">Include predefined mutants (if available)</label>
-                    <br/>
-                    <input type="checkbox" id="withMutants" name="withMutants"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </div>
-
-                <div class="form-group">
-                    <label for="" class="label-normal">Include predefined tests (if available)</label>
-                    <br/>
-                    <input type="checkbox" id="withTests" name="withTests"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </div>
-
-                <div class="form-group" id="mutantValidatorLevelDiv">
-                    <label class="label-normal" title="Click the question sign for more information on the levels"
-                           for="mutantValidatorLevel">
-                        Mutant validator
-                        <a data-toggle="modal" href="#validatorExplanation" style="color:black">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                    </label>
-                    <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
-                            data-size="medium">
-                        <%for (CodeValidatorLevel cvl : CodeValidatorLevel.values()) {%>
-                        <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
-                            <%=cvl.name().toLowerCase()%>
-                        </option>
-                        <%}%>
-                    </select>
-                </div>
-
-                <div class="form-group" id="chatEnabledDiv">
-                    <label class="label-normal" title="Players can chat with their team and with all players in the game"
-                           for="chatEnabled">
-                        Enable Game Chat
-                    </label>
-                    <br/>
-                    <input type="checkbox" id="chatEnabled" name="chatEnabled"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-                           data-onstyle="primary" data-offstyle="" checked>
-                </div>
-
-                <div class="form-group" id="capturePlayersIntentionDiv">
-                    <label class="label-normal" title="Enable Capturing Player Intention"
-                           for="capturePlayersIntention">
-                        Capture Players Intention
-                    </label>
-                    <br/>
-                    <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </div>
-
-                <div class="form-group">
-                    <label for="maxAssertionsPerTest" class="label-normal"
-                           title="Maximum number of assertions per test. Increase this for difficult to test classes.">Max.
-                        Assertions per Test</label>
-                    <br/>
-                    <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
-                           id="maxAssertionsPerTest" min=1 required/>
-                </div>
-
-                <div class="form-group">
-                    <label for="automaticEquivalenceTrigger" class="label-normal"
-                           title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
-                        Threshold for triggering equivalence duels automatically
-
-                        <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                    </label>
-                    <input class="form-control" type="number" value="0" name="automaticEquivalenceTrigger"
-                           id="automaticEquivalenceTrigger" min=0 required/>
-                </div>
-
-                <button class="btn btn-md btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled style="margin-top: 1em">
-                    Stage Games
-                </button>
-                <p style="margin-top: .5em">
-                    If you just want to create a single open game without assigning players,
-                    you can also use the <a href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>?fromAdmin=true"> Create game</a> interface.
-                </p>
-
-            </div> <%-- column --%>
-
         </div> <%-- row --%>
 
-		<div class="modal fade" id="validatorExplanation" role="dialog"
-			aria-labelledby="validatorExplanation" aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Mutant Validator Explanation</h4>
-					</div>
-
-					<div class="modal-body">
-						<%@ include file="/jsp/validator_explanation.jsp"%>
-					</div>
-
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="modal fade" id="automaticEquivalenceTriggerExplanation"
-			role="dialog"
-			aria-labelledby="automaticEquivalenceTriggerExplanation"
-			aria-hidden="true">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Threshold for Triggering Equivalence
-							Duels Automatically Explanation</h4>
-					</div>
-
-					<div class="modal-body">
-						<%@ include file="/jsp/automatic_duels_explanation.jsp"%>
-					</div>
-
-					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
-        <script>
-            $('#selectAllUsers').click(function () {
-                var checkboxes = document.getElementsByName('selectedUsers');
-                var isChecked = document.getElementById('selectAllUsers').checked;
-                checkboxes.forEach(function (element) {
-                    if(element.checked !== isChecked)
-                        element.click();
-                });
-            });
-
-            $('#selectAllTempGames').click(function () {
-                $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
-            });
-
-            $('#selectAllGames').click(function () {
-                $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
-            });
-
-            $('#togglePlayersCreated').click(function () {
-                var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
-                localStorage.setItem("showCreatedPlayers", showPlayers ? "false" : "true");
-                $("[id=playersTableCreated]").toggle();
-                $("[id=playersTableHidden]").toggle();
-                setCreatedPlayersSpan()
-            });
-
-            function setCreatedPlayersSpan() {
-                var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
-                var buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
-                document.getElementById("togglePlayersCreatedSpan").setAttribute("class", buttonClass);
-            }
-
-            function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
-                var checkboxes = document.getElementsByName(checkboxesName);
-                var allChecked = true;
-                checkboxes.forEach(function (element) {
-                    allChecked = allChecked && element.checked;
-                });
-                document.getElementById(selectAllCheckboxId).checked = allChecked;
-            }
-
-            function areAnyChecked(name) {
-                var checkboxes = document.getElementsByName(name);
-                var anyChecked = false;
-                checkboxes.forEach(function (element) {
-                    anyChecked = anyChecked || element.checked;
-                });
-                return anyChecked;
-            }
-
-            function containsText(id) {
-                return document.getElementById(id).value.trim() !== "";
-            }
-
-            function updateCheckbox(checkboxVal, isChecked) {
-                document.getElementById('submit_users_btn').disabled =
-                    !(areAnyChecked('selectedUsers') || containsText('user_name_list')) || (document.getElementById('cut_select').selectedIndex != 0);
-                setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
-                var hiddenIdList = document.getElementById('hidden_user_id_list');
-                if (isChecked) {
-                    hiddenIdList.value = hiddenIdList.value.trim() + '<' + checkboxVal + '>,';
-                } else {
-                    hiddenIdList.value = hiddenIdList.value.replace('<' + checkboxVal + '>,', '');
-                }
-            }
-
-            $('#tableAddUsers').on('draw.dt', function () {
-                setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
-            });
-
-
-            $(document).ready(function () {
-                if (localStorage.getItem("showActivePlayers") === "true") {
-                    $("[id=playersTableActive]").show();
-                }
-
-                if (localStorage.getItem("showCreatedPlayers") === "true") {
-                    $("[id=playersTableCreated]").show();
-                    $("[id=playersTableHidden]").hide();
-                }
-                $('#tableAddUsers').DataTable({
-                    pagingType: "full_numbers",
-                    "lengthChange": false,
-                    "searching": true,
-                    "order": [[5, "desc"]],
-                    "columnDefs": [{
-                        "targets": 0,
-                        "orderable": false
-                    }, {
-                        "targets": 6,
-                        "orderable": false
-                    }]
-                });
-
-                $('#tableCreatedGames').DataTable({
-                    pagingType: "full_numbers",
-                    lengthChange: false,
-                    searching: false,
-                    order: [[3, "desc"]],
-                    "columnDefs": [{
-                        "targets": 0,
-                        "orderable": false
-                    }, {
-                        "targets": 6,
-                        "orderable": false
-                    }]
-                });
-
-                setCreatedPlayersSpan();
-            });
-
-            $('.modal').on('shown.bs.modal', function () {
-                let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-                if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                    codeMirrorContainer.CodeMirror.refresh();
-                } else {
-                    let textarea = $(this).find('textarea')[0];
-                    let editor = CodeMirror.fromTextArea(textarea, {
-                        lineNumbers: false,
-                        readOnly: true,
-                        mode: "text/x-java"
-                    });
-                    editor.setSize("100%", 500);
-                    ClassAPI.getAndSetEditorValue(textarea, editor);
-                }
-            });
-        </script>
-
+        <button class="btn btn-md btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled style="margin-top: 1em">
+            Stage Games
+        </button>
+        <p style="margin-top: .5em">
+            If you just want to create a single open game without assigning players,
+            you can also use the <a href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>?fromAdmin=true"> Create game</a> interface.
+        </p>
     </form>
+
+    <div class="modal fade" id="validatorExplanation" role="dialog"
+        aria-labelledby="validatorExplanation" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Mutant Validator Explanation</h4>
+                </div>
+
+                <div class="modal-body">
+                    <%@ include file="/jsp/validator_explanation.jsp"%>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="automaticEquivalenceTriggerExplanation"
+        role="dialog"
+        aria-labelledby="automaticEquivalenceTriggerExplanation"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Threshold for Triggering Equivalence
+                        Duels Automatically Explanation</h4>
+                </div>
+
+                <div class="modal-body">
+                    <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('#selectAllUsers').click(function () {
+            var checkboxes = document.getElementsByName('selectedUsers');
+            var isChecked = document.getElementById('selectAllUsers').checked;
+            checkboxes.forEach(function (element) {
+                if(element.checked !== isChecked)
+                    element.click();
+            });
+        });
+
+        $('#selectAllTempGames').click(function () {
+            $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
+        });
+
+        $('#selectAllGames').click(function () {
+            $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
+        });
+
+        $('#togglePlayersCreated').click(function () {
+            var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
+            localStorage.setItem("showCreatedPlayers", showPlayers ? "false" : "true");
+            $("[id=playersTableCreated]").toggle();
+            $("[id=playersTableHidden]").toggle();
+            setCreatedPlayersSpan()
+        });
+
+        function setCreatedPlayersSpan() {
+            var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
+            var buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
+            document.getElementById("togglePlayersCreatedSpan").setAttribute("class", buttonClass);
+        }
+
+        function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
+            var checkboxes = document.getElementsByName(checkboxesName);
+            var allChecked = true;
+            checkboxes.forEach(function (element) {
+                allChecked = allChecked && element.checked;
+            });
+            document.getElementById(selectAllCheckboxId).checked = allChecked;
+        }
+
+        function areAnyChecked(name) {
+            var checkboxes = document.getElementsByName(name);
+            var anyChecked = false;
+            checkboxes.forEach(function (element) {
+                anyChecked = anyChecked || element.checked;
+            });
+            return anyChecked;
+        }
+
+        function containsText(id) {
+            return document.getElementById(id).value.trim() !== "";
+        }
+
+        function updateCheckbox(checkboxVal, isChecked) {
+            document.getElementById('submit_users_btn').disabled =
+                !(areAnyChecked('selectedUsers') || containsText('user_name_list')) || (document.getElementById('cut_select').selectedIndex != 0);
+            setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
+            var hiddenIdList = document.getElementById('hidden_user_id_list');
+            if (isChecked) {
+                hiddenIdList.value = hiddenIdList.value.trim() + '<' + checkboxVal + '>,';
+            } else {
+                hiddenIdList.value = hiddenIdList.value.replace('<' + checkboxVal + '>,', '');
+            }
+        }
+
+        $('#tableAddUsers').on('draw.dt', function () {
+            setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
+        });
+
+
+        $(document).ready(function () {
+            if (localStorage.getItem("showActivePlayers") === "true") {
+                $("[id=playersTableActive]").show();
+            }
+
+            if (localStorage.getItem("showCreatedPlayers") === "true") {
+                $("[id=playersTableCreated]").show();
+                $("[id=playersTableHidden]").hide();
+            }
+            $('#tableAddUsers').DataTable({
+                pagingType: "full_numbers",
+                "lengthChange": false,
+                "searching": true,
+                "order": [[5, "desc"]],
+                "columnDefs": [{
+                    "targets": 0,
+                    "orderable": false
+                }, {
+                    "targets": 6,
+                    "orderable": false
+                }]
+            });
+
+            $('#tableCreatedGames').DataTable({
+                pagingType: "full_numbers",
+                lengthChange: false,
+                searching: false,
+                order: [[3, "desc"]],
+                "columnDefs": [{
+                    "targets": 0,
+                    "orderable": false
+                }, {
+                    "targets": 6,
+                    "orderable": false
+                }]
+            });
+
+            setCreatedPlayersSpan();
+        });
+
+        $('.modal').on('shown.bs.modal', function () {
+            let codeMirrorContainer = $(this).find(".CodeMirror")[0];
+            if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+                codeMirrorContainer.CodeMirror.refresh();
+            } else {
+                let textarea = $(this).find('textarea')[0];
+                let editor = CodeMirror.fromTextArea(textarea, {
+                    lineNumbers: false,
+                    readOnly: true,
+                    mode: "text/x-java"
+                });
+                editor.setSize("100%", 500);
+                ClassAPI.getAndSetEditorValue(textarea, editor);
+            }
+        });
+    </script>
 </div>
 <%@ include file="/jsp/footer.jsp" %>
