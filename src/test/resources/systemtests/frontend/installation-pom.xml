@@ -41,6 +41,26 @@
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.5</version>
 		</dependency>
+
+		<dependency>
+  			<groupId>com.google.truth</groupId>
+			<artifactId>truth</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.truth.extensions</groupId>
+			<artifactId>truth-java8-extension</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+		<dependency>
+  			<groupId>com.google.guava</groupId>
+  			<artifactId>guava</artifactId>
+  			<!-- <version>29.0-jre</version> -->
+			<version>29.0-android</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -186,6 +206,27 @@
 									<groupId>org.jacoco</groupId>
 									<artifactId>org.jacoco.report</artifactId>
 									<version>0.7.7.201606060606</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.truth</groupId>
+  									<artifactId>truth</artifactId>
+  									<version>${truth.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.truth.extensions</groupId>
+									<artifactId>truth-java8-extension</artifactId>
+  									<version>${truth.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.guava</groupId>
+  									<artifactId>guava</artifactId>
+  									<version>29.0-android</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>

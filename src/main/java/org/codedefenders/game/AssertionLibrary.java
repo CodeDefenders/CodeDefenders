@@ -22,8 +22,11 @@ public enum AssertionLibrary {
     JUNIT4("JUnit 4"),
     JUNIT5("JUnit 5"),
     HAMCREST("Hamcrest"),
+    GOOGLE_TRUTH("Google Truth"),
     JUNIT4_HAMCREST("JUnit 4 + Hamcrest"),
-    JUNIT5_HAMCREST("JUnit 5 + Hamcrest");
+    JUNIT5_HAMCREST("JUnit 5 + Hamcrest"),
+    JUNIT4_GOOGLE_TRUTH("JUnit 4 + Google Truth"),
+    JUNIT5_GOOGLE_TRUTH("JUnit 5 + Google Truth"),;
 
     private String description;
 

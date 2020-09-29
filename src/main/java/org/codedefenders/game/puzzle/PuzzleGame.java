@@ -18,6 +18,9 @@
  */
 package org.codedefenders.game.puzzle;
 
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +46,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
 /**
  * Represents an instance of a {@link Puzzle puzzle}, which is played by one
  * player.
@@ -65,8 +65,6 @@ public class PuzzleGame extends AbstractGame {
      * Maximum number of allowed assertions per submitted test.
      */
     private int maxAssertionsPerTest;
-
-    private boolean forceHamcrest;
 
     /**
      * Validation level used to check submitted mutants.
@@ -95,14 +93,15 @@ public class PuzzleGame extends AbstractGame {
     private Puzzle puzzle;
 
     /**
-     * Creates a new {@link PuzzleGame} according to the given {@link Puzzle}.
-     * Adds the mapped tests and mutants from the {@link Puzzle puzzle}'s class to the game.
-     * Adds the user to the game as a player.
-     * If any error occurs during the preparation, {@code null} will be returned.
+     * Creates a new {@link PuzzleGame} according to the given {@link Puzzle}. Adds
+     * the mapped tests and mutants from the {@link Puzzle puzzle}'s class to the
+     * game. Adds the user to the game as a player. If any error occurs during the
+     * preparation, {@code null} will be returned.
      *
      * @param puzzle {@link Puzzle} to create a {@link PuzzleGame} for.
      * @param uid    User ID of the user who plays the puzzle.
-     * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or {@code null} if any error occurred.
+     * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or
+     *         {@code null} if any error occurred.
      */
     public static PuzzleGame createPuzzleGame(Puzzle puzzle, int uid) {
         String errorMsg = String.format("Error while preparing puzzle game for puzzle %d and user %d.",
@@ -140,15 +139,15 @@ public class PuzzleGame extends AbstractGame {
 
         /* Add the mutants from the puzzle. */
         for (Mutant mutant : mappedMutants) {
-            final Mutant newMutant = new Mutant(game.id, game.classId,
-                    mutant.getJavaFile(), mutant.getClassFile(), true, dummyAttackerId, GameDAO.getCurrentRound(game.id));
+            final Mutant newMutant = new Mutant(game.id, game.classId, mutant.getJavaFile(), mutant.getClassFile(),
+                    true, dummyAttackerId, GameDAO.getCurrentRound(game.id));
             newMutant.insert();
             mutantMap.put(mutant.getId(), newMutant);
         }
 
         if (!mutantMap.isEmpty() && !testMap.isEmpty()) {
-            for (TargetExecution targetExecution :
-                    TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.classId)) {
+            for (TargetExecution targetExecution : TargetExecutionDAO
+                    .getTargetExecutionsForUploadedWithClass(game.classId)) {
                 Test test = testMap.get(targetExecution.testId);
                 Mutant mutant = mutantMap.get(targetExecution.mutantId);
 
@@ -199,7 +198,6 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
-        this.forceHamcrest = puzzle.isForceHamcrest();
 
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
@@ -214,8 +212,8 @@ public class PuzzleGame extends AbstractGame {
      * Constructor for reading a puzzle game from the database.
      */
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
-            int maxAssertionsPerTest, boolean forceHamcrest, CodeValidatorLevel mutantValidatorLevel, GameState state,
-            int currentRound, Role activeRole) {
+            int maxAssertionsPerTest, CodeValidatorLevel mutantValidatorLevel, GameState state, int currentRound,
+            Role activeRole) {
         /* AbstractGame attributes */
         this.cut = cut;
         this.id = id;
@@ -229,7 +227,6 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = maxAssertionsPerTest;
-        this.forceHamcrest = forceHamcrest;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.currentRound = currentRound;
         this.activeRole = activeRole;
@@ -319,10 +316,6 @@ public class PuzzleGame extends AbstractGame {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
-    }
-
-    public boolean isForceHamcrest() {
-        return forceHamcrest;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {

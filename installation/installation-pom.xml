@@ -19,6 +19,7 @@
 		<junit5.version>5.5.2</junit5.version>
 		<junit5.platform.version>1.5.2</junit5.platform.version>
 		<opentest4j.version>1.2.0</opentest4j.version>
+		<truth.version>1.0.1</truth.version>
 	</properties>
 
 	<dependencies>
@@ -92,6 +93,25 @@
 			<groupId>org.opentest4j</groupId>
 			<artifactId>opentest4j</artifactId>
 			<version>${opentest4j.version}</version>
+		</dependency>
+
+		<dependency>
+  			<groupId>com.google.truth</groupId>
+			<artifactId>truth</artifactId>
+			<version>${truth.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.truth.extensions</groupId>
+			<artifactId>truth-java8-extension</artifactId>
+			<version>${truth.version}</version>
+		</dependency>
+
+		<dependency>
+  			<groupId>com.google.guava</groupId>
+  			<artifactId>guava</artifactId>
+  			<!-- <version>29.0-jre</version> -->
+			<version>29.0-android</version>
 		</dependency>
 	</dependencies>
 
@@ -287,6 +307,27 @@
 									<groupId>org.opentest4j</groupId>
 									<artifactId>opentest4j</artifactId>
 									<version>${opentest4j.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.truth</groupId>
+  									<artifactId>truth</artifactId>
+  									<version>${truth.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.truth.extensions</groupId>
+									<artifactId>truth-java8-extension</artifactId>
+  									<version>${truth.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>com.google.guava</groupId>
+  									<artifactId>guava</artifactId>
+  									<version>29.0-android</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>

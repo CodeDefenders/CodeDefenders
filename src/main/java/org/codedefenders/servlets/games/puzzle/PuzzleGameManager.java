@@ -92,6 +92,7 @@ import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
+
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link PuzzleGame PuzzleGames}.
  *
@@ -297,8 +298,7 @@ public class PuzzleGameManager extends HttpServlet {
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
                 testText,
                 game.getMaxAssertionsPerTest(),
-                game.isForceHamcrest()
-        );
+                game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();

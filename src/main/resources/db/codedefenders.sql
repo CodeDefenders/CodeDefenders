@@ -97,7 +97,7 @@ CREATE TABLE `classes` (
   `Parent_Class` int(11) DEFAULT NULL,
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   `TestingFramework` ENUM('JUNIT4', 'JUNIT5') NOT NULL DEFAULT 'JUNIT4',
-  `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
+  `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST', 'GOOGLE_TRUTH', 'JUNIT4_GOOGLE_TRUTH', 'JUNIT5_GOOGLE_TRUTH') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -138,7 +138,6 @@ CREATE TABLE `games` (
   `Start_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `Finish_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `MaxAssertionsPerTest` int(11) NOT NULL DEFAULT '2',
-  `ForceHamcrest` tinyint(1) DEFAULT '1',
   `MutantValidator` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `ChatEnabled` tinyint(1) DEFAULT '1',
   `Attackers_Limit` int(11) DEFAULT '0',
@@ -316,7 +315,6 @@ CREATE TABLE `puzzles` (
   `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
   `Level` enum('EASY','HARD') DEFAULT 'HARD',
   `Max_Assertions` int(11) NOT NULL DEFAULT '2',
-  `Force_Hamcrest` tinyint(1) DEFAULT '0',
   `Mutant_Validator_Level` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `Editable_Lines_Start` int(11) DEFAULT NULL,
   `Editable_Lines_End` int(11) DEFAULT NULL,
@@ -616,7 +614,6 @@ FROM games,
      classes
 WHERE Mode = 'MELEE'
   AND games.Class_ID = classes.Class_ID;
-
 
 CREATE OR REPLACE VIEW `view_puzzle_games` AS
 SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
