@@ -22,7 +22,6 @@
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
-<%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.leaderboard.Entry" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
@@ -78,16 +77,18 @@
             <div class="panel-heading">
                 Staged Games
                 <div style="float: right;">
-                    <input type="search" id="search-staged-games" class="form-control" placeholder="Search" style="height: .65em; width: 10em; display: inline;">
+                    <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
+                           style="height: .65em; width: 10em; display: inline;">
                 </div>
             </div>
             <div class="panel-body">
 
                 <table id="tableCreatedGames"
-                       class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
+                       class="table table-striped table-hover table-responsive games-table">
                     <thead>
                         <tr>
-                            <th><input type="checkbox" id="selectAllTempGames"
+                            <th>
+                                <input type="checkbox" id="selectAllTempGames"
                                        onchange="document.getElementById('insert_games_btn').disabled = !this.checked;
                                        document.getElementById('delete_games_btn').disabled = !this.checked">
                             </th>
@@ -106,15 +107,14 @@
                             GameClass cut = g.getCUT();
 
                     %>
-                        <tr id="<%="temp_games_"+i%>">
+                        <tr id="temp_games_<%=i%>">
                             <td>
-                                <input type="checkbox" name="selectedTempGames" id="<%="selectedTempGames_"+i%>" value="<%= i%>" onchange=
+                                <input type="checkbox" name="selectedTempGames" id="selectedTempGames_<%=i%>" value="<%=i%>" onchange=
                                         "document.getElementById('insert_games_btn').disabled = !areAnyChecked('selectedTempGames');
                                         document.getElementById('delete_games_btn').disabled = !areAnyChecked('selectedTempGames');
                                         setSelectAllCheckbox('selectedTempGames', 'selectAllTempGames');">
                             </td>
-                            <td><%=i%>
-                            </td>
+                            <td><%=i%></td>
                             <td>
                                 <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
                                     <%=cut.getAlias()%>
@@ -141,8 +141,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td><%= g.getLevel() %>
-                            </td>
+                            <td><%= g.getLevel() %></td>
                             <td>
                                 <div id="playersTableHidden" style="color: lightgray;"> (hidden)</div>
                                 <table id="playersTableCreated" hidden>
@@ -160,24 +159,21 @@
                                             String color = attackerIds.contains(id) ? "#edcece" : "#ced6ed";
                                     %>
                                     <tr style="background: <%= color %>">
-                                        <td class="col-md-2"><%= userName %>
-                                        </td>
-                                        <td class="col-md-3"><%= lastRoleStr %>
-                                        </td>
-                                        <td class="col-md-1"><%= totalScore %>
-                                        </td>
+                                        <td class="col-md-2"><%= userName %></td>
+                                        <td class="col-md-3"><%= lastRoleStr %></td>
+                                        <td class="col-md-1"><%= totalScore %></td>
                                         <td class="col-md-1">
                                             <button class="btn btn-sm btn-primary"
-                                                    value="<%=i + "-" + id%>"
-                                                    id="<%="switch_player_"+id+"_game_"+i%>"
+                                                    value="<%=i%>-<%=id%>"
+                                                    id="switch_player_<%=id%>_game_<%=i%>"
                                                     name="tempGameUserSwitchButton">
                                                 <span class="glyphicon glyphicon-transfer"></span>
                                             </button>
                                         </td>
                                         <td class="col-md-1">
                                             <button class="btn btn-sm btn-danger"
-                                                    value="<%=i + "-" + id%>"
-                                                    id="<%="remove_player_"+id+"_game_"+i%>"
+                                                    value="<%=i%>-<%=id%>"
+                                                    id="remove_player_<%=id%>_game_<%=i%>"
                                                     name="tempGameUserRemoveButton">
                                                 <span class="glyphicon glyphicon-trash"></span>
                                             </button>
@@ -185,38 +181,37 @@
                                         <%-- ------------------ --%>
                                         <%-- Show moving to game UI only if there's more than 1 game --%>
                                         <%-- ------------------ --%>
-                                        <% if (createdGames.size() + availableGames.size() > 1) {%>
+                                        <% if (createdGames.size() + availableGames.size() > 1) { %>
                                         <td class="col-md-3" style="padding-top:3px; padding-bottom:3px;">
                                         <%-- create the select and fill it with the available games except the current one --%>
-                                            <div id="<%="game_"+id%>" style="max-width: 100px; float: left;">
-                                                <select name="<%="game_" + id%>" class="form-control selectpicker" data-size="small" id="game" style="float: right">
+                                            <div id="game_<%=id%>" style="max-width: 100px; float: left;">
+                                                <select name="game_<%=id%>" class="form-control selectpicker" data-size="small" id="game" style="float: right">
                                                     <%-- List created games --%>
                                                     <% for (MultiplayerGame availableGame : availableGames) { %>
                                                         <option value="<%=availableGame.getId()%>"><%=String.valueOf(availableGame.getId()) + ": " + availableGame.getCUT().getAlias()%>
                                                         </option>
                                                     <% } %>
                                                     <%-- List the staged games --%>
-                                                    <% if (createdGames != null) {
-                                                            for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
-                                                                // Do not list the current game in the select
-                                                                if( gameIndex == i ) { continue; }
-                                                                String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
-                                                    %>
-                                                        <option value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex) + ": " + classAlias%>
-                                                        </option>
                                                     <%
+                                                        for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
+                                                            // Do not list the current game in the select
+                                                            if (gameIndex == i) {
+                                                                continue;
                                                             }
+                                                            String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
+                                                    %>
+                                                        <option value="T<%=gameIndex%>">T<%=gameIndex%>: <%=classAlias%></option>
+                                                    <%
                                                         }
                                                     %>
                                                 </select>
-
                                             </div>
-                                        <%-- Keep the role of the user also in the target game --%>
-                                            <input type="hidden" name="<%="role_" + id%>" value="<%= (attackerIds.contains(id)) ? Role.ATTACKER.name() : Role.DEFENDER.name() %>"/>
+                                            <%-- Keep the role of the user also in the target game --%>
+                                            <input type="hidden" name="role_<%=id%>" value="<%= (attackerIds.contains(id)) ? Role.ATTACKER.name() : Role.DEFENDER.name() %>"/>
                                         </td>
                                         <%-- Create the button to move it --%>
                                         <td class="col-md-1">
-                                            <button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left">
+                                            <button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="move_player_<%=id%>_from_game_T<%=i%>" name="userListButton" style="margin: 2px; float:left">
                                                 <span class="glyphicon glyphicon-arrow-right"></span>
                                             </button>
                                         </td>
@@ -278,7 +273,8 @@
             <div class="panel-heading">
                 Unassigned Users
                 <div style="float: right;">
-                    <input type="search" id="search-unassigned-users" class="form-control" placeholder="Search" style="height: .65em; width: 10em; display: inline;">
+                    <input type="search" id="search-unassigned-users" class="form-control" placeholder="Search"
+                           style="height: .65em; width: 10em; display: inline;">
                 </div>
             </div>
             <div class="panel-body">
@@ -288,21 +284,22 @@
                     <thead>
                         <tr>
                             <th>
-                                <input type="checkbox" id="selectAllUsers" onchange="document.getElementById('submit_users_btn').disabled = document.getElementById('cut_select').selectedIndex == -1 || ! this.checked;">
+                                <input type="checkbox" id="selectAllUsers"
+                                       onchange="document.getElementById('submit_users_btn').disabled = document.getElementById('cut_select').selectedIndex == -1 || ! this.checked;">
                             </th>
                             <th>User ID</th>
                             <th>User</th>
                             <th>Last Role</th>
                             <th>Total Score</th>
                             <th>Last Login</th>
-                            <th class="col-md-4">Add to existing Game</th>
+                            <th>Add to Existing Game</th>
                         </tr>
                     </thead>
                     <tbody>
 
                     <%
                         for (List<String> userInfo : unassignedUsersInfo) {
-                            int uid = Integer.valueOf(userInfo.get(0));
+                            int uid = Integer.parseInt(userInfo.get(0));
                             String username = userInfo.get(1);
                             String lastLogin = userInfo.get(3);
                             lastLogin = lastLogin != null
@@ -314,14 +311,14 @@
                             String totalScore = userInfo.get(5);
                     %>
 
-                        <tr id="<%="user_row_"+uid%>">
+                        <tr id="user_row_<%=uid%>">
                             <td>
                                 <% if (uid != login.getUserId()) { %>
-                                <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange =
-                                        "updateCheckbox(this.value, this.checked);">
-                                <%}%>
+                                <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%=uid%>"
+                                       onchange="updateCheckbox(this.value, this.checked);">
+                                <% } %>
                             </td>
-                            <td><%= uid%>
+                            <td><%= uid %>
                                 <input type="hidden" name="added_uid" value=<%=uid%>>
                             </td>
                             <td><%= username %>
@@ -332,12 +329,13 @@
                             </td>
                             <td><%= lastLogin %>
                             </td>
-                            <td id="<%="addToExistingGameTd_"+uid%>" style="padding-top:3px; padding-bottom:3px; ">
-                                <div id="<%="game_"+uid%>" style="max-width: 150px; float: left;">
-                                    <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
+                            <td id="addToExistingGameTd_<%=uid%>" style="padding-top:3px; padding-bottom:3px; ">
+                                <div id="game_<%=uid%>" style="max-width: 150px; float: left;">
+                                    <select name="game_<%=uid%>" class="form-control selectpicker" data-size="small"
                                             id="game">
                                         <% for (MultiplayerGame g : availableGames) { %>
-                                        <option value="<%=g.getId()%>"><%=String.valueOf(g.getId()) + ": " + g.getCUT().getAlias()%>
+                                        <option value="<%=g.getId()%>">
+                                            <%=g.getId()%>: <%=g.getCUT().getAlias()%>
                                         </option>
                                         <%
                                             }
@@ -345,7 +343,9 @@
                                                 for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
                                                     String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
                                         %>
-                                        <option value=<%="T" + gameIndex%>><%="T" + gameIndex + ": " + classAlias%></option>
+                                        <option value="T<%=gameIndex%>">
+                                            T<%=gameIndex%>: <%=classAlias%>
+                                        </option>
                                         <%}%>
                                         <%}%>
                                     </select>
@@ -359,7 +359,7 @@
                                 </div>
                                 <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
                                         style="margin: 2px; float:right"
-                                        id="<%="add_"+uid%>"
+                                        id="add_<%=uid%>"
                                         <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </button>
@@ -403,19 +403,20 @@
             <div class="col-sm-12 col-md-6" style="padding-left: 2em; padding-right: 2em;">
                 <h3>Game Settings</h3>
 
-                <div class="form-group" id="cutDiv">
+                <div class="form-group" id="cutDiv"
+                     title="The class the games will be played on.">
                     <label for="cut_select" class="label-normal">CUT</label>
                     <select name="class" class="form-control selectpicker" data-size="large" id="cut_select">
-                        <% for (GameClass c : GameClassDAO.getAllPlayableClasses()) { %>
-                        <option value="<%=c.getId()%>"><%=c.getAlias()%>
-                        </option>
+                        <% for (GameClass clazz : GameClassDAO.getAllPlayableClasses()) { %>
+                        <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
                         <%}%>
                     </select>
                     <br/>
                     <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?fromAdmin=true">Upload Class</a>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"
+                     title="Include mutants uploaded together with the class.">
                     <label for="withMutants" class="label-normal">Include predefined mutants (if available)</label>
                     <br/>
                     <input type="checkbox" id="withMutants" name="withMutants"
@@ -423,7 +424,8 @@
                            data-onstyle="primary" data-offstyle="">
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"
+                     title="Include tests uploaded together with the class.">
                     <label for="withTests" class="label-normal">Include predefined tests (if available)</label>
                     <br/>
                     <input type="checkbox" id="withTests" name="withTests"
@@ -431,18 +433,17 @@
                            data-onstyle="primary" data-offstyle="">
                 </div>
 
-                <div class="form-group">
-                    <label for="maxAssertionsPerTest" class="label-normal"
-                           title="Maximum number of assertions per test. Increase this for difficult to test classes.">Max.
-                        Assertions per Test</label>
+                <div class="form-group"
+                     title="Maximum number of assertions per test. Increase this for difficult to test classes.">
+                    <label for="maxAssertionsPerTest" class="label-normal">Max. Assertions per Test</label>
                     <br/>
                     <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
                            id="maxAssertionsPerTest" min=1 required/>
                 </div>
 
-                <div class="form-group" id="mutantValidatorLevelDiv">
-                    <label class="label-normal" title="Click the question sign for more information on the levels"
-                           for="mutantValidatorLevel">
+                <div class="form-group" id="mutantValidatorLevelDiv"
+                     title="Level of restrictions for the players' mutants. Click the question mark for more information.">
+                    <label class="label-normal" for="mutantValidatorLevel">
                         Mutant validator
                         <a data-toggle="modal" href="#validatorExplanation" style="color:black">
                             <span class="glyphicon glyphicon-question-sign"></span>
@@ -458,33 +459,28 @@
                     </select>
                 </div>
 
-                <div class="form-group" id="chatEnabledDiv">
-                    <label class="label-normal" title="Players can chat with their team and with all players in the game"
-                           for="chatEnabled">
-                        Enable Game Chat
-                    </label>
+                <div class="form-group" id="chatEnabledDiv"
+                     title="Allow players to chat within their their team and across teams.">
+                    <label class="label-normal" for="chatEnabled">Enable Game Chat</label>
                     <br/>
                     <input type="checkbox" id="chatEnabled" name="chatEnabled"
                            class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
                            data-onstyle="primary" data-offstyle="" checked>
                 </div>
 
-                <div class="form-group" id="capturePlayersIntentionDiv">
-                    <label class="label-normal" title="Enable Capturing Player Intention"
-                           for="capturePlayersIntention">
-                        Capture Players Intention
-                    </label>
+                <div class="form-group" id="capturePlayersIntentionDiv"
+                     title="Force players to specify their intention before submitting a mutant or test.">
+                    <label class="label-normal" for="capturePlayersIntention">Capture Players Intention</label>
                     <br/>
                     <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                           class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
                            data-onstyle="primary" data-offstyle="">
                 </div>
 
-                <div class="form-group">
-                    <label for="automaticEquivalenceTrigger" class="label-normal"
-                           title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
+                <div class="form-group"
+                     title="Threshold for triggering equivalence duels automatically. Set to 0 to deactivate this feature. Click the question mark for more information.">
+                    <label for="automaticEquivalenceTrigger" class="label-normal">
                         Threshold for triggering equivalence duels automatically
-
                         <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
                             <span class="glyphicon glyphicon-question-sign"></span>
                         </a>
@@ -492,18 +488,24 @@
                     <input class="form-control" type="number" value="0" name="automaticEquivalenceTrigger"
                            id="automaticEquivalenceTrigger" min=0 required/>
                 </div>
-                <div class="form-group">
+                <div class="form-group"
+                    title="The level the games will be played on. Harder levels restrict the information both teams receive about the other teams mutants/tests.">
                     <label for="level_group" class="label-normal">Games Level</label>
                     <div id="level_group">
                         <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="gamesLevel"
-                                                               VALUE="<%=GameLevel.HARD%>" checked="checked"/>
-                                Hard</label>
+                            <label class="label-normal">
+                                <input type="radio" name="gamesLevel"
+                                       value="<%=GameLevel.HARD%>"
+                                       checked="checked"/>
+                                Hard
+                            </label>
                         </div>
                         <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="gamesLevel"
-                                                               value="<%=GameLevel.EASY%>"/>
-                                Easy</label>
+                            <label class="label-normal">
+                                <input type="radio" name="gamesLevel"
+                                       value="<%=GameLevel.EASY%>"/>
+                                Easy
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -513,72 +515,86 @@
             <div class="col-sm-12 col-md-6" style="padding-left: 2em; padding-right: 2em;">
                 <h3>Game Management Settings</h3>
 
-                <div class="form-group">
-                    <label for="roles_group" class="label-normal">Role Assignment</label>
+                <div class="form-group"
+                     title="Method of assigning roles to players. Click the question mark for more information.">
+                    <label for="roles_group" class="label-normal">
+                        Role Assignment
+                        <a data-toggle="modal" href="#roleAssignmentExplanation" style="color:black">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                        </a>
+                    </label>
                     <div id="roles_group">
                         <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="roles"
-                                                               value="<%=AdminCreateGames.RoleAssignmentMethod.RANDOM%>"
-                                                               checked="checked"/>
+                            <label class="label-normal">
+                                <input type="radio" name="roles"
+                                       value="<%=AdminCreateGames.RoleAssignmentMethod.RANDOM%>"
+                                       checked="checked"/>
                                 Random
                             </label>
                         </div>
                         <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="roles"
-                                                               VALUE="<%=AdminCreateGames.RoleAssignmentMethod.OPPOSITE%>"/>
+                            <label class="label-normal">
+                                <input type="radio" name="roles"
+                                       value="<%=AdminCreateGames.RoleAssignmentMethod.OPPOSITE%>"/>
                                 Opposite Role
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="teams_group" class="label-normal">Team Assignment</label>
+                <div class="form-group"
+                     title="Method of assigning players to teams. Click the question mark for more information.">
+                    <label for="teams_group" class="label-normal">
+                        Team Assignment
+                        <a data-toggle="modal" href="#teamAssignmentExplanation" style="color:black">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                        </a>
+                    </label>
                     <div id="teams_group">
                         <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="teams"
-                                                               value="<%=AdminCreateGames.TeamAssignmentMethod.RANDOM%>"
-                                                               checked="checked"/>Random</label>
+                            <label class="label-normal">
+                                <input type="radio" name="teams"
+                                       value="<%=AdminCreateGames.TeamAssignmentMethod.RANDOM%>"
+                                       checked="checked"/>
+                                Random
+                            </label>
                         </div>
                         <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="teams"
-                                                               VALUE="<%=AdminCreateGames.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
+                            <label class="label-normal">
+                                <input type="radio" name="teams"
+                                       value="<%=AdminCreateGames.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
                                 Scores descending
                             </label>
                         </div>
                         <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="teams"
-                                                               VALUE="<%=AdminCreateGames.TeamAssignmentMethod.SCORE_SHUFFLED%>"/>
+                            <label class="label-normal">
+                                <input type="radio" name="teams"
+                                       value="<%=AdminCreateGames.TeamAssignmentMethod.SCORE_SHUFFLED%>"/>
                                 Scores block shuffled
                             </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"
+                     title="Number of attackers per game.">
                     <label for="attackers" class="label-normal">Attackers per Game</label>
                     <input type="number" value="3" id="attackers" name="attackers" min="1" class="form-control"/>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group"
+                     title="Number of defenders per game.">
                     <label for="defenders" class="label-normal">Defenders per Game</label>
                     <input type="number" value="3" id="defenders" name="defenders" min="1" class="form-control"/>
                 </div>
 
-                <div class="form-group">
-                    <label for="state_group" class="label-normal">Games State</label>
-                    <div id="state_group">
-                        <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="gamesState"
-                                                               VALUE="<%=GameState.CREATED%>" checked="checked"/>
-                                Created</label>
-                        </div>
-                        <div class="radio">
-                            <label class="label-normal"><input TYPE="radio" name="gamesState"
-                                                               value="<%=GameState.ACTIVE%>"/>
-                                Active</label>
-                        </div>
-                    </div>
+                <div class="form-group"
+                     title="Start games once they are created.">
+                    <label class="label-normal" for="startGames">Start Games</label>
+                    <br/>
+                    <input type="checkbox" id="startGames" name="startGames"
+                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="" checked>
                 </div>
 
             </div> <%-- column --%>
@@ -590,7 +606,7 @@
         </button>
         <p style="margin-top: .5em">
             If you just want to create a single open game without assigning players,
-            you can also use the <a href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>?fromAdmin=true"> Create game</a> interface.
+            you can also use the <a href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>?fromAdmin=true"> Create Game</a> page.
         </p>
     </form>
 
@@ -613,6 +629,7 @@
             </div>
         </div>
     </div>
+
     <div class="modal fade" id="automaticEquivalenceTriggerExplanation"
         role="dialog"
         aria-labelledby="automaticEquivalenceTriggerExplanation"
@@ -621,12 +638,82 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Threshold for Triggering Equivalence
-                        Duels Automatically Explanation</h4>
+                    <h4 class="modal-title">Equivalence Duel Threshold Explanation</h4>
                 </div>
 
                 <div class="modal-body">
                     <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="roleAssignmentExplanation"
+         role="dialog"
+         aria-labelledby="roleAssignmentExplanation"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Role Assignment Explanation</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>Specifies how roles are assigned to players:</p>
+                    <ul>
+                        <li>
+                            <b>Random:</b>
+                            Players are assigned roles randomly.
+                        </li>
+                        <li>
+                            <b>Opposite:</b>
+                            Players are assigned the opposite of their last played role, if possible.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="teamAssignmentExplanation"
+         role="dialog"
+         aria-labelledby="teamAssignmentExplanation"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Team Assignment Explanation</h4>
+                </div>
+
+                <div class="modal-body">
+                    <p>Specifies how players are assigned to teams:</p>
+                    <ul>
+                        <li>
+                            <b>Random:</b>
+                            Players are assigned to teams randomly.
+                        </li>
+                        <li>
+                            <b>Scores Descending:</b>
+                            Players are assigned to teams based on their total score in past games.
+                            The players with the highest scores are assigned to the first games,
+                            the players with the lowest scores are assigned to the last games.
+                        </li>
+                        <li>
+                            <b>Scores block shuffled:</b>
+                            Players are grouped on their total score in past games,
+                            then block shuffled and assigned to teams.
+                        </li>
+                    </ul>
                 </div>
 
                 <div class="modal-footer">
@@ -742,7 +829,7 @@
                         targets: 3,
                         orderable: false
                     }],
-                    scrollY: '400px',
+                    scrollY: '800px',
                     scrollCollapse: true,
                     paging: false,
                     dom: 't',

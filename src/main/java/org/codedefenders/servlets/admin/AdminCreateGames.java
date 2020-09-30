@@ -62,6 +62,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -329,8 +330,7 @@ public class AdminCreateGames extends HttpServlet {
             attackersPerGame = Integer.parseInt(request.getParameter("attackers"));
             defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
             gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
-            gamesState = request.getParameter("gamesState")
-                    .equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
+            gamesState = ServletUtils.parameterThenOrOther(request, "startGames", GameState.ACTIVE, GameState.CREATED);
             maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
             mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
             chatEnabled = request.getParameter("chatEnabled") != null;

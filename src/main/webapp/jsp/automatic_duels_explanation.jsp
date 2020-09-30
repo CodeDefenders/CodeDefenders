@@ -19,14 +19,15 @@
 
 --%>
 <div class="panel-body" style="padding: 10px;">
-	<p>This value refers to the number of tests which cover, but do not
+	<p>
+        This value refers to the number of tests which cover, but do not
 		kill, mutants and controls if and when equivalence duels are
 		automatically triggered.
-		<ul>
-			<li><b>0</b> disables the automatic triggering of equivalence
-				mutants.
-			<li><b>X (X>0)</b> triggers an equivalence duels for every mutant
-				which survives X tests.
-		</ul>
-	</p>
+    </p>
+    <ul>
+        <li><b>0</b> disables the automatic triggering of equivalence
+            mutants.
+        <li><b>N > 0</b> triggers an equivalence duels for every mutant
+            which survives N tests.
+    </ul>
 </div>
