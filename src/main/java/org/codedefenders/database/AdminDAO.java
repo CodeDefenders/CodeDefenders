@@ -124,7 +124,7 @@ public class AdminDAO {
         userInfo.add(rs.getString("Username"));
         userInfo.add(rs.getString("Email"));
         Timestamp ts = rs.getTimestamp("lastLogin");
-        userInfo.add(ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5));
+        userInfo.add(ts == null ? null : ts.toString().substring(0, ts.toString().length() - 5));
         userInfo.add(rs.getString("lastRole"));
         userInfo.add(String.valueOf(rs.getInt("TotalScore")));
         return userInfo;

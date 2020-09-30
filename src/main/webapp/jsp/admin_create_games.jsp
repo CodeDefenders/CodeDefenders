@@ -94,16 +94,7 @@
                             <th>ID</th>
                             <th>Class</th>
                             <th>Level</th>
-                            <th class="col-md-6">Players
-                                <div class="row">
-                                    <div class="col-sm-2" style="padding-top: 10px">Name</div>
-                                    <div class="col-sm-3" style="padding-top: 10px">Last Role</div>
-                                    <div class="col-sm-1" style="padding-top: 10px">Score</div>
-                                    <a id="togglePlayersCreated" class="btn btn-sm btn-default" style="float: right">
-                                        <span id = "togglePlayersCreatedSpan" class="glyphicon glyphicon-eye-open"></span>
-                                    </a>
-                                </div>
-                            </th>
+                            <th>Players (Name, Last Role, Score)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -161,7 +152,9 @@
                                             String userName = UserDAO.getUserById(id).getUsername();
                                             //Timestamp ts = AdminDAO.getLastLogin(aid);
                                             Role lastRole = UserDAO.getLastRoleOfUser(id);
-                                            lastRole = (lastRole != null ) ? lastRole : Role.NONE;
+                                            String lastRoleStr = lastRole != null
+                                                    ? lastRole.getFormattedString()
+                                                    : "<span style=\"color: gray;\">none<span>";
                                             Entry score = AdminDAO.getScore(id);
                                             int totalScore = score.getTotalPoints();
                                             String color = attackerIds.contains(id) ? "#edcece" : "#ced6ed";
@@ -169,13 +162,13 @@
                                     <tr style="background: <%= color %>">
                                         <td class="col-md-2"><%= userName %>
                                         </td>
-                                        <td class="col-md-3"><%= lastRole.getFormattedString() %>
+                                        <td class="col-md-3"><%= lastRoleStr %>
                                         </td>
                                         <td class="col-md-1"><%= totalScore %>
                                         </td>
                                         <td class="col-md-1">
                                             <button class="btn btn-sm btn-primary"
-                                                    value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
+                                                    value="<%=i + "-" + id%>"
                                                     id="<%="switch_player_"+id+"_game_"+i%>"
                                                     name="tempGameUserSwitchButton">
                                                 <span class="glyphicon glyphicon-transfer"></span>
@@ -183,7 +176,7 @@
                                         </td>
                                         <td class="col-md-1">
                                             <button class="btn btn-sm btn-danger"
-                                                    value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
+                                                    value="<%=i + "-" + id%>"
                                                     id="<%="remove_player_"+id+"_game_"+i%>"
                                                     name="tempGameUserRemoveButton">
                                                 <span class="glyphicon glyphicon-trash"></span>
@@ -192,7 +185,7 @@
                                         <%-- ------------------ --%>
                                         <%-- Show moving to game UI only if there's more than 1 game --%>
                                         <%-- ------------------ --%>
-                                        <% if( createdGames.size() + availableGames.size() > 1 ) {%>
+                                        <% if (createdGames.size() + availableGames.size() > 1) {%>
                                         <td class="col-md-3" style="padding-top:3px; padding-bottom:3px;">
                                         <%-- create the select and fill it with the available games except the current one --%>
                                             <div id="<%="game_"+id%>" style="max-width: 100px; float: left;">
@@ -209,7 +202,7 @@
                                                                 if( gameIndex == i ) { continue; }
                                                                 String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
                                                     %>
-                                                        <option style="color:gray" value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex) + ": " + classAlias%>
+                                                        <option value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex) + ": " + classAlias%>
                                                         </option>
                                                     <%
                                                             }
@@ -312,7 +305,12 @@
                             int uid = Integer.valueOf(userInfo.get(0));
                             String username = userInfo.get(1);
                             String lastLogin = userInfo.get(3);
-                            String lastRole = ( userInfo.get(4) != null ) ?  Role.valueOf(userInfo.get(4)).getFormattedString() : Role.NONE.getFormattedString();
+                            lastLogin = lastLogin != null
+                                    ? lastLogin
+                                    : "<span style=\"color: gray;\">never<span>";
+                            String lastRole = userInfo.get(4) != null
+                                    ? Role.valueOf(userInfo.get(4)).getFormattedString()
+                                    : "<span style=\"color: gray;\">none<span>";
                             String totalScore = userInfo.get(5);
                     %>
 
@@ -347,10 +345,7 @@
                                                 for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
                                                     String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
                                         %>
-                                        <option style="color:gray"
-                                                value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex)
-                                                + ": " + classAlias%>
-                                        </option>
+                                        <option value=<%="T" + gameIndex%>><%="T" + gameIndex + ": " + classAlias%></option>
                                         <%}%>
                                         <%}%>
                                     </select>
@@ -389,11 +384,13 @@
                     <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
             </div>
-            <div class="panel-body" style="color: gray; text-align: center;">
-                <div id="demo" class="collapse">
-                    Newline separated list of usernames or emails.<br/>
-                    The union of these users and the users selected in the table above will be used to create games.<br/>
-                    Only unassigned users are taken into account.<br/><br/>
+            <div class="panel-body">
+                <div id="demo" class="collapse panel panel-default" style="margin-top: 5px;">
+                    <div class="panel-body" style="padding: 10px;">
+                        Newline separated list of usernames or emails.
+                        These names, as well as the names selected in the above table, will be assigned to created games.
+                        Only unassigned users are taken into account.
+                    </div>
                 </div>
                 <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
                           oninput="document.getElementById('submit_users_btn').disabled =
@@ -737,7 +734,7 @@
                 }
 
                 const tableStagedGames = $('#tableCreatedGames').DataTable({
-                    order: [[0, "desc"]],
+                    order: [[1, "desc"]],
                     columnDefs: [{
                         targets: 0,
                         orderable: false
