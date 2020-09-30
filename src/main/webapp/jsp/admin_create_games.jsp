@@ -40,11 +40,16 @@
 <%-- Workaround for the stupid <div class="nest"> in header_main. Remove this once that div is gone --%>
 </div></div></div></div></div><div class="container">
 
+<%
+    boolean displayingStagedGames;
+    boolean displayingUnassignedUsers;
+%>
+
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <form id="insertGames" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post" style="margin-top: 25px; margin-bottom: 25px;">
+    <form id="insertGames" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post" style="margin-top: 25px;">
         <input type="hidden" name="formType" value="insertGames"/>
         <%
 			List<MultiplayerGame> availableGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
@@ -52,6 +57,7 @@
             List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
             if (createdGames == null || createdGames.isEmpty()) {
+                displayingStagedGames = false;
         %>
 
         <div class="panel panel-default">
@@ -65,6 +71,7 @@
 
         <%
             } else {
+                displayingStagedGames = true;
         %>
 
         <div class="panel panel-default">
@@ -257,6 +264,7 @@
             createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
             List<List<String>> unassignedUsersInfo = AdminCreateGames.getUnassignedUsers(attackerIdsList, defenderIdsList);
             if (unassignedUsersInfo.isEmpty()) {
+                displayingUnassignedUsers = false;
         %>
 
         <div class="panel panel-default">
@@ -270,6 +278,7 @@
 
         <%
             } else {
+                displayingUnassignedUsers = true;
         %>
 
         <div class="panel panel-default">
@@ -631,31 +640,6 @@
     </div>
 
     <script>
-        $('#selectAllUsers').click(function () {
-            var checkboxes = document.getElementsByName('selectedUsers');
-            var isChecked = document.getElementById('selectAllUsers').checked;
-            checkboxes.forEach(function (element) {
-                if(element.checked !== isChecked)
-                    element.click();
-            });
-        });
-
-        $('#selectAllTempGames').click(function () {
-            $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
-        });
-
-        $('#selectAllGames').click(function () {
-            $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
-        });
-
-        $('#togglePlayersCreated').click(function () {
-            var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
-            localStorage.setItem("showCreatedPlayers", showPlayers ? "false" : "true");
-            $("[id=playersTableCreated]").toggle();
-            $("[id=playersTableHidden]").toggle();
-            setCreatedPlayersSpan()
-        });
-
         function setCreatedPlayersSpan() {
             var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
             var buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
@@ -686,7 +670,7 @@
 
         function updateCheckbox(checkboxVal, isChecked) {
             document.getElementById('submit_users_btn').disabled =
-                !(areAnyChecked('selectedUsers') || containsText('user_name_list')) || (document.getElementById('cut_select').selectedIndex != 0);
+                    !(areAnyChecked('selectedUsers') || containsText('user_name_list')) || (document.getElementById('cut_select').selectedIndex != 0);
             setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
             var hiddenIdList = document.getElementById('hidden_user_id_list');
             if (isChecked) {
@@ -696,72 +680,97 @@
             }
         }
 
-        $('#tableAddUsers').on('draw.dt', function () {
-            setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
-        });
-
-
         $(document).ready(function () {
-            if (localStorage.getItem("showActivePlayers") === "true") {
-                $("[id=playersTableActive]").show();
-            }
-
-            if (localStorage.getItem("showCreatedPlayers") === "true") {
-                $("[id=playersTableCreated]").show();
-                $("[id=playersTableHidden]").hide();
-            }
-
-            const tableAddUsers = $('#tableAddUsers').DataTable({
-                order: [[5, "desc"]],
-                columnDefs: [{
-                    targets: 0,
-                    orderable: false
-                }, {
-                    targets: 6,
-                    orderable: false
-                }],
-                scrollY: '400px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {emptyTable: 'There are currently no unassigned users.'}
-            });
-            $('#search-unassigned-users').on('keyup', function () { setTimeout(() => tableAddUsers.search(this.value).draw(), 0); });
-
-            const tableStagedGames = $('#tableCreatedGames').DataTable({
-                order: [[3, "desc"]],
-                columnDefs: [{
-                    targets: 0,
-                    orderable: false
-                }, {
-                    targets: 6,
-                    orderable: false
-                }],
-                scrollY: '400px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {emptyTable: 'There are currently no staged multiplayer games.'}
-            });
-            $('#search-staged-games').on('keyup', function () { setTimeout(() => tableStagedGames.search(this.value).draw(), 0); });
-
-            setCreatedPlayersSpan();
-        });
-
-        $('.modal').on('shown.bs.modal', function () {
-            let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-            if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                codeMirrorContainer.CodeMirror.refresh();
-            } else {
-                let textarea = $(this).find('textarea')[0];
-                let editor = CodeMirror.fromTextArea(textarea, {
-                    lineNumbers: false,
-                    readOnly: true,
-                    mode: "text/x-java"
+            <% if (displayingUnassignedUsers) { %>
+                $('#selectAllUsers').click(function () {
+                    var checkboxes = document.getElementsByName('selectedUsers');
+                    var isChecked = document.getElementById('selectAllUsers').checked;
+                    checkboxes.forEach(function (element) {
+                        if (element.checked !== isChecked) {
+                            element.click();
+                        }
+                    });
                 });
-                editor.setSize("100%", 500);
-                ClassAPI.getAndSetEditorValue(textarea, editor);
-            }
+
+                $('#tableAddUsers').on('draw.dt', function () {
+                    setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
+                });
+
+                const tableAddUsers = $('#tableAddUsers').DataTable({
+                    order: [[5, "desc"]],
+                    columnDefs: [{
+                        targets: 0,
+                        orderable: false
+                    }, {
+                        targets: 6,
+                        orderable: false
+                    }],
+                    scrollY: '400px',
+                    scrollCollapse: true,
+                    paging: false,
+                    dom: 't',
+                    language: {emptyTable: 'There are currently no unassigned users.'}
+                });
+                $('#search-unassigned-users').on('keyup', function () { setTimeout(() => tableAddUsers.search(this.value).draw(), 0); });
+            <% } %>
+
+            <% if (displayingStagedGames) { %>
+                $('#selectAllTempGames').click(function () {
+                    $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
+                });
+
+                $('#togglePlayersCreated').click(function () {
+                    var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
+                    localStorage.setItem("showCreatedPlayers", showPlayers ? "false" : "true");
+                    $("[id=playersTableCreated]").toggle();
+                    $("[id=playersTableHidden]").toggle();
+                    setCreatedPlayersSpan()
+                });
+
+                if (localStorage.getItem("showActivePlayers") === "true") {
+                    $("[id=playersTableActive]").show();
+                }
+
+                if (localStorage.getItem("showCreatedPlayers") === "true") {
+                    $("[id=playersTableCreated]").show();
+                    $("[id=playersTableHidden]").hide();
+                }
+
+                const tableStagedGames = $('#tableCreatedGames').DataTable({
+                    order: [[0, "desc"]],
+                    columnDefs: [{
+                        targets: 0,
+                        orderable: false
+                    }, {
+                        targets: 3,
+                        orderable: false
+                    }],
+                    scrollY: '400px',
+                    scrollCollapse: true,
+                    paging: false,
+                    dom: 't',
+                    language: {emptyTable: 'There are currently no staged multiplayer games.'}
+                });
+                $('#search-staged-games').on('keyup', function () { setTimeout(() => tableStagedGames.search(this.value).draw(), 0); });
+
+                setCreatedPlayersSpan();
+            <% } %>
+
+            $('.modal').on('shown.bs.modal', function () {
+                let codeMirrorContainer = $(this).find(".CodeMirror")[0];
+                if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+                    codeMirrorContainer.CodeMirror.refresh();
+                } else {
+                    let textarea = $(this).find('textarea')[0];
+                    let editor = CodeMirror.fromTextArea(textarea, {
+                        lineNumbers: false,
+                        readOnly: true,
+                        mode: "text/x-java"
+                    });
+                    editor.setSize("100%", 500);
+                    ClassAPI.getAndSetEditorValue(textarea, editor);
+                }
+            });
         });
     </script>
 </div>
