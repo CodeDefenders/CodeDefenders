@@ -111,9 +111,9 @@ public class ConnectionFactory {
         result.put("databaseEmpty",
                 checkDatabase(metaData -> metaData.getTables(config.getDbName(), null, null, null), true));
         result.put("flywayHistoryExists",
-                checkDatabase(metaData -> metaData.getTables(null, null, "flyway_schema_histry", null)));
+                checkDatabase(metaData -> metaData.getTables(null, null, "flyway_schema_history", null)));
         result.put("databaseBaseline1.6",
-                checkDatabase(metaData -> metaData.getColumns(null, null, "games", "ForceHamcrest")));
+                checkDatabase(metaData -> metaData.getColumns(null, null, "mutants", "KillMessage")));
         result.put("databaseBaseline1.7",
                 checkDatabase(metaData -> metaData.getColumns(null, null, "puzzles", "Active")));
         return result;

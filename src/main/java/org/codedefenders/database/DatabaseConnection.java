@@ -23,12 +23,14 @@ import java.sql.SQLException;
 
 import org.codedefenders.util.CDIUtil;
 
+/**
+ * Provides a way to acquire a database connection in a static context.
+ *
+ * @deprecated Use {@link ConnectionFactory#getConnection()} from a non static class/method instead.
+ */
+@Deprecated
 public class DatabaseConnection {
-    public static Connection getConnection() {
-        try {
-            return CDIUtil.getBeanFromCDI(ConnectionFactory.class).getConnection();
-        } catch (SQLException ignored) {
-            return null;
-        }
+    public static Connection getConnection() throws SQLException {
+        return CDIUtil.getBeanFromCDI(ConnectionFactory.class).getConnection();
     }
 }

@@ -28,17 +28,15 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DB {
-    private static ConnectionFactory connectionFactory = CDIUtil.getBeanFromCDI(ConnectionFactory.class);
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
     public static synchronized Connection getConnection() {
         try {
-            return connectionFactory.getConnection();
+            return DatabaseConnection.getConnection();
         } catch (SQLException e) {
             logger.error("Unable to acquire SQL connection", e);
             return null;
