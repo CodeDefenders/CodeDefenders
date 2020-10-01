@@ -860,6 +860,6 @@
 </div>
 
 <%-- Workaround for the stupid <div class="nest"> in header_main. Remove this once that div is gone --%>
-</div><div></div><div><div><div><div>
+</div><div><div><div><div><div><div>
 
 <%@ include file="/jsp/footer.jsp" %>
