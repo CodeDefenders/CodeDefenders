@@ -95,7 +95,11 @@
                             <th>ID</th>
                             <th>Class</th>
                             <th>Level</th>
-                            <th>Players (Name, Last Role, Score)</th>
+                            <th>Players (Name, Last Role, Score)
+                                <a id="togglePlayersCreated" class="btn btn-sm btn-default" style="float: right">
+                                    <span id = "togglePlayersCreatedSpan" class="glyphicon glyphicon-alert"></span>
+                                </a>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -131,8 +135,9 @@
                                             <div class="modal-body">
                                                 <pre class="readonly-pre"><textarea
                                                         class="readonly-textarea classPreview"
-                                                        id="sut<%=g.getId()%>" name="cut<%=g.getCUT().getId()%>" cols="80"
-                                                        rows="30"></textarea></pre>
+                                                        id="sut<%=g.getId()%>"
+                                                        name="cut<%=g.getCUT().getId()%>"
+                                                        cols="80" rows="30"></textarea></pre>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -188,7 +193,8 @@
                                                 <select name="game_<%=id%>" class="form-control selectpicker" data-size="small" id="game" style="float: right">
                                                     <%-- List created games --%>
                                                     <% for (MultiplayerGame availableGame : availableGames) { %>
-                                                        <option value="<%=availableGame.getId()%>"><%=String.valueOf(availableGame.getId()) + ": " + availableGame.getCUT().getAlias()%>
+                                                        <option value="<%=availableGame.getId()%>">
+                                                            <%=availableGame.getId()%>: <%=availableGame.getCUT().getAlias()%>
                                                         </option>
                                                     <% } %>
                                                     <%-- List the staged games --%>
