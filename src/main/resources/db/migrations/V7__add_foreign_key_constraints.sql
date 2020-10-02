@@ -9,7 +9,7 @@ ALTER TABLE `event_chat`
 ALTER TABLE `events`
     ADD CONSTRAINT FOREIGN KEY (Game_ID) REFERENCES `games` (ID);
 ALTER TABLE `events`
-    ADD CONSTRAINT FOREIGN KEY (Player_ID) REFERENCES `users` (User_ID);
+    ADD CONSTRAINT FOREIGN KEY (Player_ID) REFERENCES `players` (ID);
 ALTER TABLE `events`
     ADD CONSTRAINT FOREIGN KEY (Event_Type) REFERENCES `event_messages` (Event_Type);
 ALTER TABLE `intention`
