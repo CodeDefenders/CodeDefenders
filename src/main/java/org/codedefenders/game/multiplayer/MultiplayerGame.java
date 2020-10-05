@@ -18,11 +18,6 @@
  */
 package org.codedefenders.game.multiplayer;
 
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
-
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +42,11 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
+
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGame extends AbstractGame {
     /*

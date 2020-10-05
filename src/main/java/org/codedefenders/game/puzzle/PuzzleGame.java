@@ -18,9 +18,6 @@
  */
 package org.codedefenders.game.puzzle;
 
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +42,9 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * Represents an instance of a {@link Puzzle puzzle}, which is played by one

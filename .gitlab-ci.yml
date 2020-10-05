@@ -1,56 +1,38 @@
 include:
-  - template: Dependency-Scanning.gitlab-ci.yml
-  - template: SAST.gitlab-ci.yml
-
-image: maven:3-jdk-8
+  # This applies global rules to run piplines for the default branch, tags and all types of merge requests
+  - template: Workflows/MergeRequest-Pipelines.gitlab-ci.yml
+  # This includes the GitLab provided dependency scanning jobs
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  # This includes the GitLab provided SAST jobs.
+  - template: Security/SAST.gitlab-ci.yml
+  # This includes the GitLab provided secret detection job.
+  - template: Security/Secret-Detection.gitlab-ci.yml
 
 stages:
   - build
   - test
 
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  SAST_DISABLE_DIND: "true"
-  SAST_DEFAULT_ANALYZERS: "spotbugs, secrets"
-  DS_DISABLE_DIND: "true"
-  DS_DEFAULT_ANALYZERS: "gemnasium-maven"
-
-cache:
-  paths:
-    - .m2/repository/
-    - target/
-    - ./config.properties
-  key: default
-
-
-spotbugs-sast:
+default:
+  image: maven:3-jdk-8
   cache:
     paths:
       - .m2/repository/
-      - ./config.properties
-    key: spotbugs
-  script:
-    - touch config.properties
-    - /analyzer run
 
-gemnasium-maven-dependency_scanning:
-  script:
-    - touch config.properties
-    - /analyzer run
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
 
-
-build:
+checkstyle:
   stage: build
   script:
-    - touch config.properties
-    - mvn --no-transfer-progress clean compile
+    - mvn validate
+  artifacts:
+    paths:
+      - target/checkstyle-*
 
-test:
+checkstyle-extract:
   stage: test
+  when: always
   script:
-    - apt update && apt-get -y install libncurses5
-    - touch config.properties
-    - mvn --no-transfer-progress test checkstyle:checkstyle
     - |
       file="";
       first=1;
@@ -58,34 +40,30 @@ test:
       path="$(pwd)";
       echo "[" > "$output";
       tail -n +3 target/checkstyle-result.xml | while read p; do
-        if echo "$p" | grep -q "<file name.*" ; then
-          file=$(expr "$p" : '<file name=\"\(.*\)\".*' | sed 's@'"$path"'@@g' );
-          echo "$file";
-        fi
-        if echo "$p" | grep -q "<error.*" ; then
-          line="$(expr "$p" : '.*line=\"\([0-9]*\)\".*')";
-          message="$(expr "$p" : '.*message=\"\(.*\)\" source.*' | sed -e 's/&apos;/`/g' -e 's/&lt;/</g' -e 's/&gt;/>/g' -e 's/&quot;/\\\"/g' -e 's/&amp;/\&/g')"
-          checksum=$(echo "$file $line $message" | sha1sum | awk '{print $1}')
-          if [ "$first" == 1 ] ; then
-            echo "{ \"description\": \"$message\", \"fingerprint\": \"$checksum\", \"location\": { \"path\": \"$file\", \"lines\": { \"begin\": \"$line\" }}}" >> "$output";
-            first=0;
-          else
-            echo ",{ \"description\": \"$message\", \"fingerprint\": \"$checksum\", \"location\": { \"path\": \"$file\", \"lines\": { \"begin\": \"$line\" }}}" >> "$output"
-          fi
-        fi
+      if echo "$p" | grep -q "<file name.*" ; then
+        file=$(expr "$p" : '<file name=\"\(.*\)\".*' | sed 's@'"$path"'@@g' );
+      echo "$file";
+      fi
+      if echo "$p" | grep -q "<error.*" ; then
+        line="$(expr "$p" : '.*line=\"\([0-9]*\)\".*')";
+        message="$(expr "$p" : '.*message=\"\(.*\)\" source.*' | sed -e 's/&apos;/`/g' -e 's/&lt;/</g' -e 's/&gt;/>/g' -e 's/&quot;/\\\"/g' -e 's/&amp;/\&/g')"
+      checksum=$(echo "$file $line $message" | sha1sum | awk '{print $1}')
+      if [ "$first" == 1 ] ; then
+        echo "{ \"description\": \"$message\", \"fingerprint\": \"$checksum\", \"location\": { \"path\": \"$file\", \"lines\": { \"begin\": \"$line\" } } }" >> "$output";
+      first=0;
+      else
+        echo ",{ \"description\": \"$message\", \"fingerprint\": \"$checksum\", \"location\": { \"path\": \"$file\", \"lines\": { \"begin\": \"$line\" } } }" >> "$output"
+      fi
+      fi
       done ;
       echo "]" >> "$output"
-    - cat target/site/jacoco-ut/index.html | grep -o '<tfoot>.*</tfoot>'
+  # This implies a dependency on the checkstyle job (an so downloads its artifacts)
+  needs:
+    - checkstyle
   artifacts:
-    paths:
-      - target/surefire-reports/
-      - target/site/jacoco-ut/
-      - checkstyle-report.json
     reports:
       codequality:
         - checkstyle-report.json
-      junit:
-        - target/surefire-reports/TEST-*.xml
 
 metrics:
   stage: build
@@ -96,3 +74,56 @@ metrics:
   artifacts:
     reports:
       metrics: metrics.txt
+
+build:
+  stage: build
+  script:
+    - mvn --no-transfer-progress clean compile -Dcheckstyle.skip
+  artifacts:
+    paths:
+      - target/
+    expire_in: 3 hrs
+
+test:
+  stage: test
+  script:
+    - apt update && apt-get -y install libncurses5
+    - mvn --no-transfer-progress test -Dcheckstyle.skip
+    - cat target/site/jacoco-ut/index.html | grep -o '<tfoot>.*</tfoot>'
+  # This implies a dependency on the build job (an so downloads its artifacts)
+  needs:
+    - build
+  artifacts:
+    paths:
+      - target/surefire-reports/
+      - target/site/jacoco-ut/
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+
+spotbugs-sast:
+  stage: test
+  dependencies: [ ]
+  needs: [ ]
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+gemnasium-maven-dependency_scanning:
+  stage: test
+  dependencies: [ ]
+  needs: [ ]
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+secret_detection:
+  stage: test
+  dependencies: [ ]
+  needs: [ ]
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
