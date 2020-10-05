@@ -6,6 +6,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<powermock.version>1.6.1</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
+		<apache-shiro.version>1.6.0</apache-shiro.version>
+
 		<config.properties>config.properties</config.properties>
 
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -473,26 +475,6 @@
 
 	<dependencies>
 
-		<!-- Shiro Security -->
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-core</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-web</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-servlet-plugin</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-
-
 		<!-- Tomcat dependencies -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
@@ -514,6 +496,23 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Shiro Security -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-core</artifactId>
+			<version>${apache-shiro.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-web</artifactId>
+			<version>${apache-shiro.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-servlet-plugin</artifactId>
+			<version>${apache-shiro.version}</version>
+			<scope>runtime</scope>
+		</dependency>
 
 		<!-- Context and Dependency Injection (CDI) -->
 		<dependency>
