@@ -7,6 +7,7 @@
 		<powermock.version>1.6.1</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
 		<apache-shiro.version>1.6.0</apache-shiro.version>
+		<slf4j.version>1.7.20</slf4j.version>
 
 		<config.properties>config.properties</config.properties>
 
@@ -606,16 +607,16 @@
 			<version>3.1.0.RELEASE</version>
 		</dependency>
 
+		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.20</version>
+			<version>${slf4j.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.20</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<dependency>
