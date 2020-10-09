@@ -20,40 +20,126 @@
 package org.codedefenders.database;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import javax.sql.DataSource;
+import javax.inject.Singleton;
 
+import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.codedefenders.configuration.Configuration;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.mysql.cj.jdbc.MysqlDataSource;
+import com.mysql.cj.jdbc.Driver;
 
-@ApplicationScoped
+
+@Singleton
 public class ConnectionFactory {
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
-    DataSource dataSource;
+    BasicDataSource dataSource;
 
     @Inject
-    ConnectionFactory(Configuration config) {
-        MysqlDataSource dataSource = new MysqlDataSource();
-        dataSource.setURL(config.getDbUrl());
-        dataSource.setUser(config.getDbUsername());
+    Configuration config;
+
+    @PostConstruct
+    void init() {
+        dataSource = new BasicDataSource();
+        try {
+            dataSource.setDriver(new Driver());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        dataSource.setUrl(config.getDbUrl());
+        dataSource.setUsername(config.getDbUsername());
         dataSource.setPassword(config.getDbPassword());
-        this.dataSource = dataSource;
+
+        migrate();
     }
 
     @PreDestroy
     void shutdown() {
-        //
-        // dataSource.close();
+        try {
+            dataSource.close();
+        } catch (SQLException e) {
+            logger.error("Error in closing database connections", e);
+        }
     }
 
-    @Produces
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    private void migrate() {
+        FluentConfiguration flywayConfig = Flyway.configure();
+        flywayConfig.dataSource(dataSource);
+        flywayConfig.locations("classpath:db/migrations");
+
+        Map<String, Boolean> check = checkDatabase();
+
+        if (!check.get("databaseEmpty") && !check.get("flywayHistoryExists")) {
+            if (check.get("databaseBaseline1.7")) {
+                flywayConfig.baselineVersion("3");
+                flywayConfig.baselineOnMigrate(true);
+            } else if (check.get("databaseBaseline1.6")) {
+                flywayConfig.baselineVersion("1");
+                flywayConfig.baselineOnMigrate(true);
+            } else {
+                throw new IllegalStateException("Unsupported database update! Please first update to 1.6");
+            }
+        }
+
+        Flyway flyway = flywayConfig.load();
+        flyway.migrate();
+    }
+
+    @FunctionalInterface
+    interface DataBaseCheck<T, R> {
+        R check(T input) throws SQLException;
+    }
+
+    private Map<String, Boolean> checkDatabase() {
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("databaseEmpty",
+                checkDatabase(metaData -> metaData.getTables(config.getDbName(), null, null, null), true));
+        result.put("flywayHistoryExists",
+                checkDatabase(metaData -> metaData.getTables(null, null, "flyway_schema_history", null)));
+        result.put("databaseBaseline1.6",
+                checkDatabase(metaData -> metaData.getColumns(null, null, "mutants", "KillMessage")));
+        result.put("databaseBaseline1.7",
+                checkDatabase(metaData -> metaData.getColumns(null, null, "puzzles", "Active")));
+        return result;
+    }
+
+    private Boolean checkDatabase(DataBaseCheck<DatabaseMetaData, ResultSet> checkFunction) {
+        return checkDatabase(checkFunction, false);
+    }
+
+    private Boolean checkDatabase(DataBaseCheck<DatabaseMetaData, ResultSet> checkFunction, boolean noResult) {
+        Boolean result = null;
+        try (Connection conn = getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            try (ResultSet rs = checkFunction.check(metaData)) {
+                result = rs.next() == !noResult;
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return result;
+    }
+
+    public void updateSize(int maxTotalConnections) {
+        //dataSource.setMaxTotal(maxTotalConnections);
+    }
+
+    public void updateWaitingTime(int parseInt) {
     }
 }

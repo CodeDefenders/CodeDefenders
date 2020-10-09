@@ -18,6 +18,7 @@
  */
 package org.codedefenders;
 
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -30,7 +31,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
-import org.codedefenders.database.ConnectionPool;
+import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,9 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private Configuration config;
 
+    @Inject
+    private ConnectionFactory connectionFactory;
+
     /**
      * This method is called when the servlet context is initialized(when
      * the Web application is deployed). You can initialize servlet context
@@ -60,8 +64,7 @@ public class SystemStartStop implements ServletContextListener {
             logger.error(e.getMessage());
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
-        try {
-            ConnectionPool.instance();
+        try (Connection ignored = connectionFactory.getConnection()) {
             logger.info("Code Defenders started successfully.");
         } catch (Exception e) {
             // Fail Deployment
@@ -77,11 +80,6 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        try {
-            ConnectionPool.instance().closeDBConnections();
-        } catch (Throwable e) {
-            logger.error("Error in closing database connections", e);
-        }
 
         // https://stackoverflow.com/questions/11872316/tomcat-guice-jdbc-memory-leak
         AbandonedConnectionCleanupThread.checkedShutdown();

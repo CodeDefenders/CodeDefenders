@@ -1,1 +1,0 @@
-ALTER TABLE users ADD Active tinyint(1) DEFAULT '1' NOT NULL;
