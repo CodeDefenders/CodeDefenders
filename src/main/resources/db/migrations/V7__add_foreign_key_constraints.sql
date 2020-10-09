@@ -16,7 +16,3 @@ ALTER TABLE `intention`
     ADD CONSTRAINT FOREIGN KEY (Mutant_ID) REFERENCES `mutants` (Mutant_ID);
 ALTER TABLE `intention`
     ADD CONSTRAINT FOREIGN KEY (Game_ID) REFERENCES `games` (ID);
-ALTER TABLE `killmapjob`
-    ADD CONSTRAINT FOREIGN KEY (Game_ID) REFERENCES `games` (ID);
-ALTER TABLE `killmapjob`
-    ADD CONSTRAINT FOREIGN KEY (Class_ID) REFERENCES `classes` (Class_ID);
