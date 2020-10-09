@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<powermock.version>1.6.1</powermock.version>
+		<powermock.version>1.7.4</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
 		<slf4j.version>1.7.20</slf4j.version>
 
@@ -756,7 +756,7 @@
 			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- This provides mockito 1.10.8 -->
+		<!-- This provides mockito 1.10.19 -->
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
