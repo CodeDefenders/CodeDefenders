@@ -517,18 +517,23 @@
 			<version>3.0.5.Final</version>
 		</dependency>
 
-		<!-- EventBus implementation, but any EventBus or MOM might work as well -->
+		<!-- Logging -->
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>23.6-jre</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
-		<!-- Test Smell Detector. Local dependency -->
+		<!-- Begin Misc Dependencies -->
 		<dependency>
-			<groupId>edu.rit.se.testsmells</groupId>
-			<artifactId>TestSmellDetector</artifactId>
-			<version>0.3</version>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.21</version>
 		</dependency>
 
 		<!-- Installer -->
@@ -545,6 +550,42 @@
 			<version>2.0.1.Final</version>
 		</dependency>
 
+		<!-- BCrypt password hashing and BeanUtils (from spring-core transitive dependency) -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+			<version>3.1.0.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.6-rc1</version>
+		</dependency>
+
+		<!-- EventBus implementation, but any EventBus or MOM might work as well + other common functionality -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>24.1.1-jre</version>
+		</dependency>
+
+		<!-- JSON serialization -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.4</version>
+		</dependency>
+
+		<!-- Test Smell Detector. Local dependency -->
+		<dependency>
+			<groupId>edu.rit.se.testsmells</groupId>
+			<artifactId>TestSmellDetector</artifactId>
+			<version>0.3</version>
+		</dependency>
+		<!-- End Misc Dependencies -->
+
+		<!-- Begin Java Source Code / Coverage Analysis -->
 		<dependency>
 			<groupId>com.googlecode.java-diff-utils</groupId>
 			<artifactId>diffutils</artifactId>
@@ -558,45 +599,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.21</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-crypto</artifactId>
-			<version>3.1.0.RELEASE</version>
-		</dependency>
-
-		<!-- Logging -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
 			<version>3.20.0-GA</version>
 		</dependency>
 
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.6-rc1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>javaparser-core</artifactId>
-			<!-- <version>2.3.0</version> -->
 			<version>3.2.4</version>
 		</dependency>
 
@@ -605,12 +615,7 @@
 			<artifactId>org.jacoco.core</artifactId>
 			<version>0.7.7.201606060606</version>
 		</dependency>
-
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.4</version>
-		</dependency>
+		<!-- End Java Source Code / Coverage Analysis -->
 
 		<!-- Begin Commons Libraries -->
 		<dependency>
@@ -766,6 +771,7 @@
 			<version>2.2.3</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- End Test Dependencies -->
 
 		<!-- Begin Integration/System Test Dependencies -->
 		<!-- HTML Client -->
@@ -800,8 +806,6 @@
 			<scope>test</scope>
 		</dependency>
 		<!-- End Integration/System Test Dependencies -->
-
-		<!-- End Test Dependencies -->
 
 	</dependencies>
 
