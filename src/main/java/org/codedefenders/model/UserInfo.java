@@ -18,7 +18,9 @@
  */
 package org.codedefenders.model;
 
-import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 import org.codedefenders.game.Role;
 
@@ -29,12 +31,16 @@ import org.codedefenders.game.Role;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class UserInfo {
-    private User user;
-    private Timestamp lastLogin;
-    private Role lastRole;
-    private int totalScore;
+    private final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+            .ofPattern("yyyy-MM-dd HH:mm")
+            .withZone(ZoneId.systemDefault());
 
-    public UserInfo(User user, Timestamp lastLogin, Role lastRole, int totalScore) {
+    private final User user;
+    private final Instant lastLogin;
+    private final Role lastRole;
+    private final int totalScore;
+
+    public UserInfo(User user, Instant lastLogin, Role lastRole, int totalScore) {
         this.user = user;
         this.lastLogin = lastLogin;
         this.lastRole = lastRole;
@@ -46,7 +52,13 @@ public class UserInfo {
     }
 
     public String getLastLoginString() {
-        return lastLogin == null ? "-- never --" : lastLogin.toString().substring(0, lastLogin.toString().length() - 5);
+        return lastLogin == null
+                ? "-- never --"
+                : dateTimeFormatter.format(lastLogin);
+    }
+
+    public Instant getLastLogin() {
+        return lastLogin;
     }
 
     public Role getLastRole() {

@@ -32,6 +32,11 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.Collection" %>
+<%@ page import="org.codedefenders.model.UserInfo" %>
+<%@ page import="java.time.format.DateTimeFormatter" %>
+<%@ page import="java.time.ZoneId" %>
+<%@ page import="java.util.SortedSet" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -240,7 +245,10 @@
 
         <%
             createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-            List<List<String>> unassignedUsersInfo = AdminCreateGames.getUnassignedUsers(attackerIdsList, defenderIdsList);
+            List<Integer> assignedUserIds = new ArrayList<>();
+            attackerIdsList.stream().flatMap(Collection::stream).forEach(assignedUserIds::add);
+            defenderIdsList.stream().flatMap(Collection::stream).forEach(assignedUserIds::add);
+            List<UserInfo> unassignedUsersInfo = AdminCreateGames.getUnassignedUsers(assignedUserIds);
         %>
 
         <div class="panel panel-default">
@@ -272,17 +280,20 @@
                     <tbody>
 
                     <%
-                        for (List<String> userInfo : unassignedUsersInfo) {
-                            int uid = Integer.parseInt(userInfo.get(0));
-                            String username = userInfo.get(1);
-                            String lastLogin = userInfo.get(3);
-                            lastLogin = lastLogin != null
-                                    ? lastLogin
+                        DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+                                .ofPattern("yyyy-MM-dd HH:mm")
+                                .withZone(ZoneId.systemDefault());
+
+                        for (UserInfo userInfo : unassignedUsersInfo) {
+                            int uid = userInfo.getUser().getId();
+                            String username = userInfo.getUser().getUsername();
+                            String lastLogin = userInfo.getLastLogin() != null
+                                    ? dateTimeFormatter.format(userInfo.getLastLogin())
                                     : "<span style=\"color: gray;\">never<span>";
-                            String lastRole = userInfo.get(4) != null
-                                    ? Role.valueOf(userInfo.get(4)).getFormattedString()
+                            String lastRole = userInfo.getLastRole() != null
+                                    ? userInfo.getLastRole().getFormattedString()
                                     : "<span style=\"color: gray;\">none<span>";
-                            String totalScore = userInfo.get(5);
+                            int totalScore = userInfo.getTotalScore();
                     %>
 
                         <tr id="user_row_<%=uid%>">
@@ -769,11 +780,11 @@
             $('#togglePlayersCreated').on('change', function () {
                 const checked = $(this).is(':checked');
                 if (checked) {
-                    $("[id=playersTableHidden]").hide();
-                    $("[id=playersTableCreated]").show();
-                } else {
                     $("[id=playersTableCreated]").hide();
                     $("[id=playersTableHidden]").show();
+                } else {
+                    $("[id=playersTableHidden]").hide();
+                    $("[id=playersTableCreated]").show();
                 }
             });
 

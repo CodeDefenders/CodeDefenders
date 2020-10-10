@@ -18,15 +18,14 @@
  */
 package org.codedefenders.servlets.admin;
 
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
-
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -61,6 +60,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
+import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -68,6 +68,9 @@ import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 @WebServlet(urlPatterns = {Paths.ADMIN_PAGE, Paths.ADMIN_GAMES})
 public class AdminCreateGames extends HttpServlet {
@@ -130,26 +133,24 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
         HttpSession session = request.getSession();
-        // Get their user id from the session.
 
         final String action = request.getParameter("formType");
         switch (action) {
             case "createGame":
-                createGame(response, request, session);
+                createGames(request, response, session);
                 break;
             case "insertGames":
-                insertGame(response, request, session);
+                insertGames(request, response, session);
                 break;
             default:
-                logger.error("Action not recognised:{}", action);
+                logger.error("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
                 break;
         }
     }
 
-    private void insertGame(HttpServletResponse response, HttpServletRequest request, HttpSession session)
+    private void insertGames(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws IOException {
         attackerIdsList = (List<List<Integer>>) session.getAttribute(ATTACKER_LISTS_SESSION_ATTRIBUTE);
         defenderIdsList = (List<List<Integer>>) session.getAttribute(DEFENDER_LISTS_SESSION_ATTRIBUTE);
@@ -297,7 +298,7 @@ public class AdminCreateGames extends HttpServlet {
 
     // TODO The name of this method might be misleading if we associate a user to an
     // existing game, instead of creating the game...
-    private void createGame(HttpServletResponse response, HttpServletRequest request, HttpSession session)
+    private void createGames(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws IOException {
         String rowUserId = request.getParameter("userListButton");
         if (rowUserId != null) { // if admin is trying to add a single user to a game
@@ -360,7 +361,7 @@ public class AdminCreateGames extends HttpServlet {
                 if (userName.length() > 0) {
                     User u = UserDAO.getUserByName(userName);
                     if (u == null) {
-                        messages.add("No user with name or email \'" + userName + "\'!");
+                        messages.add("No user with name or email '" + userName + "'!");
                     } else if (!selectedUserIds.contains(u.getId())) {
                         selectedUserIds.add(u.getId());
                     }
@@ -368,14 +369,17 @@ public class AdminCreateGames extends HttpServlet {
             }
         }
 
-        List<Integer> unassignedUserIds = getUnassignedUserIds(attackerIdsList, defenderIdsList);
+        List<Integer> assignedUserIds = new ArrayList<>();
+        attackerIdsList.stream().flatMap(Collection::stream).forEach(assignedUserIds::add);
+        defenderIdsList.stream().flatMap(Collection::stream).forEach(assignedUserIds::add);
+        List<Integer> unassignedUserIds = getUnassignedUserIds(assignedUserIds);
+
         for (Integer uid : new ArrayList<>(selectedUserIds)) {
             if (!unassignedUserIds.contains(uid)) {
                 messages.add("user " + uid + " is already playing another game!");
                 selectedUserIds.remove(uid);
             }
         }
-
 
         if (selectedUserIds.size() == 0) {
             messages.add("Please select at least one User.");
@@ -519,7 +523,7 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         // TODO Why static ?
-        List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame, cutId,
+        List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, cutId,
                 login.getUserId(), gamesLevel, gamesState, maxAssertionsPerTest, //
                 chatEnabled, mutantValidatorLevel, withTests, withMutants, //
                 capturePlayersIntention, automaticEquivalenceTrigger);
@@ -590,7 +594,7 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     // TODO Why static ?!
-    private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame, int cutId,
+    private static List<MultiplayerGame> createGames(int nbGames, int cutId,
                                                      int creatorId, GameLevel level, GameState state, int maxAssertionsPerTest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean withTests, boolean withMutants,
                                                      boolean capturePlayersIntention,
@@ -661,87 +665,43 @@ public class AdminCreateGames extends HttpServlet {
         return blockShuffledList;
     }
 
-    public static List<List<String>> getUnassignedUsers(List<List<Integer>> attackerIdsLists,
-                                                        List<List<Integer>> defenderIdsLists) {
-        List<List<String>> unassignedUsersFromDB = AdminDAO.getUnassignedUsersInfo();
-        List<Integer> defenderIds = new ArrayList<>();
-        List<Integer> attackerIds = new ArrayList<>();
-        List<List<String>> unassignedUserIds = new ArrayList<>();
-        if (attackerIdsLists != null && defenderIdsLists != null) {
-            defenderIds = flattenListOfLists(defenderIdsLists);
-            attackerIds = flattenListOfLists(attackerIdsLists);
-        }
-        for (List<String> userInfo : unassignedUsersFromDB) {
-            int uid = Integer.parseInt(userInfo.get(0));
-            if (!(attackerIds.contains(uid) || defenderIds.contains(uid))) {
-                unassignedUserIds.add(userInfo);
+    public static List<UserInfo> getUnassignedUsers(Collection<Integer> assignedUserIds) {
+        List<UserInfo> unassignedUsers = AdminDAO.getUnassignedUsersInfo();
+        List<UserInfo> filteredUnassignedUsers = new ArrayList<>();
+        assignedUserIds = new HashSet<>(assignedUserIds);
+
+        for (UserInfo userInfo : unassignedUsers) {
+            if (!assignedUserIds.contains(userInfo.getUser().getId())) {
+                filteredUnassignedUsers.add(userInfo);
             }
         }
-        return unassignedUserIds;
+
+        return filteredUnassignedUsers;
     }
 
-    private static List<Integer> getUnassignedUserIds(List<List<Integer>> attackerIdsLists,
-                                                      List<List<Integer>> defenderIdsLists) {
-        List<User> unassignedUsersFromDB = UserDAO.getUnassignedUsers();
-        List<Integer> defenderIds = new ArrayList<>();
-        List<Integer> attackerIds = new ArrayList<>();
-        List<Integer> unassignedUserIds = new ArrayList<>();
-        if (attackerIdsLists != null && defenderIdsLists != null) {
-            defenderIds = flattenListOfLists(defenderIdsLists);
-            attackerIds = flattenListOfLists(attackerIdsLists);
-        }
-        for (User u : unassignedUsersFromDB) {
-            int uid = u.getId();
-            if (!(attackerIds.contains(uid) || defenderIds.contains(uid))) {
-                unassignedUserIds.add(uid);
+    private static List<Integer> getUnassignedUserIds(Collection<Integer> assignedUserIds) {
+        List<User> unassignedUsers = UserDAO.getUnassignedUsers();
+        List<Integer> filteredUnassignedUserIds = new ArrayList<>();
+        assignedUserIds = new HashSet<>(assignedUserIds);
+
+        for (User user : unassignedUsers) {
+            if (!assignedUserIds.contains(user.getId())) {
+                filteredUnassignedUserIds.add(user.getId());
             }
         }
-        return unassignedUserIds;
-    }
 
-    private static <T> List<T> flattenListOfLists(List<List<T>> listOfLists) {
-        List<T> flatList = new ArrayList<>();
-        for (List<T> list : listOfLists) {
-            flatList.addAll(list);
-        }
-        return flatList;
+        return filteredUnassignedUserIds;
     }
 
     public static int getPlayerScore(MultiplayerGame mg, int pid) {
-        HashMap mutantScores = mg.getMutantScores();
-        HashMap testScores = mg.getTestScores();
+        HashMap<Integer, PlayerScore> mutantScores = mg.getMutantScores();
+        HashMap<Integer, PlayerScore> testScores = mg.getTestScores();
         if (mutantScores.containsKey(pid) && mutantScores.get(pid) != null) {
-            return ((PlayerScore) mutantScores.get(pid)).getTotalScore();
+            return (mutantScores.get(pid)).getTotalScore();
         } else if (testScores.containsKey(pid) && testScores.get(pid) != null) {
-            return ((PlayerScore) testScores.get(pid)).getTotalScore();
+            return (testScores.get(pid)).getTotalScore();
         }
         return 0;
-    }
-
-
-    private static String zeroPad(long toPad) {
-        String s = String.valueOf(toPad);
-        return s.length() > 1 ? s : "0" + s;
-    }
-
-    public static String formatTimestamp(String lastSubmissionTime) {
-        Timestamp currentTS = new Timestamp(System.currentTimeMillis());
-        long diff = currentTS.getTime() - Long.parseLong(lastSubmissionTime);
-        long diffSeconds = diff / 1000 % 60;
-        long diffMinutes = diff / (60 * 1000) % 60;
-        long diffHours = diff / (60 * 60 * 1000);
-        long diffDays = (int) (diff / (1000 * 60 * 60 * 24));
-        String diffString = "";
-        if (diffDays >= 1) {
-            return "more than 1 day";
-        }
-        //if (diffHours >= 1)
-        diffString += zeroPad(diffHours) + "h ";
-        //if (diffMinutes >= 1)
-        diffString += zeroPad(diffMinutes) + "m ";
-        //if (diffSeconds >= 1)
-        diffString += zeroPad(diffSeconds) + "s ";
-        return diffString;
     }
 
     private static void distributeRemainingUsers(List<Integer> selectedUserIds, List<Integer> attackerIds,

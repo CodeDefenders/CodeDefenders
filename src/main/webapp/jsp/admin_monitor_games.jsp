@@ -26,6 +26,10 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.time.Instant" %>
+<%@ page import="java.time.Duration" %>
+<%@ page import="java.time.temporal.TemporalUnit" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -179,7 +183,18 @@
                     String userName = playerInfo.get(1);
                     Role role = Role.valueOf(playerInfo.get(2));
                     String ts = playerInfo.get(3);
-                    String lastSubmissionTS = AdminDAO.TIMESTAMP_NEVER.equalsIgnoreCase(ts) ? ts : AdminCreateGames.formatTimestamp(ts);
+
+                    String lastSubmissionTS;
+                    if (ts.equalsIgnoreCase("never")) {
+                        lastSubmissionTS = ts;
+                    } else {
+                        Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
+                        Instant now = Instant.now();
+                        Duration duration = Duration.between(then, now);
+                        lastSubmissionTS = String.format("%02dh %02dm %02ds",
+                                duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
+                    }
+
                     int totalScore = Integer.parseInt(playerInfo.get(4));
                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
                     String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
