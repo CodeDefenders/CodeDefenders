@@ -78,6 +78,8 @@ import static org.codedefenders.game.puzzle.solving.MutantSolvingStrategy.Types.
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.gameId;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
@@ -171,9 +173,7 @@ public class PuzzleGameManager extends HttpServlet {
             if (game == null) {
                 logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}",
                         puzzleId, login.getUserId());
-                // TODO Really ?!
-//                PuzzleGameSelectionManager.createGame(login.getUserId(), request, response);
-                new PuzzleGameSelectionManager().createGame(login.getUserId(), request, response);
+                createGame(login.getUserId(), request, response);
                 return;
             } else {
                 gameProducer.setTheGame(game.getId());
@@ -196,6 +196,98 @@ public class PuzzleGameManager extends HttpServlet {
                 logger.error("Trying to enter puzzle game with illegal role {}", role);
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
         }
+    }
+
+    /**
+     * Creates a puzzle game for a given request for the required parameter {@code puzzleId}.
+     *
+     * <p>If the provided parameter is not valid, the request will abort and return a {@code 400} status code.
+     *
+     * <p>If a puzzle game can be created, the game is started and the user is redirected to the game page.
+     *
+     * @param request  the request to create a test.
+     * @param response the response to the request.
+     * @throws IOException when redirecting fails.
+     */
+    public void createGame(int userId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
+        if (!puzzleId.isPresent()) {
+            logger.error("Failed to retrieve puzzleId from request.");
+            response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        final Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId.get());
+        if (puzzle == null) {
+            logger.error("Failed to retrieve puzzle from database for puzzleId: {}.", puzzleId);
+            response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        final PuzzleGame game = createPuzzleGame(puzzle, userId);
+
+        if (game == null) {
+            logger.error("Failed to create puzzle game for puzzleId: {} and userId: {}.", puzzleId, userId);
+            response.setStatus(SC_BAD_REQUEST);
+            Redirect.redirectBack(request, response);
+            return;
+        } else {
+            // TODO How we should handle dependency injection here?
+            game.setEventDAO(eventDAO);
+        }
+
+        request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
+
+        String path = ctx(request) + Paths.PUZZLE_GAME + "?gameId=" + game.getId();
+        response.sendRedirect(path);
+    }
+
+    /**
+     * Creates a new {@link PuzzleGame} according to the given {@link Puzzle}. Adds
+     * the mapped tests and mutants from the {@link Puzzle puzzle}'s class to the
+     * game. Adds the user to the game as a player. If any error occurs during the
+     * preparation, {@code null} will be returned.
+     *
+     * @param puzzle {@link Puzzle} to create a {@link PuzzleGame} for.
+     * @param uid    User ID of the user who plays the puzzle.
+     * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or
+     *         {@code null} if any error occurred.
+     */
+    public PuzzleGame createPuzzleGame(Puzzle puzzle, int uid) {
+        String errorMsg = String.format("Error while preparing puzzle game for puzzle %d and user %d.",
+                puzzle.getPuzzleId(), uid);
+
+        PuzzleGame game = new PuzzleGame(puzzle, uid);
+        if (!game.insert()) {
+            logger.error(errorMsg + " Could not insert the puzzle game");
+            return null;
+        }
+
+        if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)) {
+            logger.error(errorMsg + " Could not add dummy attacker to game.");
+            return null;
+        }
+        if (!game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
+            logger.error(errorMsg + " Could not add dummy defender to game.");
+            return null;
+        }
+
+        gameManagingUtils.addPredefinedMutantsAndTests(game, true, true);
+
+        if (!game.addPlayer(uid, game.getActiveRole())) {
+            logger.error(errorMsg + " Could not add player to the game.");
+            return null;
+        }
+
+        game.setState(GameState.ACTIVE);
+        if (!game.update()) {
+            logger.error(errorMsg + " Could not update game state.");
+            return null;
+        }
+
+        return game;
     }
 
     @Override

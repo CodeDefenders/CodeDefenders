@@ -61,6 +61,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -84,6 +85,9 @@ public class AdminCreateGames extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private GameManagingUtils gameManagingUtils;
 
     public enum RoleAssignmentMethod {
         RANDOM,
@@ -408,92 +412,17 @@ public class AdminCreateGames extends HttpServlet {
                     EventType.GAME_CREATED, EventStatus.GAME, timestamp);
             eventDAO.insert(event);
         } else {
-            // TODO What to do if the insert did not work !?
-            logger.warn("Cannot create game !");
+            // TODO Missing error handling
+            logger.warn("Cannot create game!");
         }
-
-        // Handle the system tests and mutants
-        // Mutants and tests uploaded with the class are already stored in the DB
-        int classId = multiplayerGame.getClassId();
-        List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(classId);
-        List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(classId);
 
         // Always add system player to send mutants and tests at runtime!
         multiplayerGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
         multiplayerGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
 
-        // Retrieve the playerId for system users
-        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, gameId);
-        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, gameId);
-
-        // this mutant map links the uploaded mutants and the once generated from them here
-        // This implements bookkeeping for killmap
-        Map<Mutant, Mutant> mutantMap = new HashMap<>();
-        Map<Test, Test> testMap = new HashMap<>();
-
         boolean withTests = multiplayerGame.hasSystemTests();
         boolean withMutants = multiplayerGame.hasSystemMutants();
-
-        // Register Valid Mutants.
-        if (withMutants) {
-            // Validate uploaded mutants from the list
-            // Link the mutants to the game
-            for (Mutant mutant : uploadedMutants) {
-                Mutant newMutant = new Mutant(gameId, classId,
-                        mutant.getJavaFile(),
-                        mutant.getClassFile(),
-                        // Alive be default
-                        true,
-                        //
-                        dummyAttackerPlayerId,
-                        GameDAO.getCurrentRound(gameId)
-                );
-                // insert this into the DB and link the mutant to the game
-                newMutant.insert();
-                // BookKeeping
-                mutantMap.put(mutant, newMutant);
-            }
-        }
-        // Register Valid Tests
-        if (withTests) {
-            // Validate the tests from the list
-            for (Test test : uploadedTests) {
-                // At this point we need to fill in all the details
-                Test newTest = new Test(-1, classId, gameId, test.getJavaFile(),
-                        test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
-                        test.getLineCoverage().getLinesUncovered(), 0);
-                newTest.insert();
-                testMap.put(test, newTest);
-            }
-        }
-
-        if (withMutants && withTests) {
-            List<KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(classId);
-            // Filter the killmap and keep only the one created during the upload ...
-
-            for (Mutant uploadedMutant : uploadedMutants) {
-                boolean alive = true;
-                for (Test uploadedTest : uploadedTests) {
-                    // Does the test kill the mutant?
-                    for (KillMapEntry entry : killmap) {
-                        if (entry.mutant.getId() == uploadedMutant.getId()
-                                && entry.test.getId() == uploadedTest.getId()
-                                && entry.status.equals(KillMapEntry.Status.KILL)) {
-                            // This also update the DB
-                            if (mutantMap.get(uploadedMutant).isAlive()) {
-                                testMap.get(uploadedTest).killMutant();
-                                mutantMap.get(uploadedMutant).kill();
-                            }
-                            alive = false;
-                            break;
-                        }
-                    }
-                    if (!alive) {
-                        break;
-                    }
-                }
-            }
-        }
+        gameManagingUtils.addPredefinedMutantsAndTests(multiplayerGame, withMutants, withTests);
 
         // Finally add the regular users
         for (int aid : attackerIds) {

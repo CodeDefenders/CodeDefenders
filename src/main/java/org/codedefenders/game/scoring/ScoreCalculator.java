@@ -46,7 +46,7 @@ public class ScoreCalculator {
         Map<Integer, PlayerScore> mutantScores = new HashMap<Integer, PlayerScore>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getAllPlayersForGame(game.getId())) {
+        for (Player player : GameDAO.getValidPlayersForGame(game.getId())) {
             mutantScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
@@ -56,7 +56,11 @@ public class ScoreCalculator {
             // Update the Map
             Integer playerId = mutant.getPlayerId();
             PlayerScore playerScore = mutantScores.get(playerId);
-            playerScore.increaseTotalScore(mutant.getScore());
+
+            /* playerScore can be null if the mutant belongs to a system user. */
+            if (playerScore != null) {
+                playerScore.increaseTotalScore(mutant.getScore());
+            }
         }
 
         return mutantScores;
@@ -72,7 +76,7 @@ public class ScoreCalculator {
         final Map<Integer, PlayerScore> testScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getAllPlayersForGame(game.getId())) {
+        for (Player player : GameDAO.getValidPlayersForGame(game.getId())) {
             testScores.put(player.getId(), new PlayerScore(player.getId()));
         }
 
@@ -82,7 +86,11 @@ public class ScoreCalculator {
             // Update the map
             Integer playerId = test.getPlayerId();
             PlayerScore playerScore = testScores.get(playerId);
-            playerScore.increaseTotalScore(test.getScore());
+
+            /* playerScore can be null if the mutant belongs to a system user. */
+            if (playerScore != null) {
+                playerScore.increaseTotalScore(test.getScore());
+            }
         }
 
         return testScores;
@@ -98,10 +106,9 @@ public class ScoreCalculator {
         final Map<Integer, PlayerScore> duelScores = new HashMap<>();
 
         // Create the data structure to host their data
-        for (Player player : GameDAO.getAllPlayersForGame(game.getId())) {
+        for (Player player : GameDAO.getValidPlayersForGame(game.getId())) {
             PlayerScore playerScore = new PlayerScore(player.getId());
             scoringPolicy.scoreDuels(playerScore);
-            //
             duelScores.put(player.getId(), playerScore);
         }
 
@@ -119,7 +126,7 @@ public class ScoreCalculator {
             scoringPolicy.scoreTest(test);
             TestDAO.updateTest(test);
         }
-        for (Player player : GameDAO.getAllPlayersForGame(game.getId())) {
+        for (Player player : GameDAO.getValidPlayersForGame(game.getId())) {
             PlayerScore playerScore = new PlayerScore(player.getId());
             scoringPolicy.scoreDuels(playerScore);
             PlayerDAO.setPlayerPoints(playerScore.getTotalScore(), player.getId());

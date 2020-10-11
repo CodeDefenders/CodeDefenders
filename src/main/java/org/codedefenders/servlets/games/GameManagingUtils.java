@@ -23,18 +23,25 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
+import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -51,6 +58,8 @@ import org.slf4j.LoggerFactory;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
 
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.util.Constants.TESTS_DIR;
 
@@ -89,9 +98,6 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Override
     public Mutant existingMutant(int gameId, String mutatedCode) {
         String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
-
-        // return the mutant in the game with same MD5 if it exists; return null
-        // otherwise
         return MutantDAO.getMutantByGameAndMd5(gameId, md5Mutant);
     }
 
@@ -205,5 +211,96 @@ public class GameManagingUtils implements IGameManagingUtils {
         } catch (Exception e) {
             logger.error("Failed to generate or store test smell.", e);
         }
+    }
+
+    public void addPredefinedMutantsAndTests(AbstractGame game, boolean withMutants, boolean withTests) {
+        List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(game.getClassId());
+        List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(game.getClassId());
+        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
+        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
+        int currentRound = GameDAO.getCurrentRound(game.getId());
+
+        /* Link original predefined mutants/tests to their copied counterparts. */
+        Map<Integer, Mutant> mutantMap = new HashMap<>();
+        Map<Integer, Test> testMap = new HashMap<>();
+
+        /* Register predefined mutants. */
+        if (withMutants) {
+            // TODO: Validate uploaded mutants from the list
+            for (Mutant mutant : uploadedMutants) {
+                Mutant newMutant = new Mutant(game.getId(), game.getClassId(),
+                        mutant.getJavaFile(),
+                        mutant.getClassFile(),
+                        true, // Alive be default
+                        dummyAttackerPlayerId,
+                        currentRound);
+                newMutant.insert();
+                mutantMap.put(mutant.getId(), newMutant);
+            }
+        }
+
+        /* Register predefined tests. */
+        if (withTests) {
+            for (Test test : uploadedTests) {
+                Test newTest = new Test(-1, game.getClassId(), game.getId(), test.getJavaFile(),
+                        test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
+                        test.getLineCoverage().getLinesUncovered(), 0);
+                newTest.insert();
+                testMap.put(test.getId(), newTest);
+            }
+        }
+
+        /* Kill predefined mutants that are dead from predefined tests.
+           (Implementation from MultiplayerGameSelectionManager) */
+        if (withMutants && withTests) {
+            for (TargetExecution targetExecution : TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.getClassId())) {
+                Test test = testMap.get(targetExecution.testId);
+                Mutant mutant = mutantMap.get(targetExecution.mutantId);
+
+                targetExecution.testId = test.getId();
+                targetExecution.mutantId = mutant.getId();
+
+                if (targetExecution.status == TargetExecution.Status.FAIL) {
+                    test.killMutant();
+                    mutant.kill();
+                    mutant.setKillMessage(targetExecution.message);
+                    MutantDAO.updateMutantKillMessageForMutant(mutant);
+                }
+
+                targetExecution.insert();
+            }
+        }
+
+        /* Kill predefined mutants that are dead from predefined tests.
+           (Implementation from AdminCreateGames) */
+        /*
+        if (withMutants && withTests) {
+            List<KillMap.KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(classId);
+            // Filter the killmap and keep only the one created during the upload ...
+
+            for (Mutant uploadedMutant : uploadedMutants) {
+                boolean alive = true;
+                for (Test uploadedTest : uploadedTests) {
+                    // Does the test kill the mutant?
+                    for (KillMap.KillMapEntry entry : killmap) {
+                        if (entry.mutant.getId() == uploadedMutant.getId()
+                                && entry.test.getId() == uploadedTest.getId()
+                                && entry.status.equals(KillMap.KillMapEntry.Status.KILL)) {
+                            // This also update the DB
+                            if (mutantMap.get(uploadedMutant).isAlive()) {
+                                testMap.get(uploadedTest).killMutant();
+                                mutantMap.get(uploadedMutant).kill();
+                            }
+                            alive = false;
+                            break;
+                        }
+                    }
+                    if (!alive) {
+                        break;
+                    }
+                }
+            }
+        }
+        */
     }
 }
