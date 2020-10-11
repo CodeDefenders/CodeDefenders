@@ -213,12 +213,21 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
     }
 
-    public void addPredefinedMutantsAndTests(AbstractGame game, boolean withMutants, boolean withTests) {
+    public boolean addPredefinedMutantsAndTests(AbstractGame game, boolean withMutants, boolean withTests) {
         List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(game.getClassId());
         List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(game.getClassId());
         int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
         int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
         int currentRound = GameDAO.getCurrentRound(game.getId());
+
+        if (dummyAttackerPlayerId == -1) {
+            logger.error("System attacker was not added to the game " + game.getId() + ".");
+            return false;
+        }
+        if (dummyDefenderPlayerId == -1) {
+            logger.error("System defender was not added to the game " + game.getId() + ".");
+            return false;
+        }
 
         /* Link original predefined mutants/tests to their copied counterparts. */
         Map<Integer, Mutant> mutantMap = new HashMap<>();
@@ -254,8 +263,8 @@ public class GameManagingUtils implements IGameManagingUtils {
            (Implementation from MultiplayerGameSelectionManager) */
         if (withMutants && withTests) {
             for (TargetExecution targetExecution : TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.getClassId())) {
-                Test test = testMap.get(targetExecution.testId);
                 Mutant mutant = mutantMap.get(targetExecution.mutantId);
+                Test test = testMap.get(targetExecution.testId);
 
                 targetExecution.testId = test.getId();
                 targetExecution.mutantId = mutant.getId();
@@ -271,8 +280,10 @@ public class GameManagingUtils implements IGameManagingUtils {
             }
         }
 
+        return true;
+
         /* Kill predefined mutants that are dead from predefined tests.
-           (Implementation from AdminCreateGames) */
+           (Alternative implementation from AdminCreateGames) */
         /*
         if (withMutants && withTests) {
             List<KillMap.KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(classId);

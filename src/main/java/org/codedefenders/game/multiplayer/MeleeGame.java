@@ -355,6 +355,7 @@ public class MeleeGame extends AbstractGame {
         if (state == GameState.FINISHED) {
             return false;
         }
+
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }

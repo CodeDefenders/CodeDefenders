@@ -21,6 +21,7 @@ package org.codedefenders.model;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.Objects;
 
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseValue;
@@ -193,4 +194,20 @@ public class User implements Serializable {
         return new BCryptPasswordEncoder().matches(rawPassword, encodedPassword);
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        User user = (User) other;
+        return getId() == user.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }

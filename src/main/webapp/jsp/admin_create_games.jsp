@@ -36,7 +36,6 @@
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.time.ZoneId" %>
-<%@ page import="java.util.SortedSet" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -139,13 +138,12 @@
                             </td>
                             <td><%= g.getLevel() %></td>
                             <td>
-                                <div id="playersTableHidden" style="color: lightgray;"> (hidden)</div>
-                                <table id="playersTableCreated" hidden>
+                                <div id="playersTableHidden" style="color: lightgray;" hidden> (hidden)</div>
+                                <table id="playersTableCreated">
                                     <%
                                         List<Integer> attackerAndDefenderIds = ListUtils.union(attackerIds, defenderIds);
                                         for (int id : attackerAndDefenderIds) {
                                             String userName = UserDAO.getUserById(id).getUsername();
-                                            //Timestamp ts = AdminDAO.getLastLogin(aid);
                                             Role lastRole = UserDAO.getLastRoleOfUser(id);
                                             String lastRoleStr = lastRole != null
                                                     ? lastRole.getFormattedString()
@@ -241,7 +239,7 @@
     </form>
 
     <form id="users" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post">
-        <input type="hidden" name="formType" value="createGame">
+        <input type="hidden" name="formType" value="createGames">
 
         <%
             createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
@@ -372,7 +370,6 @@
                     <div class="panel-body" style="padding: 10px;">
                         Newline separated list of usernames or emails.
                         These names, as well as the names selected in the above table, will be assigned to created games.
-                        Only unassigned users are taken into account.
                     </div>
                 </div>
                 <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"

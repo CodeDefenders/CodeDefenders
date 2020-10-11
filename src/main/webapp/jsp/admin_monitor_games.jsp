@@ -30,6 +30,7 @@
 <%@ page import="java.time.Instant" %>
 <%@ page import="java.time.Duration" %>
 <%@ page import="java.time.temporal.TemporalUnit" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminMonitorGames" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -198,7 +199,7 @@
                     int totalScore = Integer.parseInt(playerInfo.get(4));
                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
                     String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
-                    int gameScore = AdminCreateGames.getPlayerScore(g, pid);
+                    int gameScore = AdminMonitorGames.getPlayerScore(g, pid);
             %>
             <tr style="height: 3px;" id="playersTableActive" hidden></tr>
             <tr id="playersTableActive" hidden>

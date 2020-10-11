@@ -21,6 +21,7 @@ package org.codedefenders.model;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 import org.codedefenders.game.Role;
 
@@ -67,5 +68,22 @@ public class UserInfo {
 
     public int getTotalScore() {
         return totalScore;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        UserInfo userInfo = (UserInfo) other;
+        return getUser().equals(userInfo.getUser());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUser());
     }
 }
