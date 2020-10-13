@@ -139,12 +139,14 @@ public class TestAccordionBean {
 
     public String getCategoriesAsJSON() {
         Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
                 .create();
         return gson.toJson(categories);
     }
 
     public String getTestsAsJSON() {
         Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
                 // It is important that its HashMap.class, it doesn't work if I change it to Map.class …
                 .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
                 .create();
