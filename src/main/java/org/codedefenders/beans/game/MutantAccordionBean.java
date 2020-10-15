@@ -133,6 +133,7 @@ public class MutantAccordionBean {
 
     public String jsonFromCategories() {
         Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
                 .create();
         return gson.toJson(categories);
     }

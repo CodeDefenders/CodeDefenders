@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -29,8 +30,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.ServletUtils;
 
 import com.google.gson.Gson;
@@ -49,11 +53,17 @@ import com.google.gson.JsonObject;
 @WebServlet(org.codedefenders.util.Paths.API_MUTANT)
 public class MutantAPI extends HttpServlet {
 
+    @Inject
+    GameService gameService;
+
+    @Inject
+    LoginBean login;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        final Optional<Mutant> mutant = ServletUtils.getIntParameter(request, "mutantId")
-                .map(MutantDAO::getMutantById);
+        final Optional<MutantDTO> mutant = ServletUtils.getIntParameter(request, "mutantId")
+                .map(id -> gameService.getMutant(login.getUserId(), id));
 
         if (!mutant.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -69,7 +79,7 @@ public class MutantAPI extends HttpServlet {
         out.flush();
     }
 
-    private String generateJsonForMutant(Mutant mutant) {
+    private String generateJsonForMutant(MutantDTO mutant) {
         Gson gson = new Gson();
 
         JsonObject root = new JsonObject();
