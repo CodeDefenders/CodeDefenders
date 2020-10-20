@@ -89,7 +89,6 @@ public class AdminCreateGamesBean implements Serializable {
         }
     }
 
-
     /**
      * Returns a mapping of the all valid users' IDs to their corresponding {@link UserInfo}.
      * @return A mapping of the all valid users' IDs to their corresponding {@link UserInfo}.
@@ -119,7 +118,14 @@ public class AdminCreateGamesBean implements Serializable {
         /* Split users into attackers and defenders. */
         Set<UserInfo> attackers = new HashSet<>();
         Set<UserInfo> defenders = new HashSet<>();
-        assignRoles(users, roleAssignmentMethod, attackersPerGame, defendersPerGame, attackers, defenders);
+        if (gameSettings.getGameType() != MELEE) {
+            assignRoles(users, roleAssignmentMethod, attackersPerGame, defendersPerGame, attackers, defenders);
+        } else {
+            /* Add all users to one role for melee games to avoid player numbers differing by more than 1 between games.
+             * For non-melee games this is expected, since, if the players can't be evenly distributed between games,
+             * games that are assigned more attackers should also get assigned more defenders as other games. */
+            attackers.addAll(users);
+        }
 
         /* Assign attackers and defenders to teams. */
         List<List<UserInfo>> attackerTeams = splitIntoTeams(attackers, numGames, teamAssignmentMethod);
