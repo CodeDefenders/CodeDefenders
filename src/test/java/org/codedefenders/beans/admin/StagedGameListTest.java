@@ -3,8 +3,8 @@ package org.codedefenders.beans.admin;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.codedefenders.beans.admin.AdminCreateGamesBean.GameSettings;
-import org.codedefenders.beans.admin.AdminCreateGamesBean.StagedGame;
+import org.codedefenders.beans.admin.StagedGameList.GameSettings;
+import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.User;
 import org.codedefenders.model.UserInfo;
@@ -21,9 +21,9 @@ import static org.junit.Assert.fail;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AdminDAO.class})
-public class AdminCreateGamesBeanTest {
+public class StagedGameListTest {
 
-    private AdminCreateGamesBean adminCreateGamesBean;
+    private StagedGameList stagedGameList;
     private HashMap<Integer, UserInfo> userInfos;
 
     @Before
@@ -41,62 +41,56 @@ public class AdminCreateGamesBeanTest {
         PowerMockito.mockStatic(AdminDAO.class);
         PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
 
-        adminCreateGamesBean = new AdminCreateGamesBean();
-        adminCreateGamesBean.updateUserInfos();
-    }
-
-    @Test
-    public void testGetUserInfos() {
-        assertThat(adminCreateGamesBean.getUserInfos(), equalTo(userInfos));
+        stagedGameList = new StagedGameList();
     }
 
     @Test
     public void testStagedGameIds() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         assertThat(stagedGame1.getId(), not(equalTo(stagedGame2.getId())));
     }
 
     @Test
     public void testGetStagedGame() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
-        assertThat(adminCreateGamesBean.getStagedGame(stagedGame1.getId()), equalTo(stagedGame1));
-        assertThat(adminCreateGamesBean.getStagedGame(stagedGame2.getId()), equalTo(stagedGame2));
-        assertThat(adminCreateGamesBean.getStagedGame(Integer.MAX_VALUE), nullValue());
+        assertThat(stagedGameList.getStagedGame(stagedGame1.getId()), equalTo(stagedGame1));
+        assertThat(stagedGameList.getStagedGame(stagedGame2.getId()), equalTo(stagedGame2));
+        assertThat(stagedGameList.getStagedGame(Integer.MAX_VALUE), nullValue());
     }
 
     @Test
     public void testGetStagedGames() {
-        assertThat(adminCreateGamesBean.getStagedGames().values(), empty());
+        assertThat(stagedGameList.getStagedGames().values(), empty());
 
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        assertThat(adminCreateGamesBean.getStagedGames().values(), containsInAnyOrder(stagedGame1));
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1));
 
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        assertThat(adminCreateGamesBean.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame2));
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame2));
     }
 
     @Test
     public void testRemoveStagedGame() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
-        assertThat(adminCreateGamesBean.removeStagedGame(stagedGame1.getId()), is(true));
-        assertThat(adminCreateGamesBean.getStagedGames().values(), containsInAnyOrder(stagedGame2));
-        assertThat(adminCreateGamesBean.removeStagedGame(stagedGame1.getId()), is(false));
+        assertThat(stagedGameList.removeStagedGame(stagedGame1.getId()), is(true));
+        assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame2));
+        assertThat(stagedGameList.removeStagedGame(stagedGame1.getId()), is(false));
 
-        assertThat(adminCreateGamesBean.removeStagedGame(stagedGame2.getId()), is(true));
-        assertThat(adminCreateGamesBean.getStagedGames().values(), empty());
-        assertThat(adminCreateGamesBean.removeStagedGame(stagedGame2.getId()), is(false));
+        assertThat(stagedGameList.removeStagedGame(stagedGame2.getId()), is(true));
+        assertThat(stagedGameList.getStagedGames().values(), empty());
+        assertThat(stagedGameList.removeStagedGame(stagedGame2.getId()), is(false));
     }
 
     @Test
     public void testAddUsers() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         /* Existing unassigned user. */
         assertThat(stagedGame1.addAttacker(0), is(true));
@@ -121,8 +115,8 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testGetPlayers() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         stagedGame1.addAttacker(0);
         stagedGame1.addDefender(1);
@@ -141,8 +135,8 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testRemovePlayers() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         stagedGame1.addAttacker(0);
         stagedGame1.addDefender(1);
@@ -176,52 +170,30 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testGetAssignedUsers() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         stagedGame1.addAttacker(0);
         stagedGame1.addDefender(1);
-        assertThat(adminCreateGamesBean.getAssignedUsers(), containsInAnyOrder(0, 1));
+        assertThat(stagedGameList.getAssignedUsers(), containsInAnyOrder(0, 1));
 
         stagedGame2.addAttacker(2);
         stagedGame2.addDefender(3);
-        assertThat(adminCreateGamesBean.getAssignedUsers(), containsInAnyOrder(0, 1, 2, 3));
+        assertThat(stagedGameList.getAssignedUsers(), containsInAnyOrder(0, 1, 2, 3));
 
         stagedGame1.removePlayer(0);
         stagedGame1.removePlayer(1);
-        assertThat(adminCreateGamesBean.getAssignedUsers(), containsInAnyOrder(2, 3));
+        assertThat(stagedGameList.getAssignedUsers(), containsInAnyOrder(2, 3));
 
         stagedGame2.removePlayer(2);
         stagedGame2.removePlayer(3);
-        assertThat(adminCreateGamesBean.getAssignedUsers(), empty());
-    }
-
-    @Test
-    public void testGetUnassignedUsers() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = adminCreateGamesBean.addStagedGame(new GameSettings());
-
-        stagedGame1.addAttacker(0);
-        stagedGame1.addDefender(1);
-        assertThat(adminCreateGamesBean.getUnassignedUsers(), containsInAnyOrder(2, 3, 4, 5, 6, 7));
-
-        stagedGame2.addAttacker(2);
-        stagedGame2.addDefender(3);
-        assertThat(adminCreateGamesBean.getUnassignedUsers(), containsInAnyOrder(4, 5, 6, 7));
-
-        stagedGame1.removePlayer(0);
-        stagedGame1.removePlayer(1);
-        assertThat(adminCreateGamesBean.getUnassignedUsers(), containsInAnyOrder(0, 1, 4, 5, 6, 7));
-
-        stagedGame2.removePlayer(2);
-        stagedGame2.removePlayer(3);
-        assertThat(adminCreateGamesBean.getUnassignedUsers(), containsInAnyOrder(0, 1, 2, 3, 4, 5, 6, 7));
+        assertThat(stagedGameList.getAssignedUsers(), empty());
     }
 
     @Test
     public void testDetachedGame() {
-        StagedGame stagedGame1 = adminCreateGamesBean.addStagedGame(new GameSettings());
-        adminCreateGamesBean.removeStagedGame(stagedGame1.getId());
+        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        stagedGameList.removeStagedGame(stagedGame1.getId());
 
         try {
             stagedGame1.addAttacker(0);

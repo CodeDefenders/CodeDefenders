@@ -36,6 +36,7 @@
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="java.time.format.DateTimeFormatter" %>
 <%@ page import="java.time.ZoneId" %>
+<%@ page import="org.codedefenders.beans.admin.AdminCreateGamesBean" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -507,7 +508,7 @@
                         <div class="radio">
                             <label class="label-normal">
                                 <input type="radio" name="roles"
-                                       value="<%=AdminCreateGames.RoleAssignmentMethod.RANDOM%>"
+                                       value="<%=AdminCreateGamesBean.RoleAssignmentMethod.RANDOM%>"
                                        checked="checked"/>
                                 Random
                             </label>
@@ -515,7 +516,7 @@
                         <div class="radio">
                             <label class="label-normal">
                                 <input type="radio" name="roles"
-                                       value="<%=AdminCreateGames.RoleAssignmentMethod.OPPOSITE%>"/>
+                                       value="<%=AdminCreateGamesBean.RoleAssignmentMethod.OPPOSITE%>"/>
                                 Opposite Role
                             </label>
                         </div>
@@ -534,7 +535,7 @@
                         <div class="radio">
                             <label class="label-normal">
                                 <input type="radio" name="teams"
-                                       value="<%=AdminCreateGames.TeamAssignmentMethod.RANDOM%>"
+                                       value="<%=AdminCreateGamesBean.TeamAssignmentMethod.RANDOM%>"
                                        checked="checked"/>
                                 Random
                             </label>
@@ -542,14 +543,14 @@
                         <div class="radio">
                             <label class="label-normal">
                                 <input type="radio" name="teams"
-                                       value="<%=AdminCreateGames.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
+                                       value="<%=AdminCreateGamesBean.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
                                 Scores descending
                             </label>
                         </div>
                         <div class="radio">
                             <label class="label-normal">
                                 <input type="radio" name="teams"
-                                       value="<%=AdminCreateGames.TeamAssignmentMethod.SCORE_SHUFFLED%>"/>
+                                       value="<%=AdminCreateGamesBean.TeamAssignmentMethod.SCORE_SHUFFLED%>"/>
                                 Scores block shuffled
                             </label>
                         </div>
