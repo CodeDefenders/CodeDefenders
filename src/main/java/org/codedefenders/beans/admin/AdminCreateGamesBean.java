@@ -164,7 +164,7 @@ public class AdminCreateGamesBean implements Serializable {
          */
         private boolean exists;
 
-        public StagedGame(int id, GameSettings gameSettings) {
+        private StagedGame(int id, GameSettings gameSettings) {
             this.id = id;
             this.gameSettings = gameSettings;
             this.attackers = new ArrayList<>();

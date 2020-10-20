@@ -142,6 +142,11 @@ public class AdminCreateGames extends HttpServlet {
         response.sendRedirect(Constants.ADMIN_GAMES_JSP);
     }
 
+    /**
+     * Extract and validate POST parameters for
+     * {@link AdminCreateGames#stageGames(Set, GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int)}.
+     * @param request The HTTP request.
+     */
     private void stageGames(HttpServletRequest request) {
         /* Extract user IDs from the table. */
         String userIdsStr = request.getParameter("userIds");
@@ -224,7 +229,7 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         /* Map given user names/emails to user IDs and validate that all exist. */
-        Optional<Set<Integer>> userIdsFromTextarea = getUsersForNamesAndEmails(userNames);
+        Optional<Set<Integer>> userIdsFromTextarea = getUserIdsForNamesAndEmails(userNames);
         if (!userIdsFromTextarea.isPresent()) {
             return;
         }
@@ -248,8 +253,9 @@ public class AdminCreateGames extends HttpServlet {
         for (UserInfo user : users) {
             if (assignedUsers.contains(user.getUser().getId())) {
                 messages.add(format(
-                        "Cannot create staged game with user {0}. User is already assigned to a staged game.",
+                        "Cannot create staged games with user {0}. User is already assigned to a staged game.",
                         user.getUser().getId()));
+                return;
             }
         }
 
@@ -257,6 +263,19 @@ public class AdminCreateGames extends HttpServlet {
                 teamAssignmentMethod, attackersPerGame, defendersPerGame);
     }
 
+    /**
+     * Assigns selected users to teams and adds staged games with these teams to the list.
+     * See {@link AdminCreateGames#assignRoles(Collection, RoleAssignmentMethod, int, int, Collection, Collection)
+     * assignRoles} and {@link AdminCreateGames#splitIntoTeams(Collection, int, TeamAssignmentMethod) splitIntoTeams}
+     * for more information on how the roles and teams are assigned.
+     *
+     * @param users The players for the staged games.
+     * @param gameSettings The game settings.
+     * @param roleAssignmentMethod The method of assigning roles to users.
+     * @param teamAssignmentMethod The method of assigning users to teams.
+     * @param attackersPerGame The number of attackers per game.
+     * @param defendersPerGame The number of defenders per game.
+     */
     private void stageGames(Set<UserInfo> users, GameSettings gameSettings,
                             RoleAssignmentMethod roleAssignmentMethod, TeamAssignmentMethod teamAssignmentMethod,
                             int attackersPerGame, int defendersPerGame) {
@@ -282,8 +301,15 @@ public class AdminCreateGames extends HttpServlet {
                 stagedGame.addDefender(user.getUser().getId());
             }
         }
+
+        messages.add(format("Staged {0} games.", numGames));
     }
 
+    /**
+     * Extract and validate POST parameters for
+     * {@link AdminCreateGames#deleteStagedGames(List)}.
+     * @param request The HTTP request.
+     */
     private void deleteStagedGames(HttpServletRequest request) {
         /* Convert game IDs to ints. */
         String stagedGameIdsStr = request.getParameter("stagedGameIds");
@@ -303,20 +329,38 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        deleteStagedGames(stagedGameIds);
-    }
+        Map<Integer, StagedGame> existingStagedGames = adminCreateGamesBean.getStagedGames();
 
-    private void deleteStagedGames(List<Integer> stagedGameIds) {
-        /* Insert given staged games. */
-        for (int stagedGameId : stagedGameIds) {
-            if (!adminCreateGamesBean.removeStagedGame(stagedGameId)) {
-                messages.add(format("ERROR: Could not delete staged game T{0}. Staged game does not exist.",
-                        stagedGameId));
-                return;
-            }
+        /* Verify that all staged games exist. */
+        if (!existingStagedGames.keySet().containsAll(stagedGameIds)) {
+            messages.add("Cannot delete staged games. Not all selected staged games exist.");
+            return;
         }
+
+        List<StagedGame> stagedGames = stagedGameIds.stream()
+                .map(existingStagedGames::get)
+                .collect(Collectors.toList());
+
+        deleteStagedGames(stagedGames);
     }
 
+    /**
+     * Deletes the given staged games from the list.
+     * @param stagedGames The staged games to delete.
+     */
+    private void deleteStagedGames(List<StagedGame> stagedGames) {
+        for (StagedGame stagedGame : stagedGames) {
+            adminCreateGamesBean.removeStagedGame(stagedGame.getId());
+        }
+
+        messages.add(format("Deleted {0} games.", stagedGames.size()));
+    }
+
+    /**
+     * Extract and validate POST parameters for
+     * {@link AdminCreateGames#createStagedGames(List)}.
+     * @param request The HTTP request.
+     */
     private void createStagedGames(HttpServletRequest request) {
         /* Convert game IDs to ints. */
         String stagedGameIdsStr = request.getParameter("stagedGameIds");
@@ -336,24 +380,36 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        createStagedGames(stagedGameIds);
+        Map<Integer, StagedGame> existingStagedGames = adminCreateGamesBean.getStagedGames();
+
+        /* Verify that all staged games exist. */
+        if (!existingStagedGames.keySet().containsAll(stagedGameIds)) {
+            messages.add("Cannot create staged games. Not all selected staged games exist.");
+            return;
+        }
+
+        List<StagedGame> stagedGames = stagedGameIds.stream()
+                .map(existingStagedGames::get)
+                .collect(Collectors.toList());
+
+        createStagedGames(stagedGames);
     }
 
-    private void createStagedGames(List<Integer> stagedGameIds) {
-        /* Insert given staged games. */
-        for (int stagedGameId : stagedGameIds) {
-            StagedGame stagedGame = adminCreateGamesBean.getStagedGame(stagedGameId);
-            if (stagedGame == null) {
-                messages.add(format("ERROR: Could not create staged game T{0}. Staged game does not exist.",
-                        stagedGameId));
-                return;
-            }
+    private void createStagedGames(List<StagedGame> stagedGames) {
+        for (StagedGame stagedGame : stagedGames) {
             if (insertStagedGame(stagedGame)) {
-                adminCreateGamesBean.removeStagedGame(stagedGameId);
+                adminCreateGamesBean.removeStagedGame(stagedGame.getId());
             }
         }
+
+        messages.add(format("Created {0} games.", stagedGames.size()));
     }
 
+    /**
+     * Extract and validate POST parameters for
+     * {@link AdminCreateGames#removePlayerFromStagedGame(StagedGame, int)}.
+     * @param request The HTTP request.
+     */
     private void removePlayerFromStagedGame(HttpServletRequest request) {
         int userId;
         int gameId;
@@ -378,6 +434,11 @@ public class AdminCreateGames extends HttpServlet {
         removePlayerFromStagedGame(stagedGame, userId);
     }
 
+    /**
+     * Extract and validate POST parameters for
+     * {@link AdminCreateGames#movePlayerBetweenStagedGames(StagedGame, StagedGame, User, Role)}.
+     * @param request The HTTP request.
+     */
     private void movePlayerBetweenStagedGames(HttpServletRequest request) {
         int userId;
         int gameIdFrom;
@@ -427,6 +488,12 @@ public class AdminCreateGames extends HttpServlet {
         }
     }
 
+    /**
+     * Extract and validate POST parameters for
+     * {@link AdminCreateGames#addPlayerToStagedGame(StagedGame, User, Role)} or
+     * {@link AdminCreateGames#addPlayerToExistingGame(AbstractGame, User, Role)}.
+     * @param request The HTTP request.
+     */
     private void addPlayerToGame(HttpServletRequest request) {
         int userId;
         int gameId;
@@ -478,10 +545,7 @@ public class AdminCreateGames extends HttpServlet {
                 return;
             }
 
-            if (!game.addPlayer(user.getUser().getId(), role)) {
-                messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}.",
-                        userId, gameId, role));
-            }
+            addPlayerToExistingGame(game, user.getUser(), role);
         }
     }
 
@@ -501,7 +565,7 @@ public class AdminCreateGames extends HttpServlet {
         return success;
     }
 
-    private Optional<Set<Integer>> getUsersForNamesAndEmails(Collection<String> userNames) {
+    private Optional<Set<Integer>> getUserIdsForNamesAndEmails(Collection<String> userNames) {
         Map<String, Integer> userIdByName = adminCreateGamesBean.getUserInfos().values().stream()
                 .collect(Collectors.toMap(
                         userInfo -> userInfo.getUser().getUsername(),
@@ -671,25 +735,36 @@ public class AdminCreateGames extends HttpServlet {
                     gameSettings.isWithMutants(), gameSettings.isWithTests());
         }
 
+        Map<Integer, UserInfo> userInfos = adminCreateGamesBean.getUserInfos();
+
         /* Add users to the game. */
         if (gameSettings.getGameType() == MULTIPLAYER) {
             for (int userId : stagedGame.getAttackers()) {
-                if (!game.addPlayer(userId, Role.ATTACKER)) {
-                    messages.add(format("ERROR: Could not add user {0} to game T{1} as {2}.",
-                            userId, stagedGame.getId(), Role.ATTACKER.getFormattedString()));
+                UserInfo user = userInfos.get(userId);
+                if (user != null) {
+                    addPlayerToExistingGame(game, user.getUser(), Role.ATTACKER);
+                } else {
+                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
+                            userId, game.getId(), Role.ATTACKER.getFormattedString()));
                 }
             }
             for (int userId : stagedGame.getDefenders()) {
-                if (!game.addPlayer(userId, Role.DEFENDER)) {
-                    messages.add(format("ERROR: Could not add user {0} to game T{1} as {2}.",
-                            userId, stagedGame.getId(), Role.DEFENDER.getFormattedString()));
+                UserInfo user = userInfos.get(userId);
+                if (user != null) {
+                    addPlayerToExistingGame(game, user.getUser(), Role.DEFENDER);
+                } else {
+                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
+                            userId, game.getId(), Role.DEFENDER.getFormattedString()));
                 }
             }
         } else if (gameSettings.getGameType() == MELEE) {
             for (int userId : stagedGame.getDefenders()) {
-                if (!game.addPlayer(userId, Role.PLAYER)) {
-                    messages.add(format("ERROR: Could not add user {0} to game T{1} as {2}.",
-                            userId, stagedGame.getId(), Role.PLAYER.getFormattedString()));
+                UserInfo user = userInfos.get(userId);
+                if (user != null) {
+                    addPlayerToExistingGame(game, user.getUser(), Role.PLAYER);
+                } else {
+                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
+                            userId, game.getId(), Role.PLAYER.getFormattedString()));
                 }
             }
         }
@@ -738,10 +813,21 @@ public class AdminCreateGames extends HttpServlet {
             messages.add(format("Added user {0} to staged game T{1} as {2}.",
                     user.getId(), stagedGame.getId(), role.getFormattedString()));
         } else {
-            messages.add(format("ERROR: Cannot add user {0} to staged game T{1}. User is already assigned to a different staged game.",
+            messages.add(format("ERROR: Cannot add user {0} to staged game T{1}. "
+                    + "User is already assigned to a different staged game.",
                     user.getId(), stagedGame.getId()));
         }
 
         return success;
+    }
+
+    private boolean addPlayerToExistingGame(AbstractGame game, User user, Role role) {
+        if (!game.addPlayer(user.getId(), role)) {
+            messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}.",
+                    user.getId(), game.getId(), role));
+            return false;
+        }
+        messages.add(format("Added user {0} to existing game {1} as {2}.", user.getId(), game.getId(), role));
+        return true;
     }
 }
