@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.SessionScoped;
@@ -69,6 +68,10 @@ public class AdminCreateGamesBean implements Serializable {
      */
     private final Map<Integer, UserInfo> userInfos = new HashMap<>();
 
+    /**
+     * Produces the staged games list that is managed by the bean.
+     * @return The beans staged games list.
+     */
     @Produces
     @Named("stagedGameList")
     public StagedGameList getStagedGameList() {
@@ -83,9 +86,9 @@ public class AdminCreateGamesBean implements Serializable {
      * This method should be called on every request before this bean is used.
      */
     public void updateUserInfos() {
-        this.userInfos.clear();
+        userInfos.clear();
         for (UserInfo userInfo : AdminDAO.getAllUsersInfo()) {
-            this.userInfos.put(userInfo.getUser().getId(), userInfo);
+            userInfos.put(userInfo.getUser().getId(), userInfo);
         }
     }
 
@@ -279,15 +282,16 @@ public class AdminCreateGamesBean implements Serializable {
      *         mapped to a valid user.
      */
     public Optional<Set<UserInfo>> getUserInfosForNamesAndEmails(Collection<String> userNames) {
-        Map<String, UserInfo> userByName = userInfos.values().stream()
-                .collect(Collectors.toMap(
-                        userInfo -> userInfo.getUser().getUsername(),
-                        userInfo -> userInfo));
-
-        Map<String, UserInfo> userByEmail = userInfos.values().stream()
-                .collect(Collectors.toMap(
-                        userInfo -> userInfo.getUser().getEmail(),
-                        userInfo -> userInfo));
+        /* Construct maps like this, because userInfos.stream().collect(Collectors.toMap(...)) produces a
+           NullPointerException for some reason. */
+        Map<String, UserInfo> userByName = new HashMap<>();
+        for (UserInfo user : userInfos.values()) {
+            userByName.put(user.getUser().getUsername(), user);
+        }
+        Map<String, UserInfo> userByEmail = new HashMap<>();
+        for (UserInfo user : userInfos.values()) {
+            userByEmail.put(user.getUser().getEmail(), user);
+        }
 
         boolean success = true;
         Set<UserInfo> users = new HashSet<>();
@@ -298,7 +302,7 @@ public class AdminCreateGamesBean implements Serializable {
                 users.add(user);
                 continue;
             }
-            user = userByEmail.get(userNameOrEmail);
+            user = userByEmail.get(userNameOrEmail.toLowerCase());
             if (user != null) {
                 users.add(user);
                 continue;
@@ -328,6 +332,12 @@ public class AdminCreateGamesBean implements Serializable {
                             int attackersPerGame, int defendersPerGame,
                             Set<UserInfo> attackers, Set<UserInfo> defenders) {
 
+        if (attackersPerGame < 0 || defendersPerGame < 0 || attackersPerGame + defendersPerGame == 0) {
+            throw new IllegalArgumentException(format("Invalid team sizes. "
+                    + "Attackers per game: {0}, defenders per game: {1}.",
+                    attackersPerGame, defendersPerGame));
+        }
+
         if (Stream.of(users, attackers, defenders).flatMap(Collection::stream).distinct().count()
                 != users.size() + attackers.size() + defenders.size()) {
             throw new IllegalArgumentException("User sets must be disjoint.");
@@ -339,8 +349,10 @@ public class AdminCreateGamesBean implements Serializable {
                  * distributed. (This method can be called with non-empty attackers and defenders sets containing
                  * already assigned users.) */
                 int numUsers = users.size() + attackers.size() + defenders.size();
-                int numAttackers = ((numUsers * attackersPerGame) + 1) / (attackersPerGame + defendersPerGame);
+                int numAttackers = (int) Math.round(numUsers
+                        * ((double) attackersPerGame / (attackersPerGame + defendersPerGame)));
                 int remainingNumAttackers = Math.max(0, numAttackers - attackers.size());
+                remainingNumAttackers = Math.min(remainingNumAttackers, users.size());
 
                 List<UserInfo> shuffledUsers = new ArrayList<>(users);
                 Collections.shuffle(shuffledUsers);
@@ -358,9 +370,9 @@ public class AdminCreateGamesBean implements Serializable {
 
                 for (UserInfo userInfo : users) {
                     if (userInfo.getLastRole() == Role.ATTACKER) {
-                        attackers.add(userInfo);
-                    } else if (userInfo.getLastRole() == Role.DEFENDER) {
                         defenders.add(userInfo);
+                    } else if (userInfo.getLastRole() == Role.DEFENDER) {
+                        attackers.add(userInfo);
                     } else {
                         remainingUsers.add(userInfo);
                     }

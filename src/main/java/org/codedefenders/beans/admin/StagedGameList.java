@@ -15,6 +15,10 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
 
+import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
+import static org.codedefenders.game.GameLevel.HARD;
+import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
+
 /**
  * Manages a list of staged games.
  * <br/>
@@ -238,17 +242,17 @@ public class StagedGameList implements Serializable {
         @Expose private GameType gameType;
 
         @Expose private GameClass cut;
-        @Expose private boolean withMutants;
-        @Expose private boolean withTests;
+        @Expose private Boolean withMutants;
+        @Expose private Boolean withTests;
 
-        @Expose private int maxAssertionsPerTest;
+        @Expose private Integer maxAssertionsPerTest;
         @Expose private CodeValidatorLevel mutantValidatorLevel;
-        @Expose private boolean chatEnabled;
-        @Expose private boolean captureIntentions;
-        @Expose private int equivalenceThreshold;
+        @Expose private Boolean chatEnabled;
+        @Expose private Boolean captureIntentions;
+        @Expose private Integer equivalenceThreshold;
         @Expose private GameLevel level;
 
-        @Expose private boolean startGame;
+        @Expose private Boolean startGame;
 
         public GameType getGameType() {
             return gameType;
@@ -338,6 +342,21 @@ public class StagedGameList implements Serializable {
             this.startGame = startGame;
         }
 
+        public static GameSettings getDefault() {
+            GameSettings gameSettings = new GameSettings();
+            gameSettings.setGameType(MULTIPLAYER);
+            gameSettings.setWithMutants(false);
+            gameSettings.setWithTests(false);
+            gameSettings.setMaxAssertionsPerTest(3);
+            gameSettings.setMutantValidatorLevel(MODERATE);
+            gameSettings.setChatEnabled(true);
+            gameSettings.setCaptureIntentions(false);
+            gameSettings.setEquivalenceThreshold(0);
+            gameSettings.setLevel(HARD);
+            gameSettings.setStartGame(false);
+            return gameSettings;
+        }
+
         public enum GameType {
             MULTIPLAYER("Multiplayer"),
             MELEE("Melee");
@@ -353,5 +372,4 @@ public class StagedGameList implements Serializable {
             }
         }
     }
-
 }

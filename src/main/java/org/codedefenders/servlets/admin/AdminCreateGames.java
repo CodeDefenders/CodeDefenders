@@ -231,6 +231,12 @@ public class AdminCreateGames extends HttpServlet {
             }
         }
 
+        /* Validate team sizes. */
+        if (attackersPerGame < 0 || defendersPerGame < 0 || attackersPerGame + defendersPerGame == 0) {
+            messages.add(format("Invalid team sizes. Attackers per game: {0}, defenders per game: {1}.",
+                    attackersPerGame, defendersPerGame));
+        }
+
         adminCreateGamesBean.stageGames(users, gameSettings, roleAssignmentMethod,
                 teamAssignmentMethod, attackersPerGame, defendersPerGame);
     }

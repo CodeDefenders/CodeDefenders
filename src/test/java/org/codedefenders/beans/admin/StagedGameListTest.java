@@ -1,46 +1,19 @@
 package org.codedefenders.beans.admin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.codedefenders.beans.admin.StagedGameList.GameSettings;
 import org.codedefenders.beans.admin.StagedGameList.StagedGame;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.model.User;
-import org.codedefenders.model.UserInfo;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.fail;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({AdminDAO.class})
 public class StagedGameListTest {
-
     private StagedGameList stagedGameList;
-    private HashMap<Integer, UserInfo> userInfos;
 
     @Before
     public void before() {
-        userInfos = new HashMap<>();
-        userInfos.put(0, new UserInfo(new User(0, "userA", "", ""), null, null, 0));
-        userInfos.put(1, new UserInfo(new User(1, "userB", "", ""), null, null, 0));
-        userInfos.put(2, new UserInfo(new User(2, "userC", "", ""), null, null, 0));
-        userInfos.put(3, new UserInfo(new User(3, "userD", "", ""), null, null, 0));
-        userInfos.put(4, new UserInfo(new User(4, "userE", "", ""), null, null, 0));
-        userInfos.put(5, new UserInfo(new User(5, "userF", "", ""), null, null, 0));
-        userInfos.put(6, new UserInfo(new User(6, "userG", "", ""), null, null, 0));
-        userInfos.put(7, new UserInfo(new User(7, "userH", "", ""), null, null, 0));
-
-        PowerMockito.mockStatic(AdminDAO.class);
-        PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
-
         stagedGameList = new StagedGameList();
     }
 
@@ -92,7 +65,7 @@ public class StagedGameListTest {
         StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
         StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
-        /* Existing unassigned user. */
+        /* Unassigned user. */
         assertThat(stagedGame1.addAttacker(0), is(true));
         assertThat(stagedGame1.addDefender(1), is(true));
 
@@ -100,11 +73,7 @@ public class StagedGameListTest {
         assertThat(stagedGame1.addAttacker(0), is(false));
         assertThat(stagedGame1.addDefender(0), is(false));
 
-        /* Non-existing user. */
-        assertThat(stagedGame1.addDefender(9), is(false));
-        assertThat(stagedGame1.addDefender(9), is(false));
-
-        /* Existing unassigned user. */
+        /* Unassigned user. */
         assertThat(stagedGame2.addAttacker(2), is(true));
         assertThat(stagedGame2.addDefender(3), is(true));
 
@@ -146,13 +115,10 @@ public class StagedGameListTest {
         /* Unassigned user. */
         assertThat(stagedGame1.removePlayer(7), is(false));
 
-        /* Non-existing user. */
-        assertThat(stagedGame1.removePlayer(9), is(false));
-
         /* User assigned to other game. */
         assertThat(stagedGame1.removePlayer(2), is(false));
 
-        /* Existing and assigned user. */
+        /* Assigned user. */
         assertThat(stagedGame1.removePlayer(0), is(true));
 
         /* No longer assigned user. */
