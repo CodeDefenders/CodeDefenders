@@ -1,49 +1,33 @@
 version: '2'
 services:
-  db:
-    build: ./backend
+  database:
+    image: "mariadb:10.5"
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: defender
-      MYSQL_PASSWORD: defender
-      MYSQL_DATABASE: defender
+      MYSQL_RANDOM_ROOT_PASSWORD: 'YES'
+      MYSQL_USER: codedefenders
+      MYSQL_PASSWORD: codedefenders
+      MYSQL_DATABASE: codedefenders
     ports:
       - "3306"
     volumes:
       - dbvolume:/var/lib/mysql
-
-  # Tomcat nodes. We do not expose directly their ports to the outside
-  frontend:
+  codedefenders:
     build:
-      context: ./frontend
-      args:
-        RELEASE_VERSION: ${RELEASE_VERSION}
+      context: ../
+      dockerfile: ./docker/Dockerfile
     restart: always
     environment:
-      CODEDEF_MANAGER_USERNAME: user
-      CODEDEF_MANAGER_PASSWORD: password
-      CODEDEF_MANAGER_ALLOWED_REMOTE_ADDR: ${ALLOWED_REMOTE_ADDR_REGEXP}
-      CODEDEF_ADMIN_USERNAME: admin
-      CODEDEF_ADMIN_PASSWORD: password
-      CODEDEF_CFG_DB_URL: "jdbc:mysql://db:3306/defender"
-      CODEDEF_CFG_DB_USERNAME: defender
-      CODEDEF_CFG_DB_PASSWORD: defender
-    links:
-      - db
-    volumes:
-      - datavolume:/codedefenders/
-
-  # Note that we build this one... Since we need to install the sticky-session module
-  load-balancer:
-    build: ./load-balancer
-    restart: always
-    tty: true
-    links:
-      - frontend
+      CODEDEFENDERS_DATA_DIR: /srv/codedefenders
+      CODEDEFENDERS_DB_HOST: database
+      CODEDEFENDERS_DB_PASSWORD: codedefenders
     ports:
-      - "80:80"
+      - "8080"
+    links:
+      - database
+    volumes:
+      - datavolume:/srv/codedefenders
 
 volumes:
-    datavolume:
-    dbvolume:
+  datavolume:
+  dbvolume:
