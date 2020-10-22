@@ -70,7 +70,7 @@ public class StagedGameList implements Serializable {
      */
     public StagedGame addStagedGame(GameSettings gameSettings) {
         int id = currentId++;
-        StagedGame stagedGame = new StagedGame(id, gameSettings);
+        StagedGame stagedGame = new StagedGame(id, new GameSettings(gameSettings));
         stagedGames.put(id, stagedGame);
         return stagedGame;
     }
@@ -253,6 +253,31 @@ public class StagedGameList implements Serializable {
         @Expose private GameLevel level;
 
         @Expose private Boolean startGame;
+
+        /**
+         * Creates a new GameSettings object with empty settings.
+         */
+        public GameSettings() {
+
+        }
+
+        /**
+         * Creates a copy of the given GameSettings object.
+         * @param other The settings to copy.
+         */
+        public GameSettings(GameSettings other) {
+            setGameType(other.getGameType());
+            setCut(other.getCut());
+            setWithMutants(other.isWithMutants());
+            setWithTests(other.isWithTests());
+            setMaxAssertionsPerTest(other.getMaxAssertionsPerTest());
+            setMutantValidatorLevel(other.getMutantValidatorLevel());
+            setChatEnabled(other.isChatEnabled());
+            setCaptureIntentions(other.isCaptureIntentions());
+            setEquivalenceThreshold(other.getEquivalenceThreshold());
+            setLevel(other.getLevel());
+            setStartGame(other.isStartGame());
+        }
 
         public GameType getGameType() {
             return gameType;
