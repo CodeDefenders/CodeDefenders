@@ -117,6 +117,7 @@ public class AdminCreateGamesBean implements Serializable {
                            RoleAssignmentMethod roleAssignmentMethod, TeamAssignmentMethod teamAssignmentMethod,
                            int attackersPerGame, int defendersPerGame) {
         int numGames = users.size() / (attackersPerGame + defendersPerGame);
+        numGames = numGames == 0 ? 1 : numGames;
 
         /* Split users into attackers and defenders. */
         Set<UserInfo> attackers = new HashSet<>();
@@ -394,8 +395,13 @@ public class AdminCreateGamesBean implements Serializable {
      * @param numTeams The number of teams to split the users into.
      * @param method The method of splitting the users into teams.
      * @return A list of the assigned teams.
+     * @throws IllegalArgumentException If {@code numTeams} is <= 0;
      */
     public List<List<UserInfo>> splitIntoTeams(Set<UserInfo> users, int numTeams, TeamAssignmentMethod method) {
+        if (numTeams <= 0) {
+            throw new IllegalArgumentException("Need at least one team to be able to assign players to teams.");
+        }
+
         List<UserInfo> usersList = new ArrayList<>(users);
 
         switch (method) {

@@ -266,17 +266,17 @@ public class StagedGameList implements Serializable {
          * @param other The settings to copy.
          */
         public GameSettings(GameSettings other) {
-            setGameType(other.getGameType());
-            setCut(other.getCut());
-            setWithMutants(other.isWithMutants());
-            setWithTests(other.isWithTests());
-            setMaxAssertionsPerTest(other.getMaxAssertionsPerTest());
-            setMutantValidatorLevel(other.getMutantValidatorLevel());
-            setChatEnabled(other.isChatEnabled());
-            setCaptureIntentions(other.isCaptureIntentions());
-            setEquivalenceThreshold(other.getEquivalenceThreshold());
-            setLevel(other.getLevel());
-            setStartGame(other.isStartGame());
+            this.gameType = other.gameType;
+            this.cut = other.cut;
+            this.withMutants = other.withMutants;
+            this.withTests = other.withTests;
+            this.maxAssertionsPerTest = other.maxAssertionsPerTest;
+            this.mutantValidatorLevel = other.mutantValidatorLevel;
+            this.chatEnabled = other.chatEnabled;
+            this.captureIntentions = other.captureIntentions;
+            this.equivalenceThreshold = other.equivalenceThreshold;
+            this.level = other.level;
+            this.startGame = other.startGame;
         }
 
         public GameType getGameType() {

@@ -191,6 +191,27 @@ public class AdminCreateGamesBeanTest {
     }
 
     @Test
+    public void testStageGamesNotEnoughPlayersForOneGame() {
+        Set<UserInfo> users = userSet(1, 2);
+        GameSettings gameSettings = new GameSettings();
+        gameSettings.setGameType(MULTIPLAYER);
+        RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
+        TeamAssignmentMethod teamAssignmentMethod = TeamAssignmentMethod.RANDOM;
+        int attackersPerGame = 2;
+        int defendersPerGame = 2;
+
+        adminCreateGamesBean.stageGames(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
+                attackersPerGame, defendersPerGame);
+
+        assertThat(stagedGameList.getStagedGames().values(), hasSize(1));
+
+        for (StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+            assertThat(stagedGame.getAttackers(), hasSize(1));
+            assertThat(stagedGame.getDefenders(), hasSize(1));
+        }
+    }
+
+    @Test
     public void testDeleteStagedGames() {
         StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
         StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
@@ -627,7 +648,7 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testSplitIntoTeams_Random() {
-        /* Random, no remaining users. */
+        /* No remaining users. */
         List<List<UserInfo>> teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 2,
                 TeamAssignmentMethod.RANDOM);
         assertThat(teams, hasSize(2));
@@ -635,7 +656,7 @@ public class AdminCreateGamesBeanTest {
         assertThat(teams.get(1), hasSize(4));
         assertThat(teams.stream().flatMap(List::stream).collect(Collectors.toList()), hasSize(8));
 
-        /* Random, with remaining users. */
+        /* With remaining users. */
         teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 3,
                 TeamAssignmentMethod.RANDOM);
         assertThat(teams, hasSize(3));
@@ -660,7 +681,7 @@ public class AdminCreateGamesBeanTest {
          * 8      | 8
          */
 
-        /* Random, no remaining users. */
+        /* No remaining users. */
         List<List<UserInfo>> teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 2,
                 TeamAssignmentMethod.SCORE_DESCENDING);
         assertThat(teams, hasSize(2));
@@ -670,7 +691,7 @@ public class AdminCreateGamesBeanTest {
         assertThat(teams.get(0), containsInAnyOrder(userSet(8, 7, 6, 5).toArray()));
         assertThat(teams.get(1), containsInAnyOrder(userSet(4, 3, 2, 1).toArray()));
 
-        /* Random, with remaining users. */
+        /* With remaining users. */
         teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 3,
                 TeamAssignmentMethod.SCORE_DESCENDING);
         assertThat(teams, hasSize(3));
