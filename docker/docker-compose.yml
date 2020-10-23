@@ -21,6 +21,8 @@ services:
       CODEDEFENDERS_DATA_DIR: /srv/codedefenders
       CODEDEFENDERS_DB_HOST: database
       CODEDEFENDERS_DB_PASSWORD: codedefenders
+      CODEDEFENDERS_ADMIN_USERNAME: admin
+      CODEDEFENDERS_ADMIN_PASSWORD: admin
     ports:
       - "8080"
     links:

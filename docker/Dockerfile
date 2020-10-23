@@ -11,11 +11,14 @@ FROM tomcat:9.0-jdk8-openjdk AS tomcat
 
 RUN mkdir /srv/codedefenders
 
-# Install ANT
-RUN apt-get update && apt-get install -y ant
+# Install ANT and MAVEN
+RUN apt-get update && apt-get install -y ant maven
+
+COPY ./installation/installation-pom.xml .
+COPY ./docker/docker-entrypoint.sh /usr/local/bin/
 
 COPY --from=build /Codedefenders/target/codedefenders /usr/local/tomcat/webapps/ROOT/
 
 EXPOSE 8080
 
-ENTRYPOINT ["catalina.sh", "run"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
