@@ -26,6 +26,8 @@
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.model.Event" %>
+<%@ page import="org.codedefenders.beans.game.HistoryBean" %>
 
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
@@ -35,6 +37,8 @@
     // Those return the PlayerID not the UserID
     final List<Player> attackers = history.getAttackers();
     final List<Player> defenders = history.getDefenders();
+    final List<HistoryBean.HistoryBeanEventDTO> events = history.getEvents();
+
 %>
 
 <div id="history" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
@@ -46,211 +50,53 @@
                 <h4 class="modal-title">History</h4>
             </div>
             <div class="modal-body">
-                <div class="scoreBanner">
-                    <span class="attackerTotal"><%
-                        int ts = 0;
-                        if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){
-                            ts += ((PlayerScore)mutantScores.get(-1)).getTotalScore();
-                        }
-                        if (testScores.containsKey(-2) && testScores.get(-2) != null){
-                            ts += ((PlayerScore)testScores.get(-2)).getTotalScore();
-                        } %>
-                        <%= ts %>
-                    </span><img class="logo" href="<%=request.getContextPath() %>/" src="images/logo.png"/><span class="defenderTotal">
-                    <% ts = 0;
-                        if (testScores.containsKey(-1) && testScores.get(-1) != null){
-                                ts += ((PlayerScore)testScores.get(-1)).getTotalScore(); %>
-                        <% } %>
-                        <%= ts %>
-                </span>
+                <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
+                      rel="stylesheet">
+                <div class="container bootstrap snippets bootdeys">
+                    <div class="col-md-9">
+                        <div class="timeline-centered timeline-sm">
+                            <%--                            <article class="timeline-entry">--%>
+                            <%--                                <div class="timeline-entry-inner">--%>
+                            <%--                                    <time datetime="2014-01-10T03:45" class="timeline-time"><span>12:45 AM</span><span>Today</span></time>--%>
+                            <%--                                    <div class="timeline-icon bg-violet"><i class="fa fa-exclamation"></i></div>--%>
+                            <%--                                    <div class="timeline-label"><h4 class="timeline-title">New Project</h4>--%>
+
+                            <%--                                        <p>Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial.</p></div>--%>
+                            <%--                                </div>--%>
+                            <%--                            </article>--%>
+                            <%
+                                for (HistoryBean.HistoryBeanEventDTO event : events) {
+
+                            %>
+                            <article class="timeline-entry right">
+                                <div class="timeline-entry-inner">
+                                    <time datetime="2014-01-10T03:45" class="timeline-time"><span>9:15 AM</span><span>Today</span>
+                                    </time>
+                                    <div class="timeline-icon bg-green"><i class="fa fa-group"></i></div>
+                                    <div class="timeline-label bg-green"><h4
+                                            class="timeline-title"><%= event.getUserMessage() %>
+                                    </h4>
+                                        <p><%-- Body message here--%></p></div>
+                                </div>
+                            </article>
+                            <%
+                                }
+                            %>
+                            <%--                            <article class="timeline-entry">--%>
+                            <%--                                <div class="timeline-entry-inner">--%>
+                            <%--                                    <time datetime="2014-01-09T13:22" class="timeline-time"><span>8:20 PM</span><span>04/03/2013</span></time>--%>
+                            <%--                                    <div class="timeline-icon bg-orange"><i class="fa fa-paper-plane"></i></div>--%>
+                            <%--                                    <div class="timeline-label bg-orange"><h4 class="timeline-title">Daily Feeds</h4>--%>
+
+                            <%--                                        <p><img src="https://via.placeholder.com/45x45/" alt="" class="timeline-img pull-left">Parsley amaranth tigernut silver beet maize fennel spinach ricebean black-eyed. Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial.</p></div>--%>
+                            <%--                                </div>--%>
+                            <%--                                <div class="timeline-entry-inner">--%>
+                            <%--                                    <div style="-webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg);" class="timeline-icon"><i class="fa fa-plus"></i></div>--%>
+                            <%--                                </div>--%>
+                            <%--                            </article>--%>
+                        </div>
+                    </div>
                 </div>
-                <table class="history">
-                    <tr class="attacker header"><th>Atttttttttackers</th><th>Mutants</th><th>Alive / Killed / Equivalent</th><th>Duels Won/Lost/Ongoing</th></th><th>Total Points</th></tr>
-                    <%
-                    int total = 0;
-                    for (Player attacker : attackers) {
-                        int playerId = attacker.getId();
-                        User aUser = attacker.getUser();
-                        // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
-                        // Does system attacker submitted any mutant?
-                        // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
-                        // For system generated mutants,  mutant.playerID == userID, which is wrong...
-                        if(aUser.getId() == Constants.DUMMY_ATTACKER_USER_ID && MutantDAO.getMutantsByGameAndUser(history.getGameId(), aUser.getId()).isEmpty() ){
-                           continue;
-                        }
-
-                        total = 0;
-                        %>
-                        <tr class="attacker"><td>
-                                <%=aUser.getUsername()%>
-                            </td>
-                            <td><%
-                                if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){ %>
-                                <%= ((PlayerScore)mutantScores.get(playerId)).getQuantity() %>
-                                <% } else { %>
-                                0
-                                <% } %></td>
-                            <td>
-                                <%
-                                    if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){%>
-                                <%= ((PlayerScore)mutantScores.get(playerId)).getMutantKillInformation() %>
-                                <% } else { %>
-                                    0 / 0 / 0
-                                <% } %>
-                            </td>
-                            <td>
-                                <!-- Equivalence duels -->
-                                <%
-                                    if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){
-                                %>
-                                <%= ((PlayerScore)mutantScores.get(playerId)).getDuelInformation() %>
-                                <% } else { %>
-                                0 / 0 / 0
-                                <% } %>
-                            </td>
-                            <td>
-                                <%
-                                if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){
-                                    total += ((PlayerScore)mutantScores.get(playerId)).getTotalScore(); %>
-                            <% }
-                                if (testScores.containsKey(playerId) && testScores.get(playerId) != null){
-                                    total += ((PlayerScore)testScores.get(playerId)).getTotalScore(); %>
-                            <% } %>
-                                <%= total %>
-                            </td>
-                        </tr>
-                <%
-                    }
-                    total = 0;
-
-                    if (attackers.isEmpty()) {
-                %><tr class="attacker"><td colspan="4"></td></tr><%
-                    }
-                %>
-                    <tr class="attacker header"><td>
-                        Attacking Team
-                    </td>
-                        <td><%
-                            if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){ %>
-                            <%= ((PlayerScore)mutantScores.get(-1)).getQuantity() %>
-                            <% } else { %>
-                            0
-                            <% } %></td>
-                        <td>
-                            <%
-                                if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){%>
-                            <%= ((PlayerScore)mutantScores.get(-1)).getMutantKillInformation() %>
-                            <% } else { %>
-                            0 / 0 / 0
-                            <% } %>
-                        </td>
-                        <td>
-                            <!-- Equivalence duels -->
-                            <%
-                                if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){
-                            %>
-                                <%= ((PlayerScore)mutantScores.get(-1)).getDuelInformation() %>
-                            <% } else { %>
-                                0 / 0 / 0
-                            <% } %>
-                        </td>
-                        <td>
-                            <%
-                                if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){
-                                    total += ((PlayerScore)mutantScores.get(-1)).getTotalScore(); %>
-                            <% } else { %>
-                            0
-                            <% }
-                                if (testScores.containsKey(-2) && testScores.get(-2) != null){
-                                    total += ((PlayerScore)testScores.get(-2)).getTotalScore(); %>
-                            <% } %>
-                            <%= total %>
-                        </td>
-                    </tr>
-                    <tr class="defender header"><th>Defenders</th><th>Tests</th><th>Mutants Killed</th><th>Duels Won/Lost/Ongoing</th><th>Total Points</th></tr>
-                    <%
-                        for (Player defender : defenders) {
-                            int playerId = defender.getId();
-                            User dUser = defender.getUser();
-
-                            // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
-                            // XXX: Hardcoded id for system user
-                            // TODO #418
-                            if(dUser.getId() == Constants.DUMMY_DEFENDER_USER_ID && TestDAO.getTestsForGameAndUser(history.getGameId(), dUser.getId()).isEmpty() ){
-                                continue;
-                             }
-
-                            total = 0;
-                    %>
-                    <tr class="defender"><td>
-                        <%=dUser.getUsername()%>
-                    </td>
-                        <td><%
-                            if (testScores.containsKey(playerId) && testScores.get(playerId) != null){ %>
-                                <%= ((PlayerScore)testScores.get(playerId)).getQuantity() %>
-
-                            <% } else { %>
-                                0 <% } %></td>
-                        <td><%
-                            if (testScores.containsKey(playerId) && testScores.get(playerId) != null){
-                                    total += ((PlayerScore)testScores.get(playerId)).getTotalScore(); %>
-                            <%= ((PlayerScore)testScores.get(playerId)).getMutantKillInformation()%>
-                            <% } else { %>
-                            0 <% } %>
-                        </td>
-                        <td>
-                            <!-- Equivalence duels -->
-                            <%
-                                if (testScores.containsKey(playerId) && testScores.get(playerId) != null){
-                            %>
-                            <%= ((PlayerScore)testScores.get(playerId)).getDuelInformation() %>
-                            <% } else { %>
-                            0 / 0 / 0
-                            <% } %>
-                        </td>
-                        <td>
-                            <%= total %>
-                        </td>
-                    </tr>
-                    <%
-                        }
-                        total = 0;
-
-                        if (defenders.isEmpty()){
-                            %><tr class="defender"><td colspan="5"></td></tr><%
-                        }
-                    %>
-                    <tr class="defender header"><td>
-                        Defending Team
-                    </td>
-                        <td><%
-                            if (testScores.containsKey(-1) && testScores.get(-1) != null){ %>
-                            <%= ((PlayerScore)testScores.get(-1)).getQuantity() %>
-
-                            <% } else { %>
-                            0 <% } %></td>
-                        <td><%
-                            if (testScores.containsKey(-1) && testScores.get(-1) != null){
-                                total += ((PlayerScore)testScores.get(-1)).getTotalScore(); %>
-                            <%= ((PlayerScore)testScores.get(-1)).getMutantKillInformation()%>
-                            <% } else { %>
-                            0 <% } %>
-                        </td>
-                        <td>
-                            <!-- Equivalence duels -->
-                            <%
-                                if (testScores.containsKey(-1) && testScores.get(-1) != null){
-                            %>
-                            <%= ((PlayerScore)testScores.get(-1)).getDuelInformation() %>
-                            <% } else { %>
-                            0 / 0 / 0
-                            <% } %>
-                        </td>
-                        <td>
-                            <%= total %>
-                        </td>
-                    </tr>
-                    </table>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

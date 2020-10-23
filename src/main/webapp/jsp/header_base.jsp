@@ -121,6 +121,8 @@
     <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
 
     <link href="css/modal_dialogs.css" rel="stylesheet" type="text/css" />
+
+    <link href="css/timeline.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body class="page-grid">
