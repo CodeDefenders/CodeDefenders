@@ -499,6 +499,14 @@ public class AdminCreateGamesBeanTest {
                 userSet(),
                 3, 4,
                 3, 4);
+
+        /* 0 users. */
+        testAssignRoles_Random(
+                userSet(),
+                userSet(),
+                userSet(),
+                1, 1,
+                0, 0);
     }
 
     @Test
@@ -644,6 +652,16 @@ public class AdminCreateGamesBeanTest {
                 4, 4,
                 userSet(),
                 userSet());
+
+        /* 0 users. */
+        testAssignRoles_Opposite(
+                userSet(),
+                userSet(),
+                userSet(),
+                1, 1,
+                0, 0,
+                userSet(),
+                userSet());
     }
 
     @Test
@@ -664,6 +682,11 @@ public class AdminCreateGamesBeanTest {
         assertThat(teams.get(1), hasSize(3));
         assertThat(teams.get(2), hasSize(2));
         assertThat(teams.stream().flatMap(List::stream).collect(Collectors.toList()), hasSize(8));
+
+        /* 0 users. */
+        teams = adminCreateGamesBean.splitIntoTeams(userSet(), 1, TeamAssignmentMethod.RANDOM);
+        assertThat(teams, hasSize(1));
+        assertThat(teams.get(0), hasSize(0));
     }
 
     @Test
@@ -702,5 +725,10 @@ public class AdminCreateGamesBeanTest {
         assertThat(teams.get(0), containsInAnyOrder(userSet(8, 7, 6).toArray()));
         assertThat(teams.get(1), containsInAnyOrder(userSet(5, 4, 3).toArray()));
         assertThat(teams.get(2), containsInAnyOrder(userSet(2, 1).toArray()));
+
+        /* 0 users. */
+        teams = adminCreateGamesBean.splitIntoTeams(userSet(), 1, TeamAssignmentMethod.RANDOM);
+        assertThat(teams, hasSize(1));
+        assertThat(teams.get(0), hasSize(0));
     }
 }

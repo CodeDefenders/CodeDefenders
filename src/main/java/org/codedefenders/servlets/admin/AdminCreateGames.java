@@ -214,12 +214,6 @@ public class AdminCreateGames extends HttpServlet {
         users.addAll(usersFromTable.get());
         users.addAll(usersFromTextArea.get());
 
-        /* Abort if no users are provided. */
-        if (users.isEmpty()) {
-            messages.add("ERROR: Please select at least one user.");
-            return;
-        }
-
         /* Validate that no users are already assigned to other staged games. */
         Set<Integer> assignedUsers = stagedGameList.getAssignedUsers();
         for (UserInfo user : users) {
