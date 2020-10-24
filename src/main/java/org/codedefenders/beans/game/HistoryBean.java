@@ -10,6 +10,7 @@ import org.codedefenders.model.Player;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,11 +44,11 @@ public class HistoryBean {
 
     public void setEvents(List<Event> events) {
         this.events = events.stream()
-                .map(this::createUserMessage).filter(Objects::nonNull)
+                .map(this::createHistoryBeanEvent).filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private HistoryBeanEventDTO createUserMessage(Event e) {
+    private HistoryBeanEventDTO createHistoryBeanEvent(Event e) {
         if (e.getUser().getId() < 100) {
             return null;
         }
@@ -57,7 +58,7 @@ public class HistoryBean {
                 userMessage += "created game";
                 break;
             case GAME_STARTED:
-                userMessage += "startet game";
+                userMessage += "started game";
                 break;
             case GAME_FINISHED:
                 userMessage += "finished game";
@@ -104,10 +105,15 @@ public class HistoryBean {
             case ATTACKER_MUTANT_CREATED:
                 userMessage += "created a mutant";
                 break;
+                /*
             case PLAYER_MUTANT_SURVIVED:
             case ATTACKER_MUTANT_SURVIVED:
+
+
                 userMessage += "created a mutant that survived";
                 break;
+
+                 */
             //    case PLAYER_MUTANT_EQUIVALENT:
             case DEFENDER_MUTANT_EQUIVALENT:
                 userMessage += "caught an equivalence";
@@ -181,13 +187,17 @@ public class HistoryBean {
 
     public static class HistoryBeanEventDTO {
         private final String userName;
-        private final Timestamp time;
+        private final LocalDateTime time;
+        private final LocalDateTime today;
         private final String userMessage;
         private final EventType type;
 
         public HistoryBeanEventDTO(String userName, Timestamp time, String message, EventType type) {
             this.userName = userName;
-            this.time = time;
+            this.time = time.toLocalDateTime();
+            LocalDateTime now = LocalDateTime.now();
+            // Today at midnight
+            today = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0);
             this.userMessage = message;
             this.type = type;
         }
@@ -196,8 +206,26 @@ public class HistoryBean {
             return userName;
         }
 
-        public Timestamp getTime() {
-            return time;
+        public String getDate() {
+            if (time.isAfter(today)) {
+                return "Today";
+            } else if (time.isAfter(today.minusDays(1))) {
+                return "Yesterday";
+            } else {
+                return time.getDayOfMonth() + "." + time.getMonth().ordinal() + "." + time.getYear();
+            }
+        }
+
+        public String getTime() {
+            return String.format("%02d", time.getHour()) + ":" + String.format("%02d", time.getMinute());
+        }
+
+        public String getFormat() {
+            // For the game_history.jsp in the format "2014-01-10T03:45"
+            return "\"" + time.getYear()
+                    + "-" + String.format("%02d", time.getMonth().ordinal())
+                    + "-" + String.format("%02d", time.getDayOfMonth()) + "T"
+                    + getTime() + "\"";
         }
 
         public String getUserMessage() {

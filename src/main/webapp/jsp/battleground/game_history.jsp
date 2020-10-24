@@ -49,7 +49,7 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">History</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="background: #eee">
                 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
                       rel="stylesheet">
                 <div class="container bootstrap snippets bootdeys">
@@ -70,7 +70,9 @@
                             %>
                             <article class="timeline-entry right">
                                 <div class="timeline-entry-inner">
-                                    <time datetime="2014-01-10T03:45" class="timeline-time"><span>9:15 AM</span><span>Today</span>
+                                    <time datetime=<%=event.getFormat()%> class="timeline-time">
+                                        <span><%= event.getTime() %></span>
+                                        <span><%= event.getDate() %></span>
                                     </time>
                                     <div class="timeline-icon bg-green"><i class="fa fa-group"></i></div>
                                     <div class="timeline-label bg-green"><h4
