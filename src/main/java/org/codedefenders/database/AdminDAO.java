@@ -113,7 +113,8 @@ public class AdminDAO {
         final Timestamp ts = rs.getTimestamp("lastLogin");
         final Instant lastLogin = ts != null ? ts.toInstant() : null;
 
-        final Role lastRole = Role.valueOrNull("lastRole");
+        String lastRoleStr = rs.getString("lastRole");
+        final Role lastRole = lastRoleStr == null ? null : Role.valueOf(lastRoleStr);
         final int totalScore = rs.getInt("TotalScore");
 
         return new UserInfo(user, lastLogin, lastRole, totalScore);
