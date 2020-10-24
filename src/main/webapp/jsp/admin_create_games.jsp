@@ -18,25 +18,15 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.apache.commons.collections.ListUtils" %>
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
-<%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
-<%@ page import="org.codedefenders.game.leaderboard.Entry" %>
-<%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
-<%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.Role" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Collection" %>
-<%@ page import="org.codedefenders.model.UserInfo" %>
-<%@ page import="java.time.format.DateTimeFormatter" %>
-<%@ page import="java.time.ZoneId" %>
 <%@ page import="org.codedefenders.beans.admin.AdminCreateGamesBean" %>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -49,314 +39,42 @@
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <form id="insertGames" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post" style="margin-top: 25px;">
-        <input type="hidden" name="formType" value="insertGames"/>
-        <%
-			List<MultiplayerGame> availableGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
-            List<MultiplayerGame> createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-            List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-            List<List<Integer>> defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
-            createdGames = createdGames != null ? createdGames : new ArrayList<>();
-            attackerIdsList = attackerIdsList != null ? attackerIdsList : new ArrayList<>();
-            defenderIdsList = defenderIdsList != null ? defenderIdsList : new ArrayList<>();
-        %>
+    <div style="height: 25px;" class="spacing"></div>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Staged Games
-                <div style="float: right;">
-                    <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
-                           style="height: .65em; width: 10em; display: inline;">
-                    <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
-                        <label class="btn btn-xs btn-default">
-                            <input id="togglePlayersCreated" type="checkbox">
-                            Hide Players&nbsp;
-                            <span class="glyphicon glyphicon-eye-close"></span>
-                        </label>
-                    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Staged Games
+            <div style="float: right;">
+                <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
+                       style="height: .65em; width: 10em; display: inline;">
+                <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
+                    <label class="btn btn-xs btn-default">
+                        <input id="togglePlayersCreated" type="checkbox">
+                        Hide Players&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
+                    </label>
                 </div>
             </div>
-            <div class="panel-body">
+        </div>
+        <div class="panel-body">
+            <table id="stagedGamesTable" class="table table-striped table-hover table-responsive"></table>
+        </div>
+    </div>
 
-                <table id="tableCreatedGames"
-                       class="table table-striped table-hover table-responsive games-table">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input type="checkbox" id="selectAllTempGames"
-                                       onchange="document.getElementById('insert_games_btn').disabled = !this.checked;
-                                       document.getElementById('delete_games_btn').disabled = !this.checked">
-                            </th>
-                            <th>ID</th>
-                            <th>Class</th>
-                            <th>Level</th>
-                            <th>Players (Name, Last Role, Score)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <%
-                        for (int i = 0; i < createdGames.size(); ++i) {
-                            MultiplayerGame g = createdGames.get(i);
-                            List<Integer> attackerIds = attackerIdsList.get(i);
-                            List<Integer> defenderIds = defenderIdsList.get(i);
-                            GameClass cut = g.getCUT();
-
-                    %>
-                        <tr id="temp_games_<%=i%>">
-                            <td>
-                                <input type="checkbox" name="selectedTempGames" id="selectedTempGames_<%=i%>" value="<%=i%>" onchange=
-                                        "document.getElementById('insert_games_btn').disabled = !areAnyChecked('selectedTempGames');
-                                        document.getElementById('delete_games_btn').disabled = !areAnyChecked('selectedTempGames');
-                                        setSelectAllCheckbox('selectedTempGames', 'selectAllTempGames');">
-                            </td>
-                            <td><%=i%></td>
-                            <td>
-                                <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-                                    <%=cut.getAlias()%>
-                                </a>
-                                <div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;">
-                                    <div class="modal-dialog">
-                                        <!-- Modal content-->
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                <h4 class="modal-title"><%=cut.getAlias()%>
-                                                </h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <pre class="readonly-pre"><textarea
-                                                        class="readonly-textarea classPreview"
-                                                        id="sut<%=g.getId()%>"
-                                                        name="cut<%=g.getCUT().getId()%>"
-                                                        cols="80" rows="30"></textarea></pre>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><%= g.getLevel() %></td>
-                            <td>
-                                <div id="playersTableHidden" style="color: lightgray;" hidden> (hidden)</div>
-                                <table id="playersTableCreated">
-                                    <%
-                                        List<Integer> attackerAndDefenderIds = ListUtils.union(attackerIds, defenderIds);
-                                        for (int id : attackerAndDefenderIds) {
-                                            String userName = UserDAO.getUserById(id).getUsername();
-                                            Role lastRole = UserDAO.getLastRoleOfUser(id);
-                                            String lastRoleStr = lastRole != null
-                                                    ? lastRole.getFormattedString()
-                                                    : "<span style=\"color: gray;\">none<span>";
-                                            Entry score = AdminDAO.getScore(id);
-                                            int totalScore = score.getTotalPoints();
-                                            String color = attackerIds.contains(id) ? "#edcece" : "#ced6ed";
-                                    %>
-                                    <tr style="background: <%= color %>">
-                                        <td class="col-md-2"><%= userName %></td>
-                                        <td class="col-md-3"><%= lastRoleStr %></td>
-                                        <td class="col-md-1"><%= totalScore %></td>
-                                        <td class="col-md-1">
-                                            <button class="btn btn-sm btn-primary"
-                                                    value="<%=i%>-<%=id%>"
-                                                    id="switch_player_<%=id%>_game_<%=i%>"
-                                                    name="tempGameUserSwitchButton">
-                                                <span class="glyphicon glyphicon-transfer"></span>
-                                            </button>
-                                        </td>
-                                        <td class="col-md-1">
-                                            <button class="btn btn-sm btn-danger"
-                                                    value="<%=i%>-<%=id%>"
-                                                    id="remove_player_<%=id%>_game_<%=i%>"
-                                                    name="tempGameUserRemoveButton">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </button>
-                                        </td>
-                                        <%-- ------------------ --%>
-                                        <%-- Show moving to game UI only if there's more than 1 game --%>
-                                        <%-- ------------------ --%>
-                                        <% if (createdGames.size() + availableGames.size() > 1) { %>
-                                        <td class="col-md-3" style="padding-top:3px; padding-bottom:3px;">
-                                        <%-- create the select and fill it with the available games except the current one --%>
-                                            <div id="game_<%=id%>" style="max-width: 100px; float: left;">
-                                                <select name="game_<%=id%>" class="form-control selectpicker" data-size="small" id="game" style="float: right">
-                                                    <%-- List created games --%>
-                                                    <% for (MultiplayerGame availableGame : availableGames) { %>
-                                                        <option value="<%=availableGame.getId()%>">
-                                                            <%=availableGame.getId()%>: <%=availableGame.getCUT().getAlias()%>
-                                                        </option>
-                                                    <% } %>
-                                                    <%-- List the staged games --%>
-                                                    <%
-                                                        for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
-                                                            // Do not list the current game in the select
-                                                            if (gameIndex == i) {
-                                                                continue;
-                                                            }
-                                                            String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
-                                                    %>
-                                                        <option value="T<%=gameIndex%>">T<%=gameIndex%>: <%=classAlias%></option>
-                                                    <%
-                                                        }
-                                                    %>
-                                                </select>
-                                            </div>
-                                            <%-- Keep the role of the user also in the target game --%>
-                                            <input type="hidden" name="role_<%=id%>" value="<%= (attackerIds.contains(id)) ? Role.ATTACKER.name() : Role.DEFENDER.name() %>"/>
-                                        </td>
-                                        <%-- Create the button to move it --%>
-                                        <td class="col-md-1">
-                                            <button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="move_player_<%=id%>_from_game_T<%=i%>" name="userListButton" style="margin: 2px; float:left">
-                                                <span class="glyphicon glyphicon-arrow-right"></span>
-                                            </button>
-                                        </td>
-                                        <% }%>
-                                        <%-- ------------------ --%>
-                                    </tr>
-                                    <% } %>
-                                </table>
-                            </td>
-                        </tr>
-                    <% } %>
-                    </tbody>
-                </table>
-
-                <br/>
-
-                <button class="btn btn-md btn-primary" type="submit" name="games_btn" id="insert_games_btn"
-                        disabled value="insert Games">
-                    Create games
-                </button>
-                <button class="btn btn-md btn-danger" type="submit" name="games_btn" id="delete_games_btn"
-                        onclick="return confirm('Are you sure you want to discard the selected Games?');"
-                        disabled value="delete Games">
-                    Discard games
-                </button>
-
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            Unassigned Users
+            <div style="float: right;">
+                <input type="search" id="search-unassigned-users" class="form-control" placeholder="Search"
+                       style="height: .65em; width: 10em; display: inline;">
             </div>
         </div>
-
-    </form>
-
-    <form id="users" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post">
-        <input type="hidden" name="formType" value="createGames">
-
-        <%
-            createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-            List<Integer> assignedUserIds = new ArrayList<>();
-            attackerIdsList.stream().flatMap(Collection::stream).forEach(assignedUserIds::add);
-            defenderIdsList.stream().flatMap(Collection::stream).forEach(assignedUserIds::add);
-            List<UserInfo> unassignedUsersInfo = AdminCreateGames.getUnassignedUsers(assignedUserIds);
-        %>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Unassigned Users
-                <div style="float: right;">
-                    <input type="search" id="search-unassigned-users" class="form-control" placeholder="Search"
-                           style="height: .65em; width: 10em; display: inline;">
-                </div>
-            </div>
-            <div class="panel-body">
-
-                <table id="tableAddUsers"
-                       class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
-                    <thead>
-                        <tr>
-                            <th>
-                                <input type="checkbox" id="selectAllUsers"
-                                       onchange="document.getElementById('submit_users_btn').disabled = document.getElementById('cut_select').selectedIndex == -1 || ! this.checked;">
-                            </th>
-                            <th>User ID</th>
-                            <th>User</th>
-                            <th>Last Role</th>
-                            <th>Total Score</th>
-                            <th>Last Login</th>
-                            <th>Add to Existing Game</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                    <%
-                        DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-                                .ofPattern("yyyy-MM-dd HH:mm")
-                                .withZone(ZoneId.systemDefault());
-
-                        for (UserInfo userInfo : unassignedUsersInfo) {
-                            int uid = userInfo.getUser().getId();
-                            String username = userInfo.getUser().getUsername();
-                            String lastLogin = userInfo.getLastLogin() != null
-                                    ? dateTimeFormatter.format(userInfo.getLastLogin())
-                                    : "<span style=\"color: gray;\">never<span>";
-                            String lastRole = userInfo.getLastRole() != null
-                                    ? userInfo.getLastRole().getFormattedString()
-                                    : "<span style=\"color: gray;\">none<span>";
-                            int totalScore = userInfo.getTotalScore();
-                    %>
-
-                        <tr id="user_row_<%=uid%>">
-                            <td>
-                                <% if (uid != login.getUserId()) { %>
-                                <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%=uid%>"
-                                       onchange="updateCheckbox(this.value, this.checked);">
-                                <% } %>
-                            </td>
-                            <td><%= uid %>
-                                <input type="hidden" name="added_uid" value=<%=uid%>>
-                            </td>
-                            <td><%= username %>
-                            </td>
-                            <td><%= lastRole %>
-                            </td>
-                            <td><%= totalScore %>
-                            </td>
-                            <td><%= lastLogin %>
-                            </td>
-                            <td id="addToExistingGameTd_<%=uid%>" style="padding-top:3px; padding-bottom:3px; ">
-                                <div id="game_<%=uid%>" style="max-width: 150px; float: left;">
-                                    <select name="game_<%=uid%>" class="form-control selectpicker" data-size="small"
-                                            id="game">
-                                        <% for (MultiplayerGame g : availableGames) { %>
-                                        <option value="<%=g.getId()%>">
-                                            <%=g.getId()%>: <%=g.getCUT().getAlias()%>
-                                        </option>
-                                        <%
-                                            }
-                                            if (createdGames != null) {
-                                                for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
-                                                    String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
-                                        %>
-                                        <option value="T<%=gameIndex%>">
-                                            T<%=gameIndex%>: <%=classAlias%>
-                                        </option>
-                                        <%}%>
-                                        <%}%>
-                                    </select>
-                                </div>
-                                <div id="<%="role_"+uid%>" style="float: left; max-width: 120px; margin-left:2px">
-                                    <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
-                                            id="role">
-                                        <option value="<%=Role.ATTACKER.name()%>">Attacker</option>
-                                        <option value="<%=Role.DEFENDER.name()%>">Defender</option>
-                                    </select>
-                                </div>
-                                <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
-                                        style="margin: 2px; float:right"
-                                        id="add_<%=uid%>"
-                                        <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </button>
-                            </td>
-                        </tr>
-
-                    <% } %>
-
-                    </tbody>
-                </table>
+        <div class="panel-body">
+            <table id="usersTable" class="table table-striped table-hover table-responsive"></table>
             </div>
         </div>
+    </div>
 
+    <form>
         <input type="text" class="form-control" id="hidden_user_id_list" name="hidden_user_id_list" hidden>
 
         <div class="panel panel-default">
@@ -547,13 +265,6 @@
                                 Scores descending
                             </label>
                         </div>
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="teams"
-                                       value="<%=AdminCreateGamesBean.TeamAssignmentMethod.SCORE_SHUFFLED%>"/>
-                                Scores block shuffled
-                            </label>
-                        </div>
                     </div>
                 </div>
 
@@ -705,76 +416,171 @@
     </div>
 
     <script>
-        function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
-            var checkboxes = document.getElementsByName(checkboxesName);
-            var allChecked = true;
-            checkboxes.forEach(function (element) {
-                allChecked = allChecked && element.checked;
+        const stagedGames = new Map(JSON.parse('${adminCreateGames.stagedGamesAsJSON}'));
+        const userInfos = new Map(JSON.parse('${adminCreateGames.userInfosAsJSON}'));
+
+        const stagedGamesData = [...stagedGames.values()].sort((a, b) => a.id - b.id);
+        const userInfosData = [...userInfos.values()].sort((a, b) => a.user.id - b.user.id);
+
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const dateFormat = Intl.DateTimeFormat([], {
+            year: '2-digit',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        <%-- datatables.net/plug-ins/sorting/custom-data-source/dom-checkbox --%>
+        $.fn.dataTable.ext.order['dom-checkbox'] = function(settings, col) {
+            return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+                return $('input', td).prop('checked') ? 0 : 1;
             });
-            document.getElementById(selectAllCheckboxId).checked = allChecked;
-        }
+        };
 
-        function areAnyChecked(name) {
-            var checkboxes = document.getElementsByName(name);
-            var anyChecked = false;
-            checkboxes.forEach(function (element) {
-                anyChecked = anyChecked || element.checked;
+        $.fn.dataTable.ext.order['data-lastLogin'] = function (settings, col) {
+            return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+                const date = this.row(td).data().lastLogin;
+                return date === null ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - date;
             });
-            return anyChecked;
-        }
+        };
 
-        function containsText(id) {
-            return document.getElementById(id).value.trim() !== "";
-        }
+        $.fn.dataTable.ext.order['data-lastRole'] = function (settings, col) {
+            return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+                const role = this.row(td).data().lastRole;
+                return role === null ? 'z' : role;
+            });
+        };
 
-        function updateCheckbox(checkboxVal, isChecked) {
-            document.getElementById('submit_users_btn').disabled =
-                    !(areAnyChecked('selectedUsers') || containsText('user_name_list')) || (document.getElementById('cut_select').selectedIndex != 0);
-            setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
-            var hiddenIdList = document.getElementById('hidden_user_id_list');
-            if (isChecked) {
-                hiddenIdList.value = hiddenIdList.value.trim() + '<' + checkboxVal + '>,';
-            } else {
-                hiddenIdList.value = hiddenIdList.value.replace('<' + checkboxVal + '>,', '');
+        const genUserId = row => {
+            return row.user.id;
+        };
+
+        const genUserName = row => {
+            return row.user.username;
+        };
+
+        const genUserLastRole = row => {
+            const span = document.createElement('span');
+            switch (row.lastRole) {
+                case null:
+                    span.style.color = 'gray';
+                    span.textContent = 'none';
+                    break;
+                case 'ATTACKER':
+                    span.textContent = 'Attacker';
+                    break;
+                case 'DEFENDER':
+                    span.textContent = 'Defender';
+                    break;
+                case 'PLAYER':
+                    span.textContent = 'Player';
+                    break;
+                default:
+                    span.textContent = 'Unknown Role';
+                    break;
             }
+            return span.outerHTML;
+        };
+
+        const genUserTotalScore = row => {
+            return row.totalScore;
+        };
+
+        const genUserLastLogin = row => {
+            const span = document.createElement('span');
+            if (row.lastLogin === null) {
+                span.style.color = 'gray';
+                span.textContent = 'never';
+            } else {
+                span.title = 'Dates are converted to you local timezone: ' + timezone + '.';
+                span.textContent = dateFormat.format(row.lastLogin);
+            }
+            return span.outerHTML;
+        };
+
+        const genUserAddToGame = row => {
+            return 'TODO';
+        };
+
+        const genStagedGameId = row => {
+            return row.id;
+        };
+
+        const genStagedGameClass = row => {
+            const name = row.gameSettings.cut.name;
+            const alias = row.gameSettings.cut.alias;
+            if (name === alias) {
+                return name;
+            } else {
+                return name + ' (alias ' + alias + ')';
+            }
+        };
+
+        const genStagedGameType = row => {
+            switch (row.gameSettings.gameType) {
+                case 'MULTIPLAYER':
+                    return 'Multiplayer';
+                case 'MELEE':
+                    return 'Melee';
+                default:
+                    return 'Unknown game type';
+            }
+        };
+
+        const genStagedGameSettings = row => {
+            return 'TODO';
+        };
+
+        const genStagedGamePlayers = row => {
+            return 'TODO';
         }
 
         $(document).ready(function () {
-            $('#selectAllUsers').click(function () {
-                var checkboxes = document.getElementsByName('selectedUsers');
-                var isChecked = document.getElementById('selectAllUsers').checked;
-                checkboxes.forEach(function (element) {
-                    if (element.checked !== isChecked) {
-                        element.click();
-                    }
-                });
+            const stagedGamesTable = $('#stagedGamesTable').DataTable({
+                data: stagedGamesData,
+                columns: [
+                    { data: null, orderDataType: 'dom-checkbox', defaultContent: '<input type="checkbox">', title: '' },
+                    { data: genStagedGameId, title: 'ID' },
+                    { data: genStagedGameClass, title: 'Class' },
+                    { data: genStagedGameType, title: 'Game Type' },
+                    { data: genStagedGameSettings, title: 'Settings' },
+                    { data: genStagedGamePlayers, title: 'Players' },
+                ],
+                order: [[1, 'asc']],
+                scrollY: '800px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: {emptyTable: 'There are currently no staged multiplayer games.'}
+            });
+            $('#search-staged-games').on('keyup', function () {
+                setTimeout(() => stagedGamesTable.search(this.value).draw(), 0);
             });
 
-            $('#tableAddUsers').on('draw.dt', function () {
-                setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
-            });
-
-            const tableAddUsers = $('#tableAddUsers').DataTable({
-                order: [[5, "desc"]],
-                columnDefs: [{
-                    targets: 0,
-                    orderable: false
-                }, {
-                    targets: 6,
-                    orderable: false
-                }],
+            const usersTable = $('#usersTable').DataTable({
+                data: userInfosData,
+                columns: [
+                    { data: null, orderDataType: 'dom-checkbox', defaultContent: '<input type="checkbox">', title: '' },
+                    { data: genUserId, title: 'ID' },
+                    { data: genUserName, title: 'Name' },
+                    { data: genUserLastRole, orderDataType: 'data-lastRole', title: 'Last Role' },
+                    { data: genUserTotalScore, title: 'Total Score' },
+                    { data: genUserLastLogin, orderDataType: 'data-lastLogin', title: 'Last Login' },
+                    { data: genUserAddToGame, title: 'Add to existing game' }
+                ],
+                order: [[5, 'asc']],
                 scrollY: '400px',
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
                 language: {emptyTable: 'There are currently no unassigned users.'}
             });
-            $('#search-unassigned-users').on('keyup', function () { setTimeout(() => tableAddUsers.search(this.value).draw(), 0); });
-
-            $('#selectAllTempGames').click(function () {
-                $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
+            $('#search-unassigned-users').on('keyup', function () {
+                setTimeout(() => usersTable.search(this.value).draw(), 0);
             });
 
+            /*
             $('#togglePlayersCreated').on('change', function () {
                 const checked = $(this).is(':checked');
                 if (checked) {
@@ -785,48 +591,7 @@
                     $("[id=playersTableCreated]").show();
                 }
             });
-
-            if (localStorage.getItem("showActivePlayers") === "true") {
-                $("[id=playersTableActive]").show();
-            }
-
-            if (localStorage.getItem("showCreatedPlayers") === "true") {
-                $("[id=playersTableCreated]").show();
-                $("[id=playersTableHidden]").hide();
-            }
-
-            const tableStagedGames = $('#tableCreatedGames').DataTable({
-                order: [[1, "desc"]],
-                columnDefs: [{
-                    targets: 0,
-                    orderable: false
-                }, {
-                    targets: 3,
-                    orderable: false
-                }],
-                scrollY: '800px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {emptyTable: 'There are currently no staged multiplayer games.'}
-            });
-            $('#search-staged-games').on('keyup', function () { setTimeout(() => tableStagedGames.search(this.value).draw(), 0); });
-
-            $('.modal').on('shown.bs.modal', function () {
-                let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-                if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                    codeMirrorContainer.CodeMirror.refresh();
-                } else {
-                    let textarea = $(this).find('textarea')[0];
-                    let editor = CodeMirror.fromTextArea(textarea, {
-                        lineNumbers: false,
-                        readOnly: true,
-                        mode: "text/x-java"
-                    });
-                    editor.setSize("100%", 500);
-                    ClassAPI.getAndSetEditorValue(textarea, editor);
-                }
-            });
+            */
         });
     </script>
 </div>

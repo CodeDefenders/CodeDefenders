@@ -1,6 +1,7 @@
 package org.codedefenders.beans.admin;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +26,7 @@ import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
@@ -33,6 +35,14 @@ import org.codedefenders.model.User;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.JSONUtils;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod.RANDOM;
@@ -45,6 +55,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
  * Implements the functionality of the admin create games page.
  * @see AdminCreateGames
  */
+@Named("adminCreateGames")
 @SessionScoped
 public class AdminCreateGamesBean implements Serializable {
 
@@ -89,6 +100,18 @@ public class AdminCreateGamesBean implements Serializable {
         userInfos.clear();
         for (UserInfo userInfo : AdminDAO.getAllUsersInfo()) {
             userInfos.put(userInfo.getUser().getId(), userInfo);
+        }
+
+        // TODO: For testing, remove later
+        if (getStagedGameList().getStagedGames().size() == 0) {
+            GameSettings gameSettings = GameSettings.getDefault();
+            gameSettings.setCut(GameClass.build().id(123).name("classname").alias("classalias").javaFile("").classFile("").create());
+            StagedGame s1 = stagedGameList.addStagedGame(gameSettings);
+            StagedGame s2 = stagedGameList.addStagedGame(gameSettings);
+            s1.addAttacker(120);
+            s1.addDefender(121);
+            s2.addAttacker(122);
+            s2.addDefender(123);
         }
     }
 
@@ -532,6 +555,65 @@ public class AdminCreateGamesBean implements Serializable {
         }
 
         return true;
+    }
+
+    /* ============================================================================================================== */
+
+    public String getUserInfosAsJSON() {
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
+                .registerTypeAdapter(UserInfo.class, new UserInfoSerializer())
+                .registerTypeAdapter(User.class, new UserSerializer())
+                .create();
+        return gson.toJson(getUserInfos());
+    }
+
+    public String getStagedGamesAsJSON() {
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
+                .registerTypeAdapter(GameClass.class, new GameClassSerializer())
+                .create();
+        return gson.toJson(getStagedGameList().getStagedGames());
+    }
+
+    // TODO: Move this elsewhere?
+    public static class UserInfoSerializer implements JsonSerializer<UserInfo> {
+        @Override
+        public JsonElement serialize(UserInfo userInfo, Type type, JsonSerializationContext context) {
+            JsonObject obj = new JsonObject();
+            obj.add("user", context.serialize(userInfo.getUser()));
+            obj.addProperty("lastLogin", userInfo.getLastLogin() == null ? null
+                    : userInfo.getLastLogin().toEpochMilli());
+            obj.addProperty("lastRole", userInfo.getLastRole() == null ? null
+                    : userInfo.getLastRole().toString());
+            obj.addProperty("totalScore", userInfo.getTotalScore());
+            return obj;
+        }
+    }
+
+    // TODO: Move this elsewhere?
+    public static class UserSerializer implements JsonSerializer<User> {
+        @Override
+        public JsonElement serialize(User user, Type type, JsonSerializationContext context) {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("id", user.getId());
+            obj.addProperty("username", user.getUsername());
+            return obj;
+        }
+    }
+
+    // TODO: Move this elsewhere?
+    public static class GameClassSerializer implements JsonSerializer<GameClass> {
+        @Override
+        public JsonElement serialize(GameClass gameClass, Type type, JsonSerializationContext context) {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("id", gameClass.getId());
+            obj.addProperty("name", gameClass.getName());
+            obj.addProperty("alias", gameClass.getAlias());
+            return obj;
+        }
     }
 
     /* ============================================================================================================== */

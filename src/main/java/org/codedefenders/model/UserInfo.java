@@ -18,6 +18,7 @@
  */
 package org.codedefenders.model;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -31,7 +32,7 @@ import org.codedefenders.game.Role;
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
-public class UserInfo {
+public class UserInfo implements Serializable {
     private final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm")
             .withZone(ZoneId.systemDefault());
