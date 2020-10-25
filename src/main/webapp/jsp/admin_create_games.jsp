@@ -49,7 +49,7 @@
                        style="height: .65em; width: 10em; display: inline;">
                 <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
                     <label class="btn btn-xs btn-default">
-                        <input id="togglePlayersCreated" type="checkbox">
+                        <input id="toggle-show-players" type="checkbox">
                         Hide Players&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
                     </label>
                 </div>
@@ -418,9 +418,12 @@
     <script>
         const stagedGames = new Map(JSON.parse('${adminCreateGames.stagedGamesAsJSON}'));
         const userInfos = new Map(JSON.parse('${adminCreateGames.userInfosAsJSON}'));
+        const activeMultiplayerGameIds = JSON.parse('${adminCreateGames.activeMultiplayerGameIdsJSON}').sort();
+        const activeMeleeGameIds = JSON.parse('${adminCreateGames.activeMeleeGameIdsJSON}').sort();
 
-        const stagedGamesData = [...stagedGames.values()].sort((a, b) => a.id - b.id);
-        const userInfosData = [...userInfos.values()].sort((a, b) => a.user.id - b.user.id);
+        const stagedGamesList = [...stagedGames.values()].sort((a, b) => a.id - b.id);
+        const userInfosList = [...userInfos.values()].sort((a, b) => a.user.id - b.user.id);
+        const activeGameIds = [...activeMultiplayerGameIds, ...activeMeleeGameIds].sort();
 
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const dateFormat = Intl.DateTimeFormat([], {
@@ -431,85 +434,124 @@
             minute: '2-digit'
         });
 
-        <%-- datatables.net/plug-ins/sorting/custom-data-source/dom-checkbox --%>
-        $.fn.dataTable.ext.order['dom-checkbox'] = function(settings, col) {
+        let playersHidden = false;
+
+        /* Sort checkboxes by checked state (from datatables.net/plug-ins/sorting/custom-data-source/dom-checkbox). */
+        $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
             return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
                 return $('input', td).prop('checked') ? 0 : 1;
             });
         };
 
-        $.fn.dataTable.ext.order['data-lastLogin'] = function (settings, col) {
-            return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
-                const date = this.row(td).data().lastLogin;
-                return date === null ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - date;
-            });
-        };
-
-        $.fn.dataTable.ext.order['data-lastRole'] = function (settings, col) {
-            return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
-                const role = this.row(td).data().lastRole;
-                return role === null ? 'z' : role;
-            });
-        };
-
-        const genUserId = row => {
-            return row.user.id;
-        };
-
-        const genUserName = row => {
-            return row.user.username;
-        };
-
-        const genUserLastRole = row => {
-            const span = document.createElement('span');
-            switch (row.lastRole) {
-                case null:
-                    span.style.color = 'gray';
-                    span.textContent = 'none';
-                    break;
-                case 'ATTACKER':
-                    span.textContent = 'Attacker';
-                    break;
-                case 'DEFENDER':
-                    span.textContent = 'Defender';
-                    break;
-                case 'PLAYER':
-                    span.textContent = 'Player';
-                    break;
-                default:
-                    span.textContent = 'Unknown Role';
-                    break;
+        const renderUserLastRole = function (lastRole, type, row, meta) {
+            switch (type) {
+                case 'type':
+                    return lastRole === null ? '' : lastRole;
+                case 'sort':
+                    return lastRole === null ? 'Z' : lastRole;
+                case 'filter':
+                    return lastRole === null ? 'none' : lastRole;
+                case 'display':
+                    const span = document.createElement('span');
+                    switch (lastRole) {
+                        case null:
+                            span.style.color = 'gray';
+                            span.textContent = 'none';
+                            break;
+                        case 'ATTACKER':
+                            span.textContent = 'Attacker';
+                            break;
+                        case 'DEFENDER':
+                            span.textContent = 'Defender';
+                            break;
+                        case 'PLAYER':
+                            span.textContent = 'Player';
+                            break;
+                        default:
+                            span.textContent = 'Unknown Role';
+                            break;
+                    }
+                    return span.outerHTML;
             }
-            return span.outerHTML;
         };
 
-        const genUserTotalScore = row => {
-            return row.totalScore;
-        };
-
-        const genUserLastLogin = row => {
-            const span = document.createElement('span');
-            if (row.lastLogin === null) {
-                span.style.color = 'gray';
-                span.textContent = 'never';
-            } else {
-                span.title = 'Dates are converted to you local timezone: ' + timezone + '.';
-                span.textContent = dateFormat.format(row.lastLogin);
+        const renderUserLastLogin = function (lastLogin, type, row, meta) {
+            switch (type) {
+                case 'type':
+                    return lastLogin === null ? 0 : lastLogin;
+                case 'sort':
+                    /* Sort users with more recent logins first, users who never logged in last. */
+                    return lastLogin === null ? Number.MAX_SAFE_INTEGER : Number.MAX_SAFE_INTEGER - lastLogin;
+                case 'filter':
+                    return lastLogin === null ? 'never' : dateFormat.format(lastLogin);
+                case 'display':
+                    const span = document.createElement('span');
+                    if (lastLogin === null) {
+                        span.style.color = 'gray';
+                        span.textContent = 'never';
+                    } else {
+                        span.title = 'Dates are converted to you local timezone: ' + timezone;
+                        span.textContent = dateFormat.format(lastLogin);
+                    }
+                    return span.outerHTML;
             }
-            return span.outerHTML;
         };
 
-        const genUserAddToGame = row => {
-            return 'TODO';
+        const renderUserAddToGame = function (userInfo, type, row, meta) {
+            const table = document.createElement('table');
+            const tr = table.insertRow();
+
+            const gameIdCell = tr.insertCell();
+            gameIdCell.style.width = '5em';
+
+            const gameIdSelect = document.createElement('select');
+            gameIdSelect.classList.add('add-player-game');
+            gameIdCell.appendChild(gameIdSelect);
+
+            for (const stagedGame of stagedGamesList) {
+                const option = document.createElement('option');
+                option.textContent = 'T' + stagedGame.id;
+                option.value = 'T' + stagedGame.id;
+                gameIdSelect.add(option);
+            }
+            for (const gameId of activeGameIds) {
+                const option = document.createElement('option');
+                option.textContent = String(gameId);
+                option.value = String(gameId);
+                gameIdSelect.add(option);
+            }
+
+            const roleCell = tr.insertCell();
+            roleCell.style.width = '8em';
+
+            const roleSelect = document.createElement('select');
+            roleSelect.classList.add('add-player-role');
+            roleCell.appendChild(roleSelect);
+
+            const addToGameCell = tr.insertCell();
+            addToGameCell.style.width = '0px';
+            addToGameCell.innerHTML =
+                `<button class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
+                     <span class="glyphicon glyphicon-plus"></span>
+                 </button>`;
+
+            return table.outerHTML;
         };
 
-        const genStagedGameId = row => {
-            return row.id;
+        const renderStagedGameId = function (stagedGameId, type, row, meta) {
+            switch (type) {
+                case 'sort':
+                    return stagedGameId
+                case 'type':
+                case 'filter':
+                case 'display':
+                    return 'T' + stagedGameId;
+            }
         };
 
-        const genStagedGameClass = row => {
-            const name = row.gameSettings.cut.name;
-            const alias = row.gameSettings.cut.alias;
+        const renderStagedGameClass = function (cut, type, row, meta) {
+            const name = cut.name;
+            const alias = cut.alias;
             if (name === alias) {
                 return name;
             } else {
@@ -517,8 +559,8 @@
             }
         };
 
-        const genStagedGameType = row => {
-            switch (row.gameSettings.gameType) {
+        const renderStagedGameType = function (gameType, type, row, meta) {
+            switch (gameType) {
                 case 'MULTIPLAYER':
                     return 'Multiplayer';
                 case 'MELEE':
@@ -528,25 +570,205 @@
             }
         };
 
-        const genStagedGameSettings = row => {
-            return 'TODO';
-        };
+        const renderStagedGamePlayers = function (stagedGame, type, row, meta) {
+            const attackers = stagedGame.attackers.map(userInfos.get, userInfos)
+            const defenders = stagedGame.defenders.map(userInfos.get, userInfos);
+            const players = [...attackers, ...defenders];
 
-        const genStagedGamePlayers = row => {
-            return 'TODO';
+            switch (type) {
+                case 'filter':
+                    return players.map(userInfo => userInfo.user.username).join(' ');
+                case 'sort':
+                case 'type':
+                    return players.length;
+                case 'display':
+                    if (playersHidden) {
+                        return '<span style="color: gray;">(hidden)</span>'
+                    } else {
+                        return createStagedGamePlayersTable(stagedGame, attackers, defenders);
+                    }
+            }
         }
 
+        const createStagedGamePlayersTable = function (stagedGame, attackers, defenders) {
+            const table = document.createElement('table');
+            table.classList.add('staged-game-players');
+            table.style.width = '100%';
+
+            if (stagedGame.gameSettings.gameType === 'MELEE') {
+                const players = [...attackers, ...defenders];
+                players.sort((a, b) => a.user.id - b.user.id);
+
+                for (const player of players) {
+                    addStagedGamePlayersRow(table, stagedGame, player, 'PLAYER');
+                }
+            } else {
+                attackers.sort((a, b) => a.user.id - b.user.id);
+                defenders.sort((a, b) => a.user.id - b.user.id);
+
+                for (const attacker of attackers) {
+                    addStagedGamePlayersRow(table, stagedGame, attacker, 'ATTACKER');
+                }
+                for (const defender of defenders) {
+                    addStagedGamePlayersRow(table, stagedGame, defender, 'DEFENDER');
+                }
+            }
+
+            return table.outerHTML;
+        };
+
+        const addStagedGamePlayersRow = function (table, stagedGame, userInfo, role) {
+            const tr = table.insertRow();
+            tr.setAttribute('data-id', userInfo.user.id);
+            if (role === 'ATTACKER') {
+                tr.style.backgroundColor = '#EDCECE';
+            } else if (role === 'DEFENDER') {
+                tr.style.backgroundColor = '#CED6ED';
+            }
+
+            const userNameCell = tr.insertCell();
+            userNameCell.style.paddingLeft = '1em';
+            userNameCell.style.width = '20%';
+            userNameCell.textContent = userInfo.user.username;
+
+            const lastRoleCell = tr.insertCell();
+            lastRoleCell.style.width = '15%';
+            lastRoleCell.innerHTML = renderUserLastRole(userInfo.lastRole, 'display');
+
+            const totalScoreCell = tr.insertCell();
+            totalScoreCell.style.width = '8%';
+            totalScoreCell.textContent = userInfo.totalScore;
+
+            const switchRolesCell = tr.insertCell();
+            switchRolesCell.style.width = '0px';
+            switchRolesCell.innerHTML =
+                    `<button class="switch-role btn btn-sm btn-primary" title="Switch role of player">
+                         <span class="glyphicon glyphicon-transfer"></span>
+                     </button>`;
+
+            const removeCell = tr.insertCell();
+            removeCell.style.width = '0px';
+            removeCell.innerHTML =
+                    `<button class="remove-player btn btn-sm btn-danger" title="Remove player from game">
+                         <span class="glyphicon glyphicon-trash"></span>
+                     </button>`;
+
+            const moveGameIdCell = tr.insertCell();
+            moveGameIdCell.style.width = '5em';
+
+            const gameIdSelect = document.createElement('select');
+            gameIdSelect.classList.add('move-player-game');
+            moveGameIdCell.appendChild(gameIdSelect);
+
+            for (const otherStagedGame of stagedGamesList) {
+                if (otherStagedGame.id !== stagedGame.id) {
+                    const option = document.createElement('option');
+                    option.textContent = 'T' + otherStagedGame.id;
+                    option.value = 'T' + otherStagedGame.id;
+                    gameIdSelect.add(option);
+                }
+            }
+            for (const gameId of activeGameIds) {
+                const option = document.createElement('option');
+                option.textContent = String(gameId);
+                option.value = String(gameId);
+                gameIdSelect.add(option);
+            }
+
+            const moveRoleCell = tr.insertCell();
+            moveRoleCell.style.width = '8em';
+
+            const roleSelect = document.createElement('select');
+            roleSelect.classList.add('move-player-role');
+            moveRoleCell.appendChild(roleSelect);
+
+            const moveButtonCell = tr.insertCell();
+            moveButtonCell.style.width = '0px';
+            moveButtonCell.innerHTML =
+                    `<button class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
+                         <span class="glyphicon glyphicon-arrow-right"></span>
+                     </button>`;
+        };
+
+        const adjustRoleSelectForGame = function (roleSelect, gameIdStr) {
+            roleSelect.innerHTML = '';
+
+            let gameType;
+            if (gameIdStr.startsWith('T')) {
+                const gameId = Number(gameIdStr.substring(1));
+                gameType = stagedGames.get(gameId).gameSettings.gameType;
+            } else {
+                const gameId = Number(gameIdStr);
+                if (activeMultiplayerGameIds.includes(gameId)) {
+                    gameType = 'MULTIPLAYER';
+                } else if (activeMeleeGameIds.includes(gameId)) {
+                    gameType = 'MELEE';
+                }
+            }
+
+            if (gameType === 'MULTIPLAYER') {
+                const attackerOption = document.createElement('option');
+                attackerOption.textContent = 'Attacker';
+                attackerOption.value = 'ATTACKER';
+                roleSelect.appendChild(attackerOption);
+                const defenderOption = document.createElement('option');
+                defenderOption.textContent = 'Defender';
+                defenderOption.value = 'DEFENDER';
+                roleSelect.appendChild(defenderOption);
+            } else if (gameType === 'MELEE') {
+                const playerOption = document.createElement('option');
+                playerOption.textContent = 'Player';
+                playerOption.value = 'PLAYER';
+                roleSelect.appendChild(playerOption);
+            }
+        };
+
+        /* Staged games table. */
         $(document).ready(function () {
             const stagedGamesTable = $('#stagedGamesTable').DataTable({
-                data: stagedGamesData,
+                data: stagedGamesList,
                 columns: [
-                    { data: null, orderDataType: 'dom-checkbox', defaultContent: '<input type="checkbox">', title: '' },
-                    { data: genStagedGameId, title: 'ID' },
-                    { data: genStagedGameClass, title: 'Class' },
-                    { data: genStagedGameType, title: 'Game Type' },
-                    { data: genStagedGameSettings, title: 'Settings' },
-                    { data: genStagedGamePlayers, title: 'Players' },
+                    {
+                        data: null,
+                        orderDataType: 'dom-checkbox',
+                        defaultContent: '<input type="checkbox">',
+                        type: 'html',
+                        title: ''
+                    },
+                    {
+                        data: 'id',
+                        render: renderStagedGameId,
+                        type: 'num-fmt',
+                        title: 'ID'
+                    },
+                    {
+                        data: 'gameSettings.cut',
+                        render: renderStagedGameClass,
+                        type: 'string',
+                        title: 'Class'
+                    },
+                    {
+                        data: 'gameSettings.gameType',
+                        render: renderStagedGameType,
+                        type: 'string',
+                        title: 'Game Type'
+                    },
+                    {
+                        data: null,
+                        orderable: false,
+                        defaultContent: '<span class="btn btn-xs btn-default show-settings">Show</span>',
+                        type: 'html',
+                        title: 'Settings'
+                    },
+                    {
+                        data: null,
+                        render: renderStagedGamePlayers,
+                        type: 'html',
+                        width: '55%',
+                        title: 'Players (Username, Last Role, Total Score)'
+                    },
                 ],
+                drawCallback: function () { $(this).find('select').prop('selectedIndex', -1); },
                 order: [[1, 'asc']],
                 scrollY: '800px',
                 scrollCollapse: true,
@@ -554,21 +776,72 @@
                 dom: 't',
                 language: {emptyTable: 'There are currently no staged multiplayer games.'}
             });
+
             $('#search-staged-games').on('keyup', function () {
                 setTimeout(() => stagedGamesTable.search(this.value).draw(), 0);
             });
 
+            $('#toggle-show-players').on('change', function () {
+                playersHidden = $(this).is(':checked');
+                stagedGamesTable.rows().invalidate().draw();
+            });
+
+            $(stagedGamesTable.table().node()).on('change', '.move-player-game', function () {
+                const tr = $(this).closest('tr');
+                const roleSelect = $(tr).find('.move-player-role').get(0);
+                adjustRoleSelectForGame(roleSelect, this.value);
+            });
+        });
+
+        /* Users table. */
+        $(document).ready(function () {
             const usersTable = $('#usersTable').DataTable({
-                data: userInfosData,
+                data: userInfosList,
                 columns: [
-                    { data: null, orderDataType: 'dom-checkbox', defaultContent: '<input type="checkbox">', title: '' },
-                    { data: genUserId, title: 'ID' },
-                    { data: genUserName, title: 'Name' },
-                    { data: genUserLastRole, orderDataType: 'data-lastRole', title: 'Last Role' },
-                    { data: genUserTotalScore, title: 'Total Score' },
-                    { data: genUserLastLogin, orderDataType: 'data-lastLogin', title: 'Last Login' },
-                    { data: genUserAddToGame, title: 'Add to existing game' }
+                    {
+                        data: null,
+                        orderDataType: 'dom-checkbox',
+                        defaultContent: '<input type="checkbox">',
+                        type: 'html',
+                        title: ''
+                    },
+                    {
+                        data: 'user.id',
+                        type: 'num',
+                        title: 'ID'
+                    },
+                    {
+                        data: 'user.username',
+                        type: 'string',
+                        title: 'Name'
+                    },
+                    {
+                        data: 'lastRole',
+                        render: renderUserLastRole,
+                        type: 'html',
+                        title: 'Last Role'
+                    },
+                    {
+                        data: 'totalScore',
+                        type: 'num',
+                        title: 'Total Score'
+                    },
+                    {
+                        data: 'lastLogin',
+                        render: renderUserLastLogin,
+                        type: 'html',
+                        title: 'Last Login'
+                    },
+                    {
+                        data: null,
+                        render: renderUserAddToGame,
+                        orderable: false,
+                        type: 'html',
+                        width: '25%',
+                        title: 'Add to existing game'
+                    }
                 ],
+                drawCallback: function () { $(this).find('select').prop('selectedIndex', -1); },
                 order: [[5, 'asc']],
                 scrollY: '400px',
                 scrollCollapse: true,
@@ -580,18 +853,11 @@
                 setTimeout(() => usersTable.search(this.value).draw(), 0);
             });
 
-            /*
-            $('#togglePlayersCreated').on('change', function () {
-                const checked = $(this).is(':checked');
-                if (checked) {
-                    $("[id=playersTableCreated]").hide();
-                    $("[id=playersTableHidden]").show();
-                } else {
-                    $("[id=playersTableHidden]").hide();
-                    $("[id=playersTableCreated]").show();
-                }
+            $(usersTable.table().node()).on('change', '.add-player-game', function () {
+                const tr = $(this).closest('tr');
+                const roleSelect = $(tr).find('.add-player-role').get(0);
+                adjustRoleSelectForGame(roleSelect, this.value);
             });
-            */
         });
     </script>
 </div>

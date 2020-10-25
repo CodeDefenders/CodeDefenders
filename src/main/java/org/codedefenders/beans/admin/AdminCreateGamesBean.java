@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.SessionScoped;
@@ -25,6 +26,9 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
@@ -106,12 +110,23 @@ public class AdminCreateGamesBean implements Serializable {
         if (getStagedGameList().getStagedGames().size() == 0) {
             GameSettings gameSettings = GameSettings.getDefault();
             gameSettings.setCut(GameClass.build().id(123).name("classname").alias("classalias").javaFile("").classFile("").create());
+
             StagedGame s1 = stagedGameList.addStagedGame(gameSettings);
+            s1.addAttacker(9);
+            s1.addDefender(8);
+
             StagedGame s2 = stagedGameList.addStagedGame(gameSettings);
-            s1.addAttacker(120);
-            s1.addDefender(121);
-            s2.addAttacker(122);
-            s2.addDefender(123);
+            s2.addAttacker(10);
+            s2.addDefender(122);
+
+            gameSettings.setGameType(MELEE);
+            StagedGame s3 = stagedGameList.addStagedGame(gameSettings);
+            s3.addAttacker(123);
+            s3.addDefender(11);
+
+            StagedGame s4 = stagedGameList.addStagedGame(gameSettings);
+            s4.addAttacker(125);
+            s4.addDefender(126);
         }
     }
 
@@ -576,6 +591,22 @@ public class AdminCreateGamesBean implements Serializable {
                 .registerTypeAdapter(GameClass.class, new GameClassSerializer())
                 .create();
         return gson.toJson(getStagedGameList().getStagedGames());
+    }
+
+    public String getActiveMultiplayerGameIdsJSON() {
+        List<Integer> games = MultiplayerGameDAO.getAvailableMultiplayerGames().stream()
+                .map(AbstractGame::getId)
+                .collect(Collectors.toList());
+        Gson gson = new GsonBuilder().create();
+        return gson.toJson(games);
+    }
+
+    public String getActiveMeleeGameIdsJSON() {
+        List<Integer> games = MeleeGameDAO.getAvailableMeleeGames().stream()
+                .map(AbstractGame::getId)
+                .collect(Collectors.toList());
+        Gson gson = new GsonBuilder().create();
+        return gson.toJson(games);
     }
 
     // TODO: Move this elsewhere?
