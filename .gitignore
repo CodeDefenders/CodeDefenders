@@ -8,6 +8,7 @@ src/test/resources/systemtests/frontend/codedefenders/
 credentials*
 config.properties
 config.properties@docker
+docker/.env
 
 ### Logs ###
 *.log

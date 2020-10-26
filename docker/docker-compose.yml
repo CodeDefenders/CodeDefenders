@@ -4,10 +4,10 @@ services:
     image: "mariadb:10.5"
     restart: always
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'YES'
-      MYSQL_USER: codedefenders
-      MYSQL_PASSWORD: codedefenders
-      MYSQL_DATABASE: codedefenders
+      - MYSQL_RANDOM_ROOT_PASSWORD=YES
+      - MYSQL_USER=${CODEDEFENDERS_DB_USERNAME}
+      - MYSQL_PASSWORD=${CODEDEFENDERS_DB_PASSWORD}
+      - MYSQL_DATABASE=${CODEDEFENDERS_DB_NAME}
     ports:
       - "3306"
     volumes:
@@ -18,11 +18,21 @@ services:
       dockerfile: ./docker/Dockerfile
     restart: always
     environment:
-      CODEDEFENDERS_DATA_DIR: /srv/codedefenders
-      CODEDEFENDERS_DB_HOST: database
-      CODEDEFENDERS_DB_PASSWORD: codedefenders
-      CODEDEFENDERS_ADMIN_USERNAME: admin
-      CODEDEFENDERS_ADMIN_PASSWORD: admin
+      # These three are hardcoded because they are part of the container setup
+      - CODEDEFENDERS_DATA_DIR=/srv/codedefenders
+      - CODEDEFENDERS_DB_HOST=database
+      - CODEDEFENDERS_ANT_HOME=/usr/share/ant
+      # These three are the only required variables as they are also passed to the database container
+      - CODEDEFENDERS_DB_USERNAME
+      - CODEDEFENDERS_DB_PASSWORD
+      - CODEDEFENDERS_DB_NAME
+      # These two are for configuring the basic auth credentials for the /admin/* url
+      - CODEDEFENDERS_ADMIN_USERNAME
+      - CODEDEFENDERS_ADMIN_PASSWORD
+      # These are the other relevant variables to pass if they exist
+      - CODEDEFENDERS_PARALLELIZE
+      - CODEDEFENDERS_MUTANT_COVERAGE
+      - CODEDEFENDERS_BLOCK_ATTACKER
     ports:
       - "8080"
     links:

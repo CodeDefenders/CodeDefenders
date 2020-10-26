@@ -40,8 +40,16 @@ download_dependencies() {
     mvn -f installation-pom.xml clean validate package -Dconfig.properties=/tmp/config.properties
 }
 
+check_required_variables() {
+    if [ -z "$CODEDEFENDERS_DB_NAME}" ] || [ -z "$CODEDEFENDERS_DB_USERNAME" ] || [ -z "$CODEDEFENDERS_DB_PASSWORD" ]
+    then
+        echo 'The environment variables "CODEDEFENDERS_DB_NAME", "CODEDEFENDERS_DB_USERNAME" and "CODEDEFENDERS_DB_NAME" have to be set to not empty values!'
+        exit 1
+    fi
+}
 
 main() {
+    check_required_variables
     gen_tomcat_users "/usr/local/tomcat/conf/tomcat-users.xml" "$CODEDEFENDERS_ADMIN_USERNAME" "$CODEDEFENDERS_ADMIN_PASSWORD"
     make_folders "/srv/codedefenders"
     download_dependencies "/srv/codedefenders"
