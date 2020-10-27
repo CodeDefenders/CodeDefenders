@@ -13,10 +13,7 @@ services:
     volumes:
       - dbvolume:/var/lib/mysql
   codedefenders:
-    build:
-      context: ../
-      dockerfile: ./docker/Dockerfile
-    restart: always
+    image: "codedefenders/codedefenders:${CODEDEFENDERS_VERSION}"
     environment:
       # These three are hardcoded because they are part of the container setup
       - CODEDEFENDERS_DATA_DIR=/srv/codedefenders
