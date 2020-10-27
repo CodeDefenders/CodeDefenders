@@ -27,3 +27,16 @@ cd <path to codedefenders repository>
 docker build --file ./docker/Dockerfile --tag codedefenders/codedefenders:<Codedefenders version> --label "maintainer=$(git config --get user.email)" .
 docker push codedefenders/codedefenders:<codedefenders version>
 ```
+
+## Using docker for testing a not published state
+
+We only publish docker images for a tagged version to docker hub.  
+For testing you can tag a locally build docker image and use this for the docker-compose.
+
+```sh
+cd <path to codedefenders repository>
+docker build --file ./docker/Dockerfile --tag codedefenders/codedefenders:dev .
+cd docker
+nano .env # Set CODEDEFENDERS_VERSION=dev
+docker-compose up
+```

@@ -1,8 +1,10 @@
 FROM maven:3.6-jdk-8 AS build
 RUN mkdir /Codedefenders/
 WORKDIR /Codedefenders/
-COPY pom.xml .
 COPY ./local-repo ./local-repo/
+COPY pom.xml .
+# Download dependencies before copying the source code as the dependencies don't change that often
+RUN mvn dependency:go-offline
 COPY ./src ./src/
 RUN mvn package -DskipTests -Dcheckstyle.skip
 
