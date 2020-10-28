@@ -45,14 +45,14 @@
         <div class="panel-heading">
             Staged Games
             <div style="float: right;">
-                <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
-                       style="height: .65em; width: 10em; display: inline;">
-                <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
+                <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
                     <label class="btn btn-xs btn-default">
                         <input id="toggle-show-players" type="checkbox">
-                        Hide Players&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
+                        Hide Players&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
                     </label>
                 </div>
+                <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
+                       style="height: .65em; width: 10em; display: inline;">
             </div>
         </div>
         <div class="panel-body">
@@ -64,7 +64,13 @@
         <div class="panel-heading">
             Unassigned Users
             <div style="float: right;">
-                <input type="search" id="search-unassigned-users" class="form-control" placeholder="Search"
+                <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
+                    <label class="btn btn-xs btn-default">
+                        <input id="toggle-show-assigned-users" type="checkbox">
+                        Show Assigned Players&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-open"></span>
+                    </label>
+                </div>
+                <input type="search" id="search-users" class="form-control" placeholder="Search"
                        style="height: .65em; width: 10em; display: inline;">
             </div>
         </div>
@@ -531,7 +537,7 @@
             const addToGameCell = tr.insertCell();
             addToGameCell.style.width = '0px';
             addToGameCell.innerHTML =
-                `<button class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
+                `<button disabled class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
                      <span class="glyphicon glyphicon-plus"></span>
                  </button>`;
 
@@ -619,7 +625,7 @@
 
         const addStagedGamePlayersRow = function (table, stagedGame, userInfo, role) {
             const tr = table.insertRow();
-            tr.setAttribute('data-id', userInfo.user.id);
+            tr.setAttribute('data-user-id', userInfo.user.id);
             if (role === 'ATTACKER') {
                 tr.style.backgroundColor = '#EDCECE';
             } else if (role === 'DEFENDER') {
@@ -642,14 +648,18 @@
             const switchRolesCell = tr.insertCell();
             switchRolesCell.style.width = '0px';
             switchRolesCell.innerHTML =
-                    `<button class="switch-role btn btn-sm btn-primary" title="Switch role of player">
+                    `<button class="switch-role-button btn btn-sm btn-primary" title="Switch role of player">
                          <span class="glyphicon glyphicon-transfer"></span>
                      </button>`;
+
+            if (role === 'PLAYER') {
+                switchRolesCell.firstChild.style.visibility = 'hidden';
+            }
 
             const removeCell = tr.insertCell();
             removeCell.style.width = '0px';
             removeCell.innerHTML =
-                    `<button class="remove-player btn btn-sm btn-danger" title="Remove player from game">
+                    `<button class="remove-player-button btn btn-sm btn-danger" title="Remove player from game">
                          <span class="glyphicon glyphicon-trash"></span>
                      </button>`;
 
@@ -668,12 +678,6 @@
                     gameIdSelect.add(option);
                 }
             }
-            for (const gameId of activeGameIds) {
-                const option = document.createElement('option');
-                option.textContent = String(gameId);
-                option.value = String(gameId);
-                gameIdSelect.add(option);
-            }
 
             const moveRoleCell = tr.insertCell();
             moveRoleCell.style.width = '8em';
@@ -685,13 +689,14 @@
             const moveButtonCell = tr.insertCell();
             moveButtonCell.style.width = '0px';
             moveButtonCell.innerHTML =
-                    `<button class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
+                    `<button disabled class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
                          <span class="glyphicon glyphicon-arrow-right"></span>
                      </button>`;
         };
 
-        const adjustRoleSelectForGame = function (roleSelect, gameIdStr) {
+        const adjustFormForGame = function (roleSelect, button, gameIdStr) {
             roleSelect.innerHTML = '';
+            button.disabled = true;
 
             let gameType;
             if (gameIdStr.startsWith('T')) {
@@ -715,12 +720,34 @@
                 defenderOption.textContent = 'Defender';
                 defenderOption.value = 'DEFENDER';
                 roleSelect.appendChild(defenderOption);
+                button.disabled = false;
             } else if (gameType === 'MELEE') {
                 const playerOption = document.createElement('option');
                 playerOption.textContent = 'Player';
                 playerOption.value = 'PLAYER';
                 roleSelect.appendChild(playerOption);
+                button.disabled = false;
             }
+        };
+
+        const postForm = function (params) {
+            const form = document.createElement('form');
+            form.method = 'post';
+
+            for (const [name, value] of Object.entries(params)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = String(name);
+                if (Array.isArray(value)) {
+                    input.value = value.join(',');
+                } else {
+                    input.value = String(value);
+                }
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
         };
 
         /* Staged games table. */
@@ -789,7 +816,49 @@
             $(stagedGamesTable.table().node()).on('change', '.move-player-game', function () {
                 const tr = $(this).closest('tr');
                 const roleSelect = $(tr).find('.move-player-role').get(0);
-                adjustRoleSelectForGame(roleSelect, this.value);
+                const button = $(tr).find('.move-player-button').get(0);
+                adjustFormForGame(roleSelect, button, this.value);
+            });
+
+            $(stagedGamesTable.table().node()).on('click', '.switch-role-button', function () {
+                const innerTr = $(this).parents('tr').get(0);
+                const outerTr = $(this).parents('tr').get(1);
+                const userId = Number(innerTr.getAttribute('data-user-id'));
+                const stagedGame = stagedGamesTable.row(outerTr).data();
+                let role = stagedGame.attackers.includes(userId) ? 'DEFENDER' : 'ATTACKER';
+                postForm({
+                    formType: 'movePlayerBetweenStagedGames',
+                    userId: userId,
+                    gameIdFrom: 'T' + stagedGame.id,
+                    gameIdTo: 'T' + stagedGame.id,
+                    role
+                });
+            });
+
+            $(stagedGamesTable.table().node()).on('click', '.remove-player-button', function () {
+                const innerTr = $(this).parents('tr').get(0);
+                const outerTr = $(this).parents('tr').get(1);
+                const stagedGame = stagedGamesTable.row(outerTr).data();
+                postForm({
+                    formType: 'removePlayerFromStagedGame',
+                    userId: innerTr.getAttribute('data-user-id'),
+                    gameId: 'T' + stagedGame.id,
+                });
+            });
+
+            $(stagedGamesTable.table().node()).on('click', '.move-player-button', function () {
+                const innerTr = $(this).parents('tr').get(0);
+                const outerTr = $(this).parents('tr').get(1);
+                const stagedGame = stagedGamesTable.row(outerTr).data();
+                const gameSelect = $(innerTr).find('.move-player-game').get(0);
+                const roleSelect = $(innerTr).find('.move-player-role').get(0);
+                postForm({
+                    formType: 'movePlayerBetweenStagedGames',
+                    userId: innerTr.getAttribute('data-user-id'),
+                    gameIdFrom: 'T' + stagedGame.id,
+                    gameIdTo: gameSelect.value,
+                    role: roleSelect.value
+                });
             });
         });
 
@@ -837,7 +906,6 @@
                         render: renderUserAddToGame,
                         orderable: false,
                         type: 'html',
-                        width: '25%',
                         title: 'Add to existing game'
                     }
                 ],
@@ -849,14 +917,30 @@
                 dom: 't',
                 language: {emptyTable: 'There are currently no unassigned users.'}
             });
-            $('#search-unassigned-users').on('keyup', function () {
+
+            $('#search-users').on('keyup', function () {
                 setTimeout(() => usersTable.search(this.value).draw(), 0);
             });
 
             $(usersTable.table().node()).on('change', '.add-player-game', function () {
-                const tr = $(this).closest('tr');
+                const tr = $(this).closest('tr').get(0);
                 const roleSelect = $(tr).find('.add-player-role').get(0);
-                adjustRoleSelectForGame(roleSelect, this.value);
+                const button = $(tr).find('.add-player-button').get(0);
+                adjustFormForGame(roleSelect, button, this.value);
+            });
+
+            $(usersTable.table().node()).on('click', '.add-player-button', function () {
+                /* Go up two levels of tr, since the form is in a table itself. */
+                const tr = $(this).parents('tr').get(1);
+                const userInfo = usersTable.row(tr).data();
+                const gameSelect = $(tr).find('.add-player-game').get(0);
+                const roleSelect = $(tr).find('.add-player-role').get(0);
+                postForm({
+                    formType: 'addPlayerToGame',
+                    userId: userInfo.user.id,
+                    gameId: gameSelect.value,
+                    role: roleSelect.value
+                });
             });
         });
     </script>

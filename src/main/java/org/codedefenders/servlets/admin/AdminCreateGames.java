@@ -112,7 +112,7 @@ public class AdminCreateGames extends HttpServlet {
                 break;
         }
 
-        response.sendRedirect(Constants.ADMIN_GAMES_JSP);
+        response.sendRedirect(request.getContextPath() + Paths.ADMIN_GAMES);
     }
 
     /**
@@ -248,13 +248,14 @@ public class AdminCreateGames extends HttpServlet {
             stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
-                    .map(Integer::valueOf)
+                    .map(stagedGameList::formattedToNumericGameId)
+                    .map(Optional::get)
                     .distinct()
                     .collect(Collectors.toList());
         } catch (NullPointerException e) {
             messages.add("ERROR: Missing parameter: stagedGameIds.");
             return;
-        } catch (NumberFormatException e) {
+        } catch (NoSuchElementException e) {
             messages.add("ERROR: Invalid parameter: stagedGameIds.");
             return;
         }
@@ -287,13 +288,14 @@ public class AdminCreateGames extends HttpServlet {
             stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
-                    .map(Integer::valueOf)
+                    .map(stagedGameList::formattedToNumericGameId)
+                    .map(Optional::get)
                     .distinct()
                     .collect(Collectors.toList());
         } catch (NullPointerException e) {
             messages.add("ERROR: Missing parameter: stagedGameIds.");
             return;
-        } catch (NumberFormatException e) {
+        } catch (NoSuchElementException e) {
             messages.add("ERROR: Invalid parameter: stagedGameIds.");
             return;
         }
@@ -323,11 +325,11 @@ public class AdminCreateGames extends HttpServlet {
         int gameId;
         try {
             userId = getIntParameter(request, "userId").get();
-            gameId = getIntParameter(request, "gameId").get();
+            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
         } catch (NullPointerException e) {
             messages.add("ERROR: Missing parameter.");
             return;
-        } catch (IllegalArgumentException e) {
+        } catch (NoSuchElementException | IllegalArgumentException e) {
             messages.add("ERROR: Invalid parameter.");
             return;
         }
@@ -355,13 +357,13 @@ public class AdminCreateGames extends HttpServlet {
         Role role;
         try {
             userId = getIntParameter(request, "userId").get();
-            gameIdFrom = getIntParameter(request, "gameIdFrom").get();
-            gameIdTo = getIntParameter(request, "gameIdTo").get();
             role = Role.valueOf(request.getParameter("role"));
+            gameIdFrom = stagedGameList.formattedToNumericGameId(request.getParameter("gameIdFrom")).get();
+            gameIdTo = stagedGameList.formattedToNumericGameId(request.getParameter("gameIdTo")).get();
         } catch (NullPointerException e) {
             messages.add("ERROR: Missing parameter.");
             return;
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NoSuchElementException e) {
             messages.add("ERROR: Invalid parameter.");
             return;
         }
@@ -399,18 +401,21 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void addPlayerToGame(HttpServletRequest request) {
-        int userId;
         int gameId;
+        boolean isStagedGame;
+        int userId;
         Role role;
-        boolean isStagedGame = false;
         try {
-            userId = getIntParameter(request, "userId").get();
             String gameIdStr = request.getParameter("gameId");
-            if (gameIdStr.startsWith("T")) {
+            Optional<Integer> stagedGameId = stagedGameList.formattedToNumericGameId(gameIdStr);
+            if (stagedGameId.isPresent()) {
                 isStagedGame = true;
-                gameIdStr = gameIdStr.substring(1);
+                gameId = stagedGameId.get();
+            } else {
+                isStagedGame = false;
+                gameId = Integer.parseInt(gameIdStr);
             }
-            gameId = Integer.parseInt(gameIdStr);
+            userId = getIntParameter(request, "userId").get();
             role = Role.valueOf(request.getParameter("role"));
         } catch (NullPointerException e) {
             messages.add("ERROR: Missing parameter.");

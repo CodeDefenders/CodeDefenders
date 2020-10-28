@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.codedefenders.game.GameClass;
@@ -61,6 +62,31 @@ public class StagedGameList implements Serializable {
      */
     public StagedGame getStagedGame(int gameId) {
         return stagedGames.get(gameId);
+    }
+
+    /**
+     * Returns the formatted staged game ID corresponding to the given numeric staged game ID.
+     * @param gameId The numeric staged game ID.
+     * @return The formatted staged game ID.
+     */
+    public String numericToFormattedGameId(int gameId) {
+        return "T" + gameId;
+    }
+
+    /**
+     * Returns the numeric staged game ID corresponding to the given formatted staged game ID.
+     * @param formattedGameId The formatted staged game ID.
+     * @return The numeric staged game ID.
+     */
+    public Optional<Integer> formattedToNumericGameId(String formattedGameId) {
+        if (!formattedGameId.startsWith("T")) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Integer.parseInt(formattedGameId.substring(1)));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -139,10 +165,26 @@ public class StagedGameList implements Serializable {
             this.exists = true;
         }
 
+        /**
+         * Returns the ID of the staged game.
+         * @return The ID of the staged game.
+         */
         public int getId() {
             return id;
         }
 
+        /**
+         * Returns the ID of the staged game formatted as a string to differentiate it from IDs of normal games.
+         * @return The formatted ID of the staged game.
+         */
+        public String getFormattedId() {
+            return numericToFormattedGameId(getId());
+        }
+
+        /**
+         * Returns the game settings of the staged game.
+         * @return The game settings of the staged game.
+         */
         public GameSettings getGameSettings() {
             return gameSettings;
         }
