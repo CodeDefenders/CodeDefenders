@@ -120,23 +120,6 @@ public class UserDAO {
     }
 
     /**
-     * Returns the last rose the user with the given id had in any game or null if there's no data.
-     */
-    // TODO Consider to return Role.NONE instead of null ? What's happens if rs.getString("Role") == null ?!
-    public static Role getLastRoleOfUser(int userId) throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT players.Role",
-                "FROM players",
-                "WHERE players.User_ID = ?",
-                "  AND players.Game_ID = (",
-                "    SELECT MAX(innerPlayers.Game_ID)",
-                "    FROM players innerPlayers",
-                "    WHERE innerPlayers.User_ID = players.User_ID",
-                "  );");
-        return DB.executeQueryReturnValue(query, rs -> Role.valueOf(rs.getString("Role")), DatabaseValue.of(userId));
-    }
-
-    /**
      * @return a mapping from game identifiers to the name of the game's creators.
      */
     public static Map<Integer, String> getGamesCreatorNames(final List<? extends AbstractGame> games) {
