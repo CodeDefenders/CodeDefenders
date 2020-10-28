@@ -145,6 +145,7 @@ public class MutantAccordionBean {
         Gson gson = new GsonBuilder()
                 // It is important that its HashMap.class, it doesn't work if I change it to Map.class …
                 .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
+                .excludeFieldsWithoutExposeAnnotation()
                 .create();
         return gson.toJson(mutants);
     }
