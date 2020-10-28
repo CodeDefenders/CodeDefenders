@@ -175,6 +175,8 @@ package:
     - ssh deploy@codedefenders.fim.uni-passau.de "mv /tmp/$DEPLOY_ENV.war /var/lib/tomcat9/webapps/$DEPLOY_ENV.war"
   needs:
     - package
+  tags:
+    - deploy
 
 deploy-staging:
   extends: .deploy
