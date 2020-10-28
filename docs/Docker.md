@@ -1,22 +1,34 @@
 # Docker
 
+We provide a `docker-compose` file for running Codedefenders.  
+Beginning with version 1.8, we publish docker images for released versions at the [dockerhub codedefenders repository](https://hub.docker.com/repository/docker/codedefenders/codedefenders).
+
 ## Quick Start
 
-Running codedefenders via docker-compose.  
-For available versions take a look at the [dockerhub codedefenders repository](https://hub.docker.com/repository/docker/codedefenders/codedefenders).
+As all [configuration](#configuration) values have sensible defaults you can simply do:
 
 ```sh
 cd docker
-cp .env.example .env
-nano .env # Adapt environment variables to your needs
 docker-compose up
 ```
 
-You can add other environment variables for configuration to the `.env` file.  
-See [the configuration documentation](./Configuration.md) for details.
+to get a working Codedefenders instance.  
+By default, it will be available at http://localhost:8080/ in your browser.
+
+## Configuration
+
+Configuring the `docker-compose` setup is possible via environment variables.  
+You can find all available docker compose specific variables with their default values in the `.env.example` file.
+
+For environment variables which are available by default see  [the configuration documentation](./Configuration.md).
 
 The docker container supports only a subset of the available configuration properties.  
 E.g. all `cluster.*` related properties (inclusive `force.local.execution`) are not supported because we have no slurm support inside the container.
+
+**WARNING:**  
+Changing the `CODEDEFENDERS_DB_*` variables after creating the container for the first time requires you to update the settings in the database container manually.  
+Otherwise, you have to destroy the [volumes](#persistence).
+
 
 ## Building docker images
 
@@ -30,8 +42,9 @@ docker push codedefenders/codedefenders:<codedefenders version>
 
 ## Using docker for testing a not published state
 
-We only publish docker images for a tagged version to docker hub.  
-For testing you can tag a locally build docker image and use this for the docker-compose.
+For testing, you can tag a local build docker image and use this for the docker-compose.  
+Be aware that we use named docker volumes which are persisted on the host.  
+So building new images and deploying them will still get the old data.
 
 ```sh
 cd <path to codedefenders repository>
@@ -40,3 +53,13 @@ cd docker
 nano .env # Set CODEDEFENDERS_VERSION=dev
 docker-compose up
 ```
+
+## Persistence
+
+The `docker-compose` file uses named volumes to persist the database and codedefenders data directory.  
+The names used should be in a normal setup `docker_datavolume` and `docker_dbvolume`.
+
+Those are managed via the `docker volume` command.
+
+**WARNING:**  
+You should only ever `rm` both volumes at the same time as otherwise the database will reference no longer existing files, or the database will try to write at places where already some files exist.
