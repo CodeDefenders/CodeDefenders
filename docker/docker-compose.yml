@@ -1,28 +1,26 @@
-version: '2'
+version: '2.1'
 services:
   database:
     image: "mariadb:10.5"
     restart: always
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=YES
-      - MYSQL_USER=${CODEDEFENDERS_DB_USERNAME}
-      - MYSQL_PASSWORD=${CODEDEFENDERS_DB_PASSWORD}
-      - MYSQL_DATABASE=${CODEDEFENDERS_DB_NAME}
-    ports:
-      - "3306"
+      - MYSQL_USER=${CODEDEFENDERS_DB_USERNAME:-defender}
+      - MYSQL_PASSWORD=${CODEDEFENDERS_DB_PASSWORD:-defender}
+      - MYSQL_DATABASE=${CODEDEFENDERS_DB_NAME:-defender}
     volumes:
       - dbvolume:/var/lib/mysql
   codedefenders:
-    image: "codedefenders/codedefenders:${CODEDEFENDERS_VERSION}"
+    image: "codedefenders/codedefenders:${CODEDEFENDERS_VERSION:-git-50f74405}"
     environment:
       # These three are hardcoded because they are part of the container setup
       - CODEDEFENDERS_DATA_DIR=/srv/codedefenders
       - CODEDEFENDERS_DB_HOST=database
       - CODEDEFENDERS_ANT_HOME=/usr/share/ant
       # These three are the only required variables as they are also passed to the database container
-      - CODEDEFENDERS_DB_USERNAME
-      - CODEDEFENDERS_DB_PASSWORD
-      - CODEDEFENDERS_DB_NAME
+      - CODEDEFENDERS_DB_USERNAME=${CODEDEFENDERS_DB_USERNAME:-defender}
+      - CODEDEFENDERS_DB_PASSWORD=${CODEDEFENDERS_DB_PASSWORD:-defender}
+      - CODEDEFENDERS_DB_NAME=${CODEDEFENDERS_DB_NAME:-defender}
       # These two are for configuring the basic auth credentials for the /admin/* url
       - CODEDEFENDERS_ADMIN_USERNAME
       - CODEDEFENDERS_ADMIN_PASSWORD
@@ -31,7 +29,7 @@ services:
       - CODEDEFENDERS_MUTANT_COVERAGE
       - CODEDEFENDERS_BLOCK_ATTACKER
     ports:
-      - "8080"
+      - "127.0.0.1:${CODEDEFENDERS_PORT:-8080}:8080"
     links:
       - database
     volumes:
