@@ -26,7 +26,6 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
@@ -280,6 +279,7 @@ public class AdminCreateGamesBean implements Serializable {
      * @return {@code true} if the user could be added, {@code false} if not.
      */
     public boolean addPlayerToExistingGame(AbstractGame game, User user, Role role) {
+        game.setEventDAO(eventDAO);
         if (!game.addPlayer(user.getId(), role)) {
             messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}.",
                     user.getId(), game.getId(), role));
