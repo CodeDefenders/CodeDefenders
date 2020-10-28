@@ -779,9 +779,10 @@ public class MultiplayerGameManager extends HttpServlet {
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
                         int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+                        int userId = UserDAO.getUserForPlayer(defenderId).getId();
                         notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
-                        Event notifDefenderEquiv = new Event(-1, game.getId(), defenderId, notification,
+                        Event notifDefenderEquiv = new Event(-1, game.getId(), userId, notification,
                                 EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(notifDefenderEquiv);
