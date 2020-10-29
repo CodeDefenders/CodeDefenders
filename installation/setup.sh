@@ -59,8 +59,6 @@ done < <(sed -e '/^$/d' -e '/^#/d' "${config_file}".tmp | sed 's|=| |')
 
 : ${data_dir:?Please provide a value for data.dir in $config_file }
 
-# Not sure this is actually require
-: ${ant_home:?Please provide a value for ant.home in $config_file }
 
 : ${tomcat_url:?Please provide a value for tomcat.url in $config_file }
 : ${tomcat_path:?Please provide a value for tomcat.path in $config_file }
@@ -74,8 +72,6 @@ echo "* Check preconditions on software"
 echo "* Check Maven"
 mvn -version > /dev/null
 
-echo "* Check Ant"
-${ant_home}/bin/ant -version > /dev/null
 
 echo "* Create folder structure under $data_dir"
 

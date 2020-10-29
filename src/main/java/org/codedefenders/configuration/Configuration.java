@@ -20,8 +20,21 @@
 package org.codedefenders.configuration;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
@@ -60,7 +73,7 @@ import com.google.common.net.InternetDomainName;
 @Alternative
 @Singleton
 public class Configuration {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
     // All the attributes need to be initialized with a null value and therefore need to be objects
     protected String dataDir;
@@ -87,12 +100,44 @@ public class Configuration {
     public final void validate() throws ConfigurationValidationException {
         List<String> validationErrors = new ArrayList<>();
 
-        // TODO: Do something useful here
-        // assert getAntHome().isDirectory();
-        // assert getDataDir().isDirectory();
-
         if (dataDir == null || dataDir.equals("")) {
             validationErrors.add("Property " + resolveAttributeName("dataDir") + " is missing");
+        } else {
+            File dataDir = getDataDir();
+            String dataDirCreate = setupDirectory(dataDir);
+            if (dataDirCreate != null) {
+                validationErrors.add(dataDirCreate);
+            } else {
+                validationErrors.add(setupFile(dataDir, "build.xml",
+                        () -> this.getClass().getResourceAsStream("/data/build.xml")));
+                validationErrors.add(setupFile(dataDir, "security.policy",
+                        () -> this.getClass().getResourceAsStream("/data/security.policy")));
+
+                for (File directory : Arrays.asList(getAiDir(), getLibraryDir(), getMutantDir(), getTestsDir(),
+                        getSourcesDir())) {
+                    validationErrors.add(setupDirectory(directory));
+                }
+
+                // TODO: Replace this with something which can resolve the dependencies.
+                try (Stream<Path> entries = Files.list(getLibraryDir().toPath())) {
+                    if (!entries.findFirst().isPresent()) {
+                        validationErrors.add("The library directory " + getLibraryDir().toPath().toString()
+                                + " is empty! Please download the dependencies via the installation-pom.xml!");
+                    }
+                } catch (IOException ignored) {
+                    // ignored
+                }
+            }
+        }
+
+        if (antHome == null || antHome.equals("")) {
+            validationErrors.add("Property " + resolveAttributeName("antHome") + " is missing");
+        } else {
+            File antExecutable = new File(getAntHome(),"/bin/ant");
+            if (!antExecutable.exists() || !antExecutable.isFile()) {
+                validationErrors.add(resolveAttributeName("antHome") + " doesn't contain the ant executable "
+                        + antExecutable);
+            }
         }
 
         if (dbHost == null || dbHost.equals("")) {
@@ -123,10 +168,66 @@ public class Configuration {
         //}
 
 
+        validationErrors.removeIf(Objects::isNull);
         if (!validationErrors.isEmpty()) {
             throw new ConfigurationValidationException(validationErrors);
         }
     }
+
+    /**
+     * Checks if the given file exists and we can read it.
+     * If the file doesn't exist, try to create it with the produceFile content.
+     *
+     * @param directory   The directory we write to.
+     * @param filename    The name of the file we write.
+     * @param produceFile A function which returns the content of the file.
+     * @return Either a error message or null if the operation was successful.
+     */
+    private String setupFile(File directory, String filename, Supplier<InputStream> produceFile) {
+        File file = new File(directory, filename);
+        try {
+            Files.copy(produceFile.get(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            logger.info("Created/Overwrote file " + file.toPath().toAbsolutePath().toString());
+            return null;
+        } catch (AccessDeniedException e) {
+            return "Can't write to " + file.toPath().toString() + ". Please check the permissions on the "
+                    + directory.toPath().toString() + " directory!";
+        } catch (DirectoryNotEmptyException e) {
+            return "Can't overwrite " + file.toPath().toString() + " because it is a non empty directory! "
+                    + "Please remove this directory!";
+        } catch (FileSystemException e) {
+            return "The file " + file.toPath().toString() + " doesn't exist, and we can't create it!";
+        } catch (IOException e) {
+            logger.debug("IOException when trying to write file", e);
+            return "Other error when trying to write file!";
+        }
+    }
+
+    private String setupDirectory(File directory) {
+        if (directory.exists() && directory.isDirectory() && !directory.canWrite()) {
+            return "Can't write to directory " + directory.toPath().toString()
+                    + ". Please check the directory permissions";
+        }
+        try {
+            Files.createDirectories(directory.toPath());
+            return null;
+        } catch (FileAlreadyExistsException e) {
+            return "The path " + directory.toPath().toString() + " already exists, but is no directory!";
+        } catch (FileSystemException e) {
+            String message = "The directory " + directory.toPath().toString() + " doesn't exist, and we can't create ";
+            if (e.getFile().equals(directory.toPath().toAbsolutePath().toString())) {
+                message += "it";
+            } else {
+                message += "the intermediate directory " + e.getFile();
+            }
+            message += ". Reason: " + e.getReason();
+            return message;
+        } catch (IOException e) {
+            logger.debug("IOException when trying to create directory", e);
+            return "Other error when trying to create directory!";
+        }
+    }
+
 
     public File getDataDir() {
         return new File(dataDir);
