@@ -105,29 +105,6 @@ public class AdminCreateGamesBean implements Serializable {
         for (UserInfo userInfo : AdminDAO.getAllUsersInfo()) {
             userInfos.put(userInfo.getUser().getId(), userInfo);
         }
-
-        // TODO: For testing, remove later
-        if (getStagedGameList().getStagedGames().size() == 0) {
-            GameSettings gameSettings = GameSettings.getDefault();
-            gameSettings.setCut(GameClass.build().id(123).name("classname").alias("classalias").javaFile("").classFile("").create());
-
-            StagedGame s1 = stagedGameList.addStagedGame(gameSettings);
-            s1.addAttacker(9);
-            s1.addDefender(8);
-
-            StagedGame s2 = stagedGameList.addStagedGame(gameSettings);
-            s2.addAttacker(10);
-            s2.addDefender(122);
-
-            gameSettings.setGameType(MELEE);
-            StagedGame s3 = stagedGameList.addStagedGame(gameSettings);
-            s3.addAttacker(123);
-            s3.addDefender(11);
-
-            StagedGame s4 = stagedGameList.addStagedGame(gameSettings);
-            s4.addAttacker(125);
-            s4.addDefender(126);
-        }
     }
 
     /**

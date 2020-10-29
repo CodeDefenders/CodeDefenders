@@ -87,6 +87,12 @@ public class AdminCreateGames extends HttpServlet {
         adminCreateGamesBean.updateUserInfos();
 
         final String action = request.getParameter("formType");
+        if (action == null) {
+            logger.error("Missing parameter: formType.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         switch (action) {
             case "stageGames":
                 stageGames(request);
@@ -107,7 +113,7 @@ public class AdminCreateGames extends HttpServlet {
                 addPlayerToGame(request);
                 break;
             default:
-                logger.error("Action not recognised: {}", action);
+                logger.error("Unknown form type: {}", action);
                 Redirect.redirectBack(request, response);
                 break;
         }
@@ -188,8 +194,8 @@ public class AdminCreateGames extends HttpServlet {
         try {
             roleAssignmentMethod = RoleAssignmentMethod.valueOf(request.getParameter("roleAssignmentMethod"));
             teamAssignmentMethod = TeamAssignmentMethod.valueOf(request.getParameter("teamAssignmentMethod"));
-            attackersPerGame = getIntParameter(request, "attackers").get();
-            defendersPerGame = getIntParameter(request, "defenders").get();
+            attackersPerGame = getIntParameter(request, "attackersPerGame").get();
+            defendersPerGame = getIntParameter(request, "defendersPerGame").get();
         } catch (NullPointerException | NoSuchElementException e) {
             messages.add("ERROR: Missing game management settings parameter.");
             return;
