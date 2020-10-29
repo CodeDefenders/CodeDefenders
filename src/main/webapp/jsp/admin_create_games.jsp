@@ -151,7 +151,7 @@
                                 <input type="radio" name="gameType"
                                        value="<%=StagedGameList.GameSettings.GameType.MULTIPLAYER%>"
                                        checked/>
-                                Multiplayer
+                                Battleground
                             </label>
                         </div>
                         <div class="radio">
@@ -484,6 +484,29 @@
         const activeMeleeGameIds = JSON.parse('${adminCreateGames.activeMeleeGameIdsJSON}').sort();
         const unassignedUserIds = new Set(JSON.parse('${adminCreateGames.unassignedUserIdsJSON}'));
 
+        // TODO: Generate these automatically with a bean?.
+        const GameType = {
+            MULTIPLAYER:    {name: 'MULTIPLAYER',   display: 'Battleground'},
+            MELEE:          {name: 'MELEE',         display: 'Melee'}
+        };
+        const CodeValidatorLevel = {
+            RELAXED:        {name: 'RELAXED',       display: 'Relaxed'},
+            MODERATE:       {name: 'MODERATE',      display: 'Moderate'},
+            STRICT:         {name: 'STRICT',        display: 'Strict'}
+        };
+        const GameLevel = {
+            HARD:           {name: 'HARD',          display: 'Hard'},
+            MEDIUM:         {name: 'MEDIUM',        display: 'Medium'},
+            EASY:           {name: 'EASY',          display: 'Easy'}
+        };
+        const Role = {
+            ATTACKER:       {name: 'ATTACKER',      display: 'Attacker'},
+            DEFENDER:       {name: 'DEFENDER',      display: 'Defender'},
+            OBSERVER:       {name: 'OBSERVER',      display: 'Observer'},
+            PLAYER:         {name: 'PLAYER',        display: 'Player'},
+            NONE:           {name: 'NONE',          display: 'None'}
+        };
+
         const stagedGamesList = [...stagedGames.values()]
             .sort((a, b) => a.id - b.id);
         const assignedUserIdsStaged = new Set(stagedGamesList
@@ -516,23 +539,11 @@
                     return lastRole === null ? 'none' : lastRole;
                 case 'display':
                     const span = document.createElement('span');
-                    switch (lastRole) {
-                        case null:
-                            span.style.color = 'gray';
-                            span.textContent = 'none';
-                            break;
-                        case 'ATTACKER':
-                            span.textContent = 'Attacker';
-                            break;
-                        case 'DEFENDER':
-                            span.textContent = 'Defender';
-                            break;
-                        case 'PLAYER':
-                            span.textContent = 'Player';
-                            break;
-                        default:
-                            span.textContent = 'Unknown Role';
-                            break;
+                    if (lastRole === null) {
+                        span.style.color = 'gray';
+                        span.textContent = 'none';
+                    } else {
+                        span.textContent = Role[lastRole].display;
                     }
                     return span.outerHTML;
             }
@@ -623,14 +634,7 @@
         };
 
         const renderStagedGameType = function (gameType, type, row, meta) {
-            switch (gameType) {
-                case 'MULTIPLAYER':
-                    return 'Multiplayer';
-                case 'MELEE':
-                    return 'Melee';
-                default:
-                    return 'Unknown game type';
-            }
+            return GameType[gameType].display;
         };
 
         const renderStagedGamePlayers = function (stagedGame, type, row, meta) {
@@ -658,22 +662,22 @@
             table.classList.add('staged-game-players');
             table.style.width = '100%';
 
-            if (stagedGame.gameSettings.gameType === 'MELEE') {
+            if (stagedGame.gameSettings.gameType === GameType.MELEE.name) {
                 const players = [...attackers, ...defenders];
                 players.sort((a, b) => a.user.id - b.user.id);
 
                 for (const player of players) {
-                    addStagedGamePlayersRow(table, stagedGame, player, 'PLAYER');
+                    addStagedGamePlayersRow(table, stagedGame, player, Role.PLAYER.name);
                 }
             } else {
                 attackers.sort((a, b) => a.user.id - b.user.id);
                 defenders.sort((a, b) => a.user.id - b.user.id);
 
                 for (const attacker of attackers) {
-                    addStagedGamePlayersRow(table, stagedGame, attacker, 'ATTACKER');
+                    addStagedGamePlayersRow(table, stagedGame, attacker, Role.ATTACKER.name);
                 }
                 for (const defender of defenders) {
-                    addStagedGamePlayersRow(table, stagedGame, defender, 'DEFENDER');
+                    addStagedGamePlayersRow(table, stagedGame, defender, Role.DEFENDER.name);
                 }
             }
 
@@ -683,9 +687,9 @@
         const addStagedGamePlayersRow = function (table, stagedGame, userInfo, role) {
             const tr = table.insertRow();
             tr.setAttribute('data-user-id', userInfo.user.id);
-            if (role === 'ATTACKER') {
+            if (role === Role.ATTACKER.name) {
                 tr.style.backgroundColor = '#EDCECE';
-            } else if (role === 'DEFENDER') {
+            } else if (role === Role.DEFENDER.name) {
                 tr.style.backgroundColor = '#CED6ED';
             }
 
@@ -762,26 +766,26 @@
             } else {
                 const gameId = Number(gameIdStr);
                 if (activeMultiplayerGameIds.includes(gameId)) {
-                    gameType = 'MULTIPLAYER';
+                    gameType = GameType.MULTIPLAYER.name;
                 } else if (activeMeleeGameIds.includes(gameId)) {
-                    gameType = 'MELEE';
+                    gameType = GameType.MELEE.name;
                 }
             }
 
-            if (gameType === 'MULTIPLAYER') {
+            if (gameType === GameType.MULTIPLAYER.name) {
                 const attackerOption = document.createElement('option');
-                attackerOption.textContent = 'Attacker';
-                attackerOption.value = 'ATTACKER';
+                attackerOption.textContent = Role.ATTACKER.display;
+                attackerOption.value = Role.ATTACKER.name;
                 roleSelect.appendChild(attackerOption);
                 const defenderOption = document.createElement('option');
-                defenderOption.textContent = 'Defender';
-                defenderOption.value = 'DEFENDER';
+                defenderOption.textContent = Role.DEFENDER.display;
+                defenderOption.value = Role.DEFENDER.name;
                 roleSelect.appendChild(defenderOption);
                 button.disabled = false;
-            } else if (gameType === 'MELEE') {
+            } else if (gameType === GameType.MELEE.name) {
                 const playerOption = document.createElement('option');
-                playerOption.textContent = 'Player';
-                playerOption.value = 'PLAYER';
+                playerOption.textContent = Role.PLAYER.display;
+                playerOption.value = Role.PLAYER.name;
                 roleSelect.appendChild(playerOption);
                 button.disabled = false;
             }
@@ -832,6 +836,57 @@
 
         const rowSelected = function (tr) {
             return tr.classList.contains('selected');
+        }
+
+        const createSettingsTable = function (gameSettings) {
+            const table = document.createElement('table');
+            table.classList.add('table', 'table-condensed');
+
+            let tr = table.insertRow();
+            tr.insertCell().textContent = 'Game Type';
+            tr.insertCell().textContent = GameType[gameSettings.gameType].display;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Class';
+            tr.insertCell().innerHTML = renderStagedGameClass(gameSettings.cut);
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Level';
+            tr.insertCell().textContent = GameLevel[gameSettings.level].display;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Include Predefined Mutants';
+            tr.insertCell().textContent = gameSettings.withMutants;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Include Predefined Tests';
+            tr.insertCell().textContent = gameSettings.withTests;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Max Assertions Per Test';
+            tr.insertCell().textContent = gameSettings.maxAssertionsPerTest;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Mutant Validator Level';
+            tr.insertCell().textContent = CodeValidatorLevel[gameSettings.mutantValidatorLevel].display;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Chat Enabled';
+            tr.insertCell().textContent = gameSettings.chatEnabled;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Capture Player Intentions';
+            tr.insertCell().textContent = gameSettings.captureIntentions;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Equivalence Threshold';
+            tr.insertCell().textContent = gameSettings.equivalenceThreshold;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Start Game';
+            tr.insertCell().textContent = gameSettings.startGame;
+
+            return table.outerHTML;
         }
 
         $(document).ready(function () {
@@ -896,6 +951,19 @@
                 },
                 drawCallback: function () {
                     $(this).find('select').prop('selectedIndex', -1);
+                    $(this).find('.show-settings').popover({
+                        container: document.body,
+                        placement: 'right',
+                        trigger: 'hover',
+                        html: true,
+                        title: 'Game Settings',
+                        content: function () {
+                            const tr = $(this).closest('tr').get(0);
+                            const row = stagedGamesTable.row(tr);
+                            const stagedGame = row.data();
+                            return createSettingsTable(stagedGame.gameSettings);
+                        }
+                    });
                 },
                 order: [[1, 'asc']],
                 scrollY: '800px',
