@@ -101,15 +101,8 @@
                 <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
                     <label class="btn btn-xs btn-default"
                            title="Show users that are part of an existing active game.">
-                        <input id="toggle-hide-assigned-users-active" type="checkbox">
-                        Hide Assigned Users (Active Games)&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
-                    </label>
-                </div>
-                <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
-                    <label class="btn btn-xs btn-default"
-                           title="Show users that are already assigned to a staged game.">
-                        <input id="toggle-hide-assigned-users-staged" type="checkbox">
-                        Hide Assigned Users (Staged Games)&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
+                        <input id="toggle-show-assigned-users" type="checkbox">
+                        Show Assigned Users (Active Games)&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-open"></span>
                     </label>
                 </div>
                 <input type="search" id="search-users" class="form-control" placeholder="Search"
@@ -491,10 +484,15 @@
         const activeMeleeGameIds = JSON.parse('${adminCreateGames.activeMeleeGameIdsJSON}').sort();
         const unassignedUserIds = new Set(JSON.parse('${adminCreateGames.unassignedUserIdsJSON}'));
 
-        const stagedGamesList = [...stagedGames.values()].sort((a, b) => a.id - b.id);
-        const userInfosList = [...userInfos.values()].sort((a, b) => a.user.id - b.user.id);
-        const activeGameIds = [...activeMultiplayerGameIds, ...activeMeleeGameIds].sort();
-        const assignedUserIdsStaged = new Set(stagedGamesList.flatMap(game => [...game.attackers, ...game.defenders]));
+        const stagedGamesList = [...stagedGames.values()]
+            .sort((a, b) => a.id - b.id);
+        const assignedUserIdsStaged = new Set(stagedGamesList
+            .flatMap(game => [...game.attackers, ...game.defenders]));
+        const userInfosList = [...userInfos.values()]
+            .filter(userInfo => !assignedUserIdsStaged.has(userInfo.user.id))
+            .sort((a, b) => a.user.id - b.user.id);
+        const activeGameIds = [...activeMultiplayerGameIds, ...activeMeleeGameIds]
+            .sort();
 
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const dateFormat = Intl.DateTimeFormat([], {
@@ -505,17 +503,8 @@
             minute: '2-digit'
         });
 
-        let hideStagedGamePlayers = JSON.parse(localStorage.getItem('hideStagedGamePlayers'));
-        let hideAssignedUsersActive = JSON.parse(localStorage.getItem('hideAssignedUsersActive'));
-        let hideAssignedUsersStaged = JSON.parse(localStorage.getItem('hideAssignedUsersStaged'));
-        hideStagedGamePlayers = hideStagedGamePlayers !== null ? hideStagedGamePlayers : false;
-        hideAssignedUsersActive = hideAssignedUsersActive !== null ? hideAssignedUsersActive : true;
-        hideAssignedUsersStaged = hideAssignedUsersStaged !== null ? hideAssignedUsersStaged : true;
-        const saveLocalStorage = function () {
-            localStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
-            localStorage.setItem('hideAssignedUsersActive', JSON.stringify(hideAssignedUsersActive));
-            localStorage.setItem('hideAssignedUsersStaged', JSON.stringify(hideAssignedUsersStaged));
-        };
+        let hideStagedGamePlayers = JSON.parse(localStorage.getItem('hideStagedGamePlayers')) || false;
+        let showAssignedUsers = JSON.parse(localStorage.getItem('showAssignedUsers')) || false;
 
         const renderUserLastRole = function (lastRole, type, row, meta) {
             switch (type) {
@@ -801,14 +790,12 @@
         const filterDisplayedUsers = function (usersTable) {
             usersTable.rows().every(function () {
                 const userInfo = this.data();
-
-                if ((hideAssignedUsersActive && !unassignedUserIds.has(userInfo.user.id))
-                    || (hideAssignedUsersStaged && assignedUserIdsStaged.has(userInfo.user.id))) {
-                    userInfo._hidden = true;
-                    $(this.node()).hide();
-                } else {
+                if (showAssignedUsers || unassignedUserIds.has(userInfo.user.id)) {
                     userInfo._hidden = false;
                     $(this.node()).show();
+                } else {
+                    userInfo._hidden = true;
+                    $(this.node()).hide();
                 }
             });
         };
@@ -849,8 +836,7 @@
 
         $(document).ready(function () {
             setCheckboxButton($('#toggle-hide-players').get(0), hideStagedGamePlayers);
-            setCheckboxButton($('#toggle-hide-assigned-users-active').get(0), hideAssignedUsersActive);
-            setCheckboxButton($('#toggle-hide-assigned-users-staged').get(0), hideAssignedUsersStaged);
+            setCheckboxButton($('#toggle-show-assigned-users').get(0), showAssignedUsers);
 
             $.fn.dataTable.ext.order['select'] = function (settings, col) {
                 return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
@@ -925,7 +911,7 @@
 
             $('#toggle-hide-players').on('change', function () {
                 hideStagedGamePlayers = $(this).is(':checked');
-                saveLocalStorage();
+                localStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
                 stagedGamesTable.rows().invalidate().draw();
             });
 
@@ -1110,15 +1096,9 @@
                 });
             });
 
-            $('#toggle-hide-assigned-users-active').on('change', function () {
-                hideAssignedUsersActive = $(this).is(':checked');
-                saveLocalStorage();
-                usersTable.draw();
-            });
-
-            $('#toggle-hide-assigned-users-staged').on('change', function () {
-                hideAssignedUsersStaged = $(this).is(':checked');
-                saveLocalStorage();
+            $('#toggle-show-assigned-users').on('change', function () {
+                showAssignedUsers = $(this).is(':checked');
+                localStorage.setItem('showAssignedUsers', JSON.stringify(showAssignedUsers));
                 usersTable.draw();
             });
 
