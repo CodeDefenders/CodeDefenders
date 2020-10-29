@@ -46,6 +46,9 @@
         <div class="panel-heading">
             Staged Games
             <div style="float: right;">
+                <button id="invert-selection-games" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                    Invert Selection
+                </button>
                 <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
                     <label class="btn btn-xs btn-default">
                         <input id="toggle-hide-players" type="checkbox">
@@ -78,6 +81,9 @@
         <div class="panel-heading">
             Unassigned Users
             <div style="float: right;">
+                <button id="invert-selection-users" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                    Invert Selection
+                </button>
                 <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
                     <label class="btn btn-xs btn-default"
                            title="Show users that are part of an existing active game.">
@@ -137,7 +143,7 @@
                             <label class="label-normal">
                                 <input type="radio" name="gameType"
                                        value="<%=StagedGameList.GameSettings.GameType.MULTIPLAYER%>"
-                                       checked="checked"/>
+                                       checked/>
                                 Multiplayer
                             </label>
                         </div>
@@ -245,7 +251,7 @@
                             <label class="label-normal">
                                 <input type="radio" name="level"
                                        value="<%=GameLevel.HARD%>"
-                                       checked="checked"/>
+                                       checked/>
                                 Hard
                             </label>
                         </div>
@@ -286,7 +292,7 @@
                             <label class="label-normal">
                                 <input type="radio" name="roleAssignmentMethod"
                                        value="<%=AdminCreateGamesBean.RoleAssignmentMethod.RANDOM%>"
-                                       checked="checked"/>
+                                       checked/>
                                 Random
                             </label>
                         </div>
@@ -313,7 +319,7 @@
                             <label class="label-normal">
                                 <input type="radio" name="teamAssignmentMethod"
                                        value="<%=AdminCreateGamesBean.TeamAssignmentMethod.RANDOM%>"
-                                       checked="checked"/>
+                                       checked/>
                                 Random
                             </label>
                         </div>
@@ -498,7 +504,7 @@
         };
 
         const renderCheckbox = function (rowData, type, row, meta) {
-            const checked = Boolean(rowData.checked);
+            const checked = Boolean(rowData._checked);
             switch (type) {
                 case 'type':
                 case 'sort':
@@ -795,12 +801,14 @@
         const filterDisplayedUsers = function (usersTable) {
             usersTable.rows().every(index => {
                 const row = usersTable.row(index);
-                const userId = row.data().user.id;
+                const userInfo = row.data();
 
-                if ((hideAssignedUsersActive && !unassignedUserIds.has(userId))
-                    || (hideAssignedUsersStaged && assignedUserIdsStaged.has(userId))) {
+                if ((hideAssignedUsersActive && !unassignedUserIds.has(userInfo.user.id))
+                    || (hideAssignedUsersStaged && assignedUserIdsStaged.has(userInfo.user.id))) {
+                    userInfo._hidden = true;
                     $(row.node()).hide();
                 } else {
+                    userInfo._hidden = false;
                     $(row.node()).show();
                 }
             });
@@ -905,7 +913,7 @@
                 const checked = $(this).is(':checked');
                 const tr = $(this).closest('tr').get(0);
                 const stagedGame = stagedGamesTable.row(tr).data();
-                stagedGame.checked = checked;
+                stagedGame._checked = checked;
             });
 
             $('#toggle-hide-players').on('change', function () {
@@ -966,8 +974,8 @@
                 postForm({
                     formType: 'deleteStagedGames',
                     stagedGameIds: stagedGamesList
-                            .filter(game => game.checked === true)
-                            .map(game => 'T' + game.id)
+                            .filter(stagedGame => Boolean(stagedGame._checked))
+                            .map(stagedGame => 'T' + stagedGame.id)
                 });
             });
 
@@ -975,8 +983,19 @@
                 postForm({
                     formType: 'createStagedGames',
                     stagedGameIds: stagedGamesList
-                            .filter(game => game.checked === true)
-                            .map(game => 'T' + game.id)
+                            .filter(stagedGame => Boolean(stagedGame._checked))
+                            .map(stagedGame => 'T' + stagedGame.id)
+                });
+            });
+
+            $('#invert-selection-games').on('click', function () {
+                stagedGamesTable.rows({search: 'applied'}).every(index => {
+                    const row = stagedGamesTable.row(index);
+                    const stagedGame = row.data();
+                    const checkbox = $(row.node()).find('.select-row').get(0);
+                    const checked = !Boolean(stagedGame._checked);
+                    checkbox.checked = checked;
+                    stagedGame._checked = checked;
                 });
             });
         });
@@ -1047,7 +1066,7 @@
                 const checked = $(this).is(':checked');
                 const tr = $(this).closest('tr').get(0);
                 const userInfo = usersTable.row(tr).data();
-                userInfo.checked = checked;
+                userInfo._checked = checked;
             });
 
             $(usersTable.table().node()).on('change', '.add-player-game', function () {
@@ -1087,13 +1106,26 @@
                 const params = {
                     formType: 'stageGames',
                     userIds: userInfosList
-                            .filter(userInfo => userInfo.checked === true)
+                            .filter(userInfo => Boolean(userInfo._checked))
                             .map(userInfo => userInfo.user.id)
                 };
                 for (const {name, value} of $("#form-settings").serializeArray()) {
                     params[name] = value;
                 }
                 postForm(params);
+            });
+
+            $('#invert-selection-users').on('click', function () {
+                usersTable.rows({search: 'applied'}).every(index => {
+                    const row = usersTable.row(index);
+                    const userInfo = row.data();
+                    if (!Boolean(userInfo._hidden)) {
+                        const checkbox = $(row.node()).find('.select-row').get(0);
+                        const checked = !Boolean(userInfo._checked);
+                        checkbox.checked = checked;
+                        userInfo._checked = checked;
+                    }
+                });
             });
         });
     </script>
