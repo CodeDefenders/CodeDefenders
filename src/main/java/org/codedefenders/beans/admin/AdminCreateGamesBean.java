@@ -530,7 +530,7 @@ public class AdminCreateGamesBean implements Serializable {
                 }
             }
         } else if (gameSettings.getGameType() == MELEE) {
-            for (int userId : stagedGame.getDefenders()) {
+            for (int userId : stagedGame.getPlayers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
                     addPlayerToExistingGame(game, user.getUser(), Role.PLAYER);
