@@ -28,6 +28,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
@@ -594,19 +595,27 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     public String getActiveMultiplayerGameIdsJSON() {
-        List<Integer> games = MultiplayerGameDAO.getAvailableMultiplayerGames().stream()
+        List<Integer> gameIds = MultiplayerGameDAO.getAvailableMultiplayerGames().stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toList());
         Gson gson = new GsonBuilder().create();
-        return gson.toJson(games);
+        return gson.toJson(gameIds);
     }
 
     public String getActiveMeleeGameIdsJSON() {
-        List<Integer> games = MeleeGameDAO.getAvailableMeleeGames().stream()
+        List<Integer> gameIds = MeleeGameDAO.getAvailableMeleeGames().stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toList());
         Gson gson = new GsonBuilder().create();
-        return gson.toJson(games);
+        return gson.toJson(gameIds);
+    }
+
+    public String getUnassignedUserIdsJSON() {
+        List<Integer> userIds = UserDAO.getUnassignedUsers().stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+        Gson gson = new GsonBuilder().create();
+        return gson.toJson(userIds);
     }
 
     // TODO: Move this elsewhere?

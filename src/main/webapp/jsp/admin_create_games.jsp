@@ -47,7 +47,7 @@
             <div style="float: right;">
                 <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
                     <label class="btn btn-xs btn-default">
-                        <input id="toggle-show-players" type="checkbox">
+                        <input id="toggle-hide-players" type="checkbox">
                         Hide Players&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
                     </label>
                 </div>
@@ -65,9 +65,17 @@
             Unassigned Users
             <div style="float: right;">
                 <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
-                    <label class="btn btn-xs btn-default">
-                        <input id="toggle-show-assigned-users" type="checkbox">
-                        Show Assigned Players&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-open"></span>
+                    <label class="btn btn-xs btn-default"
+                           title="Show users that are part of an existing active game.">
+                        <input id="toggle-hide-assigned-users-active" type="checkbox">
+                        Hide Assigned Users (Active Games)&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
+                    </label>
+                </div>
+                <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
+                    <label class="btn btn-xs btn-default"
+                           title="Show users that are already assigned to a staged game.">
+                        <input id="toggle-hide-assigned-users-staged" type="checkbox">
+                        Hide Assigned Users (Staged Games)&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
                     </label>
                 </div>
                 <input type="search" id="search-users" class="form-control" placeholder="Search"
@@ -75,7 +83,7 @@
             </div>
         </div>
         <div class="panel-body">
-            <table id="usersTable" class="table table-striped table-hover table-responsive"></table>
+            <table id="usersTable" class="table table-hover table-responsive"></table>
             </div>
         </div>
     </div>
@@ -426,10 +434,12 @@
         const userInfos = new Map(JSON.parse('${adminCreateGames.userInfosAsJSON}'));
         const activeMultiplayerGameIds = JSON.parse('${adminCreateGames.activeMultiplayerGameIdsJSON}').sort();
         const activeMeleeGameIds = JSON.parse('${adminCreateGames.activeMeleeGameIdsJSON}').sort();
+        const unassignedUserIds = new Set(JSON.parse('${adminCreateGames.unassignedUserIdsJSON}'));
 
         const stagedGamesList = [...stagedGames.values()].sort((a, b) => a.id - b.id);
         const userInfosList = [...userInfos.values()].sort((a, b) => a.user.id - b.user.id);
         const activeGameIds = [...activeMultiplayerGameIds, ...activeMeleeGameIds].sort();
+        const assignedUserIdsStaged = new Set(stagedGamesList.flatMap(game => [...game.attackers, ...game.defenders]));
 
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const dateFormat = Intl.DateTimeFormat([], {
@@ -440,13 +450,30 @@
             minute: '2-digit'
         });
 
-        let playersHidden = false;
+        let hideStagedGamePlayers = JSON.parse(localStorage.getItem('hideStagedGamePlayers'));
+        let hideAssignedUsersActive = JSON.parse(localStorage.getItem('hideAssignedUsersActive'));
+        let hideAssignedUsersStaged = JSON.parse(localStorage.getItem('hideAssignedUsersStaged'));
+        hideStagedGamePlayers = hideStagedGamePlayers !== null ? hideStagedGamePlayers : false;
+        hideAssignedUsersActive = hideAssignedUsersActive !== null ? hideAssignedUsersActive : true;
+        hideAssignedUsersStaged = hideAssignedUsersStaged !== null ? hideAssignedUsersStaged : true;
+        const saveLocalStorage = function () {
+            localStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
+            localStorage.setItem('hideAssignedUsersActive', JSON.stringify(hideAssignedUsersActive));
+            localStorage.setItem('hideAssignedUsersStaged', JSON.stringify(hideAssignedUsersStaged));
+        };
 
-        /* Sort checkboxes by checked state (from datatables.net/plug-ins/sorting/custom-data-source/dom-checkbox). */
-        $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
-            return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
-                return $('input', td).prop('checked') ? 0 : 1;
-            });
+        const renderCheckbox = function (rowData, type, row, meta) {
+            const checked = Boolean(rowData.checked);
+            switch (type) {
+                case 'type':
+                case 'sort':
+                    return 1 - Number(checked);
+                case 'filter':
+                    return '';
+                case 'display':
+                    const checkedStr = checked ? 'checked' : '';
+                    return '<input type="checkbox" class="select-row" ' + checkedStr + '>';
+            }
         };
 
         const renderUserLastRole = function (lastRole, type, row, meta) {
@@ -588,7 +615,7 @@
                 case 'type':
                     return players.length;
                 case 'display':
-                    if (playersHidden) {
+                    if (hideStagedGamePlayers) {
                         return '<span style="color: gray;">(hidden)</span>'
                     } else {
                         return createStagedGamePlayersTable(stagedGame, attackers, defenders);
@@ -730,6 +757,20 @@
             }
         };
 
+        const filterDisplayedUsers = function (usersTable) {
+            usersTable.rows().every(index => {
+                const row = usersTable.row(index);
+                const userId = row.data().user.id;
+
+                if ((hideAssignedUsersActive && !unassignedUserIds.has(userId))
+                    || (hideAssignedUsersStaged && assignedUserIdsStaged.has(userId))) {
+                    $(row.node()).hide();
+                } else {
+                    $(row.node()).show();
+                }
+            });
+        };
+
         const postForm = function (params) {
             const form = document.createElement('form');
             form.method = 'post';
@@ -750,6 +791,22 @@
             form.submit();
         };
 
+        const setCheckboxButton = function (checkbox, checked) {
+            if (checked) {
+                checkbox.checked = true;
+                checkbox.parentNode.classList.add('active');
+            } else {
+                checkbox.checked = false;
+                checkbox.parentNode.classList.remove('active');
+            }
+        }
+
+        $(document).ready(function () {
+            setCheckboxButton($('#toggle-hide-players').get(0), hideStagedGamePlayers);
+            setCheckboxButton($('#toggle-hide-assigned-users-active').get(0), hideAssignedUsersActive);
+            setCheckboxButton($('#toggle-hide-assigned-users-staged').get(0), hideAssignedUsersStaged);
+        });
+
         /* Staged games table. */
         $(document).ready(function () {
             const stagedGamesTable = $('#stagedGamesTable').DataTable({
@@ -757,8 +814,7 @@
                 columns: [
                     {
                         data: null,
-                        orderDataType: 'dom-checkbox',
-                        defaultContent: '<input type="checkbox">',
+                        render: renderCheckbox,
                         type: 'html',
                         title: ''
                     },
@@ -795,7 +851,9 @@
                         title: 'Players (Username, Last Role, Total Score)'
                     },
                 ],
-                drawCallback: function () { $(this).find('select').prop('selectedIndex', -1); },
+                drawCallback: function () {
+                    $(this).find('select').prop('selectedIndex', -1);
+                },
                 order: [[1, 'asc']],
                 scrollY: '800px',
                 scrollCollapse: true,
@@ -808,8 +866,16 @@
                 setTimeout(() => stagedGamesTable.search(this.value).draw(), 0);
             });
 
-            $('#toggle-show-players').on('change', function () {
-                playersHidden = $(this).is(':checked');
+            $(stagedGamesTable.table().node()).on('change', '.select-row', function () {
+                const checked = $(this).is(':checked');
+                const tr = $(this).closest('tr').get(0);
+                const stagedGame = stagedGamesTable.row(tr).data();
+                stagedGame.checked = checked;
+            });
+
+            $('#toggle-hide-players').on('change', function () {
+                hideStagedGamePlayers = $(this).is(':checked');
+                saveLocalStorage();
                 stagedGamesTable.rows().invalidate().draw();
             });
 
@@ -869,8 +935,7 @@
                 columns: [
                     {
                         data: null,
-                        orderDataType: 'dom-checkbox',
-                        defaultContent: '<input type="checkbox">',
+                        render: renderCheckbox,
                         type: 'html',
                         title: ''
                     },
@@ -909,7 +974,10 @@
                         title: 'Add to existing game'
                     }
                 ],
-                drawCallback: function () { $(this).find('select').prop('selectedIndex', -1); },
+                drawCallback: function () {
+                    $(this).find('select').prop('selectedIndex', -1);
+                    filterDisplayedUsers($(this).DataTable());
+                },
                 order: [[5, 'asc']],
                 scrollY: '400px',
                 scrollCollapse: true,
@@ -920,6 +988,13 @@
 
             $('#search-users').on('keyup', function () {
                 setTimeout(() => usersTable.search(this.value).draw(), 0);
+            });
+
+            $(usersTable.table().node()).on('change', '.select-row', function () {
+                const checked = $(this).is(':checked');
+                const tr = $(this).closest('tr').get(0);
+                const userInfo = usersTable.row(tr).data();
+                userInfo.checked = checked;
             });
 
             $(usersTable.table().node()).on('change', '.add-player-game', function () {
@@ -941,6 +1016,18 @@
                     gameId: gameSelect.value,
                     role: roleSelect.value
                 });
+            });
+
+            $('#toggle-hide-assigned-users-active').on('change', function () {
+                hideAssignedUsersActive = $(this).is(':checked');
+                saveLocalStorage();
+                usersTable.draw();
+            });
+
+            $('#toggle-hide-assigned-users-staged').on('change', function () {
+                hideAssignedUsersStaged = $(this).is(':checked');
+                saveLocalStorage();
+                usersTable.draw();
             });
         });
     </script>
