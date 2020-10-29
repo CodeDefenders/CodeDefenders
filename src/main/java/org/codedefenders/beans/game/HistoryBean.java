@@ -133,10 +133,16 @@ public class HistoryBean {
                  */
             //    case PLAYER_MUTANT_EQUIVALENT:
             case DEFENDER_MUTANT_EQUIVALENT:
+                if (e.getEventStatus() == EventStatus.NEW) {
+                    return null;
+                }
                 userMessage += "caught an equivalence";
                 colour = "yellow";
                 break;
             case PLAYER_WON_EQUIVALENT_DUEL:
+                if (e.getEventStatus() == EventStatus.NEW) {
+                    return null;
+                }
                 userMessage += "won an equivalence duel";
                 colour = "green";
                 break;

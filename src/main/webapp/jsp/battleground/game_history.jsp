@@ -59,7 +59,7 @@
                                 for (HistoryBean.HistoryBeanEventDTO event : events) {
 
                             %>
-                            <article class="timeline-entry "<%= event.getAlignment()%>>
+                            <article class="timeline-entry <%= event.getAlignment()%>-aligned">
                                 <div class="timeline-entry-inner">
                                     <time datetime=<%=event.getFormat()%> class="timeline-time">
                                         <span><%= event.getTime() %></span>
