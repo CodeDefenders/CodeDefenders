@@ -50,8 +50,6 @@
                 <h4 class="modal-title">History</h4>
             </div>
             <div class="modal-body" style="background: #eee">
-                <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"
-                      rel="stylesheet">
                 <div class="container bootstrap snippets bootdeys">
                     <div class="col-md-9">
                         <div class="timeline-centered timeline-sm">
@@ -66,7 +64,8 @@
                                         <span><%= event.getDate() %></span>
                                     </time>
 
-                                    <div class="timeline-icon bg-<%= event.getColour() %>"><i class="fa fa-group"></i></div>
+                                    <div class="timeline-icon bg-<%= event.getColour() %>"><i class="fa fa-group"></i>
+                                    </div>
                                     <div class="timeline-label bg-<%= event.getColour() %>"><h4
                                             class="timeline-title"><%= event.getUserMessage() %>
                                     </h4>
