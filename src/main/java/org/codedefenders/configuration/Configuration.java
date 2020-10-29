@@ -91,11 +91,11 @@ public class Configuration {
         // assert getAntHome().isDirectory();
         // assert getDataDir().isDirectory();
 
-        if (dataDir == null) {
-            validationErrors.add("Property " + resolveAttributeName("dataDir") + "is missing");
+        if (dataDir == null || dataDir.equals("")) {
+            validationErrors.add("Property " + resolveAttributeName("dataDir") + " is missing");
         }
 
-        if (dbHost == null) {
+        if (dbHost == null || dbHost.equals("")) {
             validationErrors.add("Property " + resolveAttributeName("dbHost") + " is missing");
         } else { //noinspection UnstableApiUsage
             if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
@@ -108,6 +108,10 @@ public class Configuration {
             validationErrors.add("Property " + resolveAttributeName("dbPort") + " is missing");
         } else if (dbPort <= 0 | dbPort > 65535) {
             validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort + " is not a valid port number");
+        }
+
+        if (dbName == null || dbName.equals("")) {
+            validationErrors.add("Property " + resolveAttributeName("dbName") + " is missing");
         }
 
         if (getJavaMajorVersion() > 9) {

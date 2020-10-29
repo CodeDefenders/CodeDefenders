@@ -19,6 +19,7 @@
 package org.codedefenders.configuration.implementation;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import javax.annotation.Priority;
@@ -54,12 +55,14 @@ class TieredConfiguration extends BaseConfiguration {
         Object result = null;
         try {
             Field field = Configuration.class.getDeclaredField(camelCaseName);
-            field.setAccessible(true);
-            for (BaseConfiguration otherConfig : configurations) {
-                Object otherConf = field.get(otherConfig);
-                if (otherConf != null) {
-                    logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
-                    result = otherConf;
+            if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
+                field.setAccessible(true);
+                for (BaseConfiguration otherConfig : configurations) {
+                    Object otherConf = field.get(otherConfig);
+                    if (otherConf != null) {
+                        logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
+                        result = otherConf;
+                    }
                 }
             }
         } catch (NoSuchFieldException e) {
