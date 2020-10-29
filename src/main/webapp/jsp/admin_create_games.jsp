@@ -33,6 +33,14 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
+<style>
+    table.dataTable tbody > tr.selected,
+    table.dataTable tbody > tr > .selected {
+        background-color: #D8E0EA;
+        color: inherit;
+    }
+</style>
+
 <%-- Workaround for the stupid <div class="nest"> in header_main. Remove this once that div is gone --%>
 </div></div></div></div></div><div class="container">
 
@@ -46,8 +54,11 @@
         <div class="panel-heading">
             Staged Games
             <div style="float: right;">
-                <button id="invert-selection-games" class="btn btn-xs btn-default" style="margin-right: 1em;">
-                    Invert Selection
+                <button id="select-visible-games" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                    Select Visible
+                </button>
+                <button id="deselect-visible-games" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                    Deselect Visible
                 </button>
                 <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
                     <label class="btn btn-xs btn-default">
@@ -60,7 +71,7 @@
             </div>
         </div>
         <div class="panel-body">
-            <table id="table-staged-games" class="table table-striped table-hover table-responsive"></table>
+            <table id="table-staged-games" class="table table-responsive"></table>
 
             <form class="form-inline" style="margin-top: 1em;">
                 <div class="form-group">
@@ -81,8 +92,11 @@
         <div class="panel-heading">
             Unassigned Users
             <div style="float: right;">
-                <button id="invert-selection-users" class="btn btn-xs btn-default" style="margin-right: 1em;">
-                    Invert Selection
+                <button id="select-visible-users" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                    Select Visible
+                </button>
+                <button id="deselect-visible-users" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                    Deselect Visible
                 </button>
                 <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
                     <label class="btn btn-xs btn-default"
@@ -103,7 +117,7 @@
             </div>
         </div>
         <div class="panel-body">
-            <table id="table-users" class="table table-hover table-responsive"></table>
+            <table id="table-users" class="table table-responsive"></table>
             </div>
         </div>
     </div>
@@ -503,20 +517,6 @@
             localStorage.setItem('hideAssignedUsersStaged', JSON.stringify(hideAssignedUsersStaged));
         };
 
-        const renderCheckbox = function (rowData, type, row, meta) {
-            const checked = Boolean(rowData._checked);
-            switch (type) {
-                case 'type':
-                case 'sort':
-                    return 1 - Number(checked);
-                case 'filter':
-                    return '';
-                case 'display':
-                    const checkedStr = checked ? 'checked' : '';
-                    return '<input type="checkbox" class="select-row" ' + checkedStr + '>';
-            }
-        };
-
         const renderUserLastRole = function (lastRole, type, row, meta) {
             switch (type) {
                 case 'type':
@@ -799,17 +799,16 @@
         };
 
         const filterDisplayedUsers = function (usersTable) {
-            usersTable.rows().every(index => {
-                const row = usersTable.row(index);
-                const userInfo = row.data();
+            usersTable.rows().every(function () {
+                const userInfo = this.data();
 
                 if ((hideAssignedUsersActive && !unassignedUserIds.has(userInfo.user.id))
                     || (hideAssignedUsersStaged && assignedUserIdsStaged.has(userInfo.user.id))) {
                     userInfo._hidden = true;
-                    $(row.node()).hide();
+                    $(this.node()).hide();
                 } else {
                     userInfo._hidden = false;
-                    $(row.node()).show();
+                    $(this.node()).show();
                 }
             });
         };
@@ -844,10 +843,20 @@
             }
         }
 
+        const rowSelected = function (tr) {
+            return tr.classList.contains('selected');
+        }
+
         $(document).ready(function () {
             setCheckboxButton($('#toggle-hide-players').get(0), hideStagedGamePlayers);
             setCheckboxButton($('#toggle-hide-assigned-users-active').get(0), hideAssignedUsersActive);
             setCheckboxButton($('#toggle-hide-assigned-users-staged').get(0), hideAssignedUsersStaged);
+
+            $.fn.dataTable.ext.order['select'] = function (settings, col) {
+                return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+                    return rowSelected($(td).closest('tr').get(0)) ? '0' : '1';
+                });
+            };
         });
 
         /* Staged games table. */
@@ -857,9 +866,10 @@
                 columns: [
                     {
                         data: null,
-                        render: renderCheckbox,
-                        type: 'html',
-                        title: ''
+                        title: '',
+                        defaultContent: '',
+                        className: 'select-checkbox',
+                        orderDataType: 'select'
                     },
                     {
                         data: 'id',
@@ -894,6 +904,10 @@
                         title: 'Players (Username, Last Role, Total Score)'
                     },
                 ],
+                select: {
+                    style: 'multi',
+                    className: 'selected'
+                },
                 drawCallback: function () {
                     $(this).find('select').prop('selectedIndex', -1);
                 },
@@ -907,13 +921,6 @@
 
             $('#search-staged-games').on('keyup', function () {
                 setTimeout(() => stagedGamesTable.search(this.value).draw(), 0);
-            });
-
-            $(stagedGamesTable.table().node()).on('change', '.select-row', function () {
-                const checked = $(this).is(':checked');
-                const tr = $(this).closest('tr').get(0);
-                const stagedGame = stagedGamesTable.row(tr).data();
-                stagedGame._checked = checked;
             });
 
             $('#toggle-hide-players').on('change', function () {
@@ -971,31 +978,46 @@
             });
 
             $('#delete-games-button').on('click', function () {
+                const stagedGameIds = [];
+                stagedGamesTable.rows({selected: true}).every(function () {
+                    if (rowSelected(this.node())) {
+                        const stagedGame = this.data();
+                        stagedGameIds.push('T' + stagedGame.id);
+                    }
+                });
                 postForm({
                     formType: 'deleteStagedGames',
-                    stagedGameIds: stagedGamesList
-                            .filter(stagedGame => Boolean(stagedGame._checked))
-                            .map(stagedGame => 'T' + stagedGame.id)
+                    stagedGameIds
                 });
             });
 
             $('#create-games-button').on('click', function () {
+                const stagedGameIds = [];
+                stagedGamesTable.rows({selected: true}).every(function () {
+                    if (rowSelected(this.node())) {
+                        const stagedGame = this.data();
+                        stagedGameIds.push('T' + stagedGame.id);
+                    }
+                });
                 postForm({
                     formType: 'createStagedGames',
-                    stagedGameIds: stagedGamesList
-                            .filter(stagedGame => Boolean(stagedGame._checked))
-                            .map(stagedGame => 'T' + stagedGame.id)
+                    stagedGameIds
                 });
             });
 
-            $('#invert-selection-games').on('click', function () {
-                stagedGamesTable.rows({search: 'applied'}).every(index => {
-                    const row = stagedGamesTable.row(index);
-                    const stagedGame = row.data();
-                    const checkbox = $(row.node()).find('.select-row').get(0);
-                    const checked = !Boolean(stagedGame._checked);
-                    checkbox.checked = checked;
-                    stagedGame._checked = checked;
+            $('#select-visible-games').on('click', function () {
+                stagedGamesTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.select();
+                    }
+                });
+            })
+
+            $('#deselect-visible-games').on('click', function () {
+                stagedGamesTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.deselect();
+                    }
                 });
             });
         });
@@ -1007,9 +1029,10 @@
                 columns: [
                     {
                         data: null,
-                        render: renderCheckbox,
-                        type: 'html',
-                        title: ''
+                        title: '',
+                        defaultContent: '',
+                        className: 'select-checkbox',
+                        orderDataType: 'select'
                     },
                     {
                         data: 'user.id',
@@ -1046,6 +1069,10 @@
                         title: 'Add to existing game'
                     }
                 ],
+                select: {
+                    style: 'multi',
+                    className: 'selected'
+                },
                 drawCallback: function () {
                     $(this).find('select').prop('selectedIndex', -1);
                     filterDisplayedUsers($(this).DataTable());
@@ -1060,13 +1087,6 @@
 
             $('#search-users').on('keyup', function () {
                 setTimeout(() => usersTable.search(this.value).draw(), 0);
-            });
-
-            $(usersTable.table().node()).on('change', '.select-row', function () {
-                const checked = $(this).is(':checked');
-                const tr = $(this).closest('tr').get(0);
-                const userInfo = usersTable.row(tr).data();
-                userInfo._checked = checked;
             });
 
             $(usersTable.table().node()).on('change', '.add-player-game', function () {
@@ -1103,11 +1123,16 @@
             });
 
             $('#stage-games-button').on('click', function () {
+                const userIds = [];
+                usersTable.rows({selected: true}).every(function () {
+                    if (rowSelected(this.node())) {
+                        const userInfo = this.data();
+                        userIds.push(userInfo.user.id);
+                    }
+                });
                 const params = {
                     formType: 'stageGames',
-                    userIds: userInfosList
-                            .filter(userInfo => Boolean(userInfo._checked))
-                            .map(userInfo => userInfo.user.id)
+                    userIds
                 };
                 for (const {name, value} of $("#form-settings").serializeArray()) {
                     params[name] = value;
@@ -1115,15 +1140,18 @@
                 postForm(params);
             });
 
-            $('#invert-selection-users').on('click', function () {
-                usersTable.rows({search: 'applied'}).every(index => {
-                    const row = usersTable.row(index);
-                    const userInfo = row.data();
-                    if (!Boolean(userInfo._hidden)) {
-                        const checkbox = $(row.node()).find('.select-row').get(0);
-                        const checked = !Boolean(userInfo._checked);
-                        checkbox.checked = checked;
-                        userInfo._checked = checked;
+            $('#select-visible-users').on('click', function () {
+                usersTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.select();
+                    }
+                });
+            })
+
+            $('#deselect-visible-users').on('click', function () {
+                usersTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.deselect();
                     }
                 });
             });
