@@ -38,6 +38,10 @@ download_dependencies() {
     echo "data.dir=$DATA_DIR" > /tmp/config.properties
 
     mvn -f installation-pom.xml clean validate package -Dconfig.properties=/tmp/config.properties
+
+    # TODO: Remove if we extract those files from the classpath
+    cp webapps/ROOT/WEB-INF/data/security.policy "$DATA_DIR"
+    cp webapps/ROOT/WEB-INF/data/build.xml "$DATA_DIR"
 }
 
 main() {
