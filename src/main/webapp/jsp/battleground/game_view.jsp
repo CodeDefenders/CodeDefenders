@@ -44,6 +44,7 @@
 
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
+    history.setLogin(login);
     history.setGameId(game.getId());
     history.setScores(game.getMutantScores(), game.getTestScores());
     history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());

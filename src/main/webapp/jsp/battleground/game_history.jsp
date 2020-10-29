@@ -42,7 +42,7 @@
 %>
 
 <div id="history" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 900px">
         <!-- Modal content-->
         <div class="modal-content" style="z-index: 10000; position: absolute; width: 100%; left:0%;">
             <div class="modal-header">
@@ -55,27 +55,19 @@
                 <div class="container bootstrap snippets bootdeys">
                     <div class="col-md-9">
                         <div class="timeline-centered timeline-sm">
-                            <%--                            <article class="timeline-entry">--%>
-                            <%--                                <div class="timeline-entry-inner">--%>
-                            <%--                                    <time datetime="2014-01-10T03:45" class="timeline-time"><span>12:45 AM</span><span>Today</span></time>--%>
-                            <%--                                    <div class="timeline-icon bg-violet"><i class="fa fa-exclamation"></i></div>--%>
-                            <%--                                    <div class="timeline-label"><h4 class="timeline-title">New Project</h4>--%>
-
-                            <%--                                        <p>Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial.</p></div>--%>
-                            <%--                                </div>--%>
-                            <%--                            </article>--%>
                             <%
                                 for (HistoryBean.HistoryBeanEventDTO event : events) {
 
                             %>
-                            <article class="timeline-entry right">
+                            <article class="timeline-entry "<%= event.getAlignment()%>>
                                 <div class="timeline-entry-inner">
                                     <time datetime=<%=event.getFormat()%> class="timeline-time">
                                         <span><%= event.getTime() %></span>
                                         <span><%= event.getDate() %></span>
                                     </time>
-                                    <div class="timeline-icon bg-green"><i class="fa fa-group"></i></div>
-                                    <div class="timeline-label bg-green"><h4
+
+                                    <div class="timeline-icon bg-<%= event.getColour() %>"><i class="fa fa-group"></i></div>
+                                    <div class="timeline-label bg-<%= event.getColour() %>"><h4
                                             class="timeline-title"><%= event.getUserMessage() %>
                                     </h4>
                                         <p><%-- Body message here--%></p></div>
@@ -84,18 +76,6 @@
                             <%
                                 }
                             %>
-                            <%--                            <article class="timeline-entry">--%>
-                            <%--                                <div class="timeline-entry-inner">--%>
-                            <%--                                    <time datetime="2014-01-09T13:22" class="timeline-time"><span>8:20 PM</span><span>04/03/2013</span></time>--%>
-                            <%--                                    <div class="timeline-icon bg-orange"><i class="fa fa-paper-plane"></i></div>--%>
-                            <%--                                    <div class="timeline-label bg-orange"><h4 class="timeline-title">Daily Feeds</h4>--%>
-
-                            <%--                                        <p><img src="https://via.placeholder.com/45x45/" alt="" class="timeline-img pull-left">Parsley amaranth tigernut silver beet maize fennel spinach ricebean black-eyed. Tolerably earnestly middleton extremely distrusts she boy now not. Add and offered prepare how cordial.</p></div>--%>
-                            <%--                                </div>--%>
-                            <%--                                <div class="timeline-entry-inner">--%>
-                            <%--                                    <div style="-webkit-transform: rotate(-90deg); -moz-transform: rotate(-90deg);" class="timeline-icon"><i class="fa fa-plus"></i></div>--%>
-                            <%--                                </div>--%>
-                            <%--                            </article>--%>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 package org.codedefenders.beans.game;
 
 import edu.emory.mathcs.backport.java.util.Collections;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -9,6 +10,7 @@ import org.codedefenders.model.Player;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @RequestScoped
 public class HistoryBean {
     private Integer gameId;
+    private LoginBean login;
 
     private Map<Integer, PlayerScore> mutantsScores;
     private Map<Integer, PlayerScore> testScores;
@@ -36,6 +39,10 @@ public class HistoryBean {
         gameId = null;
         mutantsScores = null;
         testScores = null;
+    }
+
+    public void setLogin(LoginBean login) {
+        this.login = login;
     }
 
     public List<HistoryBeanEventDTO> getEvents() {
@@ -53,6 +60,7 @@ public class HistoryBean {
             return null;
         }
         String userMessage = e.getUser().getUsername() + " ";
+        String colour = "gray";
         switch (e.getEventType()) {
             case GAME_CREATED:
                 userMessage += "created game";
@@ -65,18 +73,21 @@ public class HistoryBean {
                 break;
             case PLAYER_JOINED:
                 userMessage += "joined";
+                colour = "blue";
                 break;
             case ATTACKER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
                 userMessage += "joined as attacker";
+                colour = "blue";
                 break;
             case DEFENDER_JOINED:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }
                 userMessage += "joined as defender";
+                colour = "blue";
                 break;
             case GAME_PLAYER_LEFT:
                 userMessage += "left the game";
@@ -84,26 +95,32 @@ public class HistoryBean {
             case PLAYER_TEST_ERROR:
             case DEFENDER_TEST_READY:
                 userMessage += "created a test that errored";
+                colour = "red";
                 break;
             case PLAYER_TEST_READY:
             case DEFENDER_TEST_ERROR:
                 userMessage = "Test by " + userMessage + "is ready";
+                colour = "green";
                 break;
             case PLAYER_MUTANT_ERROR:
             case ATTACKER_MUTANT_ERROR:
                 userMessage += "created a mutant that errored";
+                colour = "red";
                 break;
             case PLAYER_TEST_CREATED:
             case DEFENDER_TEST_CREATED:
                 userMessage += "created a test";
+                colour = "green";
                 break;
             case PLAYER_KILLED_MUTANT:
             case DEFENDER_KILLED_MUTANT:
                 userMessage += "killed a mutant";
+                colour = "red";
                 break;
             case PLAYER_MUTANT_CREATED:
             case ATTACKER_MUTANT_CREATED:
                 userMessage += "created a mutant";
+                colour = "green";
                 break;
                 /*
             case PLAYER_MUTANT_SURVIVED:
@@ -117,19 +134,24 @@ public class HistoryBean {
             //    case PLAYER_MUTANT_EQUIVALENT:
             case DEFENDER_MUTANT_EQUIVALENT:
                 userMessage += "caught an equivalence";
+                colour = "yellow";
                 break;
             case PLAYER_WON_EQUIVALENT_DUEL:
                 userMessage += "won an equivalence duel";
+                colour = "green";
                 break;
             case PLAYER_LOST_EQUIVALENT_DUEL:
                 userMessage += "lost an equivalence duel";
+                colour = "red";
                 break;
             case PLAYER_MUTANT_CLAIMED_EQUIVALENT:
             case DEFENDER_MUTANT_CLAIMED_EQUIVALENT:
                 userMessage += "claimed a mutant equivalent";
+                colour = "yellow";
                 break;
             case ATTACKER_MUTANT_KILLED_EQUIVALENT:
                 userMessage += "proved a mutant non-equivalent";
+                colour = "yellow";
                 break;
             case GAME_MESSAGE:
             case GAME_GRACE_ONE:
@@ -142,11 +164,24 @@ public class HistoryBean {
             default:
                 return null;
         }
-        return new HistoryBeanEventDTO(
-                e.getUser().getUsername(),
-                new Timestamp(e.getTimestamp()),
-                userMessage,
-                e.getEventType());
+        String alignment;
+        if (e.getEventType().toString().matches("DEFENDER")) {
+            alignment = "right";
+        } else if (e.getEventType().toString().matches("ATTACKER")) {
+            alignment = "left";
+        } else if (e.getEventType().toString().matches("GAME")) {
+            alignment = "right";
+        } else {
+            alignment = login.getUser().getId() == e.getUser().getId() ? "left" : "right";
+        }
+            return new HistoryBeanEventDTO(
+                    e.getUser().getUsername(),
+                    new Timestamp(e.getTimestamp()),
+                    userMessage,
+                    e.getEventType(),
+                    alignment,
+                    colour
+            );
     }
 
     public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testScores) {
@@ -191,8 +226,10 @@ public class HistoryBean {
         private final LocalDateTime today;
         private final String userMessage;
         private final EventType type;
+        private final String alignment;
+        private final String colour;
 
-        public HistoryBeanEventDTO(String userName, Timestamp time, String message, EventType type) {
+        public HistoryBeanEventDTO(String userName, Timestamp time, String message, EventType type, String alignment, String colour) {
             this.userName = userName;
             this.time = time.toLocalDateTime();
             LocalDateTime now = LocalDateTime.now();
@@ -200,6 +237,16 @@ public class HistoryBean {
             today = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0);
             this.userMessage = message;
             this.type = type;
+            this.alignment = alignment;
+            this.colour = colour;
+        }
+
+        public String getAlignment() {
+            return alignment;
+        }
+
+        public String getColour() {
+            return colour;
         }
 
         public String getUserName() {
