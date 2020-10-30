@@ -1088,13 +1088,10 @@
                 const outerTr = $(this).parents('tr').get(1);
                 const userId = Number(innerTr.getAttribute('data-user-id'));
                 const stagedGame = stagedGamesTable.row(outerTr).data();
-                let role = stagedGame.attackers.includes(userId) ? 'DEFENDER' : 'ATTACKER';
                 postForm({
-                    formType: 'movePlayerBetweenStagedGames',
+                    formType: 'switchRole',
                     userId: userId,
-                    gameIdFrom: 'T' + stagedGame.id,
-                    gameIdTo: 'T' + stagedGame.id,
-                    role
+                    gameId: 'T' + stagedGame.id,
                 });
             });
 

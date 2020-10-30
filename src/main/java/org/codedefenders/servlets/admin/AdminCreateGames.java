@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -74,7 +73,7 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        adminCreateGamesBean.updateUserInfos();
+        adminCreateGamesBean.update();
         stagedGameList = adminCreateGamesBean.getStagedGameList();
 
         request.setAttribute("adminCreateGamesBean", stagedGameList);
@@ -83,7 +82,7 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        adminCreateGamesBean.updateUserInfos();
+        adminCreateGamesBean.update();
         stagedGameList = adminCreateGamesBean.getStagedGameList();
 
         final String action = request.getParameter("formType");
@@ -105,6 +104,9 @@ public class AdminCreateGames extends HttpServlet {
                 break;
             case "removePlayerFromStagedGame":
                 removePlayerFromStagedGame(request);
+                break;
+            case "switchRole":
+                switchRole(request);
                 break;
             case "movePlayerBetweenStagedGames":
                 movePlayerBetweenStagedGames(request);
@@ -349,6 +351,41 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         adminCreateGamesBean.removePlayerFromStagedGame(stagedGame, userId);
+    }
+
+    /**
+     * Extract and validate POST parameters for {@link AdminCreateGamesBean#switchRole(StagedGame, User)
+     * AdminCreateGamesBean#switchRole()}.
+     * @param request The HTTP request.
+     */
+    private void switchRole(HttpServletRequest request) {
+        int userId;
+        int gameId;
+        try {
+            userId = getIntParameter(request, "userId").get();
+            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
+        } catch (NullPointerException e) {
+            messages.add("ERROR: Missing parameter.");
+            return;
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            messages.add("ERROR: Invalid parameter.");
+            return;
+        }
+
+        UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
+        if (user == null) {
+            messages.add(format("ERROR: Cannot switch role of user {0}. User does not exist.", userId));
+            return;
+        }
+
+        StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
+        if (stagedGame == null) {
+            messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist.",
+                    userId, stagedGameList.numericToFormattedGameId(gameId)));
+            return;
+        }
+
+        adminCreateGamesBean.switchRole(stagedGame, user.getUser());
     }
 
     /**

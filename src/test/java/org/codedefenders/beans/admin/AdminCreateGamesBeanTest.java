@@ -145,7 +145,7 @@ public class AdminCreateGamesBeanTest {
     public void testGetUserInfos() {
         PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
 
-        adminCreateGamesBean.updateUserInfos();
+        adminCreateGamesBean.update();
         assertThat(adminCreateGamesBean.getUserInfos(), equalTo(userInfos));
     }
 
@@ -313,7 +313,7 @@ public class AdminCreateGamesBeanTest {
     @Test
     public void testGetUserInfosForIds() {
         PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
-        adminCreateGamesBean.updateUserInfos();
+        adminCreateGamesBean.update();
 
         Set<Integer> validSet = Stream.of(1, 2, 3).collect(Collectors.toSet());
         Set<Integer> inValidSet = Stream.of(0, 1, 2).collect(Collectors.toSet());
@@ -329,7 +329,7 @@ public class AdminCreateGamesBeanTest {
     @Test
     public void testGetUserInfosForNamesAndEmails() {
         PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
-        adminCreateGamesBean.updateUserInfos();
+        adminCreateGamesBean.update();
 
         Set<String> validSet1 = Stream.of("userA", "userB", "userC@email.com").collect(Collectors.toSet());
         Set<String> validSet2 = Stream.of("userA", "userA@email.com", "userB").collect(Collectors.toSet());

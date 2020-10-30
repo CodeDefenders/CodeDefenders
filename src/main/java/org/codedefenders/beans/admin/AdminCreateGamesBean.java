@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -75,11 +74,14 @@ public class AdminCreateGamesBean implements Serializable {
     @Inject
     private EventDAO eventDAO;
 
-    private StagedGameList stagedGameList;
+    /**
+     * The staged game list managed by the bean.
+     */
+    private final StagedGameList stagedGameList = new StagedGameList();
 
     /**
      * Maps the user IDs of all valid users to {@link UserInfo UserInfos}. This map should be updated with
-     * {@link AdminCreateGamesBean#updateUserInfos()} on every request before this bean is used.
+     * {@link AdminCreateGamesBean#update()} on every request before this bean is used.
      */
     private final Map<Integer, UserInfo> userInfos = new HashMap<>();
 
@@ -88,20 +90,24 @@ public class AdminCreateGamesBean implements Serializable {
      * @return The beans staged games list.
      */
     public StagedGameList getStagedGameList() {
-        if (stagedGameList == null) {
-            stagedGameList = new StagedGameList();
-        }
         return stagedGameList;
     }
 
     /**
-     * Retrieves the most recent {@link UserInfo UserInfos} from the DB.
-     * This method should be called on every request before this bean is used.
+     * Retrieves the most recent {@link UserInfo UserInfos} from the DB and removes any users that are no longer active
+     * from any staged games. This method should be called on every request before this bean is used.
      */
-    public void updateUserInfos() {
+    public void update() {
         userInfos.clear();
         for (UserInfo userInfo : AdminDAO.getAllUsersInfo()) {
             userInfos.put(userInfo.getUser().getId(), userInfo);
+        }
+        for (StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+            for (int userId : stagedGame.getPlayers()) {
+                if (!userInfos.containsKey(userId)) {
+                    stagedGame.removePlayer(userId);
+                }
+            }
         }
     }
 
@@ -211,6 +217,30 @@ public class AdminCreateGamesBean implements Serializable {
                     userId, stagedGame.getFormattedId()));
             return false;
         }
+    }
+
+    /**
+     * Switches the role of a user assigned to a staged game.
+     * @param stagedGame The staged game.
+     * @param user The user.
+     * @return {@code true} if the user's role could be switched, {@code false} if not.
+     */
+    public boolean switchRole(StagedGame stagedGame, User user) {
+        if (stagedGame.getAttackers().contains(user.getId())) {
+            stagedGame.removePlayer(user.getId());
+            stagedGame.addDefender(user.getId());
+        } else if (stagedGame.getDefenders().contains(user.getId())) {
+            stagedGame.removePlayer(user.getId());
+            stagedGame.addAttacker(user.getId());
+        } else {
+            messages.add(format("ERROR: Cannot switch role of user {0}. "
+                            + "User is not assigned to staged game {1}.",
+                    user.getId(), stagedGame.getFormattedId()));
+            return false;
+        }
+        messages.add(format("Switched role of user {0} in staged game {1}.",
+                user.getId(), stagedGame.getFormattedId()));
+        return true;
     }
 
     /**
