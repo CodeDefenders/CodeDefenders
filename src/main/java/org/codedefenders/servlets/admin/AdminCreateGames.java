@@ -77,53 +77,57 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        adminCreateGamesBean.update();
-        stagedGameList = adminCreateGamesBean.getStagedGameList();
+        synchronized (adminCreateGamesBean) {
+            adminCreateGamesBean.update();
+            stagedGameList = adminCreateGamesBean.getStagedGameList();
 
-        request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
+            request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
+        }
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        adminCreateGamesBean.update();
-        stagedGameList = adminCreateGamesBean.getStagedGameList();
+        synchronized (adminCreateGamesBean) {
+            adminCreateGamesBean.update();
+            stagedGameList = adminCreateGamesBean.getStagedGameList();
 
-        final String action = request.getParameter("formType");
-        if (action == null) {
-            logger.error("Missing parameter: formType.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        switch (action) {
-            case "stageGames":
-                stageGames(request);
-                break;
-            case "deleteStagedGames":
-                deleteStagedGames(request);
-                break;
-            case "createStagedGames":
-                createStagedGames(request);
-                break;
-            case "removePlayerFromStagedGame":
-                removePlayerFromStagedGame(request);
-                break;
-            case "switchRole":
-                switchRole(request);
-                break;
-            case "movePlayerBetweenStagedGames":
-                movePlayerBetweenStagedGames(request);
-                break;
-            case "addPlayerToGame":
-                addPlayerToGame(request);
-                break;
-            default:
-                logger.error("Unknown form type: {}", action);
+            final String action = request.getParameter("formType");
+            if (action == null) {
+                logger.error("Missing parameter: formType.");
                 Redirect.redirectBack(request, response);
-                break;
-        }
+                return;
+            }
 
-        response.sendRedirect(request.getContextPath() + Paths.ADMIN_GAMES);
+            switch (action) {
+                case "stageGames":
+                    stageGames(request);
+                    break;
+                case "deleteStagedGames":
+                    deleteStagedGames(request);
+                    break;
+                case "createStagedGames":
+                    createStagedGames(request);
+                    break;
+                case "removePlayerFromStagedGame":
+                    removePlayerFromStagedGame(request);
+                    break;
+                case "switchRole":
+                    switchRole(request);
+                    break;
+                case "movePlayerBetweenStagedGames":
+                    movePlayerBetweenStagedGames(request);
+                    break;
+                case "addPlayerToGame":
+                    addPlayerToGame(request);
+                    break;
+                default:
+                    logger.error("Unknown form type: {}", action);
+                    Redirect.redirectBack(request, response);
+                    break;
+            }
+
+            response.sendRedirect(request.getContextPath() + Paths.ADMIN_GAMES);
+        }
     }
 
     /**
