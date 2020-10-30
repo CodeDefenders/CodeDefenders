@@ -200,15 +200,15 @@ public class AdminCreateGamesBean implements Serializable {
     public boolean removePlayerFromStagedGame(StagedGame stagedGame, int userId) {
         if (stagedGame.removePlayer(userId)) {
             messages.add(format(
-                    "Removed user {0} from staged game T{1}.",
-                    userId, stagedGame.getId())
+                    "Removed user {0} from staged game {1}.",
+                    userId, stagedGame.getFormattedId())
             );
             return true;
         } else {
             messages.add(format(
-                    "ERROR: Cannot remove user {0} from staged game T{1}. "
+                    "ERROR: Cannot remove user {0} from staged game {1}. "
                             + "User is not assigned to the the staged game.",
-                    userId, stagedGame.getId()));
+                    userId, stagedGame.getFormattedId()));
             return false;
         }
     }
@@ -236,12 +236,12 @@ public class AdminCreateGamesBean implements Serializable {
         }
 
         if (success) {
-            messages.add(format("Added user {0} to staged game T{1} as {2}.",
-                    user.getId(), stagedGame.getId(), role.getFormattedString()));
+            messages.add(format("Added user {0} to staged game {1} as {2}.",
+                    user.getId(), stagedGame.getFormattedId(), role.getFormattedString()));
         } else {
-            messages.add(format("ERROR: Cannot add user {0} to staged game T{1}. "
+            messages.add(format("ERROR: Cannot add user {0} to staged game {1}. "
                             + "User is already assigned to a different staged game.",
-                    user.getId(), stagedGame.getId()));
+                    user.getId(), stagedGame.getFormattedId()));
         }
 
         return success;
@@ -483,23 +483,24 @@ public class AdminCreateGamesBean implements Serializable {
                     .level(gameSettings.getLevel())
                     .build();
         } else {
-            messages.add(format("ERROR: Could not create staged game T{0}. Invalid game type: {1}.",
-                    stagedGame.getId(), gameSettings.getGameType().getName()));
+            messages.add(format("ERROR: Could not create staged game {0}. Invalid game type: {1}.",
+                    stagedGame.getFormattedId(), gameSettings.getGameType().getName()));
             return false;
         }
 
         /* Insert the game. */
         game.setEventDAO(eventDAO);
         if (!game.insert()) {
-            messages.add(format("ERROR: Could not create staged game T{0}. Could not insert into the database.",
-                    stagedGame.getId()));
+            messages.add(format("ERROR: Could not create staged game {0}. Could not insert into the database.",
+                    stagedGame.getFormattedId()));
             return false;
         }
 
         /* Add system users and predefined mutants/tests. */
         if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)
                 || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
-            messages.add(format("ERROR: Could not add system players to game T{0}.", stagedGame.getId()));
+            messages.add(format("ERROR: Could not add system players to game {0}.",
+                    stagedGame.getFormattedId()));
             return false;
         }
         if (gameSettings.isWithMutants() || gameSettings.isWithTests()) {

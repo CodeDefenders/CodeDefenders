@@ -343,8 +343,8 @@ public class AdminCreateGames extends HttpServlet {
 
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
-            messages.add(format("ERROR: Cannot remove user {0} from staged game T{1}. Staged game does not exist.",
-                    userId, gameId));
+            messages.add(format("ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist.",
+                    userId, stagedGameList.numericToFormattedGameId(gameId)));
             return;
         }
 
@@ -377,15 +377,15 @@ public class AdminCreateGames extends HttpServlet {
 
         StagedGame stagedGameFrom = stagedGameList.getStagedGame(gameIdFrom);
         if (stagedGameFrom == null) {
-            messages.add(format("ERROR: Cannot move user {0} from staged game T{1}. Staged game does not exist.",
-                    userId, gameIdFrom));
+            messages.add(format("ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist.",
+                    userId, stagedGameList.numericToFormattedGameId(gameIdFrom)));
             return;
         }
 
         StagedGame stagedGameTo = stagedGameList.getStagedGame(gameIdTo);
         if (stagedGameTo == null) {
-            messages.add(format("ERROR: Cannot move user {0} to staged game T{1}. Staged game does not exist.",
-                    userId, gameIdTo));
+            messages.add(format("ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist.",
+                    userId, stagedGameList.numericToFormattedGameId(gameIdTo)));
             return;
         }
 
@@ -435,8 +435,8 @@ public class AdminCreateGames extends HttpServlet {
         UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
         if (user == null) {
             if (isStagedGame) {
-                messages.add(format("ERROR: Cannot add user {0} to staged game T{1}. User does not exist.",
-                        userId, gameId));
+                messages.add(format("ERROR: Cannot add user {0} to staged game {1}. User does not exist.",
+                        userId, stagedGameList.numericToFormattedGameId(gameId)));
             } else {
                 messages.add(format("ERROR: Cannot add user {0} to existing game {1}. User does not exist.",
                         userId, gameId));
@@ -447,8 +447,8 @@ public class AdminCreateGames extends HttpServlet {
         if (isStagedGame) {
             StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
             if (stagedGame == null) {
-                messages.add(format("ERROR: Cannot add user {0} to staged game T{1}. Staged game does not exist.",
-                        userId, gameId));
+                messages.add(format("ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist.",
+                        userId, stagedGameList.numericToFormattedGameId(gameId)));
                 return;
             }
             adminCreateGamesBean.addPlayerToStagedGame(stagedGame, user.getUser(), role);
