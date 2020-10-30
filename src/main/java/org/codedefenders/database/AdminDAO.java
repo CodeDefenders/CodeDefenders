@@ -147,6 +147,7 @@ public class AdminDAO {
                 "        FROM players, games",
                 "        WHERE games.ID = players.Game_ID",
                 "          AND games.Mode <> 'PUZZLE'",
+                "          AND (players.Role = 'ATTACKER' OR players.Role = 'DEFENDER')",
                 "        GROUP BY players.User_ID",
                 "    ) AS latestGame",
                 "    WHERE latestGame.User_ID = players.User_ID",
