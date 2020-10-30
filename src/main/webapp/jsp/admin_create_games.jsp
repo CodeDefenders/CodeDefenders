@@ -878,13 +878,6 @@
         };
 
         /**
-         * Hides user rows that should be hidden from the users table, after is has been drawn.
-         * @param {DataTable} usersTable The users table.
-         */
-        const filterDisplayedUsers = function (usersTable) {
-        };
-
-        /**
          * Generates and posts a form from the given parameters. For every "name: value" pair given in the parameters a
          * form input with the name and value is created. If the value is a list, the elements are joined with ','.
          * @param {Object} params The form parameters.
@@ -1220,7 +1213,16 @@
                     $(this).find('select').prop('selectedIndex', -1);
 
                     /* Hide hidden users. */
-                    filterDisplayedUsers($(this).DataTable());
+                    $(this).DataTable().rows().every(function () {
+                        const userInfo = this.data();
+                        if (showAssignedUsers || unassignedUserIds.has(userInfo.user.id)) {
+                            userInfo._hidden = false;
+                            $(this.node()).show();
+                        } else {
+                            userInfo._hidden = true;
+                            $(this.node()).hide();
+                        }
+                    });
                 },
                 order: [[5, 'asc']],
                 scrollY: '400px',
