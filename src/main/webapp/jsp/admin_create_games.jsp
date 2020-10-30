@@ -274,6 +274,9 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Create Staged Games With Users
+                        <a data-toggle="modal" href="#stageGamesWithUsersExplanation" style="color:black">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                        </a>
                     </div>
                     <div class="panel-body">
 
@@ -281,15 +284,9 @@
                             <label for="userNames" class="label-normal">
                                 User Names
                             </label>
-                            <a data-toggle="collapse" href="#demo" style="color:black">
+                            <a data-toggle="modal" href="#userNamesExplanation" style="color:black">
                                 <span class="glyphicon glyphicon-question-sign"></span>
                             </a>
-                            <div id="demo" class="collapse panel panel-default" style="margin-top: 5px;">
-                                <div class="panel-body" style="padding: 10px;">
-                                    Newline separated list of usernames or emails.
-                                    These names, as well as the names selected in the above table, will be assigned to created games.
-                                </div>
-                            </div>
                             <textarea class="form-control" rows="5" id="userNames" name="userNames"></textarea>
                         </div>
 
@@ -369,6 +366,9 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         Create Empty Staged Games
+                        <a data-toggle="modal" href="#stageEmptyGamesExplanation" style="color:black">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                        </a>
                     </div>
                     <div class="panel-body">
                         <div class="form-group"
@@ -395,11 +395,9 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Mutant Validator Explanation</h4>
                 </div>
-
                 <div class="modal-body">
                     <%@ include file="/jsp/validator_explanation.jsp"%>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
@@ -407,21 +405,17 @@
         </div>
     </div>
 
-    <div class="modal fade" id="automaticEquivalenceTriggerExplanation"
-        role="dialog"
-        aria-labelledby="automaticEquivalenceTriggerExplanation"
-        aria-hidden="true">
+    <div class="modal fade" id="automaticEquivalenceTriggerExplanation" role="dialog"
+        aria-labelledby="automaticEquivalenceTriggerExplanation" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Equivalence Duel Threshold Explanation</h4>
                 </div>
-
                 <div class="modal-body">
                     <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
@@ -429,17 +423,14 @@
         </div>
     </div>
 
-    <div class="modal fade" id="roleAssignmentExplanation"
-         role="dialog"
-         aria-labelledby="roleAssignmentExplanation"
-         aria-hidden="true">
+    <div class="modal fade" id="roleAssignmentExplanation" role="dialog"
+         aria-labelledby="roleAssignmentExplanation" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Role Assignment Explanation</h4>
                 </div>
-
                 <div class="modal-body">
                     <p>Specifies how roles are assigned to players:</p>
                     <ul>
@@ -453,7 +444,6 @@
                         </li>
                     </ul>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
@@ -461,17 +451,14 @@
         </div>
     </div>
 
-    <div class="modal fade" id="teamAssignmentExplanation"
-         role="dialog"
-         aria-labelledby="teamAssignmentExplanation"
-         aria-hidden="true">
+    <div class="modal fade" id="teamAssignmentExplanation" role="dialog"
+         aria-labelledby="teamAssignmentExplanation" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Team Assignment Explanation</h4>
                 </div>
-
                 <div class="modal-body">
                     <p>Specifies how players are assigned to teams:</p>
                     <ul>
@@ -492,7 +479,69 @@
                         </li>
                     </ul>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <div class="modal fade" id="userNamesExplanation" role="dialog"
+         aria-labelledby="userNamesExplanation" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">User Name Explanation</h4>
+                </div>
+                <div class="modal-body">
+                    Newline-separated list of usernames or emails. The users with these names/emails, as well as the
+                    users selected in the table, will be assigned to created staged games.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="stageGamesWithUsersExplanation" role="dialog"
+         aria-labelledby="stageGamesWithUsersExplanation" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Stage Games With Users Explanation</h4>
+                </div>
+                <div class="modal-body">
+                    Selected users from the table, as well as users entered in the text area, will be assigned to new
+                    staged games. The number of games is decided by the number of users and the selected method of
+                    distributing the users to teams.
+                    <br/>
+                    <br/>
+                    The settings for the staged games are specified in the left panel.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="stageEmptyGamesExplanation" role="dialog"
+         aria-labelledby="stageEmptyGamesExplanation" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Stage Empty Games Explanation</h4>
+                </div>
+                <div class="modal-body">
+                    Create a number staged games without users assigned to them.
+                    <br/>
+                    <br/>
+                    The settings for the staged games are specified in the left panel.
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
@@ -666,7 +715,7 @@
             gameIdSelect.classList.add('add-player-game');
             gameIdCell.appendChild(gameIdSelect);
 
-            for (const stagedGame of stagedGames.values()) {
+            for (const stagedGame of stagedGamesTableData) {
                 const option = document.createElement('option');
                 option.textContent = 'T' + stagedGame.id;
                 option.value = 'T' + stagedGame.id;
@@ -1326,6 +1375,16 @@
 
             /* Create new empty staged games. */
             $('#stage-games-empty-button').on('click', function () {
+                if (usersTable.rows({selected: true})[0].length > 0) {
+                    if (!confirm("You have users selected. Are you sure you want to stage empty games?")) {
+                        return;
+                    }
+                } else if ($('#userNames').val().length > 0) {
+                    if (!confirm("You entered user names/emails. Are you sure you want to stage empty games?")) {
+                        return;
+                    }
+                }
+
                 const params = {
                     formType: 'stageEmptyGames',
                 };
