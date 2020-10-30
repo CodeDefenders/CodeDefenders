@@ -1222,7 +1222,7 @@
                     });
                 },
                 order: [[5, 'asc']],
-                scrollY: '400px',
+                scrollY: '600px',
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
