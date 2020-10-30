@@ -244,6 +244,44 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     /**
+     * Moves a use from one staged game to another.
+     * @param stagedGameFrom The staged game to move the user from.
+     * @param stagedGameTo The staged game to move the user to.
+     * @param user The user.
+     * @param role The role the user should be added to the game as.
+     * @return {@code true} if the user could be added, {@code false} if not.
+     */
+    public boolean movePlayerBetweenStagedGames(StagedGame stagedGameFrom, StagedGame stagedGameTo,
+                                                User user, Role role) {
+        if (!stagedGameFrom.removePlayer(user.getId())) {
+            messages.add(format(
+                    "ERROR: Cannot not move user {0} from staged game {1}. "
+                            + "User is not assigned to the staged game.",
+                    user.getId(), stagedGameFrom.getFormattedId())
+            );
+            return false;
+        }
+
+        switch (role) {
+            case PLAYER:
+            case ATTACKER:
+                stagedGameTo.addAttacker(user.getId());
+                break;
+            case DEFENDER:
+                stagedGameTo.addDefender(user.getId());
+                break;
+            default:
+                messages.add(format("ERROR: Cannot move player to game with role {0}. Invalid role.", role));
+                return false;
+        }
+
+        messages.add(format("Moved user {0} from staged game {1} to staged game {2} as {3}.",
+                user.getId(), stagedGameFrom.getFormattedId(), stagedGameTo.getFormattedId(),
+                role.getFormattedString()));
+        return true;
+    }
+
+    /**
      * Adds a user to a staged game.
      * @param stagedGame The staged game.
      * @param user The user.

@@ -76,7 +76,6 @@ public class AdminCreateGames extends HttpServlet {
         adminCreateGamesBean.update();
         stagedGameList = adminCreateGamesBean.getStagedGameList();
 
-        request.setAttribute("adminCreateGamesBean", stagedGameList);
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
     }
 
@@ -389,9 +388,8 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     /**
-     * Extract and validate POST parameters for {@link AdminCreateGamesBean#removePlayerFromStagedGame(StagedGame, int)
-     * AdminCreateGamesBean#removePlayerFromStagedGame()} and {@link AdminCreateGamesBean#addPlayerToStagedGame(
-     * StagedGame, User, Role) AdminCreateGamesBean#addPlayerToStagedGame()}.
+     * Extract and validate POST parameters for {@link AdminCreateGamesBean#movePlayerBetweenStagedGames(StagedGame,
+     * StagedGame, User, Role) AdminCreateGamesBean#movePlayerBetweenStagedGames()}.
      * @param request The HTTP request.
      */
     private void movePlayerBetweenStagedGames(HttpServletRequest request) {
@@ -433,9 +431,7 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        if (adminCreateGamesBean.removePlayerFromStagedGame(stagedGameFrom, user.getUser().getId())) {
-            adminCreateGamesBean.addPlayerToStagedGame(stagedGameTo, user.getUser(), role);
-        }
+        adminCreateGamesBean.movePlayerBetweenStagedGames(stagedGameFrom, stagedGameTo, user.getUser(), role);
     }
 
     /**
