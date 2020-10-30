@@ -32,7 +32,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
+import org.codedefenders.SystemStartStop;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.configuration.ConfigurationValidationException;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.slf4j.Logger;
@@ -52,25 +54,29 @@ public class ConnectionFactory {
 
     @PostConstruct
     void init() {
-        dataSource = new BasicDataSource();
-        try {
-            dataSource.setDriver(new Driver());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        dataSource.setUrl(config.getDbUrl());
-        dataSource.setUsername(config.getDbUsername());
-        dataSource.setPassword(config.getDbPassword());
+        if (config.isValid()) {
+            dataSource = new BasicDataSource();
+            try {
+                dataSource.setDriver(new Driver());
+            } catch (SQLException e) {
+                logger.error("Couldn't setup connection to database", e);
+            }
+            dataSource.setUrl(config.getDbUrl());
+            dataSource.setUsername(config.getDbUsername());
+            dataSource.setPassword(config.getDbPassword());
 
-        migrate();
+            migrate();
+        }
     }
 
     @PreDestroy
     void shutdown() {
-        try {
-            dataSource.close();
-        } catch (SQLException e) {
-            logger.error("Error in closing database connections", e);
+        if (dataSource != null) {
+            try {
+                dataSource.close();
+            } catch (SQLException e) {
+                logger.error("Error in closing database connections", e);
+            }
         }
     }
 
