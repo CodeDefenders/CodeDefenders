@@ -74,8 +74,8 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        this.stagedGameList = adminCreateGamesBean.getStagedGameList();
         adminCreateGamesBean.updateUserInfos();
+        stagedGameList = adminCreateGamesBean.getStagedGameList();
 
         request.setAttribute("adminCreateGamesBean", stagedGameList);
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
@@ -83,8 +83,8 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        this.stagedGameList = adminCreateGamesBean.getStagedGameList();
         adminCreateGamesBean.updateUserInfos();
+        stagedGameList = adminCreateGamesBean.getStagedGameList();
 
         final String action = request.getParameter("formType");
         if (action == null) {

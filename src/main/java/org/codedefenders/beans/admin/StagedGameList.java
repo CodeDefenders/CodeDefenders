@@ -1,5 +1,6 @@
 package org.codedefenders.beans.admin;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
  *     <li>Each user can only be assigned to one staged game in the list.</li>
  * </ul>
  */
-public class StagedGameList {
+public class StagedGameList implements Serializable {
     /**
      * Maps the ID of staged games to the corresponding {@link StagedGame StagedGames}.
      */
@@ -130,7 +131,7 @@ public class StagedGameList {
      * games and melee games, always adding players as attackers or defenders. It is up to the servlet and JSP page to
      * differentiate between staged multiplayer and melee games according to the game's settings.
      */
-    public class StagedGame {
+    public class StagedGame implements Serializable {
         /**
          * The staged game's ID.
          */
@@ -279,7 +280,7 @@ public class StagedGameList {
         }
     }
 
-    public static class GameSettings {
+    public static class GameSettings implements Serializable {
         @Expose private GameType gameType;
 
         @Expose private GameClass cut;
