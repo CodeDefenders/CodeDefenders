@@ -598,12 +598,22 @@ public class AdminCreateGamesBean implements Serializable {
         }
 
         /* Add system users and predefined mutants/tests. */
-        if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)
-                || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
-            messages.add(format("ERROR: Could not add system players to game {0}.",
-                    stagedGame.getFormattedId()));
-            return false;
+        if (gameSettings.getGameType() != MELEE) {
+            if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)
+                    || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
+                messages.add(format("ERROR: Could not add system players to game {0}.",
+                        stagedGame.getFormattedId()));
+                return false;
+            }
+        } else {
+            if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER)
+                    || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.PLAYER)) {
+                messages.add(format("ERROR: Could not add system players to game {0}.",
+                        stagedGame.getFormattedId()));
+                return false;
+            }
         }
+
         if (gameSettings.isWithMutants() || gameSettings.isWithTests()) {
             gameManagingUtils.addPredefinedMutantsAndTests(game,
                     gameSettings.isWithMutants(), gameSettings.isWithTests());
@@ -624,7 +634,7 @@ public class AdminCreateGamesBean implements Serializable {
             for (int userId : stagedGame.getDefenders()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
-                    game.addPlayer(user.getUser().getId(), Role.ATTACKER);
+                    game.addPlayer(user.getUser().getId(), Role.DEFENDER);
                 } else {
                     messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
                             + "User does not exist.",
@@ -635,7 +645,7 @@ public class AdminCreateGamesBean implements Serializable {
             for (int userId : stagedGame.getPlayers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
-                    game.addPlayer(user.getUser().getId(), Role.ATTACKER);
+                    game.addPlayer(user.getUser().getId(), Role.PLAYER);
                 } else {
                     messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
                             + "User does not exist.",

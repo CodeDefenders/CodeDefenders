@@ -155,7 +155,7 @@ public class AdminCreateGames extends HttpServlet {
                     getIntParameter(request, "automaticEquivalenceTrigger").get());
             gameSettings.setLevel(GameLevel.valueOf(request.getParameter("level")));
 
-            gameSettings.setStartGame(request.getAttribute("startGame") != null);
+            gameSettings.setStartGame(request.getParameter("startGame") != null);
         } catch (NullPointerException | NoSuchElementException e) {
             messages.add("ERROR: Missing game settings parameter.");
             return null;
@@ -207,6 +207,9 @@ public class AdminCreateGames extends HttpServlet {
 
         /* Extract game settings. */
         GameSettings gameSettings = extractGameSettings(request);
+        if (gameSettings == null) {
+            return;
+        }
 
         /* Extract game management settings settings. */
         RoleAssignmentMethod roleAssignmentMethod;
@@ -282,6 +285,9 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         GameSettings gameSettings = extractGameSettings(request);
+        if (gameSettings == null) {
+            return;
+        }
 
         if (numGames > 100) {
             messages.add("ERROR: Won't create more than 100 staged games.");
