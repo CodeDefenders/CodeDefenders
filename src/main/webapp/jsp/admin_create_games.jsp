@@ -116,249 +116,272 @@
     </div>
 
     <form id="form-settings">
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                User Names
-                <a data-toggle="collapse" href="#demo" style="color:black">
-                    <span class="glyphicon glyphicon-question-sign"></span>
-                </a>
-            </div>
-            <div class="panel-body">
-                <div id="demo" class="collapse panel panel-default" style="margin-top: 5px;">
-                    <div class="panel-body" style="padding: 10px;">
-                        Newline separated list of usernames or emails.
-                        These names, as well as the names selected in the above table, will be assigned to created games.
-                    </div>
-                </div>
-                <textarea class="form-control" rows="5" id="userNames" name="userNames"></textarea>
-            </div>
-        </div>
-
         <div class="row">
+            <div class="col-sm-12 col-md-6">
 
-            <div class="col-sm-12 col-md-6" style="padding-left: 2em; padding-right: 2em;">
-                <h3>Game Settings</h3>
-
-                <div class="form-group"
-                     title="The type of game.">
-                    <label for="gameType-group" class="label-normal">
-                        Game Type
-                    </label>
-                    <div id="gameType-group">
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="gameType"
-                                       value="<%=StagedGameList.GameSettings.GameType.MULTIPLAYER%>"
-                                       checked/>
-                                Battleground
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="gameType"
-                                       value="<%=StagedGameList.GameSettings.GameType.MELEE%>"/>
-                                Melee
-                            </label>
-                        </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Game Settings
                     </div>
-                </div>
-
-                <div class="form-group"
-                     title="The class the games will be played on.">
-                    <label for="cut" class="label-normal">CUT</label>
-                    <select id="cut" name="cut" class="form-control selectpicker" data-size="large">
-                        <% for (GameClass clazz : GameClassDAO.getAllPlayableClasses()) { %>
-                            <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
-                        <% } %>
-                    </select>
-                    <br/>
-                    <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?fromAdmin=true">Upload Class</a>
-                </div>
-
-                <div class="form-group"
-                     title="Include mutants uploaded together with the class.">
-                    <label for="withMutants" class="label-normal">Include predefined mutants (if available)</label>
-                    <br/>
-                    <input type="checkbox" id="withMutants" name="withMutants"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </div>
-
-                <div class="form-group"
-                     title="Include tests uploaded together with the class.">
-                    <label for="withTests" class="label-normal">Include predefined tests (if available)</label>
-                    <br/>
-                    <input type="checkbox" id="withTests" name="withTests"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </div>
-
-                <div class="form-group"
-                     title="Maximum number of assertions per test. Increase this for difficult to test classes.">
-                    <label for="maxAssertionsPerTest" class="label-normal">Max. Assertions per Test</label>
-                    <br/>
-                    <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
-                           id="maxAssertionsPerTest" min=1 required/>
-                </div>
-
-                <div class="form-group"
-                     title="Level of restrictions for the players' mutants. Click the question mark for more information.">
-                    <label class="label-normal" for="mutantValidatorLevel">
-                        Mutant validator
-                        <a data-toggle="modal" href="#validatorExplanation" style="color:black">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                    </label>
-                    <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
-                            data-size="medium">
-                        <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
-                            <option value=<%=level.name()%> <%=level.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
-                                <%=level.name().toLowerCase()%>
-                            </option>
-                        <% } %>
-                    </select>
-                </div>
-
-                <div class="form-group"
-                     title="Allow players to chat within their their team and across teams.">
-                    <label class="label-normal" for="chatEnabled">Enable Game Chat</label>
-                    <br/>
-                    <input type="checkbox" id="chatEnabled" name="chatEnabled"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-                           data-onstyle="primary" data-offstyle="" checked>
-                </div>
-
-                <div class="form-group" id="capturePlayersIntentionDiv"
-                     title="Force players to specify their intention before submitting a mutant or test.">
-                    <label class="label-normal" for="captureIntentions">Capture Players Intention</label>
-                    <br/>
-                    <input type="checkbox" id="captureIntentions" name="captureIntentions"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-                           data-onstyle="primary" data-offstyle="">
-                </div>
-
-                <div class="form-group"
-                     title="Threshold for triggering equivalence duels automatically. Set to 0 to deactivate this feature. Click the question mark for more information.">
-                    <label for="automaticEquivalenceTrigger" class="label-normal">
-                        Threshold for triggering equivalence duels automatically
-                        <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                    </label>
-                    <input class="form-control" type="number" value="0" name="automaticEquivalenceTrigger"
-                           id="automaticEquivalenceTrigger" min=0 required/>
-                </div>
-
-                <div class="form-group"
-                    title="The level the games will be played on. Harder levels restrict the information both teams receive about the other teams mutants/tests.">
-                    <label for="level-group" class="label-normal">Games Level</label>
-                    <div id="level-group">
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="level"
-                                       value="<%=GameLevel.HARD%>"
-                                       checked/>
-                                Hard
+                    <div class="panel-body">
+                        <div class="form-group"
+                             title="The type of game.">
+                            <label for="gameType-group" class="label-normal">
+                                Game Type
                             </label>
+                            <div id="gameType-group">
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="gameType"
+                                               value="<%=StagedGameList.GameSettings.GameType.MULTIPLAYER%>"
+                                               checked/>
+                                        Battleground
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="gameType"
+                                               value="<%=StagedGameList.GameSettings.GameType.MELEE%>"/>
+                                        Melee
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="level"
-                                       value="<%=GameLevel.EASY%>"/>
-                                Easy
+
+                        <div class="form-group"
+                             title="The class the games will be played on.">
+                            <label for="cut" class="label-normal">CUT</label>
+                            <select id="cut" name="cut" class="form-control selectpicker" data-size="large">
+                                <% for (GameClass clazz : GameClassDAO.getAllPlayableClasses()) { %>
+                                    <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
+                                <% } %>
+                            </select>
+                            <br/>
+                            <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?fromAdmin=true">Upload Class</a>
+                        </div>
+
+                        <div class="form-group"
+                             title="Include mutants uploaded together with the class.">
+                            <label for="withMutants" class="label-normal">Include predefined mutants (if available)</label>
+                            <br/>
+                            <input type="checkbox" id="withMutants" name="withMutants"
+                                   class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                                   data-onstyle="primary" data-offstyle="">
+                        </div>
+
+                        <div class="form-group"
+                             title="Include tests uploaded together with the class.">
+                            <label for="withTests" class="label-normal">Include predefined tests (if available)</label>
+                            <br/>
+                            <input type="checkbox" id="withTests" name="withTests"
+                                   class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                                   data-onstyle="primary" data-offstyle="">
+                        </div>
+
+                        <div class="form-group"
+                             title="Maximum number of assertions per test. Increase this for difficult to test classes.">
+                            <label for="maxAssertionsPerTest" class="label-normal">Max. Assertions per Test</label>
+                            <br/>
+                            <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
+                                   id="maxAssertionsPerTest" min=1 required/>
+                        </div>
+
+                        <div class="form-group"
+                             title="Level of restrictions for the players' mutants. Click the question mark for more information.">
+                            <label class="label-normal" for="mutantValidatorLevel">
+                                Mutant validator
+                                <a data-toggle="modal" href="#validatorExplanation" style="color:black">
+                                    <span class="glyphicon glyphicon-question-sign"></span>
+                                </a>
                             </label>
+                            <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
+                                    data-size="medium">
+                                <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
+                                    <option value=<%=level.name()%> <%=level.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                                        <%=level.name().toLowerCase()%>
+                                    </option>
+                                <% } %>
+                            </select>
                         </div>
+
+                        <div class="form-group"
+                             title="Allow players to chat within their their team and across teams.">
+                            <label class="label-normal" for="chatEnabled">Enable Game Chat</label>
+                            <br/>
+                            <input type="checkbox" id="chatEnabled" name="chatEnabled"
+                                   class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                                   data-onstyle="primary" data-offstyle="" checked>
+                        </div>
+
+                        <div class="form-group" id="capturePlayersIntentionDiv"
+                             title="Force players to specify their intention before submitting a mutant or test.">
+                            <label class="label-normal" for="captureIntentions">Capture Players Intention</label>
+                            <br/>
+                            <input type="checkbox" id="captureIntentions" name="captureIntentions"
+                                   class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                                   data-onstyle="primary" data-offstyle="">
+                        </div>
+
+                        <div class="form-group"
+                             title="Threshold for triggering equivalence duels automatically. Set to 0 to deactivate this feature. Click the question mark for more information.">
+                            <label for="automaticEquivalenceTrigger" class="label-normal">
+                                Threshold for triggering equivalence duels automatically
+                                <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
+                                    <span class="glyphicon glyphicon-question-sign"></span>
+                                </a>
+                            </label>
+                            <input class="form-control" type="number" value="0" name="automaticEquivalenceTrigger"
+                                   id="automaticEquivalenceTrigger" min=0 required/>
+                        </div>
+
+                        <div class="form-group"
+                            title="The level the games will be played on. Harder levels restrict the information both teams receive about the other teams mutants/tests.">
+                            <label for="level-group" class="label-normal">Games Level</label>
+                            <div id="level-group">
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="level"
+                                               value="<%=GameLevel.HARD%>"
+                                               checked/>
+                                        Hard
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="level"
+                                               value="<%=GameLevel.EASY%>"/>
+                                        Easy
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group"
+                             title="Start games once they are created.">
+                            <label class="label-normal" for="startGame">Automatically Start Game After Creation</label>
+                            <br/>
+                            <input type="checkbox" id="startGame" name="startGame"
+                                   class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                                   data-onstyle="primary" data-offstyle="" checked>
+                        </div>
+
                     </div>
-                </div>
-
-                <div class="form-group"
-                     title="Start games once they are created.">
-                    <label class="label-normal" for="startGame">Start Game</label>
-                    <br/>
-                    <input type="checkbox" id="startGame" name="startGame"
-                           class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="" checked>
                 </div>
 
             </div> <%-- column --%>
+            <div class="col-sm-12 col-md-6">
 
-            <div class="col-sm-12 col-md-6" style="padding-left: 2em; padding-right: 2em;">
-                <h3>Game Management Settings</h3>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Create Staged Games With Users
+                    </div>
+                    <div class="panel-body">
 
-                <div class="form-group"
-                     title="Method of assigning roles to players. Click the question mark for more information.">
-                    <label for="roleAssignmentMethod-group" class="label-normal">
-                        Role Assignment
-                        <a data-toggle="modal" href="#roleAssignmentExplanation" style="color:black">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                    </label>
-                    <div id="roleAssignmentMethod-group">
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="roleAssignmentMethod"
-                                       value="<%=AdminCreateGamesBean.RoleAssignmentMethod.RANDOM%>"
-                                       checked/>
-                                Random
+                        <div class="form-group">
+                            <label for="userNames" class="label-normal">
+                                User Names
                             </label>
+                            <a data-toggle="collapse" href="#demo" style="color:black">
+                                <span class="glyphicon glyphicon-question-sign"></span>
+                            </a>
+                            <div id="demo" class="collapse panel panel-default" style="margin-top: 5px;">
+                                <div class="panel-body" style="padding: 10px;">
+                                    Newline separated list of usernames or emails.
+                                    These names, as well as the names selected in the above table, will be assigned to created games.
+                                </div>
+                            </div>
+                            <textarea class="form-control" rows="5" id="userNames" name="userNames"></textarea>
                         </div>
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="roleAssignmentMethod"
-                                       value="<%=AdminCreateGamesBean.RoleAssignmentMethod.OPPOSITE%>"/>
-                                Opposite Role
+
+                        <div class="form-group"
+                             title="Method of assigning roles to players. Click the question mark for more information.">
+                            <label for="roleAssignmentMethod-group" class="label-normal">
+                                Role Assignment
+                                <a data-toggle="modal" href="#roleAssignmentExplanation" style="color:black">
+                                    <span class="glyphicon glyphicon-question-sign"></span>
+                                </a>
                             </label>
+                            <div id="roleAssignmentMethod-group">
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="roleAssignmentMethod"
+                                               value="<%=AdminCreateGamesBean.RoleAssignmentMethod.RANDOM%>"
+                                               checked/>
+                                        Random
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="roleAssignmentMethod"
+                                               value="<%=AdminCreateGamesBean.RoleAssignmentMethod.OPPOSITE%>"/>
+                                        Opposite Role
+                                    </label>
+                                </div>
+                            </div>
                         </div>
+
+                        <div class="form-group"
+                             title="Method of assigning players to teams. Click the question mark for more information.">
+                            <label for="teamAssignmentMethod-group" class="label-normal">
+                                Team Assignment
+                                <a data-toggle="modal" href="#teamAssignmentExplanation" style="color:black">
+                                    <span class="glyphicon glyphicon-question-sign"></span>
+                                </a>
+                            </label>
+                            <div id="teamAssignmentMethod-group">
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="teamAssignmentMethod"
+                                               value="<%=AdminCreateGamesBean.TeamAssignmentMethod.RANDOM%>"
+                                               checked/>
+                                        Random
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label class="label-normal">
+                                        <input type="radio" name="teamAssignmentMethod"
+                                               value="<%=AdminCreateGamesBean.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
+                                        Scores Descending
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group"
+                             title="Number of attackers per game.">
+                            <label for="attackersPerGame" class="label-normal">Attackers per Game</label>
+                            <input type="number" value="3" id="attackersPerGame" name="attackersPerGame" min="1" class="form-control"/>
+                        </div>
+
+                        <div class="form-group"
+                             title="Number of defenders per game.">
+                            <label for="defendersPerGame" class="label-normal">Defenders per Game</label>
+                            <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1" class="form-control"/>
+                        </div>
+
+                        <button class="btn btn-md btn-primary" type="button" name="stage-games-with-users-button" id="stage-games-with-users-button" style="margin-top: 1em">
+                            Stage Games
+                        </button>
+
                     </div>
                 </div>
 
-                <div class="form-group"
-                     title="Method of assigning players to teams. Click the question mark for more information.">
-                    <label for="teamAssignmentMethod-group" class="label-normal">
-                        Team Assignment
-                        <a data-toggle="modal" href="#teamAssignmentExplanation" style="color:black">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                    </label>
-                    <div id="teamAssignmentMethod-group">
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="teamAssignmentMethod"
-                                       value="<%=AdminCreateGamesBean.TeamAssignmentMethod.RANDOM%>"
-                                       checked/>
-                                Random
-                            </label>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Create Empty Staged Games
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group"
+                             title="Number of staged games to create.">
+                            <label for="numGames" class="label-normal">Number of Games</label>
+                            <input type="number" value="1" id="numGames" name="numGames" min="1" max="100" class="form-control"/>
                         </div>
-                        <div class="radio">
-                            <label class="label-normal">
-                                <input type="radio" name="teamAssignmentMethod"
-                                       value="<%=AdminCreateGamesBean.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
-                                Scores Descending
-                            </label>
-                        </div>
+
+                        <button class="btn btn-md btn-primary" type="button" name="stage-games-empty-button" id="stage-games-empty-button" style="margin-top: 1em">
+                            Stage Games
+                        </button>
                     </div>
                 </div>
-
-                <div class="form-group"
-                     title="Number of attackers per game.">
-                    <label for="attackersPerGame" class="label-normal">Attackers per Game</label>
-                    <input type="number" value="3" id="attackersPerGame" name="attackersPerGame" min="1" class="form-control"/>
-                </div>
-
-                <div class="form-group"
-                     title="Number of defenders per game.">
-                    <label for="defendersPerGame" class="label-normal">Defenders per Game</label>
-                    <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1" class="form-control"/>
-                </div>
-
-                <button class="btn btn-md btn-primary" type="button" name="stage-games-button" id="stage-games-button" style="margin-top: 1em">
-                    Stage Games
-                </button>
-                <p style="margin-top: .5em">
-                    If you just want to create a single open game without assigning players,
-                    you can also use the <a href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>?fromAdmin=true"> Create Game</a> page.
-                </p>
 
             </div> <%-- column --%>
         </div> <%-- row --%>
@@ -1282,8 +1305,8 @@
                 });
             });
 
-            /* Create new staged games. */
-            $('#stage-games-button').on('click', function () {
+            /* Create new staged games with users. */
+            $('#stage-games-with-users-button').on('click', function () {
                 const userIds = [];
                 usersTable.rows({selected: true}).every(function () {
                     if (rowSelected(this.node())) {
@@ -1292,8 +1315,19 @@
                     }
                 });
                 const params = {
-                    formType: 'stageGames',
+                    formType: 'stageGamesWithUsers',
                     userIds
+                };
+                for (const {name, value} of $("#form-settings").serializeArray()) {
+                    params[name] = value;
+                }
+                postForm(params);
+            });
+
+            /* Create new empty staged games. */
+            $('#stage-games-empty-button').on('click', function () {
+                const params = {
+                    formType: 'stageEmptyGames',
                 };
                 for (const {name, value} of $("#form-settings").serializeArray()) {
                     params[name] = value;

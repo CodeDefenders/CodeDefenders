@@ -136,9 +136,10 @@ public class AdminCreateGamesBean implements Serializable {
      * @see RoleAssignmentMethod
      * @see TeamAssignmentMethod
      */
-    public void stageGames(Set<UserInfo> users, GameSettings gameSettings,
-                           RoleAssignmentMethod roleAssignmentMethod, TeamAssignmentMethod teamAssignmentMethod,
-                           int attackersPerGame, int defendersPerGame) {
+    public void stageGamesWithUsers(Set<UserInfo> users, GameSettings gameSettings,
+                                    RoleAssignmentMethod roleAssignmentMethod,
+                                    TeamAssignmentMethod teamAssignmentMethod,
+                                    int attackersPerGame, int defendersPerGame) {
         /* Split users into attackers and defenders. */
         Set<UserInfo> attackers = new HashSet<>();
         Set<UserInfo> defenders = new HashSet<>();
@@ -180,6 +181,19 @@ public class AdminCreateGamesBean implements Serializable {
         }
 
         messages.add(format("Created {0} staged games.", numGames));
+    }
+
+    /**
+     * Creates empty staged games.
+     * @param gameSettings The settings for the staged games.
+     * @param numGames The number of staged games to create.
+     */
+    public void stageEmptyGames(GameSettings gameSettings, int numGames) {
+        for (int i = 0; i < numGames; i++) {
+            stagedGameList.addStagedGame(gameSettings);
+        }
+
+        messages.add(format("Created {0} empty staged games.", numGames));
     }
 
     /**

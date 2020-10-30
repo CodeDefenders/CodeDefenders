@@ -159,7 +159,7 @@ public class AdminCreateGamesBeanTest {
         int attackersPerGame = 2;
         int defendersPerGame = 2;
 
-        adminCreateGamesBean.stageGames(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
+        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
                 attackersPerGame, defendersPerGame);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
@@ -180,7 +180,7 @@ public class AdminCreateGamesBeanTest {
         int attackersPerGame = 2;
         int defendersPerGame = 2;
 
-        adminCreateGamesBean.stageGames(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
+        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
                 attackersPerGame, defendersPerGame);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
@@ -200,7 +200,7 @@ public class AdminCreateGamesBeanTest {
         int attackersPerGame = 2;
         int defendersPerGame = 2;
 
-        adminCreateGamesBean.stageGames(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
+        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
                 attackersPerGame, defendersPerGame);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(1));

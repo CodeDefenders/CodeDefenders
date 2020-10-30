@@ -99,8 +99,11 @@ public class AdminCreateGames extends HttpServlet {
             }
 
             switch (action) {
-                case "stageGames":
-                    stageGames(request);
+                case "stageGamesWithUsers":
+                    stageGamesWithUsers(request);
+                    break;
+                case "stageEmptyGames":
+                    stageEmptyGames(request);
                     break;
                 case "deleteStagedGames":
                     deleteStagedGames(request);
@@ -131,11 +134,44 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     /**
-     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGames(Set,
+     * Extract game settings from a request.
+     * @param request The HTTP request.
+     * @return The extracted game settings.
+     */
+    private GameSettings extractGameSettings(HttpServletRequest request) {
+        GameSettings gameSettings = new GameSettings();
+        try {
+            gameSettings.setGameType(GameSettings.GameType.valueOf(request.getParameter("gameType")));
+            gameSettings.setCut(GameClassDAO.getClassForId(getIntParameter(request, "cut").get()));
+            gameSettings.setWithMutants(request.getParameter("withMutants") != null);
+            gameSettings.setWithTests(request.getParameter("withTests") != null);
+
+            gameSettings.setMaxAssertionsPerTest(getIntParameter(request, "maxAssertionsPerTest").get());
+            gameSettings.setMutantValidatorLevel(
+                    CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel")));
+            gameSettings.setChatEnabled(request.getParameter("chatEnabled") != null);
+            gameSettings.setCaptureIntentions(request.getParameter("captureIntentions") != null);
+            gameSettings.setEquivalenceThreshold(
+                    getIntParameter(request, "automaticEquivalenceTrigger").get());
+            gameSettings.setLevel(GameLevel.valueOf(request.getParameter("level")));
+
+            gameSettings.setStartGame(request.getAttribute("startGame") != null);
+        } catch (NullPointerException | NoSuchElementException e) {
+            messages.add("ERROR: Missing game settings parameter.");
+            return null;
+        } catch (IllegalArgumentException e) {
+            messages.add("ERROR: Invalid game settings parameter.");
+            return null;
+        }
+        return gameSettings;
+    }
+
+    /**
+     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGamesWithUsers(Set,
      * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int) AdminCreateGamesBean#stageGames()}.
      * @param request The HTTP request.
      */
-    private void stageGames(HttpServletRequest request) {
+    private void stageGamesWithUsers(HttpServletRequest request) {
         /* Extract user IDs from the table. */
         String userIdsStr = request.getParameter("userIds");
         Set<Integer> userIdsFromTable;
@@ -170,30 +206,7 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         /* Extract game settings. */
-        GameSettings gameSettings = new GameSettings();
-        try {
-            gameSettings.setGameType(GameSettings.GameType.valueOf(request.getParameter("gameType")));
-            gameSettings.setCut(GameClassDAO.getClassForId(getIntParameter(request, "cut").get()));
-            gameSettings.setWithMutants(request.getParameter("withMutants") != null);
-            gameSettings.setWithTests(request.getParameter("withTests") != null);
-
-            gameSettings.setMaxAssertionsPerTest(getIntParameter(request, "maxAssertionsPerTest").get());
-            gameSettings.setMutantValidatorLevel(
-                    CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel")));
-            gameSettings.setChatEnabled(request.getParameter("chatEnabled") != null);
-            gameSettings.setCaptureIntentions(request.getParameter("captureIntentions") != null);
-            gameSettings.setEquivalenceThreshold(
-                    getIntParameter(request, "automaticEquivalenceTrigger").get());
-            gameSettings.setLevel(GameLevel.valueOf(request.getParameter("level")));
-
-            gameSettings.setStartGame(request.getAttribute("startGame") != null);
-        } catch (NullPointerException | NoSuchElementException e) {
-            messages.add("ERROR: Missing game settings parameter.");
-            return;
-        } catch (IllegalArgumentException e) {
-            messages.add("ERROR: Invalid game settings parameter.");
-            return;
-        }
+        GameSettings gameSettings = extractGameSettings(request);
 
         /* Extract game management settings settings. */
         RoleAssignmentMethod roleAssignmentMethod;
@@ -247,8 +260,35 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        adminCreateGamesBean.stageGames(users, gameSettings, roleAssignmentMethod,
+        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod,
                 teamAssignmentMethod, attackersPerGame, defendersPerGame);
+    }
+
+    /**
+     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageEmptyGames(
+     * GameSettings, int) AdminCreateGamesBean#stageEmptyGames()}.
+     * @param request The HTTP request.
+     */
+    private void stageEmptyGames(HttpServletRequest request) {
+        int numGames;
+        try {
+            numGames = getIntParameter(request, "numGames").get();
+        } catch (NullPointerException e) {
+            messages.add("ERROR: Missing parameter: numGames.");
+            return;
+        } catch (NoSuchElementException e) {
+            messages.add("ERROR: Invalid parameter: numGames.");
+            return;
+        }
+
+        GameSettings gameSettings = extractGameSettings(request);
+
+        if (numGames > 100) {
+            messages.add("ERROR: Won't create more than 100 staged games.");
+            return;
+        }
+
+        adminCreateGamesBean.stageEmptyGames(gameSettings, numGames);
     }
 
     /**
