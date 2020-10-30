@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -83,12 +82,6 @@ public class AdminCreateGamesBean implements Serializable {
      */
     private final Map<Integer, UserInfo> userInfos = new HashMap<>();
 
-    /**
-     * Produces the staged games list that is managed by the bean.
-     * @return The beans staged games list.
-     */
-    @Produces
-    @Named("stagedGameList")
     public StagedGameList getStagedGameList() {
         if (stagedGameList == null) {
             stagedGameList = new StagedGameList();

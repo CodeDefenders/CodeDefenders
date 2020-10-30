@@ -1,6 +1,5 @@
 package org.codedefenders.beans.admin;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
  *     <li>Each user can only be assigned to one staged game in the list.</li>
  * </ul>
  */
-public class StagedGameList implements Serializable {
+public class StagedGameList {
     /**
      * Maps the ID of staged games to the corresponding {@link StagedGame StagedGames}.
      */

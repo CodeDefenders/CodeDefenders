@@ -70,12 +70,11 @@ public class AdminCreateGames extends HttpServlet {
     @Inject
     private AdminCreateGamesBean adminCreateGamesBean;
 
-    @Inject
-    @Named("stagedGameList")
     private StagedGameList stagedGameList;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        this.stagedGameList = adminCreateGamesBean.getStagedGameList();
         adminCreateGamesBean.updateUserInfos();
 
         request.setAttribute("adminCreateGamesBean", stagedGameList);
@@ -84,6 +83,7 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        this.stagedGameList = adminCreateGamesBean.getStagedGameList();
         adminCreateGamesBean.updateUserInfos();
 
         final String action = request.getParameter("formType");
