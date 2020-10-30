@@ -139,9 +139,6 @@ public class AdminCreateGamesBean implements Serializable {
     public void stageGames(Set<UserInfo> users, GameSettings gameSettings,
                            RoleAssignmentMethod roleAssignmentMethod, TeamAssignmentMethod teamAssignmentMethod,
                            int attackersPerGame, int defendersPerGame) {
-        int numGames = users.size() / (attackersPerGame + defendersPerGame);
-        numGames = numGames == 0 ? 1 : numGames;
-
         /* Split users into attackers and defenders. */
         Set<UserInfo> attackers = new HashSet<>();
         Set<UserInfo> defenders = new HashSet<>();
@@ -152,6 +149,18 @@ public class AdminCreateGamesBean implements Serializable {
              * For non-melee games this is expected, since, if the players can't be evenly distributed between games,
              * games that are assigned more attackers should also get assigned more defenders as other games. */
             attackers.addAll(users);
+        }
+
+        int numGames = users.size() / (attackersPerGame + defendersPerGame);
+        /* Avoid empty games. */
+        if (numGames > attackers.size() && numGames > defenders.size())  {
+            int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
+            int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
+            numGames = Math.max(numGames1, numGames2);
+        }
+        /* Always create at least one game. */
+        if (numGames == 0) {
+            numGames = 1;
         }
 
         /* Assign attackers and defenders to teams. */
