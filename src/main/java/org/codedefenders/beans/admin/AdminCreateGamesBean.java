@@ -166,7 +166,7 @@ public class AdminCreateGamesBean implements Serializable {
             }
         }
 
-        messages.add(format("Staged {0} games.", numGames));
+        messages.add(format("Created {0} staged games.", numGames));
     }
 
     /**
@@ -178,7 +178,7 @@ public class AdminCreateGamesBean implements Serializable {
             stagedGameList.removeStagedGame(stagedGame.getId());
         }
 
-        messages.add(format("Deleted {0} games.", stagedGames.size()));
+        messages.add(format("Deleted {0} staged games.", stagedGames.size()));
     }
 
     /**
@@ -192,7 +192,7 @@ public class AdminCreateGamesBean implements Serializable {
             }
         }
 
-        messages.add(format("Created {0} games.", stagedGames.size()));
+        messages.add(format("Created games for {0} staged games.", stagedGames.size()));
     }
 
     /**
@@ -213,7 +213,7 @@ public class AdminCreateGamesBean implements Serializable {
         } else {
             messages.add(format(
                     "ERROR: Cannot remove user {0} from staged game {1}. "
-                            + "User is not assigned to the the staged game.",
+                            + "User is not assigned to the staged game.",
                     userId, stagedGame.getFormattedId()));
             return false;
         }
@@ -233,8 +233,8 @@ public class AdminCreateGamesBean implements Serializable {
             stagedGame.removePlayer(user.getId());
             stagedGame.addAttacker(user.getId());
         } else {
-            messages.add(format("ERROR: Cannot switch role of user {0}. "
-                            + "User is not assigned to staged game {1}.",
+            messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}. "
+                            + "User is not assigned to the staged game.",
                     user.getId(), stagedGame.getFormattedId()));
             return false;
         }
@@ -255,7 +255,7 @@ public class AdminCreateGamesBean implements Serializable {
                                                 User user, Role role) {
         if (!stagedGameFrom.removePlayer(user.getId())) {
             messages.add(format(
-                    "ERROR: Cannot not move user {0} from staged game {1}. "
+                    "ERROR: Cannot move user {0} from staged game {1}. "
                             + "User is not assigned to the staged game.",
                     user.getId(), stagedGameFrom.getFormattedId())
             );
@@ -271,7 +271,7 @@ public class AdminCreateGamesBean implements Serializable {
                 stagedGameTo.addDefender(user.getId());
                 break;
             default:
-                messages.add(format("ERROR: Cannot move player to game with role {0}. Invalid role.", role));
+                messages.add(format("ERROR: Cannot move player to staged game with role {0}. Invalid role.", role));
                 return false;
         }
 
@@ -299,7 +299,7 @@ public class AdminCreateGamesBean implements Serializable {
                 success = stagedGame.addDefender(user.getId());
                 break;
             default:
-                messages.add(format("Cannot add player with role {0}. Invalid role.", role));
+                messages.add(format("ERROR: Cannot add player to staged game with role {0}. Invalid role.", role));
                 return false;
         }
 
@@ -551,7 +551,7 @@ public class AdminCreateGamesBean implements Serializable {
                     .level(gameSettings.getLevel())
                     .build();
         } else {
-            messages.add(format("ERROR: Could not create staged game {0}. Invalid game type: {1}.",
+            messages.add(format("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",
                     stagedGame.getFormattedId(), gameSettings.getGameType().getName()));
             return false;
         }
@@ -559,7 +559,7 @@ public class AdminCreateGamesBean implements Serializable {
         /* Insert the game. */
         game.setEventDAO(eventDAO);
         if (!game.insert()) {
-            messages.add(format("ERROR: Could not create staged game {0}. Could not insert into the database.",
+            messages.add(format("ERROR: Could not create game for staged game {0}.",
                     stagedGame.getFormattedId()));
             return false;
         }
@@ -581,7 +581,7 @@ public class AdminCreateGamesBean implements Serializable {
             for (int userId : stagedGame.getAttackers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
-                    addPlayerToExistingGame(game, user.getUser(), Role.ATTACKER);
+                    game.addPlayer(user.getUser().getId(), Role.ATTACKER);
                 } else {
                     messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
                             userId, game.getId(), Role.ATTACKER.getFormattedString()));
@@ -590,7 +590,7 @@ public class AdminCreateGamesBean implements Serializable {
             for (int userId : stagedGame.getDefenders()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
-                    addPlayerToExistingGame(game, user.getUser(), Role.DEFENDER);
+                    game.addPlayer(user.getUser().getId(), Role.ATTACKER);
                 } else {
                     messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
                             userId, game.getId(), Role.DEFENDER.getFormattedString()));
@@ -600,7 +600,7 @@ public class AdminCreateGamesBean implements Serializable {
             for (int userId : stagedGame.getPlayers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
-                    addPlayerToExistingGame(game, user.getUser(), Role.PLAYER);
+                    game.addPlayer(user.getUser().getId(), Role.ATTACKER);
                 } else {
                     messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
                             userId, game.getId(), Role.PLAYER.getFormattedString()));

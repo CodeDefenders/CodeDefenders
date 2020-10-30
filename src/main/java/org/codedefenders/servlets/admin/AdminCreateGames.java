@@ -312,7 +312,7 @@ public class AdminCreateGames extends HttpServlet {
 
         /* Verify that all staged games exist. */
         if (!existingStagedGames.keySet().containsAll(stagedGameIds)) {
-            messages.add("Cannot create staged games. Not all selected staged games exist.");
+            messages.add("ERROR: Cannot create staged games. Not all selected staged games exist.");
             return;
         }
 
