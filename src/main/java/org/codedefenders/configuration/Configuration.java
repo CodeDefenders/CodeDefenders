@@ -29,8 +29,10 @@ import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -74,6 +76,8 @@ import com.google.common.net.InternetDomainName;
 @Singleton
 public class Configuration {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+    private boolean $validated;
+    private ConfigurationValidationException $configurationValidationException;
 
     // All the attributes need to be initialized with a null value and therefore need to be objects
     protected String dataDir;
@@ -98,79 +102,112 @@ public class Configuration {
      * @throws ConfigurationValidationException This lists all the reasons why the validation failed.
      */
     public final void validate() throws ConfigurationValidationException {
-        List<String> validationErrors = new ArrayList<>();
+        if (!$validated) {
+            List<String> validationErrors = new ArrayList<>();
 
-        if (dataDir == null || dataDir.equals("")) {
-            validationErrors.add("Property " + resolveAttributeName("dataDir") + " is missing");
-        } else {
-            File dataDir = getDataDir();
-            String dataDirCreate = setupDirectory(dataDir);
-            if (dataDirCreate != null) {
-                validationErrors.add(dataDirCreate);
+            if (dataDir == null || dataDir.equals("")) {
+                validationErrors.add("Property " + resolveAttributeName("dataDir") + " is missing");
             } else {
-                validationErrors.add(setupFile(dataDir, "build.xml",
-                        () -> this.getClass().getResourceAsStream("/data/build.xml")));
-                validationErrors.add(setupFile(dataDir, "security.policy",
-                        () -> this.getClass().getResourceAsStream("/data/security.policy")));
+                File dataDir = getDataDir();
+                String dataDirCreate = setupDirectory(dataDir);
+                if (dataDirCreate != null) {
+                    validationErrors.add(dataDirCreate);
+                } else {
+                    validationErrors.add(setupFile(dataDir, "build.xml",
+                            () -> this.getClass().getResourceAsStream("/data/build.xml")));
+                    validationErrors.add(setupFile(dataDir, "security.policy",
+                            () -> this.getClass().getResourceAsStream("/data/security.policy")));
 
-                for (File directory : Arrays.asList(getAiDir(), getLibraryDir(), getMutantDir(), getTestsDir(),
-                        getSourcesDir())) {
-                    validationErrors.add(setupDirectory(directory));
-                }
+                    validationErrors.add(setupDirectory(getAiDir()));
+                    validationErrors.add(setupDirectory(getMutantDir()));
+                    validationErrors.add(setupDirectory(getTestsDir()));
+                    validationErrors.add(setupDirectory(getSourcesDir()));
 
-                // TODO: Replace this with something which can resolve the dependencies.
-                try (Stream<Path> entries = Files.list(getLibraryDir().toPath())) {
-                    if (!entries.findFirst().isPresent()) {
-                        validationErrors.add("The library directory " + getLibraryDir().toPath().toString()
-                                + " is empty! Please download the dependencies via the installation-pom.xml!");
+                    validationErrors.add(setupDirectory(getLibraryDir()));
+                    // TODO: Replace this with something which can resolve the dependencies.
+                    try (Stream<Path> entries = Files.list(getLibraryDir().toPath())) {
+                        if (!entries.findFirst().isPresent()) {
+                            validationErrors.add("The library directory " + getLibraryDir().toPath().toString()
+                                    + " is empty! Please download the dependencies via the installation-pom.xml!");
+                        }
+                    } catch (IOException ignored) {
+                        // ignored
                     }
-                } catch (IOException ignored) {
-                    // ignored
                 }
             }
-        }
 
-        if (antHome == null || antHome.equals("")) {
-            validationErrors.add("Property " + resolveAttributeName("antHome") + " is missing");
+            if (antHome == null || antHome.equals("")) {
+                validationErrors.add("Property " + resolveAttributeName("antHome") + " is missing");
+            } else {
+                File antExecutable = new File(getAntHome(), "/bin/ant");
+                if (!antExecutable.exists() || !antExecutable.isFile()) {
+                    validationErrors.add(resolveAttributeName("antHome") + " doesn't contain the ant executable "
+                            + antExecutable);
+                }
+            }
+
+            boolean dbvalid = true;
+            if (dbHost == null || dbHost.equals("")) {
+                validationErrors.add("Property " + resolveAttributeName("dbHost") + " is missing");
+                dbvalid = false;
+            } else { //noinspection UnstableApiUsage
+                if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
+                    validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
+                            + " is neither a valid ip nor a valid hostname");
+                    dbvalid = false;
+                }
+            }
+            if (dbPort == null) {
+                validationErrors.add("Property " + resolveAttributeName("dbPort") + " is missing");
+                dbvalid = false;
+            } else if (dbPort <= 0 | dbPort > 65535) {
+                validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort + " is not a valid port number");
+                dbvalid = false;
+            }
+            if (dbName == null || dbName.equals("")) {
+                validationErrors.add("Property " + resolveAttributeName("dbName") + " is missing");
+                dbvalid = false;
+            }
+            if (dbvalid) {
+                try {
+                    Class.forName("com.mysql.cj.jdbc.Driver");
+                    try (Connection conn = DriverManager.getConnection(getDbUrl(), getDbUsername(), getDbPassword())) {
+                        if (!conn.isValid(10)) { // 10 sec
+                            validationErrors.add("Can't get a valid connection within 10 seconds!");
+                        }
+                    } catch (SQLException e) {
+                        if (e.getMessage().contains("Access denied")) {
+                            validationErrors.add("Can't connect to the database. " + e.getMessage());
+                        } else {
+                            validationErrors.add("Can't connect to the database. "
+                                    + "Please check the database and the connection settings.");
+                        }
+                    }
+                } catch (ClassNotFoundException e) {
+                    validationErrors.add("Could not load the MySQL driver");
+                }
+            }
+
+            if (getJavaMajorVersion() > 9) {
+                validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 9");
+            }
+
+            /*
+            if (clusterMode) {
+                // TODO: Validate clusterOptions
+            }
+             */
+
+            validationErrors.removeIf(Objects::isNull);
+            $validated = true;
+            if (!validationErrors.isEmpty()) {
+                $configurationValidationException = new ConfigurationValidationException(validationErrors);
+                throw $configurationValidationException;
+            }
         } else {
-            File antExecutable = new File(getAntHome(),"/bin/ant");
-            if (!antExecutable.exists() || !antExecutable.isFile()) {
-                validationErrors.add(resolveAttributeName("antHome") + " doesn't contain the ant executable "
-                        + antExecutable);
+            if ($configurationValidationException != null) {
+                throw $configurationValidationException;
             }
-        }
-
-        if (dbHost == null || dbHost.equals("")) {
-            validationErrors.add("Property " + resolveAttributeName("dbHost") + " is missing");
-        } else { //noinspection UnstableApiUsage
-            if (!(InetAddresses.isUriInetAddress(dbHost) || InternetDomainName.isValid(dbHost))) {
-                validationErrors.add(resolveAttributeName("dbHost") + ": " + dbHost
-                        + " is neither a valid ip nor a valid hostname");
-            }
-        }
-
-        if (dbPort == null) {
-            validationErrors.add("Property " + resolveAttributeName("dbPort") + " is missing");
-        } else if (dbPort <= 0 | dbPort > 65535) {
-            validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort + " is not a valid port number");
-        }
-
-        if (dbName == null || dbName.equals("")) {
-            validationErrors.add("Property " + resolveAttributeName("dbName") + " is missing");
-        }
-
-        if (getJavaMajorVersion() > 9) {
-            validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 9");
-        }
-
-        //if (clusterMode) {
-        //    // TODO: Validate clusterOptions
-        //}
-
-
-        validationErrors.removeIf(Objects::isNull);
-        if (!validationErrors.isEmpty()) {
-            throw new ConfigurationValidationException(validationErrors);
         }
     }
 
@@ -228,6 +265,14 @@ public class Configuration {
         }
     }
 
+    public boolean isValid() {
+        try {
+            validate();
+        } catch (ConfigurationValidationException e) {
+            return false;
+        }
+        return true;
+    }
 
     public File getDataDir() {
         return new File(dataDir);

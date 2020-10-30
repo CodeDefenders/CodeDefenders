@@ -18,7 +18,6 @@
  */
 package org.codedefenders;
 
-import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -31,7 +30,6 @@ import javax.servlet.annotation.WebListener;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
-import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +46,6 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private Configuration config;
 
-    @Inject
-    private ConnectionFactory connectionFactory;
-
     /**
      * This method is called when the servlet context is initialized(when
      * the Web application is deployed). You can initialize servlet context
@@ -63,12 +58,6 @@ public class SystemStartStop implements ServletContextListener {
         } catch (ConfigurationValidationException e) {
             logger.error(e.getMessage());
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
-        }
-        try (Connection ignored = connectionFactory.getConnection()) {
-            logger.info("Code Defenders started successfully.");
-        } catch (Exception e) {
-            // Fail Deployment
-            throw new RuntimeException("Deployment failed. Reason: ", e);
         }
         mgr.register("test-executor").withMax(4).withCore(2).add();
 
