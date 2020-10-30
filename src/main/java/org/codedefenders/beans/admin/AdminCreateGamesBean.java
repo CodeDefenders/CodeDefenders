@@ -56,6 +56,10 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * Implements the functionality of the admin create games page.
+ * <br/>
+ * <br/>
+ * It provides the consistencies of {@link StagedGameList} and additionally guarantees that all users
+ * assigned to staged games are valid users (i.e. existing non-system users that are active).
  * @see AdminCreateGames
  */
 @Named("adminCreateGames")
@@ -213,7 +217,7 @@ public class AdminCreateGamesBean implements Serializable {
         } else {
             messages.add(format(
                     "ERROR: Cannot remove user {0} from staged game {1}. "
-                            + "User is not assigned to the staged game.",
+                    + "User is not assigned to the staged game.",
                     userId, stagedGame.getFormattedId()));
             return false;
         }
@@ -234,7 +238,7 @@ public class AdminCreateGamesBean implements Serializable {
             stagedGame.addAttacker(user.getId());
         } else {
             messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}. "
-                            + "User is not assigned to the staged game.",
+                    + "User is not assigned to the staged game.",
                     user.getId(), stagedGame.getFormattedId()));
             return false;
         }
@@ -256,7 +260,7 @@ public class AdminCreateGamesBean implements Serializable {
         if (!stagedGameFrom.removePlayer(user.getId())) {
             messages.add(format(
                     "ERROR: Cannot move user {0} from staged game {1}. "
-                            + "User is not assigned to the staged game.",
+                    + "User is not assigned to the staged game.",
                     user.getId(), stagedGameFrom.getFormattedId())
             );
             return false;
@@ -308,7 +312,7 @@ public class AdminCreateGamesBean implements Serializable {
                     user.getId(), stagedGame.getFormattedId(), role.getFormattedString()));
         } else {
             messages.add(format("ERROR: Cannot add user {0} to staged game {1}. "
-                            + "User is already assigned to a different staged game.",
+                    + "User is already assigned to a different staged game.",
                     user.getId(), stagedGame.getFormattedId()));
         }
 
@@ -399,8 +403,13 @@ public class AdminCreateGamesBean implements Serializable {
 
     /**
      * Assigns roles to a collection of users based on a {@link RoleAssignmentMethod}. The users will be added to the
-     * given {@code attackers} and {@code defenders} sets accordingly. The passed {@code attackers} and
-     * {@code defenders} sets can be non-empty. In this case, the number of already assigned attackers and defenders
+     * given {@code attackers} and {@code defenders} sets accordingly. Users that cannot be assigned with the given
+     * {@link RoleAssignmentMethod} are assigned {@link RoleAssignmentMethod#RANDOM randomly}, trying to assign the
+     * correct number of attackers and defenders.
+     * <br/>
+     * <br/>
+     * The passed {@code attackers} and {@code defenders} sets can be non-empty. In this case, the number of already
+     * assigned attackers and defenders
      * will be taken into account.
      * @param users The users to be assigned roles. Must be disjoint with {@code attackers} and {@code defenders}.
      * @param method The method of assigning the roles.
@@ -472,7 +481,8 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     /**
-     * Splits the given users into teams according to a {@link TeamAssignmentMethod}.
+     * Splits the given users into teams according to a {@link TeamAssignmentMethod}. If the users cannot be split into
+     * teams evenly, the size of some teams is increased by 1 to fit the remaining users into teams.
      * @param users The users to be split into teams.
      * @param numTeams The number of teams to split the users into.
      * @param method The method of splitting the users into teams.
@@ -583,7 +593,8 @@ public class AdminCreateGamesBean implements Serializable {
                 if (user != null) {
                     game.addPlayer(user.getUser().getId(), Role.ATTACKER);
                 } else {
-                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
+                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
+                            + "User does not exist.",
                             userId, game.getId(), Role.ATTACKER.getFormattedString()));
                 }
             }
@@ -592,7 +603,8 @@ public class AdminCreateGamesBean implements Serializable {
                 if (user != null) {
                     game.addPlayer(user.getUser().getId(), Role.ATTACKER);
                 } else {
-                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
+                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
+                            + "User does not exist.",
                             userId, game.getId(), Role.DEFENDER.getFormattedString()));
                 }
             }
@@ -602,7 +614,8 @@ public class AdminCreateGamesBean implements Serializable {
                 if (user != null) {
                     game.addPlayer(user.getUser().getId(), Role.ATTACKER);
                 } else {
-                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. User does not exist.",
+                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
+                            + "User does not exist.",
                             userId, game.getId(), Role.PLAYER.getFormattedString()));
                 }
             }
@@ -710,7 +723,6 @@ public class AdminCreateGamesBean implements Serializable {
 
         /**
          * Users are assigned the role opposite of the last role they played as.
-         * Users, which played neither as attacker or defender are assigned roles randomly.
          */
         OPPOSITE
     }

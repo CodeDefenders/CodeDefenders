@@ -59,6 +59,10 @@ import org.slf4j.LoggerFactory;
 import static java.text.MessageFormat.format;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 
+/**
+ * Handles extraction and verification of parameters for the admin create games page.
+ * @see AdminCreateGamesBean
+ */
 @WebServlet(urlPatterns = {Paths.ADMIN_PAGE, Paths.ADMIN_GAMES})
 public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
