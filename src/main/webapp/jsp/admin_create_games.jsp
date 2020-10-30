@@ -478,11 +478,68 @@
     </div>
 
     <script>
+        /**
+         *  Maps IDs to staged games.
+         */
         const stagedGames = new Map(JSON.parse('${adminCreateGames.stagedGamesAsJSON}'));
+
+        /**
+         * Maps IDs to user infos.
+         */
         const userInfos = new Map(JSON.parse('${adminCreateGames.userInfosAsJSON}'));
-        const activeMultiplayerGameIds = JSON.parse('${adminCreateGames.activeMultiplayerGameIdsJSON}').sort();
-        const activeMeleeGameIds = JSON.parse('${adminCreateGames.activeMeleeGameIdsJSON}').sort();
+
+        /**
+         * IDs of active (started and not finished) multiplayer games.
+         */
+        const activeMultiplayerGameIds = new Set(JSON.parse('${adminCreateGames.activeMultiplayerGameIdsJSON}'));
+
+        /**
+         *  IDs of active (started and not finished) melee games.
+         */
+        const activeMeleeGameIds = new Set(JSON.parse('${adminCreateGames.activeMeleeGameIdsJSON}'));
+
+        /**
+         * IDs of users not assigned to any active games.
+         */
         const unassignedUserIds = new Set(JSON.parse('${adminCreateGames.unassignedUserIdsJSON}'));
+
+
+        /**
+         * IDs of users assigned to any staged game.
+         */
+        const assignedUserIdsStaged = new Set([...stagedGames.values()]
+            .flatMap(game => [...game.attackers, ...game.defenders]));
+
+        /**
+         * IDs of active multiplayer/melee games, sorted.
+         */
+        const activeGameIds = [...activeMultiplayerGameIds.values(), ...activeMeleeGameIds.values()]
+            .sort();
+
+        /**
+         * Staged games to be displayed in the table, sorted by ID.
+         */
+        const stagedGamesTableData = [...stagedGames.values()]
+            .sort((a, b) => a.id - b.id);
+
+        /**
+         * User infos to be displayed in the table, sorted by ID.
+         */
+        const usersTableData = [...userInfos.values()]
+            .filter(userInfo => !assignedUserIdsStaged.has(userInfo.user.id))
+            .sort((a, b) => a.user.id - b.user.id);
+
+
+        /**
+         * Hide assigned players in the staged games table.
+         */
+        let hideStagedGamePlayers = JSON.parse(localStorage.getItem('hideStagedGamePlayers')) || false;
+
+        /**
+         * Show users assigned to active games in the users table.
+         */
+        let showAssignedUsers = JSON.parse(localStorage.getItem('showAssignedUsers')) || false;
+
 
         // TODO: Generate these automatically with a bean?.
         const GameType = {
@@ -507,16 +564,7 @@
             NONE:           {name: 'NONE',          display: 'None'}
         };
 
-        const stagedGamesList = [...stagedGames.values()]
-            .sort((a, b) => a.id - b.id);
-        const assignedUserIdsStaged = new Set(stagedGamesList
-            .flatMap(game => [...game.attackers, ...game.defenders]));
-        const userInfosList = [...userInfos.values()]
-            .filter(userInfo => !assignedUserIdsStaged.has(userInfo.user.id))
-            .sort((a, b) => a.user.id - b.user.id);
-        const activeGameIds = [...activeMultiplayerGameIds, ...activeMeleeGameIds]
-            .sort();
-
+        /* Timezone and date format to format the last login date for users. */
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const dateFormat = Intl.DateTimeFormat([], {
             year: '2-digit',
@@ -526,15 +574,28 @@
             minute: '2-digit'
         });
 
-        let hideStagedGamePlayers = JSON.parse(localStorage.getItem('hideStagedGamePlayers')) || false;
-        let showAssignedUsers = JSON.parse(localStorage.getItem('showAssignedUsers')) || false;
+        /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
+        $.fn.dataTable.ext.order['select-extension'] = function (settings, col) {
+            return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
+                return rowSelected($(td).closest('tr').get(0)) ? '0' : '1';
+            });
+        };
+
+        /**
+         * Checks if the given table row is selected by the DataTables select extension.
+         * @param {HTMLTableRowElement} tr The table row.
+         * @return {boolean} Whether the row is selected.
+         */
+        const rowSelected = function (tr) {
+            return tr.classList.contains('selected');
+        }
 
         const renderUserLastRole = function (lastRole, type, row, meta) {
             switch (type) {
                 case 'type':
                     return lastRole === null ? '' : lastRole;
                 case 'sort':
-                    return lastRole === null ? 'Z' : lastRole;
+                    return lastRole === null ? 'ZZ' : lastRole;
                 case 'filter':
                     return lastRole === null ? 'none' : lastRole;
                 case 'display':
@@ -582,7 +643,7 @@
             gameIdSelect.classList.add('add-player-game');
             gameIdCell.appendChild(gameIdSelect);
 
-            for (const stagedGame of stagedGamesList) {
+            for (const stagedGame of stagedGames.values()) {
                 const option = document.createElement('option');
                 option.textContent = 'T' + stagedGame.id;
                 option.value = 'T' + stagedGame.id;
@@ -598,6 +659,7 @@
             const roleCell = tr.insertCell();
             roleCell.style.width = '8em';
 
+            /* The role select is generated empty, as options are set based on the type of the selected game. */
             const roleSelect = document.createElement('select');
             roleSelect.classList.add('add-player-role');
             roleCell.appendChild(roleSelect);
@@ -647,6 +709,7 @@
                     return players.map(userInfo => userInfo.user.username).join(' ');
                 case 'sort':
                 case 'type':
+                    /* Sort the players column by the number of players. */
                     return players.length;
                 case 'display':
                     if (hideStagedGamePlayers) {
@@ -657,7 +720,15 @@
             }
         }
 
-        const createStagedGamePlayersTable = function (stagedGame, attackers, defenders) {
+        /**
+         * Creates a table displaying the players of a staged game, as well as a "form" to manipulate them.
+         * @param {StagedGame} stagedGame The staged game to create the table for.
+         * @return {String} The HTML of the created table.
+         */
+        const createStagedGamePlayersTable = function (stagedGame) {
+            const attackers = stagedGame.attackers.map(userInfos.get, userInfos)
+            const defenders = stagedGame.defenders.map(userInfos.get, userInfos);
+
             const table = document.createElement('table');
             table.classList.add('staged-game-players');
             table.style.width = '100%';
@@ -684,6 +755,13 @@
             return table.outerHTML;
         };
 
+        /**
+         * Adds a row to the players table for a staged game.
+         * @param {HTMLTableElement} table The table to add the row to.
+         * @param {StagedGame} stagedGame The staged game the row is for.
+         * @param {UserInfo} userInfo The user assigned to the staged game.
+         * @param {String} role The role of the user.
+         */
         const addStagedGamePlayersRow = function (table, stagedGame, userInfo, role) {
             const tr = table.insertRow();
             tr.setAttribute('data-user-id', userInfo.user.id);
@@ -713,6 +791,7 @@
                          <span class="glyphicon glyphicon-transfer"></span>
                      </button>`;
 
+            /* Hide switch role button for melee games. */
             if (role === 'PLAYER') {
                 switchRolesCell.firstChild.style.visibility = 'hidden';
             }
@@ -731,7 +810,7 @@
             gameIdSelect.classList.add('move-player-game');
             moveGameIdCell.appendChild(gameIdSelect);
 
-            for (const otherStagedGame of stagedGamesList) {
+            for (const otherStagedGame of stagedGames.values()) {
                 if (otherStagedGame.id !== stagedGame.id) {
                     const option = document.createElement('option');
                     option.textContent = 'T' + otherStagedGame.id;
@@ -755,9 +834,16 @@
                      </button>`;
         };
 
-        const adjustFormForGame = function (roleSelect, button, gameIdStr) {
+        /**
+         * For a "form" to add a user to an existing game, selects the correct roles for the type of the selected game
+         * and enable the "submit" button.
+         * @param {HTMLSelectElement} roleSelect The role select.
+         * @param {HTMLButtonElement} submitButton The "submit" button.
+         * @param {String} gameIdStr The formatted ID of the selected staged or existing game.
+         */
+        const adjustFormForGame = function (roleSelect, submitButton, gameIdStr) {
             roleSelect.innerHTML = '';
-            button.disabled = true;
+            submitButton.disabled = true;
 
             let gameType;
             if (gameIdStr.startsWith('T')) {
@@ -765,9 +851,9 @@
                 gameType = stagedGames.get(gameId).gameSettings.gameType;
             } else {
                 const gameId = Number(gameIdStr);
-                if (activeMultiplayerGameIds.includes(gameId)) {
+                if (activeMultiplayerGameIds.has(gameId)) {
                     gameType = GameType.MULTIPLAYER.name;
-                } else if (activeMeleeGameIds.includes(gameId)) {
+                } else if (activeMeleeGameIds.has(gameId)) {
                     gameType = GameType.MELEE.name;
                 }
             }
@@ -781,29 +867,28 @@
                 defenderOption.textContent = Role.DEFENDER.display;
                 defenderOption.value = Role.DEFENDER.name;
                 roleSelect.appendChild(defenderOption);
-                button.disabled = false;
+                submitButton.disabled = false;
             } else if (gameType === GameType.MELEE.name) {
                 const playerOption = document.createElement('option');
                 playerOption.textContent = Role.PLAYER.display;
                 playerOption.value = Role.PLAYER.name;
                 roleSelect.appendChild(playerOption);
-                button.disabled = false;
+                submitButton.disabled = false;
             }
         };
 
+        /**
+         * Hides user rows that should be hidden from the users table, after is has been drawn.
+         * @param {DataTable} usersTable The users table.
+         */
         const filterDisplayedUsers = function (usersTable) {
-            usersTable.rows().every(function () {
-                const userInfo = this.data();
-                if (showAssignedUsers || unassignedUserIds.has(userInfo.user.id)) {
-                    userInfo._hidden = false;
-                    $(this.node()).show();
-                } else {
-                    userInfo._hidden = true;
-                    $(this.node()).hide();
-                }
-            });
         };
 
+        /**
+         * Generates and posts a form from the given parameters. For every "name: value" pair given in the parameters a
+         * form input with the name and value is created. If the value is a list, the elements are joined with ','.
+         * @param {Object} params The form parameters.
+         */
         const postForm = function (params) {
             const form = document.createElement('form');
             form.method = 'post';
@@ -823,20 +908,6 @@
             document.body.appendChild(form);
             form.submit();
         };
-
-        const setCheckboxButton = function (checkbox, checked) {
-            if (checked) {
-                checkbox.checked = true;
-                checkbox.parentNode.classList.add('active');
-            } else {
-                checkbox.checked = false;
-                checkbox.parentNode.classList.remove('active');
-            }
-        }
-
-        const rowSelected = function (tr) {
-            return tr.classList.contains('selected');
-        }
 
         const createSettingsTable = function (gameSettings) {
             const table = document.createElement('table');
@@ -887,30 +958,34 @@
             tr.insertCell().textContent = gameSettings.startGame;
 
             return table.outerHTML;
-        }
+        };
 
+        /* Restore the state of show/hide toggles for the tables. */
         $(document).ready(function () {
+            const setCheckboxButton = function (checkbox, checked) {
+                if (checked) {
+                    checkbox.checked = true;
+                    checkbox.parentNode.classList.add('active');
+                } else {
+                    checkbox.checked = false;
+                    checkbox.parentNode.classList.remove('active');
+                }
+            }
             setCheckboxButton($('#toggle-hide-players').get(0), hideStagedGamePlayers);
             setCheckboxButton($('#toggle-show-assigned-users').get(0), showAssignedUsers);
-
-            $.fn.dataTable.ext.order['select'] = function (settings, col) {
-                return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
-                    return rowSelected($(td).closest('tr').get(0)) ? '0' : '1';
-                });
-            };
         });
 
         /* Staged games table. */
         $(document).ready(function () {
             const stagedGamesTable = $('#table-staged-games').DataTable({
-                data: stagedGamesList,
+                data: stagedGamesTableData,
                 columns: [
                     {
                         data: null,
                         title: '',
                         defaultContent: '',
                         className: 'select-checkbox',
-                        orderDataType: 'select'
+                        orderDataType: 'select-extension'
                     },
                     {
                         data: 'id',
@@ -950,7 +1025,10 @@
                     className: 'selected'
                 },
                 drawCallback: function () {
+                    /* Select nothing in all selects in the table. */
                     $(this).find('select').prop('selectedIndex', -1);
+
+                    /* Setup popovers to display the game settings. */
                     $(this).find('.show-settings').popover({
                         container: document.body,
                         placement: 'right',
@@ -973,16 +1051,37 @@
                 language: {emptyTable: 'There are currently no staged multiplayer games.'}
             });
 
+            /* Search bar. */
             $('#search-staged-games').on('keyup', function () {
                 setTimeout(() => stagedGamesTable.search(this.value).draw(), 0);
             });
 
+            /* Show/hide players assigned to staged games. */
             $('#toggle-hide-players').on('change', function () {
                 hideStagedGamePlayers = $(this).is(':checked');
                 localStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
                 stagedGamesTable.rows().invalidate().draw();
             });
 
+            /* Select all visible staged games. */
+            $('#select-visible-games').on('click', function () {
+                stagedGamesTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.select();
+                    }
+                });
+            })
+
+            /* Deselect all visible staged games. */
+            $('#deselect-visible-games').on('click', function () {
+                stagedGamesTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.deselect();
+                    }
+                });
+            });
+
+            /* Set role options according to the game type when a game id is selected. */
             $(stagedGamesTable.table().node()).on('change', '.move-player-game', function () {
                 const tr = $(this).closest('tr');
                 const roleSelect = $(tr).find('.move-player-role').get(0);
@@ -990,6 +1089,7 @@
                 adjustFormForGame(roleSelect, button, this.value);
             });
 
+            /* Switch a player's role. */
             $(stagedGamesTable.table().node()).on('click', '.switch-role-button', function () {
                 const innerTr = $(this).parents('tr').get(0);
                 const outerTr = $(this).parents('tr').get(1);
@@ -1005,6 +1105,7 @@
                 });
             });
 
+            /* Remove a player from a staged game. */
             $(stagedGamesTable.table().node()).on('click', '.remove-player-button', function () {
                 const innerTr = $(this).parents('tr').get(0);
                 const outerTr = $(this).parents('tr').get(1);
@@ -1016,6 +1117,7 @@
                 });
             });
 
+            /* Move a player between staged games. */
             $(stagedGamesTable.table().node()).on('click', '.move-player-button', function () {
                 const innerTr = $(this).parents('tr').get(0);
                 const outerTr = $(this).parents('tr').get(1);
@@ -1031,6 +1133,7 @@
                 });
             });
 
+            /* Delete selected games. */
             $('#delete-games-button').on('click', function () {
                 const stagedGameIds = [];
                 stagedGamesTable.rows({selected: true}).every(function () {
@@ -1045,6 +1148,7 @@
                 });
             });
 
+            /* Create selected games. */
             $('#create-games-button').on('click', function () {
                 const stagedGameIds = [];
                 stagedGamesTable.rows({selected: true}).every(function () {
@@ -1058,35 +1162,19 @@
                     stagedGameIds
                 });
             });
-
-            $('#select-visible-games').on('click', function () {
-                stagedGamesTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.select();
-                    }
-                });
-            })
-
-            $('#deselect-visible-games').on('click', function () {
-                stagedGamesTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.deselect();
-                    }
-                });
-            });
         });
 
         /* Users table. */
         $(document).ready(function () {
             const usersTable = $('#table-users').DataTable({
-                data: userInfosList,
+                data: usersTableData,
                 columns: [
                     {
                         data: null,
                         title: '',
                         defaultContent: '',
                         className: 'select-checkbox',
-                        orderDataType: 'select'
+                        orderDataType: 'select-extension'
                     },
                     {
                         data: 'user.id',
@@ -1128,7 +1216,10 @@
                     className: 'selected'
                 },
                 drawCallback: function () {
+                    /* Select nothing in all selects in the table. */
                     $(this).find('select').prop('selectedIndex', -1);
+
+                    /* Hide hidden users. */
                     filterDisplayedUsers($(this).DataTable());
                 },
                 order: [[5, 'asc']],
@@ -1139,10 +1230,37 @@
                 language: {emptyTable: 'There are currently no unassigned users.'}
             });
 
+            /* Search bar. */
             $('#search-users').on('keyup', function () {
                 setTimeout(() => usersTable.search(this.value).draw(), 0);
             });
 
+            /* Show/hide users assigned to active existing games. */
+            $('#toggle-show-assigned-users').on('change', function () {
+                showAssignedUsers = $(this).is(':checked');
+                localStorage.setItem('showAssignedUsers', JSON.stringify(showAssignedUsers));
+                usersTable.draw();
+            });
+
+            /* Select all visible users. */
+            $('#select-visible-users').on('click', function () {
+                usersTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.select();
+                    }
+                });
+            })
+
+            /* Deselect all visible users. */
+            $('#deselect-visible-users').on('click', function () {
+                usersTable.rows({search: 'applied'}).every(function () {
+                    if (!Boolean(this.data()._hidden)) {
+                        this.deselect();
+                    }
+                });
+            });
+
+            /* Set role options according to the game type when a game id is selected. */
             $(usersTable.table().node()).on('change', '.add-player-game', function () {
                 const tr = $(this).closest('tr').get(0);
                 const roleSelect = $(tr).find('.add-player-role').get(0);
@@ -1150,6 +1268,7 @@
                 adjustFormForGame(roleSelect, button, this.value);
             });
 
+            /* Add a users to a staged game or existing active game. */
             $(usersTable.table().node()).on('click', '.add-player-button', function () {
                 /* Go up two levels of tr, since the form is in a table itself. */
                 const tr = $(this).parents('tr').get(1);
@@ -1164,12 +1283,7 @@
                 });
             });
 
-            $('#toggle-show-assigned-users').on('change', function () {
-                showAssignedUsers = $(this).is(':checked');
-                localStorage.setItem('showAssignedUsers', JSON.stringify(showAssignedUsers));
-                usersTable.draw();
-            });
-
+            /* Create new staged games. */
             $('#stage-games-button').on('click', function () {
                 const userIds = [];
                 usersTable.rows({selected: true}).every(function () {
@@ -1186,22 +1300,6 @@
                     params[name] = value;
                 }
                 postForm(params);
-            });
-
-            $('#select-visible-users').on('click', function () {
-                usersTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.select();
-                    }
-                });
-            })
-
-            $('#deselect-visible-users').on('click', function () {
-                usersTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.deselect();
-                    }
-                });
             });
         });
     </script>
