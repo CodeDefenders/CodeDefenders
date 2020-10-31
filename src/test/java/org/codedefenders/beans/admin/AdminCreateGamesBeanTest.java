@@ -17,7 +17,6 @@ import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
@@ -44,12 +43,11 @@ import com.google.common.collect.Sets;
 import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MELEE;
 import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
         AdminCreateGamesBean.class,
-        DatabaseConnection.class,
         AdminDAO.class,
         GameDAO.class,
         MultiplayerGameDAO.class,
@@ -160,7 +158,7 @@ public class AdminCreateGamesBeanTest {
         int defendersPerGame = 2;
 
         adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
-                attackersPerGame, defendersPerGame);
+                attackersPerGame, defendersPerGame, 0);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
 
@@ -177,11 +175,10 @@ public class AdminCreateGamesBeanTest {
         gameSettings.setGameType(MELEE);
         RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
         TeamAssignmentMethod teamAssignmentMethod = TeamAssignmentMethod.RANDOM;
-        int attackersPerGame = 2;
-        int defendersPerGame = 2;
+        int playersPerGame = 4;
 
         adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
-                attackersPerGame, defendersPerGame);
+                0, 0, playersPerGame);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
 
@@ -201,7 +198,7 @@ public class AdminCreateGamesBeanTest {
         int defendersPerGame = 2;
 
         adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
-                attackersPerGame, defendersPerGame);
+                attackersPerGame, defendersPerGame, 0);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(1));
 
