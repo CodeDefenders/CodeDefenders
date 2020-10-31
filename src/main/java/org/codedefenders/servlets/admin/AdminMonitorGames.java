@@ -20,6 +20,7 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -43,6 +44,7 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.servlets.util.Redirect;
@@ -178,6 +180,17 @@ public class AdminMonitorGames extends HttpServlet {
     public static int getPlayerScore(MultiplayerGame mg, int pid) {
         HashMap<Integer, PlayerScore> mutantScores = mg.getMutantScores();
         HashMap<Integer, PlayerScore> testScores = mg.getTestScores();
+        if (mutantScores.containsKey(pid) && mutantScores.get(pid) != null) {
+            return (mutantScores.get(pid)).getTotalScore();
+        } else if (testScores.containsKey(pid) && testScores.get(pid) != null) {
+            return (testScores.get(pid)).getTotalScore();
+        }
+        return 0;
+    }
+
+    public static int getPlayerScore(MeleeGame mg, int pid) {
+        Map<Integer, PlayerScore> mutantScores = mg.getMutantScores();
+        Map<Integer, PlayerScore> testScores = mg.getTestScores();
         if (mutantScores.containsKey(pid) && mutantScores.get(pid) != null) {
             return (mutantScores.get(pid)).getTotalScore();
         } else if (testScores.containsKey(pid) && testScores.get(pid) != null) {
