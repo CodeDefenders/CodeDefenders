@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -29,8 +30,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.Test;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.ServletUtils;
 
 import com.google.gson.Gson;
@@ -49,11 +53,17 @@ import com.google.gson.JsonObject;
 @WebServlet(org.codedefenders.util.Paths.API_TEST)
 public class TestAPI extends HttpServlet {
 
+    @Inject
+    LoginBean login;
+
+    @Inject
+    GameService gameService;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
-        final Optional<Test> test = ServletUtils.getIntParameter(request, "testId")
-                .map(TestDAO::getTestById);
+        final Optional<TestDTO> test = ServletUtils.getIntParameter(request, "testId")
+                .map(id -> gameService.getTest(login.getUserId(), id));
 
         if (!test.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
@@ -69,14 +79,14 @@ public class TestAPI extends HttpServlet {
         out.flush();
     }
 
-    private String generateJsonForTest(Test test) {
+    private String generateJsonForTest(TestDTO test) {
         Gson gson = new Gson();
 
         JsonObject root = new JsonObject();
         root.add("id", gson.toJsonTree(test.getId(), Integer.class));
         root.add("playerId", gson.toJsonTree(test.getPlayerId(), Integer.class));
         root.add("gameId", gson.toJsonTree(test.getGameId(), Integer.class));
-        root.add("source", gson.toJsonTree(test.getAsString(), String.class));
+        root.add("source", gson.toJsonTree(test.getSource(), String.class));
 
         return gson.toJson(root);
 

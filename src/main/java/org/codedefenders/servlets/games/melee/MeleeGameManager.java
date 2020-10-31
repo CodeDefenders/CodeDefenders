@@ -45,6 +45,7 @@ import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
@@ -153,6 +154,9 @@ public class MeleeGameManager extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private Configuration config;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -550,7 +554,6 @@ public class MeleeGameManager extends HttpServlet {
             int playerId) throws IOException {
 
         final String contextPath = ctx(request);
-        final HttpSession session = request.getSession();
 
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
@@ -576,8 +579,7 @@ public class MeleeGameManager extends HttpServlet {
          * StringEscapeUtils.escapeHtml(mutantText));
          */
         if (gameManagingUtils.hasAttackerPendingMutantsInGame(game.getId(), playerId)
-                && (session.getAttribute(Constants.BLOCK_ATTACKER) != null)
-                && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
+                && config.isBlockAttacker()) {
             messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());

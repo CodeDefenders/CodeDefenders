@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2020 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -28,7 +28,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import org.codedefenders.database.ConnectionPool;
+import org.codedefenders.configuration.Configuration;
+import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,9 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private ThreadPoolManager mgr;
 
+    @Inject
+    private Configuration config;
+
     /**
      * This method is called when the servlet context is initialized(when
      * the Web application is deployed). You can initialize servlet context
@@ -49,21 +53,14 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        logger.info("Java version: " + System.getProperty("java.version"));
-        if (getJavaMajorVersion() > 9) {
-            String errorMsg = "Unsupported java version! CodeDefenders needs at most Java 9";
-            logger.error(errorMsg);
-            throw new Error(errorMsg);
-        } else {
-            try {
-                ConnectionPool.instance();
-                logger.info("Code Defenders started successfully.");
-            } catch (Exception e) {
-                // Fail Deployment
-                throw new RuntimeException("Deployment failed. Reason: ", e);
-            }
-            mgr.register("test-executor").withMax(4).withCore(2).add();
+        try {
+            config.validate();
+        } catch (ConfigurationValidationException e) {
+            logger.error(e.getMessage());
+            throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
+        mgr.register("test-executor").withMax(4).withCore(2).add();
+
     }
 
     /**
@@ -72,11 +69,6 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        try {
-            ConnectionPool.instance().closeDBConnections();
-        } catch (Throwable e) {
-            logger.error("Error in closing database connections", e);
-        }
 
         // https://stackoverflow.com/questions/11872316/tomcat-guice-jdbc-memory-leak
         AbandonedConnectionCleanupThread.checkedShutdown();
@@ -95,22 +87,5 @@ public class SystemStartStop implements ServletContextListener {
         }
 
         // The ThreadPoolManager should be able to automatically stop the instances
-    }
-
-    private static int getJavaMajorVersion() {
-        String version = System.getProperty("java.version");
-        if (version.startsWith("1.")) {
-            version = version.substring(2);
-        }
-        /* Allow these formats:
-         * 1.8.0_72-ea
-         * 9-ea
-         * 9
-         * 9.0.1
-         */
-        int dotPos = version.indexOf('.');
-        int dashPos = version.indexOf('-');
-        return Integer.parseInt(version.substring(0,
-                dotPos > -1 ? dotPos : dashPos > -1 ? dashPos : 1));
     }
 }

@@ -59,8 +59,9 @@ public abstract class AbstractGameService implements IGameService {
     public MutantDTO getMutant(int userId, Mutant mutant) {
         AbstractGame game = GameDAO.getGame(mutant.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, mutant.getGameId());
+        User user = UserDAO.getUserById(userId);
         if (game != null) {
-            return convertMutant(mutant, player.getUser(), player, game);
+            return convertMutant(mutant, user, player, game);
         } else {
             return null;
         }
@@ -100,8 +101,9 @@ public abstract class AbstractGameService implements IGameService {
     public TestDTO getTest(int userId, Test test) {
         AbstractGame game = GameDAO.getGame(test.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, test.getGameId());
+        User user = UserDAO.getUserById(userId);
         if (game != null) {
-            return convertTest(test, player.getUser(), player, game);
+            return convertTest(test, user, player, game);
         } else {
             return null;
         }

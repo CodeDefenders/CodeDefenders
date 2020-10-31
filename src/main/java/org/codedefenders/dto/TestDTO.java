@@ -47,6 +47,9 @@ public class TestDTO {
     private List<String> smells;
     private Test test;
     private List<Integer> linesCovered;
+    private Integer gameId;
+    private Integer playerId;
+    private String source;
 
     public TestDTO(Test test) {
         this.test = test;
@@ -56,7 +59,9 @@ public class TestDTO {
         this.points = test.getScore();
         this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
         this.linesCovered = test.getLineCoverage().getLinesCovered();
-
+        this.gameId = test.getGameId();
+        this.playerId = test.getPlayerId();
+        this.source = test.getAsString();
     }
 
     public int getId() {
@@ -70,6 +75,18 @@ public class TestDTO {
     public TestDTO setViewable(boolean canView) {
         this.canView = canView;
         return this;
+    }
+
+    public Integer getPlayerId() {
+        return playerId;
+    }
+
+    public Integer getGameId() {
+        return gameId;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public TestDTO setMutantData(List<Mutant> mutants) {

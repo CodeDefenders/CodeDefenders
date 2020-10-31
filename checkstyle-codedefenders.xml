@@ -30,6 +30,7 @@
 	<!-- See http://checkstyle.sf.net/config_whitespace.html -->
 	<module name="FileTabCharacter">
 		<property name="eachLine" value="true"/>
+		<property name="severity" value="error"/>
 	</module>
 
 	<module name="LineLength">
@@ -205,6 +206,7 @@
 			<property name="specialImportsRegExp" value="^org\."/>
 			<property name="sortImportsInGroupAlphabetically" value="true"/>
 			<property name="separateLineBetweenGroups" value="true"/>
+			<property name="severity" value="error"/>
 		</module>
 		<module name="MethodParamPad"/>
 		<module name="NoWhitespaceBefore">

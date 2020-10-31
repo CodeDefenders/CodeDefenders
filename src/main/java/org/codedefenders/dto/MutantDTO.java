@@ -59,6 +59,9 @@ public class MutantDTO {
     private String killMessage;
     @Expose
     private String description;
+    private Integer playerId;
+    private Integer gameId;
+    private String patchString;
 
     public MutantDTO(Mutant mutant) {
         creator = new UserDTO(mutant.getCreatorId(), mutant.getCreatorName());
@@ -78,6 +81,9 @@ public class MutantDTO {
         }
         lines = mutant.getLines();
         lineString = lines.stream().map(String::valueOf).collect(Collectors.joining(","));
+        playerId = mutant.getPlayerId();
+        gameId = mutant.getGameId();
+        patchString = mutant.getPatchString();
     }
 
     @Deprecated
@@ -111,6 +117,14 @@ public class MutantDTO {
         }
     }
 
+    public String getPatchString() {
+        if (canView) {
+            return patchString;
+        } else {
+            return null;
+        }
+    }
+
     public MutantDTO setSourceCode(String sourceCode) {
         this.sourceCode = sourceCode;
         return this;
@@ -127,6 +141,14 @@ public class MutantDTO {
 
     public List<Integer> getLines() {
         return lines;
+    }
+
+    public Integer getPlayerId() {
+        return playerId;
+    }
+
+    public Integer getGameId() {
+        return gameId;
     }
 
     public static class LineNumberComparator implements Comparator<MutantDTO> {

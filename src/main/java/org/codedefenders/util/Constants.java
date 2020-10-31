@@ -20,11 +20,10 @@ package org.codedefenders.util;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.util.Map;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.enterprise.inject.spi.CDI;
+
+import org.codedefenders.configuration.Configuration;
 
 /**
  * This class contains most constants used in Code Defenders.
@@ -34,42 +33,13 @@ import javax.naming.NamingException;
  */
 public class Constants {
 
-    // TODO Cannot be injected in static context
-    public static final String DATA_DIR;
-
-    static {
-        // First check the Web abb context
-        InitialContext initialContext;
-        String dataHome = null;
-        try {
-            initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-            dataHome = (String) environmentContext.lookup("codedefenders/data.dir");
-
-        } catch (NamingException e) {
-            // e.printStackTrace();
-        }
-
-        // Check Env
-        if (dataHome == null) {
-            ProcessBuilder pb = new ProcessBuilder();
-            Map<String, String> env = pb.environment();
-            dataHome = env.get("CODEDEFENDERS_DATA");
-        }
-        // Check System properties
-        if (dataHome == null) {
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-                dataHome = System.getProperty("codedefenders.data", "C:/codedefenders-data");
-            } else {
-                dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
-            }
-        }
-
-        DATA_DIR = dataHome;
-    }
-
-    // Configuration variable names
-    public static final String BLOCK_ATTACKER = "codedefenders/block.attacker";
+    /**
+     * Deprecated. TODO Cannot be injected in static context !! Needs to be refactored !!
+     *
+     * @deprecated Use {@link Configuration#getDataDir()} instead.
+     */
+    @Deprecated
+    public static final String DATA_DIR = CDIUtil.getBeanFromCDI(Configuration.class).getDataDir().getAbsolutePath();
 
     // Dummy game
     public static final int DUMMY_GAME_ID = -1;
@@ -79,6 +49,12 @@ public class Constants {
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
 
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getSourcesDir()} instead.
+     */
+    @Deprecated
     public static final String CUTS_DIR = Paths.get(DATA_DIR, "sources").toString();
     // dependencies, mutants and tests subdirectories for CUTs
     public static final String CUTS_DEPENDENCY_DIR = "dependencies";
@@ -89,8 +65,29 @@ public class Constants {
     public static final String MODE_PUZZLE_DIR = "puzzle";
     public static final String MODE_BATTLEGROUND_DIR = "mp";
 
+
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getMutantDir()} instead.
+     */
+    @Deprecated
     public static final String MUTANTS_DIR = Paths.get(DATA_DIR, "mutants").toString();
+
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getTestsDir()} instead.
+     */
+    @Deprecated
     public static final String TESTS_DIR = Paths.get(DATA_DIR, "tests").toString();
+
+    /**
+     * Deprecated.
+     *
+     * @deprecated Use {@link Configuration#getAiDir()} instead.
+     */
+    @Deprecated
     public static final String AI_DIR = Paths.get(DATA_DIR, "ai").toString();
 
     public static final String LIB_JUNIT = Paths.get(DATA_DIR, "lib", "junit-4.12.jar").toString();
@@ -152,14 +149,21 @@ public class Constants {
     public static final String LOSER_MESSAGE = "You lost!";
     public static final String DRAW_MESSAGE = "It was a draw!";
 
-    public static final String TEST_GENERIC_ERROR_MESSAGE = "Sorry! An error on the server prevented the compilation of your test.";
+    public static final String TEST_GENERIC_ERROR_MESSAGE
+            = "Sorry! An error on the server prevented the compilation of your test.";
 
-    public static final String TEST_DID_NOT_COMPILE_MESSAGE = "Your test did not compile. Try again, but with compilable code.";
-    public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!";
-    public static final String TEST_PASSED_ON_CUT_MESSAGE = "Great! Your test compiled and passed on the original class under test.";
-    public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE = "Your test did not pass on the original class under test. Try again.";
-    public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant. You won the duel!";
-    public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel.";
+    public static final String TEST_DID_NOT_COMPILE_MESSAGE
+            = "Your test did not compile. Try again, but with compilable code.";
+    public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: "
+            + "Only one non-empty test, at most %d assertions per test, no conditionals and no loops!";
+    public static final String TEST_PASSED_ON_CUT_MESSAGE
+            = "Great! Your test compiled and passed on the original class under test.";
+    public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE
+            = "Your test did not pass on the original class under test. Try again.";
+    public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE
+            = "Yay, your test killed the allegedly equivalent mutant. You won the duel!";
+    public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE
+            = "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel.";
     public static final String TEST_SUBMITTED_MESSAGE = "Test submitted and ready to kill mutants!";
     public static final String TEST_KILLED_ZERO_MESSAGE = "Your test has not killed any mutants, just yet.";
     public static final String TEST_KILLED_LAST_MESSAGE = "Great, your test killed the last mutant!";
@@ -170,21 +174,30 @@ public class Constants {
     public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was accepted as equivalent.";
     public static final String MUTANT_UNCOMPILABLE_MESSAGE = "Your mutant failed to compile. Try again.";
 
-    public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)";
-    public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
+    public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or "
+            + "it contains invalid code (ifs, loops, or new logical ops.)";
+    public static final String MUTANT_CREATION_ERROR_MESSAGE
+            = "Oops! Something went wrong and the mutant was not created.";
     public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
-    public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
-    public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming an equivalent mutant"; // TODO: How?
-    public static final String MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE = "Cheeky! You cannot claim equivalence on untested lines!";
-    public static final String MUTANT_KILLED_BY_TEST_MESSAGE = "Test %d killed your mutant. Better luck with the next one!"; // test
+    public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE
+            = "Mutant claimed as equivalent, waiting for attacker to respond.";
+    public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE
+            = "Something went wrong claiming an equivalent mutant"; // TODO: How?
+    public static final String MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE
+            = "Cheeky! You cannot claim equivalence on untested lines!";
+    public static final String MUTANT_KILLED_BY_TEST_MESSAGE
+            = "Test %d killed your mutant. Better luck with the next one!"; // test
     public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
     public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant survived its first test.";
-    public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
+    public static final String MUTANT_ALIVE_N_MESSAGE
+            = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
 
     // Request attributes
     public static final String REQUEST_ATTRIBUTE_PUZZLE_GAME = "active_user_puzzle_game";
 
-    public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
+    public static final String ATTACKER_HAS_PENDING_DUELS
+            = "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\n"
+            + "No worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 
     public static final String DEFAULT_KILL_MESSAGE = "Sorry, no kill message available for this mutant";
 }

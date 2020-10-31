@@ -1,49 +1,40 @@
-version: '2'
+version: '2.1'
 services:
-  db:
-    build: ./backend
+  database:
+    image: "mariadb:10.5"
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: defender
-      MYSQL_PASSWORD: defender
-      MYSQL_DATABASE: defender
-    ports:
-      - "3306"
+      - MYSQL_RANDOM_ROOT_PASSWORD=YES
+      - MYSQL_USER=${CODEDEFENDERS_DB_USERNAME:-defender}
+      - MYSQL_PASSWORD=${CODEDEFENDERS_DB_PASSWORD:-defender}
+      - MYSQL_DATABASE=${CODEDEFENDERS_DB_NAME:-defender}
     volumes:
       - dbvolume:/var/lib/mysql
-
-  # Tomcat nodes. We do not expose directly their ports to the outside
-  frontend:
-    build:
-      context: ./frontend
-      args:
-        RELEASE_VERSION: ${RELEASE_VERSION}
-    restart: always
+  codedefenders:
+    image: "codedefenders/codedefenders:${CODEDEFENDERS_VERSION:-git-50f74405}"
     environment:
-      CODEDEF_MANAGER_USERNAME: user
-      CODEDEF_MANAGER_PASSWORD: password
-      CODEDEF_MANAGER_ALLOWED_REMOTE_ADDR: ${ALLOWED_REMOTE_ADDR_REGEXP}
-      CODEDEF_ADMIN_USERNAME: admin
-      CODEDEF_ADMIN_PASSWORD: password
-      CODEDEF_CFG_DB_URL: "jdbc:mysql://db:3306/defender"
-      CODEDEF_CFG_DB_USERNAME: defender
-      CODEDEF_CFG_DB_PASSWORD: defender
-    links:
-      - db
-    volumes:
-      - datavolume:/codedefenders/
-
-  # Note that we build this one... Since we need to install the sticky-session module
-  load-balancer:
-    build: ./load-balancer
-    restart: always
-    tty: true
-    links:
-      - frontend
+      # These three are hardcoded because they are part of the container setup
+      - CODEDEFENDERS_DATA_DIR=/srv/codedefenders
+      - CODEDEFENDERS_DB_HOST=database
+      - CODEDEFENDERS_ANT_HOME=/usr/share/ant
+      # These three are the only required variables as they are also passed to the database container
+      - CODEDEFENDERS_DB_USERNAME=${CODEDEFENDERS_DB_USERNAME:-defender}
+      - CODEDEFENDERS_DB_PASSWORD=${CODEDEFENDERS_DB_PASSWORD:-defender}
+      - CODEDEFENDERS_DB_NAME=${CODEDEFENDERS_DB_NAME:-defender}
+      # These two are for configuring the basic auth credentials for the /admin/* url
+      - CODEDEFENDERS_ADMIN_USERNAME
+      - CODEDEFENDERS_ADMIN_PASSWORD
+      # These are the other relevant variables to pass if they exist
+      - CODEDEFENDERS_PARALLELIZE
+      - CODEDEFENDERS_MUTANT_COVERAGE
+      - CODEDEFENDERS_BLOCK_ATTACKER
     ports:
-      - "80:80"
+      - "127.0.0.1:${CODEDEFENDERS_PORT:-8080}:8080"
+    links:
+      - database
+    volumes:
+      - datavolume:/srv/codedefenders
 
 volumes:
-    datavolume:
-    dbvolume:
+  datavolume:
+  dbvolume:

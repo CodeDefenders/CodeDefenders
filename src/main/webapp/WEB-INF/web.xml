@@ -72,32 +72,6 @@
 		<auth-method>BASIC</auth-method>
 	</login-config>
 
-	<resource-ref>
-		<res-ref-name>jdbc/codedefenders</res-ref-name>
-		<res-type>javax.sql.DataSource</res-type>
-	</resource-ref>
-
-	<!-- SMTP settings -->
-	<context-param>
-		<param-name>smtpHost</param-name>
-		<param-value>smtp.gmail.com</param-value>
-	</context-param>
-
-	<context-param>
-		<param-name>smtpPort</param-name>
-		<param-value>587</param-value>
-	</context-param>
-
-	<context-param>
-		<param-name>emailAddress</param-name>
-		<param-value>code.defenders@gmail.com</param-value>
-	</context-param>
-
-	<context-param>
-		<param-name>emailPassword</param-name>
-		<param-value>***REMOVED***</param-value>
-	</context-param>
-
 	<!-- Shiro -->
 	<listener>
 		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
@@ -112,7 +86,6 @@
 		<filter-name>ShiroFilter</filter-name>
 		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
 	</filter>
-
 	<filter-mapping>
 		<filter-name>ShiroFilter</filter-name>
 		<url-pattern>/*</url-pattern>
