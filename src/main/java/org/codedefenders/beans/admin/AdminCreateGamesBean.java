@@ -129,17 +129,18 @@ public class AdminCreateGamesBean implements Serializable {
      * Assigns selected users to teams and adds staged games with these teams to the list.
      * @param users The players for the staged games.
      * @param gameSettings The game settings.
-     * @param roleAssignmentMethod The method of assigning roles to users.
+     * @param roleAssignmentMethod The method of assigning roles to users. Only relevant for non-melee games.
      * @param teamAssignmentMethod The method of assigning users to teams.
-     * @param attackersPerGame The number of attackers per game.
-     * @param defendersPerGame The number of defenders per game.
+     * @param attackersPerGame The number of attackers per game. Only relevant for non-melee games.
+     * @param defendersPerGame The number of defenders per game. Only relevant for non-melee games.
+     * @param playersPerGame The number of defenders per game. Only relevant for melee games.
      * @see RoleAssignmentMethod
      * @see TeamAssignmentMethod
      */
     public void stageGamesWithUsers(Set<UserInfo> users, GameSettings gameSettings,
                                     RoleAssignmentMethod roleAssignmentMethod,
                                     TeamAssignmentMethod teamAssignmentMethod,
-                                    int attackersPerGame, int defendersPerGame) {
+                                    int attackersPerGame, int defendersPerGame, int playersPerGame) {
         /* Split users into attackers and defenders. */
         Set<UserInfo> attackers = new HashSet<>();
         Set<UserInfo> defenders = new HashSet<>();
@@ -152,13 +153,19 @@ public class AdminCreateGamesBean implements Serializable {
             attackers.addAll(users);
         }
 
-        int numGames = users.size() / (attackersPerGame + defendersPerGame);
-        /* Avoid empty games. */
-        if (numGames > attackers.size() && numGames > defenders.size())  {
-            int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
-            int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
-            numGames = Math.max(numGames1, numGames2);
+        int numGames;
+        if (gameSettings.getGameType() != MELEE) {
+            numGames = users.size() / (attackersPerGame + defendersPerGame);
+            /* Avoid empty games. */
+            if (numGames > attackers.size() && numGames > defenders.size())  {
+                int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
+                int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
+                numGames = Math.max(numGames1, numGames2);
+            }
+        } else {
+            numGames = users.size() / playersPerGame;
         }
+
         /* Always create at least one game. */
         if (numGames == 0) {
             numGames = 1;

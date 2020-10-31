@@ -34,10 +34,16 @@
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <style>
+    /* Change colors of selected table rows. */
     table.dataTable tbody > tr.selected,
     table.dataTable tbody > tr > .selected {
         background-color: #D8E0EA;
         color: inherit;
+    }
+
+    /* Initially hide melee-specific forms. */
+    .melee-specific {
+        display: none;
     }
 </style>
 
@@ -292,7 +298,7 @@
                             <textarea class="form-control" rows="5" id="userNames" name="userNames"></textarea>
                         </div>
 
-                        <div class="form-group"
+                        <div class="form-group multiplayer-specific"
                              title="Method of assigning roles to players. Click the question mark for more information.">
                             <label for="roleAssignmentMethod-group" class="label-normal">
                                 Role Assignment
@@ -346,16 +352,22 @@
                             </div>
                         </div>
 
-                        <div class="form-group"
+                        <div class="form-group multiplayer-specific"
                              title="Number of attackers per game.">
                             <label for="attackersPerGame" class="label-normal">Attackers per Game</label>
                             <input type="number" value="3" id="attackersPerGame" name="attackersPerGame" min="1" class="form-control"/>
                         </div>
 
-                        <div class="form-group"
+                        <div class="form-group multiplayer-specific"
                              title="Number of defenders per game.">
                             <label for="defendersPerGame" class="label-normal">Defenders per Game</label>
                             <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1" class="form-control"/>
+                        </div>
+
+                        <div class="form-group melee-specific"
+                             title="Players per game.">
+                            <label for="playersPerGame" class="label-normal">Players per Game</label>
+                            <input type="number" value="6" id="playersPerGame" name="playersPerGame" min="1" class="form-control"/>
                         </div>
 
                         <button class="btn btn-md btn-primary" type="button" name="stage-games-with-users-button"
@@ -1353,6 +1365,20 @@
                     $('#stage-games-with-users-button').get(0).disabled = true;
                 } else {
                     $('#stage-games-with-users-button').get(0).disabled = false;
+                }
+            });
+
+            /* Toggle multiplayer/melee specific forms based on selected game type. */
+            $('#gameType-group').on('change', function (event) {
+                switch (event.target.value) {
+                    case 'MULTIPLAYER':
+                        $('.melee-specific').hide();
+                        $('.multiplayer-specific').show();
+                        break;
+                    case 'MELEE':
+                        $('.multiplayer-specific').hide();
+                        $('.melee-specific').show();
+                        break;
                 }
             });
 

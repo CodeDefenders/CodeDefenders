@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.text.MessageFormat.format;
+import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MELEE;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 
 /**
@@ -216,11 +217,13 @@ public class AdminCreateGames extends HttpServlet {
         TeamAssignmentMethod teamAssignmentMethod;
         int attackersPerGame;
         int defendersPerGame;
+        int playersPerGame;
         try {
             roleAssignmentMethod = RoleAssignmentMethod.valueOf(request.getParameter("roleAssignmentMethod"));
             teamAssignmentMethod = TeamAssignmentMethod.valueOf(request.getParameter("teamAssignmentMethod"));
             attackersPerGame = getIntParameter(request, "attackersPerGame").get();
             defendersPerGame = getIntParameter(request, "defendersPerGame").get();
+            playersPerGame = getIntParameter(request, "playersPerGame").get();
         } catch (NullPointerException | NoSuchElementException e) {
             messages.add("ERROR: Missing game management settings parameter.");
             return;
@@ -257,14 +260,21 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         /* Validate team sizes. */
-        if (attackersPerGame < 0 || defendersPerGame < 0 || attackersPerGame + defendersPerGame == 0) {
-            messages.add(format("Invalid team sizes. Attackers per game: {0}, defenders per game: {1}.",
-                    attackersPerGame, defendersPerGame));
-            return;
+        if (gameSettings.getGameType() == MELEE) {
+            if (playersPerGame < 0) {
+                messages.add(format("Invalid team sizes. Players per game: {0}.", playersPerGame));
+            }
+        } else {
+            if (attackersPerGame < 0 || defendersPerGame < 0 || attackersPerGame + defendersPerGame == 0) {
+                messages.add(format("Invalid team sizes. Attackers per game: {0}, defenders per game: {1}.",
+                        attackersPerGame, defendersPerGame));
+                return;
+            }
         }
 
+
         adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod,
-                teamAssignmentMethod, attackersPerGame, defendersPerGame);
+                teamAssignmentMethod, attackersPerGame, defendersPerGame, playersPerGame);
     }
 
     /**
