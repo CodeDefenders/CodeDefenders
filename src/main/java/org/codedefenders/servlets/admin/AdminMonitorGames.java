@@ -33,13 +33,14 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.execution.KillMapProcessor.KillMapJob;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -82,7 +83,7 @@ public class AdminMonitorGames extends HttpServlet {
         String playerToRemoveIdGameIdString = request.getParameter("activeGameUserRemoveButton");
         String playerToSwitchIdGameIdString = request.getParameter("activeGameUserSwitchButton");
         boolean switchUser = playerToSwitchIdGameIdString != null;
-        MultiplayerGame mg;
+        AbstractGame game;
         if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
             int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
             int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
@@ -92,9 +93,9 @@ public class AdminMonitorGames extends HttpServlet {
             } else if (switchUser) {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
-                mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
-                mg.setEventDAO(eventDAO);
-                if (!mg.addPlayerForce(userId, newRole)) {
+                game = GameDAO.getGame(gameToRemoveFromId);
+                game.setEventDAO(eventDAO);
+                if (!game.addPlayer(userId, newRole)) {
                     messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
                 }
             }
@@ -121,14 +122,14 @@ public class AdminMonitorGames extends HttpServlet {
                 String errorMessage = "ERROR trying to start or stop game " + gameId
                         + ".\nIf this problem persists, contact your administrator.";
 
-                mg = MultiplayerGameDAO.getMultiplayerGame(gameId);
+                game = GameDAO.getGame(gameId);
 
-                if (mg == null) {
+                if (game == null) {
                     messages.add(errorMessage);
                 } else {
-                    GameState newState = mg.getState() == GameState.ACTIVE ? GameState.FINISHED : GameState.ACTIVE;
-                    mg.setState(newState);
-                    if (!mg.update()) {
+                    GameState newState = game.getState() == GameState.ACTIVE ? GameState.FINISHED : GameState.ACTIVE;
+                    game.setState(newState);
+                    if (!game.update()) {
                         messages.add(errorMessage);
                     } else {
                         // Schedule the killmap
@@ -141,9 +142,9 @@ public class AdminMonitorGames extends HttpServlet {
                 GameState newState = request.getParameter("games_btn").equals("Start Games")
                         ? GameState.ACTIVE : GameState.FINISHED;
                 for (String gameId : selectedGames) {
-                    mg = MultiplayerGameDAO.getMultiplayerGame(Integer.parseInt(gameId));
-                    mg.setState(newState);
-                    if (!mg.update()) {
+                    game = GameDAO.getGame(Integer.parseInt(gameId));
+                    game.setState(newState);
+                    if (!game.update()) {
                         messages.add("ERROR trying to start or stop game " + String.valueOf(gameId));
                     } else {
                         // Schedule the killmap

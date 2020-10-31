@@ -67,7 +67,7 @@
                 <th>Level</th>
                 <th>
                     <a id="togglePlayersActiveMultiplayer" class="btn btn-sm btn-default" title="Show list of Players for each Game.">
-                        <span id = "togglePlayersActiveMultiplayerSpan" class="glyphicon glyphicon-alert"></span>
+                        <span id="togglePlayersActiveMultiplayerSpan" class="glyphicon glyphicon-alert"></span>
                     </a>
                 </th>
             </tr>
@@ -277,7 +277,7 @@
                 <th>Level</th>
                 <th>
                     <a id="togglePlayersActiveMelee" class="btn btn-sm btn-default" title="Show list of Players for each Game.">
-                        <span id = "togglePlayersActiveMeleeSpan" class="glyphicon glyphicon-alert"></span>
+                        <span id="togglePlayersActiveMeleeSpan" class="glyphicon glyphicon-alert"></span>
                     </a>
                 </th>
             </tr>
@@ -488,11 +488,17 @@
             function setActivePlayersSpan() {
                 var showPlayers = localStorage.getItem("showActivePlayersMultiplayer") === "true";
                 var buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
-                document.getElementById("togglePlayersActiveMultiplayerSpan").setAttribute("class", buttonClass);
+                var span = document.getElementById("togglePlayersActiveMultiplayerSpan");
+                if (span) {
+                    span.setAttribute("class", buttonClass);
+                }
 
                 showPlayers = localStorage.getItem("showActivePlayersMelee") === "true";
                 buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
-                document.getElementById("togglePlayersActiveMeleeSpan").setAttribute("class", buttonClass);
+                span = document.getElementById("togglePlayersActiveMeleeSpan");
+                if (span) {
+                    span.setAttribute("class", buttonClass);
+                }
             }
 
             /* Check only in the local table if all checkboxes are checked. */
