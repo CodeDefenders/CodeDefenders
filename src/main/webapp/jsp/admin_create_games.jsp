@@ -75,12 +75,14 @@
 
             <form class="form-inline" style="margin-top: 1em;">
                 <div class="form-group">
-                    <button class="btn btn-md btn-primary" type="button" name="create-games-button" id="create-games-button" style="margin-top: 1em">
+                    <button class="btn btn-md btn-primary" type="button" name="create-games-button"
+                            id="create-games-button" style="margin-top: 1em" disabled>
                         Create Games
                     </button>
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-md btn-danger" type="button" name="delete-games-button" id="delete-games-button" style="margin-top: 1em">
+                    <button class="btn btn-md btn-danger" type="button" name="delete-games-button"
+                            id="delete-games-button" style="margin-top: 1em" disabled>
                         Delete Games
                     </button>
                 </div>
@@ -356,7 +358,8 @@
                             <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1" class="form-control"/>
                         </div>
 
-                        <button class="btn btn-md btn-primary" type="button" name="stage-games-with-users-button" id="stage-games-with-users-button" style="margin-top: 1em">
+                        <button class="btn btn-md btn-primary" type="button" name="stage-games-with-users-button"
+                                id="stage-games-with-users-button" style="margin-top: 1em" disabled>
                             Stage Games
                         </button>
 
@@ -377,7 +380,8 @@
                             <input type="number" value="1" id="numGames" name="numGames" min="1" max="100" class="form-control"/>
                         </div>
 
-                        <button class="btn btn-md btn-primary" type="button" name="stage-games-empty-button" id="stage-games-empty-button" style="margin-top: 1em">
+                        <button class="btn btn-md btn-primary" type="button" name="stage-games-empty-button"
+                                id="stage-games-empty-button" style="margin-top: 1em">
                             Stage Games
                         </button>
                     </div>
@@ -649,18 +653,9 @@
         /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
         $.fn.dataTable.ext.order['select-extension'] = function (settings, col) {
             return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
-                return rowSelected($(td).closest('tr').get(0)) ? '0' : '1';
+                return $(td).closest('tr').hasClass('selected') ? '0' : '1';
             });
         };
-
-        /**
-         * Checks if the given table row is selected by the DataTables select extension.
-         * @param {HTMLTableRowElement} tr The table row.
-         * @return {boolean} Whether the row is selected.
-         */
-        const rowSelected = function (tr) {
-            return tr.classList.contains('selected');
-        }
 
         const renderUserLastRole = function (lastRole, type, row, meta) {
             switch (type) {
@@ -1040,7 +1035,7 @@
             setCheckboxButton($('#toggle-show-assigned-users').get(0), showAssignedUsers);
         });
 
-        /* Staged games table. */
+        /* Staged games table and related components. */
         $(document).ready(function () {
             const stagedGamesTable = $('#table-staged-games').DataTable({
                 data: stagedGamesTableData,
@@ -1128,22 +1123,24 @@
                 stagedGamesTable.rows().invalidate().draw();
             });
 
-            /* Select all visible staged games. */
-            $('#select-visible-games').on('click', function () {
-                stagedGamesTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.select();
-                    }
-                });
-            })
+            /* Toggle create-games and delete-games buttons based on whether staged games are selected. */
+            stagedGamesTable.on('select', function (e, dt, type, indexes) {
+                $('#create-games-button').get(0).disabled = false;
+                $('#delete-games-button').get(0).disabled = false;
+            });
+            stagedGamesTable.on('deselect', function (e, dt, type, indexes) {
+                if (stagedGamesTable.rows({selected: true})[0].length === 0) {
+                    $('#create-games-button').get(0).disabled = true;
+                    $('#delete-games-button').get(0).disabled = true;
+                }
+            });
 
-            /* Deselect all visible staged games. */
+            /* Select / deselect all visible staged games. */
+            $('#select-visible-games').on('click', function () {
+                stagedGamesTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).select();
+            })
             $('#deselect-visible-games').on('click', function () {
-                stagedGamesTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.deselect();
-                    }
-                });
+                stagedGamesTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).deselect();
             });
 
             /* Set role options according to the game type when a game id is selected. */
@@ -1199,10 +1196,8 @@
             $('#delete-games-button').on('click', function () {
                 const stagedGameIds = [];
                 stagedGamesTable.rows({selected: true}).every(function () {
-                    if (rowSelected(this.node())) {
-                        const stagedGame = this.data();
-                        stagedGameIds.push('T' + stagedGame.id);
-                    }
+                    const stagedGame = this.data();
+                    stagedGameIds.push('T' + stagedGame.id);
                 });
                 postForm({
                     formType: 'deleteStagedGames',
@@ -1214,10 +1209,8 @@
             $('#create-games-button').on('click', function () {
                 const stagedGameIds = [];
                 stagedGamesTable.rows({selected: true}).every(function () {
-                    if (rowSelected(this.node())) {
-                        const stagedGame = this.data();
-                        stagedGameIds.push('T' + stagedGame.id);
-                    }
+                    const stagedGame = this.data();
+                    stagedGameIds.push('T' + stagedGame.id);
                 });
                 postForm({
                     formType: 'createStagedGames',
@@ -1226,7 +1219,7 @@
             });
         });
 
-        /* Users table. */
+        /* Users table and related components. */
         $(document).ready(function () {
             const usersTable = $('#table-users').DataTable({
                 data: usersTableData,
@@ -1313,22 +1306,12 @@
                 usersTable.draw();
             });
 
-            /* Select all visible users. */
+            /* Select / deselect all visible users. */
             $('#select-visible-users').on('click', function () {
-                usersTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.select();
-                    }
-                });
+                usersTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).select();
             })
-
-            /* Deselect all visible users. */
             $('#deselect-visible-users').on('click', function () {
-                usersTable.rows({search: 'applied'}).every(function () {
-                    if (!Boolean(this.data()._hidden)) {
-                        this.deselect();
-                    }
-                });
+                usersTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).deselect();
             });
 
             /* Set role options according to the game type when a game id is selected. */
@@ -1354,14 +1337,31 @@
                 });
             });
 
+            /* Toggle stage games button based on whether users are selected or user names are given. */
+            usersTable.on('select', function (e, dt, type, indexes) {
+                $('#stage-games-with-users-button').get(0).disabled = false;
+            });
+            usersTable.on('deselect', function (e, dt, type, indexes) {
+                if (usersTable.rows({selected: true})[0].length === 0
+                        && $('#userNames').val().length === 0) {
+                    $('#stage-games-with-users-button').get(0).disabled = true;
+                }
+            });
+            $('#userNames').on('keyup', function () {
+                if (usersTable.rows({selected: true})[0].length === 0
+                        && $('#userNames').val().length === 0) {
+                    $('#stage-games-with-users-button').get(0).disabled = true;
+                } else {
+                    $('#stage-games-with-users-button').get(0).disabled = false;
+                }
+            });
+
             /* Create new staged games with users. */
             $('#stage-games-with-users-button').on('click', function () {
                 const userIds = [];
                 usersTable.rows({selected: true}).every(function () {
-                    if (rowSelected(this.node())) {
-                        const userInfo = this.data();
-                        userIds.push(userInfo.user.id);
-                    }
+                    const userInfo = this.data();
+                    userIds.push(userInfo.user.id);
                 });
                 const params = {
                     formType: 'stageGamesWithUsers',
