@@ -355,6 +355,7 @@ public class MeleeGame extends AbstractGame {
         if (state == GameState.FINISHED) {
             return false;
         }
+
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
@@ -371,7 +372,7 @@ public class MeleeGame extends AbstractGame {
 
     // We do not check that the user is in both roles !!
     public boolean hasUserJoined(int userId) {
-        for (Player p : GameDAO.getAllPlayersForGame(this.getId())) {
+        for (Player p : GameDAO.getValidPlayersForGame(this.getId())) {
             if (p.getUser().getId() == userId) {
                 return true;
             }

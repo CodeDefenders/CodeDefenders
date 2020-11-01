@@ -111,7 +111,7 @@ public class PlayerFeedbackBean {
     public Map<Player, List<Integer>> getAllRatings() {
         if (ratingsPerPlayer == null) {
             ratingsPerPlayer = new HashMap<>();
-            for (Player player : GameDAO.getAllPlayersForGame(gameId)) {
+            for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
                 ratingsPerPlayer.put(player, FeedbackDAO.getFeedbackValues(gameId, player.getUser().getId()));
             }
         }

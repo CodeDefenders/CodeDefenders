@@ -147,13 +147,11 @@
                 <td id="roleSelectionTd">
                     <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
                             data-size="medium">
-                        <%for (Role role : Role.values()) {
-                            if (role != Role.NONE && role != Role.PLAYER) { %>
-                        <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
-                            <%=role.getFormattedString()%>
-                        </option>
-                        <%  }
-                        }%>
+                        <% for (Role role : Role.multiplayerRoles()) { %>
+                            <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
+                                <%=role.getFormattedString()%>
+                            </option>
+                        <% } %>
                     </select>
                 </td>
             </tr>
@@ -180,7 +178,7 @@
                 <td title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
                     Threshold for Auto. Equiv. Duels
                 </td>
-                <td id="automaticEquivalenceTrigger">
+                <td id="automaticEquivalenceTriggerTd">
                     <input class="form-control" type="number" value="0"
                            name="automaticEquivalenceTrigger"
                            id="automaticEquivalenceTrigger" min=0 required/>

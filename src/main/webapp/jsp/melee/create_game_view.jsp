@@ -140,22 +140,21 @@
                     </a>
                 </td>
             </tr>
-            <%-- TODO Enable this after allowing users to join as player in melee mode
             <tr>
-                <%-- TODO Would be unfair to have the observer also be a player? She can stop the game when she's winning ...
                 <td title="Chose your role for this game">
                     Role selection
                 </td>
                 <td id="roleSelectionTd">
                     <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
                             data-size="medium">
-                            <!-- Hardcoded Roles -->
-                            <option selected value="OBSERVER">Observer</option>
-                            <!-- <option>Player</option> -->
+                        <% for (Role role : Role.meleeRoles()) { %>
+                            <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
+                                <%=role.getFormattedString()%>
+                            </option>
+                        <% } %>
                     </select>
                 </td>
             </tr>
-            --%>
             <input type="hidden" name="roleSelection" value="OBSERVER">
             <tr>
                 <td title="Players can chat with their team and with all players in the game">
@@ -182,7 +181,7 @@
                 <td title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
                     Threshold for Auto. Equiv. Duels
                 </td>
-                <td id="automaticEquivalenceTrigger">
+                <td id="automaticEquivalenceTriggerTd">
                     <input class="form-control" type="number" value="0"
                            name="automaticEquivalenceTrigger"
                            id="automaticEquivalenceTrigger" min=0 required/>

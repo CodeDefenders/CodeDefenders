@@ -37,13 +37,13 @@ public class Paths {
     public static final String ABOUT_PAGE = "/about";
     public static final String CONTACT_PAGE = "/contact";
     public static final String LEADERBOARD_PAGE = "/leaderboard";
-    
+
     // TODO This might be duplicated. But then, why there's a profile
     public static final String USER = "/user";
     public static final String USER_PROFILE = "/profile";
 
     public static final String PASSWORD = "/password";
-    
+
 
     public static final String GAMES_OVERVIEW = "/games/overview";
     public static final String GAMES_HISTORY = "/games/history";
@@ -65,7 +65,6 @@ public class Paths {
 
     public static final String PUZZLE_OVERVIEW = "/puzzles";
     public static final String PUZZLE_GAME = "/puzzlegame";
-    public static final String PUZZLE_GAME_SELECTION = "/puzzle/games";
 
 
     public static final String ADMIN_PAGE = "/admin";

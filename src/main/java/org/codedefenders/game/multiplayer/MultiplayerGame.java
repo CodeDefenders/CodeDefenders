@@ -73,11 +73,6 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean capturePlayersIntention;
 
-    // We need a temporary location where to store information about system tests
-    // and mutants
-    private boolean withTests;
-    private boolean withMutants;
-
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
@@ -103,9 +98,6 @@ public class MultiplayerGame extends AbstractGame {
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
-
-        private boolean withTests = false;
-        private boolean withMutants = false;
 
         private int automaticMutantEquivalenceThreshold = 0;
 
@@ -190,16 +182,6 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
-        public Builder withTests(boolean withTests) {
-            this.withTests = withTests;
-            return this;
-        }
-
-        public Builder withMutants(boolean withMutants) {
-            this.withMutants = withMutants;
-            return this;
-        }
-
         public Builder automaticMutantEquivalenceThreshold(int threshold) {
             this.automaticMutantEquivalenceThreshold = threshold;
             return this;
@@ -231,20 +213,7 @@ public class MultiplayerGame extends AbstractGame {
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
-
-        // This is mostly a temporary patch
-        this.withMutants = builder.withMutants;
-        this.withTests = builder.withTests;
-
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
-    }
-
-    public boolean hasSystemTests() {
-        return this.withTests;
-    }
-
-    public boolean hasSystemMutants() {
-        return this.withMutants;
     }
 
     public int getDefenderValue() {

@@ -128,12 +128,12 @@ public class GameDAO {
     }
 
     /**
-     * Retrieves all {@link Player Players} for a given game identifier.
+     * Retrieves all {@link Player Players}, that belong to valid users, for a given game id.
      *
-     * @param gameId the game the players are retrieved for as an {@code int}.
-     * @return a list of {@link Player Players}, can be empty but never {@code null}.
+     * @param gameId The id of the game the players are retrieved for.
+     * @return A list of {@link Player Players}, that belong to valid users. Can be empty but never {@code null}.
      */
-    public static List<Player> getAllPlayersForGame(int gameId) {
+    public static List<Player> getValidPlayersForGame(int gameId) {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM view_players_with_userdata",
