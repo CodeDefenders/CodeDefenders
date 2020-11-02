@@ -65,7 +65,7 @@ if [[ "$1" == catalina* ]]; then
             waits=0
             status="ko"
             loadbalancer_ip=""
-            while [[ "$status" != "ok" ]]; do 
+            while [[ "$status" != "ok" ]]; do
                 loadbalancer_ip=$(getent hosts load-balancer | cut -d ' ' -f1 ; test ${PIPESTATUS[0]} -eq 0)
                 if [ $? == 0 ]; then
                     status="ok"
@@ -134,13 +134,16 @@ if [[ "$1" == catalina* ]]; then
         add_tomcat_user "${CODEDEF_MANAGER_USERNAME}" "${CODEDEF_MANAGER_PASSWORD}" "${CODEDEF_MANAGER_ROLES}"
         add_tomcat_user "${CODEDEF_ADMIN_USERNAME}" "${CODEDEF_ADMIN_PASSWORD}" "${CODEDEF_ADMIN_ROLES}"
 
-        cp "/usr/local/tomcat/templates/manager-context.xml" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
+        # Configure tomcat manager if app is enabled
+        if [[ -d "/usr/local/tomcat/webapps/manager" ]]; then
+            cp "/usr/local/tomcat/templates/manager-context.xml" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
 
-        if [[ "$CODEDEF_LOAD_BALANCER_IP" != "" ]]; then
-            add_remoteIp_valve "" "${CODEDEF_LOAD_BALANCER_IP}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
+            if [[ "$CODEDEF_LOAD_BALANCER_IP" != "" ]]; then
+                add_remoteIp_valve "" "${CODEDEF_LOAD_BALANCER_IP}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
+            fi
+            add_remoteAddr_valve "${CODEDEF_MANAGER_ALLOWED_REMOTE_ADDR}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
+            add_accessLog_valve "manager" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
         fi
-        add_remoteAddr_valve "${CODEDEF_MANAGER_ALLOWED_REMOTE_ADDR}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
-        add_accessLog_valve "manager" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
 
         cp "/usr/local/tomcat/templates/codedefenders-context.xml" "/tmp/context.xml"
         if [[ "$CODEDEF_LOAD_BALANCER_IP" != "" ]]; then
