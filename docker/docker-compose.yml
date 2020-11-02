@@ -5,6 +5,7 @@ services:
       context: ./backend
       args:
         RELEASE_VERSION: ${RELEASE_VERSION}
+    image: codedefenders-back:dev
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -22,6 +23,7 @@ services:
       context: ./frontend
       args:
         RELEASE_VERSION: ${RELEASE_VERSION}
+    image: codedefenders-front:dev
     restart: always
     environment:
       CODEDEF_MANAGER_USERNAME: user
@@ -40,6 +42,7 @@ services:
   # Note that we build this one... Since we need to install the sticky-session module
   load-balancer:
     build: ./load-balancer
+    image: codedefenders-lb:dev
     restart: always
     tty: true
     links:
