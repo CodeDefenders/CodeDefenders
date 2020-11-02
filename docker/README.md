@@ -1,20 +1,27 @@
 # Docker build instructions
-1. Create compose network + containers but not starting them
+
+1. Create a ```CodeDefenders/docker/.env``` file that includes the following content
+```
+# Replace this version number with the Codefender's version you want to install
+RELEASE_VERSION=v1.7
+```
+
+2. Create compose network + containers but not starting them
 ```
 docker-compose up --no-start
 ```
-2. Next we are going to get the IP of the docker host for the ```docker_default``` network (docker host IP <=> gateway IP in docker_default network). Execute following command and copy its output:
+
+3. Next we are going to get the IP of the docker host for the ```docker_default``` network (docker host IP <=> gateway IP in docker_default network). Execute following command and copy its output:
 ```
 docker network inspect docker_default --format '{{(index (index .IPAM.Config) 0).Gateway}}'
 ```
-3. Create a ```CodeDefenders/docker/.env``` file that includes the following content
+1. Add in ```CodeDefenders/docker/.env``` file the following content
 ```
-# Replace this version number with the Codefender's version you want to install
-RELEASE_VERSION=v1.6.1
-# Replace with the calculated IP in step 2.
+# Replace with the calculated IP in step 3.
 ALLOWED_REMOTE_ADDR_REGEXP=172.XXX.YYY.ZZZ
 ```
-2. Start the containers:
+
+5. Start the containers:
 ```
 docker-compose up
 ```
