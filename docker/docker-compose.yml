@@ -1,7 +1,10 @@
 version: '2'
 services:
   db:
-    build: ./backend
+    build:
+      context: ./backend
+      args:
+        RELEASE_VERSION: ${RELEASE_VERSION}
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
