@@ -49,6 +49,9 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
+    String name = request.getServerName();
+    int port = request.getServerPort();
+    String context = request.getContextPath();
     String ticket = (String) request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME);
 %>
 
@@ -220,8 +223,7 @@
         }
     }
 
-    const wsUri = `\${location.protocol.replace(/^http/, 'ws')}//\${location.host}/notifications/<%=ticket%>/<%=login.getUserId()%>`
-
+    const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=login.getUserId()%>";
     window.PushSocket = PushSocket;
     window.pushSocket = new PushSocket(wsUri);
 
