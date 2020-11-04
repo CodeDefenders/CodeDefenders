@@ -263,7 +263,14 @@
     $(document).ready(function() {
         /* Initialize the message list. */
         const messages = new Messages(document.getElementById('chat-messages'), document.getElementById('chat-messages-container'));
-        // messages.setMessages(messagesList);
+        $.getJSON('api/game-chat?gameId=${gameId}')
+            .done(json => messages.setMessages(json))
+            .fail(messages.setMessages([
+                {
+                    system: true,
+                    message: 'Could not load chat messages.'
+                }
+            ]))
 
         /* Initialize the channel (all/team). */
         const channel = new Channel(document.getElementById('chat-channel'));
