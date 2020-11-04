@@ -20,11 +20,13 @@ package org.codedefenders.servlets.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -91,7 +93,7 @@ public class GameChatAPI extends HttpServlet {
             return;
         }
 
-        PrintWriter out = response.getWriter();
+        ServletOutputStream out = response.getOutputStream();
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
@@ -100,7 +102,8 @@ public class GameChatAPI extends HttpServlet {
         String json = gson.toJson(messages);
 
         response.setContentType("application/json");
-        out.print(json);
+        response.setCharacterEncoding("UTF-8");
+        out.write(json.getBytes(StandardCharsets.UTF_8));
         out.flush();
     }
 }
