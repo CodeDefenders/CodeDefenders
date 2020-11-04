@@ -1,6 +1,7 @@
 package org.codedefenders.notification.handling;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
@@ -11,6 +12,7 @@ import org.codedefenders.notification.events.client.registration.MutantProgressB
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.notification.web.PushSocket;
+import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +25,7 @@ public class ClientEventHandler {
     private INotificationService notificationService;
     private ServerEventHandlerContainer serverEventHandlerContainer;
     private User user;
+    private GameChatDAO gameChatDAO;
 
     public ClientEventHandler(
             INotificationService notificationService,
@@ -31,6 +34,7 @@ public class ClientEventHandler {
         this.notificationService = notificationService;
         this.serverEventHandlerContainer = serverEventHandlerContainer;
         this.user = user;
+        gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
     }
 
     public void visit(ClientGameChatEvent event) {
@@ -50,6 +54,7 @@ public class ClientEventHandler {
         serverEvent.setGameId(event.getGameId());
         serverEvent.setRole(role);
 
+        gameChatDAO.insertMessage(serverEvent);
         notificationService.post(serverEvent);
     }
 
