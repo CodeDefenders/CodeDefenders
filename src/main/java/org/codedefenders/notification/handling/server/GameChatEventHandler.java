@@ -36,8 +36,13 @@ public class GameChatEventHandler implements ServerEventHandler {
 
     @Subscribe
     public void sendChatMessage(ServerGameChatEvent event) throws IOException, EncodeException {
-        if (event.getGameId() == this.gameId && (event.isAllChat() || event.getRole() == role)) {
-            socket.sendEvent(event);
+        if (event.getGameId() == this.gameId) {
+            if (this.role == Role.OBSERVER
+                    || event.isAllChat()
+                    || event.getRole() == role
+                    || event.getRole() == Role.OBSERVER) {
+                socket.sendEvent(event);
+            }
         }
     }
 
