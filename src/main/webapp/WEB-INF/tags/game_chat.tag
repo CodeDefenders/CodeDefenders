@@ -1,12 +1,10 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%@ attribute name="gameId" type="java.lang.Integer" required="true" %>
-<%@ attribute name="registrationEventName" type="java.lang.String" required="true" %>
-<%@ attribute name="serverChatEventName" type="java.lang.String" required="true" %>
-<%@ attribute name="clientChatEventName" type="java.lang.String" required="true" %>
-<%@ attribute name="showTabs" type="java.lang.Boolean" required="true" %>
-<%-- TODO: maxlength attribute --%>
+<%--@elvariable id="gameChat" type="org.codedefenders.beans.game.GameChatBean"--%>
+<%--@elvariable id="eventNames" type="org.codedefenders.beans.notification.EventNamesBean"--%>
+
+<c:if test="${gameChat.chatEnabled}">
 
 <style>
     #chat .chat-message {
@@ -46,7 +44,7 @@
 <div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;">
     <div class="panel panel-default" style="margin: 0;">
         <div id="chat-handle" class="panel-heading">
-            <c:if test="${showTabs}">
+            <c:if test="${gameChat.showTabs}">
                 <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-default active">All</button>
                 <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-danger">Attackers</button>
                 <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-primary">Defenders</button>
@@ -68,7 +66,7 @@
                                 Team
                             </span>
                         </div>
-                        <textarea id="chat-input" class="form-control" maxlength="500" placeholder="Message" style="width: 100%; resize: none;"></textarea>
+                        <textarea id="chat-input" class="form-control" maxlength="${gameChat.maxMessageLength}" placeholder="Message" style="width: 100%; resize: none;"></textarea>
                     </div>
                 </div>
             </form>
@@ -83,8 +81,6 @@
         </div>
     </div>
 </div>
-
-<link href="css/notification-icons.css" rel="stylesheet" type="text/css" />
 
 <script>
 (function () {
@@ -176,7 +172,7 @@
         };
 
         fetch () {
-            $.getJSON('api/game-chat?gameId=${gameId}')
+            $.getJSON('${gameChat.chatApiUrl}')
                     .done(json => this.setMessages(json))
                     .fail(() => this.setMessages([Messages.SYSTEM_MESSAGE_FAILED_LOAD]));
         }
@@ -474,18 +470,18 @@
         };
 
         const sendMessage = function (message, isAllChat) {
-            pushSocket.send('${clientChatEventName}', {
-                gameId: ${gameId},
+            pushSocket.send('${eventNames.clientChatEventName}', {
+                gameId: ${gameChat.gameId},
                 allChat: isAllChat,
                 message
             });
         };
 
         /* Register for WebSocket events. */
-        pushSocket.subscribe('${registrationEventName}', {
-            gameId: ${gameId}
+        pushSocket.subscribe('${eventNames.gameChatRegistrationEventName}', {
+            gameId: ${gameChat.gameId}
         });
-        pushSocket.register('${serverChatEventName}', handleMessage);
+        pushSocket.register('${eventNames.serverChatEventName}', handleMessage);
         pushSocket.register(PushSocket.WSEventType.CLOSE,
                 () => messages.addMessage(Messages.SYSTEM_MESSAGE_DISCONNECT));
         pushSocket.register(PushSocket.WSEventType.OPEN, () =>
@@ -494,3 +490,5 @@
 
 })();
 </script>
+
+</c:if>

@@ -240,6 +240,7 @@ public class MultiplayerGame extends AbstractGame {
         this.prize = prize;
     }
 
+    @Override
     public boolean isChatEnabled() {
         return chatEnabled;
     }

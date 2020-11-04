@@ -322,4 +322,8 @@ public class PuzzleGame extends AbstractGame {
         return PuzzleDAO.updatePuzzleGame(this);
     }
 
+    @Override
+    public boolean isChatEnabled() {
+        return false;
+    }
 }

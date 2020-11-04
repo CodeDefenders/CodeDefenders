@@ -277,6 +277,7 @@ public class MeleeGame extends AbstractGame {
         this.prize = prize;
     }
 
+    @Override
     public boolean isChatEnabled() {
         return chatEnabled;
     }

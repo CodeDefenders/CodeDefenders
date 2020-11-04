@@ -20,12 +20,8 @@
 --%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.notification.events.EventNames" %>
-<%@ page import="org.codedefenders.notification.events.server.chat.ServerGameChatEvent" %>
-<%@ page import="org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent" %>
-<%@ page import="org.codedefenders.notification.events.client.chat.ClientGameChatEvent" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
@@ -52,13 +48,7 @@
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
-<t:game_chat
-        gameId="<%=game.getId()%>"
-        registrationEventName="<%=EventNames.toClientEventName(GameChatRegistrationEvent.class)%>"
-        serverChatEventName="<%=EventNames.toServerEventName(ServerGameChatEvent.class)%>"
-        clientChatEventName="<%=EventNames.toClientEventName(ClientGameChatEvent.class)%>"
-        showTabs="<%=role == Role.OBSERVER%>">
-</t:game_chat>
+<t:game_chat/>
 
 <%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
 <%--<%@ include file="/jsp/push_game_notifications.jsp"%>--%>

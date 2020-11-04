@@ -3,6 +3,7 @@ package org.codedefenders.notification.handling;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.codedefenders.beans.game.GameChatBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.game.Role;
@@ -24,9 +25,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientEventHandler.class);
-
     private static final Pattern CHAT_COMMAND_PATTERN = Pattern.compile("^/([a-zA-Z]+)");
-    private static final int MAX_MESSAGE_LENGTH = 500;
 
     private INotificationService notificationService;
     private ServerEventHandlerContainer serverEventHandlerContainer;
@@ -77,7 +76,7 @@ public class ClientEventHandler {
         }
 
         /* Trim message to maximum size. */
-        message = message.substring(0, Math.min(MAX_MESSAGE_LENGTH, message.length()));
+        message = message.substring(0, Math.min(GameChatBean.MAX_MESSAGE_LENGTH, message.length()));
 
         ServerGameChatEvent serverEvent = new ServerGameChatEvent();
         serverEvent.setMessage(message);
