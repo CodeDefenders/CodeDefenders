@@ -64,7 +64,7 @@ import com.google.gson.JsonObject;
 @WebServlet(Paths.API_GAME_CHAT)
 public class GameChatAPI extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(GameChatAPI.class);
-    private static final int DEFAULT_LIMIT = 100;
+    private static final int DEFAULT_LIMIT = 1000;
 
     @Inject
     LoginBean login;

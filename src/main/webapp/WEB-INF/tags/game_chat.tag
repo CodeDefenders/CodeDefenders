@@ -42,9 +42,8 @@
     }
 </style>
 
-<!-- Change z-index to something reasonable later. -->
-<div id="chat" style="position: fixed; left: 0px; bottom: 0px; z-index: 10001;">
-    <div class="panel panel-default" style="margin: 0px;">
+<div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;">
+    <div class="panel panel-default" style="margin: 0;">
         <div id="chat-handle" class="panel-heading">
             <c:if test="${showTabs}">
                 <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-default active">All</button>
@@ -59,11 +58,11 @@
             </div>
         </div>
         <div class="panel-footer">
-            <form class="form-inline" style="margin: 0px;">
-                <div class="form-group" style="width: 100%; margin: 0px;">
+            <form class="form-inline" style="margin: 0;">
+                <div class="form-group" style="width: 100%; margin: 0;">
                     <!-- Change this to type="text" once we get rid of base.css. -->
                     <div class="input-group" style="width: 100%;">
-                        <div class="input-group-addon" style="cursor: pointer; width: 4.5em;">
+                        <div id="chat-channel-container" class="input-group-addon" style="cursor: pointer; width: 4.5em;">
                             <span id="chat-channel">
                                 Team
                             </span>
@@ -76,14 +75,15 @@
     </div>
 </div>
 
-<!-- Change z-index to something reasonable later. -->
-<div id="chat-indicator" style="position: fixed; left: 0px; bottom: -1px; z-index: 10000; cursor: pointer;">
-    <div class="panel panel-default" style="margin: 0px; border-top-left-radius: 0px; border-bottom: none;">
-        <div class="panel-heading" style="padding-top: .5em; padding-bottom: .4em; padding-left: .5em; padding-right: .5em; border-bottom: none;">
+<div id="chat-indicator" style="position: fixed; left: 0; bottom: -1px; z-index: 10; cursor: pointer;">
+    <div class="panel panel-default" style="margin: 0; border-top-left-radius: 0; border-bottom: none;">
+        <div class="panel-heading" style="padding: .5em .7em .4em .5em; border-bottom: none;">
             Chat&nbsp;&nbsp;<span id="chat-count" class="label label-default" style="padding-top: .5em;">0</span>
         </div>
     </div>
 </div>
+
+<link href="css/notification-icons.css" rel="stylesheet" type="text/css" />
 
 <script>
 (function () {
@@ -91,7 +91,7 @@
     class Messages {
         constructor (messagesEl, containerEl) {
             this.messages = [];
-            this.filter = this.FILTER_ALL;
+            this.filter = Messages.FILTER_ALL;
             this.messagesEl = messagesEl;
             this.containerEl = containerEl;
         }
@@ -102,8 +102,8 @@
         }
 
         setMessages (messages) {
-            if (messages.length > this.MESSAGE_LIMIT) {
-                this.messages = messages.slice(messages.length - this.MESSAGE_LIMIT, messages.length);
+            if (messages.length > Messages.MESSAGE_LIMIT) {
+                this.messages = messages.slice(messages.length - Messages.MESSAGE_LIMIT, messages.length);
             } else {
                 this.messages = [...messages];
             }
@@ -112,17 +112,15 @@
 
         addMessage (message) {
             this.messages.push(message);
-            if (this.messages.length > this.MESSAGE_LIMIT) {
+            if (this.messages.length > Messages.MESSAGE_LIMIT) {
                 this.messages.shift();
             }
 
             if (this.filter(message)) {
-                const scrolledToBottom = this.containerEl.scrollTop === this.containerEl.scrollHeight - this.containerEl.clientHeight;
-
+                const wasScrolledToBottom = this.isScrolledToBottom();
                 this.messagesEl.appendChild(this.renderMessage(message));
-
-                if (scrolledToBottom) {
-                    this.containerEl.scrollTop = this.containerEl.scrollHeight;
+                if (wasScrolledToBottom) {
+                    this.scrollToBottom();
                 }
             }
         }
@@ -135,6 +133,14 @@
                 this.messagesEl.appendChild(this.renderMessage(message));
             }
 
+            this.scrollToBottom();
+        }
+
+        isScrolledToBottom () {
+            return this.containerEl.scrollTop === this.containerEl.scrollHeight - this.containerEl.clientHeight;
+        }
+
+        scrollToBottom () {
             this.containerEl.scrollTop = this.containerEl.scrollHeight;
         }
 
@@ -168,24 +174,42 @@
             return msgDiv;
         };
 
-        get MESSAGE_LIMIT () {
+        fetch () {
+            $.getJSON('api/game-chat?gameId=${gameId}')
+                    .done(json => this.setMessages(json))
+                    .fail(() => this.setMessages([Messages.SYSTEM_MESSAGE_FAILED_LOAD]));
+        }
+
+        static get MESSAGE_LIMIT () {
             return 1000;
         }
 
-        get FILTER_ALL () {
-            return message => true;
+        static get FILTER_ALL () {
+            return _ => true;
         }
 
-        get FILTER_ATTACKERS () {
+        static get FILTER_ATTACKERS () {
             return message => message.system
                     || message.isAllChat
                     || message.role !== 'DEFENDER';
         }
 
-        get FILTER_DEFENDERS () {
+        static get FILTER_DEFENDERS () {
             return message => message.system
                     || message.isAllChat
                     || message.role !== 'ATTACKER';
+        }
+
+        static get SYSTEM_MESSAGE_CONNECT () {
+            return {system: true, message: 'Connected to chat.'};
+        }
+
+        static get SYSTEM_MESSAGE_DISCONNECT () {
+            return {system: true, message: 'Disconnected from chat.'};
+        }
+
+        static get SYSTEM_MESSAGE_FAILED_LOAD () {
+            return {system: true, message: 'Could not load chat messages.'};
         }
     }
 
@@ -203,8 +227,8 @@
                 this.allChat = isAllChat;
             }
 
-            if (this.isAllChatBefore !== this.isAllChat()) {
-                this.setButton();
+            if (isAllChatBefore !== this.isAllChat()) {
+                this.updateButton();
             }
         }
 
@@ -214,8 +238,8 @@
             this.override = true;
             this.overrideValue = isAllChat;
 
-            if (this.isAllChatBefore !== this.isAllChat()) {
-                this.setButton();
+            if (isAllChatBefore !== this.isAllChat()) {
+                this.updateButton();
             }
         }
 
@@ -224,16 +248,16 @@
 
             this.override = false;
 
-            if (this.isAllChatBefore !== this.isAllChat()) {
-                this.setButton();
+            if (isAllChatBefore !== this.isAllChat()) {
+                this.updateButton();
             }
         }
 
-        setButton () {
+        updateButton () {
             if (this.isAllChat()) {
-                this.channelElement.textContent = this.CHANNEL_ALL;
+                this.channelElement.textContent = Channel.CHANNEL_ALL;
             } else {
-                this.channelElement.textContent = this.CHANNEL_TEAM;
+                this.channelElement.textContent = Channel.CHANNEL_TEAM;
             }
         }
 
@@ -243,55 +267,61 @@
                     : this.allChat;
         }
 
-        get CHANNEL_ALL () {
+        static get CHANNEL_ALL () {
             return 'All';
         }
 
-        get CHANNEL_TEAM () {
+        static get CHANNEL_TEAM () {
             return 'Team';
-        }
-
-        get COMMAND_ALL_PREFIX () {
-            return '/all ';
-        }
-
-        get COMMAND_TEAM_PREFIX () {
-            return '/team ';
         }
     }
 
-    $(document).ready(function() {
-        /* Initialize the message list. */
-        const messages = new Messages(document.getElementById('chat-messages'), document.getElementById('chat-messages-container'));
-        $.getJSON('api/game-chat?gameId=${gameId}')
-            .done(json => messages.setMessages(json))
-            .fail(messages.setMessages([
-                {
-                    system: true,
-                    message: 'Could not load chat messages.'
-                }
-            ]))
+    class MessageCount {
+        constructor(countElement) {
+            this.countElement = countElement;
+            this.count = 0;
+        }
 
-        /* Initialize the channel (all/team). */
-        const channel = new Channel(document.getElementById('chat-channel'));
-        channel.setAllChat(false);
+        setCount (count) {
+            this.count = count;
+            if (count > 0) {
+                this.countElement.classList.remove('label-default');
+                this.countElement.classList.add('label-warning');
+            } else {
+                this.countElement.classList.remove('label-warning');
+                this.countElement.classList.add('label-default');
+            }
+            this.countElement.textContent = String(count);
+        }
 
-        /* Initialize text area. */
-        const textarea = document.getElementById('chat-input');
-        const $textarea = $(textarea);
-        textarea.value = '';
+        getCount () {
+            return this.count;
+        }
+    }
+
+    class ChatInput  {
+        constructor(inputElement) {
+            this.inputElement = inputElement;
+            this.$inputElement = $(inputElement);
+            this.init()
+        }
+
+        init () {
+            const textarea = this.inputElement;
+            const $textarea = this.$inputElement;
+
+            textarea.value = '';
+            this.offset = textarea.clientHeight - $textarea.height();
+
+            $textarea.height(1);
+            $textarea.height(textarea.scrollHeight - this.offset);
+            this.emptyHeight = $textarea.height();
+        }
 
         /* Resize text area as text is typed or deleted (from stackoverflow.com/a/36958094/9360382). */
-        const offset = textarea.clientHeight - $textarea.height();
-        $textarea.height(1);
-        $textarea.height(textarea.scrollHeight - offset);
-        const emptyHeight = $textarea.height();
-        const resizeTextArea = function () {
-            console.log('offset', offset,
-                    'emptyHeight', emptyHeight,
-                    'clientHeight', textarea.clientHeight,
-                    'scrollHeight', textarea.scrollHeight,
-                    'height', $textarea.height());
+        resize () {
+            const textarea = this.inputElement;
+            const $textarea = this.$inputElement;
 
             /* Shrink the field and then re-set it to the scroll height in case it needs to shrink. */
             if (textarea.clientHeight >= textarea.scrollHeight) {
@@ -299,46 +329,87 @@
             }
 
             /* Grow the field. */
-            const height = Math.max(textarea.scrollHeight - offset, emptyHeight);
+            const height = Math.max(textarea.scrollHeight - this.offset, this.emptyHeight);
             $textarea.height(height);
-            console.log(emptyHeight - height);
-            $textarea.css('margin-top', emptyHeight - height);
-            // textarea.style['margin-top'] = emptyHeight - height;
+            $textarea.css('margin-top', this.emptyHeight - height);
         }
-        $(textarea).on('paste input', resizeTextArea);
 
-        /* Submit message on enter. */
-        $(textarea).on('keypress', function(e) {
-            if (e.keyCode === 13) {
-                if (!e.shiftKey && !e.ctrlKey) {
-                    e.preventDefault();
-                    const message = this.value.trim();
-                    if (message.length > 0) {
-                        sendMessage(message, channel.isAllChat());
-                        this.value = '';
-                        channel.removeOverride();
-                        resizeTextArea();
-                    }
-                }
+        getText () {
+            return this.inputElement.value;
+        }
+
+        setText (text) {
+            this.inputElement.value = text;
+            this.resize();
+        }
+
+        getCommand () {
+            const text = this.getText().trimStart();
+            const match = text.match(/^\/([a-zA-Z]+)/);
+            if (match !== null) {
+                return match[1];
+            } else {
+                return null;
             }
-        });
+        }
 
-        /* Override message channel when "/all " or "/team " is entered. */
-        $(textarea).on('paste input', function() {
-            const hasSlashAll = this.value.startsWith(channel.COMMAND_ALL_PREFIX);
-            const hasSlashTeam = this.value.startsWith(channel.COMMAND_TEAM_PREFIX);
+        static get COMMAND_ALL () {
+            return 'all';
+        }
 
-            if (hasSlashAll) {
-                channel.overrideAllChat(true);
-            } else if (hasSlashTeam) {
-                channel.overrideAllChat(false);
+        static get COMMAND_TEAM () {
+            return 'team';
+        }
+    }
+
+    $(document).ready(function() {
+        const messages = new Messages(
+                document.getElementById('chat-messages'),
+                document.getElementById('chat-messages-container'));
+        messages.fetch();
+
+        const messageCount = new MessageCount(
+                document.getElementById('chat-count'));
+        messageCount.setCount(0);
+
+        const channel = new Channel(
+                document.getElementById('chat-channel'));
+        channel.setAllChat(false);
+
+        const input = new ChatInput(
+                document.getElementById('chat-input'));
+
+        /* Resize after typing. Override message channel when "/all " or "/team " is entered. */
+        $(input.inputElement).on('paste input', function() {
+            input.resize();
+
+            const command = input.getCommand();
+            if (command !== null) {
+                if (command === ChatInput.COMMAND_ALL) {
+                    channel.overrideAllChat(true);
+                } else if (command === ChatInput.COMMAND_TEAM) {
+                    channel.overrideAllChat(false);
+                }
             } else {
                 channel.removeOverride();
             }
         });
 
-        /* Toggle message channel when the indicator is clicked. */
-        $("#chat-channel").parent().on('click', function () {
+        /* Submit message on enter. */
+        $(input.inputElement).on('keypress', function(e) {
+            if (e.keyCode === 13 && !e.shiftKey && !e.ctrlKey) {
+                e.preventDefault();
+                const message = input.getText().trim();
+                if (message.length > 0) {
+                    sendMessage(message, channel.isAllChat());
+                    input.setText('');
+                    channel.removeOverride();
+                }
+            }
+        });
+
+        /* Toggle message channel (all / team). */
+        $('#chat-channel-container').on('click', function () {
             channel.setAllChat(!channel.isAllChat());
         });
 
@@ -346,16 +417,15 @@
         $('#chat').on('click', '.chat-tab-button', function () {
             $('#chat .chat-tab-button').removeClass('active');
             this.classList.add('active');
-
             switch (this.getAttribute('data-tab')) {
                 case 'ALL':
-                    messages.setFilter(messages.FILTER_ALL);
+                    messages.setFilter(Messages.FILTER_ALL);
                     break;
                 case 'ATTACKERS':
-                    messages.setFilter(messages.FILTER_ATTACKERS);
+                    messages.setFilter(Messages.FILTER_ATTACKERS);
                     break;
                 case 'DEFENDERS':
-                    messages.setFilter(messages.FILTER_DEFENDERS);
+                    messages.setFilter(Messages.FILTER_DEFENDERS);
                     break;
             }
             messages.redraw();
@@ -369,7 +439,8 @@
             chat.style.right = null;
             chat.style.top = null;
             chat.style.bottom = '0px';
-            document.getElementById('chat-count').textContent = '0';
+            messageCount.setCount(0);
+            messages.scrollToBottom();
         });
 
         /* Close chat when the X on the chat window is clicked. */
@@ -390,10 +461,8 @@
 
         const handleMessage = function (serverChatEvent) {
             if (!$('#chat').is(':visible')) {
-                const count = document.getElementById('chat-count');
-                count.textContent = Number(count.textContent) + 1;
+                messageCount.setCount(messageCount.getCount());
             }
-
             messages.addMessage({
                 isAllChat: serverChatEvent.isAllChat,
                 role: serverChatEvent.role,
@@ -401,32 +470,25 @@
                 senderName: serverChatEvent.senderName,
                 message: serverChatEvent.message
             });
-
-            console.log('received message', serverChatEvent);
         };
 
         const sendMessage = function (message, isAllChat) {
-            if (message.startsWith(channel.COMMAND_ALL_PREFIX)) {
-                isAllChat = true;
-                message = message.substring(channel.COMMAND_ALL_PREFIX.length);
-            } else if (message.startsWith(channel.COMMAND_TEAM_PREFIX)) {
-                isAllChat = false;
-                message = message.substring(channel.COMMAND_TEAM_PREFIX.length);
-            }
-
             pushSocket.send('${clientChatEventName}', {
                 gameId: ${gameId},
                 allChat: isAllChat,
                 message
             });
+        };
 
-            console.log('sent message', message, isAllChat);
-        }
-
+        /* Register for WebSocket events. */
         pushSocket.subscribe('${registrationEventName}', {
             gameId: ${gameId}
         });
         pushSocket.register('${serverChatEventName}', handleMessage);
+        pushSocket.register(PushSocket.WSEventType.CLOSE,
+                () => messages.addMessage(Messages.SYSTEM_MESSAGE_DISCONNECT));
+        pushSocket.register(PushSocket.WSEventType.OPEN, () =>
+                () => messages.addMessage(Messages.SYSTEM_MESSAGE_CONNECT));
     });
 
 })();
