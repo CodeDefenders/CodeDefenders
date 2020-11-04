@@ -6,6 +6,7 @@
 <%@ attribute name="serverChatEventName" type="java.lang.String" required="true" %>
 <%@ attribute name="clientChatEventName" type="java.lang.String" required="true" %>
 <%@ attribute name="showTabs" type="java.lang.Boolean" required="true" %>
+<%-- TODO: maxlength attribute --%>
 
 <style>
     #chat .chat-message {
@@ -54,7 +55,7 @@
         </div>
         <div class="panel-body" style="padding: 0px;">
             <div id="chat-messages-container" style="height: 30em; width: 25em; overflow-y: scroll;">
-                <div id="chat-messages" style="padding: .5em .75em .5em .75em;"></div>
+                <div id="chat-messages" style="word-wrap: break-word; padding: .5em .75em .5em .75em;"></div>
             </div>
         </div>
         <div class="panel-footer">
@@ -67,7 +68,7 @@
                                 Team
                             </span>
                         </div>
-                        <textarea id="chat-input" class="form-control" placeholder="Message" style="width: 100%; resize: none;"></textarea>
+                        <textarea id="chat-input" class="form-control" maxlength="500" placeholder="Message" style="width: 100%; resize: none;"></textarea>
                     </div>
                 </div>
             </form>

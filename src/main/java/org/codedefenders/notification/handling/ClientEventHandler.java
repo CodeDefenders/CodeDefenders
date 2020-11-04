@@ -24,7 +24,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientEventHandler.class);
-    private static final Pattern chatCommandPattern = Pattern.compile("^/([a-zA-Z]+)");
+
+    private static final Pattern CHAT_COMMAND_PATTERN = Pattern.compile("^/([a-zA-Z]+)");
+    private static final int MAX_MESSAGE_LENGTH = 500;
 
     private INotificationService notificationService;
     private ServerEventHandlerContainer serverEventHandlerContainer;
@@ -53,7 +55,8 @@ public class ClientEventHandler {
         String message = event.getMessage().trim();
         boolean isAllChat = event.isAllChat();
 
-        Matcher matcher = chatCommandPattern.matcher(message);
+        /* Handle chat commands. */
+        Matcher matcher = CHAT_COMMAND_PATTERN.matcher(message);
         if (matcher.find()) {
             final String command = matcher.group(1);
             switch (command) {
@@ -72,6 +75,9 @@ public class ClientEventHandler {
                 return;
             }
         }
+
+        /* Trim message to maximum size. */
+        message = message.substring(0, Math.min(MAX_MESSAGE_LENGTH, message.length()));
 
         ServerGameChatEvent serverEvent = new ServerGameChatEvent();
         serverEvent.setMessage(message);
