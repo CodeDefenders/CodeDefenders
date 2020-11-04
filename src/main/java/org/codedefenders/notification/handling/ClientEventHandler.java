@@ -1,5 +1,8 @@
 package org.codedefenders.notification.handling;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.game.Role;
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClientEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientEventHandler.class);
+    private static final Pattern chatCommandPattern = Pattern.compile("^/([a-zA-Z]+)");
 
     private INotificationService notificationService;
     private ServerEventHandlerContainer serverEventHandlerContainer;
@@ -46,11 +50,34 @@ public class ClientEventHandler {
             return;
         }
 
+        String message = event.getMessage().trim();
+        boolean isAllChat = event.isAllChat();
+
+        Matcher matcher = chatCommandPattern.matcher(message);
+        if (matcher.find()) {
+            final String command = matcher.group(1);
+            switch (command) {
+                case "all":
+                    isAllChat = true;
+                    break;
+                case "team":
+                    isAllChat = false;
+                    break;
+                default:
+                    // Simply ignore invalid commands for now.
+                    return;
+            }
+            message = message.substring(command.length() + 1).trim();
+            if (message.isEmpty()) {
+                return;
+            }
+        }
+
         ServerGameChatEvent serverEvent = new ServerGameChatEvent();
-        serverEvent.setMessage(event.getMessage());
+        serverEvent.setMessage(message);
         serverEvent.setSenderId(user.getId());
         serverEvent.setSenderName(user.getUsername());
-        serverEvent.setAllChat(event.isAllChat());
+        serverEvent.setAllChat(isAllChat);
         serverEvent.setGameId(event.getGameId());
         serverEvent.setRole(role);
 
