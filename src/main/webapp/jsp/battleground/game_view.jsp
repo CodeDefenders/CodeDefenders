@@ -56,7 +56,8 @@
         gameId="<%=game.getId()%>"
         registrationEventName="<%=EventNames.toClientEventName(GameChatRegistrationEvent.class)%>"
         serverChatEventName="<%=EventNames.toServerEventName(ServerGameChatEvent.class)%>"
-        clientChatEventName="<%=EventNames.toClientEventName(ClientGameChatEvent.class)%>">
+        clientChatEventName="<%=EventNames.toClientEventName(ClientGameChatEvent.class)%>"
+        showTabs="<%=role == Role.OBSERVER%>">
 </t:game_chat>
 
 <%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>

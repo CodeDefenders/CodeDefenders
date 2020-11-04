@@ -5,6 +5,7 @@
 <%@ attribute name="registrationEventName" type="java.lang.String" required="true" %>
 <%@ attribute name="serverChatEventName" type="java.lang.String" required="true" %>
 <%@ attribute name="clientChatEventName" type="java.lang.String" required="true" %>
+<%@ attribute name="showTabs" type="java.lang.Boolean" required="true" %>
 
 <style>
     #chat .chat-message {
@@ -45,9 +46,11 @@
 <div id="chat" style="position: fixed; left: 0px; bottom: 0px; z-index: 10001;">
     <div class="panel panel-default" style="margin: 0px;">
         <div id="chat-handle" class="panel-heading">
-            <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-default active">All</button>
-            <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-danger">Atackers</button>
-            <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-primary">Defenders</button>
+            <c:if test="${showTabs}">
+                <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-default active">All</button>
+                <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-danger">Attackers</button>
+                <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-primary">Defenders</button>
+            </c:if>
             <button id="chat-close" type="button" class="close" style="margin-top: -.5em; margin-right: -.5em;">×</button>
         </div>
         <div class="panel-body" style="padding: 0px;">
