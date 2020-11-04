@@ -302,8 +302,9 @@
             if (e.keyCode === 13) {
                 if (!e.shiftKey && !e.ctrlKey) {
                     e.preventDefault();
-                    if (this.value.trim().length > 0) {
-                        sendMessage(this.value, channel.isAllChat());
+                    const message = this.value.trim();
+                    if (message.length > 0) {
+                        sendMessage(message, channel.isAllChat());
                         this.value = '';
                         channel.removeOverride();
                         resizeTextArea();
@@ -395,6 +396,14 @@
         };
 
         const sendMessage = function (message, isAllChat) {
+            if (message.startsWith(channel.COMMAND_ALL_PREFIX)) {
+                isAllChat = true;
+                message = message.substring(channel.COMMAND_ALL_PREFIX.length);
+            } else if (message.startsWith(channel.COMMAND_TEAM_PREFIX)) {
+                isAllChat = false;
+                message = message.substring(channel.COMMAND_TEAM_PREFIX.length);
+            }
+
             pushSocket.send('${clientChatEventName}', {
                 gameId: ${gameId},
                 allChat: isAllChat,
