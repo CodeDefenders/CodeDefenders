@@ -20,6 +20,9 @@ import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.beans.game.GameChatBean.ChatCommand.ALL;
+import static org.codedefenders.beans.game.GameChatBean.ChatCommand.TEAM;
+
 /**
  * Handles incoming client events from a {@link PushSocket}.
  */
@@ -58,16 +61,10 @@ public class ClientEventHandler {
         Matcher matcher = CHAT_COMMAND_PATTERN.matcher(message);
         if (matcher.find()) {
             final String command = matcher.group(1);
-            switch (command) {
-                case "all":
-                    isAllChat = true;
-                    break;
-                case "team":
-                    isAllChat = false;
-                    break;
-                default:
-                    // Simply ignore invalid commands for now.
-                    return;
+            if (command.equals(ALL.getCommandString())) {
+                isAllChat = true;
+            } else if (command.equals(TEAM.getCommandString())) {
+                isAllChat = false;
             }
             message = message.substring(command.length() + 1).trim();
             if (message.isEmpty()) {

@@ -49,4 +49,20 @@ public class GameChatBean {
     public int getMaxMessageLength() {
         return MAX_MESSAGE_LENGTH;
     }
+
+    // TODO: Create beans for enum constants
+    public enum ChatCommand {
+        ALL("all"),
+        TEAM("team");
+
+        String commandString;
+
+        ChatCommand(String commandString) {
+            this.commandString = commandString;
+        }
+
+        public String getCommandString() {
+            return commandString;
+        }
+    }
 }
