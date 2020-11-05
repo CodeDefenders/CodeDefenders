@@ -45,9 +45,12 @@
     <div class="panel panel-default" style="margin: 0;">
         <div id="chat-handle" class="panel-heading">
             <c:if test="${gameChat.showTabs}">
-                <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-default active">All</button>
-                <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-danger">Attackers</button>
-                <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-primary">Defenders</button>
+                <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-default active"
+                    title="Show all message.">All</button>
+                <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-danger"
+                    title="Show messages from the perspective of the attacker team.">Attackers</button>
+                <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-primary"
+                    title="Show messages from the perspective of the defender team.">Defenders</button>
             </c:if>
             <button id="chat-close" type="button" class="close" style="margin-top: -.5em; margin-right: -.5em;">×</button>
         </div>
@@ -62,7 +65,7 @@
                     <!-- Change this to type="text" once we get rid of base.css. -->
                     <div class="input-group" style="width: 100%;">
                         <div id="chat-channel-container" class="input-group-addon" style="cursor: pointer; width: 4.5em;">
-                            <span id="chat-channel">
+                            <span id="chat-channel" title="Switch between sending messages to your own team or all players.">
                                 Team
                             </span>
                         </div>
@@ -85,7 +88,14 @@
 <script>
 (function () {
 
+    /**
+     * Manages the stored messages and displays them.
+     */
     class Messages {
+        /**
+         * @param {HTMLDivElement} messagesEl The div containing the message elements.
+         * @param {HTMLDivElement} containerEl The scrollable container containing the messagesEl element.
+         */
         constructor (messagesEl, containerEl) {
             this.messages = [];
             this.filter = Messages.FILTER_ALL;
@@ -93,11 +103,20 @@
             this.containerEl = containerEl;
         }
 
+        /**
+         * Filters the messages according to the given filter.
+         * @param {Function<object, boolean>} filter The filter.
+         */
         setFilter (filter) {
             this.filter = filter;
             this.redraw();
         }
 
+        /**
+         * Replaces the stored messages with the given messages and displays
+         * the messages passing the currently set filter.
+         * @param {object[]} messages The new messages.
+         */
         setMessages (messages) {
             if (messages.length > Messages.MESSAGE_LIMIT) {
                 this.messages = messages.slice(messages.length - Messages.MESSAGE_LIMIT, messages.length);
@@ -107,6 +126,10 @@
             this.redraw();
         }
 
+        /**
+         * Adds a new message and displays it, if it passes the currently set filter.
+         * @param {object} message The new message.
+         */
         addMessage (message) {
             this.messages.push(message);
             if (this.messages.length > Messages.MESSAGE_LIMIT) {
@@ -122,6 +145,9 @@
             }
         }
 
+        /**
+         * Clears the displayed messages and redraws them, filtering them according to the set filter.
+         */
         redraw () {
             this.messagesEl.innerHTML = '';
 
@@ -133,14 +159,25 @@
             this.scrollToBottom();
         }
 
+        /**
+         * Checks whether the container element is scrolled all the way to the bottom.
+         */
         isScrolledToBottom () {
             return this.containerEl.scrollTop === this.containerEl.scrollHeight - this.containerEl.clientHeight;
         }
 
+        /**
+         * Scrolls the container element all the way to the bottom.
+         */
         scrollToBottom () {
             this.containerEl.scrollTop = this.containerEl.scrollHeight;
         }
 
+        /**
+         * Creates a DOM element for a message and caches it. Returns the cached element if present.
+         * @param {object} message The message.
+         * @return {HTMLSpanElement} The rendered message.
+         */
         renderMessage (message) {
             if (message._cache) {
                 return message._cache;
@@ -171,46 +208,77 @@
             return msgDiv;
         };
 
+        /**
+         * Fetches the messages for the game from the API and replaces any stored messages with them.
+         */
         fetch () {
             $.getJSON('${gameChat.chatApiUrl}')
                     .done(json => this.setMessages(json))
                     .fail(() => this.setMessages([Messages.SYSTEM_MESSAGE_FAILED_LOAD]));
         }
 
+        /**
+         * The maximum number of messages to display.
+         */
         static get MESSAGE_LIMIT () {
             return 1000;
         }
 
+        /**
+         * Filter to show all message.
+         */
         static get FILTER_ALL () {
             return _ => true;
         }
 
+        /**
+         * Filter to show messages from the perspective of the attacker team.
+         */
         static get FILTER_ATTACKERS () {
             return message => message.system
                     || message.isAllChat
                     || message.role !== 'DEFENDER';
         }
 
+        /**
+         * Filter to show messages from the perspective of the defender team.
+         */
         static get FILTER_DEFENDERS () {
             return message => message.system
                     || message.isAllChat
                     || message.role !== 'ATTACKER';
         }
 
+        /**
+         * Message to show on WebSocket connect.
+         */
         static get SYSTEM_MESSAGE_CONNECT () {
             return {system: true, message: 'Connected to chat.'};
         }
 
+        /**
+         * Message to show on WebSocket disconnect.
+         */
         static get SYSTEM_MESSAGE_DISCONNECT () {
             return {system: true, message: 'Disconnected from chat.'};
         }
 
+        /**
+         * Message to show on failing to fetch the existing messages from the API.
+         */
         static get SYSTEM_MESSAGE_FAILED_LOAD () {
             return {system: true, message: 'Could not load chat messages.'};
         }
     }
 
+    /**
+     * Stores the currently active message channel (team / all) and displays it.
+     * The active message channel determines if chat messages are sent to the team or all players.
+     */
     class Channel {
+        /**
+         * @param {HTMLSpanElement} channelElement The element displaying the channel
+         */
         constructor (channelElement) {
             this.channelElement = channelElement;
             this.allChat = false;
@@ -218,6 +286,10 @@
             this.overrideValue = false;
         }
 
+        /**
+         * Set all chat or team chat as the active channel. Does nothing if override is enabled.
+         * @param {boolean} isAllChat Whether to enable or disable all chat.
+         */
         setAllChat (isAllChat) {
             const isAllChatBefore = this.isAllChat();
             if (!this.override) {
@@ -229,6 +301,10 @@
             }
         }
 
+        /**
+         * Override the message channel. Ignoring if all chat would otherwise be enabled or not.
+         * @param {boolean} isAllChat Whether to override with all chat enabled or disabled.
+         */
         overrideAllChat (isAllChat) {
             const isAllChatBefore = this.isAllChat();
 
@@ -240,6 +316,9 @@
             }
         }
 
+        /**
+         * Removes the message channel override, returning to the previously set message channel.
+         */
         removeOverride () {
             const isAllChatBefore = this.isAllChat();
 
@@ -250,6 +329,9 @@
             }
         }
 
+        /**
+         * Updates the element displaying the message channel.
+         */
         updateButton () {
             if (this.isAllChat()) {
                 this.channelElement.textContent = Channel.CHANNEL_ALL;
@@ -258,6 +340,10 @@
             }
         }
 
+        /**
+         * Returns whether the message channel is set to all chat or team chat.
+         * @return {boolean} Whether the message channel is set to all chat (true) or team chat (false).
+         */
         isAllChat () {
             return this.override
                     ? this.overrideValue
@@ -273,12 +359,22 @@
         }
     }
 
+    /**
+     * Stores and displays the count of unread messages when the chat is hidden.
+     */
     class MessageCount {
+        /**
+         * @param {HTMLSpanElement} countElement The element conaining the message count.
+         */
         constructor(countElement) {
             this.countElement = countElement;
             this.count = 0;
         }
 
+        /**
+         * Sets the count to the given number and displays it.
+         * @param {number} count The count to set.
+         */
         setCount (count) {
             this.count = count;
             if (count > 0) {
@@ -296,13 +392,23 @@
         }
     }
 
+    /**
+     * Manages the chat input textarea.
+     */
     class ChatInput  {
+        /**
+         * @param {HTMLTextAreaElement} inputElement The text area serving as chat input.
+         */
         constructor(inputElement) {
             this.inputElement = inputElement;
             this.$inputElement = $(inputElement);
             this.init()
         }
 
+        /**
+         * Initializes the empty height and height offset of the text area.
+         * In order for this method to work, the text area has to be ready and visible.
+         */
         init () {
             const textarea = this.inputElement;
             const $textarea = this.$inputElement;
@@ -315,7 +421,9 @@
             this.emptyHeight = $textarea.height();
         }
 
-        /* Resize text area as text is typed or deleted (from stackoverflow.com/a/36958094/9360382). */
+        /**
+         *  Resizes the text area to its text. (from stackoverflow.com/a/36958094/9360382).
+         */
         resize () {
             const textarea = this.inputElement;
             const $textarea = this.$inputElement;
@@ -340,6 +448,10 @@
             this.resize();
         }
 
+        /**
+         * If the text area's text starts with a command (a word prefixed with a '/'),
+         * returns the word making up the command.
+         */
         getCommand () {
             const text = this.getText().trimStart();
             const match = text.match(/^\/([a-zA-Z]+)/);
@@ -350,15 +462,20 @@
             }
         }
 
+        // TODO: Create a bean for enum constants.
         static get COMMAND_ALL () {
             return 'all';
         }
 
+        // TODO: Create a bean for enum constants.
         static get COMMAND_TEAM () {
             return 'team';
         }
     }
 
+    /**
+     * Restores the previous visibility and position of the chat.
+     */
     function loadSettings () {
         let showChat = JSON.parse(localStorage.getItem('showChat')) || false;
         let chatPos = JSON.parse(localStorage.getItem('chatPos'));
@@ -408,12 +525,13 @@
             if (command !== null) {
                 if (command === ChatInput.COMMAND_ALL) {
                     channel.overrideAllChat(true);
+                    return
                 } else if (command === ChatInput.COMMAND_TEAM) {
                     channel.overrideAllChat(false);
+                    return;
                 }
-            } else {
-                channel.removeOverride();
             }
+            channel.removeOverride();
         });
 
         /* Submit message on enter. */
@@ -500,6 +618,10 @@
             handle: '#chat-handle'
         });
 
+        /**
+         * Handles a received message.
+         * @param {ServerGameChatEvent} serverChatEvent The received message.
+         */
         const handleMessage = function (serverChatEvent) {
             if (!$('#chat').is(':visible')) {
                 messageCount.setCount(messageCount.getCount() + 1);
@@ -513,6 +635,11 @@
             });
         };
 
+        /**
+         * Sends a message.
+         * @param {object} message The message to be sent.
+         * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
+         */
         const sendMessage = function (message, isAllChat) {
             pushSocket.send('${eventNames.clientChatEventName}', {
                 gameId: ${gameChat.gameId},
