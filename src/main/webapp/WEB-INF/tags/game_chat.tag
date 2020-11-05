@@ -359,7 +359,33 @@
         }
     }
 
+    function loadSettings () {
+        let showChat = JSON.parse(localStorage.getItem('showChat')) || false;
+        let chatPos = JSON.parse(localStorage.getItem('chatPos'));
+
+        const chat = document.getElementById('chat');
+        const $chat = $(chat);
+
+        if (showChat) {
+            if (chatPos !== null) {
+                chat.style.bottom = null;
+                chat.style.right = null;
+                chat.style.top = chatPos.top;
+                chat.style.left = chatPos.left;
+            }
+        } else {
+            $chat.hide();
+        }
+    }
+
     $(document).ready(function() {
+        const input = new ChatInput(
+                document.getElementById('chat-input'));
+
+        /* Load settings as early as possible, but after initializing the text area,
+        because the text area has to be visible to get correct height values from it. */
+        loadSettings();
+
         const messages = new Messages(
                 document.getElementById('chat-messages'),
                 document.getElementById('chat-messages-container'));
@@ -373,8 +399,6 @@
                 document.getElementById('chat-channel'));
         channel.setAllChat(false);
 
-        const input = new ChatInput(
-                document.getElementById('chat-input'));
 
         /* Resize after typing. Override message channel when "/all " or "/team " is entered. */
         $(input.inputElement).on('paste input', function() {
@@ -401,6 +425,7 @@
                     sendMessage(message, channel.isAllChat());
                     input.setText('');
                     channel.removeOverride();
+                    messages.scrollToBottom();
                 }
             }
         });
@@ -431,18 +456,26 @@
         /* Toggle the chat and reset it's position when the indicator is clicked. */
         $("#chat-indicator").on('click', function () {
             const chat = document.getElementById('chat');
-            $(chat).toggle();
-            chat.style.left = '0px';
-            chat.style.right = null;
-            chat.style.top = null;
-            chat.style.bottom = '0px';
-            messageCount.setCount(0);
-            messages.scrollToBottom();
+            if ($(chat).is(':visible')) {
+                $(chat).hide();
+                localStorage.setItem('showChat', JSON.stringify(false))
+            } else {
+                chat.style.top = null;
+                chat.style.right = null;
+                chat.style.bottom = '0px';
+                chat.style.left = '0px';
+                messageCount.setCount(0);
+                $(chat).show();
+                messages.scrollToBottom();
+                localStorage.setItem('showChat', JSON.stringify(true))
+            }
+            localStorage.removeItem('chatPos');
         });
 
         /* Close chat when the X on the chat window is clicked. */
         $("#chat-close").on('click', function () {
             $("#chat").hide();
+            localStorage.setItem('showChat', JSON.stringify(false))
         });
 
         /* Make the chat window draggable. */
@@ -453,12 +486,23 @@
                 event.target.style.bottom = null;
                 event.target.style.right = null;
             },
+            stop: event => {
+                console.log(event);
+                console.log(event.target.style.bottom);
+                console.log(event.target.style.right);
+                localStorage.setItem('chatPos',
+                    JSON.stringify({
+                        top: event.target.style.top,
+                        left: event.target.style.left
+                    })
+                );
+            },
             handle: '#chat-handle'
         });
 
         const handleMessage = function (serverChatEvent) {
             if (!$('#chat').is(':visible')) {
-                messageCount.setCount(messageCount.getCount());
+                messageCount.setCount(messageCount.getCount() + 1);
             }
             messages.addMessage({
                 isAllChat: serverChatEvent.isAllChat,
