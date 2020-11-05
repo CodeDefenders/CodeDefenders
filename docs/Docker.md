@@ -57,9 +57,22 @@ docker-compose up
 ## Persistence
 
 The `docker-compose` file uses named volumes to persist the database and codedefenders data directory.  
-The names used should be in a normal setup `docker_datavolume` and `docker_dbvolume`.
+The names used in a normal setup should be `docker_datavolume` and `docker_dbvolume`.
 
 Those are managed via the `docker volume` command.
 
+As long as those volumes are there, the content of the mysql db and the data folder are persisted.
+So if you have stopped, and even destroyed, the containers by using the same docker-compose file the data are preserved.
+
 **WARNING:**  
 You should only ever `rm` both volumes at the same time as otherwise the database will reference no longer existing files, or the database will try to write at places where already some files exist.
+
+More information can be found in the [docker documentation](https://docs.docker.com/storage/volumes/)
+
+### Reliability
+A minimum of reliability is guaranteed by automatically restarting the container if the fail or are manually stopped (by mistake). Therefore, unless you stop the docker-compose, containers will automatically restart.
+
+**Note** Restarting the containers *might* not preserve the user sessions, that is, you users might have to re-login in the system after a crash/restart.
+
+### Customization
+If you need more instances or if you need to customize the deployment, you must update the Docker and various configurations files under the ```/docker``` folder. But at that point your are on your own.

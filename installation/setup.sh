@@ -78,12 +78,16 @@ echo "* Create folder structure under $data_dir"
 # Create the home folder and checks this worked
 
 if [ -e ${data_dir} ]; then
-    read -p "* Data DIR ${data_dir} exists. Do you want to wipe it out? Continue (y/n)? " choice
-    case "$choice" in
-        y|Y ) rm -rfv  ${data_dir};;
-        n|N ) echo "no";;
-        * ) echo "Invalid. Abort"; exit 1;;
-    esac
+    # Ignore if directory is empty
+    if ! [ -n "$(find "${data_dir}" -maxdepth 0 -type d -empty 2>/dev/null)" ]
+    then
+        read -p "* Data DIR ${data_dir} exists. Do you want to wipe it out? Continue (y/n)? " choice
+        case "$choice" in
+            y|Y ) rm -rfv  ${data_dir};;
+            n|N ) echo "no";;
+            * ) echo "Invalid. Abort"; exit 1;;
+        esac
+    fi
 fi
 
 # Better safe than sorry.
