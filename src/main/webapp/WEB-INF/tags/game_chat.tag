@@ -619,10 +619,10 @@
         });
 
         /**
-         * Handles a received message.
+         * Handles a received chat message.
          * @param {ServerGameChatEvent} serverChatEvent The received message.
          */
-        const handleMessage = function (serverChatEvent) {
+        const handleChatMessage = function (serverChatEvent) {
             if (!$('#chat').is(':visible')) {
                 messageCount.setCount(messageCount.getCount() + 1);
             }
@@ -631,6 +631,17 @@
                 role: serverChatEvent.role,
                 senderId: serverChatEvent.senderId,
                 senderName: serverChatEvent.senderName,
+                message: serverChatEvent.message
+            });
+        };
+
+        /**
+         * Handles a received system message.
+         * @param {ServerSystemChatEvent} serverChatEvent The received message.
+         */
+        const handleSystemMessage = function (serverChatEvent) {
+            messages.addMessage({
+                system: true,
                 message: serverChatEvent.message
             });
         };
@@ -652,7 +663,8 @@
         pushSocket.subscribe('${eventNames.gameChatRegistrationEventName}', {
             gameId: ${gameChat.gameId}
         });
-        pushSocket.register('${eventNames.serverChatEventName}', handleMessage);
+        pushSocket.register('${eventNames.serverChatEventName}', handleChatMessage);
+        pushSocket.register('${eventNames.serverSystemChatEventName}', handleSystemMessage);
         pushSocket.register(PushSocket.WSEventType.CLOSE,
                 () => messages.addMessage(Messages.SYSTEM_MESSAGE_DISCONNECT));
         pushSocket.register(PushSocket.WSEventType.OPEN, () =>

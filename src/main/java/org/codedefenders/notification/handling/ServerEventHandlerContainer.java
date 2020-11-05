@@ -33,13 +33,15 @@ public class ServerEventHandlerContainer {
     private INotificationService notificationService;
     private PushSocket socket;
     private User user;
+    private String ticket;
 
     private Map<ServerEventHandler, ServerEventHandler> handlers;
 
-    public ServerEventHandlerContainer(INotificationService notificationService, PushSocket socket, User user) {
+    public ServerEventHandlerContainer(INotificationService notificationService, PushSocket socket, User user, String ticket) {
         this.notificationService = notificationService;
         this.socket = socket;
         this.user = user;
+        this.ticket = ticket;
         this.handlers = new HashMap<>();
     }
 
@@ -84,10 +86,10 @@ public class ServerEventHandlerContainer {
         }
 
         if (event.getAction() == RegistrationEvent.Action.REGISTER) {
-            addHandler(new GameChatEventHandler(socket, event.getGameId(), role));
+            addHandler(new GameChatEventHandler(socket, event.getGameId(), role, ticket));
 
         } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
-            removeHandler(new GameChatEventHandler(socket,event.getGameId(), role));
+            removeHandler(new GameChatEventHandler(socket, event.getGameId(), role, ticket));
         }
     }
 

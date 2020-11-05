@@ -15,6 +15,7 @@ import org.codedefenders.notification.events.client.registration.GameLifecycleRe
 import org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
+import org.codedefenders.notification.events.server.chat.ServerSystemChatEvent;
 import org.codedefenders.notification.web.PushSocket;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
@@ -33,19 +34,32 @@ public class ClientEventHandler {
     private INotificationService notificationService;
     private ServerEventHandlerContainer serverEventHandlerContainer;
     private User user;
-    private GameChatDAO gameChatDAO;
+    private String ticket;
 
     public ClientEventHandler(
             INotificationService notificationService,
             ServerEventHandlerContainer serverEventHandlerContainer,
-            User user) {
+            User user,
+            String ticket) {
         this.notificationService = notificationService;
         this.serverEventHandlerContainer = serverEventHandlerContainer;
         this.user = user;
-        gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
+        this.ticket = ticket;
+    }
+
+    /**
+     * Sends a system message to the chat instance.
+     * @param message The message to send.
+     */
+    private void sendSystemMessage(String message) {
+        ServerSystemChatEvent systemMessage = new ServerSystemChatEvent();
+        systemMessage.setMessage(message);
+        systemMessage.setTicket(ticket);
+        notificationService.post(systemMessage);
     }
 
     public void visit(ClientGameChatEvent event) {
+        GameChatDAO gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
         Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
 
         if (role == null) {
@@ -65,15 +79,24 @@ public class ClientEventHandler {
                 isAllChat = true;
             } else if (command.equals(TEAM.getCommandString())) {
                 isAllChat = false;
+            } else {
+                sendSystemMessage("/" + command + "is not a valid chat command.");
+                return;
             }
             message = message.substring(command.length() + 1).trim();
             if (message.isEmpty()) {
+                sendSystemMessage("Your message cannot be empty.");
                 return;
             }
         }
 
         /* Trim message to maximum size. */
         message = message.substring(0, Math.min(GameChatBean.MAX_MESSAGE_LENGTH, message.length()));
+
+        /* Check if message is empty. */
+        if (message.isEmpty()) {
+            return;
+        }
 
         ServerGameChatEvent serverEvent = new ServerGameChatEvent();
         serverEvent.setMessage(message);
