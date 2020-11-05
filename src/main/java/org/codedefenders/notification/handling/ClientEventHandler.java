@@ -80,7 +80,7 @@ public class ClientEventHandler {
             } else if (command.equals(TEAM.getCommandString())) {
                 isAllChat = false;
             } else {
-                sendSystemMessage("/" + command + "is not a valid chat command.");
+                sendSystemMessage("/" + command + " is not a valid chat command.");
                 return;
             }
             message = message.substring(command.length() + 1).trim();
