@@ -61,7 +61,7 @@
     }
 </style>
 
-<div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;">
+<div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;" hidden>
     <div class="panel panel-default" style="margin: 0;">
         <div id="chat-handle" class="panel-heading">
             <c:if test="${gameChat.showTabs}">
@@ -415,7 +415,6 @@
         constructor(inputElement) {
             this.inputElement = inputElement;
             this.$inputElement = $(inputElement);
-            this.init()
         }
 
         /**
@@ -494,7 +493,6 @@
         let chatPos = JSON.parse(localStorage.getItem('chatPos'));
 
         const chat = document.getElementById('chat');
-        const $chat = $(chat);
 
         if (showChat) {
             if (chatPos !== null) {
@@ -503,18 +501,25 @@
                 chat.style.top = chatPos.top;
                 chat.style.left = chatPos.left;
             }
-        } else {
-            $chat.hide();
+            $(chat).show();
         }
     }
 
     $(document).ready(function() {
+        const chatElement = document.getElementById('chat');
+
         const input = new ChatInput(
                 document.getElementById('chat-input'));
 
-        /* Load settings as early as possible, but after initializing the text area,
-        because the text area has to be visible to get correct height values from it. */
-        loadSettings();
+        /* Initialize the textarea heights needed for the resizing once the textarea is shown. */
+        new MutationObserver((mutations, observer) => {
+            for (const mutation of mutations) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    setTimeout(input.init.bind(input), 0);
+                    observer.disconnect();
+                }
+            }
+        }).observe(chatElement, {attributes: true});
 
         const messages = new Messages(
                 document.getElementById('chat-messages'),
@@ -528,7 +533,6 @@
         const channel = new Channel(
                 document.getElementById('chat-channel'));
         channel.setAllChat(false);
-
 
         /* Resize after typing. Override message channel when "/all " or "/team " is entered. */
         $(input.inputElement).on('paste input', function() {
@@ -567,7 +571,7 @@
         });
 
         /* Filter messages based on the active tab. */
-        $('#chat').on('click', '.chat-tab-button', function () {
+        $(chatElement).on('click', '.chat-tab-button', function () {
             $('#chat .chat-tab-button').removeClass('active');
             this.classList.add('active');
             switch (this.getAttribute('data-tab')) {
@@ -610,7 +614,7 @@
         });
 
         /* Make the chat window draggable. */
-        $("#chat").draggable({
+        $(chatElement).draggable({
             /* Reset bottom and right properties, because they
              * mess up the draggable, which uses top and left. */
             start: event => {
@@ -618,9 +622,6 @@
                 event.target.style.right = null;
             },
             stop: event => {
-                console.log(event);
-                console.log(event.target.style.bottom);
-                console.log(event.target.style.right);
                 localStorage.setItem('chatPos',
                     JSON.stringify({
                         top: event.target.style.top,
@@ -636,7 +637,7 @@
          * @param {ServerGameChatEvent} serverChatEvent The received message.
          */
         const handleChatMessage = function (serverChatEvent) {
-            if (!$('#chat').is(':visible')) {
+            if (!$(chatElement).is(':visible')) {
                 messageCount.setCount(messageCount.getCount() + 1);
             }
             messages.addMessage({
@@ -671,6 +672,8 @@
                 message
             });
         };
+
+        loadSettings();
 
         /* Register for WebSocket events. */
         pushSocket.subscribe('${eventNames.gameChatRegistrationEventName}', {
