@@ -98,6 +98,11 @@ public class ClientEventHandler {
             return;
         }
 
+        /* Ignore all chat for roles that can be viewed by everyone anyways. */
+        if (role == Role.PLAYER || role == Role.OBSERVER) {
+            isAllChat = false;
+        }
+
         ServerGameChatEvent serverEvent = new ServerGameChatEvent();
         serverEvent.setMessage(message);
         serverEvent.setSenderId(user.getId());
