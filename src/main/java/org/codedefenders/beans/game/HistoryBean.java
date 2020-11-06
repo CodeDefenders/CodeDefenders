@@ -1,22 +1,22 @@
 package org.codedefenders.beans.game;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.annotation.ManagedBean;
+import javax.enterprise.context.RequestScoped;
+
 import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
-
-import javax.annotation.ManagedBean;
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import org.codedefenders.util.CDIUtil;
 
 /**
  * <p>Provides data for the history game component.</p>
@@ -25,11 +25,13 @@ import java.util.stream.Collectors;
 @ManagedBean
 @RequestScoped
 public class HistoryBean {
+
+    // TODO: Replace this with proper @Inject if this is completly managed by CDI (not jsp:useBean pseudo CDI …)
+    EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
+
     private Integer gameId;
     private LoginBean login;
 
-    private Map<Integer, PlayerScore> mutantsScores;
-    private Map<Integer, PlayerScore> testScores;
     private List<HistoryBeanEventDTO> events;
 
     private List<Player> attackers;
@@ -37,8 +39,6 @@ public class HistoryBean {
 
     public HistoryBean() {
         gameId = null;
-        mutantsScores = null;
-        testScores = null;
     }
 
     public void setLogin(LoginBean login) {
@@ -46,13 +46,12 @@ public class HistoryBean {
     }
 
     public List<HistoryBeanEventDTO> getEvents() {
+        if (events == null) {
+            events = eventDAO.getEventsForGame(gameId).stream()
+                    .map(this::createHistoryBeanEvent).filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
         return events;
-    }
-
-    public void setEvents(List<Event> events) {
-        this.events = events.stream()
-                .map(this::createHistoryBeanEvent).filter(Objects::nonNull)
-                .collect(Collectors.toList());
     }
 
     private HistoryBeanEventDTO createHistoryBeanEvent(Event e) {
@@ -180,19 +179,14 @@ public class HistoryBean {
         } else {
             alignment = login.getUser().getId() == e.getUser().getId() ? "left" : "right";
         }
-            return new HistoryBeanEventDTO(
-                    e.getUser().getUsername(),
-                    new Timestamp(e.getTimestamp()),
-                    userMessage,
-                    e.getEventType(),
-                    alignment,
-                    colour
-            );
-    }
-
-    public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testScores) {
-        this.mutantsScores = Collections.unmodifiableMap(mutantsScores);
-        this.testScores = Collections.unmodifiableMap(testScores);
+        return new HistoryBeanEventDTO(
+                e.getUser().getUsername(),
+                new Timestamp(e.getTimestamp()),
+                userMessage,
+                e.getEventType(),
+                alignment,
+                colour
+        );
     }
 
     public void setPlayers(List<Player> attackers, List<Player> defenders) {
@@ -208,14 +202,6 @@ public class HistoryBean {
 
     public void setGameId(int gameId) {
         this.gameId = gameId;
-    }
-
-    public Map<Integer, PlayerScore> getMutantsScores() {
-        return mutantsScores;
-    }
-
-    public Map<Integer, PlayerScore> getTestScores() {
-        return testScores;
     }
 
     public List<Player> getAttackers() {
@@ -235,7 +221,8 @@ public class HistoryBean {
         private final String alignment;
         private final String colour;
 
-        public HistoryBeanEventDTO(String userName, Timestamp time, String message, EventType type, String alignment, String colour) {
+        public HistoryBeanEventDTO(String userName, Timestamp time, String message, EventType type, String alignment,
+                                   String colour) {
             this.userName = userName;
             this.time = time.toLocalDateTime();
             LocalDateTime now = LocalDateTime.now();

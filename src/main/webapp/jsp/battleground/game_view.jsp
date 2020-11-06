@@ -46,9 +46,7 @@
 <%
     history.setLogin(login);
     history.setGameId(game.getId());
-    history.setScores(game.getMutantScores(), game.getTestScores());
     history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
-    history.setEvents(game.getEvents());
 %>
 
 <jsp:include page="/jsp/battleground/header_game.jsp"/>

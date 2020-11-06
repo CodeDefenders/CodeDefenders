@@ -27,6 +27,11 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="org.codedefenders.database.MeleeGameDAO" %>
+<%@ page import="org.codedefenders.model.Player" %>
+<%@ page import="org.codedefenders.database.PlayerDAO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.stream.Collectors" %>
+<%@ page import="java.util.Collections" %>
 
 <%--
     @param Integer gameId
@@ -81,12 +86,33 @@
 
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request"/>
 
+<jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
+<%
+    history.setLogin(login);
+    history.setGameId(game.getId());
+
+    Player player = PlayerDAO.getPlayerForUserAndGame(login.getUserId(), game.getId());
+    List<Player> otherPlayers = game.getPlayers().stream()
+            .filter(p -> {
+                if (player != null) {
+                    return p.getId() != player.getId();
+                } else {
+                    return true;
+                }
+            })
+            .collect(Collectors.toList());
+    // We simply need two distinct sets, to determine which events to display on the left/right side of the timeline
+    history.setPlayers(Collections.singletonList(player), otherPlayers);
+%>
+
+
 <%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:include page="/jsp/melee/header_game.jsp"/>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
+<jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <div class="row" style="padding: 0px 15px;">

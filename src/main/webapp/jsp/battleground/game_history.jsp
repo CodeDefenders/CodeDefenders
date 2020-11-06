@@ -18,27 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.database.TestDAO" %>
-<%@ page import="org.codedefenders.database.MutantDAO" %>
-<%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="org.codedefenders.model.Event" %>
 <%@ page import="org.codedefenders.beans.game.HistoryBean" %>
 
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
-    Map<Integer, PlayerScore> mutantScores = history.getMutantsScores();
-    Map<Integer, PlayerScore> testScores = history.getTestScores();
-
     // Those return the PlayerID not the UserID
-    final List<Player> attackers = history.getAttackers();
-    final List<Player> defenders = history.getDefenders();
     final List<HistoryBean.HistoryBeanEventDTO> events = history.getEvents();
-
 %>
 
 <div id="history" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
@@ -49,34 +35,30 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">History</h4>
             </div>
-            <div class="modal-body" style="background: #eee">
-                <div class="container bootstrap snippets bootdeys">
-                    <div class="col-md-9">
-                        <div class="timeline-centered timeline-sm">
-                            <%
-                                for (HistoryBean.HistoryBeanEventDTO event : events) {
+            <div class="modal-body" style="background: #eee; overflow-y: auto; max-height: 60vh">
+                <div class="timeline-centered timeline-sm">
+                    <%
+                        for (HistoryBean.HistoryBeanEventDTO event : events) {
 
-                            %>
-                            <article class="timeline-entry <%= event.getAlignment()%>-aligned">
-                                <div class="timeline-entry-inner">
-                                    <time datetime=<%=event.getFormat()%> class="timeline-time">
-                                        <span><%= event.getTime() %></span>
-                                        <span><%= event.getDate() %></span>
-                                    </time>
+                    %>
+                    <article class="timeline-entry <%= event.getAlignment()%>-aligned">
+                        <div class="timeline-entry-inner">
+                            <time datetime=<%=event.getFormat()%> class="timeline-time">
+                                <span><%= event.getTime() %></span>
+                                <span><%= event.getDate() %></span>
+                            </time>
 
-                                    <div class="timeline-icon bg-<%= event.getColour() %>"><i class="fa fa-group"></i>
-                                    </div>
-                                    <div class="timeline-label bg-<%= event.getColour() %>"><h4
-                                            class="timeline-title"><%= event.getUserMessage() %>
-                                    </h4>
-                                        <p><%-- Body message here--%></p></div>
-                                </div>
-                            </article>
-                            <%
-                                }
-                            %>
+                            <div class="timeline-icon bg-<%= event.getColour() %>"><i class="fa fa-group"></i>
+                            </div>
+                            <div class="timeline-label bg-<%= event.getColour() %>"><h4
+                                    class="timeline-title"><%= event.getUserMessage() %>
+                            </h4>
+                                <p><%-- Body message here--%></p></div>
                         </div>
-                    </div>
+                    </article>
+                    <%
+                        }
+                    %>
                 </div>
             </div>
             <div class="modal-footer">
