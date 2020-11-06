@@ -4,7 +4,20 @@ import org.codedefenders.game.Role;
 
 import com.google.gson.annotations.Expose;
 
+/**
+ * Represents a message written by a user in the game chat.
+ */
 public class ServerGameChatEvent extends ServerChatEvent {
+    /**
+     * The user id of the sender.
+     */
+    @Expose private int senderId;
+
+    /**
+     * The user name of the sender.
+     */
+    @Expose private String senderName;
+
     /**
      * Role of the sender.
      */
@@ -18,6 +31,14 @@ public class ServerGameChatEvent extends ServerChatEvent {
 
     private int gameId;
 
+    public int getSenderId() {
+        return senderId;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
     public int getGameId() {
         return gameId;
     }
@@ -28,6 +49,14 @@ public class ServerGameChatEvent extends ServerChatEvent {
 
     public boolean isAllChat() {
         return isAllChat;
+    }
+
+    public void setSenderId(int senderId) {
+        this.senderId = senderId;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 
     public void setRole(Role role) {

@@ -72,15 +72,12 @@ public class DatabaseAccess {
      * Retrieve the latest (in the past 5 minutes and not yet seen)
      * events that belong to a game and relate to equivalence duels.
      */
-    // FIXME userId not useful
     public static List<Event> getNewEquivalenceDuelEventsForGame(int gameId, int lastMessageId) {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM events",
                 "LEFT JOIN event_messages AS em",
                 "  ON events.Event_Type = em.Event_Type ",
-                "LEFT JOIN event_chat AS ec",
-                "  ON events.Event_Id = ec.Event_Id ", // FIXME this is here otherwise the getEvents call fails, get rid of this...
                 "WHERE Game_ID=?",
                 "  AND Event_Status=?",
                 "  AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?) ",
@@ -106,8 +103,6 @@ public class DatabaseAccess {
                 "FROM events ",
                 "LEFT JOIN event_messages AS em",
                 "  ON events.Event_Type = em.Event_Type ",
-                "LEFT JOIN event_chat AS ec",
-                "  ON events.Event_Id = ec.Event_Id",
                 "WHERE Event_Status!='DELETED' ",
                 "  AND Player_ID=?;");
         return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, DatabaseValue.of(userId));
@@ -119,8 +114,6 @@ public class DatabaseAccess {
                 "FROM events ",
                 "LEFT JOIN event_messages AS em",
                 "  ON events.Event_Type = em.Event_Type ",
-                "LEFT JOIN event_chat AS ec",
-                "  ON events.Event_Id = ec.Event_Id ",
                 "WHERE Player_ID=?",
                 "  AND Event_Status<>?",
                 "  AND Event_Status<>? ",
@@ -142,8 +135,6 @@ public class DatabaseAccess {
                 rs.getString("events.Event_Type"),
                 rs.getString("Event_Status"),
                 rs.getTimestamp("Timestamp"));
-        String chatMessage = rs.getString("ec.Message");
-        event.setChatMessage(chatMessage);
         return event;
     }
 
@@ -156,8 +147,6 @@ public class DatabaseAccess {
                 rs.getString("events.Event_Type"),
                 rs.getString("Event_Status"),
                 rs.getTimestamp("Timestamp"));
-        String chatMessage = rs.getString("ec.Message");
-        event.setChatMessage(chatMessage);
         return event;
     }
 

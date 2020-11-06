@@ -79,20 +79,20 @@ public class EventDecoder implements Decoder.Text<ClientEvent> {
      * instead of using {@code null} or {@code 0} as default values.
      * Uses the {@link Expose} annotation.
      */
-    private static class ClientEventDeserializer implements JsonDeserializer {
-        Class clazz;
+    private static class ClientEventDeserializer implements JsonDeserializer<ClientEvent> {
+        Class<ClientEvent> clazz;
 
-        ClientEventDeserializer(Class clazz) {
+        ClientEventDeserializer(Class<ClientEvent> clazz) {
             this.clazz = clazz;
         }
 
         @Override
-        public Object deserialize(JsonElement jsonElement,
+        public ClientEvent deserialize(JsonElement jsonElement,
                                   Type jsonType,
                                   JsonDeserializationContext context) throws JsonParseException {
-            Object obj;
+            ClientEvent event;
             try {
-                obj = clazz.newInstance();
+                event = clazz.newInstance();
             } catch (InstantiationException | IllegalAccessException e) {
                 throw new JsonParseException("Error while creating event object of type: " + clazz.getName() + ". "
                         + "JSON was: " + jsonElement, e);
@@ -116,7 +116,7 @@ public class EventDecoder implements Decoder.Text<ClientEvent> {
                     continue;
                 }
 
-                Class type = attribute.getPropertyType();
+                Class<?> type = attribute.getPropertyType();
                 Object value;
 
                 /* Check if attribute is present in JSON. */
@@ -135,14 +135,14 @@ public class EventDecoder implements Decoder.Text<ClientEvent> {
 
                 /* Set DTO attribute. */
                 try {
-                    attribute.getWriteMethod().invoke(obj, value);
+                    attribute.getWriteMethod().invoke(event, value);
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new JsonParseException("Error while writing attribute to DTO: " + name + ". "
                             + "JSON was: " + jsonElement, e);
                 }
             }
 
-            return obj;
+            return event;
         }
     }
 }

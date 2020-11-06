@@ -5485,44 +5485,6 @@ input[type=email]:disabled:-ms-input-placeholder {
   padding-bottom: 8px;
   border-color: #e51c23;
 }
-textarea {
-  max-width: 100%;
-  min-width: 100%;
-  min-height: 100px;
-  width: 100%;
-  background: none;
-  border: 0;
-  border-bottom: 1px solid #cfd8dc;
-  padding: 5px 0 9px 0;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
-  -webkit-font-smoothing: antialiased;
-}
-textarea:focus {
-  outline: 0;
-  border-width: 2px;
-  padding-bottom: 8px;
-  border-color: #00bcd4;
-}
-textarea:disabled {
-  border-style: dotted;
-}
-textarea:disabled:hover {
-  cursor: not-allowed;
-}
-textarea:disabled::-webkit-input-placeholder {
-  opacity: 0.5;
-}
-textarea:disabled:-moz-placeholder {
-  opacity: 0.5;
-}
-textarea:disabled::-moz-placeholder {
-  opacity: 0.5;
-}
-textarea:disabled:-ms-input-placeholder {
-  opacity: 0.5;
-}
 select {
   width: 100%;
 }

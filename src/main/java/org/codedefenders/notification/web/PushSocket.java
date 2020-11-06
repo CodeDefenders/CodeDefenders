@@ -137,8 +137,8 @@ public class PushSocket {
 
         this.user = user;
         this.ticket = ticket;
-        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user);
-        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user);
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user, ticket);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user, ticket);
         this.session = session;
 
         open = true;

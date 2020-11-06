@@ -111,7 +111,6 @@
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
     <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/codedefenders/messaging.js"></script>
 
     <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
     <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>
