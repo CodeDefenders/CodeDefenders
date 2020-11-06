@@ -15,13 +15,30 @@
         padding-bottom: 2px;
     }
 
-    /* Message decorations. */
-    #chat .chat-message-all .chat-message-name::before {
-        content: "[ALL]";
-        padding-right: .25em;
-    }
     #chat .chat-message .chat-message-name::after {
         content: ":";
+        padding-right: .25em;
+    }
+
+    /* Message prefixes. */
+    #chat .chat-message-all .chat-message-name::before {
+        content: "[All]";
+        padding-right: .25em;
+    }
+    #chat .chat-message-team.chat-message-attacker .chat-message-name::before {
+        content: "[Attacker]";
+        padding-right: .25em;
+    }
+    #chat .chat-message-team.chat-message-defender .chat-message-name::before {
+        content: "[Defender]";
+        padding-right: .25em;
+    }
+    #chat .chat-message-team.chat-message-player .chat-message-name::before {
+        content: "[Player]";
+        padding-right: .25em;
+    }
+    #chat .chat-message-team.chat-message-observer .chat-message-name::before {
+        content: "[Observer]";
         padding-right: .25em;
     }
 
