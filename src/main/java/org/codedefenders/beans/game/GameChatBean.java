@@ -20,6 +20,11 @@ public class GameChatBean {
      */
     public static final int MAX_MESSAGE_LENGTH = 500;
 
+    /**
+     * The maximum number of messages to be displayed.
+     */
+    public static final int MESSAGE_LIMIT = 1000;
+
     @Inject
     @Named("game")
     private AbstractGame game;
@@ -62,7 +67,7 @@ public class GameChatBean {
      * @return The URL for the chat API.
      */
     public String getChatApiUrl() {
-        return Paths.API_GAME_CHAT.substring(1) + "?gameId=" + game.getId();
+        return Paths.API_GAME_CHAT.substring(1) + "?gameId=" + game.getId() + "&limit=" + getMessageLimit();
     }
 
     /**
@@ -73,19 +78,12 @@ public class GameChatBean {
         return MAX_MESSAGE_LENGTH;
     }
 
-    // TODO: Create beans for enum constants
-    public enum ChatCommand {
-        ALL("all"),
-        TEAM("team");
-
-        String commandString;
-
-        ChatCommand(String commandString) {
-            this.commandString = commandString;
-        }
-
-        public String getCommandString() {
-            return commandString;
-        }
+    /**
+     * Returns the maximum number of messages to be displayed.
+     * @return The maximum number of messages to be displayed.
+     */
+    public int getMessageLimit() {
+        return MESSAGE_LIMIT;
     }
+
 }

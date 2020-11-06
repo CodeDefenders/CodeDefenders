@@ -1,6 +1,9 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%@ tag import="org.codedefenders.game.Role" %>
+<%@ tag import="org.codedefenders.game.ChatCommand" %>
+
 <%--@elvariable id="gameChat" type="org.codedefenders.beans.game.GameChatBean"--%>
 <%--@elvariable id="eventNames" type="org.codedefenders.beans.notification.EventNamesBean"--%>
 
@@ -118,8 +121,8 @@
          * @param {object[]} messages The new messages.
          */
         setMessages (messages) {
-            if (messages.length > Messages.MESSAGE_LIMIT) {
-                this.messages = messages.slice(messages.length - Messages.MESSAGE_LIMIT, messages.length);
+            if (messages.length > ${gameChat.messageLimit}) {
+                this.messages = messages.slice(messages.length - ${gameChat.messageLimit}, messages.length);
             } else {
                 this.messages = [...messages];
             }
@@ -132,7 +135,7 @@
          */
         addMessage (message) {
             this.messages.push(message);
-            if (this.messages.length > Messages.MESSAGE_LIMIT) {
+            if (this.messages.length > ${gameChat.messageLimit}) {
                 this.messages.shift();
             }
 
@@ -218,13 +221,6 @@
         }
 
         /**
-         * The maximum number of messages to display.
-         */
-        static get MESSAGE_LIMIT () {
-            return 1000;
-        }
-
-        /**
          * Filter to show all message.
          */
         static get FILTER_ALL () {
@@ -237,7 +233,7 @@
         static get FILTER_ATTACKERS () {
             return message => message.system
                     || message.isAllChat
-                    || message.role !== 'DEFENDER';
+                    || message.role !== '${Role.DEFENDER}';
         }
 
         /**
@@ -246,7 +242,7 @@
         static get FILTER_DEFENDERS () {
             return message => message.system
                     || message.isAllChat
-                    || message.role !== 'ATTACKER';
+                    || message.role !== '${Role.ATTACKER}';
         }
 
         /**
@@ -462,12 +458,12 @@
             }
         }
 
-        // TODO: Create a bean for enum constants.
+        // TODO: Get the command string from the enum.
         static get COMMAND_ALL () {
             return 'all';
         }
 
-        // TODO: Create a bean for enum constants.
+        // TODO: Get the command string from the enum.
         static get COMMAND_TEAM () {
             return 'team';
         }
@@ -523,10 +519,10 @@
 
             const command = input.getCommand();
             if (command !== null) {
-                if (command === ChatInput.COMMAND_ALL) {
+                if (command === '${ChatCommand.ALL.commandString}') {
                     channel.overrideAllChat(true);
                     return
-                } else if (command === ChatInput.COMMAND_TEAM) {
+                } else if (command === '${ChatCommand.TEAM.commandString}') {
                     channel.overrideAllChat(false);
                     return;
                 }

@@ -21,8 +21,8 @@ import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.beans.game.GameChatBean.ChatCommand.ALL;
-import static org.codedefenders.beans.game.GameChatBean.ChatCommand.TEAM;
+import static org.codedefenders.game.ChatCommand.ALL;
+import static org.codedefenders.game.ChatCommand.TEAM;
 
 /**
  * Handles incoming client events from a {@link PushSocket}.
