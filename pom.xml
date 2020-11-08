@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<powermock.version>1.6.1</powermock.version>
+		<powermock.version>1.7.4</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
+		<slf4j.version>1.7.20</slf4j.version>
+
 		<config.properties>config.properties</config.properties>
+
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
@@ -24,42 +29,60 @@
 	</licenses>
 
 	<build>
-		<filters>
-			<!-- This enables to read properties from this file and automagically
-				put their values in other files. For example, we use that to update: context.xml -->
-			<filter>${config.properties}</filter>
-		</filters>
-
 		<plugins>
-			<!-- Disables default deploy plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
+				<artifactId>maven-checkstyle-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>default-deploy</id>
-						<phase>none</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- Execute the installer within maven without the need of packaging
-				a jar for it -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.6.0</version>
-				<executions>
-					<execution>
+						<phase>validate</phase>
 						<goals>
-							<goal>java</goal>
+							<goal>check</goal>
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.6</version>
 				<configuration>
-					<mainClass>org.codedefenders.installer.Installer</mainClass>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+					</archive>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 				</configuration>
 			</plugin>
+
+			<!--
+				Beginn configuration for automatic deployment
+			-->
+
+			<!-- Reads all the properties from ${config.properties} -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<id>read-deploy-properties</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${config.properties}</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!-- Fails if the ${config.properties} file does not exists -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -95,88 +118,20 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Reads all the properties from ${config.properties} -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>${config.properties}</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+
+			<!-- Disables default deploy plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.1</version>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.7</version>
 				<executions>
 					<execution>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<echo>Displaying properties value</echo>
-								<!-- <echo>[build.profile.id] ${build.profile.id}</echo> -->
-								<echo>[data.dir] ${data.dir}</echo>
-								<echo>[db.url]${db.url}</echo>
-								<echo>[tomcat.path] ${tomcat.path}</echo>
-								<echo>[tomcat.url] ${tomcat.url}</echo>
-								<echo>[cluster.mode] ${cluster.mode}</echo>
-								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
-								<echo>[parallelize] ${parallelize}</echo>
-								<echo>[force.local.execution] ${force.local.execution}</echo>
-								<echo>[block.attacker] ${block.attacker}</echo>
-							</tasks>
-						</configuration>
+						<id>default-deploy</id>
+						<phase>none</phase>
 					</execution>
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-					</archive>
-					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-					<webResources>
-						<!-- Enable reading props from config.file and setting all the files
-							in META-INF -->
-						<resource>
-							<directory>src/main/webapp/META-INF</directory>
-							<filtering>true</filtering>
-							<targetPath>META-INF</targetPath>
-						</resource>
-					</webResources>
-					<packagingExcludes>**/empty.tmp</packagingExcludes>
-					<excludes>src/main/resources/db/**</excludes>
-				</configuration>
-			</plugin>
 			<!-- Deploys on tomcat reading the properties from ${configuration.properties} -->
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
@@ -201,47 +156,62 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>com.mycila</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>3.0</version>
-				<configuration>
-					<header>src/etc/header.txt</header>
-					<useDefaultExcludes>true</useDefaultExcludes>
-					<mapping>
-						<java>SLASHSTAR_STYLE</java>
-					</mapping>
-					<properties>
-						<year>2016-2019</year>
-					</properties>
-					<excludes>
-						<exclude>LICENSE.txt</exclude>
-						<exclude>README.md</exclude>
-						<exclude>**/.idea/**</exclude>
-						<exclude>**/*.js</exclude>
-						<exclude>**/*.css</exclude>
-						<exclude>**/*.txt</exclude>
-						<exclude>**/*.ts</exclude>
-						<exclude>**/*.</exclude>
-						<exclude>**/*.html</exclude>
-						<exclude>**/*.sql</exclude>
-						<exclude>**/*.xml</exclude>
-						<exclude>docker/**</exclude>
-						<exclude>config.properties</exclude>
-						<exclude>src/test/resources/**</exclude>
-						<exclude>installation/puzzles/**</exclude>
-						<exclude>local-repo/**</exclude>
-						<exclude>.editorconfig</exclude>
-						<exclude>.gitlab-ci.yml</exclude>
-						<exclude>src/main/resources/codemirror/**</exclude>
-						<exclude>src/main/resources/js/libs/**</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
 		</plugins>
 
 		<pluginManagement>
 			<plugins>
+				<!--
+				Execute the installer within maven without the need of packaging a jar for it
+				-->
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>1.6.0</version>
+					<configuration>
+						<mainClass>org.codedefenders.installer.Installer</mainClass>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>3.0</version>
+					<configuration>
+						<header>src/etc/header.txt</header>
+						<useDefaultExcludes>true</useDefaultExcludes>
+						<mapping>
+							<java>SLASHSTAR_STYLE</java>
+						</mapping>
+						<properties>
+							<year>2016-2019</year>
+						</properties>
+						<excludes>
+							<exclude>LICENSE.txt</exclude>
+							<exclude>README.md</exclude>
+							<exclude>**/.idea/**</exclude>
+							<exclude>**/*.js</exclude>
+							<exclude>**/*.css</exclude>
+							<exclude>**/*.txt</exclude>
+							<exclude>**/*.ts</exclude>
+							<exclude>**/*.</exclude>
+							<exclude>**/*.html</exclude>
+							<exclude>**/*.sql</exclude>
+							<exclude>**/*.xml</exclude>
+							<exclude>docker/**</exclude>
+							<exclude>config.properties</exclude>
+							<exclude>src/test/resources/**</exclude>
+							<exclude>installation/puzzles/**</exclude>
+							<exclude>local-repo/**</exclude>
+							<exclude>.editorconfig</exclude>
+							<exclude>.gitlab-ci.yml</exclude>
+							<exclude>makefile</exclude>
+							<exclude>.gitattributes</exclude>
+							<exclude>src/main/resources/codemirror/**</exclude>
+							<exclude>src/main/resources/js/libs/**</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
@@ -505,27 +475,7 @@
 
 	<dependencies>
 
-		<!-- Shiro Security -->
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-core</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-web</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-servlet-plugin</artifactId>
-			<version>1.6.0</version>
-		</dependency>
-
-
-		<!-- Tomcat dependencies -->
+		<!-- Tomcat dependencies - Provides Servlet API -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-catalina</artifactId>
@@ -535,17 +485,29 @@
 		<!-- Web Socket API -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-websocket</artifactId>
+			<artifactId>tomcat-websocket-api</artifactId>
 			<version>${tomcat.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- Tag libs -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+			<scope>runtime</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jasper-el</artifactId>
+			<artifactId>tomcat-dbcp</artifactId>
 			<version>${tomcat.version}</version>
-			<scope>test</scope>
 		</dependency>
 
+		<!-- Shiro Security - This includes shiro-web and shiro-core -->
+		<dependency>
+			<groupId>org.apache.shiro</groupId>
+			<artifactId>shiro-servlet-plugin</artifactId>
+			<version>1.6.0</version>
+		</dependency>
 
 		<!-- Context and Dependency Injection (CDI) -->
 		<dependency>
@@ -560,25 +522,23 @@
 			<version>3.0.5.Final</version>
 		</dependency>
 
+		<!-- Logging -->
 		<dependency>
-			<groupId>org.jboss.weld</groupId>
-			<artifactId>weld-junit4</artifactId>
-			<version>2.0.0.Final</version>
-			<scope>test</scope>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
-		<!-- EventBus implementation, but any EventBus or MOM might work as well -->
+		<!-- Begin Misc Dependencies -->
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>23.6-jre</version>
-		</dependency>
-
-		<!-- Test Smell Detector. Local dependency -->
-		<dependency>
-			<groupId>edu.rit.se.testsmells</groupId>
-			<artifactId>TestSmellDetector</artifactId>
-			<version>0.3</version>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.21</version>
 		</dependency>
 
 		<!-- Installer -->
@@ -590,47 +550,16 @@
 
 		<!-- Server side validation -->
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>6.0.10.Final</version>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
 		</dependency>
 
-		<!-- Servlet Spec -->
+		<!-- BCrypt password hashing and BeanUtils (from spring-core transitive dependency) -->
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>com.googlecode.java-diff-utils</groupId>
-			<artifactId>diffutils</artifactId>
-			<version>1.2.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-all</artifactId>
-			<version>1.3</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.bitbucket.cowwoc</groupId>
-			<artifactId>diff-match-patch</artifactId>
-			<version>1.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.11</version>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+			<version>6.5.7</version>
 		</dependency>
 
 		<dependency>
@@ -640,34 +569,44 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.20</version>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.6-rc1</version>
+		</dependency>
+
+		<!-- EventBus implementation, but any EventBus or MOM might work as well + other common functionality -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>24.1.1-jre</version>
+		</dependency>
+
+		<!-- JSON serialization -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.4</version>
+		</dependency>
+
+		<!-- Test Smell Detector. Local dependency -->
+		<dependency>
+			<groupId>edu.rit.se.testsmells</groupId>
+			<artifactId>TestSmellDetector</artifactId>
+			<version>0.3</version>
+		</dependency>
+		<!-- End Misc Dependencies -->
+
+		<!-- Begin Java Source Code / Coverage Analysis -->
+		<dependency>
+			<groupId>com.googlecode.java-diff-utils</groupId>
+			<artifactId>diffutils</artifactId>
+			<version>1.2.1</version>
 		</dependency>
 
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.20</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>1.9.5</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.6</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-fileupload</groupId>
-			<artifactId>commons-fileupload</artifactId>
-			<version>1.3.3</version>
+			<groupId>org.bitbucket.cowwoc</groupId>
+			<artifactId>diff-match-patch</artifactId>
+			<version>1.1</version>
 		</dependency>
 
 		<dependency>
@@ -677,72 +616,168 @@
 		</dependency>
 
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>mail</artifactId>
-			<version>1.4.6-rc1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.github.javaparser</groupId>
 			<artifactId>javaparser-core</artifactId>
-			<!-- <version>2.3.0</version> -->
 			<version>3.2.4</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jacoco</groupId>
-			<artifactId>jacoco-maven-plugin</artifactId>
+			<artifactId>org.jacoco.core</artifactId>
 			<version>0.7.7.201606060606</version>
 		</dependency>
+		<!-- End Java Source Code / Coverage Analysis -->
 
+		<!-- Begin Commons Libraries -->
 		<dependency>
-			<groupId>org.jacoco</groupId>
-			<artifactId>org.jacoco.ant</artifactId>
-			<version>0.7.7.201606060606</version>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.4</version>
 		</dependency>
-
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.8.4</version>
+			<groupId>commons-dbutils</groupId>
+			<artifactId>commons-dbutils</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>1.3.3</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.6</version>
 		</dependency>
+		<!-- End Commons Libraries -->
+
+		<!-- Begin Client Side Dependencies -->
 		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils</artifactId>
-			<version>1.9.3</version>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap</artifactId>
+			<version>3.3.5</version>
+			<scope>runtime</scope>
 		</dependency>
-		<!-- Test. Shall we keep this around now that we use docker ? -->
 		<dependency>
-			<groupId>ch.vorburger.mariaDB4j</groupId>
-			<artifactId>mariaDB4j</artifactId>
-			<version>2.2.3</version>
+			<groupId>org.webjars</groupId>
+			<artifactId>bootstrap-select</artifactId>
+			<version>1.9.4</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>bootstrap-toggle</artifactId>
+			<version>2.2.1</version>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- Do we still need this? -->
+		<dependency>
+			<groupId>org.webjars.bower</groupId>
+			<artifactId>slick-carousel</artifactId>
+			<version>1.5.8</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery</artifactId>
+			<version>3.3.1-2</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>jquery-ui</artifactId>
+			<version>1.12.1</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>font-awesome</artifactId>
+			<version>4.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>codemirror</artifactId>
+			<version>5.22.0</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>momentjs</artifactId>
+			<version>2.14.1</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>datatables</artifactId>
+			<version>1.10.16</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>datatables-select</artifactId>
+			<version>1.3.1</version>
+		</dependency>
+		<!-- Provides datetime-moment.js -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>datatables-plugins</artifactId>
+			<version>1.10.16</version>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- End Client Side Dependencies -->
+
+		<!-- Begin Test Dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13</version>
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Enable usage of CDI for tests -->
 		<dependency>
-			<groupId>commons-dbutils</groupId>
-			<artifactId>commons-dbutils</artifactId>
-			<version>1.7</version>
+			<groupId>org.jboss.weld</groupId>
+			<artifactId>weld-junit4</artifactId>
+			<version>2.0.0.Final</version>
+			<scope>test</scope>
 		</dependency>
 
+		<!-- Assertion matcher framework - hamcrest-core is already part of junit4 -->
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.7</version>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
 		</dependency>
 
-
+		<!-- Mocking frameworks -->
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-module-junit4</artifactId>
 			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
+		<!-- This provides mockito 1.10.19 -->
 		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
@@ -750,6 +785,16 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Used for database tests. TODO: Shall we keep this around now that we use docker ? -->
+		<dependency>
+			<groupId>ch.vorburger.mariaDB4j</groupId>
+			<artifactId>mariaDB4j</artifactId>
+			<version>2.2.3</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- End Test Dependencies -->
+
+		<!-- Begin Integration/System Test Dependencies -->
 		<!-- HTML Client -->
 		<dependency>
 			<groupId>net.sourceforge.htmlunit</groupId>
@@ -781,78 +826,7 @@
 			<version>8.11.2</version>
 			<scope>test</scope>
 		</dependency>
-
-		<!-- Tag libs -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>jstl</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>taglibs</groupId>
-			<artifactId>standard</artifactId>
-			<version>1.1.2</version>
-		</dependency>
-
-		<!-- Begin Client Side Dependencies -->
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap</artifactId>
-			<version>3.3.5</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap-select</artifactId>
-			<version>1.9.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars.bower</groupId>
-			<artifactId>bootstrap-toggle</artifactId>
-			<version>2.2.1</version>
-		</dependency>
-		<!-- Do we still need this? -->
-		<dependency>
-			<groupId>org.webjars.bower</groupId>
-			<artifactId>slick-carousel</artifactId>
-			<version>1.5.8</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.3.1-2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery-ui</artifactId>
-			<version>1.12.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>font-awesome</artifactId>
-			<version>4.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>codemirror</artifactId>
-			<version>5.22.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>momentjs</artifactId>
-			<version>2.14.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>datatables</artifactId>
-			<version>1.10.16</version>
-		</dependency>
-		<!-- Provides datetime-moment.js -->
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>datatables-plugins</artifactId>
-			<version>1.10.16</version>
-		</dependency>
-		<!-- End Client Side Dependencies -->
+		<!-- End Integration/System Test Dependencies -->
 
 	</dependencies>
 

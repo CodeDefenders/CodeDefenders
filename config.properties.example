@@ -1,33 +1,3 @@
-# CodeDefenders data directory
-data.dir=/var/lib/codedefenders
-# Ant Home on local machine
-ant.home=/usr/share/ant
-# JDBC Connection url to database
-db.url=jdbc:mysql://127.0.0.1:3306/codedefenders
-# database access data
-db.username=codedefenders
-db.password=
-
-# Cluster Setting
-cluster.mode=disabled
-# Java Home on cluster
-cluster.java.home=
-# SLURM reservation name if any
-cluster.reservation.name=
-# SLURM Job timeout
-cluster.timeout=2
-# Force compilation and testing of original version on the local machine
-force.local.execution=enabled
-
-# Parallelize Ant task execution
-parallelize=disabled
-
-# Skip tests on mutants that are not covered
-mutant.coverage=enabled
-
-# Block the attackers if there are pending equivalence duels
-block.attacker=enabled
-
 # Tomcat data for the deployment
 tomcat.username=manager
 tomcat.password=

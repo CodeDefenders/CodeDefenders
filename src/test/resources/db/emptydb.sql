@@ -61,7 +61,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
   ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('ALLOW_USER_PROFILE', 'BOOL_VALUE', NULL, NULL, TRUE),
-  ('PRIVACY_NOTICE', 'STRING_VALUE', '', NULL, NULL);
+  ('PRIVACY_NOTICE', 'STRING_VALUE', '', NULL, NULL),
+  ('FAILED_DUEL_VALIDATION_THRESHOLD', 'INT_VALUE', NULL, 20, NULL);
 
 --
 -- Table structure for table `ratings`
@@ -93,9 +94,10 @@ CREATE TABLE `classes` (
   `AiPrepared` tinyint(1) DEFAULT '0',
   `RequireMocking` tinyint(1) DEFAULT '0',
   `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
+  `Parent_Class` int(11) DEFAULT NULL,
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   `TestingFramework` ENUM('JUNIT4', 'JUNIT5') NOT NULL DEFAULT 'JUNIT4',
-  `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
+  `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST', 'GOOGLE_TRUTH', 'JUNIT4_GOOGLE_TRUTH', 'JUNIT5_GOOGLE_TRUTH') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -136,7 +138,6 @@ CREATE TABLE `games` (
   `Start_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `Finish_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `MaxAssertionsPerTest` int(11) NOT NULL DEFAULT '2',
-  `ForceHamcrest` tinyint(1) DEFAULT '1',
   `MutantValidator` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `ChatEnabled` tinyint(1) DEFAULT '1',
   `Attackers_Limit` int(11) DEFAULT '0',
@@ -144,7 +145,7 @@ CREATE TABLE `games` (
   `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO','SOLVED','FAILED') DEFAULT 'CREATED',
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
-  `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
+  `ActiveRole` enum('ATTACKER','DEFENDER','PLAYER') NOT NULL DEFAULT 'ATTACKER',
   `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE', 'MELEE') NOT NULL DEFAULT 'PARTY',
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
@@ -247,7 +248,7 @@ CREATE TABLE `players` (
   `User_ID` int(11) NOT NULL,
   `Game_ID` int(11) NOT NULL,
   `Points` int(11) NOT NULL,
-  `Role` enum('ATTACKER','DEFENDER') NOT NULL,
+  `Role` enum('ATTACKER','DEFENDER','PLAYER') NOT NULL,
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`ID`),
   UNIQUE KEY `players_User_ID_Game_ID_uindex` (`User_ID`,`Game_ID`),
@@ -310,10 +311,10 @@ DROP TABLE IF EXISTS `puzzles`;
 CREATE TABLE `puzzles` (
   `Puzzle_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Class_ID` int(11) NOT NULL,
+  `Active` tinyint(1) DEFAULT '1',
   `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
   `Level` enum('EASY','HARD') DEFAULT 'HARD',
   `Max_Assertions` int(11) NOT NULL DEFAULT '2',
-  `Force_Hamcrest` tinyint(1) DEFAULT '0',
   `Mutant_Validator_Level` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `Editable_Lines_Start` int(11) DEFAULT NULL,
   `Editable_Lines_End` int(11) DEFAULT NULL,
@@ -558,12 +559,25 @@ VALUES
   ('DEFENDER_TEST_CREATED','@event_user created a test'),
   ('DEFENDER_TEST_ERROR','@event_user created a test that errored'),
   ('DEFENDER_TEST_READY','Test by @event_user is ready'),
+  ('PLAYER_JOINED','@event_user joined the game'),
+  ('PLAYER_MESSAGE','@event_user: @chat_message'),
+  ('PLAYER_MUTANT_CREATED','@event_user created a mutant'),
+  ('PLAYER_MUTANT_ERROR','@event_user created a mutant that errored'),
+  ('PLAYER_MUTANT_KILLED_EQUIVALENT','@event_user proved a mutant non-equivalent'),
+  ('PLAYER_MUTANT_SURVIVED','@event_user created a mutant that survived'),
+  ('PLAYER_KILLED_MUTANT','@event_user killed a mutant'),
+  ('PLAYER_MUTANT_CLAIMED_EQUIVALENT','@event_user claimed a mutant equivalent'),
+  ('PLAYER_MUTANT_EQUIVALENT','@event_user caught an equivalence'),
+  ('PLAYER_TEST_CREATED','@event_user created a test'),
+  ('PLAYER_TEST_ERROR','@event_user created a test that errored'),
+  ('PLAYER_TEST_READY','Test by @event_user is ready'),
   ('GAME_CREATED','Game created'),('GAME_FINISHED','Game Over!'),
   ('GAME_GRACE_ONE','The game is entering grace period one.'),
   ('GAME_GRACE_TWO','The game is entering grace period two.'),
   ('GAME_MESSAGE','@event_user: @chat_message'),
   ('GAME_MESSAGE_ATTACKER','@event_user: @chat_message'),
   ('GAME_MESSAGE_DEFENDER','@event_user: @chat_message'),
+  ('GAME_MESSAGE_PLAYER','@event_user: @chat_message'),
   ('GAME_PLAYER_LEFT','@event_user left the game'),
   ('GAME_STARTED','The game has started!');
 
@@ -582,27 +596,32 @@ SELECT *
 FROM `view_active_classes`
 WHERE Puzzle = 1;
 
+CREATE OR REPLACE VIEW `view_active_puzzles` AS
+SELECT *
+FROM `puzzles`
+WHERE Active = 1;
+
 CREATE OR REPLACE VIEW `view_battleground_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
 FROM games,
      classes
 WHERE Mode = 'PARTY'
   AND games.Class_ID = classes.Class_ID;
 
+CREATE OR REPLACE VIEW `view_melee_games` AS
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
+FROM games,
+     classes
+WHERE Mode = 'MELEE'
+  AND games.Class_ID = classes.Class_ID;
+
 CREATE OR REPLACE VIEW `view_puzzle_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle, classes.Parent_Class
 FROM games,
      classes
 WHERE Mode = 'PUZZLE'
   AND games.Class_ID = classes.Class_ID;
 
-CREATE OR REPLACE VIEW `view_melee_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle
-FROM games,
-     classes
-WHERE Mode = 'MELEE'
-  AND games.Class_ID = classes.Class_ID;
-  
 CREATE OR REPLACE VIEW `view_mutants_with_user` AS
 SELECT mutants.*, users.*
 FROM mutants
@@ -671,6 +690,7 @@ CREATE OR REPLACE VIEW `view_defenders`
       sum(T.MutantsKilled) AS NKilled
     FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID
     GROUP BY PD.user_id;
+
 
 CREATE OR REPLACE VIEW `view_leaderboard`
   AS

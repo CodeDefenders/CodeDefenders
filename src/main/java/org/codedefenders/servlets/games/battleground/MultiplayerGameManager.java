@@ -45,6 +45,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
@@ -124,6 +125,9 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 public class MultiplayerGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
+
+    @Inject
+    private Configuration config;
 
     @Inject
     private GameManagingUtils gameManagingUtils;
@@ -351,8 +355,7 @@ public class MultiplayerGameManager extends HttpServlet {
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
                 testText,
                 game.getMaxAssertionsPerTest(),
-                game.isForceHamcrest()
-        );
+                game.getCUT().getAssertionLibrary());
         boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
@@ -578,8 +581,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // If the user has pending duels we cannot accept the mutant, but we keep it around
         // so students do not lose mutants once the duel is solved.
         if (gameManagingUtils.hasAttackerPendingMutantsInGame(gameId, attackerId)
-                && (session.getAttribute(Constants.BLOCK_ATTACKER) != null)
-                && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
+                && config.isBlockAttacker()) {
             messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
             // Keep the mutant code in the view for later
             previousSubmission.setMutantCode(mutantText);
@@ -777,9 +779,10 @@ public class MultiplayerGameManager extends HttpServlet {
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
                         int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+                        int userId = UserDAO.getUserForPlayer(defenderId).getId();
                         notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
-                        Event notifDefenderEquiv = new Event(-1, game.getId(), defenderId, notification,
+                        Event notifDefenderEquiv = new Event(-1, game.getId(), userId, notification,
                                 EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(notifDefenderEquiv);
@@ -816,8 +819,7 @@ public class MultiplayerGameManager extends HttpServlet {
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(
                     testText,
                     game.getMaxAssertionsPerTest(),
-                    game.isForceHamcrest()
-            );
+                    game.getCUT().getAssertionLibrary());
             boolean validationSuccess = validationMessage.isEmpty();
 
             TestValidatedEvent tve = new TestValidatedEvent();

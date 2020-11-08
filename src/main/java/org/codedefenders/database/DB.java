@@ -32,11 +32,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DB {
-    private static ConnectionPool connPool = ConnectionPool.instance();
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
     public static synchronized Connection getConnection() {
-        return connPool.getDBConnection();
+        try {
+            return DatabaseConnection.getConnection();
+        } catch (SQLException e) {
+            logger.error("Unable to acquire SQL connection", e);
+            return null;
+        }
     }
 
     public static void cleanup(Connection conn, PreparedStatement stmt) {
@@ -47,7 +51,11 @@ public class DB {
         } catch (SQLException se) {
             logger.error("SQL exception while closing statement!", se);
         } finally {
-            connPool.releaseDBConnection(conn);
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                logger.error("Unable to close SQL connection", e);
+            }
         }
     }
 

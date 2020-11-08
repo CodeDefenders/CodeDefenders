@@ -54,7 +54,11 @@ public class GameService implements IGameService {
     public MutantDTO getMutant(int userId, int mutantId) {
         // I can't delegate this to the other services, as the game type is still unknown.
         Mutant mutant = MutantDAO.getMutantById(mutantId);
-        return getMutant(userId, mutant);
+        if (mutant != null) {
+            return getMutant(userId, mutant);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -91,7 +95,11 @@ public class GameService implements IGameService {
     public TestDTO getTest(int userId, int testId) {
         // I can't delegate this to the other services, as the game type is still unknown.
         Test test = TestDAO.getTestById(testId);
-        return getTest(userId, test);
+        if (test != null) {
+            return getTest(userId, test);
+        } else {
+            return null;
+        }
     }
 
     @Override

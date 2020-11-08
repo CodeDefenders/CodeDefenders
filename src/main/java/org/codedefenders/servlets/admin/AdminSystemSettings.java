@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.ConnectionPool;
+import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 
@@ -40,6 +40,9 @@ public class AdminSystemSettings extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private ConnectionFactory connectionFactory;
 
     public enum SETTING_NAME {
         SHOW_PLAYER_FEEDBACK {
@@ -275,10 +278,10 @@ public class AdminSystemSettings extends HttpServlet {
                     case INT_VALUE:
                         setting.setIntValue(Integer.parseInt(valueString));
                         if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS)) {
-                            ConnectionPool.instance().updateSize(Integer.parseInt(valueString));
+                            connectionFactory.updateSize(Integer.parseInt(valueString));
                         }
                         if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME)) {
-                            ConnectionPool.instance().updateWaitingTime(Integer.parseInt(valueString));
+                            connectionFactory.updateWaitingTime(Integer.parseInt(valueString));
                         }
                         break;
                     case BOOL_VALUE:

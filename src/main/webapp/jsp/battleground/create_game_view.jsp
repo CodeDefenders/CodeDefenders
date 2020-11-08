@@ -121,16 +121,6 @@
                 </td>
             </tr>
             <tr>
-                <td title="Force the use of Hamcrest to define assertions">
-                    Force Use of Hamcrest
-                </td>
-                <td id="forceHamcrestTd">
-                    <input type="checkbox" id="forceHamcrest" name="forceHamcrest"
-                           class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
-                           data-onstyle="primary" data-offstyle="">
-                </td>
-            </tr>
-            <tr>
                 <td title="Click the question sign for more information on the levels">
                     Mutant validator
                 </td>
@@ -157,13 +147,11 @@
                 <td id="roleSelectionTd">
                     <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
                             data-size="medium">
-                        <%for (Role role : Role.values()) {
-                            if (role != Role.NONE && role != Role.PLAYER) { %>
-                        <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
-                            <%=role.getFormattedString()%>
-                        </option>
-                        <%  }
-                        }%>
+                        <% for (Role role : Role.multiplayerRoles()) { %>
+                            <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
+                                <%=role.getFormattedString()%>
+                            </option>
+                        <% } %>
                     </select>
                 </td>
             </tr>
@@ -190,7 +178,7 @@
                 <td title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
                     Threshold for Auto. Equiv. Duels
                 </td>
-                <td id="automaticEquivalenceTrigger">
+                <td id="automaticEquivalenceTriggerTd">
                     <input class="form-control" type="number" value="0"
                            name="automaticEquivalenceTrigger"
                            id="automaticEquivalenceTrigger" min=0 required/>

@@ -57,6 +57,8 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
 public class AdminUserManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminUserManagement.class);
 
+    static final String USER_NAME_LIST_DELIMITER = "[\\r\\n]+";
+
     @Inject
     private MessagesBean messages;
 
@@ -199,7 +201,7 @@ public class AdminUserManagement extends HttpServlet {
     }
 
     private void createUserAccounts(HttpServletRequest request, String userNameListString) {
-        final String[] lines = userNameListString.split(AdminCreateGames.USER_NAME_LIST_DELIMITER);
+        final String[] lines = userNameListString.split(USER_NAME_LIST_DELIMITER);
 
         final boolean sendMail = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
         final String hostAddress = ServletUtils.getBaseURL(request);

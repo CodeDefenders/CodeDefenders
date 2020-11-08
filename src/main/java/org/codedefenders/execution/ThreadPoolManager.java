@@ -40,6 +40,9 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -50,6 +53,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  */
 @ApplicationScoped
 public class ThreadPoolManager {
+    private static final Logger logger = LoggerFactory.getLogger(ThreadPoolManager.class);
+
     private final AtomicBoolean running = new AtomicBoolean();
     private final Map<String, ThreadPoolModel> models = new HashMap<>();
     private final ConcurrentMap<String, ThreadPoolExecutor> pools = new ConcurrentHashMap<>();
@@ -85,7 +90,7 @@ public class ThreadPoolManager {
      * @return a pool builder to customize defaults of the pool. Think to call add() to ensure it is registered.
      */
     public ThreadPoolBuilder register(final String name) {
-        System.out.println("ThreadPoolManager.register() " + name);
+        logger.info("Registered: " + name);
         return new ThreadPoolBuilder(this, name);
     }
 

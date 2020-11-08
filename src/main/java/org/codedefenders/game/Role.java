@@ -18,6 +18,9 @@
  */
 package org.codedefenders.game;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * This enumeration represents roles players can have in a game.
  */
@@ -55,5 +58,21 @@ public enum Role {
 
     public String getFormattedString() {
         return this.displayName;
+    }
+
+    /**
+     * Returns a list of all possible roles for multiplayer games.
+     * @return A list of all possible roles for multiplayer games.
+     */
+    public static List<Role> multiplayerRoles() {
+        return Arrays.asList(ATTACKER, DEFENDER, OBSERVER);
+    }
+
+    /**
+     * Returns a list of all possible roles for melee games.
+     * @return A list of all possible roles for melee games.
+     */
+    public static List<Role> meleeRoles() {
+        return Arrays.asList(PLAYER, OBSERVER);
     }
 }

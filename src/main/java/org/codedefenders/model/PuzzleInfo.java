@@ -34,7 +34,7 @@ public class PuzzleInfo {
      */
     public static PuzzleInfo of(Puzzle p) {
         return new PuzzleInfo(p.getPuzzleId(), p.getChapterId(), p.getPosition(), p.getTitle(), p.getDescription(),
-            p.getMaxAssertionsPerTest(), p.isForceHamcrest(), p.getEditableLinesStart(), p.getEditableLinesEnd());
+            p.getMaxAssertionsPerTest(), p.getEditableLinesStart(), p.getEditableLinesEnd());
     }
 
     private int puzzleId;
@@ -43,12 +43,11 @@ public class PuzzleInfo {
     private String title;
     private String description;
     private int maxAssertionsPerTest;
-    private boolean forceHamcrest;
     private Integer editableLinesStart;
     private Integer editableLinesEnd;
 
     private PuzzleInfo(int puzzleId, Integer chapterId, Integer position, String title,
-                       String description, int maxAssertionsPerTest, boolean forceHamcrest,
+                       String description, int maxAssertionsPerTest,
                        Integer editableLinesStart, Integer editableLinesEnd) {
         this.puzzleId = puzzleId;
         this.chapterId = chapterId;
@@ -56,7 +55,6 @@ public class PuzzleInfo {
         this.title = title;
         this.description = description;
         this.maxAssertionsPerTest = maxAssertionsPerTest;
-        this.forceHamcrest = forceHamcrest;
         this.editableLinesStart = editableLinesStart;
         this.editableLinesEnd = editableLinesEnd;
     }
@@ -83,10 +81,6 @@ public class PuzzleInfo {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
-    }
-
-    public boolean isForceHamcrest() {
-        return forceHamcrest;
     }
 
     public Integer getEditableLinesStart() {

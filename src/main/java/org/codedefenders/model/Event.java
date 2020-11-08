@@ -67,10 +67,6 @@ public class Event {
 
     private String message = null;
 
-    private String chatMessage = null;
-
-    private String parsedChatMessage = null;
-
     private String parsedMessage = null;
 
     private EventType eventType = null;
@@ -109,20 +105,6 @@ public class Event {
         this.eventId = eventId;
     }
 
-    public void setChatMessage(String message) {
-        chatMessage = message;
-    }
-
-    public String getChatMessage() {
-        if (chatMessage == null) {
-            return "";
-        }
-        if (parsedChatMessage == null) {
-            parsedChatMessage = parse(new HashMap<>(), chatMessage, false);
-        }
-        return parsedChatMessage;
-    }
-
     public String parse(HashMap<String, String> replacements, String message, boolean emphasise) {
 
         String procMessage = message;
@@ -142,9 +124,7 @@ public class Event {
                     "<span style='color: " + color + "'>@" + userLabel + "</span>");
         }
 
-        if (procMessage.contains("@chat_message")) {
-            procMessage = procMessage.replace("@chat_message", getChatMessage());
-        } else if (emphasise) {
+        if (emphasise) {
             procMessage = "<span style='font-style: italic; font-weight: " + "bold;'>" + procMessage + "</span>";
         }
 

@@ -1,5 +1,6 @@
 package org.codedefenders.beans.game;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -8,8 +9,6 @@ import javax.enterprise.context.RequestScoped;
 
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * <p>Provides data for the scoreboard game component.</p>

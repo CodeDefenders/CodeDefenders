@@ -24,6 +24,7 @@ import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import org.codedefenders.util.Paths;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
@@ -43,6 +44,8 @@ import static org.codedefenders.systemtests.SeleniumTestUtils.waitForVisible;
  *     <li>username that is taken by another user</li>
  * </ul>
  */
+//FIXME
+@Ignore
 @Category(SystemTest.class)
 public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 

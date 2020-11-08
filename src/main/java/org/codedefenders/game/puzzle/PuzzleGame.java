@@ -66,8 +66,6 @@ public class PuzzleGame extends AbstractGame {
      */
     private int maxAssertionsPerTest;
 
-    private boolean forceHamcrest;
-
     /**
      * Validation level used to check submitted mutants.
      */
@@ -95,98 +93,12 @@ public class PuzzleGame extends AbstractGame {
     private Puzzle puzzle;
 
     /**
-     * Creates a new {@link PuzzleGame} according to the given {@link Puzzle}.
-     * Adds the mapped tests and mutants from the {@link Puzzle puzzle}'s class to the game.
-     * Adds the user to the game as a player.
-     * If any error occurs during the preparation, {@code null} will be returned.
-     *
-     * @param puzzle {@link Puzzle} to create a {@link PuzzleGame} for.
-     * @param uid    User ID of the user who plays the puzzle.
-     * @return A fully prepared {@link PuzzleGame} for the given puzzle and user, or {@code null} if any error occurred.
-     */
-    public static PuzzleGame createPuzzleGame(Puzzle puzzle, int uid) {
-        String errorMsg = String.format("Error while preparing puzzle game for puzzle %d and user %d.",
-                puzzle.getPuzzleId(), uid);
-
-        PuzzleGame game = new PuzzleGame(puzzle, uid);
-        if (!game.insert()) {
-            logger.error(errorMsg + " Could not insert the puzzle game");
-            return null;
-        }
-
-        if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)) {
-            logger.error(errorMsg + " Could not add dummy attacker to game.");
-            return null;
-        }
-        if (!game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
-            logger.error(errorMsg + " Could not add dummy defender to game.");
-            return null;
-        }
-        int dummyAttackerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.id);
-        int dummyDefenderId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.id);
-
-        final List<Test> mappedTests = GameClassDAO.getMappedTestsForClassId(game.classId);
-        final List<Mutant> mappedMutants = GameClassDAO.getMappedMutantsForClassId(game.classId);
-
-        /* Add the tests from the puzzle. */
-        Map<Integer, Test> testMap = new HashMap<>();
-
-        for (Test test : mappedTests) {
-            final Test newTest = Test.newTestForGameAndPlayerIds(game.id, dummyDefenderId, test);
-            newTest.insert();
-            testMap.put(test.getId(), newTest);
-        }
-        Map<Integer, Mutant> mutantMap = new HashMap<>();
-
-        /* Add the mutants from the puzzle. */
-        for (Mutant mutant : mappedMutants) {
-            final Mutant newMutant = new Mutant(game.id, game.classId,
-                    mutant.getJavaFile(), mutant.getClassFile(), true, dummyAttackerId, GameDAO.getCurrentRound(game.id));
-            newMutant.insert();
-            mutantMap.put(mutant.getId(), newMutant);
-        }
-
-        if (!mutantMap.isEmpty() && !testMap.isEmpty()) {
-            for (TargetExecution targetExecution :
-                    TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.classId)) {
-                Test test = testMap.get(targetExecution.testId);
-                Mutant mutant = mutantMap.get(targetExecution.mutantId);
-
-                targetExecution.testId = test.getId();
-                targetExecution.mutantId = mutant.getId();
-
-                if (targetExecution.status == TargetExecution.Status.FAIL) {
-                    test.killMutant();
-                    mutant.kill();
-                    mutant.setKillMessage(targetExecution.message);
-                    MutantDAO.updateMutantKillMessageForMutant(mutant);
-                }
-
-                targetExecution.insert();
-            }
-        }
-
-        if (!game.addPlayer(uid, game.getActiveRole())) {
-            logger.error(errorMsg + " Could not add player to the game.");
-            return null;
-        }
-
-        game.setState(GameState.ACTIVE);
-        if (!game.update()) {
-            logger.error(errorMsg + " Could not update game state.");
-            return null;
-        }
-
-        return game;
-    }
-
-    /**
      * Constructor for creating a new puzzle game (instantiating a puzzle).
      *
      * @param puzzle The {@link Puzzle} the {@link PuzzleGame} is for.
      * @param uid    The user id of the user who the puzzle is for.
      */
-    private PuzzleGame(Puzzle puzzle, int uid) {
+    public PuzzleGame(Puzzle puzzle, int uid) {
         /* AbstractGame attributes */
         this.id = 0; // ID will be set when inserting the game.
         this.classId = puzzle.getClassId();
@@ -199,7 +111,6 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
-        this.forceHamcrest = puzzle.isForceHamcrest();
 
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
@@ -214,8 +125,8 @@ public class PuzzleGame extends AbstractGame {
      * Constructor for reading a puzzle game from the database.
      */
     public PuzzleGame(GameClass cut, int puzzleId, int id, int classId, GameLevel level, int creatorId,
-            int maxAssertionsPerTest, boolean forceHamcrest, CodeValidatorLevel mutantValidatorLevel, GameState state,
-            int currentRound, Role activeRole) {
+            int maxAssertionsPerTest, CodeValidatorLevel mutantValidatorLevel, GameState state, int currentRound,
+            Role activeRole) {
         /* AbstractGame attributes */
         this.cut = cut;
         this.id = id;
@@ -229,7 +140,6 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = maxAssertionsPerTest;
-        this.forceHamcrest = forceHamcrest;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.currentRound = currentRound;
         this.activeRole = activeRole;
@@ -319,10 +229,6 @@ public class PuzzleGame extends AbstractGame {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
-    }
-
-    public boolean isForceHamcrest() {
-        return forceHamcrest;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {
@@ -416,4 +322,8 @@ public class PuzzleGame extends AbstractGame {
         return PuzzleDAO.updatePuzzleGame(this);
     }
 
+    @Override
+    public boolean isChatEnabled() {
+        return false;
+    }
 }

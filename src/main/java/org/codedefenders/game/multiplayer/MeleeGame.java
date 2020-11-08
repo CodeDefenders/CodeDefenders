@@ -87,7 +87,6 @@ public class MeleeGame extends AbstractGame {
 
     private boolean requiresValidation;
     private int maxAssertionsPerTest;
-    private boolean forceHamcrest;
 
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
@@ -107,7 +106,6 @@ public class MeleeGame extends AbstractGame {
         private final int classId;
         private final int creatorId;
         private final int maxAssertionsPerTest;
-        private final boolean forceHamcrest;
 
         // optional values with default values
         private GameClass cut = null;
@@ -133,11 +131,10 @@ public class MeleeGame extends AbstractGame {
 
         private int automaticMutantEquivalenceThreshold = 0;
 
-        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest) {
+        public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
             this.classId = classId;
             this.creatorId = creatorId;
             this.maxAssertionsPerTest = maxAssertionsPerTest;
-            this.forceHamcrest = forceHamcrest;
         }
 
         public Builder cut(GameClass cut) {
@@ -245,7 +242,6 @@ public class MeleeGame extends AbstractGame {
         this.prize = builder.prize;
         this.requiresValidation = builder.requiresValidation;
         this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
-        this.forceHamcrest = builder.forceHamcrest;
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
@@ -281,16 +277,13 @@ public class MeleeGame extends AbstractGame {
         this.prize = prize;
     }
 
+    @Override
     public boolean isChatEnabled() {
         return chatEnabled;
     }
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
-    }
-
-    public boolean isForceHamcrest() {
-        return forceHamcrest;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {
@@ -354,6 +347,7 @@ public class MeleeGame extends AbstractGame {
         }
     }
 
+    @Override
     public boolean addPlayer(int userId, Role role) {
         return canJoinGame(userId) && addPlayerForce(userId, role);
     }
@@ -362,6 +356,7 @@ public class MeleeGame extends AbstractGame {
         if (state == GameState.FINISHED) {
             return false;
         }
+
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
@@ -378,7 +373,7 @@ public class MeleeGame extends AbstractGame {
 
     // We do not check that the user is in both roles !!
     public boolean hasUserJoined(int userId) {
-        for (Player p : GameDAO.getAllPlayersForGame(this.getId())) {
+        for (Player p : GameDAO.getValidPlayersForGame(this.getId())) {
             if (p.getUser().getId() == userId) {
                 return true;
             }
@@ -450,6 +445,7 @@ public class MeleeGame extends AbstractGame {
         eventDAO.insert(notif);
     }
 
+    @Override
     public boolean insert() {
         try {
             this.id = meleeGameDAO.storeMeleeGame(this);
@@ -460,6 +456,7 @@ public class MeleeGame extends AbstractGame {
         }
     }
 
+    @Override
     public boolean update() {
         return meleeGameDAO.updateMeleeGame(this);
     }

@@ -1,1 +1,0 @@
-ALTER TABLE classes ADD RequireMocking TINYINT DEFAULT 0 NOT NULL;

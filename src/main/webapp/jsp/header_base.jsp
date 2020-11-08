@@ -100,16 +100,18 @@
 
     <!-- Table sorter -->
     <script type="text/javascript" src="webjars/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="webjars/datatables-select/1.3.1/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" src="webjars/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript" src="webjars/momentjs/2.14.1/min/moment.min.js"></script> <!-- must come before datetime-moment -->
     <script type="text/javascript" src="webjars/datatables-plugins/1.10.16/sorting/datetime-moment.js"></script> <!-- must come after moment -->
-    <link href="webjars/datatables/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="webjars/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="webjars/datatables-select/1.3.1/css/select.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="css/datatables-override.css" rel="stylesheet" type="text/css" />
 
 
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
     <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/codedefenders/messaging.js"></script>
 
     <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
     <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>

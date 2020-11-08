@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +36,6 @@ import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE;
 
 public class AdminDAO {
-
-    public static final String TIMESTAMP_NEVER = "never";
 
     public static Entry getScore(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -111,183 +110,70 @@ public class AdminDAO {
     private static UserInfo userInfoFromRS(ResultSet rs) throws SQLException {
         final User user = UserDAO.userFromRS(rs);
 
-        Timestamp ts = rs.getTimestamp("lastLogin");
-        final Role lastRole = Role.valueOrNull("lastRole");
+        final Timestamp ts = rs.getTimestamp("lastLogin");
+        final Instant lastLogin = ts != null ? ts.toInstant() : null;
+
+        String lastRoleStr = rs.getString("lastRole");
+        final Role lastRole = lastRoleStr == null ? null : Role.valueOf(lastRoleStr);
         final int totalScore = rs.getInt("TotalScore");
 
-        return new UserInfo(user, ts, lastRole, totalScore);
-    }
-
-    private static List<String> uglyListUserInfoFromRS(ResultSet rs) throws SQLException {
-        List<String> userInfo = new ArrayList<>();
-        userInfo.add(String.valueOf(rs.getInt("User_ID")));
-        userInfo.add(rs.getString("Username"));
-        userInfo.add(rs.getString("Email"));
-        Timestamp ts = rs.getTimestamp("lastLogin");
-        userInfo.add(ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5));
-        userInfo.add(rs.getString("lastRole"));
-        userInfo.add(String.valueOf(rs.getInt("TotalScore")));
-        return userInfo;
-    }
-
-    public static List<List<String>> getUnassignedUsersInfo() throws UncheckedSQLException, SQLMappingException {
-        final String query = String.join("\n",
-                "SELECT DISTINCT",
-                "  u.User_ID,",
-                "  u.Username,",
-                "  u.Email,",
-                "  lastLogin.ts AS lastLogin,",
-                "  Role         AS lastRole,",
-                "  totalScore",
-                "FROM",
-                "  view_valid_users u",
-                "  LEFT JOIN (SELECT",
-                "          MAX(Timestamp) AS ts,",
-                "          user_id",
-                "        FROM sessions",
-                "        GROUP BY User_ID) AS lastLogin ON lastLogin.User_ID = u.User_ID",
-                "  LEFT JOIN",
-                "  (SELECT",
-                "     players.User_ID,",
-                "     Role",
-                "   FROM users",
-                "     INNER JOIN players ON users.User_ID = players.User_ID",
-                "     INNER JOIN games ON players.Game_ID = games.ID",
-                "     INNER JOIN",
-                "     (SELECT",
-                "        players.User_ID,",
-                "        max(players.Game_ID) AS latestGame",
-                "      FROM players",
-                "      GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID) AS lastRole",
-                "    ON lastRole.User_ID = u.User_ID",
-                "  JOIN",
-                "  (SELECT",
-                "     U.User_ID,",
-                "     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore",
-                "   FROM users U LEFT JOIN",
-                "     (SELECT",
-                "        PA.user_id,",
-                "        sum(M.Points) AS AScore",
-                "      FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID",
-                "      GROUP BY PA.user_id)",
-                "       AS Attacker ON U.user_id = Attacker.user_id",
-                "     LEFT JOIN",
-                "     (SELECT",
-                "        PD.user_id,",
-                "        sum(T.Points) AS DScore",
-                "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID",
-                "      GROUP BY PD.user_id)",
-                "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = u.User_ID",
-                "WHERE u.User_ID NOT IN (",
-                "  SELECT DISTINCT players.User_ID",
-                "  FROM (players",
-                "    INNER JOIN games ON players.Game_ID = games.ID)",
-                "  WHERE",
-                "    (State = 'ACTIVE' OR State = 'CREATED') AND Role IN ('ATTACKER', 'DEFENDER') AND Active = 1",
-                ")",
-                "ORDER BY lastLogin DESC, User_ID;");
-        return DB.executeQueryReturnList(query, AdminDAO::uglyListUserInfoFromRS);
+        return new UserInfo(user, lastLogin, lastRole, totalScore);
     }
 
     public static List<UserInfo> getAllUsersInfo() throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT DISTINCT",
-                "  users.*,",
-                "  lastLogin.ts AS lastLogin,",
-                "  Role         AS lastRole,",
-                "  totalScore",
-                "FROM",
-                "  view_valid_users AS users",
-                "  LEFT JOIN (SELECT",
-                "          MAX(Timestamp) AS ts,",
-                "          user_id",
-                "        FROM sessions",
-                "        GROUP BY User_ID) AS lastLogin ON lastLogin.User_ID = users.User_ID",
-                "  LEFT JOIN",
-                "  (SELECT",
-                "     players.User_ID,",
-                "     Role",
-                "   FROM users",
-                "     INNER JOIN players ON users.User_ID = players.User_ID",
-                "     INNER JOIN games ON players.Game_ID = games.ID",
-                "     INNER JOIN",
-                "     (SELECT",
-                "        players.User_ID,",
-                "        max(players.Game_ID) AS latestGame",
-                "      FROM players",
-                "      GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID) AS lastRole",
-                "    ON lastRole.User_ID = users.User_ID",
-                "  JOIN",
-                "  (SELECT",
-                "     U.User_ID,",
-                "     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore",
-                "   FROM users U LEFT JOIN",
-                "     (SELECT",
-                "        PA.user_id,",
-                "        sum(M.Points) AS AScore",
-                "      FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID",
-                "      GROUP BY PA.user_id)",
-                "       AS Attacker ON U.user_id = Attacker.user_id",
-                "     LEFT JOIN",
-                "     (SELECT",
-                "        PD.user_id,",
-                "        sum(T.Points) AS DScore",
-                "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID",
-                "      GROUP BY PD.user_id)",
-                "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID",
-                "ORDER BY lastLogin DESC, User_ID;");
-        return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS);
-    }
+                "SELECT DISTINCT users.*,",
+                "       lastLogin.timeStamp AS lastLogin,",
+                "       lastRole.Role       AS lastRole,",
+                "       IFNULL(attackerScore.score, 0) + IFNULL(defenderScore.score, 0) AS TotalScore",
+                "FROM view_valid_users users",
 
-    public static UserInfo getUsersInfo(int userId) throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT DISTINCT",
-                "  users.*,",
-                "  lastLogin.ts AS lastLogin,",
-                "  Role         AS lastRole,",
-                "  totalScore",
-                "FROM",
-                "  view_valid_users AS users",
-                "  LEFT JOIN (SELECT",
-                "          MAX(Timestamp) AS ts,",
-                "          user_id",
-                "        FROM sessions",
-                "        GROUP BY User_ID) AS lastLogin ON lastLogin.User_ID = users.User_ID",
-                "  LEFT JOIN",
-                "  (SELECT",
-                "     players.User_ID,",
-                "     Role",
-                "   FROM users",
-                "     INNER JOIN players ON users.User_ID = players.User_ID",
-                "     INNER JOIN games ON players.Game_ID = games.ID",
-                "     INNER JOIN",
-                "     (SELECT",
-                "        players.User_ID,",
-                "        max(players.Game_ID) AS latestGame",
-                "      FROM players",
-                "      GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID) AS lastRole",
-                "    ON lastRole.User_ID = users.User_ID",
-                "  JOIN",
-                "  (SELECT",
-                "     U.User_ID,",
-                "     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore",
-                "   FROM users U LEFT JOIN",
-                "     (SELECT",
-                "        PA.user_id,",
-                "        sum(M.Points) AS AScore",
-                "      FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID",
-                "      GROUP BY PA.user_id)",
-                "       AS Attacker ON U.user_id = Attacker.user_id",
-                "     LEFT JOIN",
-                "     (SELECT",
-                "        PD.user_id,",
-                "        sum(T.Points) AS DScore",
-                "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID",
-                "      GROUP BY PD.user_id)",
-                "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID",
-                "WHERE users.User_ID = ?",
-                "ORDER BY lastLogin DESC, User_ID;");
-        return DB.executeQueryReturnValue(query, AdminDAO::userInfoFromRS, DatabaseValue.of(userId));
+                /* Last login. */
+                "LEFT JOIN (",
+                "    SELECT MAX(Timestamp) AS timeStamp,",
+                "           User_ID",
+                "    FROM sessions",
+                "    GROUP BY User_ID",
+                ") AS lastLogin ON lastLogin.User_ID = users.User_ID",
+
+                /* Last role. */
+                "LEFT JOIN (",
+                "    SELECT players.User_ID,",
+                "           players.Role",
+                "    FROM players,",
+                "    (",
+                "        SELECT players.User_ID,",
+                "               MAX(players.Game_ID) AS latestGameID",
+                "        FROM players, games",
+                "        WHERE games.ID = players.Game_ID",
+                "          AND games.Mode <> 'PUZZLE'",
+                "          AND (players.Role = 'ATTACKER' OR players.Role = 'DEFENDER')",
+                "        GROUP BY players.User_ID",
+                "    ) AS latestGame",
+                "    WHERE latestGame.User_ID = players.User_ID",
+                "      AND latestGame.latestGameID = players.Game_ID",
+                ") AS lastRole ON lastRole.User_ID = users.User_ID",
+
+                /* Attacker score. */
+                "LEFT JOIN (",
+                "    SELECT players.User_ID,",
+                "           SUM(mutants.Points) AS score",
+                "    FROM players,",
+                "         mutants",
+                "    WHERE players.id = mutants.Player_ID",
+                "    GROUP BY players.User_ID",
+                ") AS attackerScore ON users.User_ID = attackerScore.User_ID",
+
+                /* Defender score. */
+                "LEFT JOIN (",
+                "    SELECT players.User_ID,",
+                "           sum(tests.Points) AS score",
+                "    FROM players,",
+                "         tests",
+                "    WHERE players.id = tests.Player_ID",
+                "    GROUP BY players.User_ID",
+                ") AS defenderScore ON users.User_ID = defenderScore.User_ID;");
+        return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS);
     }
 
     public static List<List<String>> getPlayersInfo(int gameId) throws UncheckedSQLException, SQLMappingException {
@@ -366,7 +252,7 @@ public class AdminDAO {
             playerInfo.add(rs.getString("Username"));
             playerInfo.add(rs.getString("Role"));
             Timestamp ts = rs.getTimestamp("lastSubmission");
-            playerInfo.add(ts == null ? TIMESTAMP_NEVER : "" + ts.getTime());
+            playerInfo.add(ts == null ? "never" : "" + ts.getTime());
             playerInfo.add(String.valueOf(rs.getInt("TotalScore")));
             playerInfo.add(String.valueOf(rs.getInt("nbSubmissions")));
             return playerInfo;

@@ -61,19 +61,6 @@ public class EventDAO {
         // The execute* returns the Connection to the ConnectionPool so we must not reuse it
         int eventId = DB.executeUpdateGetKeys(stmt1, conn1);
 
-        if (eventId >= 0) {
-            if (event.getChatMessage() != null) {
-                query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
-                valueList = new DatabaseValue[]{DatabaseValue.of(eventId), DatabaseValue.of(event.getChatMessage())};
-                // We need to get a second connection as the execute* returned the Connection to the ConnectionPool
-                // so we must not reuse it
-                final Connection conn = DB.getConnection();
-                final PreparedStatement stmt2 = DB.createPreparedStatement(conn, query, valueList);
-                // This automatically returns the connection to the ConnectionPool
-                DB.executeUpdate(stmt2, conn);
-
-            }
-        }
         return eventId >= 0;
     }
 
@@ -116,9 +103,12 @@ public class EventDAO {
     }
 
     public List<Event> getNewEventsForGame(int gameId, long timestamp, Role role) {
-        String query = String.join("\n", "SELECT *", "FROM events", "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ", "LEFT JOIN event_chat AS ec",
-                "  ON events.Event_Id = ec.Event_Id", "WHERE Game_ID=?", "  AND Event_Status=? ",
+        String query = String.join("\n", "SELECT *",
+                "FROM events",
+                "LEFT JOIN event_messages AS em",
+                "  ON events.Event_Type = em.Event_Type ",
+                "WHERE Game_ID=?",
+                "  AND Event_Status=? ",
                 "  AND Timestamp >= FROM_UNIXTIME(?)");
         if (role.equals(Role.ATTACKER)) {
             query += " AND events.Event_Type!='DEFENDER_MESSAGE'";

@@ -32,9 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.User;
-import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -86,8 +87,8 @@ public class UserProfileManager extends HttpServlet {
             response.sendRedirect(ServletUtils.getBaseURL(request));
             return;
         }
-        final Optional<UserInfo> requestingUserInfo = Optional.ofNullable(AdminDAO.getUsersInfo(login.getUserId()));
-        if (!requestingUserInfo.isPresent()) {
+
+        if (UserDAO.getUserById(login.getUserId()) == null) {
             response.sendRedirect(request.getContextPath());
             return;
         }
@@ -197,6 +198,6 @@ public class UserProfileManager extends HttpServlet {
         user.setUsername(DELETED_USER_NAME);
         user.setEmail(String.format(DELETED_USER_EMAIL, UUID.randomUUID()));
         user.setEncodedPassword(DELETED_USER_PASSWORD);
-        return user.update();
+        return user.update() && DatabaseAccess.deleteSessions(user.getId());
     }
 }

@@ -23,8 +23,7 @@ import java.io.IOException;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.enterprise.inject.spi.CDI;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.EncodeException;
@@ -45,6 +44,7 @@ import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.handling.ServerEventHandlerContainer;
+import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,8 +83,8 @@ import org.slf4j.LoggerFactory;
 // @RequestScoped -> TODO What's this?
 @ServerEndpoint(
         value = "/notifications/{ticket}/{userId}",
-        encoders = { EventEncoder.class },
-        decoders = { EventDecoder.class })
+        encoders = {EventEncoder.class},
+        decoders = {EventDecoder.class})
 public class PushSocket {
     // TODO Make an Inject for this
     private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
@@ -107,34 +107,21 @@ public class PushSocket {
     private Session session;
 
     public PushSocket() {
-        try {
-            // Since @Inject does not work with WebSocket ...
-            InitialContext initialContext = new InitialContext();
-            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
-            Bean bean;
-            CreationalContext ctx;
+        // Since @Inject does not work with WebSocket ...
 
-            bean = bm.getBeans(INotificationService.class).iterator().next();
-            ctx = bm.createCreationalContext(bean);
-            notificationService = (INotificationService) bm.getReference(bean, INotificationService.class, ctx);
+        notificationService = CDIUtil.getBeanFromCDI(INotificationService.class);
 
-            bean = bm.getBeans(ITicketingService.class).iterator().next();
-            ctx = bm.createCreationalContext(bean);
-            ticketingServices = (ITicketingService) bm.getReference(bean, ITicketingService.class, ctx);
-
-        } catch (NamingException e) {
-            e.printStackTrace();
-        }
+        ticketingServices = CDIUtil.getBeanFromCDI(ITicketingService.class);
 
         open = false;
     }
 
     @OnOpen
     public synchronized void open(Session session,
-                                  @PathParam("ticket") String ticket,
-                                  @PathParam("userId") Integer userId) throws IOException {
+            @PathParam("ticket") String ticket,
+            @PathParam("userId") Integer userId) throws IOException {
 
-        if (! ticketingServices.validateTicket(ticket, userId)) {
+        if (!ticketingServices.validateTicket(ticket, userId)) {
             logger.info("Invalid ticket " + ticket + " for session " + session);
             session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
             return;
@@ -150,8 +137,8 @@ public class PushSocket {
 
         this.user = user;
         this.ticket = ticket;
-        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user);
-        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user);
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user, ticket);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user, ticket);
         this.session = session;
 
         open = true;

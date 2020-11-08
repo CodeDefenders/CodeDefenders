@@ -26,6 +26,9 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.util.stream.Collectors" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
@@ -59,6 +62,8 @@
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
+<t:game_chat/>
+
 <%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
 <%--<%@ include file="/jsp/push_game_notifications.jsp"%>--%>
 <%-- Show the mail icon with counts of unread notifications: requires push_notifications.jsp --%>
