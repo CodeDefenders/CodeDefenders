@@ -49,9 +49,6 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
-    String name = request.getServerName();
-    int port = request.getServerPort();
-    String context = request.getContextPath();
     String ticket = (String) request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME);
 %>
 
@@ -223,7 +220,14 @@
         }
     }
 
-    const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=login.getUserId()%>";
+    const baseWsUri = document.baseURI
+            .replace(/^http/, 'ws')
+            .replace(/\/$/, '');
+    let wsUri = `\${baseWsUri}/notifications/<%=ticket%>/<%=login.getUserId()%>`;
+    /* Workaround for WSS not working on port 80 on staging server. */
+    if (wsUri.includes('passau') && wsUri.includes(':80/')) {
+        wsUri = wsUri.replace(':80/', ':443/')
+    }
     window.PushSocket = PushSocket;
     window.pushSocket = new PushSocket(wsUri);
 
