@@ -43,16 +43,22 @@
             <% if (game.getCreatorId() == login.getUserId()) { %>
             <div class="admin-panel col-md-12">
                 <% if (game.getState() == GameState.ACTIVE) { %>
-                <form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
-                    <button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn">End Game</button>
+                <form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
+                      method="post" style="display: inline-block;">
+                    <button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn">End
+                        Game
+                    </button>
                     <input type="hidden" name="formType" value="endGame">
-                    <input type="hidden" name="gameId" value="<%= game.getId() %>" />
+                    <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
                 </form>
                 <% } else if (game.getState() == GameState.CREATED) { %>
-                <form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
-                    <button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn">Start Game</button>
+                <form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
+                      method="post" style="display: inline-block;">
+                    <button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn">Start
+                        Game
+                    </button>
                     <input type="hidden" name="formType" value="startGame">
-                    <input type="hidden" name="gameId" value="<%= game.getId() %>" />
+                    <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
                 </form>
                 <% } %>
             </div>
@@ -72,9 +78,16 @@
                    style="color: black; font-size: 18px; padding: 5px;">
                     <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
+
+
                 <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal"
                    data-target="#scoreboard">Scoreboard
                 </a>
+                <a href="#" class="btn btn-default btn-diff" id="btnHistory" data-toggle="modal"
+                   data-target="#history">History
+                </a>
+
+
                 <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
                    title="Export as a Gradle project to import into an IDE."
                    class="btn btn-default btn-diff" id="btnProjectExport">

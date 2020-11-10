@@ -117,6 +117,13 @@
     scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
+<jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
+<%
+    history.setLogin(login);
+    history.setGameId(game.getId());
+    history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+%>
+
 
 <%-- -------------------------------------------------------------------------------- --%>
 
@@ -126,6 +133,8 @@
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
+
+<jsp:include page="/jsp/battleground/game_history.jsp"/>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">

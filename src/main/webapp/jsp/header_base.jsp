@@ -88,6 +88,7 @@
     <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
     <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
     <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" >
 
     <%-- This function shall be loaded on any page in which we compile the mutant --%>
     <%-- Sources:
@@ -123,6 +124,8 @@
     <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
 
     <link href="css/modal_dialogs.css" rel="stylesheet" type="text/css" />
+
+    <link href="css/timeline.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body class="page-grid">

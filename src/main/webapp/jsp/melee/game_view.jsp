@@ -20,6 +20,11 @@
 --%>
 <%@ page import="org.codedefenders.game.Role"%>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame"%>
+<%@ page import="org.codedefenders.database.PlayerDAO" %>
+<%@ page import="org.codedefenders.model.Player" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -30,6 +35,26 @@
     MeleeGame game = (MeleeGame) request.getAttribute("game");
     Role role = game.getRole(login.getUserId());
 %>
+
+<jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
+<%
+    history.setLogin(login);
+    history.setGameId(game.getId());
+
+    Player player = PlayerDAO.getPlayerForUserAndGame(login.getUserId(), game.getId());
+    List<Player> otherPlayers = game.getPlayers().stream()
+            .filter(p -> {
+                if (player != null) {
+                    return p.getId() != player.getId();
+                } else {
+                    return true;
+                }
+            })
+            .collect(Collectors.toList());
+    // We simply need two distinct sets, to determine which events to display on the left/right side of the timeline
+    history.setPlayers(Collections.singletonList(player), otherPlayers);
+%>
+
 
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
@@ -47,6 +72,8 @@
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
+
+<jsp:include page="/jsp/battleground/game_history.jsp"/>
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
