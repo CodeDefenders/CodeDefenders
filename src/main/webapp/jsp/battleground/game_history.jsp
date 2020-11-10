@@ -35,7 +35,7 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">History</h4>
             </div>
-            <div class="modal-body" style="background: #eee; overflow-y: auto; max-height: 60vh">
+            <div class="modal-body" style="background: #eee; overflow-y: auto; max-height: 55vh">
                 <div class="timeline-centered timeline-sm">
                     <%
                         for (HistoryBean.HistoryBeanEventDTO event : events) {
