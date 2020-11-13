@@ -223,11 +223,7 @@
     const baseWsUri = document.baseURI
             .replace(/^http/, 'ws')
             .replace(/\/$/, '');
-    let wsUri = `\${baseWsUri}/notifications/<%=ticket%>/<%=login.getUserId()%>`;
-    /* Workaround for WSS not working on port 80 on staging server. */
-    if (wsUri.includes('passau') && wsUri.includes(':80/')) {
-        wsUri = wsUri.replace(':80/', ':443/')
-    }
+    const wsUri = `\${baseWsUri}/notifications/<%=ticket%>/<%=login.getUserId()%>`;
     window.PushSocket = PushSocket;
     window.pushSocket = new PushSocket(wsUri);
 
