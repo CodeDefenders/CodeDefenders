@@ -84,6 +84,7 @@
                 <li>Sabina Galdobin (University of Passau)</li>
                 <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi (University of Passau)</a></li>
                 <li>Marvin Kreis (University of Passau)</li>
+                <li>Kassian K&ouml;ck (University of Passau)</li>
                 <li>Rob Sharp (The University of Sheffield)</li>
                 <li>Lorenz Wendlinger (University of Passau)</li>
                 <li><a href="https://github.com/werli">Phil Werli</a> (University of Passau)</li>
