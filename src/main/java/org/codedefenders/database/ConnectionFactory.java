@@ -64,6 +64,8 @@ public class ConnectionFactory {
             dataSource.setUrl(config.getDbUrl());
             dataSource.setUsername(config.getDbUsername());
             dataSource.setPassword(config.getDbPassword());
+            dataSource.setMaxTotal(config.getMaximumTotalDatabaseConnections());
+            dataSource.setMaxWaitMillis(config.getDatabaseConnectionTimeout());
 
             migrate();
         }
@@ -142,10 +144,23 @@ public class ConnectionFactory {
         return result;
     }
 
+    /**
+     *
+     * @param maxTotalConnections
+     *
+     * @deprecated Set this via the configuration
+     */
+    @Deprecated
     public void updateSize(int maxTotalConnections) {
-        //dataSource.setMaxTotal(maxTotalConnections);
     }
 
+    /**
+     *
+     * @param parseInt
+     *
+     * @deprecated Set this via the configuration
+     */
+    @Deprecated
     public void updateWaitingTime(int parseInt) {
     }
 }

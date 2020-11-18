@@ -90,14 +90,16 @@ public class AdminSystemSettings extends HttpServlet {
         CONNECTION_POOL_CONNECTIONS {
             @Override
             public String toString() {
-                return "Number of permanently open connections. Recommended: >20 \n"
+                return "NOT USED, SET THIS VIA THE CONFIGURATION. \n"
+                        + "Number of permanently open connections. Recommended: >20 \n"
                         + "Lowering this number closes the delta in connections!";
             }
         },
         CONNECTION_WAITING_TIME {
             @Override
             public String toString() {
-                return "Amount of time in ms a thread waits to be notified of newly available connections."
+                return "NOT USED, SET THIS VIA THE CONFIGURATION. \n"
+                        + "Amount of time in ms a thread waits to be notified of newly available connections."
                         + "Recommended: ~5000ms";
             }
         },
