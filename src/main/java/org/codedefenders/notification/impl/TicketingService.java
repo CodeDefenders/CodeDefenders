@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
 
 import org.codedefenders.notification.ITicketingService;
 
@@ -35,7 +36,7 @@ import static java.time.temporal.ChronoUnit.HOURS;
  * connection.
  */
 @ManagedBean
-@ApplicationScoped
+@Singleton
 public class TicketingService implements ITicketingService {
     /**
      * Stores tickets by their UUID.

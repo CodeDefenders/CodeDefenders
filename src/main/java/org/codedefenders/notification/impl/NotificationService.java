@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Singleton;
 
 import org.codedefenders.notification.INotificationService;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ import com.google.gson.Gson;
  * @author gambi
  */
 @ManagedBean
-@ApplicationScoped
+@Singleton
 public class NotificationService implements INotificationService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
     private static final int NUM_THREADS = 8;
