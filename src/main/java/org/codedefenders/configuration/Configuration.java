@@ -87,6 +87,8 @@ public class Configuration {
     protected String dbName;
     protected String dbUsername;
     protected String dbPassword;
+    protected Integer dbConnectionsMax;
+    protected Integer dbConnectionsTimeout;
     protected Boolean clusterMode;
     protected String clusterJavaHome;
     protected String clusterReservationName;
@@ -316,6 +318,14 @@ public class Configuration {
 
     public String getDbPassword() {
         return dbPassword;
+    }
+
+    public Integer getMaximumTotalDatabaseConnections() {
+        return dbConnectionsMax;
+    }
+
+    public Integer getDatabaseConnectionTimeout() {
+        return dbConnectionsTimeout;
     }
 
     public boolean isClusterModeEnabled() {
