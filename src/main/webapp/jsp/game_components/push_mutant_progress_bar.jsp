@@ -108,9 +108,9 @@
 
             /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
             const reconnect = () => {
+                pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
                 pushSocket.reconnect();
                 registerMutantProgressBar();
-                pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
             };
             pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
         }
