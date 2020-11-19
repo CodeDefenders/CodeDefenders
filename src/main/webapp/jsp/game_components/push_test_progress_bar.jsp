@@ -105,7 +105,7 @@
                 pushSocket.reconnect();
                 registerTestProgressBar();
             };
-            pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
+            // pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
         };
 
     })();
