@@ -331,8 +331,6 @@ public class Mutant implements Serializable {
         tests = tests.stream()
                 .filter(t -> t.getPlayerId() != this.getPlayerId())
                 .collect(Collectors.toList());
-        //
-        TestDAO.getValidTestsForClass(classId);
         for (Test t : tests) {
             if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines())) {
                 return true;
