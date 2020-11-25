@@ -44,8 +44,8 @@ public class MultiplayerGameService extends AbstractGameService {
                 .setCovered(mutant.isCovered())
                 // TODO: This could use some tests
                 .setViewable(playerRole != Role.NONE // User must participate in the Game
-                        // Defender can see Mutants in easy Game
-                        && (game.getLevel() == GameLevel.EASY
+                        // Defender can see Mutants if the game is over or its an easy Game
+                        && (game.isFinished() || game.getLevel() == GameLevel.EASY
                         || (game.getLevel() == GameLevel.HARD
                         // In Hard Games the User must either be an Attacker or Observer
                         && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
