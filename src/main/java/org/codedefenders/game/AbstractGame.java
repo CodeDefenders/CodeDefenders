@@ -54,6 +54,7 @@ public abstract class AbstractGame {
     protected List<Event> events;
     protected List<Mutant> mutants;
     protected List<Test> tests;
+    protected List<Test> testsDefendersOnly;
 
     public abstract boolean addPlayer(int userId, Role role);
 
@@ -126,11 +127,17 @@ public abstract class AbstractGame {
     }
 
     public List<Test> getTests(boolean defendersOnly) {
-        // TODO Why we cache this result?
-        if (tests == null) {
-            tests = TestDAO.getValidTestsForGame(this.id, defendersOnly);
+        if (defendersOnly) {
+            if (testsDefendersOnly == null) {
+                testsDefendersOnly = TestDAO.getValidTestsForGame(this.id, true);
+            }
+            return testsDefendersOnly;
+        } else {
+            if (tests == null) {
+                tests = TestDAO.getValidTestsForGame(this.id, false);
+            }
+            return tests;
         }
-        return tests;
     }
 
     // NOTE: I do not want to break compatibility so I define yet another method...

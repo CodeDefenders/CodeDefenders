@@ -27,7 +27,6 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -327,29 +326,26 @@ public class Mutant implements Serializable {
     public boolean isCovered() {
         // Return valid tests for DEFENDERS or PLAYERS in the GAME. Cannot exist both at the same time
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
-        // Filter the tests that were created by the same user that created the mutant
-        tests = tests.stream()
+        return isCovered(tests);
+    }
+
+    public boolean isCovered(List<Test> tests) {
+        return tests.stream()
+                // Filter the tests that were created by the same user that created the mutant
                 .filter(t -> t.getPlayerId() != this.getPlayerId())
-                .collect(Collectors.toList());
-        for (Test t : tests) {
-            if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines())) {
-                return true;
-            }
-        }
-        return false;
+                .anyMatch(t -> t.isMutantCovered(this));
     }
 
     // This might return several instances of the same test since Test does not implement hash and equalsTo
     public Set<Test> getCoveringTests() {
-        Set<Test> coveringTests = new LinkedHashSet<>();
+        List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
+        return getCoveringTests(tests);
+    }
 
-        for (Test t : TestDAO.getValidTestsForGame(gameId, false)) {
-            if (t.isMutantCovered(this)) {
-                coveringTests.add(t);
-            }
-        }
-
-        return coveringTests;
+    public Set<Test> getCoveringTests(List<Test> tests) {
+        return tests.stream()
+                .filter(t -> t.isMutantCovered(this))
+                .collect(Collectors.toSet());
     }
 
     public boolean doesRequireRecompilation() {

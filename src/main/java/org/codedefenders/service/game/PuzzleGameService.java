@@ -39,7 +39,7 @@ public class PuzzleGameService extends AbstractGameService {
             return new MutantDTO(mutant);
         } else {
             return new MutantDTO(mutant)
-                    .setCovered(mutant.isCovered())
+                    .setCovered(mutant.isCovered(game.getTests(true)))
                     .setViewable(player.getRole() != null && player.getRole() != Role.NONE);
         }
     }

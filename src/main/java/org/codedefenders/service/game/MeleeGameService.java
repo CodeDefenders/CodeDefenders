@@ -42,7 +42,7 @@ public class MeleeGameService extends AbstractGameService {
 
         return new MutantDTO(mutant)
                 // Note: getCoveringTests will make a DB Query under the hood
-                .setCovered(mutant.getCoveringTests().stream()
+                .setCovered(mutant.getCoveringTests(game.getTests(false)).stream()
                         .anyMatch(t -> player != null && t.getPlayerId() == player.getId()))
                 .setViewable(playerRole != Role.NONE
                         && (game.getLevel() == GameLevel.EASY
