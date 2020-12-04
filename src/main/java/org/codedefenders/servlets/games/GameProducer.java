@@ -4,14 +4,19 @@ import java.io.Serializable;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 
 // https://stackoverflow.com/questions/28855122/how-to-inject-a-http-session-attribute-to-a-bean-using-cdi
 @RequestScoped
 public class GameProducer implements Serializable {
+
+    @Inject
+    EventDAO eventDAO;
 
     private AbstractGame theGame;
 
@@ -22,8 +27,9 @@ public class GameProducer implements Serializable {
     }
 
     public void setTheGame(Integer gameId) {
-        // TODO Replace this with @Inject gameDAO
         this.theGame = GameDAO.getGame(gameId);
+        if (this.theGame != null) {
+            this.theGame.setEventDAO(eventDAO);
+        }
     }
-
 }
