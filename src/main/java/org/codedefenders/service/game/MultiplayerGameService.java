@@ -41,7 +41,7 @@ public class MultiplayerGameService extends AbstractGameService {
         Role playerRole = determineRole(user, player, game);
 
         return new MutantDTO(mutant)
-                .setCovered(mutant.isCovered())
+                .setCovered(mutant.isCovered(game.getTests(true)))
                 // TODO: This could use some tests
                 .setViewable(playerRole != Role.NONE // User must participate in the Game
                         // Defender can see Mutants if the game is over or its an easy Game
