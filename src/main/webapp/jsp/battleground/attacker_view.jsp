@@ -113,9 +113,9 @@
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-6" style="margin-top: 10px;">
         <div id="mutants-div">
-            <h3>Existing Mutants</h3>
+            <h3 style="margin-top: 0px;margin-bottom: 17px;">Existing Mutants</h3>
             <t:mutant_accordion/>
         </div>
 
@@ -127,7 +127,7 @@
         <% } %>
     </div>
 
-    <div class="col-md-6" id="newmut-div">
+    <div class="col-md-6" id="newmut-div" style="margin-top: 10px;">
         <div class="row" style="display: contents">
             <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
 
