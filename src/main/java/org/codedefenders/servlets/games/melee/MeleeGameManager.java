@@ -214,8 +214,8 @@ public class MeleeGameManager extends HttpServlet {
         MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean();
         // Why ID is necessary here?
         meleeScoreboardBean.setGameId(game.getId());
-        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(), scoreCalculator.getTestScores(),
-                scoreCalculator.getDuelScores());
+        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(game.getId()),
+                scoreCalculator.getTestScores(game.getId()), scoreCalculator.getDuelScores(game.getId()));
         meleeScoreboardBean.setPlayers(game.getPlayers());
         // Set the preconditions for the score board
         request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);

@@ -405,7 +405,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, gameId));
             }
 
-            scoreCalculator.storeScoresToDB();
+            scoreCalculator.storeScoresToDB(game.getId());
 
             /*
              * Publish the event about the user
