@@ -56,6 +56,7 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -158,26 +159,23 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private Configuration config;
 
+    @Inject
+    private AbstractGame game;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
-            logger.info("No gameId parameter. Aborting request.");
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
-            return;
-        }
-        int gameId = gameIdOpt.get();
-
-        MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-
         if (game == null) {
-            logger.error("Could not find melee game {}", gameId);
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            logger.error("No game found. Aborting request.");
+            Redirect.redirectBack(request, response);
             return;
-        } else {
-            game.setEventDAO(eventDAO);
+        } else if (!(this.game instanceof MeleeGame)) {
+            logger.error("Game found is no MeleeGame. Aborting request.");
+            Redirect.redirectBack(request, response);
+            return;
         }
+        MeleeGame game = (MeleeGame) this.game;
+        int gameId = game.getId();
         int userId = login.getUserId();
 
         if (!game.hasUserJoined(userId) && game.getCreatorId() != userId) {
@@ -226,23 +224,17 @@ public class MeleeGameManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
-            logger.warn("No gameId parameter. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-        final int gameId = gameIdOpt.get();
-
-        final MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
-
         if (game == null) {
-            logger.warn("Could not retrieve game from database for gameId: {}", gameId);
+            logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else {
-            game.setEventDAO(eventDAO);
+        } else if (!(this.game instanceof MeleeGame)) {
+            logger.error("Game found is no MeleeGame. Aborting request.");
+            Redirect.redirectBack(request, response);
+            return;
         }
+        MeleeGame game = (MeleeGame) this.game;
+        int gameId = game.getId();
 
         if (!game.hasUserJoined(login.getUserId())) {
             logger.warn("User {} has not yet joined the game : {}", login.getUserId(), gameId);
