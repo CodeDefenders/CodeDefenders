@@ -281,7 +281,7 @@
     <%-- Attacker view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-md-6" id="newmut-div">
+    <div class="col-md-6" id="newmut-div" style="margin-top: 20px;">
         <div class="row" style="display: contents">
             <h3 style="margin-bottom: 0; display: inline">Create a mutant
                 here</h3>
@@ -354,7 +354,7 @@
     <div class="col-md-6" id="utest-div">
 
         <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
-        <h3>
+        <h3 style="margin-bottom: 17px;">
             Write a new JUnit test here
             <button type="submit" class="btn btn-primary btn-game btn-right"
                     id="submitTest" form="def"
