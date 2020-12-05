@@ -23,11 +23,6 @@
 <%-- Attributes set in the servlet --%>
 <%--@elvariable id="leaderbordEntries" type="java.util.List<org.codedefenders.game.leaderboard.Entry>"--%>
 
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Leaderboard"); %>
-
-
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="w-100">

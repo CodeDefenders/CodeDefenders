@@ -21,19 +21,26 @@ package org.codedefenders.servlets;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.game.leaderboard.Leaderboard;
 
 @WebServlet("/leaderboard")
 public class LeaderboardPage extends HttpServlet {
 
+    @Inject
+    PageInfoBean pageInfo;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        pageInfo.setPageTitle("Leaderboard");
 
         req.setAttribute("leaderboardEntries", Leaderboard.getAll());
 
