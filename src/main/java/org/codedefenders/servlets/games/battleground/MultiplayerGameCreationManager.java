@@ -34,6 +34,4 @@ public class MultiplayerGameCreationManager extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.getRequestDispatcher("/jsp/battleground/create_game_view.jsp").forward(req, resp);
     }
-
-
 }

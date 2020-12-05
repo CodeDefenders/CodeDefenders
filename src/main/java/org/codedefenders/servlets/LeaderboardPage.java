@@ -17,7 +17,7 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.servlets.games.melee;
+package org.codedefenders.servlets;
 
 import java.io.IOException;
 
@@ -27,11 +27,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/melee/create")
-public class MeleeGameCreationManager extends HttpServlet {
+@WebServlet("/leaderboard")
+public class LeaderboardPage extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("/jsp/melee/create_game_view.jsp").forward(req, resp);
+        req.getRequestDispatcher("/jsp/leaderboards.jsp").forward(req, resp);
     }
 }
