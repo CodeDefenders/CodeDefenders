@@ -109,43 +109,6 @@
 
 	<!-- Servlets-->
 
-	<!-- Public sites -->
-	<servlet>
-		<servlet-name>HelpPage</servlet-name>
-		<jsp-file>/jsp/help.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>HelpPage</servlet-name>
-		<url-pattern>/help</url-pattern>
-	</servlet-mapping>
-
-	<servlet-mapping>
-		<servlet-name>AboutPage</servlet-name>
-		<url-pattern>/about</url-pattern>
-	</servlet-mapping>
-	<servlet>
-		<servlet-name>AboutPage</servlet-name>
-		<jsp-file>/jsp/about_page.jsp</jsp-file>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>ContactPage</servlet-name>
-		<url-pattern>/contact</url-pattern>
-	</servlet-mapping>
-	<servlet>
-		<servlet-name>ContactPage</servlet-name>
-		<jsp-file>/jsp/contact.jsp</jsp-file>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>StudyOverview</servlet-name>
-		<url-pattern>/study</url-pattern>
-	</servlet-mapping>
-	<servlet>
-		<servlet-name>StudyOverview</servlet-name>
-		<jsp-file>/jsp/study.jsp</jsp-file>
-	</servlet>
-
 	<!--  Login page -->
 	<servlet>
     	<servlet-name>Login</servlet-name>
