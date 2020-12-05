@@ -107,18 +107,6 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- Servlets-->
-
-	<!--  Login page -->
-	<servlet>
-    	<servlet-name>Login</servlet-name>
-    	<jsp-file>/jsp/login_view.jsp</jsp-file>
-	</servlet>
-
-	<servlet-mapping>
-    	<servlet-name>Login</servlet-name>
-    	<url-pattern>/login</url-pattern>
-	</servlet-mapping>
 
 	<error-page>
 		<location>/jsp/error_page_404.jsp</location>
