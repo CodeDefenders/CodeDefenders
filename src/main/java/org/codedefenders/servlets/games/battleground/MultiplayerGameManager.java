@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -157,6 +158,7 @@ public class MultiplayerGameManager extends HttpServlet {
     private EventDAO eventDAO;
 
     @Inject
+    @Named("game")
     AbstractGame game;
 
     @Override

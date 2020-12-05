@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -105,6 +106,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private GameManagingUtils gameManagingUtils;
 
     @Inject
+    @Named("game")
     AbstractGame game;
 
     @Override

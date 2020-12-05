@@ -37,6 +37,7 @@ import com.google.gson.annotations.Expose;
 public class TestAccordionBean {
 
     @Inject
+    @Named("game")
     AbstractGame game;
 
     @Inject

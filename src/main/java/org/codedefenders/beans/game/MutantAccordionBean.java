@@ -44,6 +44,7 @@ public class MutantAccordionBean {
     LoginBean loginBean;
 
     @Inject
+    @Named("game")
     AbstractGame game;
 
     private List<MutantDTO> mutantList;
