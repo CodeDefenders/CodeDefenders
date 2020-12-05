@@ -131,37 +131,6 @@
 	</servlet>
 	<!-- Misc end-->
 
-	<!-- Melee mode servlets start -->
-	<servlet-mapping>
-		<servlet-name>MeleeCreatePage</servlet-name>
-		<url-pattern>/melee/create</url-pattern>
-	</servlet-mapping>
-	<servlet>
-		<servlet-name>MeleeCreatePage</servlet-name>
-		<jsp-file>/jsp/melee/create_game_view.jsp</jsp-file>
-	</servlet>
-	<!--  -->
-	<!-- Battleground mode servlets start -->
-
-	<servlet-mapping>
-		<servlet-name>BattlegroundHistoryPage</servlet-name>
-		<url-pattern>/multiplayer/history</url-pattern>
-	</servlet-mapping>
-	<servlet>
-		<servlet-name>BattlegroundHistoryPage</servlet-name>
-		<jsp-file>/jsp/battleground/history_game_view.jsp</jsp-file>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>BattlegroundCreatePage</servlet-name>
-		<url-pattern>/multiplayer/create</url-pattern>
-	</servlet-mapping>
-	<servlet>
-		<servlet-name>BattlegroundCreatePage</servlet-name>
-		<jsp-file>/jsp/battleground/create_game_view.jsp</jsp-file>
-	</servlet>
-	<!-- Battleground mode servlets end -->
-
 	<error-page>
 		<location>/jsp/error_page_404.jsp</location>
 	</error-page>
