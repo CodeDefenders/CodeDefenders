@@ -73,7 +73,7 @@
         <c:choose>
             <c:when test="${empty activeGames}">
                 <tr>
-                    <td colspan="100%"> You are currently not active in any game.</td>
+                    <td colspan="100%"> You are currently not active in any games.</td>
                 </tr>
             </c:when>
             <c:otherwise>
