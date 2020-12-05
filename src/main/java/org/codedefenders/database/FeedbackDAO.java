@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
-import org.codedefenders.servlets.FeedbackManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,7 @@ import static org.codedefenders.model.Feedback.types;
 
 public class FeedbackDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(FeedbackDAO.class);
 
     public static boolean storeFeedback(int gameId, int userId, List<Integer> ratingsList) {
         StringBuilder bob = new StringBuilder("INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ");
