@@ -65,7 +65,7 @@ public class PlayerFeedbackBean {
     }
 
     public boolean canGiveFeedback() {
-        return role == Role.ATTACKER || role == Role.DEFENDER;
+        return role == Role.ATTACKER || role == Role.DEFENDER || role == Role.PLAYER;
     }
 
     public boolean canSeeFeedback() {
@@ -96,6 +96,16 @@ public class PlayerFeedbackBean {
                     default:
                         return true;
                 }
+            case PLAYER:
+                switch (type) {
+                    case DEFENDER_FAIRNESS:
+                    case DEFENDER_COMPETENCE:
+                    case ATTACKER_FAIRNESS:
+                    case ATTACKER_COMPETENCE:
+                return false;
+            default:
+                return true;
+        }
             default:
                 return true;
         }
