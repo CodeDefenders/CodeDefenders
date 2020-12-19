@@ -305,7 +305,7 @@ public class MeleeGameManager extends HttpServlet {
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
                 // Send the notification about the flagged mutant to attacker
-                int mutantOwnerId = aliveMutant.getPlayerId();
+                int mutantOwnerId = UserDAO.getUserForPlayer(aliveMutant.getPlayerId()).getId();
                 Event event = new Event(-1, game.getId(), mutantOwnerId,
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold

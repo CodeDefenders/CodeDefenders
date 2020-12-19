@@ -512,6 +512,7 @@ public class DatabaseTest {
         testInsertPlayer();
         int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
         Timestamp ts = Timestamp.valueOf("1995-03-27 12:08:00");
+        // TODO: Events don't take PlayerIDs but UserIDs!!
         Event ev = new Event(1, multiplayerGame.getId(), pid, "message", EventType.ATTACKER_MESSAGE, EventStatus.GAME,
                 ts);
 
