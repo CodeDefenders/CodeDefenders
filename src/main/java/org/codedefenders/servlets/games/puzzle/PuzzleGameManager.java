@@ -131,6 +131,8 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private EventDAO  eventDAO;
 
+    // TODO I have no idea why this is accessed here, so I will not change this code
+    // but smells fishy.... GameProducer is something that should not be used explicitly...
     @Inject
     private GameProducer gameProducer;
 

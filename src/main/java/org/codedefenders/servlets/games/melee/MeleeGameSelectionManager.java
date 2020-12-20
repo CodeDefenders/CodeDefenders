@@ -106,8 +106,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private GameManagingUtils gameManagingUtils;
 
     @Inject
-    @Named("game")
-    AbstractGame game;
+    @Named("MeleeGame")
+    private MeleeGame game;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -233,12 +233,8 @@ public class MeleeGameSelectionManager extends HttpServlet {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
         }
-        MeleeGame game = (MeleeGame) this.game;
+        
         int gameId = game.getId();
 
         if (game.hasUserJoined(login.getUserId())) {
@@ -288,7 +284,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        MeleeGame game = (MeleeGame) this.game;
+
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
@@ -333,7 +329,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        MeleeGame game = (MeleeGame) this.game;
+
         int gameId = game.getId();
 
         if (game.getState() == GameState.CREATED) {
@@ -362,7 +358,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        MeleeGame game = (MeleeGame) this.game;
+
         int gameId = game.getId();
 
         if (game.getState() == GameState.ACTIVE) {

@@ -20,6 +20,8 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.JSONUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -36,6 +38,8 @@ import com.google.gson.annotations.Expose;
 @RequestScoped
 public class TestAccordionBean {
 
+    private static final Logger logger = LoggerFactory.getLogger(TestAccordionBean.class);
+    
     @Inject
     @Named("game")
     AbstractGame game;
@@ -60,6 +64,9 @@ public class TestAccordionBean {
 
     @PostConstruct
     public void setup() {
+        
+        logger.info("TestAccordionBean the injected game is " + game );
+        
         GameClass cut = game.getCUT();
         List<TestDTO> testsList = gameService.getTests(login.getUser(), game);
 

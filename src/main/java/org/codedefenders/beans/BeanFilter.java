@@ -21,10 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Adds various beans to the request, so they can be shared between the application and the JSPs.
+ * Adds various beans to the request, so they can be shared between the
+ * application and the JSPs.
  */
-/* This filter should only be required until we change our JSPs to use the JSP tag libraries, since the tags can access
- * the session beans directly, without this extra step of adding them to the request.  */
+/*
+ * This filter should only be required until we change our JSPs to use the JSP
+ * tag libraries, since the tags can access the session beans directly, without
+ * this extra step of adding them to the request.
+ */
 @WebFilter(filterName = "BeanFilter")
 public class BeanFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BeanFilter.class);
@@ -51,10 +55,13 @@ public class BeanFilter implements Filter {
 
         // Configure the GameProducer with the game associated to this request if any
         if (request instanceof HttpServletRequest) {
-            Optional<Integer> possiblyGameId = ServletUtils.gameId((HttpServletRequest)request);
-            possiblyGameId.ifPresent(integer -> gameProducer.setTheGame(integer));
-        }
 
+            Optional<Integer> possiblyGameId = ServletUtils.gameId((HttpServletRequest) request);
+            if( possiblyGameId.isPresent() ) {
+                logger.info("Setting game for request " + ((HttpServletRequest) request).getRequestURL() );
+                possiblyGameId.ifPresent(integer -> gameProducer.setTheGame(integer));
+            }
+        }
 
         chain.doFilter(request, response);
     }

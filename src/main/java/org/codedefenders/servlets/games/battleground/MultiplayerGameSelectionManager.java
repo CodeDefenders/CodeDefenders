@@ -23,6 +23,7 @@ import java.sql.Timestamp;
 import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -37,6 +38,7 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapProcessor;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -97,9 +99,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     @Inject
     private GameManagingUtils gameManagingUtils;
 
-    @Inject
-    private AbstractGame game;
-
+    @Inject  
+    @Named("MultiplayerGame")
+    private MultiplayerGame game;
+        
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
@@ -107,6 +110,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        
         final String action = formType(request);
         switch (action) {
             case "createGame":
@@ -232,12 +236,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
         }
-        MultiplayerGame game = (MultiplayerGame) this.game;
+
         int gameId = game.getId();
 
         Role role = game.getRole(login.getUserId());
@@ -303,7 +303,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        MultiplayerGame game = (MultiplayerGame) this.game;
+
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
@@ -346,7 +346,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        MultiplayerGame game = (MultiplayerGame) this.game;
+
         int gameId = game.getId();
 
         if (game.getState() == GameState.CREATED) {
@@ -375,7 +375,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        MultiplayerGame game = (MultiplayerGame) this.game;
+
         int gameId = game.getId();
 
         if (game.getState() == GameState.ACTIVE) {

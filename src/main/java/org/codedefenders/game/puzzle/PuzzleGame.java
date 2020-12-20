@@ -55,6 +55,11 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 public class PuzzleGame extends AbstractGame {
     protected static final Logger logger = LoggerFactory.getLogger(PuzzleGame.class);
 
+    
+    @Override
+    public Class getType() {
+        return PuzzleGame.class;
+    }
     /*
      * Attributes from AbstractGame protected int id; protected int classId;
      * protected int creatorId; protected GameState state; protected GameLevel

@@ -15,12 +15,15 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codedefenders.beans.BeanFilter;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.JSONUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -37,6 +40,10 @@ import com.google.gson.annotations.Expose;
 @RequestScoped
 public class MutantAccordionBean {
 
+    private static final Logger logger = LoggerFactory.getLogger(MutantAccordionBean.class);
+
+    
+    
     @Inject
     GameService gameService;
 
@@ -52,7 +59,13 @@ public class MutantAccordionBean {
 
     @PostConstruct
     public void setup() {
+        
+        logger.info("MutantAccordionBean the injected game is " + game );
+        logger.info("MutantAccordionBean the use is " + loginBean.getUser());
+        
         mutantList = gameService.getMutants(loginBean.getUser(), game);
+        
+        logger.info("MutantAccordionBean the Mutant list is " + mutantList);
 
         categories = new ArrayList<>();
 

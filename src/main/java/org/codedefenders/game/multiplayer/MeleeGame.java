@@ -43,6 +43,11 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 
 public class MeleeGame extends AbstractGame {
 
+    @Override
+    public Class getType() {
+        return MeleeGame.class;
+    }
+    
     /*
      * Inherited from AbstractGame
      *
