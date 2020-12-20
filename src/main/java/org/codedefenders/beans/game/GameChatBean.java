@@ -26,11 +26,11 @@ public class GameChatBean {
     public static final int MESSAGE_LIMIT = 1000;
 
     @Inject
-    @Named("game")
+    @Named("AbstractGame")
     private AbstractGame game;
 
     @Inject
-    LoginBean login;
+    private LoginBean login;
 
     /**
      * Checks whether the chat is enabled in the current game.

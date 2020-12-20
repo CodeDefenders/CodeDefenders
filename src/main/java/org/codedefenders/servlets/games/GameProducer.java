@@ -29,7 +29,7 @@ public class GameProducer implements Serializable {
 
     @Produces
     @RequestScoped
-    @Named("game")
+    @Named("AbstractGame")
     public AbstractGame getTheGame() {
         return this.theGame;
     }

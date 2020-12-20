@@ -158,8 +158,8 @@ public class MultiplayerGameManager extends HttpServlet {
     private EventDAO eventDAO;
 
     @Inject
-    @Named("game")
-    AbstractGame game;
+    @Named("MultiplayerGame")
+    private MultiplayerGame game;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -168,12 +168,8 @@ public class MultiplayerGameManager extends HttpServlet {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
         }
-        MultiplayerGame game = (MultiplayerGame) this.game;
+
         int gameId = game.getId();
 
         int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
@@ -211,12 +207,8 @@ public class MultiplayerGameManager extends HttpServlet {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
         }
-        MultiplayerGame game = (MultiplayerGame) this.game;
+
         int gameId = game.getId();
 
         final String action = ServletUtils.formType(request);

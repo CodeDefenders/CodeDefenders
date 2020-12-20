@@ -42,8 +42,6 @@ public class MutantAccordionBean {
 
     private static final Logger logger = LoggerFactory.getLogger(MutantAccordionBean.class);
 
-    
-    
     @Inject
     GameService gameService;
 
@@ -51,7 +49,7 @@ public class MutantAccordionBean {
     LoginBean loginBean;
 
     @Inject
-    @Named("game")
+    @Named("AbstractGame")
     AbstractGame game;
 
     private List<MutantDTO> mutantList;
@@ -59,13 +57,7 @@ public class MutantAccordionBean {
 
     @PostConstruct
     public void setup() {
-        
-        logger.info("MutantAccordionBean the injected game is " + game );
-        logger.info("MutantAccordionBean the use is " + loginBean.getUser());
-        
         mutantList = gameService.getMutants(loginBean.getUser(), game);
-        
-        logger.info("MutantAccordionBean the Mutant list is " + mutantList);
 
         categories = new ArrayList<>();
 

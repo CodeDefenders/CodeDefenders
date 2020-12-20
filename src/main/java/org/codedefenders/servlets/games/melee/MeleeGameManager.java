@@ -32,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -160,7 +161,8 @@ public class MeleeGameManager extends HttpServlet {
     private Configuration config;
 
     @Inject
-    private AbstractGame game;
+    @Named("MeleeGame")
+    private MeleeGame game;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -169,12 +171,8 @@ public class MeleeGameManager extends HttpServlet {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
         }
-        MeleeGame game = (MeleeGame) this.game;
+        
         int gameId = game.getId();
         int userId = login.getUserId();
 
@@ -228,12 +226,8 @@ public class MeleeGameManager extends HttpServlet {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
         }
-        MeleeGame game = (MeleeGame) this.game;
+        
         int gameId = game.getId();
 
         if (!game.hasUserJoined(login.getUserId())) {

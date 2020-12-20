@@ -41,7 +41,7 @@ public class TestAccordionBean {
     private static final Logger logger = LoggerFactory.getLogger(TestAccordionBean.class);
     
     @Inject
-    @Named("game")
+    @Named("AbstractGame")
     AbstractGame game;
 
     @Inject
@@ -64,9 +64,6 @@ public class TestAccordionBean {
 
     @PostConstruct
     public void setup() {
-        
-        logger.info("TestAccordionBean the injected game is " + game );
-        
         GameClass cut = game.getCUT();
         List<TestDTO> testsList = gameService.getTests(login.getUser(), game);
 

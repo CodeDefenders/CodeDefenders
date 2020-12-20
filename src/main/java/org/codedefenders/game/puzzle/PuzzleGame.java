@@ -18,18 +18,11 @@
  */
 package org.codedefenders.game.puzzle;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -53,9 +46,13 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
  * @see Puzzle
  */
 public class PuzzleGame extends AbstractGame {
+
     protected static final Logger logger = LoggerFactory.getLogger(PuzzleGame.class);
 
-    
+    // No args constructor for CDI
+    public PuzzleGame() {}
+
+    // Store the type explicitly for CDI
     @Override
     public Class getType() {
         return PuzzleGame.class;
