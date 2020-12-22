@@ -15,7 +15,7 @@
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
-	<version>1.9-SNAPSHOT</version>
+	<version>1.8.1</version>
 	<url>http://www.code-defenders.org/</url>
 	<inceptionYear>2016</inceptionYear>
 	<packaging>war</packaging>
