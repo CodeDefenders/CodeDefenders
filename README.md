@@ -110,3 +110,9 @@ Code Defenders is built and deployed with Maven using the following commands.
 ```bash
 mvn clean deploy -DskipTests
 ```
+
+### Supporters
+
+This project is supported [IMPRESS](https://impress-project.eu/).
+Check the [official website](https://code-defenders.org/about) for a detailed
+list of supporters.
