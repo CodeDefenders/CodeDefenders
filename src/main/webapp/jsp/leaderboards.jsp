@@ -21,7 +21,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Attributes set in the servlet --%>
-<%--@elvariable id="leaderbordEntries" type="java.util.List<org.codedefenders.game.leaderboard.Entry>"--%>
+<%--@elvariable id="leaderboardEntries" type="java.util.List<org.codedefenders.game.leaderboard.Entry>"--%>
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
@@ -41,7 +41,7 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="entry" items="${leaderbordEntries}">
+        <c:forEach var="entry" items="${leaderboardEntries}">
             <tr>
                 <td>${entry.username}</td>
                 <td>${entry.mutantsSubmitted}</td>
