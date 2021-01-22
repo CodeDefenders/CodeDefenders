@@ -54,6 +54,11 @@ public class PreviousSubmissionBean implements Serializable {
         errorLines = null;
     }
 
+    public void clearButNoMutant() {
+        testCode = null;
+        errorLines = null;
+    }
+
     // --------------------------------------------------------------------------------
 
     public boolean hasMutant() {
