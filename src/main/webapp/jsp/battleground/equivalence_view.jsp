@@ -93,7 +93,7 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
-<% previousSubmission.clearButNoMutant(); %>
+<% previousSubmission.clearButKeepMutant(); %>
 
 <%-- -------------------------------------------------------------------------------- --%>
 
