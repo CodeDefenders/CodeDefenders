@@ -162,7 +162,7 @@ public class MultiplayerGameManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        MultiplayerGame game = gameProducer.getMultiplayerGame();
+        MultiplayerGame game = gameProducer.getGame();
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
@@ -202,7 +202,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        MultiplayerGame game = gameProducer.getMultiplayerGame();
+        MultiplayerGame game = gameProducer.getGame();
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);

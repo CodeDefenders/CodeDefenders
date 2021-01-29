@@ -223,7 +223,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final boolean canJoinGames = AdminDAO.getSystemSetting(GAME_JOINING).getBoolValue();
-        final MultiplayerGame game = gameProducer.getMultiplayerGame();
+        final MultiplayerGame game = gameProducer.getGame();
 
         if (!canJoinGames) {
             logger.warn("User {} tried to join a battleground game, but joining games is not permitted.", login.getUserId());
@@ -292,7 +292,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contextPath = request.getContextPath();
-        final MultiplayerGame game = gameProducer.getMultiplayerGame();
+        final MultiplayerGame game = gameProducer.getGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
@@ -337,7 +337,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final MultiplayerGame game = gameProducer.getMultiplayerGame();
+        final MultiplayerGame game = gameProducer.getGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
@@ -368,7 +368,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final MultiplayerGame game = gameProducer.getMultiplayerGame();
+        final MultiplayerGame game = gameProducer.getGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
