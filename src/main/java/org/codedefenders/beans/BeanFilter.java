@@ -54,13 +54,13 @@ public class BeanFilter implements Filter {
         request.setAttribute("previousSubmission", previousSubmission);
 
         // Configure the GameProducer with the game associated to this request if any
-        // TODO This is a bit too generous, we should not consider /css/, /webjars/, and probably other 
+        // TODO This is a bit too generous, we should not consider /css/, /webjars/, and probably other
         // requests
         if (request instanceof HttpServletRequest) {
 
             Optional<Integer> possiblyGameId = ServletUtils.gameId((HttpServletRequest) request);
             if( possiblyGameId.isPresent() ) {
-                possiblyGameId.ifPresent(integer -> gameProducer.setTheGame(integer));
+                possiblyGameId.ifPresent(integer -> gameProducer.setGameId(integer));
             }
         }
 

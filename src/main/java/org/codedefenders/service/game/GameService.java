@@ -150,11 +150,11 @@ public class GameService implements IGameService {
     // TODO Honestly, this smells like some anti-pattern... the right service should
     // be instantiated by the CI directly
     private IGameService getGameServiceForGame(AbstractGame game) {
-        if (MultiplayerGame.class.equals(game.getType()) ) {
+        if (game instanceof MultiplayerGame) {
             return multiplayerGameService;
-        } else if (MeleeGame.class.equals(game.getType()) ) {
+        } else if (game instanceof MeleeGame) {
             return meleeGameService;
-        } else if (PuzzleGame.class.equals(game.getType()) ) {
+        } else if (game instanceof PuzzleGame) {
             return puzzleGameService;
         }
         // TODO This might require some love, like an exception...

@@ -32,7 +32,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -50,14 +49,12 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
-import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -80,6 +77,7 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -161,18 +159,19 @@ public class MeleeGameManager extends HttpServlet {
     private Configuration config;
 
     @Inject
-    @Named("MeleeGame")
-    private MeleeGame game;
+    private GameProducer gameProducer;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        MeleeGame game = gameProducer.getMeleeGAme();
+
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
         }
-        
+
         int gameId = game.getId();
         int userId = login.getUserId();
 
@@ -222,12 +221,14 @@ public class MeleeGameManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        MeleeGame game = gameProducer.getMeleeGAme();
+
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
         }
-        
+
         int gameId = game.getId();
 
         if (!game.hasUserJoined(login.getUserId())) {

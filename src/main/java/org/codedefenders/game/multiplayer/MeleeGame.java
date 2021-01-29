@@ -43,15 +43,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 
 public class MeleeGame extends AbstractGame {
 
-    // No args constructor for CDI
-    public MeleeGame() {}
-
-    // Store the type explicitly for CDI
-    @Override
-    public Class getType() {
-        return MeleeGame.class;
-    }
-    
     /*
      * Inherited from AbstractGame
      *

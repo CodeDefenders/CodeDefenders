@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -38,7 +37,6 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapProcessor;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
@@ -56,6 +54,7 @@ import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -106,8 +105,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private GameManagingUtils gameManagingUtils;
 
     @Inject
-    @Named("MeleeGame")
-    private MeleeGame game;
+    private GameProducer gameProducer;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -229,12 +227,14 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
+        MeleeGame game = gameProducer.getMeleeGAme();
+
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
         }
-        
+
         int gameId = game.getId();
 
         if (game.hasUserJoined(login.getUserId())) {
@@ -274,12 +274,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contextPath = request.getContextPath();
+        MeleeGame game = gameProducer.getMeleeGAme();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MeleeGame)) {
+        } else if (!(game instanceof MeleeGame)) {
             logger.error("Game found is no MeleeGame. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
@@ -320,11 +321,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        MeleeGame game = gameProducer.getMeleeGAme();
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MeleeGame)) {
+        } else if (!(game instanceof MeleeGame)) {
             logger.error("Game found is no MeleeGame. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
@@ -349,11 +351,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        MeleeGame game = gameProducer.getMeleeGAme();
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MeleeGame)) {
+        } else if (!(game instanceof MeleeGame)) {
             logger.error("Game found is no MeleeGame. Aborting request.");
             Redirect.redirectBack(request, response);
             return;

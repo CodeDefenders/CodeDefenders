@@ -3,9 +3,7 @@ package org.codedefenders.servlets.games;
 import java.io.Serializable;
 
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
@@ -25,40 +23,29 @@ public class GameProducer implements Serializable {
     @Inject
     private EventDAO eventDAO;
 
-    private AbstractGame theGame;
+    private AbstractGame game;
 
-    @Produces
-    @RequestScoped
-    @Named("AbstractGame")
-    public AbstractGame getTheGame() {
-        return this.theGame;
+
+    public AbstractGame getGame() {
+        return this.game;
     }
 
-    @Produces
-    @RequestScoped
-    @Named("MultiplayerGame")
-    public MultiplayerGame getTheMPGame() {
-        return (MultiplayerGame) this.theGame;
+    public MultiplayerGame getMultiplayerGame() {
+        return (MultiplayerGame) this.game;
     }
-    
-    @Produces
-    @RequestScoped
-    @Named("MeleeGame")
-    public MeleeGame getTheGameAsMeleeGame() {
-        return (MeleeGame) this.theGame;
+
+    public MeleeGame getMeleeGAme() {
+        return (MeleeGame) this.game;
     }
-    
-    @Produces
-    @RequestScoped
-    @Named("PuzzleGame")
-    public PuzzleGame getTheGameAsPuzzleGame() {
-        return (PuzzleGame) this.theGame;
+
+    public PuzzleGame getPuzzleGAme() {
+        return (PuzzleGame) this.game;
     }
-    
-    public void setTheGame(Integer gameId) {
-        this.theGame = GameDAO.getGame(gameId);
-        if (this.theGame != null) {
-            this.theGame.setEventDAO(eventDAO);
+
+    public void setGameId(Integer gameId) {
+        this.game = GameDAO.getGame(gameId);
+        if (this.game != null) {
+            this.game.setEventDAO(eventDAO);
         }
     }
 }

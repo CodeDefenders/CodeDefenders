@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -38,8 +37,6 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapProcessor;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
@@ -54,6 +51,7 @@ import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -99,10 +97,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     @Inject
     private GameManagingUtils gameManagingUtils;
 
-    @Inject  
-    @Named("MultiplayerGame")
-    private MultiplayerGame game;
-        
+    @Inject
+    private GameProducer gameProducer;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
@@ -110,7 +107,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        
+
         final String action = formType(request);
         switch (action) {
             case "createGame":
@@ -226,6 +223,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final boolean canJoinGames = AdminDAO.getSystemSetting(GAME_JOINING).getBoolValue();
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
+
         if (!canJoinGames) {
             logger.warn("User {} tried to join a battleground game, but joining games is not permitted.", login.getUserId());
             Redirect.redirectBack(request, response);
@@ -293,12 +292,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contextPath = request.getContextPath();
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MultiplayerGame)) {
+        } else if (!(game instanceof MultiplayerGame)) {
             logger.error("Game found is no MultiplayerGame. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
@@ -337,11 +337,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
+
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MultiplayerGame)) {
+        } else if (!(game instanceof MultiplayerGame)) {
             logger.error("Game found is no MultiplayerGame. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
@@ -366,11 +368,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
+
         if (game == null) {
             logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else if (!(this.game instanceof MultiplayerGame)) {
+        } else if (!(game instanceof MultiplayerGame)) {
             logger.error("Game found is no MultiplayerGame. Aborting request.");
             Redirect.redirectBack(request, response);
             return;

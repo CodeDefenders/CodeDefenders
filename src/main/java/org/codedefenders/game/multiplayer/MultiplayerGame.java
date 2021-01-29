@@ -49,16 +49,7 @@ import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
 import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGame extends AbstractGame {
-    
-    // No args constructor for CDI
-    public MultiplayerGame() {}
 
-    // Store the type explicitly for CDI
-    @Override
-    public Class getType() {
-        return MultiplayerGame.class;
-    }
-    
     /*
      * Inherited from AbstractGame
      *

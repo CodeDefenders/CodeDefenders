@@ -145,7 +145,7 @@ public class PuzzleGameManager extends HttpServlet {
         boolean fromGameId = gameIdOpt.isPresent(); // else from puzzleId
         if (fromGameId) {
             final int gameId = gameIdOpt.get();
-            gameProducer.setTheGame(gameId);
+            gameProducer.setGameId(gameId);
             game = PuzzleDAO.getPuzzleGameForId(gameId);
 
             if (game == null) {
@@ -178,7 +178,7 @@ public class PuzzleGameManager extends HttpServlet {
                 createGame(login.getUserId(), request, response);
                 return;
             } else {
-                gameProducer.setTheGame(game.getId());
+                gameProducer.setGameId(game.getId());
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 game.setEventDAO(eventDAO);
             }

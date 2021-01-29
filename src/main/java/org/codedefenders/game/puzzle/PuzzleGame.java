@@ -49,14 +49,6 @@ public class PuzzleGame extends AbstractGame {
 
     protected static final Logger logger = LoggerFactory.getLogger(PuzzleGame.class);
 
-    // No args constructor for CDI
-    public PuzzleGame() {}
-
-    // Store the type explicitly for CDI
-    @Override
-    public Class getType() {
-        return PuzzleGame.class;
-    }
     /*
      * Attributes from AbstractGame protected int id; protected int classId;
      * protected int creatorId; protected GameState state; protected GameLevel

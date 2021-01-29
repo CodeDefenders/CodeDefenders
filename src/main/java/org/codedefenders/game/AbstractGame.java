@@ -61,8 +61,6 @@ public abstract class AbstractGame {
     public abstract boolean insert();
 
     public abstract boolean update();
-    
-    public abstract Class getType();
 
     // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
     // Consider to move this into a setEvents method instead !
