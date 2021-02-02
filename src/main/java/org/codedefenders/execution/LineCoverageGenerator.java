@@ -37,7 +37,6 @@ import org.jacoco.core.analysis.ICounter;
 import org.jacoco.core.analysis.ILine;
 import org.jacoco.core.data.ExecutionDataStore;
 import org.jacoco.core.tools.ExecFileLoader;
-import org.objectweb.asm.ClassReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +88,7 @@ public class LineCoverageGenerator {
         final Pattern innerClassPatter = Pattern.compile(regex);
         for (File classFile : classFileFolder.listFiles((dir, name) -> innerClassPatter.matcher(name).matches())) {
             try {
-                analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
+                analyzer.analyzeClass(new FileInputStream(classFile), "");
             } catch (IOException e) {
                 logger.error("Failed to analyze file: " + classFile + ". Returning empty LineCoverage.", e);
                 return new LineCoverage();
