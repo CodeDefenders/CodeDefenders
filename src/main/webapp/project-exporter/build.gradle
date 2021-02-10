@@ -3,9 +3,8 @@ group 'org.codefenders'
 
 apply plugin: 'java'
 
-compileJava {
-    options.release = 11
-}
+sourceCompatibility = 11
+targetCompatibility = 11
 
 sourceSets {
     main {
