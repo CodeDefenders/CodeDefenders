@@ -7,6 +7,7 @@
 		<powermock.version>2.0.9</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
 		<slf4j.version>1.7.20</slf4j.version>
+		<source.target.version>${java.specification.version}</source.target.version>
 
 		<config.properties>config.properties</config.properties>
 	</properties>
@@ -32,7 +33,9 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
-					<release>11</release>
+					<source>${source.target.version}</source>
+					<target>${source.target.version}</target>
+					<!--<release>11</release>-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -118,6 +121,21 @@
 									<property>tomcat.path</property>
 									<message>Tomcat deploy path is missing</message>
 								</requireProperty>
+							</rules>
+						</configuration>
+					</execution>
+					<execution>
+						<id>java-version-used</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireJavaVersion>
+									<version>[1.8,9),[11,12)</version>
+									<message>Project requires JDK 8 or 11</message>
+								</requireJavaVersion>
 							</rules>
 						</configuration>
 					</execution>
