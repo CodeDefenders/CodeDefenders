@@ -109,6 +109,7 @@ public class AdminSystemSettings extends HttpServlet {
                 return "HTML formatted text shown in the site notice. This is mandatory in many regions.";
             }
         },
+        //TODO: Remove Privacy notice
         PRIVACY_NOTICE {
             @Override
             public String toString() {

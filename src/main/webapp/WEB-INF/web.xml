@@ -138,6 +138,15 @@
 	</servlet>
 
 	<servlet-mapping>
+		<servlet-name>ImprintPage</servlet-name>
+		<url-pattern>/imprint</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>ImprintPage</servlet-name>
+		<jsp-file>/jsp/imprint.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
 		<servlet-name>StudyOverview</servlet-name>
 		<url-pattern>/study</url-pattern>
 	</servlet-mapping>

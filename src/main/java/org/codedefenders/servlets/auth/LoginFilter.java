@@ -119,7 +119,8 @@ public class LoginFilter implements Filter {
                 || path.endsWith(context + Paths.LOGIN) || path.endsWith(context + Paths.HELP_PAGE)
                 || path.endsWith(context + "/video") || path.endsWith(context + "/video.mp4")
                 || path.contains(context + "/papers") || path.endsWith(context + Paths.API_SEND_EMAIL)
-                || path.endsWith(context + Paths.ABOUT_PAGE) || path.endsWith(context + Paths.CONTACT_PAGE)) {
+                || path.endsWith(context + Paths.ABOUT_PAGE) || path.endsWith(context + Paths.CONTACT_PAGE)
+                || path.endsWith(context + Paths.IMPRINT_PAGE)) {
             return false;
         }
 
