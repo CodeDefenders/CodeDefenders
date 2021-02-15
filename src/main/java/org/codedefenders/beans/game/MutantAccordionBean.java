@@ -142,9 +142,8 @@ public class MutantAccordionBean {
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()
-                // It is important that its HashMap.class, it doesn't work if I change it to Map.class …
-                .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
                 .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .create();
         return gson.toJson(mutants);
     }
