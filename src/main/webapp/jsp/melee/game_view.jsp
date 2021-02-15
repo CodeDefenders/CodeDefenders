@@ -78,7 +78,7 @@
 <%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
-<jsp:include page="/jsp/melee/player_feedback.jsp"/>
+<jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
