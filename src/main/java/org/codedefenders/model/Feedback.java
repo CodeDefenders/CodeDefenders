@@ -27,9 +27,10 @@ import java.util.List;
  */
 public class Feedback {
 
-    public static List<Type> types = Collections.unmodifiableList(Arrays.asList(Type.values()));
     public static final int MAX_RATING = 5;
     public static final int MIN_RATING = -1;
+
+    public static final List<Type> types = Collections.unmodifiableList(Arrays.asList(Type.values()));
 
     public enum Type {
         CUT_MUTATION_DIFFICULTY("Mutation Difficulty", "The class under test is difficult to mutate"),
@@ -39,6 +40,26 @@ public class Feedback {
         ATTACKER_FAIRNESS("Attacker Fairness", "The attacking team is playing fair"),
         DEFENDER_FAIRNESS("Defender Fairness", "The defending team is playing fair"),
         GAME_ENGAGING("Game Engaging", "The game is engaging");
+
+        public static final List<Type> ATTACKER_TYPES = Arrays.asList(
+                Type.CUT_MUTATION_DIFFICULTY,
+                Type.DEFENDER_COMPETENCE,
+                Type.DEFENDER_FAIRNESS,
+                Type.GAME_ENGAGING
+        );
+
+        public static final List<Type> DEFENDER_TYPES = Arrays.asList(
+                Type.CUT_TEST_DIFFICULTY,
+                Type.ATTACKER_COMPETENCE,
+                Type.ATTACKER_FAIRNESS,
+                Type.GAME_ENGAGING
+        );
+
+        public static final List<Type> PLAYER_TYPES = Arrays.asList(
+                Type.CUT_MUTATION_DIFFICULTY,
+                Type.CUT_TEST_DIFFICULTY,
+                Type.GAME_ENGAGING
+        );
 
         String displayName;
         String description;

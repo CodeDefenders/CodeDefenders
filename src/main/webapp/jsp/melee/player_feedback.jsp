@@ -114,10 +114,7 @@
 
                         <%
                             List<Integer> ratings = playerFeedback.getOwnRatings();
-                            for (Type f : Feedback.types) {
-                                if (!playerFeedback.isRatingForRole(f)) {
-                                    continue;
-                                }
+                            for (Type f : playerFeedback.getAvailableFeedbackTypes()) {
                                 int oldValue = ratings.isEmpty() ? -1 : ratings.get(f.ordinal());
                         %>
 
@@ -196,9 +193,9 @@
                         <td><%=player.getUser().getUsername()%></td>
                         <%
                             for (Type f : Type.values()) {
-                                
+
                                 if( ! (f == Type.GAME_ENGAGING || f == Type.CUT_MUTATION_DIFFICULTY || f == Type.CUT_TEST_DIFFICULTY )){ continue; }
-                                
+
                                 int ratingValue = ratings.get(f.ordinal());
                                 if (ratingValue < 1) {
                         %>
@@ -231,9 +228,9 @@
                         <%
                             List<Double> averageRatings = playerFeedback.getAverageRatings();
                             for (Type f : Feedback.types) {
-                                
+
                                 if( ! (f == Type.GAME_ENGAGING || f == Type.CUT_MUTATION_DIFFICULTY || f == Type.CUT_TEST_DIFFICULTY )){ continue; }
-                                
+
                                 double ratingValue = averageRatings.isEmpty() ? -1 : averageRatings.get(f.ordinal());
                                 if (ratingValue < 1) {
                         %>

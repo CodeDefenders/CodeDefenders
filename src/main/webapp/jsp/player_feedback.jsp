@@ -114,10 +114,7 @@
 
                         <%
                             List<Integer> ratings = playerFeedback.getOwnRatings();
-                            for (Type f : Feedback.types) {
-                                if (!playerFeedback.isRatingForRole(f)) {
-                                    continue;
-                                }
+                            for (Type f : playerFeedback.getAvailableFeedbackTypes()) {
                                 int oldValue = ratings.isEmpty() ? -1 : ratings.get(f.ordinal());
                         %>
 

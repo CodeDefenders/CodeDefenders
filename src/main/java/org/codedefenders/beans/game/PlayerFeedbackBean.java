@@ -1,5 +1,7 @@
 package org.codedefenders.beans.game;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
@@ -36,6 +39,8 @@ public class PlayerFeedbackBean {
     private Map<Player, List<Integer>> ratingsPerPlayer;
     private List<Double> averageRatings;
 
+    private List<Type> availableFeedbackTypes;
+
     public PlayerFeedbackBean() {
         gameId = null;
         creatorId = null;
@@ -46,6 +51,8 @@ public class PlayerFeedbackBean {
         ownRatings = null;
         ratingsPerPlayer = null;
         averageRatings = null;
+
+        availableFeedbackTypes = Collections.emptyList();
     }
 
     public void setGameInfo(int gameId, int creatorId) {
@@ -76,41 +83,6 @@ public class PlayerFeedbackBean {
         return user.getId() == creatorId || showFeedbackEnabled;
     }
 
-    public boolean isRatingForRole(Type type) {
-        switch (role) {
-            case DEFENDER:
-                switch (type) {
-                    case CUT_MUTATION_DIFFICULTY:
-                    case DEFENDER_FAIRNESS:
-                    case DEFENDER_COMPETENCE:
-                        return false;
-                    default:
-                        return true;
-                }
-            case ATTACKER:
-                switch (type) {
-                    case CUT_TEST_DIFFICULTY:
-                    case ATTACKER_FAIRNESS:
-                    case ATTACKER_COMPETENCE:
-                        return false;
-                    default:
-                        return true;
-                }
-            case PLAYER:
-                switch (type) {
-                    case DEFENDER_FAIRNESS:
-                    case DEFENDER_COMPETENCE:
-                    case ATTACKER_FAIRNESS:
-                    case ATTACKER_COMPETENCE:
-                return false;
-            default:
-                return true;
-        }
-            default:
-                return true;
-        }
-    }
-
     public List<Integer> getOwnRatings() {
         if (ownRatings == null) {
             ownRatings = FeedbackDAO.getFeedbackValues(gameId, user.getId());
@@ -133,5 +105,29 @@ public class PlayerFeedbackBean {
             averageRatings = FeedbackDAO.getAverageGameRatings(gameId);
         }
         return averageRatings;
+    }
+
+    public void setAvailableFeedbackTypesForRole(Role role) {
+        switch (role) {
+            case ATTACKER:
+                availableFeedbackTypes = Type.ATTACKER_TYPES;
+                break;
+            case DEFENDER:
+                availableFeedbackTypes = Type.DEFENDER_TYPES;
+                break;
+            case PLAYER:
+                availableFeedbackTypes = Type.PLAYER_TYPES;
+                break;
+            case OBSERVER:
+                availableFeedbackTypes = Feedback.types;
+                break;
+            case NONE:
+                availableFeedbackTypes = Collections.emptyList();
+                break;
+        }
+    }
+
+    public List<Type> getAvailableFeedbackTypes() {
+        return availableFeedbackTypes;
     }
 }
