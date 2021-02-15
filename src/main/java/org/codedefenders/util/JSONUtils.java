@@ -62,6 +62,11 @@ public class JSONUtils {
             @Override
             @SuppressWarnings("unchecked")
             public void write(JsonWriter jsonWriter, Map<K, V> map) throws IOException {
+                if (map == null) {
+                    jsonWriter.nullValue();
+                    return;
+                }
+
                 jsonWriter.beginArray();
                 if (!map.isEmpty()) {
                     Map.Entry<K, V> firstEntry = map.entrySet().iterator().next();
