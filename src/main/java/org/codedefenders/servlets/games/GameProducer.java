@@ -11,17 +11,16 @@ import org.codedefenders.game.AbstractGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// https://stackoverflow.com/questions/28855122/how-to-inject-a-http-session-attribute-to-a-bean-using-cdi
-@RequestScoped // This is for injecting the GameProducer into the filter the sets it up
+@RequestScoped
 public class GameProducer implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(GameProducer.class);
 
     @Inject
     private EventDAO eventDAO;
 
-    private Integer gameId;
-
-    private AbstractGame game;
+    private Integer gameId = null;
+    private AbstractGame game = null;
+    private boolean gameQueried = false;
 
     /**
      * Tries to find a game for the former set gameId {@link #setGameId(Integer)} and cast it to the required type.
@@ -33,7 +32,8 @@ public class GameProducer implements Serializable {
         if (gameId == null) {
             return null;
         }
-        if (game == null) {
+        if (game == null && !gameQueried) {
+            gameQueried = true;
             game = GameDAO.getGame(gameId);
             if (game != null) {
                 game.setEventDAO(eventDAO);
