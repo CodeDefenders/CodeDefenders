@@ -32,7 +32,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.FeedbackDAO;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -76,11 +80,19 @@ public class FeedbackManager extends HttpServlet {
     }
 
     private boolean saveFeedback(HttpServletRequest request, int userId, int gameId) {
+        Role role = DatabaseAccess.getRole(userId, gameId);
+        List<Feedback.Type> allowedFeedbackTypes = Feedback.Type.getFeedbackTypesForRole(role);
+
         List<Integer> ratingsList = new ArrayList<>();
         for (Feedback.Type f : Feedback.Type.values()) {
-            String rating = request.getParameter("rating" + f.name());
-            ratingsList.add(rating == null ? 0 : Integer.parseInt(rating));
+            if (allowedFeedbackTypes.contains(f)) {
+                String rating = request.getParameter("rating" + f.name());
+                ratingsList.add(rating == null ? 0 : Integer.parseInt(rating));
+            } else {
+                ratingsList.add(0);
+            }
         }
+
         return FeedbackDAO.storeFeedback(gameId, userId, ratingsList);
     }
 }

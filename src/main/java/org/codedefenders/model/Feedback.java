@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.codedefenders.game.Role;
+
 /**
  * This class contains static constants for feedback and the {@link Type feedback type}.
  */
@@ -75,6 +77,23 @@ public class Feedback {
 
         public String description() {
             return description;
+        }
+
+        public static List<Type> getFeedbackTypesForRole(Role role) {
+            switch (role) {
+                case ATTACKER:
+                    return ATTACKER_TYPES;
+                case DEFENDER:
+                    return DEFENDER_TYPES;
+                case PLAYER:
+                    return PLAYER_TYPES;
+                case OBSERVER:
+                    return TYPES;
+                case NONE:
+                    return Collections.emptyList();
+                default:
+                    throw new IllegalArgumentException("Unknown role: " + role);
+            }
         }
     }
 

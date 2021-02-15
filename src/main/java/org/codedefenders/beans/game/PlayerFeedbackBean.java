@@ -106,23 +106,7 @@ public class PlayerFeedbackBean {
     }
 
     public void setAvailableFeedbackTypesForRole(Role role) {
-        switch (role) {
-            case ATTACKER:
-                availableFeedbackTypes = Type.ATTACKER_TYPES;
-                break;
-            case DEFENDER:
-                availableFeedbackTypes = Type.DEFENDER_TYPES;
-                break;
-            case PLAYER:
-                availableFeedbackTypes = Type.PLAYER_TYPES;
-                break;
-            case OBSERVER:
-                availableFeedbackTypes = Type.TYPES;
-                break;
-            case NONE:
-                availableFeedbackTypes = Collections.emptyList();
-                break;
-        }
+        availableFeedbackTypes = Type.getFeedbackTypesForRole(role);
     }
 
     public List<Type> getAvailableFeedbackTypes() {
