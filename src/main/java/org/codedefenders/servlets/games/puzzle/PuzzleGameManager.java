@@ -103,7 +103,6 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  * <p>Serves under {@code /puzzlegame}.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
- * @see PuzzleGameSelectionManager
  * @see PuzzleGame
  */
 @WebServlet(org.codedefenders.util.Paths.PUZZLE_GAME)
@@ -131,8 +130,6 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private EventDAO  eventDAO;
 
-    // TODO I have no idea why this is accessed here, so I will not change this code
-    // but smells fishy.... GameProducer is something that should not be used explicitly...
     @Inject
     private GameProducer gameProducer;
 
