@@ -30,8 +30,6 @@ public class Feedback {
     public static final int MAX_RATING = 5;
     public static final int MIN_RATING = -1;
 
-    public static final List<Type> types = Collections.unmodifiableList(Arrays.asList(Type.values()));
-
     public enum Type {
         CUT_MUTATION_DIFFICULTY("Mutation Difficulty", "The class under test is difficult to mutate"),
         CUT_TEST_DIFFICULTY("Test Difficulty", "The class under test is difficult to test"),
@@ -40,6 +38,8 @@ public class Feedback {
         ATTACKER_FAIRNESS("Attacker Fairness", "The attacking team is playing fair"),
         DEFENDER_FAIRNESS("Defender Fairness", "The defending team is playing fair"),
         GAME_ENGAGING("Game Engaging", "The game is engaging");
+
+        public static final List<Type> TYPES = Collections.unmodifiableList(Arrays.asList(values()));
 
         public static final List<Type> ATTACKER_TYPES = Arrays.asList(
                 Type.CUT_MUTATION_DIFFICULTY,

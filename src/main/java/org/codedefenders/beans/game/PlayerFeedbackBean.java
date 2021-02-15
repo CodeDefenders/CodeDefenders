@@ -1,6 +1,5 @@
 package org.codedefenders.beans.game;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
@@ -119,7 +117,7 @@ public class PlayerFeedbackBean {
                 availableFeedbackTypes = Type.PLAYER_TYPES;
                 break;
             case OBSERVER:
-                availableFeedbackTypes = Feedback.types;
+                availableFeedbackTypes = Type.TYPES;
                 break;
             case NONE:
                 availableFeedbackTypes = Collections.emptyList();

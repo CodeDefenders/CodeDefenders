@@ -222,7 +222,7 @@
                         <td>Average</td>
                         <%
                             List<Double> averageRatings = playerFeedback.getAverageRatings();
-                            for (Type f : Feedback.types) {
+                            for (Type f : Type.TYPES) {
                                 double ratingValue = averageRatings.isEmpty() ? -1 : averageRatings.get(f.ordinal());
                                 if (ratingValue < 1) {
                         %>

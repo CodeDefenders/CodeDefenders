@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import static org.codedefenders.model.Feedback.MAX_RATING;
 import static org.codedefenders.model.Feedback.MIN_RATING;
 import static org.codedefenders.model.Feedback.Type;
-import static org.codedefenders.model.Feedback.types;
+import static org.codedefenders.model.Feedback.Type.TYPES;
 
 public class FeedbackDAO {
 
@@ -41,7 +41,7 @@ public class FeedbackDAO {
     public static boolean storeFeedback(int gameId, int userId, List<Integer> ratingsList) {
         StringBuilder bob = new StringBuilder("INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ");
 
-        if (ratingsList.size() > types.size() || ratingsList.size() < 1) {
+        if (ratingsList.size() > TYPES.size() || ratingsList.size() < 1) {
             return false;
         }
 
@@ -52,7 +52,7 @@ public class FeedbackDAO {
             List<DatabaseValue> valueList = Arrays.asList(
                     DatabaseValue.of(userId),
                     DatabaseValue.of(gameId),
-                    DatabaseValue.of(types.get(i).name()),
+                    DatabaseValue.of(TYPES.get(i).name()),
                     DatabaseValue.of(boundedValue)
             );
             allValuesList.addAll(valueList);
@@ -66,7 +66,7 @@ public class FeedbackDAO {
     }
 
     public static List<Integer> getFeedbackValues(int gameId, int userId) {
-        List<Integer> values = Stream.generate(() -> -1).limit(types.size()).collect(Collectors.toList());
+        List<Integer> values = Stream.generate(() -> -1).limit(TYPES.size()).collect(Collectors.toList());
 
         final String query = String.join("\n",
                 "SELECT value, type",
@@ -76,7 +76,7 @@ public class FeedbackDAO {
 
         DB.RSMapper<Boolean> mapper = rs -> {
             String typeString = rs.getString("type");
-            if (types.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+            if (TYPES.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
                 int index = Type.valueOf(typeString).ordinal();
                 values.set(index, rs.getInt("value"));
             } else {
@@ -94,7 +94,7 @@ public class FeedbackDAO {
     }
 
     public static List<Double> getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
-        List<Double> values = DoubleStream.generate(() -> -1.0).limit(types.size())
+        List<Double> values = DoubleStream.generate(() -> -1.0).limit(TYPES.size())
                 .boxed()
                 .collect(Collectors.toList());
 
@@ -107,7 +107,7 @@ public class FeedbackDAO {
 
         DB.RSMapper<Boolean> mapper = rs -> {
             String typeString = rs.getString("type");
-            if (types.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+            if (TYPES.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
                 int index = Type.valueOf(typeString).ordinal();
                 values.set(index, rs.getDouble("average"));
             } else {

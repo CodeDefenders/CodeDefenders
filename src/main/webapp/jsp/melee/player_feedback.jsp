@@ -227,7 +227,7 @@
                         <td>Average</td>
                         <%
                             List<Double> averageRatings = playerFeedback.getAverageRatings();
-                            for (Type f : Feedback.types) {
+                            for (Type f : Type.TYPES) {
 
                                 if( ! (f == Type.GAME_ENGAGING || f == Type.CUT_MUTATION_DIFFICULTY || f == Type.CUT_TEST_DIFFICULTY )){ continue; }
 
