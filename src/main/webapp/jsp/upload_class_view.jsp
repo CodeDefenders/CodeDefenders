@@ -87,17 +87,15 @@
                                 If the class under test has dependencies, you can upload them here.
                             </span>
                             <ul style="margin-top: .5em;">
-                                <li>The dependencies are uploaded inside of a <code>zip</code> file.</li>
+                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
                                 <li>Dependencies may contain packages.</li>
-                                <li>The folder structure inside the <code>zip</code> file is irrelevant.</li>
                             </ul>
                             <span>Example:</span>
 <pre>deps
-`-- lift
-    |-- Floor.java
-    `-- floors
-        |-- BasementFloor.java
-        `-- NormalFloor.java</pre>
+&#x251c;&#x2500; Event.java
+&#x2514;&#x2500; events
+    &#x251c;&#x2500; StartEvent.java
+    &#x2514;&#x2500; StopEvent.java</pre>
                         </div>
                         <div>
                             <h3>Upload Mutants (optional)</h3>
@@ -109,16 +107,15 @@
                                 Mutants uploaded with a class under test can be used to initialize games with existing mutants.
                             </span>
                             <ul style="margin-top: .5em;">
-                                <li>The mutants are uploaded inside of a <code>zip</code> file.</li>
+                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
                                 <li>All mutants must have the same class name as the class under test.</li>
-                                <li>The folder structure inside the <code>zip</code> file is irrelevant.</li>
                             </ul>
                             <span>Example:</span>
 <pre>mutants
-|-- 01
-|   `-- Lift.java
-`-- 02
-    `-- Lift.java</pre>
+&#x251c;&#x2500; 01
+&#x2502;   &#x2514;&#x2500; EventBus.java
+&#x2514;&#x2500; 02
+    &#x2514;&#x2500; EventBus.java</pre>
                         </div>
                         <div>
                             <h3>Upload Tests (optional)</h3>
@@ -130,16 +127,15 @@
                                 Tests uploaded with a class under test can be used to initialize games with existing tests.
                             </span>
                             <ul style="margin-top: .5em;">
-                                <li>The tests are uploaded inside of a <code>zip</code> file.</li>
+                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
                                 <li>Multiple tests can have the same name, but they don't have to.</li>
-                                <li>The folder structure inside the <code>zip</code> file is irrelevant.</li>
                             </ul>
                             <span>Example:</span>
 <pre>tests
-|-- 01
-|   `-- TestLift.java
-`-- 02
-    `-- TestLift.java</pre>
+&#x251c;&#x2500; 01
+&#x2502;   &#x2514;&#x2500; TestEventBus.java
+&#x2514;&#x2500; 02
+    &#x2514;&#x2500; TestEventBus.java</pre>
                         </div>
                         <br>
                         <input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
