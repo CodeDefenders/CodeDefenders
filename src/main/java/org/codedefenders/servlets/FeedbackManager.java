@@ -19,8 +19,8 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -34,8 +34,6 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.FeedbackDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.servlets.util.Redirect;
@@ -81,18 +79,25 @@ public class FeedbackManager extends HttpServlet {
 
     private boolean saveFeedback(HttpServletRequest request, int userId, int gameId) {
         Role role = DatabaseAccess.getRole(userId, gameId);
-        List<Feedback.Type> allowedFeedbackTypes = Feedback.Type.getFeedbackTypesForRole(role);
+        Map<Feedback.Type, Integer> ratings = new HashMap<>();
 
-        List<Integer> ratingsList = new ArrayList<>();
-        for (Feedback.Type f : Feedback.Type.values()) {
-            if (allowedFeedbackTypes.contains(f)) {
-                String rating = request.getParameter("rating" + f.name());
-                ratingsList.add(rating == null ? 0 : Integer.parseInt(rating));
-            } else {
-                ratingsList.add(0);
+        for (Feedback.Type ratingType : Feedback.Type.getFeedbackTypesForRole(role)) {
+
+            String ratingString = request.getParameter("rating" + ratingType.name());
+            if (ratingString == null) {
+                continue;
+            }
+
+            try {
+                int rating = Integer.parseInt(ratingString);
+                ratings.put(ratingType, rating);
+
+            } catch (NumberFormatException e) {
+                // Ignore invalid ratings.
+                logger.warn("Invalid rating value: '" + ratingString + "'.");
             }
         }
 
-        return FeedbackDAO.storeFeedback(gameId, userId, ratingsList);
+        return FeedbackDAO.storeFeedback(gameId, userId, ratings);
     }
 }

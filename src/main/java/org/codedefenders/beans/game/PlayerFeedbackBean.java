@@ -12,6 +12,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
@@ -21,8 +22,6 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
  * <p>Provides data for the player feedback game component.</p>
  * <p>Bean Name: {@code playerFeedback}</p>
  */
-// TODO: Put some of this logic into the FeedbackDAO methods. This is a mess.
-// TODO: Also work with maps of feedback values instead of lists.
 @ManagedBean
 @RequestScoped
 public class PlayerFeedbackBean {
@@ -33,9 +32,9 @@ public class PlayerFeedbackBean {
 
     private Boolean showFeedbackEnabled;
 
-    private List<Integer> ownRatings;
-    private Map<Player, List<Integer>> ratingsPerPlayer;
-    private List<Double> averageRatings;
+    private Map<Feedback.Type, Integer> ownRatings;
+    private Map<Feedback.Type, Double> averageRatings;
+    private Map<Player, Map<Feedback.Type, Integer>> ratingsPerPlayer;
 
     private List<Type> availableFeedbackTypes;
 
@@ -81,14 +80,14 @@ public class PlayerFeedbackBean {
         return user.getId() == creatorId || showFeedbackEnabled;
     }
 
-    public List<Integer> getOwnRatings() {
+    public Map<Feedback.Type, Integer> getOwnRatings() {
         if (ownRatings == null) {
             ownRatings = FeedbackDAO.getFeedbackValues(gameId, user.getId());
         }
         return ownRatings;
     }
 
-    public Map<Player, List<Integer>> getAllRatings() {
+    public Map<Player, Map<Feedback.Type, Integer>> getAllRatings() {
         if (ratingsPerPlayer == null) {
             ratingsPerPlayer = new HashMap<>();
             for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
@@ -98,7 +97,7 @@ public class PlayerFeedbackBean {
         return ratingsPerPlayer;
     }
 
-    public List<Double> getAverageRatings() {
+    public Map<Feedback.Type, Double> getAverageRatings() {
         if (averageRatings == null) {
             averageRatings = FeedbackDAO.getAverageGameRatings(gameId);
         }
