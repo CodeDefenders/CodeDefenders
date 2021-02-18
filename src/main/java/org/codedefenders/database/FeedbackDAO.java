@@ -102,28 +102,34 @@ public class FeedbackDAO {
         return avgRatings;
     }
 
-    private static List<Double> getAverageClassDifficultyRatings(Type feedbackType)
+    private static Map<Integer, Double> getAverageClassDifficultyRatings(Type feedbackType)
             throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT",
-                "  IFNULL(AVG(value), -1)   AS 'average',",
-                "  c.Class_ID,",
-                "  COUNT(value) AS 'votes'",
-                "FROM (SELECT * FROM ratings WHERE type = ? AND value > 0) as filteredRatings",
-                "RIGHT JOIN games g ON filteredRatings.Game_ID = g.ID",
-                "RIGHT JOIN classes c ON g.Class_ID = c.Class_ID",
-                "GROUP BY c.Class_ID ORDER BY c.Class_ID;");
+        Map<Integer, Double> avgClassRatings = new HashMap<>();
 
-        return DB.executeQueryReturnList(query, rs -> rs.getDouble(1), DatabaseValue.of(feedbackType.name()));
+        String query = String.join("\n",
+                "SELECT AVG(ratings.value) AS 'average',",
+                "       games.Class_ID AS classId,",
+                "       COUNT(ratings.value) AS 'votes'",
+                "FROM ratings, games",
+                "WHERE ratings.Game_ID = games.ID",
+                "  AND ratings.type = ?",
+                "  AND ratings.value > 0",
+                "GROUP BY games.Class_ID;");
+
+        DB.executeQueryReturnList(query,
+                rs -> avgClassRatings.put(
+                        rs.getInt("classId"),
+                        rs.getDouble("average")),
+                DatabaseValue.of(feedbackType.name()));
+
+        return avgClassRatings;
     }
 
-    // TODO Phil 28/12/18: pretty sure this doesn't result in the wanted behavior.
-    //  This is ordered, but when trying to map to classes, the classes aren't ordered so the mapping just disappears.
-    public static List<Double> getAverageMutationDifficulties() {
+    public static Map<Integer, Double> getAverageMutationDifficulties() {
         return getAverageClassDifficultyRatings(Type.CUT_MUTATION_DIFFICULTY);
     }
 
-    public static List<Double> getAverageTestDifficulties() {
+    public static Map<Integer, Double> getAverageTestDifficulties() {
         return getAverageClassDifficultyRatings(Type.CUT_TEST_DIFFICULTY);
     }
 }
