@@ -137,14 +137,6 @@ span.defenderTotal {
 	background-color: #fafafa;
 }
 
-body {
-	padding-top: 0px;
-	padding-left: 0px;
-	padding-right: 0px;
-	margin-bottom: 100px; /* footer height */
-	width: 100%;
-}
-
 .btn-diff, .btn-right {
 	float: right;
 }

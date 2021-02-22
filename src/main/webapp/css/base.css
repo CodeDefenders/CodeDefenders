@@ -20,7 +20,6 @@
   margin: 10px;
   margin-bottom: 30px;
   width:calc(100% - 20px);
-  position: absolute;
   overflow: hidden;
   background: #fafafa;
   margin-bottom: 50px;
@@ -477,7 +476,23 @@ Blue dropdown menus. Didn't look so great.
     background-color: #54c4f8;
     color: white;
 }
+*/
+
+/*
+ * Set footer position to the bottom of the screen.
+ * https://css-tricks.com/couple-takes-sticky-footer/
  */
-
-
-
+html, body {
+    height: 100%;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+#content {
+    flex: 1 0 auto;
+}
+#footer {
+    flex-shrink: 0;
+    margin: 0;
+}

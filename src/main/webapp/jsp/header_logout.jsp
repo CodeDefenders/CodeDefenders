@@ -56,4 +56,6 @@
     </div>
 </nav>
 
+<div id="content">
+
 <jsp:include page="/jsp/messages.jsp"/>
