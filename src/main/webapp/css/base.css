@@ -370,10 +370,6 @@ a.tile {
   transform: rotateY(-180deg);
 }
 
-a {
-  color: #00bcd4;
-  text-decoration: none;
-}
 a:hover {
   color: #4dd0e1;
   text-decoration: underline;
@@ -403,3 +399,85 @@ ul {
 .btn-ssm {
   padding: 1px 4px;
 }
+
+/* Background color. */
+body {
+    background-color: #fafafa;
+}
+
+/* Navbar style. */
+
+/* General look of the navbar. */
+.navbar-cd {
+    background-color: #03a9f4;
+    border-radius: 0;
+    border: none;
+}
+
+/* Background and color of the Logo + Name. */
+.navbar-cd .navbar-brand {
+    color: white;
+}
+.navbar-cd .navbar-brand:hover,
+.navbar-cd .navbar-brand:focus {
+    background-color: #29b6f6;
+}
+
+/* Background and color of header entries. */
+.navbar-cd .navbar-nav > li > a {
+    color: white;
+}
+.navbar-cd .navbar-nav > li > a:hover,
+.navbar-cd .navbar-nav > li > a:focus {
+    background-color: #29b6f6;
+}
+
+/* Background and color of open dropdowns. */
+.navbar-cd .navbar-nav > .dropdown.open > a {
+    background-color: #29b6f6;
+    color: white;
+}
+
+/* Background and color dropdowns in collapsed mode. */
+@media (max-width: 767px) {
+    .navbar-cd .navbar-nav .open .dropdown-menu > li > a {
+        color: white;
+    }
+    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:focus,
+    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:hover {
+        background-color: #29b6f6;
+    }
+    .navbar-cd .navbar-nav .open .dropdown-menu .divider {
+        background-color: #54c4f8;
+    }
+}
+
+/* "Toggle header" button color in collapsed mode. */
+.navbar-cd .navbar-toggle .icon-bar {
+    background-color: white;
+}
+
+/*
+Blue dropdown menus. Didn't look so great.
+
+.navbar-cd .dropdown-menu {
+    background-color: #29b6f6;
+    border-top: none;
+    box-shadow: none;
+}
+
+.navbar-cd .dropdown-menu > li > a {
+    color: white;
+}
+.navbar-cd .dropdown-menu > li > a:hover {
+    background-color: #54c4f8;
+    color: white;
+}
+.navbar-cd .dropdown-menu > li > a:focus {
+    background-color: #54c4f8;
+    color: white;
+}
+ */
+
+
+

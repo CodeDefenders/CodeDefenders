@@ -351,54 +351,6 @@ img.displayed {
 	width:700px;
 }
 
-img.logo {
-    max-width:40px;
-}
-
-nav {
-    text-align:center;
-}
-
-nav ul {
-    margin: 0;
-    padding: 0;
-    display:inline-block;
-    list-style: none;
-    border-bottom: 1px solid #ccc;
-    border-top: 1px solid #ccc;
-}
-nav li {
-    margin: 0;
-    display:inline-block;
-}
-nav li a {
-    display: block;
-    padding: 5px 5px;
-    font-size: 13px;
-    text-decoration: none;
-}
-
-.navbar-right {
-	padding-right: 10px;
-}
-
-.navbar-brand {
-    padding-top: 0px;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 0px;
-}
-
-.navbar-nav {
-	float: none;
-	margin: 0 auto;
-}
-
-.navbar-text {
-	margin-top: 5px;
-	margin-bottom: 5px;
-}
-
 /* Link styles (used on .masthead-links as well) */
 .jumbotron a {
 	color: #000;
