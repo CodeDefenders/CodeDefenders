@@ -33,13 +33,13 @@
 <script>
 (function () {
 
-    let notificationCount = 0;
+    let count = 0;
 
     var updateUserNotifications = function (url) {
         $.getJSON(url, function (r) {
             $(r).each(function (index) {
                 if (r[index].eventStatus === 'NEW') {
-                    notificationCount++;
+                    count++;
                 }
 
                 const userDropdown = document.getElementById('user-dropdown');
@@ -54,10 +54,18 @@
                 userDropdown.appendChild(li);
             });
 
-            if (notificationCount > 0) {
-                document.getElementById('notification-count').innerText = notificationCount;
-                document.getElementById('notification-count').style.display = null;
-                document.getElementById('notification-separator').style.display = null;
+            const notificationCount = document.getElementById('notification-count');
+            const notificationSeparator = document.getElementById('notification-separator')
+            notificationCount.innerText = count;
+
+            if (count > 0) {
+                notificationCount.classList.remove('label-default');
+                notificationCount.classList.add('label-warning');
+                notificationSeparator.style.display = null;
+            } else {
+                notificationCount.classList.remove('label-warning');
+                notificationCount.classList.add('label-default');
+                notificationSeparator.style.display = 'none';
             }
         });
     };
@@ -120,7 +128,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         ${login.user.username}
-                        <span id="notification-count" class="label label-warning" style="margin-left: .25em; display: none;"></span>
+                        <span id="notification-count" class="label label-default" style="margin-left: .25em;"></span>
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu" id="user-dropdown">
@@ -129,7 +137,7 @@
                         <% } %>
                         <li><a id="headerHelpButton" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a></li>
                         <li><a id="headerLogout" href="<%=request.getContextPath() + Paths.LOGOUT%>">Logout</a></li>
-                        <li id="notification-separator" role="separator" class="divider" style="display: none;"></li>
+                        <li id="notification-separator" role="separator" class="divider"></li>
                     </ul>
                 </li>
             </ul>
