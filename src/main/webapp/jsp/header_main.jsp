@@ -23,7 +23,7 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<div class="nest">
+<div class="container">
     <div class="full-width">
         <div class="bg-plus-2" style="padding:2px 0;">
         </div>

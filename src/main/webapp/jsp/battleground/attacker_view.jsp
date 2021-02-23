@@ -111,7 +111,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
     <div class="col-md-6" style="margin-top: 10px;">
         <div id="mutants-div">

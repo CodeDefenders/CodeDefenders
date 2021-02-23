@@ -46,14 +46,12 @@
 </div>
 </div>
 
-<div class="game-container">
-	<nav class="nest"
-		style="width: 100%; margin-left: 0; margin-right: auto;">
-		<div class="crow fly">
+<div class="container game-container">
+    <div class="row">
 			<%
 			    if (game.getCreatorId() == login.getUserId()) {
 			%>
-			<div class="admin-panel col-md-12">
+			<div class="admin-panel col-md-6">
 				<%
 				    if (game.getState() == GameState.ACTIVE) {
 				%>
@@ -86,7 +84,7 @@
 			%>
 
 			<%-- This bar shows the possible interactions at game level --%>
-			<div class="container">
+			<div class="col-md-6" style="float: right;">
 
 				<%-- Make those interactive later ! For the moment they are just place holders ! --%>
 				<%-- Probably use some DISABLE CSS or something  --%>
@@ -114,7 +112,5 @@
                 <a href="#" class="btn btn-default btn-diff" id="btnFeedback"
 					data-toggle="modal" data-target="#playerFeedback"> Feedback </a>
 					--%>
-			</div>
-		</div>
-	</nav>
-	<div class="clear"></div>
+            </div>
+    </div>

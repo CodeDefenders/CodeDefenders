@@ -115,7 +115,7 @@
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
 
     <div class="col-md-6">
         <div id="mutants-div">

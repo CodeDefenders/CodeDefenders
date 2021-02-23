@@ -75,9 +75,8 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
-</div> <%-- TODO move the whole div here after changing the header --%>
 
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
 	<div class="col-md-6">
 		<div id="mutants-div">
 			<h3>Existing Mutants</h3>
@@ -98,3 +97,4 @@
 	</div>
 </div>
 
+</div> <%-- TODO move the whole div here after changing the header --%>

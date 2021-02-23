@@ -18,10 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<div class="clear"></div>
 </div>
-<div class="nest"><div class="full-width">
-    <div class="nest">
-        <div class="crow fly">
-            <div class="crow fly">
+<div>
+    <div>
+        <div>
+            <div>
+                <div>
 <%@ include file="/jsp/footer.jsp" %>

@@ -114,12 +114,12 @@
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
 <div class="game-container">
-    <div class="row" style="padding: 0px 15px;">
+    <div class="row">
         <h4 class="col-md-2"><b><%=title%></b></h4>
         <h4><%=description%></h4>
     </div>
     <hr class="hr-primary" style="margin: 5px">
-    <div class="row" style="padding: 0px 15px;">
+    <div class="row">
         <div class="col-md-6" id="cut-div">
             <h3>Class Under Test</h3>
             <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
@@ -148,7 +148,7 @@
         </div>
     </div>
 
-    <div class="row" style="padding: 0px 15px;">
+    <div class="row">
         <div class="col-md-6" id="mutants-div">
             <h3>Existing Mutants</h3>
             <t:mutant_accordion/>

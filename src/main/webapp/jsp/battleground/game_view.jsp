@@ -66,7 +66,6 @@
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<div class="crow fly no-gutter up">
 <%
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
 
@@ -90,7 +89,7 @@
             return;
     }
 %>
-    </div>
+
 <%
 if (game.isCapturePlayersIntention()) {
     if (role == Role.DEFENDER) {

@@ -34,8 +34,7 @@
 
 <jsp:include page="/jsp/header_logout.jsp"/>
 
-<div class="nest">
-    <div class="crow fly no-gutter">
+<div class="container">
         <div id="splash" class="jumbotron masthead">
             <h2><img class="logo" href="${pageContext.request.contextPath}/"
                      src="images/logo.png" style="margin-right: 10px"/>Code Defenders: A Mutation Testing Game</h2>
@@ -110,8 +109,8 @@
             </table>
             <a id="enter" class="btn btn-primary btn-large" href="login">Log in or sign up</a>
         </div>
-    </div>
+
+    <%@ include file="/jsp/footer_logout.jsp" %>
 </div>
 
-<%@ include file="/jsp/footer_logout.jsp" %>
 <%@ include file="/jsp/footer.jsp" %>

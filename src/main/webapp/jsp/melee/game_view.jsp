@@ -77,19 +77,17 @@
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<div class="crow fly no-gutter up">
-	<%
-	    if (role.equals(Role.OBSERVER)) {
-	%>
-			<jsp:include page="/jsp/melee/creator_view.jsp" />
-	<%
-	    } else {
-	%>
-			<jsp:include page="/jsp/melee/player_view.jsp" />
-	<%
-	    }
-	%>
-</div>
+<%
+    if (role.equals(Role.OBSERVER)) {
+%>
+        <jsp:include page="/jsp/melee/creator_view.jsp" />
+<%
+    } else {
+%>
+        <jsp:include page="/jsp/melee/player_view.jsp" />
+<%
+    }
+%>
 
 <!-- This corresponds to dispatcher.Dispatch -->
 <jsp:include page="/jsp/game_notifications.jsp"/>

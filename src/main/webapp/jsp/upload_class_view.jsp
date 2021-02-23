@@ -26,7 +26,7 @@
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div>
-	<div class="w-100 up">
+	<div class="w-100">
 		<h2>Upload Class</h2>
 		<div id="divUpload">
 			<form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="form-upload" method="post" enctype="multipart/form-data">

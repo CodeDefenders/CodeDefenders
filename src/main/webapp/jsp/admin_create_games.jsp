@@ -47,9 +47,6 @@
     }
 </style>
 
-<%-- Workaround for the stupid <div class="nest"> in header_main. Remove this once that div is gone --%>
-</div></div></div></div></div><div class="container">
-
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
@@ -119,7 +116,6 @@
         </div>
         <div class="panel-body">
             <table id="table-users" class="table table-responsive"></table>
-            </div>
         </div>
     </div>
 
@@ -1422,8 +1418,5 @@
         });
     </script>
 </div>
-
-<%-- Workaround for the stupid <div class="nest"> in header_main. Remove this once that div is gone --%>
-</div><div><div><div><div><div><div>
 
 <%@ include file="/jsp/footer.jsp" %>
