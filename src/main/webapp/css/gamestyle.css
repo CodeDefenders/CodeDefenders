@@ -1,105 +1,5 @@
 @import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
 
-body {
-	/*font-family: 'Roboto', arial;*/
-	  font-family: 'Ubuntu', 'Open Sans', sans-serif;
-	font-size: 14px;
-	line-height: 22px;
-	color: #424242;
-}
-
-h2 {
-	font-size: 32px;
-}
-
-h3 {
-	font-size: 25px;
-}
-
-#site-logo:hover {
-	color: #CCCCCC;
-}
-
-.menu-top .bg-light-blue .minus-2 {
-	background-color: rgb(0, 151, 209);
-}
-
-.main-title {
-	font-family: 'Ubuntu', 'Open Sans', sans-serif;
-	color: #ffffff;
-	font-size: 48px;
-}
-
-.scoreboard {
-	width: 100%;
-	color: #cccccc;
-}
-
-.scoreboard .attacker {
-	background-color: #772233;
-}
-span.attackerTotal {
-	color: #772233;
-	text-align: right;
-	font-size: 36px;
-}
-
-.scoreboard .attacker.header, .scoreboard .attacker.total {
-	background-color: #884466;
-}
-
-.scoreBanner {
-	width: 100%;
-	text-align: center;
-	margin-bottom: 10px;
-}
-
-.scoreboard .defender {
-	background-color: #225577;
-}
-
-span.defenderTotal {
-	color: #225577;
-	text-align: left;
-	font-size: 36px;
-}
-
-.scoreboard .defender.header, .scoreboard .defender.total {
-	background-color: #446688;
-}
-
-.scoreboard .header th {
-	color: #ffffff;
-	font-weight: lighter;
-	font-size: 16px;
-
-}
-
-.button a {
-	text-align: center;
-	margin: 0 auto;
-	width: 100%;
-}
-
-.blank_row {
-	height: 10px !important; /* Overwrite any previous rules */
-	background-color: #FFFFFF;
-}
-
-#info {
-	float: left;
-	margin: auto;
-	width: 50%;
-	padding: 0px 1%;
-}
-
-#right {
-	float: left;
-	margin: auto;
-	width: 50%;
-	padding: 0px 1%;
-}
-
 #splash .btn {
 	padding: 10px 34px;
 	font-size: 20px;
@@ -109,52 +9,21 @@ span.defenderTotal {
 }
 
 #splash {
-	position: relative;
-	width: 100%;
-	/*height: 650px;*/
-	z-index:15;
-	margin: auto;
-	text-align:center;
-	background-color: #fafafa;
+	text-align: center;
+	background-color: transparent;
 }
 
 #research {
-	position: relative;
-	width: 100%;
-	z-index:15;
-	margin: auto;
-	text-align:center;
-	background-color: #fafafa;
+	text-align: center;
 }
 
-#contact {
-	position: relative;
-	width: 100%;
-	height: 650px;
-	z-index:15;
-	margin: auto;
-	text-align:center;
-	background-color: #fafafa;
-}
-
-.btn-diff, .btn-right {
+/* TODO: make these just .right / .bold */
+.btn-right {
 	float: right;
 }
-
-.btn-game {
+.btn-bold {
 	font-weight: 700;
 }
-
-.turn-badge {
-	font-size: 10pt;
-	color: #fff;
-}
-.turn-badge:hover {
-	color: #fff;
-}
-
-/* Sign-in form */
-
 
 .tableform {
 	border-collapse: separate;
@@ -164,29 +33,13 @@ span.defenderTotal {
 	line-height: 27px;
 }
 
-th, td {
-	padding: 5px;
+.table-center td,
+.table-center th {
+    text-align:center;
 }
 
-.games-table td, .games-table th
-{
-	padding: 5px;
-	text-align:center;
-}
-
+/* TODO: check the form... classes. */
 .form-upload {
-	padding: 15px;
-	margin: 0 auto;
-	max-width: 550px;
-}
-
-.form-contact {
-	padding: 15px;
-	margin: 0 auto;
-	max-width: 450px;
-}
-
-.form-creategame {
 	padding: 15px;
 	margin: 0 auto;
 	max-width: 550px;
@@ -204,7 +57,6 @@ th, td {
 	max-width: 330px;
 }
 
-.form-creategame,
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
 	margin-bottom: 10px;
@@ -240,58 +92,6 @@ th, td {
 	border-top-right-radius: 0;
 }
 
-/* Slider */
-
-.slick-slider {
-	overflow: visible !important;
-	position: relative;
-	max-width : 80%;
-	width : 80%;
-	margin-left: 50px;
-	margin-right: 50px;
-	-moz-box-sizing: border-box;
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	-ms-touch-action: none;
-	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-.slick-prev,
-.slick-next {
-	position: absolute;
-	line-height: 1;
-	border: none;
-	outline: none;
-	cursor: pointer;
-	background: transparent;
-	color: transparent;
-}
-
-.slick-prev {
-	top: 50%;
-	left: -50px;
-}
-
-.slick-next {
-	top: 50%;
-	right: -50px;
-}
-
-.slick-prev:before {
-	content: '\2770';
-	color: gray;
-	font-size: 50px;
-}
-
-.slick-next:after {
-	content: '\2771';
-	color: gray;
-	font-size: 50px;
-}
-
 /* Read-only textareas */
 
 .readonly-pre .CodeMirror-focused .CodeMirror-cursor {
@@ -311,20 +111,6 @@ th, td {
     background: #F5F5F5; /* #f7f7f7; */
 }
 
-.bigicon {
-	font-size: 35px;
-	color: #000;
-}
-
-.fieldset-auto-width {
-	display: inline-block;
-}
-
-.menu-top {
-	height: 60px;
-
-}
-
 textarea[id="inputMessage"] {
     resize: none;
 }
@@ -333,49 +119,14 @@ textarea[id="inputMessage"] {
 	float: right !important;
 }
 
-img.displayed {
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	border-radius: 25px;
-	border: 5px solid #f5f5f5;
-	padding: 20px;
-	width:700px;
-}
-
-/* Link styles (used on .masthead-links as well) */
-.jumbotron a {
-	color: #000;
-	-webkit-transition: all .2s ease-in-out;
-	-moz-transition: all .2s ease-in-out;
-	transition: all .2s ease-in-out;
-}
-
-/* Textual links in masthead */
-.masthead-links {
-	margin: 0;
-	list-style: none;
-}
-.masthead-links li {
-	display: inline;
-	padding: 0 10px;
-	color: rgba(255,255,255,.25);
-}
-
 /* Papercite */
 
-.paper-list {
-	margin: 10px
-}
-
 .papercite_bibliography {
-	color: #ccc;
 	list-style-type: none;
 }
 
 .papercite_bibliography li {
 	font: 14px/1.5 Helvetica, sans-serif;
-	padding-left: 60px;
 	color: #555;
 	margin-bottom: 20px;
 }
@@ -390,7 +141,7 @@ img.displayed {
 
 .tex {
 	margin: 0 auto;
-	width:40%;
+	width: 40%;
 }
 
 .paper_title {
@@ -399,14 +150,4 @@ img.displayed {
 
 .paper_venue {
 	font-style: italic;
-}
-
-
-.linenumber-intention {
-    color: #003b56;
-}
-
-.linenumber-intention:hover, .linenumber-intention:active {
-    cursor: pointer;
-    color: #049adb;
 }

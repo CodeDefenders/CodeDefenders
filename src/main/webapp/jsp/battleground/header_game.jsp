@@ -43,7 +43,7 @@
                 <% if (game.getState() == GameState.ACTIVE) { %>
                 <form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
                       method="post" style="display: inline-block;">
-                    <button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn">End
+                    <button type="submit" class="btn btn-primary btn-bold" id="endGame" form="adminEndBtn">End
                         Game
                     </button>
                     <input type="hidden" name="formType" value="endGame">
@@ -52,7 +52,7 @@
                 <% } else if (game.getState() == GameState.CREATED) { %>
                 <form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
                       method="post" style="display: inline-block;">
-                    <button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn">Start
+                    <button type="submit" class="btn btn-primary btn-bold" id="startGame" form="adminStartBtn">Start
                         Game
                     </button>
                     <input type="hidden" name="formType" value="startGame">
@@ -71,27 +71,27 @@
                 <%--<a id="notification-chat" class="notification-icon glyphicon glyphicon-envelope"></a>--%>
                 <%--<a id="notification-game" class="notification-icon glyphicon glyphicon-bell"></a>--%>
 
-                <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal"
+                <a href="#" class="btn btn-right" id="btnScoringTooltip" data-toggle="modal"
                    data-target="#scoringTooltip"
                    style="color: black; font-size: 18px; padding: 5px;">
                     <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
 
 
-                <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal"
+                <a href="#" class="btn btn-default btn-right" id="btnScoreboard" data-toggle="modal"
                    data-target="#scoreboard">Scoreboard
                 </a>
-                <a href="#" class="btn btn-default btn-diff" id="btnHistory" data-toggle="modal"
+                <a href="#" class="btn btn-default btn-right" id="btnHistory" data-toggle="modal"
                    data-target="#history">History
                 </a>
 
 
                 <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
                    title="Export as a Gradle project to import into an IDE."
-                   class="btn btn-default btn-diff" id="btnProjectExport">
+                   class="btn btn-default btn-right" id="btnProjectExport">
                     Export
                 </a>
-                <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal"
+                <a href="#" class="btn btn-default btn-right" id="btnFeedback" data-toggle="modal"
                    data-target="#playerFeedback">
                     Feedback
                 </a>

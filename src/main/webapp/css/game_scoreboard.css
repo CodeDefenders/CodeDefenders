@@ -1,0 +1,43 @@
+.scoreboard {
+    color: #cccccc;
+}
+
+.scoreboard .attacker {
+    background-color: #772233;
+}
+span.attackerTotal {
+    color: #772233;
+    text-align: right;
+    font-size: 36px;
+}
+
+.scoreboard .attacker.header, .scoreboard .attacker.total {
+    background-color: #884466;
+}
+
+.scoreBanner {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.scoreboard .defender {
+    background-color: #225577;
+}
+
+span.defenderTotal {
+    color: #225577;
+    text-align: left;
+    font-size: 36px;
+}
+
+.scoreboard .defender.header, .scoreboard .defender.total {
+    background-color: #446688;
+}
+
+.scoreboard .header th {
+    color: #ffffff;
+    font-weight: lighter;
+    font-size: 16px;
+
+}

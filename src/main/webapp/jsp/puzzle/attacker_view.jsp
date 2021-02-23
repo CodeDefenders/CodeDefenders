@@ -140,14 +140,14 @@
         <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
             <input type="hidden" name="formType" value="reset">
             <input type="hidden" name="gameId" value="<%= game.getId() %>">
-            <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
+            <button class="btn btn-primary btn-warning btn-bold btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
                 Reset
             </button>
         </form>
 
         <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
         <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
-            <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk"
+            <button type="submit" class="btn btn-primary btn-bold btn-right" id="submitMutant" form="atk"
                     onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                 Attack!

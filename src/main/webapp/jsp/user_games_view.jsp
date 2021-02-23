@@ -61,7 +61,7 @@
 
 <div class="container">
     <h2 class="full-width page-title">My Games</h2>
-    <table id="my-games" class="table table-striped table-hover table-responsive table-paragraphs games-table">
+    <table id="my-games" class="table table-striped table-hover table-responsive table-center">
         <tr>
             <th>ID</th>
             <th>Creator</th>
@@ -512,7 +512,7 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="openBattleground">
             <table id="tableOpenBattleground"
-                   class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                   class="table table-striped table-hover table-responsive table-center">
                 <tr>
                     <th>ID</th>
                     <th>Creator</th>
@@ -735,7 +735,7 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="openMelee">
             <table id="tableOpenMelee"
-                   class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                   class="table table-striped table-hover table-responsive table-center">
                 <tr>
                     <th>ID</th>
                     <th>Creator</th>

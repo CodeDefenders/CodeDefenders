@@ -37,10 +37,6 @@
     <!-- jQuery -->
     <script src="webjars/jquery/3.3.1-2/jquery.min.js" type="text/javascript" ></script>
 
-    <!-- Slick -->
-    <link href="webjars/slick-carousel/1.5.8/slick/slick.css" rel="stylesheet" type="text/css" />
-    <script src="webjars/slick-carousel/1.5.8/slick/slick.min.js" type="text/javascript" ></script>
-
 	<!-- Favicon.ico -->
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
 

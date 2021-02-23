@@ -38,7 +38,7 @@
 <div class="container">
 
 <h3>Battlegrounds</h3>
-<table class="table table-striped table-hover table-responsive table-paragraphs games-table">
+<table class="table table-striped table-hover table-responsive table-center">
     <thead>
         <tr>
             <th>ID</th>
@@ -229,7 +229,7 @@
 </table>
 
 <h3>Melee games</h3>
-<table class="table table-striped table-hover table-responsive table-paragraphs games-table">
+<table class="table table-striped table-hover table-responsive table-center">
         <thead>
         <tr>
             <th>ID</th>

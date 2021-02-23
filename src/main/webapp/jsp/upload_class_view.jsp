@@ -149,7 +149,7 @@
 				List<Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
 				List<Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
 			%>
-			<table class="table table-striped table-hover table-responsive table-paragraphs games-table" id = "tableUploadedClasses">
+			<table class="table table-striped table-hover table-responsive table-center" id = "tableUploadedClasses">
 				<thead>
 				<tr>
 					<th class="col-sm-1 col-sm-offset-2">ID</th>

@@ -69,7 +69,7 @@
             -->
             <p style="font-size: medium">Currently active multiplayer games:</p>
 
-            <table class="table table-hover table-responsive table-paragraphs games-table">
+            <table class="table table-hover table-responsive table-center">
                 <tr>
                     <th>Creator</th>
                     <th>Class</th>

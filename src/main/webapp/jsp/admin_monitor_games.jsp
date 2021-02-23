@@ -53,7 +53,7 @@
         </div>
         <% } else { %>
         <table id="table-multiplayer"
-               class="table-hover table-striped table-responsive table-paragraphs games-table display table-condensed">
+               class="table-hover table-striped table-responsive table-center display table-condensed">
             <thead>
             <tr style="border-bottom: 1px solid black">
                 <th><input type="checkbox" id="selectAllGamesMultiplayer">
@@ -264,7 +264,7 @@
         </div>
         <% } else { %>
         <table id="table-melee"
-               class="table-hover table-striped table-responsive table-paragraphs games-table display table-condensed">
+               class="table-hover table-striped table-condensed table-responsive table-center display">
             <thead>
             <tr style="border-bottom: 1px solid black">
                 <th><input type="checkbox" id="selectAllGamesMelee">

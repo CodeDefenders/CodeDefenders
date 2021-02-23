@@ -37,7 +37,7 @@
     </div>
 
     <table id="tableClasses"
-               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-center dataTable display">
         <thead>
             <tr>
                 <th>ID</th>

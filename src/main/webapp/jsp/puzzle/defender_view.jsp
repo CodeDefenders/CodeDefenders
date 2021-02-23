@@ -129,7 +129,7 @@
         <div class="col-md-6" id="ut-div">
             <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
             <h3>Write a new JUnit test here
-                <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
+                <button type="submit" class="btn btn-primary btn-bold btn-right" id="submitTest" form="def"
                         onClick="testProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
                         <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend!

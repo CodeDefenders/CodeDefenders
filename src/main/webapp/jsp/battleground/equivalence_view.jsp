@@ -140,9 +140,9 @@
 
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
-                <button class="btn btn-danger btn-left" name="acceptEquivalent" type="submit"
+                <button class="btn btn-danger" name="acceptEquivalent" type="submit"
                         onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
-                <button class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit"
+                <button class="btn btn-primary btn-bold btn-right" name="rejectEquivalent" type="submit"
                         onclick="testProgressBar(); return true;">Submit Killing Test</button>
 
                 <div>
