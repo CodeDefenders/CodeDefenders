@@ -70,7 +70,7 @@
                     </label>
                 </div>
                 <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
-                       style="height: .65em; width: 10em; display: inline;">
+                       style="height: 1.5em; width: 10em; display: inline;">
             </div>
         </div>
         <div class="panel-body">
@@ -111,7 +111,7 @@
                     </label>
                 </div>
                 <input type="search" id="search-users" class="form-control" placeholder="Search"
-                       style="height: .65em; width: 10em; display: inline;">
+                       style="height: 1.5em; width: 10em; display: inline;">
             </div>
         </div>
         <div class="panel-body">
