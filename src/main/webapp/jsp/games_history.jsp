@@ -35,7 +35,7 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
-<div>
+<div class="container">
 
 <h3>Battlegrounds</h3>
 <table class="table table-striped table-hover table-responsive table-paragraphs games-table">

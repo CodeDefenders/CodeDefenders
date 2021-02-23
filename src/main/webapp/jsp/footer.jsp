@@ -20,13 +20,7 @@
 --%>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-                        </div>
-                    </div>
-               </div>
-            </div>
-        </div>
-    </div>
-</div>
+</div> <%-- closes #content --%>
 
 <nav class="navbar navbar-cd" id="footer">
     <div> <%-- class="container-fluid" --%>
@@ -38,5 +32,3 @@
         </div>
     </div>
 </nav>
-
-</div> <%-- closes #content --%>

@@ -157,4 +157,4 @@
     </div>
 </div>
 
-<%@ include file="/jsp/battleground/footer_game.jsp" %>
+<%@ include file="/jsp/footer_game.jsp" %>

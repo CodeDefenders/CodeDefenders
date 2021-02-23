@@ -391,5 +391,3 @@
         <t:test_accordion/>
     </div>
 </div>
-
-</div> <%-- TODO move the whole div here after changing the header --%>

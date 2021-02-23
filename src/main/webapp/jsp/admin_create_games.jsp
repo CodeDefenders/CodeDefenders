@@ -47,7 +47,7 @@
     }
 </style>
 
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 

@@ -146,8 +146,8 @@
     </div>
 </nav>
 
-<div id="content">
-
 <jsp:include page="/jsp/game_components/progress_bar_common.jsp"/>
 
 <jsp:include page="/jsp/messages.jsp"/>
+
+<div id="content"> <%-- closed in footer --%>

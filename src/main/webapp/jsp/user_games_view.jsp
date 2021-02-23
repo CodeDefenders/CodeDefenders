@@ -59,7 +59,7 @@
     }
 </style>
 
-<div class="w-100">
+<div class="container">
     <h2 class="full-width page-title">My Games</h2>
     <table id="my-games" class="table table-striped table-hover table-responsive table-paragraphs games-table">
         <tr>

@@ -18,10 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-</div>
-<div>
-    <div>
-        <div>
-            <div>
-                <div>
+
+</div> <%-- closes #game-container --%>
+
 <%@ include file="/jsp/footer.jsp" %>

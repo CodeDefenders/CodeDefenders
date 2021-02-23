@@ -128,4 +128,4 @@
     <link href="css/timeline.css" rel="stylesheet" type="text/css" />
 </head>
 
-<body class="page-grid">
+<body>

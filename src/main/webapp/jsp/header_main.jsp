@@ -23,13 +23,6 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<div class="container">
-    <div class="full-width">
-        <div class="bg-plus-2" style="padding:2px 0;">
-        </div>
-        <% if (pageInfo.hasPageTitle()) { %>
-            <h2 class="full-width page-title" style="text-align: center;">${pageInfo.pageTitle}</h2>
-        <% } %>
-        <div>
-            <div>
-                <div>
+<% if (pageInfo.hasPageTitle()) { %>
+    <h2 class="full-width page-title" style="text-align: center;">${pageInfo.pageTitle}</h2>
+<% } %>

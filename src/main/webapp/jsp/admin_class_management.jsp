@@ -27,7 +27,7 @@
     List<GameClassInfo> allClasses  = (List<GameClassInfo>) request.getAttribute("classInfos");
 %>
 
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminClasses"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 

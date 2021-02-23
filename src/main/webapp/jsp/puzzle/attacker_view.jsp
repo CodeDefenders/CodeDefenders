@@ -109,8 +109,8 @@
 
 
 <jsp:include page="/jsp/header_main.jsp"/>
-</div></div></div></div></div>
-<div class="game-container">
+
+<div id="game-container">
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
@@ -162,6 +162,8 @@
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
+</div>
+
 </div>
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>

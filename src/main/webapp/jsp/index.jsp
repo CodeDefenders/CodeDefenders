@@ -110,7 +110,7 @@
             <a id="enter" class="btn btn-primary btn-large" href="login">Log in or sign up</a>
         </div>
 
-    <%@ include file="/jsp/footer_logout.jsp" %>
+    <%@ include file="/jsp/research.jsp" %>
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>

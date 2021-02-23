@@ -137,4 +137,4 @@
     </div>
 </div>
 
-<%@ include file="/jsp/melee/footer_game.jsp" %>
+<%@ include file="/jsp/footer_game.jsp" %>

@@ -38,15 +38,9 @@
     pageInfo.setPageTitle("Game " + game.getId() + " (" + role.getFormattedString() + ")");
 %>
 
-
 <jsp:include page="/jsp/header_main.jsp" />
-</div>
-</div>
-</div>
-</div>
-</div>
 
-<div class="container game-container">
+<div id="game-container" class="container"> <%-- closed in footer --%>
     <div class="row">
 			<%
 			    if (game.getCreatorId() == login.getUserId()) {

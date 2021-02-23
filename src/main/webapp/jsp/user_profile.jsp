@@ -29,7 +29,7 @@
     int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 %>
 
-<div>
+<div class="container">
     <div id="user-information-container">
         <h2>Profile Information</h2>
 

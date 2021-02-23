@@ -99,5 +99,3 @@
 		<jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
 	</div>
 </div>
-
-</div> <%-- TODO move the whole div here after changing the header --%>

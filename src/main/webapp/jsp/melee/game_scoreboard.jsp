@@ -19,14 +19,6 @@
 
 --%>
 <%@page import="org.codedefenders.beans.game.ScoreItem"%>
-<%@ page import="org.codedefenders.model.Player"%>
-<%@ page import="java.util.List"%>
-<%@ page import="org.codedefenders.util.Constants"%>
-<%@ page import="org.codedefenders.database.TestDAO"%>
-<%@ page import="org.codedefenders.database.MutantDAO"%>
-<%@ page import="org.codedefenders.game.multiplayer.PlayerScore"%>
-<%@ page import="org.codedefenders.model.User"%>
-<%@ page import="java.util.Map"%>
 
 <jsp:useBean id="meleeScoreboardBean" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
 
@@ -57,7 +49,7 @@
 					    for (ScoreItem scoreItem : meleeScoreboardBean.getSortedScoreItems()) {
 					        // Highlight the row of the current player. Apparently, embedding the rendering in the class tag breaks it ?
 					        if (login.getUserId() == scoreItem.getUser().getId()) {
-					            %><tr class="bg-info"><% 
+					            %><tr class="bg-info"><%
 					        } else {
 					            %><tr><%
 					        }

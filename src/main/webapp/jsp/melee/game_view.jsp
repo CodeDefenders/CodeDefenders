@@ -91,4 +91,4 @@
 
 <!-- This corresponds to dispatcher.Dispatch -->
 <jsp:include page="/jsp/game_notifications.jsp"/>
-<%@ include file="/jsp/melee/footer_game.jsp" %>
+<%@ include file="/jsp/footer_game.jsp" %>

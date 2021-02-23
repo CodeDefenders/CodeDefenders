@@ -109,11 +109,10 @@
 
 
 <jsp:include page="/jsp/header_main.jsp"/>
-</div></div></div></div></div>
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
-<div class="game-container">
+<div id="game-container">
     <div class="row">
         <h4 class="col-md-2"><b><%=title%></b></h4>
         <h4><%=description%></h4>
