@@ -25,17 +25,15 @@
 <%-- The min-height and padding style attributes are here to make the footer a bit smaller, because it looks
      weird if it's the same size of as the header. --%>
 <nav class="navbar navbar-cd" id="footer" style="min-height: 0;">
-    <div> <%-- class="container-fluid" --%>
-        <div id="navbar-controls-footer">
-            <ul class="nav navbar-nav">
-                <li>
-                    <a id="footerAbout" class="text-white btn tab-link bg-minus-1"
-                       href="<%=request.getContextPath() + Paths.ABOUT_PAGE%>"
-                       style="padding-top: .5em; padding-bottom: .5em;">About CodeDefenders</a></li>
-                <li><a id="footerContact" class="text-white btn tab-link bg-minus-1"
-                       href="<%=request.getContextPath() + Paths.CONTACT_PAGE%>"
-                       style="padding-top: .5em; padding-bottom: .5em;">Contact Us</a></li>
-            </ul>
-        </div>
+    <div id="navbar-controls-footer">
+        <ul class="nav navbar-nav">
+            <li>
+                <a id="footerAbout" class="text-white btn tab-link bg-minus-1"
+                   href="<%=request.getContextPath() + Paths.ABOUT_PAGE%>"
+                   style="padding-top: .5em; padding-bottom: .5em;">About CodeDefenders</a></li>
+            <li><a id="footerContact" class="text-white btn tab-link bg-minus-1"
+                   href="<%=request.getContextPath() + Paths.CONTACT_PAGE%>"
+                   style="padding-top: .5em; padding-bottom: .5em;">Contact Us</a></li>
+        </ul>
     </div>
 </nav>

@@ -26,33 +26,31 @@
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
 <nav class="navbar navbar-cd" id="header">
-    <div> <%-- class="container-fluid" --%>
-        <div class="navbar-header">
+    <div class="navbar-header">
 
-            <%-- The style attributes here are a workaround to make Logo + Text work in the navbar brand. --%>
-            <a class="navbar-brand" href="${pageContext.request.contextPath}" style="position: relative;">
-                <img src="images/logo.png" style="width: 2em; position: absolute; top: .1em; left: .4em;"/>
-                <span style="margin-left: 2em;">Code Defenders</span>
-            </a>
+        <%-- The style attributes here are a workaround to make Logo + Text work in the navbar brand. --%>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}" style="position: relative;">
+            <img src="images/logo.png" style="width: 2em; position: absolute; top: .1em; left: .4em;"/>
+            <span style="margin-left: 2em;">Code Defenders</span>
+        </a>
 
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-navbar-controls" aria-expanded="true">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-navbar-controls" aria-expanded="true">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
 
-        </div>
-        <div class="collapse navbar-collapse" id="header-navbar-controls">
+    </div>
+    <div class="collapse navbar-collapse" id="header-navbar-controls">
 
-            <ul class="nav navbar-nav">
-                <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
-                    <li><a href="login">Login</a></li>
-                </c:if>
-                <li><a href="#research" onclick="openResearchBox()">Research</a></li>
-                <li><a href="help">Help</a></li>
-            </ul>
+        <ul class="nav navbar-nav">
+            <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
+                <li><a href="login">Login</a></li>
+            </c:if>
+            <li><a href="#research" onclick="openResearchBox()">Research</a></li>
+            <li><a href="help">Help</a></li>
+        </ul>
 
-        </div>
     </div>
 </nav>
 
