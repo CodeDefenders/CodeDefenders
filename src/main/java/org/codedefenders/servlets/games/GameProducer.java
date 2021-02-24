@@ -37,10 +37,12 @@ public class GameProducer implements Serializable {
             game = GameDAO.getGame(gameId);
             if (game != null) {
                 game.setEventDAO(eventDAO);
+            } else {
+                logger.debug("Could not retrieve game with id {} from database", gameId);
             }
         }
         try {
-            //This has to be an unchecked cast, because the (game instanceOf GameT) check doesn't work
+            //This has to be an unchecked cast, because the (game instanceOf GameT) check doesn't work with generics
             //noinspection unchecked
             return (GameT) game;
         } catch (ClassCastException e) {
