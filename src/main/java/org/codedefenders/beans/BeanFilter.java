@@ -57,9 +57,7 @@ public class BeanFilter implements Filter {
         // TODO This is a bit too generous, we should not consider /css/, /webjars/, and probably other requests
         if (request instanceof HttpServletRequest) {
             Optional<Integer> optGameId = ServletUtils.gameId((HttpServletRequest) request);
-            if (optGameId.isPresent()) {
-                optGameId.ifPresent(integer -> gameProducer.setGameId(integer));
-            }
+            optGameId.ifPresent(gameProducer::setGameId);
         }
 
         chain.doFilter(request, response);
