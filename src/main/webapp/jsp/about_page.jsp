@@ -104,20 +104,6 @@
 
     </div>
 
-    <%
-        String siteNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue();
-        if (!siteNotice.isEmpty()) {
-    %>
-        <h2 style="text-align: center">Site Notice</h2>
-        <div class="panel panel-default" style="padding:25px">
-            <div class="panel-body">
-                <%=siteNotice%>
-            </div>
-        </div>
-    <%
-        }
-    %>
-
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>
