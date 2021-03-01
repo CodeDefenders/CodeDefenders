@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -19,7 +18,10 @@ import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -36,29 +38,24 @@ import com.google.gson.annotations.Expose;
 @RequestScoped
 public class TestAccordionBean {
 
-    @Inject
-    AbstractGame game;
-
-    @Inject
-    GameService gameService;
-
-    @Inject
-    LoginBean login;
+    private static final Logger logger = LoggerFactory.getLogger(TestAccordionBean.class);
 
     /**
      * The categories of the test accordion, in sorted order.
      * One category containing all tests and one category for each method of the class,
      * containing the tests that cover the method.
      */
-    private List<TestAccordionCategory> categories;
+    private final List<TestAccordionCategory> categories;
 
     /**
      * Maps test ids to tests.
      */
-    private Map<Integer, TestDTO> tests;
+    private final Map<Integer, TestDTO> tests;
 
-    @PostConstruct
-    public void setup() {
+    @Inject
+    public TestAccordionBean(LoginBean login, GameService gameService, GameProducer gameProducer) {
+        AbstractGame game = gameProducer.getGame();
+
         GameClass cut = game.getCUT();
         List<TestDTO> testsList = gameService.getTests(login.getUser(), game);
 
@@ -147,8 +144,7 @@ public class TestAccordionBean {
     public String getTestsAsJSON() {
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
-                // It is important that its HashMap.class, it doesn't work if I change it to Map.class …
-                .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
+                .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .create();
         return gson.toJson(tests);
     }

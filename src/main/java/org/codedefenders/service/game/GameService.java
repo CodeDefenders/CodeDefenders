@@ -142,10 +142,13 @@ public class GameService implements IGameService {
             case PUZZLE:
                 return puzzleGameService;
             default:
+                // TODO This might require some love, like an exception...
                 return null;
         }
     }
 
+    // TODO Honestly, this smells like some anti-pattern... the right service should
+    // be instantiated by the CI directly
     private IGameService getGameServiceForGame(AbstractGame game) {
         if (game instanceof MultiplayerGame) {
             return multiplayerGameService;
@@ -153,8 +156,8 @@ public class GameService implements IGameService {
             return meleeGameService;
         } else if (game instanceof PuzzleGame) {
             return puzzleGameService;
-        } else {
-            return null;
         }
+        // TODO This might require some love, like an exception...
+        return null;
     }
 }
