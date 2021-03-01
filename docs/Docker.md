@@ -5,14 +5,19 @@ Beginning with version 1.8, we publish docker images for released versions at th
 
 ## Quick Start
 
-As all [configuration](#configuration) values have sensible defaults you can simply do:
+To get a working CodeDefenders instance you first need to define the version you want to use.  
+For this simply copy over the `docker/.env.example` file to `docker/.env` and update the `CODEDEFENDERS_VERSION` to an appropriate value.  
+E.g. if you want to deploy CodeDefenders v1.8.1 you would set this to 1.8.1.  
+Additionally, it is a good idea to checkout the corresponding git tag (in this example `v1.8.1`), as it is possible that the docker-compose setup from two versions ago does not work with the docker image from the current version.
+
+Afterwards you can simply 
 
 ```sh
 cd docker
 docker-compose up
 ```
 
-to get a working Codedefenders instance.  
+to spin up the docker container.  
 By default, it will be available at http://localhost:8080/ in your browser.
 
 ## Configuration
