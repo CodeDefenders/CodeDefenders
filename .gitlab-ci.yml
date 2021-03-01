@@ -22,6 +22,7 @@ default:
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  SAST_JAVA_VERSION: 11
 
 checkstyle:
   stage: build
