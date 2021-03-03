@@ -148,7 +148,7 @@
 					</div>
 				</li>
 				<li>
-					<a href="http://study.code-defenders.org/papers/aMutation16_CodeDefenders.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Jos&eacute; Miguel Rojas and Gordon Fraser.
