@@ -19,6 +19,8 @@
 
 --%>
 
+<link href="css/research.css" rel="stylesheet" type="text/css" />
+
 <div id="research" class="paper-list">
 
 	<h2 style="border-top: 1px solid lightgray; padding-top: 20px">

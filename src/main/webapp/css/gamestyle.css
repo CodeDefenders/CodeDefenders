@@ -13,10 +13,6 @@
 	background-color: transparent;
 }
 
-#research {
-	text-align: center;
-}
-
 /* TODO: make these just .right / .bold */
 .btn-right {
 	float: right;
@@ -117,37 +113,4 @@ textarea[id="inputMessage"] {
 
 .pull-right {
 	float: right !important;
-}
-
-/* Papercite */
-
-.papercite_bibliography {
-	list-style-type: none;
-}
-
-.papercite_bibliography li {
-	font: 14px/1.5 Helvetica, sans-serif;
-	color: #555;
-	margin-bottom: 20px;
-}
-
-.bibtex_hide {
-	display: none;
-}
-
-.bibtex_show {
-	text-align: left;
-}
-
-.tex {
-	margin: 0 auto;
-	width: 40%;
-}
-
-.paper_title {
-	font-weight: bold;
-}
-
-.paper_venue {
-	font-style: italic;
 }
