@@ -1,18 +1,5 @@
 @import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
 
-#splash .btn {
-	padding: 10px 34px;
-	font-size: 20px;
-	font-weight: 300;
-	color: #fff;
-	border: 0;
-}
-
-#splash {
-	text-align: center;
-	background-color: transparent;
-}
-
 .btn-bold {
 	font-weight: 700;
 }

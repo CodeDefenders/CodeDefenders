@@ -34,6 +34,8 @@
 
 <jsp:include page="/jsp/header_logout.jsp"/>
 
+<link href="css/index.css" rel="stylesheet" type="text/css" />
+
 <div class="container">
         <div id="splash" class="jumbotron masthead">
             <h2><img class="logo" href="${pageContext.request.contextPath}/"
