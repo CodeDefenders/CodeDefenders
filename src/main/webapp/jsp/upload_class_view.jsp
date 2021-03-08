@@ -41,7 +41,7 @@
                         <input id="fileUploadCUT" name="fileUploadCUT" type="file" class="file-loading" accept=".java" required />
                     </span>
 					<br>
-					<span>The class used for games. Mutants are created from and tests are created for this class.</span>
+					<span>The class used for games. Mutants and tests are created for this class.</span>
 				</div>
                 <br>
 
@@ -84,8 +84,18 @@
                             </span>
                             <br>
                             <span>
-                                If the class under test has dependencies, upload them as inside a <code>zip</code> file.
+                                If the class under test has dependencies, you can upload them here.
                             </span>
+                            <ul style="margin-top: .5em;">
+                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
+                                <li>Dependencies may contain packages.</li>
+                            </ul>
+                            <span>Example:</span>
+<pre>deps
+&#x251c;&#x2500; Event.java
+&#x2514;&#x2500; events
+    &#x251c;&#x2500; StartEvent.java
+    &#x2514;&#x2500; StopEvent.java</pre>
                         </div>
                         <div>
                             <h3>Upload Mutants (optional)</h3>
@@ -95,8 +105,17 @@
                             <br>
                             <span>
                                 Mutants uploaded with a class under test can be used to initialize games with existing mutants.
-                                Note that all mutants must have the same class name as the class under test and must be uploaded inside a <code>zip</code> file.
                             </span>
+                            <ul style="margin-top: .5em;">
+                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
+                                <li>All mutants must have the same class name as the class under test.</li>
+                            </ul>
+                            <span>Example:</span>
+<pre>mutants
+&#x251c;&#x2500; 01
+&#x2502;   &#x2514;&#x2500; EventBus.java
+&#x2514;&#x2500; 02
+    &#x2514;&#x2500; EventBus.java</pre>
                         </div>
                         <div>
                             <h3>Upload Tests (optional)</h3>
@@ -106,8 +125,17 @@
                             <br>
                             <span>
                                 Tests uploaded with a class under test can be used to initialize games with existing tests.
-                                Note that all tests must be uploaded inside a <code>zip</code> file.
                             </span>
+                            <ul style="margin-top: .5em;">
+                                <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
+                                <li>Multiple tests can have the same name, but they don't have to.</li>
+                            </ul>
+                            <span>Example:</span>
+<pre>tests
+&#x251c;&#x2500; 01
+&#x2502;   &#x2514;&#x2500; TestEventBus.java
+&#x2514;&#x2500; 02
+    &#x2514;&#x2500; TestEventBus.java</pre>
                         </div>
                         <br>
                         <input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
