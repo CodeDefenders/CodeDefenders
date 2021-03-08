@@ -13,10 +13,6 @@
 	background-color: transparent;
 }
 
-/* TODO: make these just .right / .bold */
-.btn-right {
-	float: right;
-}
 .btn-bold {
 	font-weight: 700;
 }
@@ -109,8 +105,4 @@
 
 textarea[id="inputMessage"] {
     resize: none;
-}
-
-.pull-right {
-	float: right !important;
 }

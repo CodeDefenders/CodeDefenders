@@ -85,21 +85,21 @@
 				<%--<a id="notification-chat" class="notification-icon glyphicon glyphicon-envelope"></a>--%>
 				<%--<a id="notification-game" class="notification-icon glyphicon glyphicon-bell"></a>--%>
 
-				<a href="#" class="btn btn-right" id="btnScoringTooltip"
+				<a href="#" class="btn pull-right" id="btnScoringTooltip"
 					data-toggle="modal" data-target="#scoringTooltip"
 					style="color: black; font-size: 18px; padding: 5px;"> <span
 					class="glyphicon glyphicon-question-sign"></span>
 				</a>
-                <a href="#" class="btn btn-default btn-right" id="btnScoreboard"
+                <a href="#" class="btn btn-default pull-right" id="btnScoreboard"
                    data-toggle="modal" data-target="#scoreboard">Scoreboard
                 </a>
-                <a href="#" class="btn btn-default btn-right" id="btnHistory" data-toggle="modal"
+                <a href="#" class="btn btn-default pull-right" id="btnHistory" data-toggle="modal"
                    data-target="#history">History
                 </a>
                 <a
 					href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
 					title="Export as a Gradle project to import into an IDE."
-					class="btn btn-default btn-right" id="btnProjectExport"> Export
+					class="btn btn-default pull-right" id="btnProjectExport"> Export
                 </a>
 
 				<%-- TODO: Enable this if we can collect feedback for melee mode

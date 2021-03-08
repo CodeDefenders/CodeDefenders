@@ -152,7 +152,7 @@
                     return '<span class="mutantCUTImage mutantImageFlagged"></span>';
             }
         };
-        const genViewButton = row => row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm btn-right">View</button>' : '';
+        const genViewButton = row => row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm pull-right">View</button>' : '';
 
         const genAdditionalButton = row => {
             switch (row.state) {
@@ -164,10 +164,10 @@
                                     '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
                                     '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
                                     '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
-                                    '      <button type="submit" class="btn btn-default btn-ssm btn-right">Claim Equivalent</button>\n' +
+                                    '      <button type="submit" class="btn btn-default btn-ssm pull-right">Claim Equivalent</button>\n' +
                                     '   </form>';
                         } else {
-                            return '<button type="submit" class="btn btn-default btn-ssm btn-right" disabled>Claim Equivalent</button>';
+                            return '<button type="submit" class="btn btn-default btn-ssm pull-right" disabled>Claim Equivalent</button>';
                         }
                     } else {
                         return '';
@@ -175,7 +175,7 @@
 
                     </c:if>
                 case "KILLED":
-                    return '<button class="ma-view-test-button btn btn-default btn-ssm btn-right">View Killing Test</button>';
+                    return '<button class="ma-view-test-button btn btn-default btn-ssm pull-right">View Killing Test</button>';
                 default:
                     return '';
             }

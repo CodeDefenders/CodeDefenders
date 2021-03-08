@@ -64,7 +64,7 @@ function updateAttackForm(value){
 
     var attackDropDownButton = document.createElement('button');
     attackDropDownButton.setAttribute("type", "button");
-    attackDropDownButton.setAttribute("class", "btn btn-primary btn-bold btn-right dropdown-toggle");
+    attackDropDownButton.setAttribute("class", "btn btn-primary btn-bold pull-right dropdown-toggle");
     attackDropDownButton.setAttribute("data-toggle", "dropdown");
     // Note the ID !
     attackDropDownButton.setAttribute("id", "submitMutantTemp" );
