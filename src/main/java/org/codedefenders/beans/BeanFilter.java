@@ -14,6 +14,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.codedefenders.beans.game.PreviousSubmissionBean;
+import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -42,6 +43,9 @@ public class BeanFilter implements Filter {
     @Inject
     private GameProducer gameProducer;
 
+    @Inject
+    private PageInfoBean pageInfo;
+
     @Override
     public void init(FilterConfig config) throws ServletException {
 
@@ -52,6 +56,7 @@ public class BeanFilter implements Filter {
             throws IOException, ServletException {
         request.setAttribute("login", login);
         request.setAttribute("previousSubmission", previousSubmission);
+        request.setAttribute("pageInfo", pageInfo);
 
         // Configure the GameProducer with the game associated to this request if any
         // TODO This is a bit too generous, we should not consider /css/, /webjars/, and probably other requests
