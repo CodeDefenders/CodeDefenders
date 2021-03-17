@@ -1,10 +1,16 @@
 /* Re-usable classes
 ============================================================================= */
 
+/* Tables
+----------------------------------------------------------------------------- */
+
 .table-center td,
 .table-center th {
     text-align: center;
 }
+
+/* Attacker- and defender-colored elements
+----------------------------------------------------------------------------- */
 
 .bg-attacker {
     background-color: var(--attacker-color);
