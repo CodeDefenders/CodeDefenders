@@ -56,7 +56,8 @@
 
     <link href="css/colors.css" rel="stylesheet">
     <link href="css/base.css" rel="stylesheet">
-    <link href="css/header_footer.css" rel="stylesheet">
+    <link href="css/page_layout.css" rel="stylesheet">
+    <link href="css/navbar.css" rel="stylesheet">
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>

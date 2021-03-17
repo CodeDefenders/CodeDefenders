@@ -69,32 +69,3 @@
     color: white;
 }
 */
-
-/*
- * Set footer position to the bottom of the screen.
- * https://css-tricks.com/couple-takes-sticky-footer/
- */
-html, body {
-    height: 100%;
-}
-body {
-    display: grid;
-    grid-template-areas:
-            'header'
-            'content'
-            'footer';
-    grid-template-rows:
-            min-content
-            auto
-            min-content;
-    grid-template-columns: 100%;
-}
-#header {
-    grid-area: header;
-}
-#content {
-    grid-area: content;
-}
-#footer {
-    grid-area: footer;
-}
