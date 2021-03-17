@@ -109,11 +109,9 @@
 					title="Export as a Gradle project to import into an IDE."
 					class="btn btn-default btn-diff" id="btnProjectExport"> Export
                 </a>
-
-				<%-- TODO: Enable this if we can collect feedback for melee mode
+                
                 <a href="#" class="btn btn-default btn-diff" id="btnFeedback"
 					data-toggle="modal" data-target="#playerFeedback"> Feedback </a>
-					--%>
 			</div>
 		</div>
 	</nav>

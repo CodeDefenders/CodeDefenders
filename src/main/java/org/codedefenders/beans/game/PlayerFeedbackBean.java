@@ -1,5 +1,6 @@
 package org.codedefenders.beans.game;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
@@ -20,8 +22,6 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
  * <p>Provides data for the player feedback game component.</p>
  * <p>Bean Name: {@code playerFeedback}</p>
  */
-// TODO: Put some of this logic into the FeedbackDAO methods. This is a mess.
-// TODO: Also work with maps of feedback values instead of lists.
 @ManagedBean
 @RequestScoped
 public class PlayerFeedbackBean {
@@ -32,9 +32,9 @@ public class PlayerFeedbackBean {
 
     private Boolean showFeedbackEnabled;
 
-    private List<Integer> ownRatings;
-    private Map<Player, List<Integer>> ratingsPerPlayer;
-    private List<Double> averageRatings;
+    private Map<Feedback.Type, Integer> ownRatings;
+    private Map<Feedback.Type, Double> averageRatings;
+    private Map<Player, Map<Feedback.Type, Integer>> ratingsPerPlayer;
 
     public PlayerFeedbackBean() {
         gameId = null;
@@ -65,7 +65,7 @@ public class PlayerFeedbackBean {
     }
 
     public boolean canGiveFeedback() {
-        return role == Role.ATTACKER || role == Role.DEFENDER;
+        return role == Role.ATTACKER || role == Role.DEFENDER || role == Role.PLAYER;
     }
 
     public boolean canSeeFeedback() {
@@ -76,39 +76,23 @@ public class PlayerFeedbackBean {
         return user.getId() == creatorId || showFeedbackEnabled;
     }
 
-    public boolean isRatingForRole(Type type) {
-        switch (role) {
-            case DEFENDER:
-                switch (type) {
-                    case CUT_MUTATION_DIFFICULTY:
-                    case DEFENDER_FAIRNESS:
-                    case DEFENDER_COMPETENCE:
-                        return false;
-                    default:
-                        return true;
-                }
-            case ATTACKER:
-                switch (type) {
-                    case CUT_TEST_DIFFICULTY:
-                    case ATTACKER_FAIRNESS:
-                    case ATTACKER_COMPETENCE:
-                        return false;
-                    default:
-                        return true;
-                }
-            default:
-                return true;
-        }
-    }
-
-    public List<Integer> getOwnRatings() {
+    public Map<Feedback.Type, Integer> getOwnRatings() {
         if (ownRatings == null) {
             ownRatings = FeedbackDAO.getFeedbackValues(gameId, user.getId());
         }
         return ownRatings;
     }
 
-    public Map<Player, List<Integer>> getAllRatings() {
+    /**
+     * Returns whether the user currently has any valid (> 0) saved ratings.
+     */
+    public boolean hasOwnRatings() {
+        Map<Feedback.Type, Integer> ratings = getOwnRatings();
+        return ratings.values().stream()
+                .anyMatch(rating -> rating > 0);
+    }
+
+    public Map<Player, Map<Feedback.Type, Integer>> getAllRatings() {
         if (ratingsPerPlayer == null) {
             ratingsPerPlayer = new HashMap<>();
             for (Player player : GameDAO.getValidPlayersForGame(gameId)) {
@@ -118,10 +102,14 @@ public class PlayerFeedbackBean {
         return ratingsPerPlayer;
     }
 
-    public List<Double> getAverageRatings() {
+    public Map<Feedback.Type, Double> getAverageRatings() {
         if (averageRatings == null) {
             averageRatings = FeedbackDAO.getAverageGameRatings(gameId);
         }
         return averageRatings;
+    }
+
+    public List<Type> getAvailableFeedbackTypes() {
+        return Feedback.Type.getFeedbackTypesForRole(role);
     }
 }
