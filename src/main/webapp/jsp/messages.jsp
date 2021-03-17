@@ -1,20 +1,27 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<c:if test="${messages.count > 0}">
-    <div class="alert alert-info" id="messages-div" style="width: 98.9vw">
-        <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br/>
+<jsp:useBean id="messages" class="org.codedefenders.beans.message.MessagesBean" scope="request"/>
 
+<c:if test="${messages.count > 0}">
+    <div id="messages" style="margin: 0 2rem 0 2rem;">
         <c:forEach items="${messages.messages}" var="message">
-            <%-- Don't escape text here; message.getText() already escapes the text. --%>
-            <pre id="message-${message.id}"><strong><c:out value="${message.text}" escapeXml="false"/></strong></pre>
+            <div id="message-${message.id}" class="alert alert-info alert-dismissible fade in" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <%-- Don't escape text here; message.getText() already escapes the text. --%>
+                <pre style="margin: 0;"><c:out value="${message.text}" escapeXml="false"/></pre>
+            </div>
         </c:forEach>
     </div>
 
-    <c:if test="${messages.fadeOut}">
-        <script>
-            $(document).ready(() => $('#messages-div').delay(10000).fadeOut());
-        </script>
-    </c:if>
+    <script>
+        $(document).ready(() => {
+            <c:forEach items="${messages.messages}" var="message">
+                <c:if test="${message.fadeOut}">
+                    setTimeout(() => $('#message-${message.id}').alert('close'), 10000);
+                </c:if>
+            </c:forEach>
+        });
+    </script>
 
     ${messages.clear()}
 </c:if>

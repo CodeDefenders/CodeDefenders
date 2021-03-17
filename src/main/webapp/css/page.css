@@ -25,9 +25,13 @@ body {
     display: grid;
     grid-template-areas:
             'header'
+            'progress'
+            'messages'
             'content'
             'footer';
     grid-template-rows:
+            min-content
+            min-content
             min-content
             auto
             min-content;
@@ -37,11 +41,15 @@ body {
 #header {
     grid-area: header;
 }
-
+#progress {
+    grid-area: progress;
+}
+#messages {
+    grid-area: messages;
+}
 #content {
     grid-area: content;
 }
-
 #footer {
     grid-area: footer;
 }

@@ -35,9 +35,6 @@
     <base href="${pageContext.request.contextPath}/">
 
     <link href="css/variables.css" rel="stylesheet">
-    <link href="css/page.css" rel="stylesheet">
-    <link href="css/common.css" rel="stylesheet">
-    <link href="css/deprecated.css" rel="stylesheet">
 
     <!-- jQuery -->
     <script src="webjars/jquery/3.3.1-2/jquery.min.js" type="text/javascript" ></script>
@@ -96,6 +93,10 @@
     <link href="webjars/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="webjars/datatables-select/1.3.1/css/select.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="css/datatables_customize.css" rel="stylesheet">
+
+    <link href="css/page.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/deprecated.css" rel="stylesheet">
 
     <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
     <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>

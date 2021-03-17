@@ -25,7 +25,6 @@
 <jsp:include page="/jsp/header_base.jsp"/>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-
 <%
     boolean profileEnabled = UserProfileManager.checkEnabled();
 %>
@@ -145,7 +144,6 @@
 </nav>
 
 <jsp:include page="/jsp/game_components/progress_bar_common.jsp"/>
-
 <jsp:include page="/jsp/messages.jsp"/>
 
 <div id="content"> <%-- closed in footer --%>
