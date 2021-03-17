@@ -109,6 +109,8 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<link href="css/game.css" rel="stylesheet">
+
 <jsp:include page="/jsp/melee/header_game.jsp"/>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>

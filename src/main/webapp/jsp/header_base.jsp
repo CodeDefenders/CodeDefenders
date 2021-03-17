@@ -59,7 +59,7 @@
     <link href="css/common.css" rel="stylesheet">
     <link href="css/bootstrap_customize.css" rel="stylesheet">
     <link href="css/deprecated.css" rel="stylesheet">
-    <link href="css/game.css" rel="stylesheet">
+    <link href="css/tables_customize.css" rel="stylesheet">
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
@@ -103,21 +103,12 @@
     <script type="text/javascript" src="webjars/datatables-plugins/1.10.16/sorting/datetime-moment.js"></script> <!-- must come after moment -->
     <link href="webjars/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="webjars/datatables-select/1.3.1/css/select.bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/datatables-override.css" rel="stylesheet" type="text/css" />
 
     <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
     <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>
     <script type="text/javascript" src="js/codedefenders/mutant-info-api.js"></script>
 
     <!-- Upload page -->
-    <link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
-
-    <link href="css/game_highlighting.css" rel="stylesheet" type="text/css" />
-    <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
-
-    <link href="css/modal_dialogs.css" rel="stylesheet" type="text/css" />
-
-    <link href="css/timeline.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body>

@@ -110,6 +110,8 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
+<link href="css/game.css" rel="stylesheet">
+
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
 <div id="game-container">

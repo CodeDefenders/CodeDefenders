@@ -25,6 +25,8 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
+<link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
+
 <div>
     <div class="container">
 		<h2>Upload Class</h2>

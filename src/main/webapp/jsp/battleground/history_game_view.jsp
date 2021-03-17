@@ -69,6 +69,8 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<link href="css/game.css" rel="stylesheet">
+
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 <%
     classViewer.setClassCode(game.getCUT());
