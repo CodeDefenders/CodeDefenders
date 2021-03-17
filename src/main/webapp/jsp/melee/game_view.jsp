@@ -40,7 +40,6 @@
 <%
     playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
     playerFeedback.setPlayerInfo(login.getUser(), role);
-    playerFeedback.setAvailableFeedbackTypesForRole(role);
 %>
 
 

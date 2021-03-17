@@ -35,7 +35,6 @@
 <%
     playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
     playerFeedback.setPlayerInfo(login.getUser(), role);
-    playerFeedback.setAvailableFeedbackTypesForRole(role);
 %>
 
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>

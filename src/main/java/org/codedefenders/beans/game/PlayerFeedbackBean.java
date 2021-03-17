@@ -1,11 +1,9 @@
 package org.codedefenders.beans.game;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
@@ -38,8 +36,6 @@ public class PlayerFeedbackBean {
     private Map<Feedback.Type, Double> averageRatings;
     private Map<Player, Map<Feedback.Type, Integer>> ratingsPerPlayer;
 
-    private List<Type> availableFeedbackTypes;
-
     public PlayerFeedbackBean() {
         gameId = null;
         creatorId = null;
@@ -50,8 +46,6 @@ public class PlayerFeedbackBean {
         ownRatings = null;
         ratingsPerPlayer = null;
         averageRatings = null;
-
-        availableFeedbackTypes = Collections.emptyList();
     }
 
     public void setGameInfo(int gameId, int creatorId) {
@@ -115,11 +109,7 @@ public class PlayerFeedbackBean {
         return averageRatings;
     }
 
-    public void setAvailableFeedbackTypesForRole(Role role) {
-        availableFeedbackTypes = Type.getFeedbackTypesForRole(role);
-    }
-
     public List<Type> getAvailableFeedbackTypes() {
-        return availableFeedbackTypes;
+        return Feedback.Type.getFeedbackTypesForRole(role);
     }
 }
