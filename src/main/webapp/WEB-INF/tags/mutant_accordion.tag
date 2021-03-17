@@ -272,7 +272,7 @@
                             </div>
                             <div class="modal-body">
                                 <pre class="readonly-pre"><textarea name="test-` + test.id + `"></textarea></pre>
-                                <pre class="readonly-pre build-trace">` + test.killMessage + `</pre>
+                                <pre class="readonly-pre terminal-pre">` + test.killMessage + `</pre>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

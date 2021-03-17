@@ -1,4 +1,4 @@
-/* Page-wide bootstrap customizations and re-usable classes that depends on
+/* (Page-wide) Bootstrap customizations and re-usable classes that depends on
 other bootstrap classes
 ============================================================================= */
 
@@ -63,3 +63,21 @@ other bootstrap classes
 .navbar-cd .navbar-toggle .icon-bar {
     background-color: white;
 }
+
+/* Tables
+----------------------------------------------------------------------------- */
+
+/* Color rows by .odd/.even instead of :nth-of-type(2n+1).
+   Use :nth-of-type(n) to increase CSS specificity. */
+.table-striped > tbody > .odd:nth-of-type(n) {
+    background: transparent;
+}
+.table-striped > tbody > .even:nth-of-type(n) {
+    background-color: #f4f4f4;
+}
+
+/* Darker color on hover. */
+.table-hover > tbody > tr:hover > td {
+    background-color: #f2f2f2;
+}
+

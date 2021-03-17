@@ -76,10 +76,10 @@
     background-image: url('../images/ingameicons/flag.png');
 }
 
-/* Terminal-like text style
+/* Terminal-like text style for command-line output <pre>s
 ----------------------------------------------------------------------------- */
 
-.build-trace {
+.terminal-pre {
     background: #000;
     color: #c4c4c4;
     white-space: pre;
