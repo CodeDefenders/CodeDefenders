@@ -1,0 +1,45 @@
+/* Re-usable classes
+============================================================================= */
+
+.table-center td,
+.table-center th {
+    text-align: center;
+}
+
+.bg-attacker {
+    background-color: var(--attacker-color);
+}
+
+.bg-defender {
+    background-color: var(--defender-color);
+}
+
+.fg-attacker {
+    color: var(--attacker-color);
+}
+
+.fg-defender {
+    color: var(--defender-color);
+}
+
+.btn-attacker {
+    color: white;
+    background-color: var(--attacker-color);
+    border-color: var(--attacker-color-contrast);
+}
+.btn-attacker:hover {
+    color: white;
+    background-color: var(--attacker-color-dark);
+    border-color: var(--attacker-color-contrast-dark);
+}
+
+.btn-defender {
+    color: white;
+    background-color: var(--defender-color);
+    border-color: var(--defender-color-contrast);
+}
+.btn-defender:hover {
+    color: white;
+    background-color: var(--defender-color-dark);
+    border-color: var(--defender-color-contrast-dark);
+}

@@ -1,14 +1,3 @@
-@import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
-
-.btn-bold {
-	font-weight: 700;
-}
-
-.table-center td,
-.table-center th {
-    text-align:center;
-}
-
 /* Read-only textareas */
 
 .readonly-pre .CodeMirror-focused .CodeMirror-cursor {
@@ -21,4 +10,18 @@
 
 .readonly-pre .CodeMirror {
     background: #F5F5F5;
+}
+
+.validatorLevelTag {
+    display: inline-block;
+    padding: 0;
+    margin-top: -2px;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+
+#game-container {
+    padding-left: 30px;
+    padding-right: 30px;
+    width: 100%;
 }

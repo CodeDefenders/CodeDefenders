@@ -1,0 +1,47 @@
+/* Page settings and layout
+============================================================================= */
+
+/* Font, background and text color
+----------------------------------------------------------------------------- */
+
+@import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
+
+body {
+    font-family: 'Ubuntu', 'Open Sans', sans-serif;
+    font-size: 14px;
+    line-height: 22px;
+    color: #424242;
+    background-color: #fafafa;
+}
+
+/* Set footer position to the bottom of the screen
+----------------------------------------------------------------------------- */
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: grid;
+    grid-template-areas:
+            'header'
+            'content'
+            'footer';
+    grid-template-rows:
+            min-content
+            auto
+            min-content;
+    grid-template-columns: 100%;
+}
+
+#header {
+    grid-area: header;
+}
+
+#content {
+    grid-area: content;
+}
+
+#footer {
+    grid-area: footer;
+}

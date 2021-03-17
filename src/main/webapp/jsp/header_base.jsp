@@ -54,10 +54,11 @@
     <link href="webjars/bootstrap-select/1.9.4/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <script src="webjars/bootstrap-select/1.9.4/js/bootstrap-select.min.js" type="text/javascript" ></script>
 
-    <link href="css/colors.css" rel="stylesheet">
-    <link href="css/base.css" rel="stylesheet">
-    <link href="css/page_layout.css" rel="stylesheet">
-    <link href="css/navbar.css" rel="stylesheet">
+    <link href="css/variables.css" rel="stylesheet">
+    <link href="css/page.css" rel="stylesheet">
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/bootstrap_customize.css" rel="stylesheet">
+    <link href="css/deprecated.css" rel="stylesheet">
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>

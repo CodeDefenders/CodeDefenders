@@ -82,7 +82,7 @@
         <div class="panel-footer">
             <form class="form-inline" style="margin: 0;">
                 <div class="form-group" style="width: 100%; margin: 0;">
-                    <!-- Change this to type="text" once we get rid of base.css. -->
+                    <!-- Change this to type="text" once we get rid of common.css. -->
                     <div class="input-group" style="width: 100%;">
                         <div id="chat-channel-container" class="input-group-addon" style="cursor: pointer; width: 4.5em;">
                             <span id="chat-channel" title="Switch between sending messages to your own team or all players.">

@@ -1,0 +1,13 @@
+/* Page-wide CSS variables
+============================================================================= */
+
+:root {
+    --attacker-color: #884466;
+    --attacker-color-dark: #713d57;
+    --attacker-color-contrast: #772233;
+    --attacker-color-contrast-dark: #64222f;
+    --defender-color: #446688;
+    --defender-color-dark: #3d546c;
+    --defender-color-contrast: #225577;
+    --defender-color-contrast-dark: #21455e;
+}
