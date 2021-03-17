@@ -36,26 +36,24 @@
 
     <link href="css/variables.css" rel="stylesheet">
 
+    <!-- Favicon.ico -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
     <!-- jQuery -->
     <script src="webjars/jquery/3.3.1-2/jquery.min.js" type="text/javascript" ></script>
-
-	<!-- Favicon.ico -->
-	<link rel="icon" href="favicon.ico" type="image/x-icon">
-
-    <!-- Bootstrap -->
-    <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/bootstrap_customize.css" rel="stylesheet">
 
     <!-- JQuery UI -->
     <script src="webjars/jquery-ui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
     <link href="webjars/jquery-ui/1.12.1/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 
+    <!-- Bootstrap -->
+    <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="webjars/bootstrap-toggle/2.2.1/css/bootstrap-toggle.min.css" rel="stylesheet" type="text/css" />
     <script src="webjars/bootstrap-toggle/2.2.1/js/bootstrap-toggle.min.js" type="text/javascript" ></script>
-    <!-- select -->
     <link href="webjars/bootstrap-select/1.9.4/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <script src="webjars/bootstrap-select/1.9.4/js/bootstrap-select.min.js" type="text/javascript" ></script>
+    <link href="css/bootstrap_customize.css" rel="stylesheet">
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
@@ -72,16 +70,16 @@
     <script src="webjars/codemirror/5.22.0/addon/edit/closebrackets.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/addon/hint/show-hint.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/addon/hint/anyword-hint.js" type="text/javascript" ></script>
-
     <script src="webjars/codemirror/5.22.0/keymap/emacs.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/keymap/sublime.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/keymap/vim.js" type="text/javascript" ></script>
 
     <link href="webjars/codemirror/5.22.0/lib/codemirror.css" rel="stylesheet" type="text/css" />
-
     <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
     <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
     <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
+    <link href="css/codemirror_customize.css" rel="stylesheet" type="text/css" />
+
     <link href="webjars/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" >
 
     <!-- DataTables -->

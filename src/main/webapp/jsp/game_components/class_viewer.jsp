@@ -22,9 +22,6 @@
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
-<link href="css/codemirror_customize.css" rel="stylesheet" type="text/css" />
-
-
 <%-- no dependencies -> no tabs --%>
 <% if (!classViewer.hasDependencies()) { %>
 
