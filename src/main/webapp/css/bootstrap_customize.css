@@ -45,7 +45,7 @@ other bootstrap classes
 }
 
 /* Background and color dropdowns in collapsed mode.
-   (767px is at which width the navbar collapses.) */
+   (767px is the width at which the navbar collapses.) */
 @media (max-width: 767px) {
     .navbar-cd .navbar-nav .open .dropdown-menu > li > a {
         color: white;
@@ -62,23 +62,4 @@ other bootstrap classes
 /* "Toggle navbar" button color in collapsed mode. */
 .navbar-cd .navbar-toggle .icon-bar {
     background-color: white;
-}
-
-/* Blue dropdown menus. */
-.navbar-cd .dropdown-menu {
-    background-color: #29b6f6;
-    border-top: none;
-    box-shadow: none;
-}
-
-.navbar-cd .dropdown-menu > li > a {
-    color: white;
-}
-.navbar-cd .dropdown-menu > li > a:hover {
-    background-color: #54c4f8;
-    color: white;
-}
-.navbar-cd .dropdown-menu > li > a:focus {
-    background-color: #54c4f8;
-    color: white;
 }

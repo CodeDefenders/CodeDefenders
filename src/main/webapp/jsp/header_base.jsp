@@ -59,6 +59,7 @@
     <link href="css/common.css" rel="stylesheet">
     <link href="css/bootstrap_customize.css" rel="stylesheet">
     <link href="css/deprecated.css" rel="stylesheet">
+    <link href="css/game.css" rel="stylesheet">
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
@@ -94,7 +95,6 @@
         https://stackoverflow.com/questions/10575343/codemirror-is-it-possible-to-scroll-to-a-line-so-that-it-is-in-the-middle-of-w/10725768
     --%>
 
-
     <!-- Table sorter -->
     <script type="text/javascript" src="webjars/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="webjars/datatables-select/1.3.1/js/dataTables.select.min.js"></script>
@@ -104,11 +104,6 @@
     <link href="webjars/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="webjars/datatables-select/1.3.1/css/select.bootstrap.min.css" rel="stylesheet" type="text/css" />
     <link href="css/datatables-override.css" rel="stylesheet" type="text/css" />
-
-
-    <!-- MultiplayerGame -->
-    <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
-    <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
 
     <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
     <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>

@@ -49,3 +49,29 @@
     background-color: var(--defender-color-dark);
     border-color: var(--defender-color-contrast-dark);
 }
+
+/* Mutant icons
+----------------------------------------------------------------------------- */
+
+.mutantCUTImage {
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    display: inline-block;
+}
+
+.mutantImageAlive {
+    background-image: url('../images/ingameicons/mutant.png');
+}
+.mutantImageEquiv {
+    background-image: url('../images/ingameicons/mutantEquiv.png');
+}
+.mutantImageFlagged {
+    background-image: url('../images/ingameicons/mutantFlagged.png');
+}
+.mutantImageKilled {
+    background-image: url('../images/ingameicons/mutantKilled.png');
+}
+.mutantImageFlagAction {
+    background-image: url('../images/ingameicons/flag.png');
+}

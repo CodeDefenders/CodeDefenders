@@ -12,14 +12,6 @@
     background: #F5F5F5;
 }
 
-.validatorLevelTag {
-    display: inline-block;
-    padding: 0;
-    margin-top: -2px;
-    padding-left: 3px;
-    padding-right: 3px;
-}
-
 #game-container {
     padding-left: 30px;
     padding-right: 30px;
