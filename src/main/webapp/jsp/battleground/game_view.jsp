@@ -57,9 +57,6 @@
 <jsp:include page="/jsp/push_notifications.jsp"/>
 <t:game_chat/>
 
-<%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
-<%--<%@ include file="/jsp/push_game_notifications.jsp"%>--%>
-
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>

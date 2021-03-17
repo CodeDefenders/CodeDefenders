@@ -66,11 +66,6 @@
             <%-- This bar shows the possible interactions at game level --%>
             <div class="col-md-5" style="float: right;">
 
-                <%-- Make those interactive later ! For the moment they are just place holders ! --%>
-                <%-- Probably use some DISABLE CSS or something  --%>
-                <%--<a id="notification-chat" class="notification-icon glyphicon glyphicon-envelope"></a>--%>
-                <%--<a id="notification-game" class="notification-icon glyphicon glyphicon-bell"></a>--%>
-
                 <a href="#" class="btn pull-right" id="btnScoringTooltip" data-toggle="modal"
                    data-target="#scoringTooltip"
                    style="color: black; font-size: 18px; padding: 5px;">
