@@ -37,7 +37,8 @@
 %>
 
 <div id="login" class="container">
-    <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
+    <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" id="form-signin"
+        style="padding: 15px; margin: 0 auto; max-width: 25em;">
         <input type="hidden" name="formType" value="login">
         <h2 class="form-signin-heading">Sign in</h2>
         <label for="inputUsername" class="sr-only">Username</label>

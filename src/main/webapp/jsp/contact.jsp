@@ -64,7 +64,8 @@
 		<label for="inputSubject" class="sr-only">Subject</label>
 		<input type="text" id="inputSubject" name="subject" class="form-control" placeholder="Subject" required autofocus>
 		<label for="inputMessage" class="sr-only">Message</label>
-		<textarea id="inputMessage" name="message" class="form-control" placeholder="Message" rows="8" required></textarea>
+		<textarea id="inputMessage" name="message" class="form-control" placeholder="Message" rows="8" required
+            style="resize: none;"></textarea>
 		<button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>
 	</form>
 <%

@@ -4,71 +4,9 @@
 	font-weight: 700;
 }
 
-.tableform {
-	border-collapse: separate;
-	border-spacing: 20px;
-	font-size: 16px;
-	text-align: center;
-	line-height: 27px;
-}
-
 .table-center td,
 .table-center th {
     text-align:center;
-}
-
-/* TODO: check the form... classes. */
-.form-upload {
-	padding: 15px;
-	margin: 0 auto;
-	max-width: 550px;
-}
-
-.form-creategame-mp {
-	padding: 15px;
-	margin: 0 auto;
-	max-width: 750px;
-}
-
-.form-signin {
-	padding: 15px;
-	margin: 0 auto;
-	max-width: 330px;
-}
-
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-	margin-bottom: 10px;
-}
-.form-signin .checkbox {
-	font-weight: normal;
-}
-
-.form-creategame .form-control,
-.form-signin .form-control {
-	position: relative;
-	height: auto;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	padding: 10px;
-	font-size: 16px;
-}
-
-.form-creategame .form-control:focus,
-.form-signin .form-control:focus {
-	z-index: 2;
-}
-
-.form-signin input[type="email"] {
-	margin-bottom: -1px;
-	border-bottom-right-radius: 0;
-	border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-	margin-bottom: 10px;
-	border-top-left-radius: 0;
-	border-top-right-radius: 0;
 }
 
 /* Read-only textareas */
@@ -79,17 +17,8 @@
 
 .readonly-pre .CodeMirror-lines {
     cursor : default; /* default pointer */
-	text-align: left;
-}
-
-.CodeMirror-sizer {
-	text-align: left;
 }
 
 .readonly-pre .CodeMirror {
-    background: #F5F5F5; /* #f7f7f7; */
-}
-
-textarea[id="inputMessage"] {
-    resize: none;
+    background: #F5F5F5;
 }
