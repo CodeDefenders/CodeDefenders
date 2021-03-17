@@ -1,9 +1,11 @@
 package org.codedefenders.beans.game;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
@@ -85,6 +87,15 @@ public class PlayerFeedbackBean {
             ownRatings = FeedbackDAO.getFeedbackValues(gameId, user.getId());
         }
         return ownRatings;
+    }
+
+    /**
+     * Returns whether the user currently has any valid (> 0) saved ratings.
+     */
+    public boolean hasOwnRatings() {
+        Map<Feedback.Type, Integer> ratings = getOwnRatings();
+        return ratings.values().stream()
+                .anyMatch(rating -> rating > 0);
     }
 
     public Map<Player, Map<Feedback.Type, Integer>> getAllRatings() {

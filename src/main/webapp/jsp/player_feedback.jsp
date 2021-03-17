@@ -152,7 +152,9 @@
                     <p>Thank you for your time.</p>
                     <br>
 
-                    <button class="btn btn-primary" type="submit"> Save Feedback</button>
+                    <button class="btn btn-primary" type="submit" ${playerFeedback.hasOwnRatings() ? "" : "disabled"}>
+                        Save Feedback
+                    </button>
                 </form>
             </div>
             <%}%>
@@ -264,4 +266,10 @@
         document.getElementById('provideFeedbackLink').classList.toggle('active');
         document.getElementById('viewFeedbackLink').classList.toggle('active');
     }
+
+    $(document).ready(() => {
+        $('#sendFeedback').on('change', '.rating input', function () {
+            $('#sendFeedback button[type="submit"]').removeAttr('disabled');
+        });
+    });
 </script>
