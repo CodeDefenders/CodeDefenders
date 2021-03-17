@@ -24,7 +24,7 @@
 
 <%-- The min-height and padding style attributes are here to make the footer a bit smaller, because it looks
      weird if it's the same size of as the header. --%>
-<nav class="navbar navbar-cd" id="footer" style="min-height: 0;">
+<nav class="navbar navbar-cd" id="footer" style="min-height: 0; margin: 0;">
     <div id="navbar-controls-footer">
         <ul class="nav navbar-nav">
             <li>
