@@ -59,12 +59,19 @@ public class DatabaseAccess {
         return s;
     }
 
-    public static void removePlayerEventsForGame(int gameId, int playerId) {
+    /**
+     *
+     * @param gameId The gameId for which to remove the events.
+     * @param userId The userId of the events to remove.
+     *
+     * @implNote Even if the database table column is called {@code Player_ID} it stores User_IDs!
+     */
+    public static void removePlayerEventsForGame(int gameId, int userId) {
         String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=?";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(EventStatus.DELETED.toString()),
                 DatabaseValue.of(gameId),
-                DatabaseValue.of(playerId)};
+                DatabaseValue.of(userId)};
         DB.executeUpdateQuery(query, values);
     }
 
