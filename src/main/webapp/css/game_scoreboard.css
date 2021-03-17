@@ -3,16 +3,16 @@
 }
 
 .scoreboard .attacker {
-    background-color: #772233;
+    background-color: var(--attacker-color-contrast);
 }
 span.attackerTotal {
-    color: #772233;
+    color: var(--attacker-color-contrast);
     text-align: right;
     font-size: 36px;
 }
 
 .scoreboard .attacker.header, .scoreboard .attacker.total {
-    background-color: #884466;
+    background-color: var(--attacker-color);
 }
 
 .scoreBanner {
@@ -22,17 +22,17 @@ span.attackerTotal {
 }
 
 .scoreboard .defender {
-    background-color: #225577;
+    background-color: var(--defender-color-contrast);
 }
 
 span.defenderTotal {
-    color: #225577;
+    color: var(--defender-color-contrast);
     text-align: left;
     font-size: 36px;
 }
 
 .scoreboard .defender.header, .scoreboard .defender.total {
-    background-color: #446688;
+    background-color: var(--defender-color);
 }
 
 .scoreboard .header th {

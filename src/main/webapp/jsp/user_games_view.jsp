@@ -406,8 +406,7 @@
 
                                 if (info.gameState() != GameState.CREATED) { // Game is already running, the user is a player, so she can play
                         %>
-                        <a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
-                           style="background-color: #884466;border-color: #772233;"
+                        <a class="btn btn-sm btn-primary btn-attacker" id="<%="play-"+gameId%>"
                            href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play in melee
                             game</a>
                         <%
@@ -430,8 +429,7 @@
                                 break;
                             default: // The user is not yet a player, so she may join the game
                         %>
-                        <a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
-                           style="background-color: #884466;border-color: #772233;"
+                        <a class="btn btn-sm btn-primary btn-attacker" id="<%="play-"+gameId%>"
                            href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play</a>
                         <%
                                         break;
@@ -801,8 +799,7 @@
                                     <input type="hidden" name="player" value=1>
                                     <%=info.players().size()%>
                                     <button type="submit" id="<%="join-"+info.gameId()%>"
-                                            class="btn btn-primary btn-sm btn-join"
-                                            style="background-color: #884466;border-color: #772233;"
+                                            class="btn btn-primary btn-sm btn-join btn-attacker"
                                             value="Join">
                                         Join
                                     </button>
