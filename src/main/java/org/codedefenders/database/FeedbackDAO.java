@@ -38,6 +38,10 @@ public class FeedbackDAO {
     private static final Logger logger = LoggerFactory.getLogger(FeedbackDAO.class);
 
     public static boolean storeFeedback(int gameId, int userId, Map<Feedback.Type, Integer> ratings) {
+        if (ratings.isEmpty()) {
+            return true;
+        }
+
         List<DatabaseValue<?>> values = new ArrayList<>();
 
         for (Map.Entry<Feedback.Type, Integer> entry : ratings.entrySet()) {
