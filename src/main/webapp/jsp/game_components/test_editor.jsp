@@ -26,6 +26,8 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
+<link href="css/codemirror_customize.css" rel="stylesheet" type="text/css" />
+
 <pre><textarea id="test-code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
 
 <script>

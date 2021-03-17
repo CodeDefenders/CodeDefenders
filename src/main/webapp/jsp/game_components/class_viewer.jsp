@@ -22,8 +22,7 @@
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
-<link href="css/game_highlighting.css" rel="stylesheet" type="text/css" />
-<link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
+<link href="css/codemirror_customize.css" rel="stylesheet" type="text/css" />
 
 
 <%-- no dependencies -> no tabs --%>

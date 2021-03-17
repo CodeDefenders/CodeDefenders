@@ -1,5 +1,9 @@
-/* Icons
--------------------------------------------------- */
+/* CodeMirror customizations
+============================================================================= */
+
+/* Mutant Icons
+----------------------------------------------------------------------------- */
+
 .mutant-icons {
     margin-left: 3px;
     display: inline-block;
@@ -35,7 +39,8 @@
 }
 
 /* Mutant Popovers
--------------------------------------------------- */
+----------------------------------------------------------------------------- */
+
 .mutant-popover-body {
     margin-right: -14px;
     padding-right: 14px;
@@ -56,8 +61,10 @@
     max-width: 100%;
 }
 
-/* Coverage Colors
--------------------------------------------------- */
+/* Highlighting colors / decorations
+----------------------------------------------------------------------------- */
+
+.line-error { border-bottom: 1px dotted #ff0000; }
 .coverage-0 { background-color: rgba(153, 255, 153, 0.00); }
 .coverage-1 { background-color: rgba(153, 255, 153, 0.01); }
 .coverage-2 { background-color: rgba(153, 255, 153, 0.02); }
@@ -159,3 +166,18 @@
 .coverage-98 { background-color: rgba(153, 255, 153, 0.98); }
 .coverage-99 { background-color: rgba(153, 255, 153, 0.99); }
 .coverage-100 { background-color: rgba(153, 255, 153, 1.00); }
+
+/* Style for read-only CodeMirror instances
+----------------------------------------------------------------------------- */
+
+.readonly-pre .CodeMirror-focused .CodeMirror-cursor {
+    visibility: hidden; /* hide cursor */
+}
+
+.readonly-pre .CodeMirror-lines {
+    cursor : default; /* default pointer */
+}
+
+.readonly-pre .CodeMirror {
+    background: #F5F5F5;
+}

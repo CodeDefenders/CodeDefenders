@@ -1,17 +1,3 @@
-/* Read-only textareas */
-
-.readonly-pre .CodeMirror-focused .CodeMirror-cursor {
-    visibility: hidden; /* hide cursor */
-}
-
-.readonly-pre .CodeMirror-lines {
-    cursor : default; /* default pointer */
-}
-
-.readonly-pre .CodeMirror {
-    background: #F5F5F5;
-}
-
 #game-container {
     padding-left: 30px;
     padding-right: 30px;
