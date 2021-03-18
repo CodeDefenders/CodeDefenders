@@ -54,7 +54,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
@@ -199,8 +199,8 @@ public class ParallelizeTest {
 
     }
 
-    private User createAndInsertUserInDBWithDefaultCredentials(String name) {
-        User newUser = new User(name, User.encodePassword("password"), "demo@" + name + ".org");
+    private UserEntity createAndInsertUserInDBWithDefaultCredentials(String name) {
+        UserEntity newUser = new UserEntity(name, UserEntity.encodePassword("password"), "demo@" + name + ".org");
         boolean inserted = newUser.insert();
         assumeTrue(inserted);
         return newUser;
@@ -241,7 +241,7 @@ public class ParallelizeTest {
         return null;
     }
 
-    private MultiplayerGame createStandardBattlegroundStartItAndStoreInDB(GameClass cut, User creator) {
+    private MultiplayerGame createStandardBattlegroundStartItAndStoreInDB(GameClass cut, UserEntity creator) {
         int classId = cut.getId();
         int creatorId = creator.getId();
         GameLevel level = GameLevel.HARD;
@@ -275,9 +275,9 @@ public class ParallelizeTest {
     }
 
     private MultiplayerGame setupTestBattlegroundUsing(String cutName) {
-        User observer = createAndInsertUserInDBWithDefaultCredentials("observer");
-        User defender = createAndInsertUserInDBWithDefaultCredentials("demodefender");
-        User attacker = createAndInsertUserInDBWithDefaultCredentials("demoattacker");
+        UserEntity observer = createAndInsertUserInDBWithDefaultCredentials("observer");
+        UserEntity defender = createAndInsertUserInDBWithDefaultCredentials("demodefender");
+        UserEntity attacker = createAndInsertUserInDBWithDefaultCredentials("demoattacker");
 
         GameClass cut = updateCUTAndStoreInDB(cutName);
 

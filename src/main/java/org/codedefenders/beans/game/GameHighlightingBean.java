@@ -1,7 +1,6 @@
 package org.codedefenders.beans.game;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
@@ -10,7 +9,7 @@ import org.codedefenders.game.GameHighlightingDTO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.JSONUtils;
 
 import com.google.gson.Gson;
@@ -63,7 +62,7 @@ public class GameHighlightingBean {
         this.setGameData(mutants, tests, null);
     }
 
-    public void setGameData(List<Mutant> mutants, List<Test> tests, User user) {
+    public void setGameData(List<Mutant> mutants, List<Test> tests, UserEntity user) {
         gameHighlightingData = new GameHighlightingDTO(mutants, tests, user);
     }
 

@@ -63,7 +63,7 @@ public class Event {
 
     private int gameId = 0;
 
-    private transient User user = null;
+    private transient UserEntity user = null;
 
     private String message = null;
 
@@ -114,7 +114,7 @@ public class Event {
         }
 
         if (procMessage.contains("@event_user")) {
-            User user = getUser();
+            UserEntity user = getUser();
 
             String userLabel = (user == null) ? "Unknown"
                     : (user.getUsername().equals(currentUserName)) ? "You" : user.getUsername();
@@ -151,7 +151,7 @@ public class Event {
         return parsedMessage;
     }
 
-    public User getUser() {
+    public UserEntity getUser() {
         if (user == null) {
             user = UserDAO.getUserById(userId);
         }

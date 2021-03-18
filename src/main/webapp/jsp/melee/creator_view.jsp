@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User"%>
+<%@ page import="org.codedefenders.model.UserEntity"%>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 
@@ -33,7 +33,7 @@
 	MeleeGame game = (MeleeGame) request.getAttribute("game");
 	final GameClass cut = game.getCUT();
 
-    final User user = login.getUser();
+    final UserEntity user = login.getUser();
 %>
 
 

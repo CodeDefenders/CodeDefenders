@@ -30,14 +30,14 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Constants;
 
 @ApplicationScoped
 public class MultiplayerGameService extends AbstractGameService {
 
     @Override
-    protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game) {
+    protected MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
         return new MutantDTO(mutant)
@@ -61,7 +61,7 @@ public class MultiplayerGameService extends AbstractGameService {
     }
 
     @Override
-    protected TestDTO convertTest(Test test, User user, Player player, AbstractGame game) {
+    protected TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
         return new TestDTO(test)

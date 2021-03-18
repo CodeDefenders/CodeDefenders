@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class User implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(User.class);
+public class UserEntity implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(UserEntity.class);
 
     private int id;
     private String username;
@@ -41,23 +41,23 @@ public class User implements Serializable {
     private boolean allowContact;
     private KeyMap keyMap;
 
-    public User(String username) {
-        this(username, User.encodePassword(""));
+    public UserEntity(String username) {
+        this(username, UserEntity.encodePassword(""));
     }
 
-    public User(String username, String encodedPassword) {
+    public UserEntity(String username, String encodedPassword) {
         this(username, encodedPassword, "");
     }
 
-    public User(String username, String encodedPassword, String email) {
+    public UserEntity(String username, String encodedPassword, String email) {
         this(0, username, encodedPassword, email);
     }
 
-    public User(int id, String username, String encodedPassword, String email) {
+    public UserEntity(int id, String username, String encodedPassword, String email) {
         this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT);
     }
 
-    public User(int id, String username, String encodedPassword, String email, boolean validated,
+    public UserEntity(int id, String username, String encodedPassword, String email, boolean validated,
                 boolean active, boolean allowContact, KeyMap keyMap) {
         this.id = id;
         this.username = username;
@@ -202,7 +202,7 @@ public class User implements Serializable {
         if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        User user = (User) other;
+        UserEntity user = (UserEntity) other;
         return getId() == user.getId();
     }
 

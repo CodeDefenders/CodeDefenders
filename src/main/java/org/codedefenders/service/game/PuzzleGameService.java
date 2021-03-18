@@ -28,13 +28,13 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 @ApplicationScoped
 public class PuzzleGameService extends AbstractGameService {
 
     @Override
-    protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game) {
+    protected MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game) {
         if (player == null) {
             return new MutantDTO(mutant);
         } else {
@@ -45,7 +45,7 @@ public class PuzzleGameService extends AbstractGameService {
     }
 
     @Override
-    protected TestDTO convertTest(Test test, User user, Player player, AbstractGame game) {
+    protected TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game) {
         if (player == null) {
             return new TestDTO(test);
         } else {

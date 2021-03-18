@@ -26,7 +26,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.Before;
@@ -84,7 +84,7 @@ public class AdminCreateGamesBeanTest {
         /* Mock bean dependencies of AdminCreateGamesBean. */
         LoginBean loginBean = PowerMockito.mock(LoginBean.class);
         PowerMockito.when(loginBean.getUserId()).thenReturn(0);
-        PowerMockito.when(loginBean.getUser()).thenReturn(new User(0, "creator", "", ""));
+        PowerMockito.when(loginBean.getUser()).thenReturn(new UserEntity(0, "creator", "", ""));
 
         MessagesBean messagesBean = PowerMockito.mock(MessagesBean.class);
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);
@@ -111,14 +111,14 @@ public class AdminCreateGamesBeanTest {
     @Before
     public void initializeData() {
         userInfos = new HashMap<>();
-        userInfos.put(1, new UserInfo(new User(1, "userA", "", "userA@email.com"), null, Role.ATTACKER, 1));
-        userInfos.put(2, new UserInfo(new User(2, "userB", "", "userB@email.com"), null, Role.ATTACKER, 2));
-        userInfos.put(3, new UserInfo(new User(3, "userC", "", "userC@email.com"), null, Role.ATTACKER, 3));
-        userInfos.put(4, new UserInfo(new User(4, "userD", "", "userD@email.com"), null, Role.ATTACKER, 4));
-        userInfos.put(5, new UserInfo(new User(5, "userE", "", "userE@email.com"), null, Role.PLAYER, 5));
-        userInfos.put(6, new UserInfo(new User(6, "userF", "", "userF@email.com"), null, Role.PLAYER, 6));
-        userInfos.put(7, new UserInfo(new User(7, "userG", "", "userG@email.com"), null, Role.DEFENDER, 7));
-        userInfos.put(8, new UserInfo(new User(8, "userH", "", "userH@email.com"), null, Role.DEFENDER, 8));
+        userInfos.put(1, new UserInfo(new UserEntity(1, "userA", "", "userA@email.com"), null, Role.ATTACKER, 1));
+        userInfos.put(2, new UserInfo(new UserEntity(2, "userB", "", "userB@email.com"), null, Role.ATTACKER, 2));
+        userInfos.put(3, new UserInfo(new UserEntity(3, "userC", "", "userC@email.com"), null, Role.ATTACKER, 3));
+        userInfos.put(4, new UserInfo(new UserEntity(4, "userD", "", "userD@email.com"), null, Role.ATTACKER, 4));
+        userInfos.put(5, new UserInfo(new UserEntity(5, "userE", "", "userE@email.com"), null, Role.PLAYER, 5));
+        userInfos.put(6, new UserInfo(new UserEntity(6, "userF", "", "userF@email.com"), null, Role.PLAYER, 6));
+        userInfos.put(7, new UserInfo(new UserEntity(7, "userG", "", "userG@email.com"), null, Role.DEFENDER, 7));
+        userInfos.put(8, new UserInfo(new UserEntity(8, "userH", "", "userH@email.com"), null, Role.DEFENDER, 8));
     }
 
     private Set<UserInfo> userSet(int... ids) {
@@ -241,7 +241,7 @@ public class AdminCreateGamesBeanTest {
 
         PowerMockito.when(MultiplayerGameDAO.storeMultiplayerGame(Matchers.any(MultiplayerGame.class))).thenReturn(0);
         PowerMockito.when(GameDAO.addPlayerToGame(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(Role.class))).thenReturn(true);
-        PowerMockito.when(UserDAO.getUserById(Matchers.anyInt())).thenReturn(new User(""));
+        PowerMockito.when(UserDAO.getUserById(Matchers.anyInt())).thenReturn(new UserEntity(""));
         adminCreateGamesBean = PowerMockito.spy(adminCreateGamesBean);
 
         adminCreateGamesBean.createStagedGames(stagedGames);

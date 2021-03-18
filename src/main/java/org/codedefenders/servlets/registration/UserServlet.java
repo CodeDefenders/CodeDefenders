@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.validation.input.CodeDefendersValidator;
@@ -56,7 +56,7 @@ public class UserServlet extends HttpServlet {
                 } else if (UserDAO.getUserByEmail(email) != null) {
                     messages.add("Could not create user. Email has already been used. You can reset your password.");
                 } else {
-                    User newUser = new User(username, User.encodePassword(password), email);
+                    UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);
                     if (newUser.insert()) {
                         messages.add("Your user has been created. You can login now.");
                     } else {

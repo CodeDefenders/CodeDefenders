@@ -15,7 +15,7 @@ import javax.enterprise.context.RequestScoped;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 /**
  * <p>
@@ -121,7 +121,7 @@ public class MeleeScoreboardBean {
         for (Player player : this.players) {
             // We need user id because User is not Hashable (maybe it does not redefine
             // proper hash/equals?)
-            User user = player.getUser();
+            UserEntity user = player.getUser();
             int playerId = player.getId();
             PlayerScore attackScore = mutantsScores.get(user.getId());
             if (attackScore == null) {

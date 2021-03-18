@@ -26,7 +26,7 @@ import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 public interface IGameService {
 
@@ -36,7 +36,7 @@ public interface IGameService {
 
     List<MutantDTO> getMutants(int userId, int gameId);
 
-    List<MutantDTO> getMutants(User user, AbstractGame game);
+    List<MutantDTO> getMutants(UserEntity user, AbstractGame game);
 
     TestDTO getTest(int userId, int testId);
 
@@ -44,5 +44,5 @@ public interface IGameService {
 
     List<TestDTO> getTests(int userId, int gameId);
 
-    List<TestDTO> getTests(User user, AbstractGame game);
+    List<TestDTO> getTests(UserEntity user, AbstractGame game);
 }

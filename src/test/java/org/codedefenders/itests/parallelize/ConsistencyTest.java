@@ -70,7 +70,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
@@ -217,19 +217,19 @@ public class ConsistencyTest {
      */
     @Test
     public void testRunAllTestsOnMutant() throws IOException, InterruptedException {
-        User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
+        UserEntity observer = new UserEntity("observer", UserEntity.encodePassword("password"), "demo@observer.com");
         observer.insert();
         //
         System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Observer " + observer.getId());
-        User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
+        UserEntity attacker = new UserEntity("demoattacker", UserEntity.encodePassword("password"), "demo@attacker.com");
         attacker.insert();
         System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Attacker" + attacker.getId());
         //
         // Create 3 defenders
         //
-        User[] defenders = new User[3];
+        UserEntity[] defenders = new UserEntity[3];
         for (int i = 0; i < defenders.length; i++) {
-            defenders[i] = new User("demodefender" + i, User.encodePassword("password"), "demo"+i+"@defender.com");
+            defenders[i] = new UserEntity("demodefender" + i, UserEntity.encodePassword("password"), "demo"+i+"@defender.com");
             defenders[i].insert();
             System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
         }
@@ -264,7 +264,7 @@ public class ConsistencyTest {
 
         // Attacker and Defender must join the game. Those calls update also the db
         multiplayerGame.addPlayer(attacker.getId(), Role.ATTACKER);
-        for (User defender : defenders) {
+        for (UserEntity defender : defenders) {
             multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
         }
 
@@ -286,7 +286,7 @@ public class ConsistencyTest {
                 Charset.defaultCharset());
         //
         List<org.codedefenders.game.Test> tests = new ArrayList<>();
-        for (final User defender : defenders) {
+        for (final UserEntity defender : defenders) {
             tests.add(gameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
                     Constants.MODE_BATTLEGROUND_DIR));
         }

@@ -27,7 +27,7 @@ import java.util.Objects;
 import org.codedefenders.game.Role;
 
 /**
- * This class serves as a container class for {@link User Users} and
+ * This class serves as a container class for {@link UserEntity Users} and
  * additional information.
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
@@ -37,19 +37,19 @@ public class UserInfo implements Serializable {
             .ofPattern("yyyy-MM-dd HH:mm")
             .withZone(ZoneId.systemDefault());
 
-    private final User user;
+    private final UserEntity user;
     private final Instant lastLogin;
     private final Role lastRole;
     private final int totalScore;
 
-    public UserInfo(User user, Instant lastLogin, Role lastRole, int totalScore) {
+    public UserInfo(UserEntity user, Instant lastLogin, Role lastRole, int totalScore) {
         this.user = user;
         this.lastLogin = lastLogin;
         this.lastRole = lastRole;
         this.totalScore = totalScore;
     }
 
-    public User getUser() {
+    public UserEntity getUser() {
         return user;
     }
 

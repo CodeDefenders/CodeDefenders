@@ -70,7 +70,7 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
@@ -186,7 +186,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    User defender = UserDAO.getUserForPlayer(defenderId);
+                    UserEntity defender = UserDAO.getUserForPlayer(defenderId);
 
                     request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
@@ -1010,7 +1010,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                User mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
+                                UserEntity mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
 
                                 Event event = new Event(-1, gameId, mutantOwner.getId(),
                                         "One or more of your mutants is flagged equivalent.",

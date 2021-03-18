@@ -67,7 +67,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -195,7 +195,7 @@ public class MeleeGameManager extends HttpServlet {
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    User defender = UserDAO.getUserForPlayer(defenderId);
+                    UserEntity defender = UserDAO.getUserForPlayer(defenderId);
                     // TODO This should be a better name
                     request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
@@ -238,7 +238,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         final String action = ServletUtils.formType(request);
-        final User user = UserDAO.getUserById(login.getUserId());
+        final UserEntity user = UserDAO.getUserById(login.getUserId());
 
         final int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
@@ -327,7 +327,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     @SuppressWarnings("Duplicates")
-    private void createTest(HttpServletRequest request, HttpServletResponse response, User user, MeleeGame game)
+    private void createTest(HttpServletRequest request, HttpServletResponse response, UserEntity user, MeleeGame game)
             throws IOException {
 
         final String contextPath = ctx(request);
@@ -537,7 +537,7 @@ public class MeleeGameManager extends HttpServlet {
         return decorated.toString();
     }
 
-    private void createMutant(HttpServletRequest request, HttpServletResponse response, User user, MeleeGame game,
+    private void createMutant(HttpServletRequest request, HttpServletResponse response, UserEntity user, MeleeGame game,
             int playerId) throws IOException {
 
         final String contextPath = ctx(request);
@@ -728,7 +728,7 @@ public class MeleeGameManager extends HttpServlet {
                     m.kill(Mutant.Equivalence.DECLARED_YES);
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
-                    User eventUser = UserDAO.getUserById(login.getUserId());
+                    UserEntity eventUser = UserDAO.getUserById(login.getUserId());
 
                     Event notifEquiv = new Event(-1, game.getId(), login.getUserId(),
                             eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.",
@@ -987,7 +987,7 @@ public class MeleeGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                User mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
+                                UserEntity mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
 
                                 Event event = new Event(-1, gameId, mutantOwner.getId(),
                                         "One or more of your mutants is flagged equivalent.",

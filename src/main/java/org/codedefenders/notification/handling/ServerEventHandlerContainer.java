@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.commons.lang.NotImplementedException;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.GameLifecycleRegistrationEvent;
@@ -32,12 +32,12 @@ public class ServerEventHandlerContainer {
 
     private INotificationService notificationService;
     private PushSocket socket;
-    private User user;
+    private UserEntity user;
     private String ticket;
 
     private Map<ServerEventHandler, ServerEventHandler> handlers;
 
-    public ServerEventHandlerContainer(INotificationService notificationService, PushSocket socket, User user, String ticket) {
+    public ServerEventHandlerContainer(INotificationService notificationService, PushSocket socket, UserEntity user, String ticket) {
         this.notificationService = notificationService;
         this.socket = socket;
         this.user = user;

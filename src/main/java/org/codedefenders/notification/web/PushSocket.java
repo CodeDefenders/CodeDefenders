@@ -20,10 +20,6 @@ package org.codedefenders.notification.web;
 
 import java.io.IOException;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.EncodeException;
@@ -36,7 +32,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
 import org.codedefenders.notification.events.EventNames;
@@ -96,7 +92,7 @@ public class PushSocket {
     private ITicketingService ticketingServices;
 
     // Authorization
-    private User user;
+    private UserEntity user;
     private String ticket;
     private boolean open;
 
@@ -127,7 +123,7 @@ public class PushSocket {
             return;
         }
 
-        User user = UserDAO.getUserById(userId);
+        UserEntity user = UserDAO.getUserById(userId);
 
         if (user == null) {
             logger.info("Invalid user id for session " + session);

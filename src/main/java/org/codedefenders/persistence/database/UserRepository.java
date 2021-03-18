@@ -22,12 +22,12 @@ package org.codedefenders.persistence.database;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 @ApplicationScoped
 public class UserRepository {
 
-    public User getUserByName(String name) {
+    public UserEntity getUserByName(String name) {
         return UserDAO.getUserByName(name);
     }
 }

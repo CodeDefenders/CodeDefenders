@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 /**
  * This class handles the database logic for players.
@@ -39,7 +39,7 @@ public class PlayerDAO {
      * Constructs a player from a {@link ResultSet} entry.
      *
      * @param rs The {@link ResultSet}.
-     * @return The constructed player together with an {@link User} instance.
+     * @return The constructed player together with an {@link UserEntity} instance.
      * @see DB.RSMapper
      */
     static Player playerFromRS(ResultSet rs) throws SQLException {
@@ -70,7 +70,7 @@ public class PlayerDAO {
      * </ul>
      *
      * @param rs The {@link ResultSet}.
-     * @return The constructed player together with an {@link User} instance.
+     * @return The constructed player together with an {@link UserEntity} instance.
      * @see DB.RSMapper
      */
     static Player playerWithUserFromRS(ResultSet rs) throws SQLException {
@@ -89,7 +89,7 @@ public class PlayerDAO {
         boolean allowContact = rs.getBoolean("usersAllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("usersKeyMap"));
 
-        final User user = new User(userId, userName, password, email, validated, userActive, allowContact, keyMap);
+        final UserEntity user = new UserEntity(userId, userName, password, email, validated, userActive, allowContact, keyMap);
 
         return new Player(id, user, gameId, points, role, active);
     }

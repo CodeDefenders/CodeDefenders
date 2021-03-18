@@ -26,7 +26,7 @@
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.List" %>
@@ -47,9 +47,9 @@
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
-    User equivDefender = (User) request.getAttribute("equivDefender");
+    UserEntity equivDefender = (UserEntity) request.getAttribute("equivDefender");
 
-    final User user = login.getUser();
+    final UserEntity user = login.getUser();
     // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
     final int userId = login.getUserId();
     final List<Test> playerTests = game.getTests()

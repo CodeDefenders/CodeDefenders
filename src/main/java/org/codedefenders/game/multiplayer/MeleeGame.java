@@ -38,7 +38,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 public class MeleeGame extends AbstractGame {
@@ -332,7 +332,7 @@ public class MeleeGame extends AbstractGame {
 
     public boolean addPlayer(int userId) {
         if (canJoinGame(userId) && addPlayerForce(userId, Role.PLAYER)) {
-            User u = UserDAO.getUserById(userId);
+            UserEntity u = UserDAO.getUserById(userId);
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event e = new Event(-1, id, userId, u.getUsername() + " joined melee game", EventType.PLAYER_JOINED,
                     EventStatus.GAME, timestamp);

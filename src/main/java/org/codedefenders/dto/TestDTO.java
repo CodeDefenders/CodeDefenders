@@ -26,7 +26,7 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 import com.google.gson.annotations.Expose;
 
@@ -54,7 +54,7 @@ public class TestDTO {
     public TestDTO(Test test) {
         this.test = test;
         this.id = test.getId();
-        User creator = UserDAO.getUserForPlayer(test.getPlayerId());
+        UserEntity creator = UserDAO.getUserForPlayer(test.getPlayerId());
         this.creator = new UserDTO(creator.getId(), creator.getUsername());
         this.points = test.getScore();
         this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);

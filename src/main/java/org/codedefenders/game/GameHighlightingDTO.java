@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Constants;
 
 import com.google.gson.annotations.Expose;
@@ -70,7 +70,7 @@ public class GameHighlightingDTO {
      * @param mutants The mutants in the game.
      * @param tests The tests in the game.
      */
-    public GameHighlightingDTO(List<Mutant> mutants, List<Test> tests, User user) {
+    public GameHighlightingDTO(List<Mutant> mutants, List<Test> tests, UserEntity user) {
         this.mutantIdsPerLine = new TreeMap<>();
         this.testIdsPerLine = new TreeMap<>();
         this.mutants = new TreeMap<>();
@@ -133,7 +133,7 @@ public class GameHighlightingDTO {
         @Expose public Mutant.State status;
         @Expose public boolean canClaim;
 
-        public GHMutantDTO(Mutant mutant, User user) {
+        public GHMutantDTO(Mutant mutant, UserEntity user) {
             this.id = mutant.getId();
             this.score = mutant.getScore();
             this.creatorName = mutant.getCreatorName();

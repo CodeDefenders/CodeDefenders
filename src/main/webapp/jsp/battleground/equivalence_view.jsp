@@ -19,7 +19,7 @@
 
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
@@ -36,7 +36,7 @@
 
 <%
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
-    User equivDefender = (User) request.getAttribute("equivDefender");
+    UserEntity equivDefender = (UserEntity) request.getAttribute("equivDefender");
 
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();

@@ -43,7 +43,7 @@ import org.codedefenders.game.scoring.Scorer;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +85,7 @@ public class ParallelMutationTester extends MutationTester //
         List<Mutant> killedMutants = new ArrayList<Mutant>();
 
         // Acquire and release the connection
-        User u = UserDAO.getUserForPlayer(test.getPlayerId());
+        UserEntity u = UserDAO.getUserForPlayer(test.getPlayerId());
 
         // Fork and Join parallelization
         Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
@@ -202,7 +202,7 @@ public class ParallelMutationTester extends MutationTester //
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
-        User u = UserDAO.getUserForPlayer(mutant.getPlayerId());
+        UserEntity u = UserDAO.getUserForPlayer(mutant.getPlayerId());
 
         final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
         for (Test test : tests) {

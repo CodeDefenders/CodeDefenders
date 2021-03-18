@@ -24,7 +24,7 @@
 <%@ page import="org.codedefenders.database.TestDAO" %>
 <%@ page import="org.codedefenders.database.MutantDAO" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
-<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="java.util.Map" %>
 
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
@@ -70,7 +70,7 @@
                     int total = 0;
                     for (Player attacker : attackers) {
                         int playerId = attacker.getId();
-                        User aUser = attacker.getUser();
+                        UserEntity aUser = attacker.getUser();
                         // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
                         // Does system attacker submitted any mutant?
                         // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
@@ -171,7 +171,7 @@
                     <%
                         for (Player defender : defenders) {
                             int playerId = defender.getId();
-                            User dUser = defender.getUser();
+                            UserEntity dUser = defender.getUser();
 
                             // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
                             // XXX: Hardcoded id for system user

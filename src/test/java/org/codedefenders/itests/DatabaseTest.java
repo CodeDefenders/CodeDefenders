@@ -22,14 +22,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -50,8 +46,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Feedback;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -88,10 +83,10 @@ public class DatabaseTest {
 
     @Before // BeforeClass has to be static...
     public void createEntities() {
-        user1 = new User("FREE_USERNAME", User.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
-        user2 = new User("FREE_USERNAME2", User.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
+        user1 = new UserEntity("FREE_USERNAME", UserEntity.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
+        user2 = new UserEntity("FREE_USERNAME2", UserEntity.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
 
-        creator = new User(20000, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
+        creator = new UserEntity(20000, "FREE_USERNAME3", UserEntity.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
 
         cut1 = GameClass.build()
                 .id(22345678)
@@ -136,9 +131,9 @@ public class DatabaseTest {
         });
     }
 
-    private User creator;
-    private User user1;
-    private User user2;
+    private UserEntity creator;
+    private UserEntity user1;
+    private UserEntity user2;
 
     private MultiplayerGame multiplayerGame;
 
@@ -151,13 +146,13 @@ public class DatabaseTest {
     @Test
     public void testInsertUser() throws Exception {
         assertTrue(user1.insert());
-        User userFromDB = UserDAO.getUserById(user1.getId());
+        UserEntity userFromDB = UserDAO.getUserById(user1.getId());
         assertEquals(user1.getId(), userFromDB.getId());
         assertEquals(user1.getUsername(), userFromDB.getUsername());
         assertEquals(user1.getEmail(), userFromDB.getEmail());
         // FIXME this is never written to the DB
         // assertEquals(user1.isValidated(), userFromDB.isValidated());
-        assertTrue(User.passwordMatches("TEST_PASSWORD", userFromDB.getEncodedPassword()));
+        assertTrue(UserEntity.passwordMatches("TEST_PASSWORD", userFromDB.getEncodedPassword()));
         assertNotEquals("Password should not be stored in plain text", "TEST_PASSWORD", userFromDB.getEncodedPassword());
         // FIXME Split this in two tests
         // assertFalse("Inserting a user twice should fail", user1.insert());
@@ -167,12 +162,12 @@ public class DatabaseTest {
     public void testUpdateUser() {
         assumeTrue(user1.insert());
 
-        user1.setEncodedPassword(User.encodePassword("TEST_PASSWORD" + "_new"));
+        user1.setEncodedPassword(UserEntity.encodePassword("TEST_PASSWORD" + "_new"));
         user1.setUsername(user1.getUsername() + "_new");
         user1.setEmail(user1.getEmail() + "_new");
 
         assertTrue(user1.update());
-        User userFromDB = UserDAO.getUserById(user1.getId());
+        UserEntity userFromDB = UserDAO.getUserById(user1.getId());
         assertEquals(user1.getId(), userFromDB.getId());
         assertEquals(user1.getUsername(), userFromDB.getUsername());
         assertEquals(user1.getEmail(), userFromDB.getEmail());

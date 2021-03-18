@@ -27,13 +27,12 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 /**
  * This class handles the database logic for mutants.
- * @see User
+ * @see UserEntity
  */
 public class UserDAO {
 
@@ -43,7 +42,7 @@ public class UserDAO {
      * @return The constructed user.
      * @see RSMapper
      */
-    static User userFromRS(ResultSet rs) throws SQLException {
+    static UserEntity userFromRS(ResultSet rs) throws SQLException {
         int userId = rs.getInt("User_ID");
         String password = rs.getString("Password");
         String userName = rs.getString("Username");
@@ -53,13 +52,13 @@ public class UserDAO {
         boolean allowContact = rs.getBoolean("AllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("KeyMap"));
 
-        return new User(userId, userName, password, email, validated, active, allowContact, keyMap);
+        return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap);
     }
 
     /**
      * Returns the user for the given user id.
      */
-    public static User getUserById(int userId) throws UncheckedSQLException, SQLMappingException {
+    public static UserEntity getUserById(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE User_ID = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(userId));
     }
@@ -67,7 +66,7 @@ public class UserDAO {
     /**
      * Returns the user with the given name.
      */
-    public static User getUserByName(String name) throws UncheckedSQLException, SQLMappingException {
+    public static UserEntity getUserByName(String name) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Username=?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(name));
     }
@@ -75,12 +74,12 @@ public class UserDAO {
     /**
      * Returns the user with the given email.
      */
-    public static User getUserByEmail(String email) throws UncheckedSQLException, SQLMappingException {
+    public static UserEntity getUserByEmail(String email) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Email = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(email));
     }
 
-    public static User getUserForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
+    public static UserEntity getUserForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT users.*",
                 "FROM users, players",
@@ -92,7 +91,7 @@ public class UserDAO {
     /**
      * Returns a list of all users (including dummy / system users).
      */
-    public static List<User> getUsers() throws UncheckedSQLException, SQLMappingException {
+    public static List<UserEntity> getUsers() throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users";
         return DB.executeQueryReturnList(query, UserDAO::userFromRS);
     }
@@ -101,7 +100,7 @@ public class UserDAO {
      * Returns a list of real users (not including dummy / system users), which are not taking part in a currently
      * active game.
      */
-    public static List<User> getUnassignedUsers() throws UncheckedSQLException, SQLMappingException {
+    public static List<UserEntity> getUnassignedUsers() throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT DISTINCT u.*",
                 "FROM view_valid_users u",

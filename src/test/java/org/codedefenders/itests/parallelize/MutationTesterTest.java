@@ -23,8 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.Executors;
@@ -48,10 +46,9 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidator;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -61,8 +58,6 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -203,24 +198,24 @@ public class MutationTesterTest {
     public void testRunAllTestsOnMutant() throws IOException, InterruptedException {
 
         // Create the users, game, and such
-        User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
+        UserEntity observer = new UserEntity("observer", UserEntity.encodePassword("password"), "demo@observer.com");
         observer.insert();
 
-        User[] attackers = new User[3];
-        attackers[0] = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
+        UserEntity[] attackers = new UserEntity[3];
+        attackers[0] = new UserEntity("demoattacker", UserEntity.encodePassword("password"), "demo@attacker.com");
         attackers[0].insert();
-        attackers[1] = new User("demoattacker1", User.encodePassword("password"), "demo1@attacker.com");
+        attackers[1] = new UserEntity("demoattacker1", UserEntity.encodePassword("password"), "demo1@attacker.com");
         attackers[1].insert();
-        attackers[2] = new User("demoattacker2", User.encodePassword("password"), "demo2@attacker.com");
+        attackers[2] = new UserEntity("demoattacker2", UserEntity.encodePassword("password"), "demo2@attacker.com");
         attackers[2].insert();
 
         //
-        User[] defenders = new User[3];
-        defenders[0] = new User("demodefender", User.encodePassword("password"), "demo@defender.com");
+        UserEntity[] defenders = new UserEntity[3];
+        defenders[0] = new UserEntity("demodefender", UserEntity.encodePassword("password"), "demo@defender.com");
         defenders[0].insert();
-        defenders[1] = new User("demodefender1", User.encodePassword("password"), "demo1@defender.com");
+        defenders[1] = new UserEntity("demodefender1", UserEntity.encodePassword("password"), "demo1@defender.com");
         defenders[1].insert();
-        defenders[2] = new User("demodefender2", User.encodePassword("password"), "demo2@defender.com");
+        defenders[2] = new UserEntity("demodefender2", UserEntity.encodePassword("password"), "demo2@defender.com");
         defenders[2].insert();
 
         // Taken from Game 232

@@ -36,7 +36,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 public abstract class AbstractGameService implements IGameService {
 
@@ -59,7 +59,7 @@ public abstract class AbstractGameService implements IGameService {
     public MutantDTO getMutant(int userId, Mutant mutant) {
         AbstractGame game = GameDAO.getGame(mutant.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, mutant.getGameId());
-        User user = UserDAO.getUserById(userId);
+        UserEntity user = UserDAO.getUserById(userId);
         if (game != null) {
             return convertMutant(mutant, user, player, game);
         } else {
@@ -69,7 +69,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<MutantDTO> getMutants(int userId, int gameId) {
-        User user = UserDAO.getUserById(userId);
+        UserEntity user = UserDAO.getUserById(userId);
         AbstractGame game = GameDAO.getGame(gameId);
         if (game != null) {
             return getMutants(user, game);
@@ -79,7 +79,7 @@ public abstract class AbstractGameService implements IGameService {
     }
 
     @Override
-    public List<MutantDTO> getMutants(User user, AbstractGame game) {
+    public List<MutantDTO> getMutants(UserEntity user, AbstractGame game) {
         Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
         return game.getMutants().stream()
                 .map(mutant -> convertMutant(mutant, user, player, game))
@@ -89,7 +89,7 @@ public abstract class AbstractGameService implements IGameService {
 
     // NOTE: This could be split into several methods. Like: canFlag(Mutant mutant, Player player, AbstractGame game);
     //  So the actual building of the MutantDTO could happen in this class.
-    protected abstract MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game);
+    protected abstract MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game);
 
 
     @Override
@@ -101,7 +101,7 @@ public abstract class AbstractGameService implements IGameService {
     public TestDTO getTest(int userId, Test test) {
         AbstractGame game = GameDAO.getGame(test.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, test.getGameId());
-        User user = UserDAO.getUserById(userId);
+        UserEntity user = UserDAO.getUserById(userId);
         if (game != null) {
             return convertTest(test, user, player, game);
         } else {
@@ -111,7 +111,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<TestDTO> getTests(int userId, int gameId) {
-        User user = UserDAO.getUserById(userId);
+        UserEntity user = UserDAO.getUserById(userId);
         AbstractGame game = GameDAO.getGame(gameId);
         if (game != null) {
             return getTests(user, game);
@@ -121,7 +121,7 @@ public abstract class AbstractGameService implements IGameService {
     }
 
     @Override
-    public List<TestDTO> getTests(User user, AbstractGame game) {
+    public List<TestDTO> getTests(UserEntity user, AbstractGame game) {
         Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
         return game.getTests().stream()
                 .map(test -> convertTest(test, user, player, game))
@@ -129,10 +129,10 @@ public abstract class AbstractGameService implements IGameService {
                 .collect(Collectors.toList());
     }
 
-    protected abstract TestDTO convertTest(Test test, User user, Player player, AbstractGame game);
+    protected abstract TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game);
 
     // TODO:
-    protected Role determineRole(User user, Player player, AbstractGame game) {
+    protected Role determineRole(UserEntity user, Player player, AbstractGame game) {
         Role result = null;
         if (game != null) {
             if (player != null) {

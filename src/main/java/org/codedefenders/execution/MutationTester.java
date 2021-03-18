@@ -39,7 +39,7 @@ import org.codedefenders.game.scoring.Scorer;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,7 +117,7 @@ public class MutationTester implements IMutationTester {
         List<Mutant> killedMutants = new ArrayList<>();
 
         // Acquire and release the connection
-        User u = UserDAO.getUserForPlayer(test.getPlayerId());
+        UserEntity u = UserDAO.getUserForPlayer(test.getPlayerId());
 
         for (Mutant mutant : mutants) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -188,7 +188,7 @@ public class MutationTester implements IMutationTester {
     public void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages) {
 
         int testOwnerPlayerId = test.getPlayerId();
-        User u = UserDAO.getUserForPlayer(testOwnerPlayerId);
+        UserEntity u = UserDAO.getUserForPlayer(testOwnerPlayerId);
 
         List<Mutant> mutants = game.getAliveMutants().stream().filter(m -> m.getPlayerId() != testOwnerPlayerId)
                 .collect(Collectors.toList());
@@ -280,7 +280,7 @@ public class MutationTester implements IMutationTester {
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
-        User u = UserDAO.getUserForPlayer(mutant.getPlayerId());
+        UserEntity u = UserDAO.getUserForPlayer(mutant.getPlayerId());
 
         for (Test test : tests) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -428,7 +428,7 @@ public class MutationTester implements IMutationTester {
             TestScheduler scheduler) {
 
         int mutantOwnerPlayerId = mutant.getPlayerId();
-        User u = UserDAO.getUserForPlayer(mutantOwnerPlayerId);
+        UserEntity u = UserDAO.getUserForPlayer(mutantOwnerPlayerId);
 
         // Get all the tests from the game which DO NOT belong to mutantOwnerPlayerId
         // Note we need to return the test for all the roles to include PLAYER

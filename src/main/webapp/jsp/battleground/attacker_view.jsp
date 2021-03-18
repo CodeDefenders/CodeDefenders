@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User"%>
+<%@ page import="org.codedefenders.model.UserEntity"%>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
@@ -40,7 +40,7 @@
 
     boolean showTestAccordion = game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED);
 
-    final User user = login.getUser();
+    final UserEntity user = login.getUser();
 
 %>
 

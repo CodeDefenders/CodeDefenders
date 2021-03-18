@@ -33,7 +33,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
@@ -74,7 +74,7 @@ public class PasswordServlet extends HttpServlet {
             case "resetPassword":
                 email = request.getParameter("accountEmail");
                 username = request.getParameter("accountUsername");
-                User u = UserDAO.getUserByEmail(email);
+                UserEntity u = UserDAO.getUserByEmail(email);
                 if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
                     messages.add("No such User found or Email and Username do not match");
                 } else {
@@ -104,8 +104,8 @@ public class PasswordServlet extends HttpServlet {
                     if (!(validator.validPassword(password))) {
                         messages.add("Password not changed. Make sure it is valid.");
                     } else if (password.equals(confirm)) {
-                        User user = UserDAO.getUserById(userId);
-                        user.setEncodedPassword(User.encodePassword(password));
+                        UserEntity user = UserDAO.getUserById(userId);
+                        user.setEncodedPassword(UserEntity.encodePassword(password));
                         if (user.update()) {
                             DatabaseAccess.setPasswordResetSecret(user.getId(), null);
                             responseURL = request.getContextPath() + Paths.LOGIN;

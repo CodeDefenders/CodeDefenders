@@ -18,7 +18,7 @@
   --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.Optional" %>
 <%@ page import="org.codedefenders.game.GameState" %>

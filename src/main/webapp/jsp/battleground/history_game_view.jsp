@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User"%>
+<%@ page import="org.codedefenders.model.UserEntity"%>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.Optional" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
@@ -61,7 +61,7 @@
     final GameClass cut = game.getCUT();
     Role role = game.getRole(login.getUserId());
 
-    final User user = login.getUser();
+    final UserEntity user = login.getUser();
 
 %>
 

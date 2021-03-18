@@ -7,7 +7,7 @@ import org.codedefenders.beans.game.GameChatBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.client.chat.ClientGameChatEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
@@ -33,13 +33,13 @@ public class ClientEventHandler {
 
     private INotificationService notificationService;
     private ServerEventHandlerContainer serverEventHandlerContainer;
-    private User user;
+    private UserEntity user;
     private String ticket;
 
     public ClientEventHandler(
             INotificationService notificationService,
             ServerEventHandlerContainer serverEventHandlerContainer,
-            User user,
+            UserEntity user,
             String ticket) {
         this.notificationService = notificationService;
         this.serverEventHandlerContainer = serverEventHandlerContainer;

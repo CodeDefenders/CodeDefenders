@@ -37,7 +37,7 @@ import org.apache.commons.lang.math.IntRange;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
 /**
- * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
+ * This {@link HttpServlet} handles admin requests for managing {@link UserEntity Users}.
  *
  * <p>Serves on path: {@code /admin/users}.
  */
@@ -145,7 +145,7 @@ public class AdminUserManagement extends HttpServlet {
     }
 
     private boolean setUserInactive(int userId) {
-        final User user = UserDAO.getUserById(userId);
+        final UserEntity user = UserDAO.getUserById(userId);
         if (user == null) {
             return false;
         }
@@ -158,7 +158,7 @@ public class AdminUserManagement extends HttpServlet {
 
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
-        User u = UserDAO.getUserById(userId);
+        UserEntity u = UserDAO.getUserById(userId);
         if (u == null) {
             return "Error. User " + userId + " cannot be retrieved from database.";
         }
@@ -189,7 +189,7 @@ public class AdminUserManagement extends HttpServlet {
             if (!validator.validPassword(password)) {
                 return "Password is not valid";
             }
-            u.setEncodedPassword(User.encodePassword(password));
+            u.setEncodedPassword(UserEntity.encodePassword(password));
         }
         u.setUsername(name);
         u.setEmail(email);
@@ -267,7 +267,7 @@ public class AdminUserManagement extends HttpServlet {
             email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
         }
 
-        final User user = new User(username, User.encodePassword(password), email);
+        final UserEntity user = new UserEntity(username, UserEntity.encodePassword(password), email);
         final boolean createSuccess = user.insert();
 
         if (!createSuccess) {
@@ -303,9 +303,9 @@ public class AdminUserManagement extends HttpServlet {
 
         String newPassword = generatePW();
 
-        if (AdminDAO.setUserPassword(uid, User.encodePassword(newPassword))) {
+        if (AdminDAO.setUserPassword(uid, UserEntity.encodePassword(newPassword))) {
             if (AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue()) {
-                User u = UserDAO.getUserById(uid);
+                UserEntity u = UserDAO.getUserById(uid);
                 String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
                 EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
             }

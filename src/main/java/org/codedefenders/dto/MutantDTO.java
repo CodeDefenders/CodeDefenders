@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 import com.google.gson.annotations.Expose;
 
@@ -87,7 +87,7 @@ public class MutantDTO {
     }
 
     @Deprecated
-    public MutantDTO(Mutant mutant, User user, boolean playerCoverToClaim) {
+    public MutantDTO(Mutant mutant, UserEntity user, boolean playerCoverToClaim) {
         this(mutant);
     }
 

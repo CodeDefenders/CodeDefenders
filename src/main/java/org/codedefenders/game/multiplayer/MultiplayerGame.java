@@ -40,7 +40,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
@@ -300,7 +300,7 @@ public class MultiplayerGame extends AbstractGame {
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
-        User u = UserDAO.getUserById(userId);
+        UserEntity u = UserDAO.getUserById(userId);
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 

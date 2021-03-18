@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.codedefenders.game.Role;
 import org.codedefenders.game.leaderboard.Entry;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
@@ -108,7 +108,7 @@ public class AdminDAO {
     }
 
     private static UserInfo userInfoFromRS(ResultSet rs) throws SQLException {
-        final User user = UserDAO.userFromRS(rs);
+        final UserEntity user = UserDAO.userFromRS(rs);
 
         final Timestamp ts = rs.getTimestamp("lastLogin");
         final Instant lastLogin = ts != null ? ts.toInstant() : null;
