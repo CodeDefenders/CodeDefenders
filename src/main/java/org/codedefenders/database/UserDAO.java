@@ -68,7 +68,10 @@ public class UserDAO {
 
     /**
      * Returns the user with the given name.
+     *
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#getUserByName(String)} instead.
      */
+    @Deprecated
     public static UserEntity getUserByName(String name) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Username=?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(name));

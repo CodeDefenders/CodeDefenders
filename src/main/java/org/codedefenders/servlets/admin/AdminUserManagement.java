@@ -176,7 +176,7 @@ public class AdminUserManagement extends HttpServlet {
             return "Passwords don't match";
         }
 
-        if (!name.equals(u.getUsername()) && UserDAO.getUserByName(name) != null) {
+        if (!name.equals(u.getUsername()) && userRepo.getUserByName(name) != null) {
             return "Username " + name + " is already taken";
         }
 
@@ -239,7 +239,7 @@ public class AdminUserManagement extends HttpServlet {
         }
 
         final String username = credentials[0].trim();
-        if (UserDAO.getUserByName(username) != null) {
+        if (userRepo.getUserByName(username) != null) {
             logger.info("Failed to create user. Username already in use:" + username);
             messages.add("Username '" + username + "' already in use.");
             return;
