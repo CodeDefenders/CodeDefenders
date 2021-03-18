@@ -137,7 +137,7 @@
         /* Functions to generate table columns. */
         const genId = row => `<span class="ma-mutant-link btn-link">Mutant \${row.id}</span>
                 <span class="ma-column-name">  by  </span> \${row.creator.name}
-                \${row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : ''}`;
+                \${row.killedBy ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedBy.name : ''}`;
         const genPoints = row => `<span class="ma-column-name">Points:</span> \${row.points}`;
         const genLines = row => row.description;
         const genIcon = row => {
@@ -210,7 +210,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Mutant ` + mutant.id + ` (by ` + mutant.creatorName + `)</h4>
+                                <h4 class="modal-title">Mutant ` + mutant.id + ` (by ` + mutant.creator.name + `)</h4>
                             </div>
                             <div class="modal-body">
                                 <pre class="readonly-pre"><textarea class="mutdiff" name="mutant-` + mutant.id + `"></textarea></pre>
@@ -351,7 +351,7 @@
                 const mutant = rowData(this, dataTable);
                 viewTestModal({
                     "id": mutant.killedByTestId,
-                    "creatorName": mutant.killedByName,
+                    "creatorName": mutant.killedBy.name,
                     "killMessage": mutant.killMessage
                 });
             });

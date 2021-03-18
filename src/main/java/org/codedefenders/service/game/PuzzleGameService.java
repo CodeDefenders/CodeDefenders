@@ -19,10 +19,12 @@
 
 package org.codedefenders.service.game;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
@@ -39,13 +41,45 @@ public class PuzzleGameService extends AbstractGameService {
 
     @Override
     protected MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game) {
-        if (player == null) {
-            return new MutantDTO(mutant);
+        SimpleUser killedBy;
+        int killedByTestId;
+        String killMessage;
+        if (mutant.getKillingTest() != null) {
+            UserEntity killedByUser = userRepository.getUserById(userRepository.getUserIdForPlayerId(mutant.getKillingTest().getPlayerId()));
+            killedBy = new SimpleUser(killedByUser.getId(), killedByUser.getUsername());
+            killedByTestId = mutant.getKillingTest().getId();
+            killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
         } else {
-            return new MutantDTO(mutant)
-                    .setCovered(mutant.isCovered(game.getTests(true)))
-                    .setViewable(player.getRole() != null && player.getRole() != Role.NONE);
+            killedBy = null;
+            killedByTestId = -1;
+            killMessage = null;
         }
+        boolean canView;
+        if (player != null) {
+            canView = player.getRole() != null && player.getRole() != Role.NONE;
+        } else {
+            canView = false;
+        }
+
+        return new MutantDTO(
+                mutant.getId(),
+                new SimpleUser(mutant.getCreatorId(), mutant.getCreatorName()),
+                mutant.getState(),
+                mutant.getScore(),
+                StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream()
+                        .filter(Objects::nonNull).collect(Collectors.joining("<br>"))),
+                mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(",")),
+                mutant.isCovered(game.getTests(true)),
+                canView,
+                false,
+                killedBy,
+                killedByTestId,
+                killMessage,
+                mutant.getGameId(),
+                mutant.getPlayerId(),
+                mutant.getLines(),
+                mutant.getPatchString()
+        );
     }
 
     @Override

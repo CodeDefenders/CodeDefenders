@@ -19,10 +19,12 @@
 
 package org.codedefenders.service.game;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
@@ -44,24 +46,55 @@ public class MultiplayerGameService extends AbstractGameService {
     protected MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
-        return new MutantDTO(mutant)
-                .setCovered(mutant.isCovered(game.getTests(true)))
-                // TODO: This could use some tests
-                .setViewable(playerRole != Role.NONE // User must participate in the Game
-                        // Defender can see Mutants if the game is over or its an easy Game
-                        && (game.isFinished() || game.getLevel() == GameLevel.EASY
-                        || (game.getLevel() == GameLevel.HARD
-                        // In Hard Games the User must either be an Attacker or Observer
-                        && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
-                        // Or the mutant must be killed or equivalent
-                        || mutant.getState().equals(Mutant.State.KILLED)
-                        || mutant.getState().equals(Mutant.State.EQUIVALENT)))))
-                .setCanMarkEquivalent(game.getState().equals(GameState.ACTIVE)
-                        && mutant.getState().equals(Mutant.State.ALIVE)
-                        && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                        && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                        && mutant.getCreatorId() != user.getId()
-                        && mutant.getLines().size() >= 1);
+        SimpleUser killedBy;
+        int killedByTestId;
+        String killMessage;
+        if (mutant.getKillingTest() != null) {
+            UserEntity killedByUser = userRepository.getUserById(userRepository.getUserIdForPlayerId(mutant.getKillingTest().getPlayerId()));
+            killedBy = new SimpleUser(killedByUser.getId(), killedByUser.getUsername());
+            killedByTestId = mutant.getKillingTest().getId();
+            killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
+        } else {
+            killedBy = null;
+            killedByTestId = -1;
+            killMessage = null;
+        }
+        // TODO: This could use some tests
+        boolean canView = playerRole != Role.NONE // User must participate in the Game
+                // Defender can see Mutants if the game is over or its an easy Game
+                && (game.isFinished() || game.getLevel() == GameLevel.EASY
+                || (game.getLevel() == GameLevel.HARD
+                // In Hard Games the User must either be an Attacker or Observer
+                && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
+                // Or the mutant must be killed or equivalent
+                || mutant.getState().equals(Mutant.State.KILLED)
+                || mutant.getState().equals(Mutant.State.EQUIVALENT))));
+        boolean canMarkEquivalent = game.getState().equals(GameState.ACTIVE)
+                && mutant.getState().equals(Mutant.State.ALIVE)
+                && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                && mutant.getCreatorId() != user.getId()
+                && mutant.getLines().size() >= 1;
+
+        return new MutantDTO(
+                mutant.getId(),
+                new SimpleUser(mutant.getCreatorId(), mutant.getCreatorName()),
+                mutant.getState(),
+                mutant.getScore(),
+                StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream()
+                        .filter(Objects::nonNull).collect(Collectors.joining("<br>"))),
+                mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(",")),
+                mutant.isCovered(game.getTests(true)),
+                canView,
+                canMarkEquivalent,
+                killedBy,
+                killedByTestId,
+                killMessage,
+                mutant.getGameId(),
+                mutant.getPlayerId(),
+                mutant.getLines(),
+                mutant.getPatchString()
+        );
     }
 
     @Override

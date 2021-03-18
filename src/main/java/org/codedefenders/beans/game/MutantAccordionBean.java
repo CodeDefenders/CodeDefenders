@@ -55,7 +55,7 @@ public class MutantAccordionBean {
         categories = new ArrayList<>();
 
         MutantAccordionCategory allMutants = new MutantAccordionCategory("All Mutants", "all");
-        allMutants.addMutantIds(getMutants().stream().map(MutantDTO::getId).collect(Collectors.toList()));
+        allMutants.addMutantIds(getMutants().stream().map(m -> m.id).collect(Collectors.toList()));
         categories.add(allMutants);
 
         MutantAccordionCategory mutantsWithoutMethod =
@@ -108,12 +108,12 @@ public class MutantAccordionBean {
                 } else {
                     lastRange = entry.getKey();
                     belongsMethod = true;
-                    entry.getValue().addMutantId(mutant.getId());
+                    entry.getValue().addMutantId(mutant.id);
                 }
             }
 
             if (!belongsMethod) {
-                mutantsWithoutMethod.addMutantId(mutant.getId());
+                mutantsWithoutMethod.addMutantId(mutant.id);
             }
         }
     }
@@ -138,7 +138,7 @@ public class MutantAccordionBean {
     }
 
     public String jsonMutants() {
-        Map<Integer, MutantDTO> mutants = this.mutantList.stream().collect(Collectors.toMap(MutantDTO::getId, m -> m));
+        Map<Integer, MutantDTO> mutants = this.mutantList.stream().collect(Collectors.toMap(m -> m.id, m -> m));
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()

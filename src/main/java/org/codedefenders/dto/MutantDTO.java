@@ -34,87 +34,70 @@ import com.google.gson.annotations.Expose;
 
 public class MutantDTO {
     @Expose
-    private final int id;
+    public final int id;
     @Expose
-    private SimpleUser creator;
+    public final SimpleUser creator;
     @Expose
-    private Mutant.State state;
+    public final Mutant.State state;
     @Expose
-    private int points;
+    public final int points;
     @Expose
-    private String lineString;
+    public final String lineString;
     @Expose
-    private Boolean covered;
+    public Boolean covered;
     @Expose
-    private String killedByName;
+    public final SimpleUser killedBy;
     @Expose
-    private boolean canMarkEquivalent;
+    public final boolean canMarkEquivalent;
     @Expose
-    private boolean canView = false;
-    private String sourceCode;
-    private List<Integer> lines;
+    public final boolean canView;
     @Expose
-    private int killedByTestId;
+    public final int killedByTestId;
     @Expose
-    private String killMessage;
+    public final String killMessage;
     @Expose
-    private String description;
-    private Integer playerId;
-    private Integer gameId;
-    private String patchString;
+    public final String description;
 
-    public MutantDTO(Mutant mutant) {
-        creator = new SimpleUser(mutant.getCreatorId(), mutant.getCreatorName());
-        id = mutant.getId();
-        points = mutant.getScore();
-        state = mutant.getState();
-        description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream()
-                .filter(Objects::nonNull).collect(Collectors.joining("<br>")));
-        if (mutant.getKillingTest() != null) {
-            killedByName = UserDAO.getUserForPlayer(mutant.getKillingTest().getPlayerId()).getUsername();
-            killedByTestId = mutant.getKillingTest().getId();
-            killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
-        } else {
-            killedByName = null;
-            killedByTestId = -1;
-            killMessage = null;
-        }
-        lines = mutant.getLines();
-        lineString = lines.stream().map(String::valueOf).collect(Collectors.joining(","));
-        playerId = mutant.getPlayerId();
-        gameId = mutant.getGameId();
-        patchString = mutant.getPatchString();
-    }
+    private final List<Integer> lines;
+    private final Integer gameId;
+    private final Integer playerId;
+    private final String patchString;
 
-    @Deprecated
-    public MutantDTO(Mutant mutant, UserEntity user, boolean playerCoverToClaim) {
-        this(mutant);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public MutantDTO setCovered(boolean covered) {
+    public MutantDTO(
+            int id,
+            SimpleUser creator,
+            Mutant.State state,
+            int points,
+            String description,
+            String lineString,
+            boolean covered,
+            boolean canView,
+            boolean canMarkEquivalent,
+            SimpleUser killedBy,
+            int killedByTestId,
+            String killMessage,
+            int gameId,
+            int playerId,
+            List<Integer> lines,
+            String patchString
+    ) {
+        this.id = id;
+        this.creator = creator;
+        this.state = state;
+        this.points = points;
+        this.description = description;
+        this.lineString = lineString;
         this.covered = covered;
-        return this;
-    }
-
-    public boolean isViewable() {
-        return canView;
-    }
-
-    public MutantDTO setViewable(boolean canView) {
         this.canView = canView;
-        return this;
-    }
+        this.canMarkEquivalent = canMarkEquivalent;
+        this.killedBy = killedBy;
+        this.killedByTestId = killedByTestId;
+        this.killMessage = killMessage;
 
-    public String getSourceCode() {
-        if (canView) {
-            return sourceCode;
-        } else {
-            return null;
-        }
+        this.gameId = gameId;
+        this.playerId = playerId;
+        this.lines = lines;
+        this.patchString = patchString;
     }
 
     public String getPatchString() {
@@ -123,20 +106,6 @@ public class MutantDTO {
         } else {
             return null;
         }
-    }
-
-    public MutantDTO setSourceCode(String sourceCode) {
-        this.sourceCode = sourceCode;
-        return this;
-    }
-
-    public boolean isCanMarkEquivalent() {
-        return canMarkEquivalent;
-    }
-
-    public MutantDTO setCanMarkEquivalent(boolean canMarkEquivalent) {
-        this.canMarkEquivalent = canMarkEquivalent;
-        return this;
     }
 
     public List<Integer> getLines() {
@@ -150,6 +119,7 @@ public class MutantDTO {
     public Integer getGameId() {
         return gameId;
     }
+
 
     public static class LineNumberComparator implements Comparator<MutantDTO> {
 
