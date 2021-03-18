@@ -34,7 +34,7 @@ public class TestDTO {
     @Expose
     private int id;
     @Expose
-    private UserDTO creator;
+    private SimpleUser creator;
     @Expose
     private boolean canView = false;
     @Expose
@@ -55,7 +55,7 @@ public class TestDTO {
         this.test = test;
         this.id = test.getId();
         UserEntity creator = UserDAO.getUserForPlayer(test.getPlayerId());
-        this.creator = new UserDTO(creator.getId(), creator.getUsername());
+        this.creator = new SimpleUser(creator.getId(), creator.getUsername());
         this.points = test.getScore();
         this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
         this.linesCovered = test.getLineCoverage().getLinesCovered();

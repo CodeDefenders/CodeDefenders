@@ -21,13 +21,13 @@ package org.codedefenders.dto;
 
 import com.google.gson.annotations.Expose;
 
-public class UserDTO {
+public class SimpleUser {
     @Expose
-    private final int id;
+    public final int id;
     @Expose
-    private final String name;
+    public final String name;
 
-    public UserDTO(int id, String name) {
+    public SimpleUser(int id, String name) {
         this.id = id;
         this.name = name;
     }

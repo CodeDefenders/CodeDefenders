@@ -36,7 +36,7 @@ public class MutantDTO {
     @Expose
     private final int id;
     @Expose
-    private UserDTO creator;
+    private SimpleUser creator;
     @Expose
     private Mutant.State state;
     @Expose
@@ -64,7 +64,7 @@ public class MutantDTO {
     private String patchString;
 
     public MutantDTO(Mutant mutant) {
-        creator = new UserDTO(mutant.getCreatorId(), mutant.getCreatorName());
+        creator = new SimpleUser(mutant.getCreatorId(), mutant.getCreatorName());
         id = mutant.getId();
         points = mutant.getScore();
         state = mutant.getState();
