@@ -38,24 +38,6 @@ public class PlayerDAO {
     /**
      * Constructs a player from a {@link ResultSet} entry.
      *
-     * @param rs The {@link ResultSet}.
-     * @return The constructed player together with an {@link UserEntity} instance.
-     * @see DB.RSMapper
-     */
-    static Player playerFromRS(ResultSet rs) throws SQLException {
-        int id = rs.getInt("ID");
-        int userId = rs.getInt("User_ID");
-        int gameId = rs.getInt("Game_ID");
-        int points = rs.getInt("Points");
-        Role role = Role.valueOf(rs.getString("Role"));
-        boolean active = rs.getBoolean("Active");
-
-        return new Player(id, userId, gameId, points, role, active);
-    }
-
-    /**
-     * Constructs a player from a {@link ResultSet} entry.
-     *
      * <p>Requires the user information to have the following column names. Naming
      * these columns should be done with SQL aliasing.
      *
