@@ -78,7 +78,7 @@ public class PasswordServlet extends HttpServlet {
             case "resetPassword":
                 email = request.getParameter("accountEmail");
                 username = request.getParameter("accountUsername");
-                UserEntity u = UserDAO.getUserByEmail(email);
+                UserEntity u = userRepo.getUserByEmail(email);
                 if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
                     messages.add("No such User found or Email and Username do not match");
                 } else {

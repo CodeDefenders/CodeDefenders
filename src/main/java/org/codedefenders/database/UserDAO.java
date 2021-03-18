@@ -79,7 +79,10 @@ public class UserDAO {
 
     /**
      * Returns the user with the given email.
+     *
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#getUserByEmail(String)} instead.
      */
+    @Deprecated
     public static UserEntity getUserByEmail(String email) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Email = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(email));

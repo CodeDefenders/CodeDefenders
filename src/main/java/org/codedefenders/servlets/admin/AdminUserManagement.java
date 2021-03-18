@@ -180,7 +180,7 @@ public class AdminUserManagement extends HttpServlet {
             return "Username " + name + " is already taken";
         }
 
-        if (!email.equals(u.getEmail()) && UserDAO.getUserByEmail(email) != null) {
+        if (!email.equals(u.getEmail()) && userRepo.getUserByEmail(email) != null) {
             return "Email " + email + " is already in use";
         }
 
@@ -262,7 +262,7 @@ public class AdminUserManagement extends HttpServlet {
         final boolean hasMail = credentials.length == 3;
         if (hasMail) {
             email = credentials[2].trim();
-            if (UserDAO.getUserByEmail(email) != null) {
+            if (userRepo.getUserByEmail(email) != null) {
                 logger.info("Failed to create user. Email address already in use:" + email);
                 messages.add("Email '" + email + "' already in use.");
                 return;

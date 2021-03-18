@@ -57,7 +57,7 @@ public class UserServlet extends HttpServlet {
                     messages.add("Could not create user. Password entries did not match.");
                 } else if (userRepo.getUserByName(username) != null) {
                     messages.add("Could not create user. Username is already taken.");
-                } else if (UserDAO.getUserByEmail(email) != null) {
+                } else if (userRepo.getUserByEmail(email) != null) {
                     messages.add("Could not create user. Email has already been used. You can reset your password.");
                 } else {
                     UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);

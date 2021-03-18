@@ -34,4 +34,8 @@ public class UserRepository {
     public UserEntity getUserByName(String name) {
         return UserDAO.getUserByName(name);
     }
+
+    public UserEntity getUserByEmail(String email) {
+        return UserDAO.getUserByEmail(email);
+    }
 }
