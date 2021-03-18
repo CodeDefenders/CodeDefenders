@@ -19,6 +19,7 @@
 
 package org.codedefenders.persistence.database;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -68,13 +69,16 @@ public class UserRepository {
             // If the key wasn't in the "easy to compute" group, we need to
             // do things the hard way.
             return playerIdCache.get(playerId, () -> {
-                Integer userId = queryRunner.query(connectionFactory.getConnection(), query, resultSet -> {
-                    if (resultSet.next()) {
-                        return resultSet.getInt(1);
-                    } else {
-                        throw new SQLException();
-                    }
-                }, playerId);
+                Integer userId;
+                try (Connection conn = connectionFactory.getConnection()) {
+                    userId = queryRunner.query(conn, query, resultSet -> {
+                        if (resultSet.next()) {
+                            return resultSet.getInt(1);
+                        } else {
+                            throw new SQLException();
+                        }
+                    }, playerId);
+                }
                 if (userId == null) {
                     throw new SQLException();
                 } else {
