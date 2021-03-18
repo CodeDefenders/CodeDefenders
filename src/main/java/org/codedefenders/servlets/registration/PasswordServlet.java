@@ -34,6 +34,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
@@ -49,6 +50,9 @@ public class PasswordServlet extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserRepository userRepo;
 
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
@@ -104,7 +108,7 @@ public class PasswordServlet extends HttpServlet {
                     if (!(validator.validPassword(password))) {
                         messages.add("Password not changed. Make sure it is valid.");
                     } else if (password.equals(confirm)) {
-                        UserEntity user = UserDAO.getUserById(userId);
+                        UserEntity user = userRepo.getUserById(userId);
                         user.setEncodedPassword(UserEntity.encodePassword(password));
                         if (user.update()) {
                             DatabaseAccess.setPasswordResetSecret(user.getId(), null);

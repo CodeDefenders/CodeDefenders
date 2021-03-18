@@ -76,6 +76,7 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -161,6 +162,9 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private GameProducer gameProducer;
 
+    @Inject
+    private UserRepository userRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -238,7 +242,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         final String action = ServletUtils.formType(request);
-        final UserEntity user = UserDAO.getUserById(login.getUserId());
+        final UserEntity user = userRepo.getUserById(login.getUserId());
 
         final int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
@@ -661,7 +665,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         messages.add(MUTANT_COMPILED_MESSAGE);
-        final String notificationMsg = UserDAO.getUserById(user.getId()).getUsername() + " created a mutant.";
+        final String notificationMsg = userRepo.getUserById(user.getId()).getUsername() + " created a mutant.";
         // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
         Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
@@ -728,7 +732,7 @@ public class MeleeGameManager extends HttpServlet {
                     m.kill(Mutant.Equivalence.DECLARED_YES);
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
-                    UserEntity eventUser = UserDAO.getUserById(login.getUserId());
+                    UserEntity eventUser = userRepo.getUserById(login.getUserId());
 
                     Event notifEquiv = new Event(-1, game.getId(), login.getUserId(),
                             eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.",
@@ -874,7 +878,7 @@ public class MeleeGameManager extends HttpServlet {
                     // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points
                     // added.
                     newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
-                    final String message = UserDAO.getUserById(login.getUserId()).getUsername() + " killed mutant "
+                    final String message = userRepo.getUserById(login.getUserId()).getUsername() + " killed mutant "
                             + mPending.getId() + " in an equivalence duel.";
                     Event notif = new Event(-1, gameId, login.getUserId(), message,
                             EventType.PLAYER_WON_EQUIVALENT_DUEL, EventStatus.GAME,
@@ -898,7 +902,7 @@ public class MeleeGameManager extends HttpServlet {
                         logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
                                 newTest.getId(), mPending.getId());
                         mPending.kill(ASSUMED_YES);
-                        final String message = UserDAO.getUserById(login.getUserId()).getUsername()
+                        final String message = userRepo.getUserById(login.getUserId()).getUsername()
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
                         Event notif = new Event(-1, gameId, login.getUserId(), message,
                                 EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
@@ -1021,7 +1025,7 @@ public class MeleeGameManager extends HttpServlet {
 
         int nClaimed = claimedMutants.get();
         if (nClaimed > 0) {
-            String flaggingChatMessage = UserDAO.getUserById(login.getUserId()).getUsername() + " flagged " + nClaimed
+            String flaggingChatMessage = userRepo.getUserById(login.getUserId()).getUsername() + " flagged " + nClaimed
                     + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
                     EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,

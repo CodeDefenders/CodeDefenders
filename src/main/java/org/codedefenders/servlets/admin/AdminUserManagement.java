@@ -38,6 +38,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
@@ -61,6 +62,9 @@ public class AdminUserManagement extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserRepository userRepo;
 
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
@@ -145,7 +149,7 @@ public class AdminUserManagement extends HttpServlet {
     }
 
     private boolean setUserInactive(int userId) {
-        final UserEntity user = UserDAO.getUserById(userId);
+        final UserEntity user = userRepo.getUserById(userId);
         if (user == null) {
             return false;
         }
@@ -158,7 +162,7 @@ public class AdminUserManagement extends HttpServlet {
 
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
-        UserEntity u = UserDAO.getUserById(userId);
+        UserEntity u = userRepo.getUserById(userId);
         if (u == null) {
             return "Error. User " + userId + " cannot be retrieved from database.";
         }
@@ -305,7 +309,7 @@ public class AdminUserManagement extends HttpServlet {
 
         if (AdminDAO.setUserPassword(uid, UserEntity.encodePassword(newPassword))) {
             if (AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue()) {
-                UserEntity u = UserDAO.getUserById(uid);
+                UserEntity u = userRepo.getUserById(uid);
                 String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
                 EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
             }

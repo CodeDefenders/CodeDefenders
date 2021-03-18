@@ -36,6 +36,7 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -60,6 +61,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserRepository userRepo;
 
     @Inject
     private LoginBean login;
@@ -88,7 +92,7 @@ public class UserProfileManager extends HttpServlet {
             return;
         }
 
-        if (UserDAO.getUserById(login.getUserId()) == null) {
+        if (userRepo.getUserById(login.getUserId()) == null) {
             response.sendRedirect(request.getContextPath());
             return;
         }

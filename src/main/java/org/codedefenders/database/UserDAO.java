@@ -57,7 +57,10 @@ public class UserDAO {
 
     /**
      * Returns the user for the given user id.
+     *
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#getUserById(int)} instead.
      */
+    @Deprecated
     public static UserEntity getUserById(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE User_ID = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(userId));

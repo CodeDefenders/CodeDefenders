@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -37,6 +39,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 
 public abstract class AbstractGameService implements IGameService {
 
@@ -50,6 +53,9 @@ public abstract class AbstractGameService implements IGameService {
     // @Inject
     // MutantDAO mutantDAO;
 
+    @Inject
+    protected UserRepository userRepository;
+
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
         return getMutant(userId, MutantDAO.getMutantById(mutantId));
@@ -59,7 +65,7 @@ public abstract class AbstractGameService implements IGameService {
     public MutantDTO getMutant(int userId, Mutant mutant) {
         AbstractGame game = GameDAO.getGame(mutant.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, mutant.getGameId());
-        UserEntity user = UserDAO.getUserById(userId);
+        UserEntity user = userRepository.getUserById(userId);
         if (game != null) {
             return convertMutant(mutant, user, player, game);
         } else {
@@ -69,7 +75,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<MutantDTO> getMutants(int userId, int gameId) {
-        UserEntity user = UserDAO.getUserById(userId);
+        UserEntity user = userRepository.getUserById(userId);
         AbstractGame game = GameDAO.getGame(gameId);
         if (game != null) {
             return getMutants(user, game);
@@ -101,7 +107,7 @@ public abstract class AbstractGameService implements IGameService {
     public TestDTO getTest(int userId, Test test) {
         AbstractGame game = GameDAO.getGame(test.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, test.getGameId());
-        UserEntity user = UserDAO.getUserById(userId);
+        UserEntity user = userRepository.getUserById(userId);
         if (game != null) {
             return convertTest(test, user, player, game);
         } else {
@@ -111,7 +117,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<TestDTO> getTests(int userId, int gameId) {
-        UserEntity user = UserDAO.getUserById(userId);
+        UserEntity user = userRepository.getUserById(userId);
         AbstractGame game = GameDAO.getGame(gameId);
         if (game != null) {
             return getTests(user, game);

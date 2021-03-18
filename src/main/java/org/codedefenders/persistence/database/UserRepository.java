@@ -27,6 +27,10 @@ import org.codedefenders.model.UserEntity;
 @ApplicationScoped
 public class UserRepository {
 
+    public UserEntity getUserById(int userId) {
+        return UserDAO.getUserById(userId);
+    }
+
     public UserEntity getUserByName(String name) {
         return UserDAO.getUserByName(name);
     }

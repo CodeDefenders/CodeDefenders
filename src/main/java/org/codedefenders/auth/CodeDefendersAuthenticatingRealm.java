@@ -52,7 +52,7 @@ public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
     SettingsRepository settingsRepository;
 
     @Inject
-    UserRepository userRepository;
+    UserRepository userRepo;
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
@@ -61,7 +61,7 @@ public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
         if (token instanceof UsernamePasswordToken) {
             UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) token;
 
-            UserEntity activeUser = userRepository.getUserByName(usernamePasswordToken.getUsername());
+            UserEntity activeUser = userRepo.getUserByName(usernamePasswordToken.getUsername());
 
             if (activeUser == null) {
                 throw new UnknownAccountException("Username not found or password incorrect.");

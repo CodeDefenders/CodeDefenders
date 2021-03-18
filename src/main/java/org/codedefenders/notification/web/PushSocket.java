@@ -40,6 +40,7 @@ import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.handling.ServerEventHandlerContainer;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,10 +87,13 @@ public class PushSocket {
     private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
 
     // @Inject
-    private INotificationService notificationService;
+    private final INotificationService notificationService;
 
     // @Inject
-    private ITicketingService ticketingServices;
+    private final ITicketingService ticketingServices;
+
+    // @Inject
+    private final UserRepository userRepo;
 
     // Authorization
     private UserEntity user;
@@ -109,6 +113,8 @@ public class PushSocket {
 
         ticketingServices = CDIUtil.getBeanFromCDI(ITicketingService.class);
 
+        userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+
         open = false;
     }
 
@@ -123,7 +129,7 @@ public class PushSocket {
             return;
         }
 
-        UserEntity user = UserDAO.getUserById(userId);
+        UserEntity user = userRepo.getUserById(userId);
 
         if (user == null) {
             logger.info("Invalid user id for session " + session);
