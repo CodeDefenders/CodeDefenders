@@ -48,6 +48,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -60,6 +61,9 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private UserRepository userRepo;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
@@ -87,7 +91,7 @@ public class AdminMonitorGames extends HttpServlet {
         if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
             int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
             int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
-            int userId = UserDAO.getUserForPlayer(playerToRemoveId).getId();
+            int userId = userRepo.getUserIdForPlayerId(playerToRemoveId);
             if (!deletePlayer(playerToRemoveId, gameToRemoveFromId)) {
                 messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
             } else if (switchUser) {

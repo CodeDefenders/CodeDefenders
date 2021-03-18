@@ -40,6 +40,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,18 +66,19 @@ import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
  *
  * <p>We inject instances using {@link MutationTesterProducer}.
  */
-@Alternative // This disable the automatic injection so we pass dependencies via the constructor
 public class MutationTester implements IMutationTester {
     private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
     protected BackendExecutorService backend;
     protected EventDAO eventDAO;
+    protected UserRepository userRepo;
 
     protected boolean useMutantCoverage;
 
-    public MutationTester(BackendExecutorService backend, EventDAO eventDAO, boolean useMutantCoverage) {
+    public MutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO, boolean useMutantCoverage) {
         this.backend = backend;
         this.eventDAO = eventDAO;
+        this.userRepo = userRepo;
         this.useMutantCoverage = useMutantCoverage;
     }
 
@@ -117,7 +119,7 @@ public class MutationTester implements IMutationTester {
         List<Mutant> killedMutants = new ArrayList<>();
 
         // Acquire and release the connection
-        UserEntity u = UserDAO.getUserForPlayer(test.getPlayerId());
+        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(test.getPlayerId()));
 
         for (Mutant mutant : mutants) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -188,7 +190,7 @@ public class MutationTester implements IMutationTester {
     public void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages) {
 
         int testOwnerPlayerId = test.getPlayerId();
-        UserEntity u = UserDAO.getUserForPlayer(testOwnerPlayerId);
+        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(testOwnerPlayerId));
 
         List<Mutant> mutants = game.getAliveMutants().stream().filter(m -> m.getPlayerId() != testOwnerPlayerId)
                 .collect(Collectors.toList());
@@ -280,7 +282,7 @@ public class MutationTester implements IMutationTester {
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
-        UserEntity u = UserDAO.getUserForPlayer(mutant.getPlayerId());
+        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(mutant.getPlayerId()));
 
         for (Test test : tests) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -300,7 +302,7 @@ public class MutationTester implements IMutationTester {
                     test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
                 }
 
-                Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
+                Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()),
                         u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(notif);
@@ -428,7 +430,7 @@ public class MutationTester implements IMutationTester {
             TestScheduler scheduler) {
 
         int mutantOwnerPlayerId = mutant.getPlayerId();
-        UserEntity u = UserDAO.getUserForPlayer(mutantOwnerPlayerId);
+        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(mutantOwnerPlayerId));
 
         // Get all the tests from the game which DO NOT belong to mutantOwnerPlayerId
         // Note we need to return the test for all the roles to include PLAYER
@@ -452,7 +454,7 @@ public class MutationTester implements IMutationTester {
                 // TODO Scoring MeleeGames is still open
                 //test.incrementScore(Scorer.score(game, test, mlist));
 
-                Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
+                Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()),
                         u.getUsername() + "&#39;s mutant is killed", EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(notif);

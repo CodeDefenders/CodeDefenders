@@ -19,13 +19,34 @@
 
 package org.codedefenders.persistence.database;
 
-import javax.enterprise.context.ApplicationScoped;
+import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.commons.dbutils.QueryRunner;
+import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.UserEntity;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 @ApplicationScoped
 public class UserRepository {
+
+    private final Cache<Integer, Integer> playerIdCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .recordStats()
+            .build();
+
+    private final ConnectionFactory connectionFactory;
+
+    @Inject
+    UserRepository(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
 
     public UserEntity getUserById(int userId) {
         return UserDAO.getUserById(userId);
@@ -37,5 +58,34 @@ public class UserRepository {
 
     public UserEntity getUserByEmail(String email) {
         return UserDAO.getUserByEmail(email);
+    }
+
+    public Integer getUserIdForPlayerId(int playerId) {
+        QueryRunner queryRunner = new QueryRunner();
+        String query = "SELECT users.User_ID AS User_ID "
+                + "FROM users, players "
+                + "WHERE players.User_ID = users.User_ID "
+                + "AND players.ID = ?";
+
+        try {
+            // If the key wasn't in the "easy to compute" group, we need to
+            // do things the hard way.
+            return playerIdCache.get(playerId, () -> {
+                Integer userId = queryRunner.query(connectionFactory.getConnection(), query, resultSet -> {
+                    if (resultSet.next()) {
+                        return resultSet.getInt(1);
+                    } else {
+                        throw new SQLException();
+                    }
+                }, playerId);
+                if (userId == null) {
+                    throw new SQLException();
+                } else {
+                    return userId;
+                }
+            });
+        } catch (ExecutionException e) {
+            return null;
+        }
     }
 }

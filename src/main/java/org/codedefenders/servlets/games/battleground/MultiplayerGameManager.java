@@ -80,6 +80,7 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -159,6 +160,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private GameProducer gameProducer;
 
+    @Inject
+    private UserRepository userRepo;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -186,7 +190,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    UserEntity defender = UserDAO.getUserForPlayer(defenderId);
+                    UserEntity defender = userRepo.getUserById(userRepo.getUserIdForPlayerId(defenderId));
 
                     request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
@@ -763,7 +767,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
                         int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
-                        int userId = UserDAO.getUserForPlayer(defenderId).getId();
+                        int userId = userRepo.getUserIdForPlayerId(defenderId);
                         notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
                         Event notifDefenderEquiv = new Event(-1, game.getId(), userId, notification,
@@ -1010,7 +1014,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                UserEntity mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
+                                UserEntity mutantOwner = userRepo.getUserById(userRepo.getUserIdForPlayerId(m.getPlayerId()));
 
                                 Event event = new Event(-1, gameId, mutantOwner.getId(),
                                         "One or more of your mutants is flagged equivalent.",

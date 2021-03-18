@@ -88,6 +88,12 @@ public class UserDAO {
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(email));
     }
 
+    /**
+     *
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#getUserIdForPlayerId(int)} in
+     * combination with {@link org.codedefenders.persistence.database.UserRepository#getUserById(int)} instead.
+     */
+    @Deprecated
     public static UserEntity getUserForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT users.*",

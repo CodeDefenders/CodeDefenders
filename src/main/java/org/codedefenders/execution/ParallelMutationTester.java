@@ -44,6 +44,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,15 +64,14 @@ import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
  *
  * <p>We inject instances using {@link MutationTesterProducer}
  */
-@Alternative // This disable the automatic injection so we pass dependencies via the constructor
 public class ParallelMutationTester extends MutationTester //
         // This MIGHT be superfluous but I am not sure how CDI works with annotations
         implements IMutationTester {
     private ExecutorService testExecutorThreadPool;
 
     // TODO Move the Executor service before useMutantCoverage
-    public ParallelMutationTester(BackendExecutorService backend, EventDAO eventDAO, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
-        super(backend, eventDAO, useMutantCoverage);
+    public ParallelMutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
+        super(backend, userRepo, eventDAO, useMutantCoverage);
         this.testExecutorThreadPool = testExecutorThreadPool;
     }
 
@@ -85,7 +85,7 @@ public class ParallelMutationTester extends MutationTester //
         List<Mutant> killedMutants = new ArrayList<Mutant>();
 
         // Acquire and release the connection
-        UserEntity u = UserDAO.getUserForPlayer(test.getPlayerId());
+        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(test.getPlayerId()));
 
         // Fork and Join parallelization
         Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
@@ -202,7 +202,7 @@ public class ParallelMutationTester extends MutationTester //
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
-        UserEntity u = UserDAO.getUserForPlayer(mutant.getPlayerId());
+        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(mutant.getPlayerId()));
 
         final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
         for (Test test : tests) {
@@ -270,7 +270,7 @@ public class ParallelMutationTester extends MutationTester //
                         test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
                     }
 
-                    Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
+                    Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()),
                             u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
                             EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);

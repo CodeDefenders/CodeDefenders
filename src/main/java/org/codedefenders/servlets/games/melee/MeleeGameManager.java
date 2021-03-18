@@ -199,7 +199,7 @@ public class MeleeGameManager extends HttpServlet {
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    UserEntity defender = UserDAO.getUserForPlayer(defenderId);
+                    UserEntity defender = userRepo.getUserById(userRepo.getUserIdForPlayerId(defenderId));
                     // TODO This should be a better name
                     request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
@@ -304,7 +304,7 @@ public class MeleeGameManager extends HttpServlet {
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
                 // Send the notification about the flagged mutant to attacker
-                int mutantOwnerId = UserDAO.getUserForPlayer(aliveMutant.getPlayerId()).getId();
+                int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
                 Event event = new Event(-1, game.getId(), mutantOwnerId,
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
@@ -991,7 +991,7 @@ public class MeleeGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                UserEntity mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
+                                UserEntity mutantOwner = userRepo.getUserById(userRepo.getUserIdForPlayerId(m.getPlayerId()));
 
                                 Event event = new Event(-1, gameId, mutantOwner.getId(),
                                         "One or more of your mutants is flagged equivalent.",
