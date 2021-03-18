@@ -19,9 +19,13 @@
 
 package org.codedefenders.service.game;
 
+import java.util.stream.Collectors;
+
 import javax.enterprise.context.ApplicationScoped;
 
+import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
@@ -46,12 +50,19 @@ public class PuzzleGameService extends AbstractGameService {
 
     @Override
     protected TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game) {
-        if (player == null) {
-            return new TestDTO(test);
-        } else {
-            return new TestDTO(test)
-                    .setMutantData(game.getMutants())
-                    .setViewable(true);
-        }
+        boolean viewable = true;
+
+        UserEntity creator = userRepository.getUserById(userRepository.getUserIdForPlayerId(test.getPlayerId()));
+        SimpleUser simpleCreator = new SimpleUser(creator.getId(), creator.getUsername());
+
+        return new TestDTO(test.getId(), simpleCreator, test.getScore(), viewable,
+                test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
+                test.getKilledMutants().stream().map(Mutant::getId).collect(Collectors.toList()),
+                (new TestSmellsDAO()).getDetectedTestSmellsForTest(test),
+                test.getGameId(),
+                test.getPlayerId(),
+                test.getLineCoverage().getLinesCovered(),
+                test.getAsString()
+        );
     }
 }

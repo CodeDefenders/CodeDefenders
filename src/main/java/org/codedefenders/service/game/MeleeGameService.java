@@ -19,9 +19,13 @@
 
 package org.codedefenders.service.game;
 
+import java.util.stream.Collectors;
+
 import javax.enterprise.context.ApplicationScoped;
 
+import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -63,12 +67,23 @@ public class MeleeGameService extends AbstractGameService {
     protected TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
-        return new TestDTO(test)
-                .setMutantData(game.getMutants())
-                .setViewable(game.getState() == GameState.FINISHED
-                        || playerRole == Role.OBSERVER
-                        || playerRole == Role.DEFENDER
-                        || game.getLevel() == GameLevel.EASY
-                        || test.getPlayerId() == player.getId());
+        boolean viewable = game.getState() == GameState.FINISHED
+                || playerRole == Role.OBSERVER
+                || playerRole == Role.DEFENDER
+                || game.getLevel() == GameLevel.EASY
+                || test.getPlayerId() == player.getId();
+
+        UserEntity creator = userRepository.getUserById(userRepository.getUserIdForPlayerId(test.getPlayerId()));
+        SimpleUser simpleCreator = new SimpleUser(creator.getId(), creator.getUsername());
+
+        return new TestDTO(test.getId(), simpleCreator, test.getScore(), viewable,
+                test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
+                test.getKilledMutants().stream().map(Mutant::getId).collect(Collectors.toList()),
+                (new TestSmellsDAO()).getDetectedTestSmellsForTest(test),
+                test.getGameId(),
+                test.getPlayerId(),
+                test.getLineCoverage().getLinesCovered(),
+                test.getAsString()
+        );
     }
 }

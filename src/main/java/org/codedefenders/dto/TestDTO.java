@@ -20,61 +20,57 @@
 package org.codedefenders.dto;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.codedefenders.model.UserEntity;
 
 import com.google.gson.annotations.Expose;
 
 public class TestDTO {
     @Expose
-    private int id;
+    public final int id;
     @Expose
-    private SimpleUser creator;
+    public final SimpleUser creator;
     @Expose
-    private boolean canView = false;
+    public final Integer points;
     @Expose
-    private List<Integer> coveredMutantIds;
+    public boolean canView;
     @Expose
-    private List<Integer> killedMutantIds;
+    public List<Integer> coveredMutantIds;
     @Expose
-    private Integer points;
+    public List<Integer> killedMutantIds;
     @Expose
-    private List<String> smells;
-    private Test test;
-    private List<Integer> linesCovered;
-    private Integer gameId;
-    private Integer playerId;
-    private String source;
+    public final List<String> smells;
 
-    public TestDTO(Test test) {
-        this.test = test;
-        this.id = test.getId();
-        UserEntity creator = UserDAO.getUserForPlayer(test.getPlayerId());
-        this.creator = new SimpleUser(creator.getId(), creator.getUsername());
-        this.points = test.getScore();
-        this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
-        this.linesCovered = test.getLineCoverage().getLinesCovered();
-        this.gameId = test.getGameId();
-        this.playerId = test.getPlayerId();
-        this.source = test.getAsString();
-    }
+    private final List<Integer> linesCovered;
+    private final Integer gameId;
+    private final Integer playerId;
+    private final String source;
 
-    public int getId() {
-        return id;
+    public TestDTO(int id,
+            SimpleUser creator,
+            Integer points,
+            boolean canView,
+            List<Integer> coveredMutantIds,
+            List<Integer> killedMutantIds,
+            List<String> smells,
+            int gameId,
+            int playerId,
+            List<Integer> linesCovered,
+            String source
+    ) {
+        this.id = id;
+        this.creator = creator;
+        this.points = points;
+        this.canView = canView;
+        this.coveredMutantIds = coveredMutantIds;
+        this.killedMutantIds = killedMutantIds;
+        this.smells = smells;
+        this.gameId = gameId;
+        this.playerId = playerId;
+        this.linesCovered = linesCovered;
+        this.source = source;
     }
 
     public List<Integer> getLinesCovered() {
         return linesCovered;
-    }
-
-    public TestDTO setViewable(boolean canView) {
-        this.canView = canView;
-        return this;
     }
 
     public Integer getPlayerId() {
@@ -87,15 +83,5 @@ public class TestDTO {
 
     public String getSource() {
         return source;
-    }
-
-    public TestDTO setMutantData(List<Mutant> mutants) {
-        this.coveredMutantIds = test.getCoveredMutants(mutants).stream()
-                .map(Mutant::getId)
-                .collect(Collectors.toList());
-        this.killedMutantIds = test.getKilledMutants().stream()
-                .map(Mutant::getId)
-                .collect(Collectors.toList());
-        return this;
     }
 }
