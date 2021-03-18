@@ -20,6 +20,7 @@
 package org.codedefenders.persistence.database;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -87,5 +88,13 @@ public class UserRepository {
         } catch (ExecutionException e) {
             return null;
         }
+    }
+
+    public List<UserEntity> getUsers() {
+        return UserDAO.getUsers();
+    }
+
+    public List<UserEntity> getUnassignedUsers() {
+        return UserDAO.getUnassignedUsers();
     }
 }

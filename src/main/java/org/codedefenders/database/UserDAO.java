@@ -106,6 +106,7 @@ public class UserDAO {
     /**
      * Returns a list of all users (including dummy / system users).
      */
+    @Deprecated
     public static List<UserEntity> getUsers() throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users";
         return DB.executeQueryReturnList(query, UserDAO::userFromRS);
@@ -114,7 +115,10 @@ public class UserDAO {
     /**
      * Returns a list of real users (not including dummy / system users), which are not taking part in a currently
      * active game.
+     *
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository}
      */
+    @Deprecated
     public static List<UserEntity> getUnassignedUsers() throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT DISTINCT u.*",

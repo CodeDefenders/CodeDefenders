@@ -36,6 +36,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
@@ -77,6 +78,9 @@ public class AdminCreateGamesBean implements Serializable {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private UserRepository userRepo;
 
     /**
      * The staged game list managed by the bean.
@@ -708,7 +712,7 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     public String getUnassignedUserIdsJSON() {
-        List<Integer> userIds = UserDAO.getUnassignedUsers().stream()
+        List<Integer> userIds = userRepo.getUnassignedUsers().stream()
                 .map(UserEntity::getId)
                 .collect(Collectors.toList());
         Gson gson = new GsonBuilder().create();
