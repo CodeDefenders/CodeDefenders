@@ -37,17 +37,13 @@ import com.google.common.cache.CacheBuilder;
 @ApplicationScoped
 public class UserRepository {
 
+    @Inject
+    private ConnectionFactory connectionFactory;
+
     private final Cache<Integer, Integer> playerIdCache = CacheBuilder.newBuilder()
             .maximumSize(100)
             .recordStats()
             .build();
-
-    private final ConnectionFactory connectionFactory;
-
-    @Inject
-    UserRepository(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
 
     public UserEntity getUserById(int userId) {
         return UserDAO.getUserById(userId);
