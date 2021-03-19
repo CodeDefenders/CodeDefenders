@@ -32,17 +32,6 @@
 	<jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<%
-	String result = (String)request.getSession().getAttribute("emailSent");
-	request.getSession().removeAttribute("emailSent");
-	if (result != null) {
-%>
-<div class="alert alert-info" id="messages-div">
-	<p><%=result%></p>
-</div>
-<%
-	}
-%>
 <div class="container" style=" max-width: 50%; min-width: 25%; ">
 	<h2 style="text-align: center">Contact Us</h2>
 	<p style="text-align: center">

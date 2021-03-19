@@ -54,6 +54,6 @@
     </div>
 </nav>
 
-<div id="content"> <%-- closed in footer --%>
-
 <jsp:include page="/jsp/messages.jsp"/>
+
+<div id="content"> <%-- closed in footer --%>
