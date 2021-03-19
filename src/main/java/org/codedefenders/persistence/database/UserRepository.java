@@ -41,6 +41,7 @@ public class UserRepository {
     @Inject
     private ConnectionFactory connectionFactory;
 
+    // TODO: This could use some tuning:
     private final Cache<Integer, Integer> playerIdCache = CacheBuilder.newBuilder()
             .maximumSize(100)
             .recordStats()
@@ -75,12 +76,12 @@ public class UserRepository {
                         if (resultSet.next()) {
                             return resultSet.getInt(1);
                         } else {
-                            throw new SQLException();
+                            return null;
                         }
                     }, playerId);
                 }
                 if (userId == null) {
-                    throw new SQLException();
+                    throw new Exception();
                 } else {
                     return userId;
                 }

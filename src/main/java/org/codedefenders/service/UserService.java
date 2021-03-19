@@ -36,8 +36,9 @@ import com.google.common.cache.CacheBuilder;
 @ApplicationScoped
 public class UserService {
 
+    // TODO: This could use some tuning
     private final Cache<Integer, SimpleUser> simpleUserCache = CacheBuilder.newBuilder()
-            .maximumSize(100)
+            .maximumSize(200)
             .recordStats()
             .build();
 
@@ -60,7 +61,7 @@ public class UserService {
             return simpleUserCache.get(userId, () -> {
                 UserEntity user = userRepo.getUserById(userId);
                 if (user == null) {
-                    throw new SQLException();
+                    throw new Exception();
                 } else {
                     return simpleUserFromUserEntity(user);
                 }

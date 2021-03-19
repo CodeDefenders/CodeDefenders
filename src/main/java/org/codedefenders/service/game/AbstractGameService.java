@@ -107,7 +107,7 @@ public abstract class AbstractGameService implements IGameService {
         String killMessage;
         Test killingTest = mutant.getKillingTest();
         if (killingTest != null) {
-            killedBy = userService.getSimpleUserById(killingTest.getPlayerId());
+            killedBy = userService.getSimpleUserByPlayerId(killingTest.getPlayerId());
             killedByTestId = killingTest.getId();
             killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
         } else {
