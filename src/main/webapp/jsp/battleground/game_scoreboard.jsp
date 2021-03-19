@@ -68,7 +68,7 @@
                         <%= ts %>
                     </span>
                 </div>
-                <table class="scoreboard table table-fluid">
+                <table class="scoreboard table table-responsive">
                     <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Alive / Killed / Equivalent</th><th>Duels Won/Lost/Ongoing</th></th><th>Total Points</th></tr>
                     <%
                     int total = 0;
