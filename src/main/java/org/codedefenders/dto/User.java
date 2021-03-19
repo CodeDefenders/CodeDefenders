@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Code Defenders contributors
+ * Copyright (C) 2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -19,19 +19,28 @@
 
 package org.codedefenders.dto;
 
-import com.google.gson.annotations.Expose;
+import org.codedefenders.model.KeyMap;
 
 /**
- * For usage in the 90% of the places where we need a User and the userId and the username are enough.
+ * This object contains all the properties of a User we expose to the application.
  */
-public class SimpleUser {
-    @Expose
-    public final int id;
-    @Expose
-    public final String name;
+public class User extends SimpleUser {
 
-    public SimpleUser(int id, String name) {
-        this.id = id;
-        this.name = name;
+    public final Boolean active;
+
+    public final String email;
+    public final Boolean emailValidated;
+    public final Boolean allowContact;
+
+    public final KeyMap keyMap;
+
+    public User(int id, String name, Boolean active, String email, Boolean emailValidated,
+            Boolean allowContact, KeyMap keyMap) {
+        super(id, name);
+        this.active = active;
+        this.email = email;
+        this.emailValidated = emailValidated;
+        this.allowContact = allowContact;
+        this.keyMap = keyMap;
     }
 }

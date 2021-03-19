@@ -26,12 +26,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UserDAO;
+import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
@@ -40,6 +42,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 
 public abstract class AbstractGameService implements IGameService {
 
@@ -49,12 +52,13 @@ public abstract class AbstractGameService implements IGameService {
     // @Inject
     // PlayerDAO playerDAO;
     // @Inject
-    // UserDAO userDAO;
-    // @Inject
     // MutantDAO mutantDAO;
 
     @Inject
     protected UserRepository userRepository;
+
+    @Inject
+    protected UserService userService;
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
@@ -95,7 +99,53 @@ public abstract class AbstractGameService implements IGameService {
 
     // NOTE: This could be split into several methods. Like: canFlag(Mutant mutant, Player player, AbstractGame game);
     //  So the actual building of the MutantDTO could happen in this class.
-    protected abstract MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game);
+    protected MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game) {
+        Role playerRole = determineRole(user, player, game);
+
+        SimpleUser killedBy;
+        int killedByTestId;
+        String killMessage;
+        Test killingTest = mutant.getKillingTest();
+        if (killingTest != null) {
+            killedBy = userService.getSimpleUserById(killingTest.getPlayerId());
+            killedByTestId = killingTest.getId();
+            killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
+        } else {
+            killedBy = null;
+            killedByTestId = -1;
+            killMessage = null;
+        }
+        boolean canView = canViewMutant(mutant, game, user, player, playerRole);
+        boolean canMarkEquivalent = canMarkMutantEquivalent(mutant, game, user);
+        boolean isCovered = isMutantCovered(mutant, game, player);
+
+        return new MutantDTO(
+                mutant.getId(),
+                new SimpleUser(mutant.getCreatorId(), mutant.getCreatorName()),
+                mutant.getState(),
+                mutant.getScore(),
+                StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream()
+                        .filter(Objects::nonNull).collect(Collectors.joining("<br>"))),
+                mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(",")),
+                isCovered,
+                canView,
+                canMarkEquivalent,
+                killedBy,
+                killedByTestId,
+                killMessage,
+                mutant.getGameId(),
+                mutant.getPlayerId(),
+                mutant.getLines(),
+                mutant.getPatchString()
+        );
+    }
+
+    protected abstract boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player);
+
+    protected abstract boolean canViewMutant(Mutant mutant, AbstractGame game, UserEntity user, Player player,
+            Role playerRole);
+
+    protected abstract boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, UserEntity user);
 
 
     @Override
@@ -135,7 +185,25 @@ public abstract class AbstractGameService implements IGameService {
                 .collect(Collectors.toList());
     }
 
-    protected abstract TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game);
+    protected TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game) {
+        Role playerRole = determineRole(user, player, game);
+
+        boolean viewable = canViewTest(test, game, player, playerRole);
+
+        SimpleUser creator = userService.getSimpleUserByPlayerId(test.getPlayerId());
+
+        return new TestDTO(test.getId(), creator, test.getScore(), viewable,
+                test.getCoveredMutants(game.getMutants()).stream().map(Mutant::getId).collect(Collectors.toList()),
+                test.getKilledMutants().stream().map(Mutant::getId).collect(Collectors.toList()),
+                (new TestSmellsDAO()).getDetectedTestSmellsForTest(test),
+                test.getGameId(),
+                test.getPlayerId(),
+                test.getLineCoverage().getLinesCovered(),
+                test.getAsString()
+        );
+    }
+
+    protected abstract boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole);
 
     // TODO:
     protected Role determineRole(UserEntity user, Player player, AbstractGame game) {
