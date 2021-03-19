@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<jsp:useBean id="messages" class="org.codedefenders.beans.message.MessagesBean" scope="request"/>
+<%--@elvariable id="messages" type="org.codedefenders.beans.message.MessagesBean"--%>
 
 <c:if test="${messages.count > 0}">
     <div id="messages" style="margin: 0 2rem 0 2rem;">
