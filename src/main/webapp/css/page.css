@@ -6,12 +6,9 @@
 
 @import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
 
-body {
+html, body {
     font-family: 'Ubuntu', 'Open Sans', sans-serif;
     font-size: 14px;
-    line-height: 22px;
-    color: #424242;
-    background-color: #fafafa;
 }
 
 /* Set position of top-level page elements

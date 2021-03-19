@@ -13,12 +13,13 @@
     --bg-attacker-contrast: #ac2c44;
     --bg-attacker-contrast-dark: #8c1f35;
 
-    /* Used e.g. in buttons */
+    /* Used e.g. in buttons. */
     --bg-defender: #3479a2;
     --bg-defender-dark: #296486;
     --bg-defender-contrast: #29698f;
     --bg-defender-contrast-dark: #1b5171;
 
+    /* Used e.g. in in-game scoreboard. */
     --fg-attacker: #e41d41;
     --fg-defender: #1b8fd5;
 }
