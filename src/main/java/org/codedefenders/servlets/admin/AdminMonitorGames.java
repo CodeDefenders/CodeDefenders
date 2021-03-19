@@ -19,8 +19,11 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -30,14 +33,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MeleeGameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.game.AbstractGame;
@@ -49,6 +54,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -63,9 +69,59 @@ public class AdminMonitorGames extends HttpServlet {
     private EventDAO eventDAO;
 
     @Inject
+    private LoginBean login;
+
+    @Inject
     private UserRepository userRepo;
 
+    @Inject
+    private UserService userService;
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
+
+        Map<Integer, String> multiplayerGameCreatorNames = multiplayerGames.stream()
+                .collect(Collectors.toMap(AbstractGame::getId,
+                        game -> userService.getSimpleUserById(game.getCreatorId()).name));
+
+        Map<Integer, List<List<String>>> multiplayerPlayersInf = multiplayerGames.stream()
+                .map(AbstractGame::getId)
+                .collect(Collectors.toMap(id -> id, AdminDAO::getPlayersInfo));
+
+        Map<Integer, Integer> multiplayerUserIdForPlayerIds = multiplayerPlayersInf.values().stream()
+                .flatMap(Collection::stream)
+                .map(list -> list.get(0))
+                .map(Integer::parseInt)
+                .distinct()
+                .collect(Collectors.toMap(pid -> pid, pid -> userRepo.getUserIdForPlayerId(pid)));
+
+        request.setAttribute("multiplayerGames", multiplayerGames);
+        request.setAttribute("multiplayerGameCreatorNames", multiplayerGameCreatorNames);
+        request.setAttribute("multiplayerPlayersInfoForGame", multiplayerPlayersInf);
+        request.setAttribute("multiplayerUserIdForPlayerIds", multiplayerUserIdForPlayerIds);
+
+        List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
+        Map<Integer, String> meleeGameCreatorNames = meleeGames.stream()
+                .collect(Collectors.toMap(AbstractGame::getId,
+                        game -> userService.getSimpleUserById(game.getCreatorId()).name));
+
+        Map<Integer, List<List<String>>> meleePlayersInfoForGame = meleeGames.stream()
+                .map(AbstractGame::getId)
+                .collect(Collectors.toMap(id -> id, AdminDAO::getPlayersInfo));
+
+        Map<Integer, Integer> meleeUserIdForPlayerIds = meleePlayersInfoForGame.values().stream()
+                .flatMap(Collection::stream)
+                .map(list -> list.get(0))
+                .map(Integer::parseInt)
+                .distinct()
+                .collect(Collectors.toMap(pid -> pid, pid -> userRepo.getUserIdForPlayerId(pid)));
+
+        request.setAttribute("meleeGames", meleeGames);
+        request.setAttribute("meleeGameCreatorNames", meleeGameCreatorNames);
+        request.setAttribute("meleePlayersInfoForGame", meleePlayersInfoForGame);
+        request.setAttribute("meleeUserIdForPlayerIds", meleeUserIdForPlayerIds);
+
         request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
     }
 

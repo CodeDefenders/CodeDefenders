@@ -23,12 +23,12 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="java.time.Instant" %>
 <%@ page import="java.time.Duration" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminMonitorGames" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
+<%@ page import="java.util.Map" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -43,7 +43,11 @@
 
         <h3>Current Multiplayer Games</h3>
         <%
-            List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
+            List<MultiplayerGame> multiplayerGames = (List<MultiplayerGame>) request.getAttribute("multiplayerGames");
+            Map<Integer, String> multiplayerGameCreatorNames = (Map<Integer, String>) request.getAttribute("multiplayerGameCreatorNames");
+            Map<Integer, List<List<String>>> multiplayerPlayerInfoForGame = (Map<Integer, List<List<String>>>) request.getAttribute("multiplayerPlayersInfoForGame");
+            Map<Integer, Integer> multiplayerUserIdForPlayerIds = (Map<Integer, Integer>) request.getAttribute("multiplayerUserIdForPlayerIds");
+
             if (multiplayerGames.isEmpty()) {
         %>
         <div class="panel panel-default">
@@ -122,7 +126,7 @@
                         </div>
                     </div>
                 </td>
-                <td class="col-sm-1"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %>
+                <td class="col-sm-1"><%= multiplayerGameCreatorNames.get(gid) %>
                 </td>
                 <td class="col-sm-1"><%=g.getAttackerPlayers().size()%>
                 </td>
@@ -137,7 +141,7 @@
 
                     </button>
                 </td>
-                    <%List<List<String>> playersInfo = AdminDAO.getPlayersInfo(gid);
+                    <%List<List<String>> playersInfo = multiplayerPlayerInfoForGame.get(gid);
                 if(!playersInfo.isEmpty()){%>
             <tr id="playersTableActive" hidden>
                 <th colspan="3">Game Score</th>
@@ -169,7 +173,7 @@
                 for (List<String> playerInfo : playersInfo) {
                     int pid = Integer.parseInt(playerInfo.get(0));
                     // Do not visualize system users.
-                    int userID = UserDAO.getUserForPlayer( pid ).getId();
+                    int userID = multiplayerUserIdForPlayerIds.get(pid);
                     // Note this does not prevent someone to forge move player requests which remove system users from the game
                     if( userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID ){
                         continue;
@@ -254,7 +258,11 @@
 
         <h3>Current Melee Games</h3>
         <%
-            List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
+            List<MeleeGame> meleeGames = (List<MeleeGame>) request.getAttribute("meleeGames");
+            Map<Integer, String> meleeGameCreatorNames = (Map<Integer, String>) request.getAttribute("meleeGameCreatorNames");
+            Map<Integer, List<List<String>>> meleePlayersInfoForGame = (Map<Integer, List<List<String>>>) request.getAttribute("meleePlayersInfoForGame");
+            Map<Integer, Integer> meleeUserIdForPlayerIds = (Map<Integer, Integer>) request.getAttribute("meleeUserIdForPlayerIds");
+
             if (meleeGames.isEmpty()) {
         %>
         <div class="panel panel-default">
@@ -332,7 +340,7 @@
                         </div>
                     </div>
                 </td>
-                <td class="col-sm-1"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %>
+                <td class="col-sm-1"><%= meleeGameCreatorNames.get(gid) %>
                 </td>
                 <td class="col-sm-1"><%=g.getPlayers().size()%>
                 </td>
@@ -345,7 +353,7 @@
 
                     </button>
                 </td>
-                    <%List<List<String>> playersInfo = AdminDAO.getPlayersInfo(gid);
+                    <%List<List<String>> playersInfo = meleePlayersInfoForGame.get(gid);
                 if(!playersInfo.isEmpty()){%>
             <tr id="playersTableActive" hidden>
                 <th colspan="3">Game Score</th>
@@ -372,7 +380,7 @@
                 for (List<String> playerInfo : playersInfo) {
                     int pid = Integer.parseInt(playerInfo.get(0));
                     // Do not visualize system users.
-                    int userID = UserDAO.getUserForPlayer( pid ).getId();
+                    int userID = meleeUserIdForPlayerIds.get(pid);
                     // Note this does not prevent someone to forge move player requests which remove system users from the game
                     if( userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID ){
                         continue;
