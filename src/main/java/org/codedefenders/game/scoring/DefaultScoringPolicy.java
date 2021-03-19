@@ -80,7 +80,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
         // TODO Filter by getUser
         // Process the event log to compute the score of each entity
         for (Event event : eventLog) {
-            if (event.getUser().getId() == Constants.DUMMY_CREATOR_USER_ID) {
+            if (event.getUserId() == Constants.DUMMY_CREATOR_USER_ID) {
                 // Extract Message Payload
                 Integer testId = Integer.parseInt(event.getMessage().split(":")[0]);
                 // The first field of the message is overloaded for lost equivalence duels

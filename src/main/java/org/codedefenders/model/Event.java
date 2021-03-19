@@ -21,9 +21,11 @@ package org.codedefenders.model;
 import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
 
-import org.codedefenders.database.UserDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
+import org.codedefenders.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +64,6 @@ public class Event {
     }
 
     private int gameId = 0;
-
-    private transient UserEntity user = null;
 
     private String message = null;
 
@@ -105,19 +105,20 @@ public class Event {
         this.eventId = eventId;
     }
 
-    public String parse(HashMap<String, String> replacements, String message, boolean emphasise) {
+    public String parse(HashMap<String, String> replacements, String message, boolean emphasise,
+            UserService userService) {
 
         String procMessage = message;
 
-        for (String s : replacements.keySet()) {
-            procMessage = procMessage.replace(s, replacements.get(s));
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            procMessage = procMessage.replace(entry.getKey(), replacements.get(entry.getValue()));
         }
 
         if (procMessage.contains("@event_user")) {
-            UserEntity user = getUser();
+            SimpleUser user = userService.getSimpleUserById(userId);
 
             String userLabel = (user == null) ? "Unknown"
-                    : (user.getUsername().equals(currentUserName)) ? "You" : user.getUsername();
+                    : (user.name.equals(currentUserName)) ? "You" : user.name;
             String color = (user == null) ? "#000000" : ROLE_COLORS.get(role);
 
             procMessage = procMessage.replace("@event_user",
@@ -131,32 +132,20 @@ public class Event {
         return procMessage;
     }
 
-    public void parse(HashMap<String, String> replacements, boolean emphasise) {
-        this.parsedMessage = parse(replacements, message, emphasise);
+    public void parse(HashMap<String, String> replacements, boolean emphasise, UserService userService) {
+        this.parsedMessage = parse(replacements, message, emphasise, userService);
     }
 
-    public void parse(boolean emphasise) {
-        parse(new HashMap<>(), emphasise);
+    public void parse(boolean emphasise, UserService userService) {
+        parse(new HashMap<>(), emphasise, userService);
     }
 
     public String getMessage() {
         return message;
     }
 
-    public String getParsedMessage() {
-        if (parsedMessage == null) {
-            parse(true);
-        }
-
-        return parsedMessage;
-    }
-
-    public UserEntity getUser() {
-        if (user == null) {
-            user = UserDAO.getUserById(userId);
-        }
-
-        return user;
+    public int getUserId() {
+        return userId;
     }
 
     public EventStatus getEventStatus() {
