@@ -31,6 +31,16 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *
+ * @deprecated Please use {@link org.apache.commons.dbutils.QueryRunner} from the apache commons-dbutils package
+ * instead.
+ * But please watch out for differing behaviour: You are responsible for closing the passed {@link Connection}. So the
+ * easiest way is to use a try-with-resource statement when getting the connection from the {@link ConnectionFactory}.
+ * It should provide nearly the same methods (or better ones, without the need to care about the prepared
+ * statement creation).
+ */
+@Deprecated
 public class DB {
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
