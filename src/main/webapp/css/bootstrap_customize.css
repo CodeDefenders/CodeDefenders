@@ -75,9 +75,3 @@ bootstrap classes
 .table-striped > tbody > .even:nth-of-type(n) {
     background-color: #f4f4f4;
 }
-
-/* Darker color on hover. */
-.table-hover > tbody > tr:hover > td {
-    background-color: #f2f2f2;
-}
-
