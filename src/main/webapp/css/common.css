@@ -13,41 +13,41 @@
 ----------------------------------------------------------------------------- */
 
 .bg-attacker {
-    background-color: var(--attacker-color);
+    background-color: var(--bg-attacker);
 }
 
 .bg-defender {
-    background-color: var(--defender-color);
+    background-color: var(--bg-defender);
 }
 
 .fg-attacker {
-    color: var(--attacker-color);
+    color: var(--fg-attacker);
 }
 
 .fg-defender {
-    color: var(--defender-color);
+    color: var(--fg-defender);
 }
 
 .btn-attacker {
     color: white;
-    background-color: var(--attacker-color);
-    border-color: var(--attacker-color-contrast);
+    background-color: var(--bg-attacker);
+    border-color: var(--bg-attacker-contrast);
 }
 .btn-attacker:hover {
     color: white;
-    background-color: var(--attacker-color-dark);
-    border-color: var(--attacker-color-contrast-dark);
+    background-color: var(--bg-attacker-dark);
+    border-color: var(--bg-attacker-contrast-dark);
 }
 
 .btn-defender {
     color: white;
-    background-color: var(--defender-color);
-    border-color: var(--defender-color-contrast);
+    background-color: var(--bg-defender);
+    border-color: var(--bg-defender-contrast);
 }
 .btn-defender:hover {
     color: white;
-    background-color: var(--defender-color-dark);
-    border-color: var(--defender-color-contrast-dark);
+    background-color: var(--bg-defender-dark);
+    border-color: var(--bg-defender-contrast-dark);
 }
 
 /* Mutant icons

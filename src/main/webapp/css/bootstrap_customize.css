@@ -15,7 +15,7 @@ bootstrap classes
 
 /* General look of the navbar. */
 .navbar-cd {
-    background-color: var(--codedefenders-color);
+    background-color: var(--bg-codedefenders);
     border-radius: 0;
     border: none;
 }
@@ -26,7 +26,7 @@ bootstrap classes
 }
 .navbar-cd .navbar-brand:hover,
 .navbar-cd .navbar-brand:focus {
-    background-color: var(--codedefenders-color-bright);
+    background-color: var(--bg-codedefenders-bright);
 }
 
 /* Background and color of navbar entries. */
@@ -35,12 +35,12 @@ bootstrap classes
 }
 .navbar-cd .navbar-nav > li > a:hover,
 .navbar-cd .navbar-nav > li > a:focus {
-    background-color: var(--codedefenders-color-bright);
+    background-color: var(--bg-codedefenders-bright);
 }
 
 /* Background and color of open dropdowns. */
 .navbar-cd .navbar-nav > .dropdown.open > a {
-    background-color: var(--codedefenders-color-bright);
+    background-color: var(--bg-codedefenders-bright);
     color: white;
 }
 
@@ -52,10 +52,10 @@ bootstrap classes
     }
     .navbar-cd .navbar-nav .open .dropdown-menu > li > a:focus,
     .navbar-cd .navbar-nav .open .dropdown-menu > li > a:hover {
-        background-color: var(--codedefenders-color-bright);
+        background-color: var(--bg-codedefenders-bright);
     }
     .navbar-cd .navbar-nav .open .dropdown-menu .divider {
-        background-color: var(--codedefenders-color-brighter);
+        background-color: var(--bg-codedefenders-brighter);
     }
 }
 

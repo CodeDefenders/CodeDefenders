@@ -2,15 +2,23 @@
 ============================================================================= */
 
 :root {
-    --codedefenders-color: #03a9f4;
-    --codedefenders-color-bright: #29b6f6;
-    --codedefenders-color-brighter: #54c4f8;
-    --attacker-color: #884466;
-    --attacker-color-dark: #713d57;
-    --attacker-color-contrast: #772233;
-    --attacker-color-contrast-dark: #64222f;
-    --defender-color: #446688;
-    --defender-color-dark: #3d546c;
-    --defender-color-contrast: #225577;
-    --defender-color-contrast-dark: #21455e;
+    /* Used e.g. in header/footer. */
+    --bg-codedefenders: #03a9f4;
+    --bg-codedefenders-bright: #29b6f6;
+    --bg-codedefenders-brighter: #54c4f8;
+
+    /* Used e.g. in buttons */
+    --bg-attacker: #b94258;
+    --bg-attacker-dark: #9d384b;
+    --bg-attacker-contrast: #ac2c44;
+    --bg-attacker-contrast-dark: #8c1f35;
+
+    /* Used e.g. in buttons */
+    --bg-defender: #3479a2;
+    --bg-defender-dark: #296486;
+    --bg-defender-contrast: #28668a;
+    --bg-defender-contrast-dark: #1b5171;
+
+    --fg-attacker: #e41d41;
+    --fg-defender: #1b8fd5;
 }
