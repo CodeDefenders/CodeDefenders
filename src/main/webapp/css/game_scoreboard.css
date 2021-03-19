@@ -5,14 +5,16 @@
 .scoreboard .attacker {
     background-color: var(--bg-attacker);
 }
-span.attackerTotal {
+
+.attackerTotal {
     color: var(--fg-attacker);
     text-align: right;
     font-size: 36px;
 }
 
-.scoreboard .attacker.header, .scoreboard .attacker.total {
-    background-color: var(--bg-attacker);
+.scoreboard .attacker.header,
+.scoreboard .attacker.total {
+    background-color: var(--bg-attacker-contrast);
 }
 
 .scoreBanner {
@@ -25,14 +27,15 @@ span.attackerTotal {
     background-color: var(--bg-defender);
 }
 
-span.defenderTotal {
+.defenderTotal {
     color: var(--fg-defender);
     text-align: left;
     font-size: 36px;
 }
 
-.scoreboard .defender.header, .scoreboard .defender.total {
-    background-color: var(--bg-defender);
+.scoreboard .defender.header,
+.scoreboard .defender.total {
+    background-color: var(--bg-defender-contrast);
 }
 
 .scoreboard .header th {

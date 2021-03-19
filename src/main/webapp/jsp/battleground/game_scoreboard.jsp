@@ -40,7 +40,7 @@
 <link href="css/game_scoreboard.css" rel="stylesheet">
 
 <div id="scoreboard" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="width: 60rem;">
         <!-- Modal content-->
         <div class="modal-content" style="z-index: 10000; position: absolute; width: 100%; left:0%;">
             <div class="modal-header">
@@ -58,15 +58,17 @@
                             ts += ((PlayerScore)testScores.get(-2)).getTotalScore();
                         } %>
                         <%= ts %>
-                    </span><img class="logo" href="<%=request.getContextPath() %>/" src="images/logo.png"/><span class="defenderTotal">
+                    </span>
+                    <img class="logo" href="<%=request.getContextPath() %>/" src="images/logo.png"/>
+                    <span class="defenderTotal">
                     <% ts = 0;
                         if (testScores.containsKey(-1) && testScores.get(-1) != null){
                                 ts += ((PlayerScore)testScores.get(-1)).getTotalScore(); %>
                         <% } %>
                         <%= ts %>
-                </span>
+                    </span>
                 </div>
-                <table class="scoreboard">
+                <table class="scoreboard table table-fluid">
                     <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Alive / Killed / Equivalent</th><th>Duels Won/Lost/Ongoing</th></th><th>Total Points</th></tr>
                     <%
                     int total = 0;
@@ -129,7 +131,7 @@
                 %><tr class="attacker"><td colspan="4"></td></tr><%
                     }
                 %>
-                    <tr class="attacker header"><td>
+                    <tr class="attacker total"><td>
                         Attacking Team
                     </td>
                         <td><%
@@ -222,7 +224,7 @@
                             %><tr class="defender"><td colspan="5"></td></tr><%
                         }
                     %>
-                    <tr class="defender header"><td>
+                    <tr class="defender total"><td>
                         Defending Team
                     </td>
                         <td><%
