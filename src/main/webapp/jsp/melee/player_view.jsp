@@ -20,7 +20,6 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
@@ -30,7 +29,6 @@
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.stream.Collectors" %>
 
 <%--
     @param MeleeGame game
@@ -50,16 +48,9 @@
     UserEntity equivDefender = (UserEntity) request.getAttribute("equivDefender");
 
     final UserEntity user = login.getUser();
-    // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
-    final int userId = login.getUserId();
-    final List<Test> playerTests = game.getTests()
-            .stream()
-            .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == userId)
-            .collect(Collectors.toList());
-    final List<Test> enemyTests = game.getTests()
-            .stream()
-            .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() != userId)
-            .collect(Collectors.toList());
+    // These two are set in the MeleeGameManager, since we need to do a getUserIdForPlayerId lookup for test filtering.
+    final List<Test> playerTests = (List<Test>) request.getAttribute("playerTests");
+    final List<Test> enemyTests = (List<Test>) request.getAttribute("enemyTests");
 %>
 
 <jsp:useBean id="previousSubmission"

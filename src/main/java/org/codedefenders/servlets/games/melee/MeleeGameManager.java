@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -218,6 +219,18 @@ public class MeleeGameManager extends HttpServlet {
         meleeScoreboardBean.setPlayers(game.getPlayers());
         // Set the preconditions for the score board
         request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
+
+        // We need to compute/set this here for the `player_view.jsp`.
+        List<Test> playerTests = game.getTests()
+                .stream()
+                .filter(t -> userRepo.getUserIdForPlayerId(t.getPlayerId()) == userId)
+                .collect(Collectors.toList());
+        List<Test> enemyTests = game.getTests()
+                .stream()
+                .filter(t -> userRepo.getUserIdForPlayerId(t.getPlayerId()) != userId)
+                .collect(Collectors.toList());
+        request.setAttribute("playerTests", playerTests);
+        request.setAttribute("enemyTests", enemyTests);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_VIEW_JSP);
         dispatcher.forward(request, response);
