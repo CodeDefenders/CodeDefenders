@@ -18,9 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
@@ -34,10 +32,8 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <%
-        String editUser = request.getParameter("editUser");
-        if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
-            UserEntity u = UserDAO.getUserById(Integer.parseInt(editUser));
-            if (u != null) {
+        UserEntity u = (UserEntity) request.getAttribute("user");
+        if (u != null) {
     %>
     <h3>Edit Info for User <%=u.getId()%>
     </h3>
@@ -84,7 +80,6 @@
         </script>
     </form>
     <%
-            }
         }
     %>
 

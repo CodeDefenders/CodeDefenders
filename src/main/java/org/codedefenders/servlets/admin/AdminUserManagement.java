@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.math.IntRange;
+import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
@@ -80,6 +81,15 @@ public class AdminUserManagement extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        UserEntity user = null;
+        String editUser = request.getParameter("editUser");
+        if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
+            user = userRepo.getUserById(Integer.parseInt(editUser));
+        }
+
+        request.setAttribute("user", user);
+
         request.getRequestDispatcher(Constants.ADMIN_USER_JSP).forward(request, response);
     }
 
