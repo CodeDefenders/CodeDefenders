@@ -25,7 +25,6 @@ import java.util.Map;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -327,12 +326,12 @@ public class MeleeGame extends AbstractGame {
     }
 
     protected boolean canJoinGame(int userId) {
-        return !requiresValidation || UserDAO.getUserById(userId).isValidated();
+        return !requiresValidation || userRepository.getUserById(userId).isValidated();
     }
 
     public boolean addPlayer(int userId) {
         if (canJoinGame(userId) && addPlayerForce(userId, Role.PLAYER)) {
-            UserEntity u = UserDAO.getUserById(userId);
+            UserEntity u = userRepository.getUserById(userId);
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event e = new Event(-1, id, userId, u.getUsername() + " joined melee game", EventType.PLAYER_JOINED,
                     EventStatus.GAME, timestamp);

@@ -27,7 +27,6 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
@@ -37,6 +36,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
@@ -362,6 +362,7 @@ public class AdminCreateGamesBean implements Serializable {
      */
     public boolean addPlayerToExistingGame(AbstractGame game, UserEntity user, Role role) {
         game.setEventDAO(eventDAO);
+        game.setUserRepository(userRepo);
         if (!game.addPlayer(user.getId(), role)) {
             messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}.",
                     user.getId(), game.getId(), role));
@@ -602,6 +603,7 @@ public class AdminCreateGamesBean implements Serializable {
 
         /* Insert the game. */
         game.setEventDAO(eventDAO);
+        game.setUserRepository(userRepo);
         if (!game.insert()) {
             messages.add(format("ERROR: Could not create game for staged game {0}.",
                     stagedGame.getFormattedId()));

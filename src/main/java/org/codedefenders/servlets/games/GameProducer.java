@@ -8,6 +8,7 @@ import javax.inject.Inject;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,9 @@ public class GameProducer implements Serializable {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private UserRepository userRepo;
 
     private Integer gameId = null;
     private AbstractGame game = null;
@@ -37,6 +41,7 @@ public class GameProducer implements Serializable {
             game = GameDAO.getGame(gameId);
             if (game != null) {
                 game.setEventDAO(eventDAO);
+                game.setUserRepository(userRepo);
             } else {
                 logger.debug("Could not retrieve game with id {} from database", gameId);
             }

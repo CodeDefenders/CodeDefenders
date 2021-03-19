@@ -154,9 +154,12 @@ public class AdminMonitorGames extends HttpServlet {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
                 game = GameDAO.getGame(gameToRemoveFromId);
-                game.setEventDAO(eventDAO);
-                if (!game.addPlayer(userId, newRole)) {
-                    messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
+                if (game != null) {
+                    game.setEventDAO(eventDAO);
+                    game.setUserRepository(userRepo);
+                    if (!game.addPlayer(userId, newRole)) {
+                        messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
+                    }
                 }
             }
 
