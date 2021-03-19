@@ -139,7 +139,12 @@ public class UserDAO {
 
     /**
      * @return a mapping from game identifiers to the name of the game's creators.
+     *
+     * @deprecated Please use {@link org.codedefenders.service.UserService#getSimpleUserById(int)} to look up a
+     * {@link org.codedefenders.dto.SimpleUser} object, which contains the username, via the creatorId obtained via
+     * {@link AbstractGame#getCreatorId()}.
      */
+    @Deprecated
     public static Map<Integer, String> getGamesCreatorNames(final List<? extends AbstractGame> games) {
         if (games.isEmpty()) {
             return new HashMap<>();
