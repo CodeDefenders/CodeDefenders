@@ -311,11 +311,11 @@ public class MeleeGame extends AbstractGame {
     // TODO Those methods should be removed? The scoring bean should take the game
     // as input and then compute the score
     public Map<Integer, PlayerScore> getMutantScores() {
-        return scoringBean.getMutantScores();
+        return scoringBean.getMutantScores(id);
     }
 
     public Map<Integer, PlayerScore> getTestScores() {
-        return scoringBean.getTestScores();
+        return scoringBean.getTestScores(id);
     }
 
     /*

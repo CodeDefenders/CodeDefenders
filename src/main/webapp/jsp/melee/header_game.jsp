@@ -97,9 +97,7 @@
 					class="btn btn-default pull-right" id="btnProjectExport"> Export
                 </a>
 
-				<%-- TODO: Enable this if we can collect feedback for melee mode
-                <a href="#" class="btn btn-default btn-diff" id="btnFeedback"
+                <a href="#" class="btn btn-default pull-right" id="btnFeedback"
 					data-toggle="modal" data-target="#playerFeedback"> Feedback </a>
-					--%>
             </div>
     </div>

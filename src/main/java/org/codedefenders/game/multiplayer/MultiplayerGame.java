@@ -49,6 +49,7 @@ import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
 import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGame extends AbstractGame {
+
     /*
      * Inherited from AbstractGame
      *

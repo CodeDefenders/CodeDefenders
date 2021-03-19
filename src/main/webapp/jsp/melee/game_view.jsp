@@ -36,6 +36,13 @@
     Role role = game.getRole(login.getUserId());
 %>
 
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
+<%
+    playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+    playerFeedback.setPlayerInfo(login.getUser(), role);
+%>
+
+
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
     history.setLogin(login);
@@ -66,11 +73,10 @@
 <t:game_chat/>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
-
+<jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
-
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%

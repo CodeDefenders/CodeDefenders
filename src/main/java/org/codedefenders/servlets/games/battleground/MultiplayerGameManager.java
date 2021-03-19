@@ -50,7 +50,6 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
@@ -82,6 +81,7 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -156,27 +156,21 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private EventDAO eventDAO;
 
+    @Inject
+    private GameProducer gameProducer;
+
     @Override
-    protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
-        Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
-            logger.info("No gameId parameter. Aborting request.");
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
-            return;
-        }
-        int gameId = gameIdOpt.get();
-
-        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        MultiplayerGame game = gameProducer.getGame();
         if (game == null) {
-            logger.error("Could not find multiplayer game {}", gameId);
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            logger.error("No game found. Aborting request.");
+            Redirect.redirectBack(request, response);
             return;
-        } else {
-            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
-            game.setEventDAO(eventDAO);
         }
+
+        int gameId = game.getId();
+
         int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
         if (playerId == -1 && game.getCreatorId() != login.getUserId()) {
@@ -208,24 +202,14 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
-            logger.debug("No gameId parameter. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-        final int gameId = gameIdOpt.get();
-
-        final MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-
+        MultiplayerGame game = gameProducer.getGame();
         if (game == null) {
-            logger.debug("Could not retrieve game from database for gameId: {}", gameId);
+            logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else {
-            // TODO Shall we make MultiplayerGameDAO ensure dependencies are set?
-            game.setEventDAO(eventDAO);
         }
+
+        int gameId = game.getId();
 
         final String action = ServletUtils.formType(request);
         switch (action) {

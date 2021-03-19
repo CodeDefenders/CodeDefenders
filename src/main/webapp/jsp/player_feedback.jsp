@@ -19,7 +19,6 @@
 
 --%>
 
-<%@page import="java.util.List"%>
 <%@page import="org.codedefenders.util.Paths"%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.Feedback" %>
@@ -113,34 +112,36 @@
                         <tbody>
 
                         <%
-                            List<Integer> ratings = playerFeedback.getOwnRatings();
-                            for (Type f : Feedback.types) {
-                                if (!playerFeedback.isRatingForRole(f)) {
-                                    continue;
-                                }
-                                int oldValue = ratings.isEmpty() ? -1 : ratings.get(f.ordinal());
+                            Map<Feedback.Type, Integer> ratings = playerFeedback.getOwnRatings();
+                            for (Type type : playerFeedback.getAvailableFeedbackTypes()) {
+                                int oldValue = ratings.getOrDefault(type, 0);
                         %>
 
                         <tr>
-                            <td><%=f.description()%>
+                            <td><%=type.description()%>
                             </td>
                             <td>
                                 <fieldset class="rating">
-                                    <input type="radio" id="star5_<%=f.name()%>" name="rating<%=f.name()%>" value=5
-                                        <%=oldValue == 5 ? "checked" : ""%>>
-                                    <label class="full" for="star5_<%=f.name()%>" title="very much"></label>
-                                    <input type="radio" id="star4_<%=f.name()%>" name="rating<%=f.name()%>" value=4
-                                        <%=oldValue == 4 ? "checked" : ""%>>
-                                    <label class="full" for="star4_<%=f.name()%>" title="a lot"></label>
-                                    <input type="radio" id="star3_<%=f.name()%>" name="rating<%=f.name()%>" value=3
-                                        <%=oldValue == 3 ? "checked" : ""%>>
-                                    <label class="full" for="star3_<%=f.name()%>" title="somewhat"></label>
-                                    <input type="radio" id="star2_<%=f.name()%>" name="rating<%=f.name()%>" value=2
-                                        <%=oldValue == 2 ? "checked" : ""%>>
-                                    <label class="full" for="star2_<%=f.name()%>" title="a bit"></label>
-                                    <input type="radio" id="star1_<%=f.name()%>" name="rating<%=f.name()%>" value=1
-                                        <%=oldValue == 1 ? "checked" : ""%>>
-                                    <label class="full" for="star1_<%=f.name()%>" title="not at all"></label>
+                                    <input type="radio" id="star5_<%=type.name()%>" name="rating<%=type.name()%>" value=5
+                                        <%=oldValue == 5 ? "checked" : ""%>
+                                        autocomplete="off">
+                                    <label class="full" for="star5_<%=type.name()%>" title="very much"></label>
+                                    <input type="radio" id="star4_<%=type.name()%>" name="rating<%=type.name()%>" value=4
+                                        <%=oldValue == 4 ? "checked" : ""%>
+                                        autocomplete="off">
+                                    <label class="full" for="star4_<%=type.name()%>" title="a lot"></label>
+                                    <input type="radio" id="star3_<%=type.name()%>" name="rating<%=type.name()%>" value=3
+                                        <%=oldValue == 3 ? "checked" : ""%>
+                                        autocomplete="off">
+                                    <label class="full" for="star3_<%=type.name()%>" title="somewhat"></label>
+                                    <input type="radio" id="star2_<%=type.name()%>" name="rating<%=type.name()%>" value=2
+                                        <%=oldValue == 2 ? "checked" : ""%>
+                                        autocomplete="off">
+                                    <label class="full" for="star2_<%=type.name()%>" title="a bit"></label>
+                                    <input type="radio" id="star1_<%=type.name()%>" name="rating<%=type.name()%>" value=1
+                                        <%=oldValue == 1 ? "checked" : ""%>
+                                        autocomplete="off">
+                                    <label class="full" for="star1_<%=type.name()%>" title="not at all"></label>
                                 </fieldset>
                             </td>
                         </tr>
@@ -156,7 +157,9 @@
                     <p>Thank you for your time.</p>
                     <br>
 
-                    <button class="btn btn-primary" type="submit"> Save Feedback</button>
+                    <button class="btn btn-primary" type="submit" ${playerFeedback.hasOwnRatings() ? "" : "disabled"}>
+                        Save Feedback
+                    </button>
                 </form>
             </div>
             <%}%>
@@ -180,22 +183,18 @@
 
                     <%
                         if (playerFeedback.canSeeFeedback()) {
-                            for (Map.Entry<Player, List<Integer>> entry : playerFeedback.getAllRatings().entrySet()) {
+                            for (Map.Entry<Player, Map<Feedback.Type, Integer>> entry : playerFeedback.getAllRatings().entrySet()) {
                                 Player player = entry.getKey();
-                                List<Integer> ratings = entry.getValue();
-
-                                if (ratings.isEmpty()) {
-                                    continue;
-                                }
+                                Map<Feedback.Type, Integer> ratings = entry.getValue();
 
                                 String rowColor = player.getRole() == Role.ATTACKER ? "#9a002914" : "#0029a01a";
                     %>
                     <tr style="background-color:<%=rowColor%>">
                         <td><%=player.getUser().getUsername()%></td>
                         <%
-                            for (Type f : Type.values()) {
-                                int ratingValue = ratings.get(f.ordinal());
-                                if (ratingValue < 1) {
+                            for (Type type : Feedback.Type.TYPES) {
+                                Integer ratingValue = ratings.get(type);
+                                if (ratingValue == null) {
                         %>
                         <td></td>
 
@@ -224,21 +223,21 @@
                     <tr>
                         <td>Average</td>
                         <%
-                            List<Double> averageRatings = playerFeedback.getAverageRatings();
-                            for (Type f : Feedback.types) {
-                                double ratingValue = averageRatings.isEmpty() ? -1 : averageRatings.get(f.ordinal());
-                                if (ratingValue < 1) {
+                            Map<Feedback.Type, Double> averageRatings = playerFeedback.getAverageRatings();
+                            for (Type type : Type.TYPES) {
+                                Double rating = averageRatings.get(type);
+                                if (rating == null) {
                         %>
                         <td></td>
 
                         <% } else { %>
 
                         <td>
-                            <p style="text-align: left;"><%=String.format("%.1f", ratingValue)%></p>
+                            <p style="text-align: left;"><%=String.format("%.1f", rating)%></p>
                             <fieldset class="rating">
                                 <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
                                 <label class="full" title="<%=i%>"
-                                       style="font-size:9px; color:<%=i <= Math.round(ratingValue)  ? "#FFD700" : "#bdbdbd"%>"></label>
+                                       style="font-size:9px; color:<%=i <= Math.round(rating)  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>
                             </fieldset>
                         </td>
@@ -272,4 +271,10 @@
         document.getElementById('provideFeedbackLink').classList.toggle('active');
         document.getElementById('viewFeedbackLink').classList.toggle('active');
     }
+
+    $(document).ready(() => {
+        $('#sendFeedback').on('change', '.rating input', function () {
+            $('#sendFeedback button[type="submit"]').removeAttr('disabled');
+        });
+    });
 </script>

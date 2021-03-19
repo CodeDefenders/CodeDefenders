@@ -9,6 +9,7 @@ import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.Paths;
 
 @ManagedBean
@@ -25,12 +26,14 @@ public class GameChatBean {
      */
     public static final int MESSAGE_LIMIT = 1000;
 
-    @Inject
-    @Named("game")
-    private AbstractGame game;
+    private final LoginBean login;
+    private final AbstractGame game;
 
     @Inject
-    LoginBean login;
+    public GameChatBean(GameProducer gameProducer, LoginBean login) {
+        this.login = login;
+        this.game = gameProducer.getGame();
+    }
 
     /**
      * Checks whether the chat is enabled in the current game.

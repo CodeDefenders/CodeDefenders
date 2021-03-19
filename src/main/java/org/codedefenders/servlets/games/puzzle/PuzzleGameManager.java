@@ -103,7 +103,6 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  * <p>Serves under {@code /puzzlegame}.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
- * @see PuzzleGameSelectionManager
  * @see PuzzleGame
  */
 @WebServlet(org.codedefenders.util.Paths.PUZZLE_GAME)
@@ -143,7 +142,7 @@ public class PuzzleGameManager extends HttpServlet {
         boolean fromGameId = gameIdOpt.isPresent(); // else from puzzleId
         if (fromGameId) {
             final int gameId = gameIdOpt.get();
-            gameProducer.setTheGame(gameId);
+            gameProducer.setGameId(gameId);
             game = PuzzleDAO.getPuzzleGameForId(gameId);
 
             if (game == null) {
@@ -176,7 +175,7 @@ public class PuzzleGameManager extends HttpServlet {
                 createGame(login.getUserId(), request, response);
                 return;
             } else {
-                gameProducer.setTheGame(game.getId());
+                gameProducer.setGameId(game.getId());
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 game.setEventDAO(eventDAO);
             }

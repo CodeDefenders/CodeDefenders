@@ -45,7 +45,12 @@ public class GameDAO {
      * @return The {@link AbstractGame} with the given ID or null if no game found.
      */
     public static AbstractGame getGame(int gameId) {
-        switch (getGameMode(gameId)) {
+        GameMode gameMode = getGameMode(gameId);
+        if (gameMode == null) {
+            return null;
+        }
+        
+        switch (gameMode) {
             case PARTY:
                 return MultiplayerGameDAO.getMultiplayerGame(gameId);
             case MELEE:

@@ -18,62 +18,59 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.leaderboard.Leaderboard" %>
-<%@ page import="org.codedefenders.game.leaderboard.Entry" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Leaderboard"); %>
+<%-- Attributes set in the servlet --%>
+<%--@elvariable id="leaderboardEntries" type="java.util.List<org.codedefenders.game.leaderboard.Entry>"--%>
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="container">
-	<h3>Battlegrounds</h3>
-	<table id="tableMPLeaderboard" class="table table-striped table-hover table-responsive table-center dataTable display">
-		<thead>
-			<tr>
-				<th class="col-sm-2">User</th>
-				<th class="col-sm-1">Mutants</th>
-				<th class="col-sm-2">Attacker Score</th>
-				<th class="col-sm-1">Tests</th>
-				<th class="col-sm-2">Defender Score</th>
-				<th class="col-sm-2">Mutants Killed</th>
-				<th class="col-sm-2">Total Score</th>
-			</tr>
-		</thead>
-		<tbody>
-		<%
-			for (Entry p : Leaderboard.getAll()) {
-		%>
-		<tr>
-			<td><%=p.getUsername()%></td>
-			<td><%=p.getMutantsSubmitted()%></td>
-			<td><%=p.getAttackerScore()%></td>
-			<td><%=p.getTestsSubmitted()%></td>
-			<td><%=p.getDefenderScore()%></td>
-			<td><%=p.getMutantsKilled()%></td>
-			<td><%=p.getTotalPoints()%></td>
-		</tr>
-		<% } %>
+    <h3>Battlegrounds</h3>
+    <table id="tableMPLeaderboard"
+           class="table table-striped table-hover table-responsive table-center dataTable display">
+        <thead>
+        <tr>
+            <th class="col-sm-2">User</th>
+            <th class="col-sm-1">Mutants</th>
+            <th class="col-sm-2">Attacker Score</th>
+            <th class="col-sm-1">Tests</th>
+            <th class="col-sm-2">Defender Score</th>
+            <th class="col-sm-2">Mutants Killed</th>
+            <th class="col-sm-2">Total Score</th>
+        </tr>
+        </thead>
+        <tbody>
+        <c:forEach var="entry" items="${leaderboardEntries}">
+            <tr>
+                <td>${entry.username}</td>
+                <td>${entry.mutantsSubmitted}</td>
+                <td>${entry.attackerScore}</td>
+                <td>${entry.testsSubmitted}</td>
+                <td>${entry.defenderScore}</td>
+                <td>${entry.mutantsKilled}</td>
+                <td>${entry.totalPoints}</td>
+            </tr>
+        </c:forEach>
+        </tbody>
+    </table>
 
-		</tbody>
-	</table>
+    <script>
+        (function () {
 
-	<script>
-	(function () {
+            $(document).ready(function () {
+                $.fn.dataTable.moment('DD/MM/YY HH:mm');
+                $('#tableMPLeaderboard').DataTable({
+                    "order": [[6, "desc"]],
+                    "columnDefs": [
+                        {"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
+                    ],
+                    "pageLength": 50
+                });
+            });
 
-		$(document).ready(function () {
-			$.fn.dataTable.moment('DD/MM/YY HH:mm');
-			$('#tableMPLeaderboard').DataTable({
-				"order": [[6, "desc"]],
-				"columnDefs": [
-					{"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
-				],
-				"pageLength": 50
-			});
-		});
-
-	})();
-	</script>
+        })();
+    </script>
 
 </div>
 <%@ include file="/jsp/footer.jsp" %>

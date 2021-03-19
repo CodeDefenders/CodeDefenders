@@ -19,6 +19,14 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.net.InetAddresses;
 
+/**
+ * This filter performs the login with the form data submitted via a HTTP POST request to the {@code /login} url.
+ *
+ * <p>The whole authentication logic is handled silently by the parent class {@link FormAuthenticationFilter} which
+ * performs a login against the {@link org.codedefenders.auth.CodeDefendersAuthenticatingRealm} with the credentials
+ * found in the {@code username} and {@code password} HTML parameters of the POST request.
+ *
+ */
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
@@ -55,7 +63,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         DatabaseAccess.logSession(((User) subject.getPrincipal()).getId(), getClientIpAddress(httpRequest));
         login.loginUser((User) subject.getPrincipal());
 
-        return true;//super.onLoginSuccess(token, subject, request, response);
+        // Call the super method, as this is the one doing the redirect after a successful login.
+        return super.onLoginSuccess(token, subject, request, response);
     }
 
     @Override
