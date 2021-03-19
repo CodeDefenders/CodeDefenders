@@ -20,7 +20,6 @@
 package org.codedefenders.persistence.database;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -28,6 +27,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.UserEntity;
@@ -72,13 +72,7 @@ public class UserRepository {
             return playerIdCache.get(playerId, () -> {
                 Integer userId;
                 try (Connection conn = connectionFactory.getConnection()) {
-                    userId = queryRunner.query(conn, query, resultSet -> {
-                        if (resultSet.next()) {
-                            return resultSet.getInt(1);
-                        } else {
-                            return null;
-                        }
-                    }, playerId);
+                    userId = queryRunner.query(conn, query, new ScalarHandler<>(), playerId);
                 }
                 if (userId == null) {
                     throw new Exception();
