@@ -181,7 +181,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
         // org.codedefenders.util.Paths.ADMIN_ANALYTICS_KILLMAPS = "/admin/analytics/killmaps";
 
-         // org.codedefenders.util.Paths.API_ANALYTICS_USERS = "/admin/api/users";
+        // org.codedefenders.util.Paths.API_ANALYTICS_USERS = "/admin/api/users";
         // org.codedefenders.util.Paths.API_ANALYTICS_CLASSES = "/admin/api/classes";
         // org.codedefenders.util.Paths.API_ANALYTICS_KILLMAP = "/admin/api/killmap";
         // org.codedefenders.util.Paths.API_KILLMAP_MANAGEMENT = "/admin/api/killmapmanagement";
