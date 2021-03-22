@@ -104,7 +104,7 @@ public class GameHighlightingBean {
 
     public String getJSON() {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(Map.class, new JSONUtils.MapSerializer())
+                .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .create();
         return gson.toJson(gameHighlightingData);
     }

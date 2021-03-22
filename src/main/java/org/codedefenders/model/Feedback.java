@@ -22,12 +22,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.codedefenders.game.Role;
+
 /**
  * This class contains static constants for feedback and the {@link Type feedback type}.
  */
 public class Feedback {
 
-    public static List<Type> types = Collections.unmodifiableList(Arrays.asList(Type.values()));
     public static final int MAX_RATING = 5;
     public static final int MIN_RATING = -1;
 
@@ -39,6 +40,28 @@ public class Feedback {
         ATTACKER_FAIRNESS("Attacker Fairness", "The attacking team is playing fair"),
         DEFENDER_FAIRNESS("Defender Fairness", "The defending team is playing fair"),
         GAME_ENGAGING("Game Engaging", "The game is engaging");
+
+        public static final List<Type> TYPES = Collections.unmodifiableList(Arrays.asList(values()));
+
+        public static final List<Type> ATTACKER_TYPES = Arrays.asList(
+                Type.CUT_MUTATION_DIFFICULTY,
+                Type.DEFENDER_COMPETENCE,
+                Type.DEFENDER_FAIRNESS,
+                Type.GAME_ENGAGING
+        );
+
+        public static final List<Type> DEFENDER_TYPES = Arrays.asList(
+                Type.CUT_TEST_DIFFICULTY,
+                Type.ATTACKER_COMPETENCE,
+                Type.ATTACKER_FAIRNESS,
+                Type.GAME_ENGAGING
+        );
+
+        public static final List<Type> PLAYER_TYPES = Arrays.asList(
+                Type.CUT_MUTATION_DIFFICULTY,
+                Type.CUT_TEST_DIFFICULTY,
+                Type.GAME_ENGAGING
+        );
 
         String displayName;
         String description;
@@ -54,6 +77,23 @@ public class Feedback {
 
         public String description() {
             return description;
+        }
+
+        public static List<Type> getFeedbackTypesForRole(Role role) {
+            switch (role) {
+                case ATTACKER:
+                    return ATTACKER_TYPES;
+                case DEFENDER:
+                    return DEFENDER_TYPES;
+                case PLAYER:
+                    return PLAYER_TYPES;
+                case OBSERVER:
+                    return TYPES;
+                case NONE:
+                    return Collections.emptyList();
+                default:
+                    throw new IllegalArgumentException("Unknown role: " + role);
+            }
         }
     }
 

@@ -105,8 +105,8 @@ public class MutationTesterTest {
     @BeforeClass
     public static void setupEnvironment() throws IOException {
         // ERROR > WARN > INFO > DEBUG > TRACE.
-        System.setProperty(org.slf4j.impl.SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "INFO");
-        System.setProperty(org.slf4j.impl.SimpleLogger.LOG_FILE_KEY, "System.err");
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "INFO");
+        System.setProperty("org.slf4j.simpleLogger.logFile", "System.err");
         //
 
         codedefendersHome = Files.createTempDirectory("integration-tests").toFile();

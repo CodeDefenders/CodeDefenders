@@ -49,7 +49,6 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
-import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -78,6 +77,7 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -158,26 +158,21 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private Configuration config;
 
+    @Inject
+    private GameProducer gameProducer;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
-            logger.info("No gameId parameter. Aborting request.");
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
-            return;
-        }
-        int gameId = gameIdOpt.get();
-
-        MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
+        MeleeGame game = gameProducer.getGame();
 
         if (game == null) {
-            logger.error("Could not find melee game {}", gameId);
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            logger.error("No game found. Aborting request.");
+            Redirect.redirectBack(request, response);
             return;
-        } else {
-            game.setEventDAO(eventDAO);
         }
+
+        int gameId = game.getId();
         int userId = login.getUserId();
 
         if (!game.hasUserJoined(userId) && game.getCreatorId() != userId) {
@@ -214,8 +209,8 @@ public class MeleeGameManager extends HttpServlet {
         MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean();
         // Why ID is necessary here?
         meleeScoreboardBean.setGameId(game.getId());
-        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(), scoreCalculator.getTestScores(),
-                scoreCalculator.getDuelScores());
+        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(game.getId()),
+                scoreCalculator.getTestScores(game.getId()), scoreCalculator.getDuelScores(game.getId()));
         meleeScoreboardBean.setPlayers(game.getPlayers());
         // Set the preconditions for the score board
         request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
@@ -226,23 +221,15 @@ public class MeleeGameManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
-            logger.warn("No gameId parameter. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-        final int gameId = gameIdOpt.get();
-
-        final MeleeGame game = MeleeGameDAO.getMeleeGame(gameId);
+        MeleeGame game = gameProducer.getGame();
 
         if (game == null) {
-            logger.warn("Could not retrieve game from database for gameId: {}", gameId);
+            logger.error("No game found. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
-        } else {
-            game.setEventDAO(eventDAO);
         }
+
+        int gameId = game.getId();
 
         if (!game.hasUserJoined(login.getUserId())) {
             logger.warn("User {} has not yet joined the game : {}", login.getUserId(), gameId);

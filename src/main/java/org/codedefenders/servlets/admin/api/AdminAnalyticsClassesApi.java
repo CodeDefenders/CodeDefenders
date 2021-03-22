@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpStatus;
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.database.AnalyticsDAO;
 import org.codedefenders.util.Paths;
