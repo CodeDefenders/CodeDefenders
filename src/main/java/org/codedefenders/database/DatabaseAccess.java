@@ -67,7 +67,8 @@ public class DatabaseAccess {
      * @implNote Even if the database table column is called {@code Player_ID} it stores User_IDs!
      */
     public static void removePlayerEventsForGame(int gameId, int userId) {
-        String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=?";
+        String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=? "
+                + "AND Event_Type NOT IN ('GAME_CREATED', 'GAME_STARTED', 'GAME_FINISHED', 'GAME_GRACE_ONE', 'GAME_GRACE_TWO');";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(EventStatus.DELETED.toString()),
                 DatabaseValue.of(gameId),
