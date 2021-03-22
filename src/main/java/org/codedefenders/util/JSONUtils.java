@@ -32,7 +32,6 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class JSONUtils {
     /**
@@ -84,7 +83,7 @@ public class JSONUtils {
 
             @Override
             public Map<K, V> read(JsonReader jsonReader) {
-                throw new NotImplementedException();
+                throw new UnsupportedOperationException();
             }
         }
     }
