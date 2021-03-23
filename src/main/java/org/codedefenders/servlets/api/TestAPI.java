@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
+import org.apache.http.HttpStatus;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.TestDTO;

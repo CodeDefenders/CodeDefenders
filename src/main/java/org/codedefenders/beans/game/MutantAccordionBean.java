@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,7 +19,10 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
@@ -37,21 +39,18 @@ import com.google.gson.annotations.Expose;
 @RequestScoped
 public class MutantAccordionBean {
 
-    @Inject
-    GameService gameService;
+    private static final Logger logger = LoggerFactory.getLogger(MutantAccordionBean.class);
+
+    private final AbstractGame game;
+
+    private final List<MutantDTO> mutantList;
+    private final List<MutantAccordionCategory> categories;
 
     @Inject
-    LoginBean loginBean;
+    public MutantAccordionBean(GameService gameService, LoginBean login, GameProducer gameProducer) {
+        this.game = gameProducer.getGame();
 
-    @Inject
-    AbstractGame game;
-
-    private List<MutantDTO> mutantList;
-    private List<MutantAccordionCategory> categories;
-
-    @PostConstruct
-    public void setup() {
-        mutantList = gameService.getMutants(loginBean.getUser(), game);
+        mutantList = gameService.getMutants(login.getUser(), game);
 
         categories = new ArrayList<>();
 
@@ -143,9 +142,8 @@ public class MutantAccordionBean {
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()
-                // It is important that its HashMap.class, it doesn't work if I change it to Map.class …
-                .registerTypeAdapter(HashMap.class, new JSONUtils.MapSerializer())
                 .excludeFieldsWithoutExposeAnnotation()
+                .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .create();
         return gson.toJson(mutants);
     }

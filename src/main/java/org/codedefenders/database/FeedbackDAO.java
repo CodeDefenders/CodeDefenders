@@ -19,54 +19,50 @@
 package org.codedefenders.database;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import org.codedefenders.model.Feedback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.model.Feedback.MAX_RATING;
 import static org.codedefenders.model.Feedback.MIN_RATING;
 import static org.codedefenders.model.Feedback.Type;
-import static org.codedefenders.model.Feedback.types;
 
 public class FeedbackDAO {
 
     private static final Logger logger = LoggerFactory.getLogger(FeedbackDAO.class);
 
-    public static boolean storeFeedback(int gameId, int userId, List<Integer> ratingsList) {
-        StringBuilder bob = new StringBuilder("INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ");
-
-        if (ratingsList.size() > types.size() || ratingsList.size() < 1) {
-            return false;
+    public static boolean storeFeedback(int gameId, int userId, Map<Feedback.Type, Integer> ratings) {
+        if (ratings.isEmpty()) {
+            return true;
         }
 
-        String queryValues = "(?, ?, ?, ?),";
-        List<DatabaseValue> allValuesList = new ArrayList<>();
-        for (int i = 0; i < ratingsList.size(); i++) {
-            int boundedValue = Math.min(Math.max(MIN_RATING, ratingsList.get(i)), MAX_RATING);
-            List<DatabaseValue> valueList = Arrays.asList(
-                    DatabaseValue.of(userId),
-                    DatabaseValue.of(gameId),
-                    DatabaseValue.of(types.get(i).name()),
-                    DatabaseValue.of(boundedValue)
-            );
-            allValuesList.addAll(valueList);
-            bob.append(queryValues);
-        }
-        bob.deleteCharAt(bob.length() - 1).append(" ON DUPLICATE KEY UPDATE value = VALUES(value)");
+        List<DatabaseValue<?>> values = new ArrayList<>();
 
-        String query = bob.toString();
-        DatabaseValue[] values = allValuesList.toArray(new DatabaseValue[0]);
-        return DB.executeUpdateQuery(query, values);
+        for (Map.Entry<Feedback.Type, Integer> entry : ratings.entrySet()) {
+            int clampedRating = Math.min(Math.max(MIN_RATING, entry.getValue()), MAX_RATING);
+            values.add(DatabaseValue.of(userId));
+            values.add(DatabaseValue.of(gameId));
+            values.add(DatabaseValue.of(entry.getKey().name()));
+            values.add(DatabaseValue.of(clampedRating));
+        }
+
+        String query = "INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ";
+        query += Stream.generate(() -> "(?, ?, ?, ?)")
+                .limit(ratings.size())
+                .collect(Collectors.joining(",\n"));
+        query += " ON DUPLICATE KEY UPDATE value = VALUES(value);";
+
+        return DB.executeUpdateQuery(query, values.toArray(new DatabaseValue[0]));
     }
 
-    public static List<Integer> getFeedbackValues(int gameId, int userId) {
-        List<Integer> values = Stream.generate(() -> -1).limit(types.size()).collect(Collectors.toList());
+    public static Map<Feedback.Type, Integer> getFeedbackValues(int gameId, int userId) {
+        Map<Feedback.Type, Integer> ratings = new HashMap<>();
 
         final String query = String.join("\n",
                 "SELECT value, type",
@@ -74,29 +70,21 @@ public class FeedbackDAO {
                 "WHERE Game_ID = ?",
                 "  AND User_ID = ?;");
 
-        DB.RSMapper<Boolean> mapper = rs -> {
-            String typeString = rs.getString("type");
-            if (types.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
-                int index = Type.valueOf(typeString).ordinal();
-                values.set(index, rs.getInt("value"));
-            } else {
-                logger.warn("No such feedback type: " + typeString);
-            }
-            return true;
+        DB.RSMapper<Void> mapper = rs -> {
+            Feedback.Type type = Feedback.Type.valueOf(rs.getString("type"));
+            int rating = rs.getInt("value");
+            ratings.put(type, rating);
+            return null;
         };
 
-        DatabaseValue[] dbvalues = {DatabaseValue.of(gameId), DatabaseValue.of(userId)};
-        List<Boolean> result = DB.executeQueryReturnList(query, mapper, dbvalues);
-        if (result.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return values;
+        DB.executeQueryReturnList(query, mapper,
+                DatabaseValue.of(gameId), DatabaseValue.of(userId));
+
+        return ratings;
     }
 
-    public static List<Double> getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
-        List<Double> values = DoubleStream.generate(() -> -1.0).limit(types.size())
-                .boxed()
-                .collect(Collectors.toList());
+    public static Map<Feedback.Type, Double> getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
+        Map<Feedback.Type, Double> avgRatings = new HashMap<>();
 
         String query = String.join("\n",
                 "SELECT AVG(value) AS 'average', type",
@@ -105,47 +93,47 @@ public class FeedbackDAO {
                 "  AND value > 0",
                 "GROUP BY type;");
 
-        DB.RSMapper<Boolean> mapper = rs -> {
-            String typeString = rs.getString("type");
-            if (types.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
-                int index = Type.valueOf(typeString).ordinal();
-                values.set(index, rs.getDouble("average"));
-            } else {
-                logger.warn("No such feedback type: " + typeString);
-            }
-            return true;
+        DB.RSMapper<Void> mapper = rs -> {
+            Feedback.Type type = Feedback.Type.valueOf(rs.getString("type"));
+            double avgRating = rs.getDouble("average");
+            avgRatings.put(type, avgRating);
+            return null;
         };
 
-        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DatabaseValue.of(gameId));
+        DB.executeQueryReturnList(query, mapper,
+                DatabaseValue.of(gameId));
 
-        if (result.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return values;
+        return avgRatings;
     }
 
-    private static List<Double> getAverageClassDifficultyRatings(Type feedbackType)
+    private static Map<Integer, Double> getAverageClassDifficultyRatings(Type feedbackType)
             throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT",
-                "  IFNULL(AVG(value), -1)   AS 'average',",
-                "  c.Class_ID,",
-                "  COUNT(value) AS 'votes'",
-                "FROM (SELECT * FROM ratings WHERE type = ? AND value > 0) as filteredRatings",
-                "RIGHT JOIN games g ON filteredRatings.Game_ID = g.ID",
-                "RIGHT JOIN classes c ON g.Class_ID = c.Class_ID",
-                "GROUP BY c.Class_ID ORDER BY c.Class_ID;");
+        Map<Integer, Double> avgClassRatings = new HashMap<>();
 
-        return DB.executeQueryReturnList(query, rs -> rs.getDouble(1), DatabaseValue.of(feedbackType.name()));
+        String query = String.join("\n",
+                "SELECT AVG(ratings.value) AS 'average',",
+                "       games.Class_ID AS classId,",
+                "       COUNT(ratings.value) AS 'votes'",
+                "FROM ratings, games",
+                "WHERE ratings.Game_ID = games.ID",
+                "  AND ratings.type = ?",
+                "  AND ratings.value > 0",
+                "GROUP BY games.Class_ID;");
+
+        DB.executeQueryReturnList(query,
+                rs -> avgClassRatings.put(
+                        rs.getInt("classId"),
+                        rs.getDouble("average")),
+                DatabaseValue.of(feedbackType.name()));
+
+        return avgClassRatings;
     }
 
-    // TODO Phil 28/12/18: pretty sure this doesn't result in the wanted behavior.
-    //  This is ordered, but when trying to map to classes, the classes aren't ordered so the mapping just disappears.
-    public static List<Double> getAverageMutationDifficulties() {
+    public static Map<Integer, Double> getAverageMutationDifficulties() {
         return getAverageClassDifficultyRatings(Type.CUT_MUTATION_DIFFICULTY);
     }
 
-    public static List<Double> getAverageTestDifficulties() {
+    public static Map<Integer, Double> getAverageTestDifficulties() {
         return getAverageClassDifficultyRatings(Type.CUT_TEST_DIFFICULTY);
     }
 }

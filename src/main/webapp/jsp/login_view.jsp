@@ -23,18 +23,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Login"); %>
-
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-
 <jsp:include page="/jsp/header_logout.jsp"/>
-
-<%
-    if (login.isLoggedIn()) {
-        response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
-    }
-%>
 
 <div id="login" class="container">
     <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">

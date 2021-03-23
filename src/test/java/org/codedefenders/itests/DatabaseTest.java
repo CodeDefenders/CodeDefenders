@@ -525,36 +525,4 @@ public class DatabaseTest {
         assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
         assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
     }
-
-    //FIXME
-    @Ignore
-    @Test
-    public void testRatings() {
-        assumeTrue(creator.insert());
-        assumeTrue(user1.insert());
-        assumeTrue(cut1.insert());
-        Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
-        assumeTrue(multiplayerGame.insert());
-
-        Integer[] ratings = IntStream.rangeClosed(Feedback.MIN_RATING, Feedback.MAX_RATING).boxed().toArray(Integer[]::new);
-        assertTrue("Feedback could not be inserted",
-                FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), Arrays.asList(ratings)));
-
-        List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
-        assertNotNull(feedbackValues);
-        Integer[] ratingsFromDB = feedbackValues.toArray(new Integer[0]);
-
-        assertArrayEquals(ratings, ratingsFromDB);
-
-        Integer[] updatedRatings = IntStream.generate(() -> new Random().nextInt(Feedback.MAX_RATING)).limit(7).boxed().toArray(Integer[]::new);
-
-        List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
-        assertTrue("Feedback could not be updated",
-                FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList));
-
-        List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
-        assertNotNull(feedbackValues2);
-        Integer[] updatedRatingsFromDB = feedbackValues2.toArray(new Integer[0]);
-        assertArrayEquals(updatedRatings, updatedRatingsFromDB);
-    }
 }

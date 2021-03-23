@@ -460,8 +460,6 @@ public class AdminCreateGamesBean implements Serializable {
                     attackersPerGame, defendersPerGame));
         }
 
-        Stream.of(attackers);
-
         if (Stream.of(users, attackers, defenders).flatMap(Collection::stream).distinct().count()
                 != users.size() + attackers.size() + defenders.size()) {
             throw new IllegalArgumentException("User sets must be disjoint.");
