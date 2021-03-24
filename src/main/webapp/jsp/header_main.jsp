@@ -19,10 +19,12 @@
 
 --%>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<% if (pageInfo.hasPageTitle()) { %>
+<c:if test="pageInfo.hasPageTitle">
     <h2 class="full-width page-title" style="text-align: center;">${pageInfo.pageTitle}</h2>
-<% } %>
+</c:if>
