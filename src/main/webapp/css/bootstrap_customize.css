@@ -64,6 +64,19 @@ bootstrap classes
     background-color: white;
 }
 
+/* Center items in nav. (from https://gist.github.com/sadewowtito/2b5bcbd10e853919a960)
+   (767px is the width at which the navbar collapses.) */
+@media (min-width: 768px) {
+    .navbar-nav.navbar-nav-center {
+        width: 100%;
+        text-align: center;
+    }
+    .navbar-nav.navbar-nav-center > li {
+        float: none;
+        display: inline-block;
+    }
+}
+
 /* Tables
 ----------------------------------------------------------------------------- */
 
