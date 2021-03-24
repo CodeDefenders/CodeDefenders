@@ -64,7 +64,7 @@
             <% } %>
 
             <%-- This bar shows the possible interactions at game level --%>
-            <div class="col-md-5" style="float: right;">
+            <div class="col-md-6" style="float: right;">
 
                 <a href="#" class="btn pull-right" id="btnScoringTooltip" data-toggle="modal"
                    data-target="#scoringTooltip"
