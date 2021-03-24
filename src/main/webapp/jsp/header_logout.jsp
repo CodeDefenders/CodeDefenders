@@ -44,12 +44,14 @@
     <div class="collapse navbar-collapse" id="header-navbar-controls">
 
         <ul class="nav navbar-nav">
-            <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
-                <li><a href="login">Login</a></li>
-            </c:if>
             <li><a href="#research" onclick="openResearchBox()">Research</a></li>
             <li><a href="help">Help</a></li>
         </ul>
+        <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="login">Login</a></li>
+            </ul>
+        </c:if>
 
     </div>
 </nav>
