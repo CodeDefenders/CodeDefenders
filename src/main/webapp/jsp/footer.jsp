@@ -28,12 +28,15 @@
     <div id="footer-navbar-controls">
         <ul class="nav navbar-nav navbar-nav-center">
             <li>
-                <a id="footerAbout" class="text-white btn tab-link bg-minus-1"
+                <a id="footerAbout" class="text-white btn"
                    href="<%=request.getContextPath() + Paths.ABOUT_PAGE%>"
                    style="padding-top: .5em; padding-bottom: .5em;">About CodeDefenders</a></li>
-            <li><a id="footerContact" class="text-white btn tab-link bg-minus-1"
+            <li><a id="footerContact" class="text-white btn"
                    href="<%=request.getContextPath() + Paths.CONTACT_PAGE%>"
                    style="padding-top: .5em; padding-bottom: .5em;">Contact Us</a></li>
+            <li><a id="footerHelp" class="text-white btn"
+                   href="<%=request.getContextPath() + Paths.HELP_PAGE%>"
+                   style="padding-top: .5em; padding-bottom: .5em;">Help</a></li>
         </ul>
     </div>
 </nav>

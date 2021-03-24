@@ -45,7 +45,6 @@
 
         <ul class="nav navbar-nav">
             <li><a href="#research" onclick="openResearchBox()">Research</a></li>
-            <li><a href="help">Help</a></li>
         </ul>
         <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
             <ul class="nav navbar-nav navbar-right">
