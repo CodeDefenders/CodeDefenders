@@ -23,14 +23,13 @@
 
 <div id="research" class="paper-list">
 
-	<h2 style="border-top: 1px solid lightgray; padding-top: 20px">
-		<a id="showResearch" data-toggle="collapse" href="#researchBox" style="color:black"
-		   onclick="changeChevron()">
+	<h3>
+		<a id="showResearch" data-toggle="collapse" href="#researchBox" onclick="changeChevron()">
 			Research
-			<span id = "researchBoxToggle" class="glyphicon glyphicon-chevron-down" style=" font-size: 20px; margin: 5px; "></span>
+			<span id="researchBoxToggle" class="glyphicon glyphicon-chevron-down"></span>
 		</a>
-	</h2>
-	<p></p>
+	</h3>
+
 	<div id="researchBox" class="collapse" style="font-size: 12px;">
 		<div class="row-fluid">
 			<ul class="papercite_bibliography">

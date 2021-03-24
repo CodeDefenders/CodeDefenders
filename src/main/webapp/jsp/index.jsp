@@ -112,7 +112,10 @@
             <a id="enter" class="btn btn-primary btn-large" href="login">Log in or sign up</a>
         </div>
 
-    <%@ include file="/jsp/research.jsp" %>
+    <hr>
+    <div class="text-center">
+        <%@ include file="/jsp/research.jsp" %>
+    </div>
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>

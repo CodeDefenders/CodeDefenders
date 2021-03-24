@@ -1,5 +1,10 @@
-#research {
-    text-align: center;
+#showResearch {
+    color: inherit;
+    text-decoration: none;
+}
+
+#showResearch .glyphicon {
+    font-size: initial;
 }
 
 .papercite_bibliography {
