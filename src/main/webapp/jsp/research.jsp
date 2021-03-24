@@ -173,20 +173,29 @@
 	</div>
 </div>
 
-<script>function changeChevron() {
-    var toggle = document.getElementById('researchBoxToggle');
-    var currentClass = toggle.getAttribute("class");
-    var newClass = currentClass === 'glyphicon glyphicon-chevron-down' ? 'glyphicon glyphicon-chevron-up' : 'glyphicon glyphicon-chevron-down';
-    toggle.setAttribute('class', newClass);
-}
+<script>
+    function openResearchBox() {
+        $('#researchBox').collapse('show')
+        const toggle = document.getElementById('researchBoxToggle');
+        toggle.setAttribute('class', 'glyphicon glyphicon-chevron-up');
+    }
 
-function toggleBibtex(div) {
-    var className = div.getAttribute("class");
-    if(className=="bibtex_hide") {
-        div.className = "bibtex_show";
+    function changeChevron() {
+        const toggle = document.getElementById('researchBoxToggle');
+        const currentClass = toggle.getAttribute("class");
+        const newClass = currentClass === 'glyphicon glyphicon-chevron-down'
+                ? 'glyphicon glyphicon-chevron-up'
+                : 'glyphicon glyphicon-chevron-down';
+        toggle.setAttribute('class', newClass);
     }
-    else{
-        div.className = "bibtex_hide";
+
+    function toggleBibtex(div) {
+        const className = div.getAttribute("class");
+        if (className === "bibtex_hide") {
+            div.className = "bibtex_show";
+        }
+        else{
+            div.className = "bibtex_hide";
+        }
     }
-}
 </script>
