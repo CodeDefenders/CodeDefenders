@@ -56,7 +56,7 @@ public class PasswordServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PasswordServlet.class);
 
     private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
-            + "This link is only valid for %d hours.\n\n" + "Greetings, your CodeDefenders team";
+            + "This link is only valid for %d hours.\n\n" + "Greetings, your Code Defenders team";
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -111,13 +111,13 @@ public class PasswordServlet extends HttpServlet {
                         if (user.update()) {
                             DatabaseAccess.setPasswordResetSecret(user.getId(), null);
                             responseURL = request.getContextPath() + Paths.LOGIN;
-                            messages.add("Successfully changed your Password.");
+                            messages.add("Successfully changed your password.");
                         }
                     } else {
-                        messages.add("Your Two Password Entries Did Not Match");
+                        messages.add("Your two password entries did not match");
                     }
                 } else {
-                    messages.add("Your Password reset link is not valid or has expired");
+                    messages.add("Your password reset link is not valid or has expired.");
                     responseURL = request.getContextPath() + Paths.LOGIN;
                 }
                 response.sendRedirect(responseURL);
