@@ -114,8 +114,6 @@ public class ShiroConfig {
         fcMan.createChain(org.codedefenders.util.Paths.USER_PROFILE, AUTHENTICATION);
 
         // URLs that require authentication
-        // org.codedefenders.util.Paths.PASSWORD = "/password";
-        fcMan.createChain(org.codedefenders.util.Paths.PASSWORD, AUTHENTICATION);
 
         // org.codedefenders.util.Paths.GAMES_OVERVIEW = "/games/overview";
         // org.codedefenders.util.Paths.GAMES_HISTORY = "/games/history";
