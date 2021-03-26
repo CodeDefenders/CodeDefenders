@@ -76,7 +76,7 @@ public class PasswordServlet extends HttpServlet {
                 username = request.getParameter("accountUsername");
                 User u = UserDAO.getUserByEmail(email);
                 if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
-                    messages.add("No such User found or Email and Username do not match");
+                    messages.add("No user was found for this username and email. Please check if the username and email match.");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
                     DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
@@ -87,7 +87,9 @@ public class PasswordServlet extends HttpServlet {
                             AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
                                     .getIntValue());
                     if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
-                        messages.add("A link for changing your password has been sent to " + email);
+                        messages.add("A password reset link has been sent to " + email);
+                    } else {
+                        messages.add("Something went wrong. No email could be sent.");
                     }
                 }
                 response.sendRedirect(request.getContextPath() + Paths.LOGIN);
