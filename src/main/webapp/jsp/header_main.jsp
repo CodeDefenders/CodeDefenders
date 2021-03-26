@@ -25,6 +25,6 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<c:if test="pageInfo.hasPageTitle">
+<c:if test="${pageInfo.hasPageTitle()}">
     <h2 class="full-width page-title" style="text-align: center;">${pageInfo.pageTitle}</h2>
 </c:if>
