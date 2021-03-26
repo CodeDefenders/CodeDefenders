@@ -1,13 +1,6 @@
 /* (Page-wide) DataTables customizations
 ============================================================================= */
 
-/* Smaller search field
------------------------------------------------------------------------------ */
-
-.dataTables_wrapper .input-sm[type="search"] {
-    height: 2em;
-}
-
 /* Background color of child tables
 ----------------------------------------------------------------------------- */
 
@@ -25,7 +18,7 @@
     background-color: #f4f4f4;
 }
 
-/* Other child table styles
+/* Child table styles (for child tables of like in admin analytics)
 ----------------------------------------------------------------------------- */
 
 /* Indent for row details */
@@ -34,13 +27,24 @@ table .indented {
 }
 
 /* Child table margins and padding */
+.table-child-details {
+    padding-top: 1em;
+    padding-bottom: 1.5em;
+}
 .table-child-details > tbody > tr > td {
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 4px;
 }
 .table-child-details > thead > tr > th {
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 12px;
+}
+.table-child-details > thead:first-child > tr:first-child > th {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 0;
 }
 
 /* Borders between child table rows */
