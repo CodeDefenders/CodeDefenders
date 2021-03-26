@@ -37,7 +37,7 @@
     final List<Player> defenders = scoreboard.getDefenders();
 %>
 
-<link href="css/game_scoreboard.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/game_scoreboard.css" rel="stylesheet">
 
 <div id="scoreboard" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
     <div class="modal-dialog" style="width: 60rem;">

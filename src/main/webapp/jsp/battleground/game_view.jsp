@@ -51,7 +51,7 @@
     history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
-<link href="css/game.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
 

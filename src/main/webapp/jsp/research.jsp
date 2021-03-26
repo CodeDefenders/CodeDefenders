@@ -19,7 +19,7 @@
 
 --%>
 
-<link href="css/research.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/research.css" rel="stylesheet">
 
 <div id="research" class="paper-list">
 

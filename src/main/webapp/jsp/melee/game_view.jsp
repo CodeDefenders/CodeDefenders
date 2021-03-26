@@ -62,7 +62,7 @@
     history.setPlayers(Collections.singletonList(player), otherPlayers);
 %>
 
-<link href="css/game.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 

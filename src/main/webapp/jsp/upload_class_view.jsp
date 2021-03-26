@@ -26,7 +26,7 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
-<link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/css/uploadcut.css" rel="stylesheet">
 
 <div>
     <div class="container">

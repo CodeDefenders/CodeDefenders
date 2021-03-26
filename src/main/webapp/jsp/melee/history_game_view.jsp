@@ -109,7 +109,7 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<link href="css/game.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/melee/header_game.jsp"/>
 

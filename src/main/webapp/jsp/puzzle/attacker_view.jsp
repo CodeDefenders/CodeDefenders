@@ -110,7 +110,7 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
-<link href="css/game.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <div id="game-container">
 

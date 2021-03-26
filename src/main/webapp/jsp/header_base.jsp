@@ -44,14 +44,14 @@
 
     <!-- JQuery UI -->
     <script src="webjars/jquery-ui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
-    <link href="webjars/jquery-ui/1.12.1/jquery-ui.min.css" rel="stylesheet" type="text/css" />
+    <link href="webjars/jquery-ui/1.12.1/jquery-ui.min.css" rel="stylesheet">
 
     <!-- Bootstrap -->
     <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="webjars/bootstrap-toggle/2.2.1/css/bootstrap-toggle.min.css" rel="stylesheet" type="text/css" />
+    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="webjars/bootstrap-toggle/2.2.1/css/bootstrap-toggle.min.css" rel="stylesheet">
     <script src="webjars/bootstrap-toggle/2.2.1/js/bootstrap-toggle.min.js" type="text/javascript" ></script>
-    <link href="webjars/bootstrap-select/1.9.4/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
+    <link href="webjars/bootstrap-select/1.9.4/css/bootstrap-select.min.css" rel="stylesheet">
     <script src="webjars/bootstrap-select/1.9.4/js/bootstrap-select.min.js" type="text/javascript" ></script>
     <link href="css/bootstrap_customize.css" rel="stylesheet">
 
@@ -74,13 +74,13 @@
     <script src="webjars/codemirror/5.22.0/keymap/sublime.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/keymap/vim.js" type="text/javascript" ></script>
 
-    <link href="webjars/codemirror/5.22.0/lib/codemirror.css" rel="stylesheet" type="text/css" />
-    <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
-    <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
-    <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
-    <link href="css/codemirror_customize.css" rel="stylesheet" type="text/css" />
+    <link href="webjars/codemirror/5.22.0/lib/codemirror.css" rel="stylesheet">
+    <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet">
+    <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet">
+    <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet">
+    <link href="css/codemirror_customize.css" rel="stylesheet">
 
-    <link href="webjars/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" >
+    <link href="webjars/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- DataTables -->
     <script type="text/javascript" src="webjars/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
@@ -88,8 +88,8 @@
     <script type="text/javascript" src="webjars/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript" src="webjars/momentjs/2.14.1/min/moment.min.js"></script> <!-- must come before datetime-moment -->
     <script type="text/javascript" src="webjars/datatables-plugins/1.10.16/sorting/datetime-moment.js"></script> <!-- must come after moment -->
-    <link href="webjars/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="webjars/datatables-select/1.3.1/css/select.bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="webjars/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href="webjars/datatables-select/1.3.1/css/select.bootstrap.min.css" rel="stylesheet">
     <link href="css/datatables_customize.css" rel="stylesheet">
 
     <link href="css/page.css" rel="stylesheet">

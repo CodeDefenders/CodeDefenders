@@ -69,7 +69,7 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<link href="css/game.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 <%
