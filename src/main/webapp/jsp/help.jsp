@@ -65,7 +65,7 @@
     <p>The attack page only has two panels, existing mutants, and a panel containing the CUT, which can be modified to create mutants. Green lines are covered by existing tests, with darker green showing more coverage.</p>
     <p><img style="margin-top:16px" src="images/help/attack_01.png" class="img-responsive"/></p>
     <p>Similarly to tests, mutants are limited by rules, which come in three strictness levels:</p>
-    <div class = "panel" style="margin: 30px"><%@ include file="/jsp/validator_explanation.jsp" %></div>
+    <div class = "panel" style="margin: 30px"><%@ include file="/jsp/mutant_validator_explanation.jsp" %></div>
     <p>Here I have created a mutant by changing the > comparator to <. Return values, variables, etc. can also be changed.</p>
     <p>
         <img style="margin-top:16px" src="images/help/attack_02_originalsnippet.png" class="img-responsive"/>
