@@ -19,6 +19,7 @@
 
 --%>
 <div class="panel-body" style="padding: 10px;">
+    <h3>Mutation rules</h3>
     <b>Relaxed</b> <br>
     <ul>
         <li>No calls to <i>System.*</i>,<i>Random.*</i></li>

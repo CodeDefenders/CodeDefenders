@@ -412,7 +412,10 @@
                     <h4 class="modal-title">Mutant Validator Explanation</h4>
                 </div>
                 <div class="modal-body">
-                    <%@ include file="/jsp/validator_explanation.jsp"%>
+                    <%@ include file="/jsp/mutant_validator_explanation.jsp"%>
+                </div>
+                <div class="modal-body">
+                    <%@ include file="/jsp/test_validator_explanation.jsp"%>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
