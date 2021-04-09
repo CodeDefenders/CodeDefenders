@@ -61,12 +61,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -190,7 +190,7 @@ public class DatabaseTest {
 
         assertTrue("Should have inserted class", cut2.insert());
         assertEquals(2, GameClassDAO.getAllPlayableClasses().size());
-        PowerMockito.verifyStatic();
+        //PowerMockito.verifyStatic();
     }
 
     //FIXME
@@ -524,37 +524,5 @@ public class DatabaseTest {
         assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
         assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
         assertEquals(eventDAO.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
-    }
-
-    //FIXME
-    @Ignore
-    @Test
-    public void testRatings() {
-        assumeTrue(creator.insert());
-        assumeTrue(user1.insert());
-        assumeTrue(cut1.insert());
-        Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
-        assumeTrue(multiplayerGame.insert());
-
-        Integer[] ratings = IntStream.rangeClosed(Feedback.MIN_RATING, Feedback.MAX_RATING).boxed().toArray(Integer[]::new);
-        assertTrue("Feedback could not be inserted",
-                FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), Arrays.asList(ratings)));
-
-        List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
-        assertNotNull(feedbackValues);
-        Integer[] ratingsFromDB = feedbackValues.toArray(new Integer[0]);
-
-        assertArrayEquals(ratings, ratingsFromDB);
-
-        Integer[] updatedRatings = IntStream.generate(() -> new Random().nextInt(Feedback.MAX_RATING)).limit(7).boxed().toArray(Integer[]::new);
-
-        List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
-        assertTrue("Feedback could not be updated",
-                FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList));
-
-        List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
-        assertNotNull(feedbackValues2);
-        Integer[] updatedRatingsFromDB = feedbackValues2.toArray(new Integer[0]);
-        assertArrayEquals(updatedRatings, updatedRatingsFromDB);
     }
 }

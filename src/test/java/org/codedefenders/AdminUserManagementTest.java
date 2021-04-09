@@ -57,7 +57,7 @@ public class AdminUserManagementTest {
     /**
      * I tried to mock away stuff but at the moment is not possible since basically
      * every class writes to the database So I use a fake databased instead
-     * 
+     *
      * @throws Exception
      */
     // @PrepareForTest({ AdminDAO.class, EmailUtils.class, DatabaseAccess.class,
@@ -182,7 +182,7 @@ public class AdminUserManagementTest {
             Assert.fail("Exception raised");
         }
 
-        PowerMockito.verifyStatic();
+        //PowerMockito.verifyStatic();
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         EmailUtils.sendEmail(Mockito.anyString(), Mockito.anyString(), captor.capture());
         String email = captor.getValue();

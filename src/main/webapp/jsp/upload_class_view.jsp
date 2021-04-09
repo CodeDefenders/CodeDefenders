@@ -22,6 +22,7 @@
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.*" %>
+<%@ page import="java.util.Map" %>
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
@@ -174,8 +175,8 @@
 		<div id="classList" >
 			<%
 				List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
-				List<Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
-				List<Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
+				Map<Integer, Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
+				Map<Integer, Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
 			%>
 			<table class="table table-striped table-hover table-responsive table-paragraphs games-table" id = "tableUploadedClasses">
 				<thead>
@@ -193,10 +194,9 @@
 				<% if (gameClasses.isEmpty()) { %>
 					<tr><td colspan="100%">No classes uploaded.</td></tr>
 				<% } else {
-					for (int i = 0; i < gameClasses.size(); i++) {
-						GameClass c = gameClasses.get(i);
-						double mutationDiff = avgMutationDifficulties.get(i);
-						double testingDiff = avgTestDifficulties.get(i);
+					for (GameClass c : gameClasses) {
+						Double mutationDiff = avgMutationDifficulties.get(c.getId());
+						Double testingDiff = avgTestDifficulties.get(c.getId());
 					%>
 						<tr>
 							<td><%= c.getId() %></td>
@@ -226,8 +226,8 @@
 								</div>
 							</td>
 							<td><%=GameClassDAO.getMappedDependencyIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantIdsForClassId(c.getId()).size()%></td>
-							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
-							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
+							<td><%=mutationDiff != null ? String.valueOf(mutationDiff) : ""%></td>
+							<td><%=testingDiff != null ? String.valueOf(testingDiff) : ""%></td>
 							<%--
 							<td>
 								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() + Paths.AI_PREPARER%>" method="post" >
