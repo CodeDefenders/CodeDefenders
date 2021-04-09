@@ -23,7 +23,7 @@
                         </div>
                     </div><div class="clear">
                 </div>
-           </div>
+            </div>
         </div>
     </div>
 </div>
@@ -35,6 +35,7 @@
         both; margin: 0; padding: 0; width: 100%;">
                 <ul class="crow fly navbar-collapse" id="bs-example-navbar-collapse-1" style="z-index: 1000; text-align: center; list-style:none;
                 width: 80%; float: none; margin: 0 auto;">
+                    <li style="float: none"><a id="footerImprint" class="text-white btn tab-link bg-minus-1"  style="width:100%;" href="<%=request.getContextPath() + Paths.IMPRINT_PAGE%>">Imprint and Privacy Policy</a></li>
                     <li style="float: none"><a id="footerAbout" class="text-white btn tab-link bg-minus-1" style="width:100%;" href="<%=request.getContextPath() + Paths.ABOUT_PAGE%>">About CodeDefenders</a></li>
                     <li style="float: none"><a id="footerContact" class="text-white btn tab-link bg-minus-1"  style="width:100%;" href="<%=request.getContextPath() + Paths.CONTACT_PAGE%>">Contact Us</a></li>
                 </ul>
