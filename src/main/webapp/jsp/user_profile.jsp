@@ -38,19 +38,6 @@
             You can look at your <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
         </p>
 
-        <%
-            String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
-            if(!privacyNotice.isEmpty()) {
-        %>
-
-        <h4>Privacy Notice</h4>
-        <p>
-            <%=privacyNotice%>
-        </p>
-        <%
-          }
-        %>
-
     </div>
 
     <div id="update-profile-container">

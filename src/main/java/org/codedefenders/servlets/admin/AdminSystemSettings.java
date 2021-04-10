@@ -112,7 +112,7 @@ public class AdminSystemSettings extends HttpServlet {
         PRIVACY_NOTICE {
             @Override
             public String toString() {
-                return "HTML formatted text shown in the provacy notice. This is mandatory for GDPR compliance.";
+                return "HTML formatted text shown in the privacy notice. This is mandatory for GDPR compliance.";
             }
         },
         EMAIL_SMTP_HOST {
