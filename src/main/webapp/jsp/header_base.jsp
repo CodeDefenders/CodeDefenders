@@ -40,19 +40,15 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
     <!-- jQuery -->
-    <script src="webjars/jquery/3.3.1-2/jquery.min.js" type="text/javascript" ></script>
+    <script src="webjars/jquery/3.6.0/jquery.min.js" type="text/javascript" ></script>
 
     <!-- JQuery UI -->
     <script src="webjars/jquery-ui/1.12.1/jquery-ui.min.js" type="text/javascript" ></script>
     <link href="webjars/jquery-ui/1.12.1/jquery-ui.min.css" rel="stylesheet">
 
     <!-- Bootstrap -->
-    <script src="webjars/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link href="webjars/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-    <link href="webjars/bootstrap-toggle/2.2.1/css/bootstrap-toggle.min.css" rel="stylesheet">
-    <script src="webjars/bootstrap-toggle/2.2.1/js/bootstrap-toggle.min.js" type="text/javascript" ></script>
-    <link href="webjars/bootstrap-select/1.9.4/css/bootstrap-select.min.css" rel="stylesheet">
-    <script src="webjars/bootstrap-select/1.9.4/js/bootstrap-select.min.js" type="text/javascript" ></script>
+    <script src="webjars/bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
+    <link href="webjars/bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap_customize.css" rel="stylesheet">
 
     <!-- Codemirror -->
@@ -80,16 +76,16 @@
     <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet">
     <link href="css/codemirror_customize.css" rel="stylesheet">
 
-    <link href="webjars/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="webjars/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
     <!-- DataTables -->
-    <script type="text/javascript" src="webjars/datatables/1.10.16/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="webjars/datatables-select/1.3.1/js/dataTables.select.min.js"></script>
-    <script type="text/javascript" src="webjars/datatables/1.10.16/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="webjars/datatables/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="webjars/datatables-select/1.3.3/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" src="webjars/datatables/1.10.24/js/dataTables.bootstrap5.min.js"></script>
     <script type="text/javascript" src="webjars/momentjs/2.14.1/min/moment.min.js"></script> <!-- must come before datetime-moment -->
-    <script type="text/javascript" src="webjars/datatables-plugins/1.10.16/sorting/datetime-moment.js"></script> <!-- must come after moment -->
-    <link href="webjars/datatables/1.10.16/css/dataTables.bootstrap.min.css" rel="stylesheet">
-    <link href="webjars/datatables-select/1.3.1/css/select.bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="webjars/datatables-plugins/1.10.24/sorting/datetime-moment.js"></script> <!-- must come after moment -->
+    <link href="webjars/datatables/1.10.24/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="webjars/datatables-select/1.3.3/css/select.bootstrap5.min.css" rel="stylesheet">
     <link href="css/datatables_customize.css" rel="stylesheet">
 
     <link href="css/page.css" rel="stylesheet">
