@@ -1,0 +1,91 @@
+/* (Page-wide) Re-usable classes
+============================================================================= */
+
+/* Tables
+----------------------------------------------------------------------------- */
+
+.table-center td,
+.table-center th {
+    text-align: center;
+}
+
+/* Attacker- and defender-colored elements
+----------------------------------------------------------------------------- */
+
+.bg-attacker {
+    background-color: var(--bg-attacker);
+}
+
+.bg-defender {
+    background-color: var(--bg-defender);
+}
+
+.fg-attacker {
+    color: var(--fg-attacker);
+}
+
+.fg-defender {
+    color: var(--fg-defender);
+}
+
+.btn-attacker {
+    color: white;
+    background-color: var(--bg-attacker);
+    border-color: var(--bg-attacker-contrast);
+}
+.btn-attacker:hover {
+    color: white;
+    background-color: var(--bg-attacker-dark);
+    border-color: var(--bg-attacker-contrast-dark);
+}
+
+.btn-defender {
+    color: white;
+    background-color: var(--bg-defender);
+    border-color: var(--bg-defender-contrast);
+}
+.btn-defender:hover {
+    color: white;
+    background-color: var(--bg-defender-dark);
+    border-color: var(--bg-defender-contrast-dark);
+}
+
+/* Mutant icons
+----------------------------------------------------------------------------- */
+
+.mutantCUTImage {
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    display: inline-block;
+}
+
+.mutantImageAlive {
+    background-image: url('../images/ingameicons/mutant.png');
+}
+.mutantImageEquiv {
+    background-image: url('../images/ingameicons/mutantEquiv.png');
+}
+.mutantImageFlagged {
+    background-image: url('../images/ingameicons/mutantFlagged.png');
+}
+.mutantImageKilled {
+    background-image: url('../images/ingameicons/mutantKilled.png');
+}
+.mutantImageFlagAction {
+    background-image: url('../images/ingameicons/flag.png');
+}
+
+/* Terminal-like text style for command-line output <pre>s
+----------------------------------------------------------------------------- */
+
+.terminal-pre {
+    background: #000;
+    color: #c4c4c4;
+    white-space: pre;
+    overflow-x: auto;
+    font-size: 12px;
+    border-radius: 0;
+    border: 0;
+    padding: 8px;
+}

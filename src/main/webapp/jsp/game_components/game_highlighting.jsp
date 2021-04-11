@@ -35,7 +35,7 @@
         - Mutant Pop-overs:
             <div class="mutant-popover-body"/>
 
-    The CSS is located in game_highlighting.css.
+    The CSS is located in codemirror_customize.css.
 --%>
 
 <jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>

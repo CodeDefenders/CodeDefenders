@@ -1,0 +1,52 @@
+/* Page settings and layout
+============================================================================= */
+
+/* Font, background and text color
+----------------------------------------------------------------------------- */
+
+@import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
+
+html, body {
+    font-family: 'Ubuntu', 'Open Sans', sans-serif;
+    font-size: 14px;
+}
+
+/* Set position of top-level page elements
+----------------------------------------------------------------------------- */
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: grid;
+    grid-template-areas:
+            'header'
+            'progress'
+            'messages'
+            'content'
+            'footer';
+    grid-template-rows:
+            min-content
+            min-content
+            min-content
+            auto
+            min-content;
+    grid-template-columns: 100%;
+}
+
+#header {
+    grid-area: header;
+}
+#progress {
+    grid-area: progress;
+}
+#messages {
+    grid-area: messages;
+}
+#content {
+    grid-area: content;
+}
+#footer {
+    grid-area: footer;
+}

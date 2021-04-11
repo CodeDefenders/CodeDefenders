@@ -63,11 +63,13 @@ public class Message implements Serializable {
 
     /* Builder-style setter methods. */
 
-    public void fadeOut(boolean fadeOut) {
+    public Message fadeOut(boolean fadeOut) {
         this.fadeOut = fadeOut;
+        return this;
     }
 
-    public void escape(boolean escape) {
+    public Message escape(boolean escape) {
         this.escape = escape;
+        return this;
     }
 }

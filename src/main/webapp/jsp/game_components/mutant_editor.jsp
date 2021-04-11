@@ -27,9 +27,6 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 
-
-
-
 <%-- no dependencies -> no tabs --%>
 <% if (!mutantEditor.hasDependencies()) { %>
 

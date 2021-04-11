@@ -1,0 +1,90 @@
+/* (Page-wide) Bootstrap customizations and re-usable classes that depends on
+bootstrap classes
+============================================================================= */
+
+/* Buttons
+----------------------------------------------------------------------------- */
+
+/* Small buttons between btn-sm and btn-xs. */
+.btn-ssm {
+    padding: 1px 4px;
+}
+
+/* Navbar
+----------------------------------------------------------------------------- */
+
+/* General look of the navbar. */
+.navbar-cd {
+    background-color: var(--bg-codedefenders);
+    border-radius: 0;
+    border: none;
+}
+
+/* Background and color of the Logo + Name. */
+.navbar-cd .navbar-brand {
+    color: white;
+}
+.navbar-cd .navbar-brand:hover,
+.navbar-cd .navbar-brand:focus {
+    background-color: var(--bg-codedefenders-bright);
+}
+
+/* Background and color of navbar entries. */
+.navbar-cd .navbar-nav > li > a {
+    color: white;
+}
+.navbar-cd .navbar-nav > li > a:hover,
+.navbar-cd .navbar-nav > li > a:focus {
+    background-color: var(--bg-codedefenders-bright);
+}
+
+/* Background and color of open dropdowns. */
+.navbar-cd .navbar-nav > .dropdown.open > a {
+    background-color: var(--bg-codedefenders-bright);
+    color: white;
+}
+
+/* Background and color dropdowns in collapsed mode.
+   (767px is the width at which the navbar collapses.) */
+@media (max-width: 767px) {
+    .navbar-cd .navbar-nav .open .dropdown-menu > li > a {
+        color: white;
+    }
+    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:focus,
+    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:hover {
+        background-color: var(--bg-codedefenders-bright);
+    }
+    .navbar-cd .navbar-nav .open .dropdown-menu .divider {
+        background-color: var(--bg-codedefenders-brighter);
+    }
+}
+
+/* "Toggle navbar" button color in collapsed mode. */
+.navbar-cd .navbar-toggle .icon-bar {
+    background-color: white;
+}
+
+/* Center items in nav. (from https://gist.github.com/sadewowtito/2b5bcbd10e853919a960)
+   (767px is the width at which the navbar collapses.) */
+@media (min-width: 768px) {
+    .navbar-nav.navbar-nav-center {
+        width: 100%;
+        text-align: center;
+    }
+    .navbar-nav.navbar-nav-center > li {
+        float: none;
+        display: inline-block;
+    }
+}
+
+/* Tables
+----------------------------------------------------------------------------- */
+
+/* Color rows by .odd/.even instead of :nth-of-type(2n+1).
+   Use :nth-of-type(n) to increase CSS specificity. */
+.table-striped > tbody > .odd:nth-of-type(n) {
+    background: transparent;
+}
+.table-striped > tbody > .even:nth-of-type(n) {
+    background-color: #f4f4f4;
+}

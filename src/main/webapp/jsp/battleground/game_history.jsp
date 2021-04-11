@@ -27,6 +27,8 @@
     final List<HistoryBean.HistoryBeanEventDTO> events = history.getEvents();
 %>
 
+<link href="${pageContext.request.contextPath}/css/timeline.css" rel="stylesheet">
+
 <div id="history" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
     <div class="modal-dialog" style="width: 900px">
         <!-- Modal content-->

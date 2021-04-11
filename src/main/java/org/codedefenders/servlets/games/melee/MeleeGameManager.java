@@ -446,7 +446,7 @@ public class MeleeGameManager extends HttpServlet {
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-            messages.add(decorate).escape(false);
+            messages.add(decorate).escape(false).fadeOut(false);
 
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
@@ -456,7 +456,7 @@ public class MeleeGameManager extends HttpServlet {
                 TargetExecution.Target.TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-            messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message)).escape(false);
+            messages.add(testOriginalTarget.message);
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
@@ -826,7 +826,7 @@ public class MeleeGameManager extends HttpServlet {
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
                     String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-                    messages.add(decorate).escape(false);
+                    messages.add(decorate).escape(false).fadeOut(false);
                 }
 
                 previousSubmission.setTestCode(testText);
@@ -840,7 +840,7 @@ public class MeleeGameManager extends HttpServlet {
                 // testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
                 logger.debug("testOriginalTarget: " + testOriginalTarget);
                 messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
-                messages.add(testOriginalTarget.message);
+                messages.add(testOriginalTarget.message).fadeOut(false);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
                 return;
