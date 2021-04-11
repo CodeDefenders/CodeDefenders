@@ -64,8 +64,7 @@ public class UserServlet extends HttpServlet {
                         messages.add("Could not create a user for you, sorry!");
                     }
                 }
-                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                dispatcher.forward(request, response);
+                response.sendRedirect(Constants.LOGIN_VIEW_JSP);
                 break;
 
             default:

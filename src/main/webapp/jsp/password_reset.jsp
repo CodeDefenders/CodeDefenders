@@ -39,7 +39,7 @@
 <div id="login" class="container">
     <div class="modal-body">
         <div id="create">
-            <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
+            <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post">
                 <input type="hidden" name="formType" value="resetPassword">
                 <input type="hidden" name="reference"
                        value="<%= reference %>">

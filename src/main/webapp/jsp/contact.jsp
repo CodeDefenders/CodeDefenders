@@ -44,7 +44,7 @@
 	if(emailEnabled) {
 %>
 <div class="container">
-	<form action="<%=request.getContextPath() + Paths.API_SEND_EMAIL%>" method="post" class="form-signin">
+	<form action="<%=request.getContextPath() + Paths.API_SEND_EMAIL%>" method="post">
 		<input type="hidden" name="formType" value="login">
 		<label for="inputName" class="sr-only">Name</label>
 		<input type="text" id="inputName" name="name" class="form-control" placeholder="Name" required autofocus>
