@@ -46,6 +46,7 @@ body {
 }
 #content {
     grid-area: content;
+    padding: 2rem 0;
 }
 #footer {
     grid-area: footer;
