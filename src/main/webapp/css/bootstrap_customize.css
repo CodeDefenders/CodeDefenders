@@ -13,68 +13,53 @@ bootstrap classes
 /* Navbar
 ----------------------------------------------------------------------------- */
 
-/* General look of the navbar. */
+/* Background color. */
 .navbar-cd {
     background-color: var(--bg-codedefenders);
-    border-radius: 0;
-    border: none;
 }
 
-/* Background and color of the Logo + Name. */
+/* Brand style. */
 .navbar-cd .navbar-brand {
     color: white;
 }
-.navbar-cd .navbar-brand:hover,
-.navbar-cd .navbar-brand:focus {
-    background-color: var(--bg-codedefenders-bright);
-}
 
-/* Background and color of navbar entries. */
-.navbar-cd .navbar-nav > li > a {
+/* Text color of navbar items. */
+.navbar-cd .navbar-nav .nav-item > .nav-link {
+    color: #ffffffe0;
+}
+.navbar-cd .navbar-nav .nav-item > .nav-link:hover,
+.navbar-cd .navbar-nav .nav-item > .nav-link:focus {
     color: white;
 }
-.navbar-cd .navbar-nav > li > a:hover,
-.navbar-cd .navbar-nav > li > a:focus {
-    background-color: var(--bg-codedefenders-bright);
-}
-
-/* Background and color of open dropdowns. */
-.navbar-cd .navbar-nav > .dropdown.open > a {
-    background-color: var(--bg-codedefenders-bright);
+.navbar-cd .navbar-nav .dropdown > .nav-link.show {
     color: white;
 }
 
-/* Background and color dropdowns in collapsed mode.
-   (767px is the width at which the navbar collapses.) */
-@media (max-width: 767px) {
-    .navbar-cd .navbar-nav .open .dropdown-menu > li > a {
-        color: white;
-    }
-    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:focus,
-    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:hover {
+/* Rules for non-collapsed mode only (767px is the width at which the navbar collapses for md.) */
+@media (min-width: 768px) {
+    /* Highlighted (important) nav items. */
+    .navbar-cd .nav-item-highlight > .nav-link {
         background-color: var(--bg-codedefenders-bright);
+        padding: .25rem .75rem;
+        border: 1px solid #ffffff10;
+        border-radius: .2rem;
+        margin-right: .75rem;
     }
-    .navbar-cd .navbar-nav .open .dropdown-menu .divider {
+    .navbar-cd .nav-item-highlight:hover > .nav-link {
+        background-color: var(--bg-codedefenders-brighter);
+    }
+    .navbar-cd .nav-item-highlight.dropdown > .nav-link.show {
         background-color: var(--bg-codedefenders-brighter);
     }
 }
 
 /* "Toggle navbar" button color in collapsed mode. */
-.navbar-cd .navbar-toggle .icon-bar {
-    background-color: white;
+.navbar-cd .navbar-toggler-icon {
+    /* Copied from bootstrap and modified. */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e")
 }
-
-/* Center items in nav. (from https://gist.github.com/sadewowtito/2b5bcbd10e853919a960)
-   (767px is the width at which the navbar collapses.) */
-@media (min-width: 768px) {
-    .navbar-nav.navbar-nav-center {
-        width: 100%;
-        text-align: center;
-    }
-    .navbar-nav.navbar-nav-center > li {
-        float: none;
-        display: inline-block;
-    }
+.navbar-cd .navbar-toggler {
+    box-shadow: none;
 }
 
 /* Tables

@@ -4,8 +4,8 @@
 :root {
     /* Used e.g. in header/footer. */
     --bg-codedefenders: #03a9f4;
-    --bg-codedefenders-bright: #29b6f6;
-    --bg-codedefenders-brighter: #54c4f8;
+    --bg-codedefenders-bright: #24baff;
+    --bg-codedefenders-brighter: #48c3fd;
 
     /* Used e.g. in buttons */
     --bg-attacker: #b94258;
