@@ -496,19 +496,24 @@
     <%}%>
 
     <%if (gamesJoinable) { %>
+
     <!-- Nav tabs -->
-    <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active">
-            <a href="#openBattleground" role="tab" data-toggle="tab">Open battleground games</a>
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="open-battleground-tab" data-bs-toggle="tab" data-bs-target="#openBattleground" type="button" role="tab" aria-controls="home" aria-selected="true">
+                Open battleground games
+            </button>
         </li>
-        <li role="presentation">
-            <a href="#openMelee" role="tab" data-toggle="tab">Open melee games</a>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="open-melee-tab" data-bs-toggle="tab" data-bs-target="#openMelee" type="button" role="tab" aria-controls="home" aria-selected="false">
+                Open melee games
+            </button>
         </li>
     </ul>
 
     <!-- Tab panes -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="openBattleground">
+        <div class="tab-pane fade show active" id="openBattleground" role="tabpanel" aria-labelledby="open-battleground-tab">
             <table id="tableOpenBattleground"
                    class="table table-striped table-hover table-responsive table-center">
                 <tr>
@@ -520,7 +525,7 @@
                     <th>Level</th>
                 </tr>
                 <c:choose>
-                    <c:when test="${empty openMultiplayerGames}}">
+                    <c:when test="${empty openMultiplayerGames}">
                         <tr>
                             <td colspan="100%"> There are currently no open battleground games.</td>
                         </tr>
@@ -731,7 +736,7 @@
                 </c:choose>
             </table>
         </div>
-        <div role="tabpanel" class="tab-pane" id="openMelee">
+        <div class="tab-pane fade" id="openMelee" role="tabpanel" aria-labelledby="open-melee-tab">
             <table id="tableOpenMelee"
                    class="table table-striped table-hover table-responsive table-center">
                 <tr>
@@ -742,7 +747,7 @@
                     <th>Level</th>
                 </tr>
                 <c:choose>
-                    <c:when test="${empty openMeleeGames}}">
+                    <c:when test="${empty openMeleeGames}">
                         <tr>
                             <td colspan="100%"> There are currently no open melee games.</td>
                         </tr>
