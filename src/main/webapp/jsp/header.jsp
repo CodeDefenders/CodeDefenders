@@ -96,7 +96,7 @@
         <a class="navbar-brand" href="${pageContext.request.contextPath}">
             <img src="${pageContext.request.contextPath}/images/logo.png" alt="" class="d-inline-block"
                  <%-- Negative margin to prevent the navbar from getting tall from the tall image. --%>
-                 style="height: 2.5rem; margin: -2rem .25rem -1.7rem 0;" />
+                 style="height: 2.5rem; margin: -2rem .25rem -1.7rem .2rem;" />
             Code Defenders
         </a>
 
