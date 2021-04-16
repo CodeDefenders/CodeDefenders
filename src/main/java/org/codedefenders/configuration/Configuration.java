@@ -190,8 +190,8 @@ public class Configuration {
                 }
             }
 
-            if (getJavaMajorVersion() > 9) {
-                validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 9");
+            if (getJavaMajorVersion() > 11) {
+                validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 11");
             }
 
             /*

@@ -60,7 +60,7 @@ public class PasswordServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PasswordServlet.class);
 
     private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
-            + "This link is only valid for %d hours.\n\n" + "Greetings, your CodeDefenders team";
+            + "This link is only valid for %d hours.\n\n" + "Greetings, your Code Defenders team";
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -80,7 +80,7 @@ public class PasswordServlet extends HttpServlet {
                 username = request.getParameter("accountUsername");
                 UserEntity u = userRepo.getUserByEmail(email);
                 if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
-                    messages.add("No such User found or Email and Username do not match");
+                    messages.add("No user was found for this username and email. Please check if the username and email match.");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
                     DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
@@ -91,7 +91,9 @@ public class PasswordServlet extends HttpServlet {
                             AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
                                     .getIntValue());
                     if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
-                        messages.add("A link for changing your password has been sent to " + email);
+                        messages.add("A password reset link has been sent to " + email);
+                    } else {
+                        messages.add("Something went wrong. No email could be sent.");
                     }
                 }
                 response.sendRedirect(request.getContextPath() + Paths.LOGIN);
@@ -113,13 +115,13 @@ public class PasswordServlet extends HttpServlet {
                         if (user.update()) {
                             DatabaseAccess.setPasswordResetSecret(user.getId(), null);
                             responseURL = request.getContextPath() + Paths.LOGIN;
-                            messages.add("Successfully changed your Password.");
+                            messages.add("Successfully changed your password.");
                         }
                     } else {
-                        messages.add("Your Two Password Entries Did Not Match");
+                        messages.add("Your two password entries did not match");
                     }
                 } else {
-                    messages.add("Your Password reset link is not valid or has expired");
+                    messages.add("Your password reset link is not valid or has expired.");
                     responseURL = request.getContextPath() + Paths.LOGIN;
                 }
                 response.sendRedirect(responseURL);

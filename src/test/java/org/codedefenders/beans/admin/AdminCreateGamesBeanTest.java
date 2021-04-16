@@ -77,10 +77,7 @@ public class AdminCreateGamesBeanTest {
      * because I couldn't get WeldInitiator to work with PowerMockito.
      */
     @Before
-    public void initializeBean() throws NoSuchFieldException, IllegalAccessException {
-        adminCreateGamesBean = new AdminCreateGamesBean();
-        stagedGameList = adminCreateGamesBean.getStagedGameList();
-
+    public void initializeBean() {
         /* Mock bean dependencies of AdminCreateGamesBean. */
         LoginBean loginBean = PowerMockito.mock(LoginBean.class);
         PowerMockito.when(loginBean.getUserId()).thenReturn(0);
@@ -90,22 +87,8 @@ public class AdminCreateGamesBeanTest {
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);
         EventDAO eventDAO = PowerMockito.mock(EventDAO.class);
 
-        /* Inject the mocked beans manually. */
-        Field messagesField = AdminCreateGamesBean.class.getDeclaredField("messages");
-        messagesField.setAccessible(true);
-        messagesField.set(adminCreateGamesBean, messagesBean);
-
-        Field loginField = AdminCreateGamesBean.class.getDeclaredField("login");
-        loginField.setAccessible(true);
-        loginField.set(adminCreateGamesBean, loginBean);
-
-        Field gameManagingUtilsField = AdminCreateGamesBean.class.getDeclaredField("gameManagingUtils");
-        gameManagingUtilsField.setAccessible(true);
-        gameManagingUtilsField.set(adminCreateGamesBean, gameManagingUtils);
-
-        Field eventDAOField = AdminCreateGamesBean.class.getDeclaredField("eventDAO");
-        eventDAOField.setAccessible(true);
-        eventDAOField.set(adminCreateGamesBean, eventDAO);
+        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO);
+        stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
     @Before

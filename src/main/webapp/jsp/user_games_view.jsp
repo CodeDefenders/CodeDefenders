@@ -59,9 +59,9 @@
     }
 </style>
 
-<div class="w-100">
+<div class="container">
     <h2 class="full-width page-title">My Games</h2>
-    <table id="my-games" class="table table-striped table-hover table-responsive table-paragraphs games-table">
+    <table id="my-games" class="table table-striped table-hover table-responsive table-center">
         <tr>
             <th>ID</th>
             <th>Creator</th>
@@ -406,8 +406,7 @@
 
                                 if (info.gameState() != GameState.CREATED) { // Game is already running, the user is a player, so she can play
                         %>
-                        <a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
-                           style="background-color: #884466;border-color: #772233;"
+                        <a class="btn btn-sm btn-attacker" id="<%="play-"+gameId%>"
                            href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play in melee
                             game</a>
                         <%
@@ -430,8 +429,7 @@
                                 break;
                             default: // The user is not yet a player, so she may join the game
                         %>
-                        <a class="btn btn-sm btn-primary" id="<%="play-"+gameId%>"
-                           style="background-color: #884466;border-color: #772233;"
+                        <a class="btn btn-sm btn-attacker" id="<%="play-"+gameId%>"
                            href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play</a>
                         <%
                                         break;
@@ -512,7 +510,7 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="openBattleground">
             <table id="tableOpenBattleground"
-                   class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                   class="table table-striped table-hover table-responsive table-center">
                 <tr>
                     <th>ID</th>
                     <th>Creator</th>
@@ -735,7 +733,7 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="openMelee">
             <table id="tableOpenMelee"
-                   class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                   class="table table-striped table-hover table-responsive table-center">
                 <tr>
                     <th>ID</th>
                     <th>Creator</th>
@@ -801,8 +799,7 @@
                                     <input type="hidden" name="player" value=1>
                                     <%=info.players().size()%>
                                     <button type="submit" id="<%="join-"+info.gameId()%>"
-                                            class="btn btn-primary btn-sm btn-join"
-                                            style="background-color: #884466;border-color: #772233;"
+                                            class="btn btn-primary btn-sm btn-join btn-attacker"
                                             value="Join">
                                         Join
                                     </button>

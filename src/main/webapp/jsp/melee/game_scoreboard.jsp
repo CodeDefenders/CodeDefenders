@@ -19,14 +19,6 @@
 
 --%>
 <%@page import="org.codedefenders.beans.game.ScoreItem"%>
-<%@ page import="org.codedefenders.model.Player"%>
-<%@ page import="java.util.List"%>
-<%@ page import="org.codedefenders.util.Constants"%>
-<%@ page import="org.codedefenders.database.TestDAO"%>
-<%@ page import="org.codedefenders.database.MutantDAO"%>
-<%@ page import="org.codedefenders.game.multiplayer.PlayerScore"%>
-<%@ page import="org.codedefenders.model.UserEntity"%>
-<%@ page import="java.util.Map"%>
 
 <jsp:useBean id="meleeScoreboardBean" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
 

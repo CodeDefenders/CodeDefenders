@@ -111,7 +111,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
@@ -124,7 +123,7 @@
 
         <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
         <h3>Write a new JUnit test here
-            <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
+            <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitTest" form="def"
                 onClick="window.testProgressBar(); this.form.submit(); this.disabled = true; this.value = 'Defending...';"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                 Defend!
@@ -141,9 +140,7 @@
     </div>
 </div>
 
-</div> <%-- TODO move the whole div here after changing the header --%>
-
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
     <div class="col-md-6" id="mutants-div">
         <h3>Existing Mutants</h3>
         <t:mutant_accordion/>
@@ -154,5 +151,3 @@
         <t:test_accordion/>
     </div>
 </div>
-
-<div>

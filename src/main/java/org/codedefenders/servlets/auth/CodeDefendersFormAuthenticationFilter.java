@@ -1,5 +1,7 @@
 package org.codedefenders.servlets.auth;
 
+import java.io.IOException;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -14,6 +16,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,10 +76,20 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         messages.add("Username not found or password incorrect.");
 
-        return super.onLoginFailure(token, e, request, response);
+        if (request instanceof HttpServletRequest
+                && response instanceof HttpServletResponse) {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+            try {
+                httpResponse.sendRedirect(httpRequest.getContextPath() + Paths.LOGIN);
+            } catch (IOException ioException) {
+                logger.error("TODO", e);
+            }
+        }
+
+        return false;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private String getClientIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (invalidIP(ip)) {

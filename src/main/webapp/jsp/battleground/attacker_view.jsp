@@ -111,7 +111,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
     <div class="col-md-6" style="margin-top: 10px;">
         <div id="mutants-div">
@@ -133,7 +132,7 @@
 
             <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
             <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
-            <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk"
+            <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitMutant" form="atk"
                 onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
                 style="float: right; margin-right: 5px"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
@@ -142,7 +141,7 @@
 
             <!-- Reset button -->
             <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post" style="float: right; margin-right: 5px">
-                <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset">
+                <button class="btn btn-primary btn-warning btn-bold pull-right" id="btnReset">
                     Reset
                 </button>
                 <input type="hidden" name="formType" value="reset">

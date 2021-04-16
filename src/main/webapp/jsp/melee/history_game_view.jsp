@@ -109,13 +109,15 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+
 <jsp:include page="/jsp/melee/header_game.jsp"/>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
 
     <div class="col-md-6">
         <div id="mutants-div">
@@ -137,4 +139,4 @@
     </div>
 </div>
 
-<%@ include file="/jsp/melee/footer_game.jsp" %>
+<%@ include file="/jsp/footer_game.jsp" %>

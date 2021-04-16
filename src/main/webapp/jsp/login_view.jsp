@@ -26,33 +26,43 @@
 <jsp:include page="/jsp/header_logout.jsp"/>
 
 <div id="login" class="container">
-    <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
-        <input type="hidden" name="formType" value="login">
+    <div style="padding: 15px; margin: 0 auto; max-width: 25rem;">
         <h2 class="form-signin-heading">Sign in</h2>
-        <label for="inputUsername" class="sr-only">Username</label>
-        <input type="text" id="inputUsername" name="username" class="form-control" placeholder="Username"
-               required autofocus>
-        <label for="inputPassword" class="sr-only">Password</label>
-        <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
-        <div>
-            <input type="checkbox" id="consentOK" style="margin-right:5px;" checked>I understand and consent that the
-            mutants and tests I create in the game will be used for research purposes.
-        </div>
-        <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
+        <form action="<%=request.getContextPath() + Paths.LOGIN%>" method="post" id="form-signin">
 
-        <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
-        <a id="createAccountToggle" href="#" class="text-center new-account" data-toggle="modal" data-target="#createAccountModal">Create an account</a>
-        <%}%>
+            <div class="form-group">
+                <label for="inputUsername">Username</label>
+                <input type="text" class="form-control" id="inputUsername" name="username" placeholder="Username">
+            </div>
 
-        <%
-            if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
-                // a newly generated password can only be sent to the user if mails are enabled
-        %>
-        <a href="#" class="text-center new-account" data-toggle="modal" data-target="#passwordResetModal"
-           style=" float: right;" id="passwordForgotten">Password forgotten</a>
-        <%}%>
+            <div class="form-group">
+                <label for="inputPassword">Password</label>
+                <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password">
+            </div>
 
-    </form>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="consentOK" checked>
+                    I understand and consent that the mutants and tests I create in the game will be used for research purposes.
+                </label>
+            </div>
+
+            <button id="signInButton" type="submit" class="btn btn-primary btn-lg"
+                    style="width: 100%; margin-bottom: .5rem;">
+                Sign in
+            </button>
+
+            <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
+                <a id="createAccountToggle" href="#" class="text-center new-account" data-toggle="modal" data-target="#createAccountModal">Create an account</a>
+            <% } %>
+
+            <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
+                    /* a newly generated password can only be sent to the user if mails are enabled */ %>
+                <a href="#" class="text-center new-account" data-toggle="modal" data-target="#passwordResetModal"
+                   style="float: right;" id="passwordForgotten">Password forgotten</a>
+            <% } %>
+        </form>
+    </div>
 </div>
 
 <!-- TODO ARE THOSE EVEN USED ? -->
@@ -68,7 +78,7 @@
     left: 0;
     z-index: 1050;
     background: #00000080;">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 30rem;">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -78,36 +88,49 @@
             <div class="modal-body">
                 <form action="<%=request.getContextPath()  + Paths.PASSWORD%>" method="post" class="form-signin">
                     <input type="hidden" name="resetPwSecret" id="resetPwSecret" value="<%=resetPw%>">
-
                     <input type="hidden" name="formType" value="changePassword">
-                    <label for="inputPassword" class="sr-only">Password</label>
-                    <input type="password" id="inputPasswordChange" name="inputPasswordChange" class="form-control"
-                           onkeyup="validatePasswordChange()" placeholder="Password" required minlength="<%=pwMinLength%>">
-                    <span class="label label-danger" style="color: white" id="pw_confirm_message_change"></span>
-                    <label for="inputPassword" class="sr-only">Confirm Password</label>
-                    <input type="password" id="inputConfirmPasswordChange" name="inputConfirmPasswordChange"
-                           onkeyup="validatePasswordChange()" class="form-control" placeholder="Confirm Password" required
-                           minlength="<%=pwMinLength%>">
-                    <button id="submitChangePassword" disabled class="btn btn-lg btn-primary btn-block"
-                            type="submit">Change Password
+
+                    <div class="form-group" id="group-change-password">
+                        <label class="control-label" for="inputUsername">Password</label>
+                        <input type="password" class="form-control" id="inputPasswordChange" name="inputPasswordChange" placeholder="Password"
+                               onchange="validatePasswordChange()" required minlength="<%=pwMinLength%>">
+                    </div>
+
+                    <div class="form-group" id="group-change-password-confirm">
+                        <label class="control-label" for="inputPassword">Confirm Password</label>
+                        <input type="password" class="form-control" id="inputConfirmPasswordChange" name="inputConfirmPasswordChange" placeholder="Confirm Password"
+                               onchange="validatePasswordChange()" required minlength="<%=pwMinLength%>">
+                        <span id="reset-password-help" class="help-block" style="display: none;">Passwords don't match.</span>
+                    </div>
+
+                    <button id="submitChangePassword" class="btn btn-lg btn-primary" type="submit" disabled
+                            style="width: 100%; margin-bottom: .5rem;">
+                        Change Password
                     </button>
 
                     <script>
                         function validatePasswordChange() {
-                            if (document.getElementById('inputPasswordChange').value ===
-                                document.getElementById('inputConfirmPasswordChange').value) {
-                                document.getElementById('pw_confirm_message_change').innerHTML = '';
+                            const password = document.getElementById('inputPasswordChange').value;
+                            const passwordConfirm = document.getElementById('inputConfirmPasswordChange').value;
+
+                            if (password === passwordConfirm || passwordConfirm === '') {
+                                document.getElementById('reset-password-help').style.display = 'none';
+                                document.getElementById('group-change-password').classList.remove('has-error');
+                                document.getElementById('group-change-password-confirm').classList.remove('has-error');
                                 document.getElementById('submitChangePassword').disabled = false;
                             } else {
-                                document.getElementById('pw_confirm_message_change').innerHTML = 'Passwords don\'t match!';
+                                document.getElementById('reset-password-help').style.display = null;
+                                document.getElementById('group-change-password').classList.add('has-error');
+                                document.getElementById('group-change-password-confirm').classList.add('has-error');
                                 document.getElementById('submitChangePassword').disabled = true;
                             }
                         }
                     </script>
                 </form>
-                <span style="margin-right:5px; font-size:small;">Valid password:
+                <span style="font-size: small;">Valid password:
                     <%=pwMinLength%>
-                    -20 alphanumeric characters, no whitespace or special character.</span>
+                    -20 alphanumeric characters, no whitespace or special character.
+                </span>
 
             </div>
         </div>
@@ -117,7 +140,7 @@
 <%}%>
 
 <div id="passwordResetModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 30rem;">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -127,15 +150,25 @@
             <div class="modal-body">
                 <form action="<%=request.getContextPath()  + Paths.PASSWORD%>" method="post" class="form-signin">
                     <input type="hidden" name="formType" value="resetPassword">
-                    <label for="inputUsername" class="sr-only">Username</label>
-                    <input type="text" id="accountUsername" name="accountUsername" class="form-control"
-                           placeholder="Username" required autofocus>
-                    <label for="inputEmail" class="sr-only">Email</label>
-                    <input type="email" id="accountEmail" name="accountEmail" class="form-control" placeholder="Email"
-                           required>
-                    <button class="btn btn-lg btn-primary btn-block" type="submit">Reset Password</button>
+
+                    <div class="form-group">
+                        <label for="accountUsername">Username</label>
+                        <input type="text" class="form-control" id="accountUsername" name="accountUsername" placeholder="Username"
+                               required autofocus>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="accountEmail">Email</label>
+                        <input type="email" class="form-control" id="accountEmail" name="accountEmail" placeholder="Email"
+                               required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg"
+                            style="width: 100%; margin-bottom: .5rem;">
+                        Reset Password
+                    </button>
                 </form>
-                <span style="margin-right:5px; font-size:small;">
+                <span style="font-size: small;">
                     This will send a mail with a link to change your password to your email account.
                 </span>
             </div>
@@ -149,7 +182,7 @@
 
 <!-- Modal -->
 <div id="createAccountModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 30rem;">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -161,52 +194,84 @@
                 <div id="create">
                     <form action="<%=request.getContextPath()  + Paths.USER%>" method="post" class="form-signin">
                         <input type="hidden" name="formType" value="create">
-                        <label for="inputUsername" class="sr-only">Username</label>
-                        <span class="label label-danger" id="invalid_username_message" style="color: white;visibility: hidden">3-20 alphanumerics starting with a letter (a-z), no space or special characters.</span>
-                        <input type="text" id="inputUsernameCreate" name="username" class="form-control"
-                               onkeyup="validateUsername()" placeholder="Username" required minlength="3" maxlength="20" autofocus>
-                        <label for="inputEmail" class="sr-only">Email</label>
-                        <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required>
-                        <label for="inputPassword" class="sr-only">Password</label>
-                        <input type="password" id="inputPasswordCreate" name="password" class="form-control"
-                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>" style="margin: 0">
-                        <label for="inputPassword" class="sr-only">Password</label>
-                        <input type="password" id="inputConfirmPasswordCreate" name="confirm" class="form-control"
-                               onkeyup="validatePassword()" placeholder="Confirm Password" required style="margin: 0">
-                        <span class="label label-danger" id="pw_confirm_message_create" style="color: white;visibility: hidden">Passwords do not match!</span>
-                        <button class="btn btn-lg btn-primary btn-block" id="submitCreateAccount" type="submit" style="margin-top: 5px">Create Account</button>
+
+                        <div class="form-group" id="group-create-username">
+                            <label class="control-label" for="inputUsernameCreate">Username</label>
+                            <input type="text" class="form-control" id="inputUsernameCreate" name="username" placeholder="Username"
+                                   onkeyup="validateCreateAccountForm()" required minlength="3" maxlength="20" autofocus>
+                            <span id="create-username-help" class="help-block" style="display: none;">
+                                3-20 alphanumerics starting with a letter (a-z), no space or special characters.
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputEmailCreate">Email</label>
+                            <input type="email" class="form-control" id="inputEmailCreate" name="email" placeholder="Email"
+                                   required>
+                        </div>
+
+                        <div class="form-group" id="group-create-password">
+                            <label class="control-label" for="inputPasswordCreate">Password</label>
+                            <input type="password" class="form-control" id="inputPasswordCreate" name="password" placeholder="Password"
+                                   onkeyup="validateCreateAccountForm()" required minlength="<%=pwMinLength%>">
+                        </div>
+
+                        <div class="form-group" id="group-create-password-confirm">
+                            <label class="control-label" for="inputConfirmPasswordCreate">Confirm Password</label>
+                            <input type="password" class="form-control" id="inputConfirmPasswordCreate" name="confirm" placeholder="Confirm Password"
+                                   onkeyup="validateCreateAccountForm()" required>
+                            <span id="create-password-help" class="help-block" style="display: none;">Passwords don't match.</span>
+                        </div>
+
+                        <button class="btn btn-lg btn-primary" id="submitCreateAccount" type="submit"
+                                style="width: 100%; margin-bottom: .5rem;">
+                            Create Account
+                        </button>
                     </form>
-                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special characters.<br>
-                        Valid password: <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>-20 alphanumeric characters, no whitespace or special characters.</span>
+                    <span style="font-size: small;">
+                        Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special characters.<br>
+                        Valid password: <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>-20 alphanumeric characters, no whitespace or special characters.
+                    </span>
                 </div>
                 <script type="text/javascript">
-                    function validatePassword() {
-                        if(document.getElementById('inputConfirmPasswordCreate').value === '') {
-                            document.getElementById('pw_confirm_message_create').style.visibility = "hidden";
-                            return;
-                        }
+                    function validateCreateAccountForm() {
+                        const valid = validatePassword() && validateUsername();
+                        document.getElementById('submitChangePassword').disabled = !valid;
+                    }
 
-                        if (document.getElementById('inputPasswordCreate').value === document.getElementById('inputConfirmPasswordCreate').value) {
-                            document.getElementById('pw_confirm_message_create').style.visibility = "hidden";
-                            document.getElementById('submitCreateAccount').disabled = false;
+                    function validatePassword() {
+                        const password = document.getElementById('inputPasswordCreate').value;
+                        const passwordConfirm = document.getElementById('inputConfirmPasswordCreate').value;
+
+                        if (password === passwordConfirm || passwordConfirm === '') {
+                            document.getElementById('create-password-help').style.display = 'none';
+                            document.getElementById('group-create-password').classList.remove('has-error');
+                            document.getElementById('group-create-password-confirm').classList.remove('has-error');
+                            return true;
                         } else {
-                            document.getElementById('pw_confirm_message_create').style.visibility = "visible";
-                            document.getElementById('submitCreateAccount').disabled = true;
+                            document.getElementById('create-password-help').style.display = null;
+                            document.getElementById('group-create-password').classList.add('has-error');
+                            document.getElementById('group-create-password-confirm').classList.add('has-error');
+                            return false;
                         }
                     }
+
                     function validateUsername() {
-                        var username = document.getElementById('inputUsernameCreate').value;
+                        const username = document.getElementById('inputUsernameCreate').value;
+
                         if (isValidUsername(username)) {
-                            document.getElementById('invalid_username_message').style.visibility = "hidden";
-                            document.getElementById('submitCreateAccount').disabled = false;
+                            document.getElementById('create-username-help').style.display = 'none';
+                            document.getElementById('group-create-username').classList.remove('has-error');
+                            return true;
                         } else {
-                            document.getElementById('invalid_username_message').style.visibility = "visible";
-                            document.getElementById('submitCreateAccount').disabled = true;
+                            document.getElementById('create-username-help').style.display = null;
+                            document.getElementById('group-create-username').classList.add('has-error');
+                            return false;
                         }
 
                         function isValidUsername(username) {
                             // matches 1 a-z for the first char, 2-19 alphanumeric chars for the rest
-                            var regExp = new RegExp('^[a-z][a-zA-Z0-9]{2,19}$');
+                            const regExp = new RegExp('^[a-z][a-zA-Z0-9]{2,19}$');
                             return regExp.test(username);
                         }
                     }

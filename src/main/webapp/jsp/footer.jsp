@@ -20,25 +20,25 @@
 --%>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-                        </div>
-                    </div><div class="clear">
-                </div>
-           </div>
-        </div>
-    </div>
-</div>
+</div> <%-- closes #content --%>
 
-<div style=" position: fixed; bottom: 0; width: 100%; z-index: -1000">
-    <div class="bg-light-blue .minus-2 text-white" style="padding: 5px;">
-        <div class="full-width" style="padding-top: 3px;">
-            <div class="ws-12 container" style="text-align: right; clear:
-        both; margin: 0; padding: 0; width: 100%;">
-                <ul class="crow fly navbar-collapse" id="bs-example-navbar-collapse-1" style="z-index: 1000; text-align: center; list-style:none;
-                width: 80%; float: none; margin: 0 auto;">
-                    <li style="float: none"><a id="footerAbout" class="text-white btn tab-link bg-minus-1" style="width:100%;" href="<%=request.getContextPath() + Paths.ABOUT_PAGE%>">About CodeDefenders</a></li>
-                    <li style="float: none"><a id="footerContact" class="text-white btn tab-link bg-minus-1"  style="width:100%;" href="<%=request.getContextPath() + Paths.CONTACT_PAGE%>">Contact Us</a></li>
-                </ul>
-            </div>
-        </div>
+<%-- The min-height and padding style attributes are here to make the footer a bit smaller, because it looks
+     weird if it's the same size of as the header. --%>
+<nav class="navbar navbar-cd" id="footer" style="min-height: 0; margin: 0;">
+    <div id="footer-navbar-controls">
+        <ul class="nav navbar-nav navbar-nav-center">
+            <li><a id="footerAbout" class="text-white btn"
+                   href="<%=request.getContextPath() + Paths.ABOUT_PAGE%>"
+                   style="padding-top: .5em; padding-bottom: .5em;">About CodeDefenders</a></li>
+            <li><a id="footerContact" class="text-white btn"
+                   href="<%=request.getContextPath() + Paths.CONTACT_PAGE%>"
+                   style="padding-top: .5em; padding-bottom: .5em;">Contact Us</a></li>
+            <li><a id="footerHelp" class="text-white btn"
+                   href="<%=request.getContextPath() + Paths.HELP_PAGE%>"
+                   style="padding-top: .5em; padding-bottom: .5em;">Help</a></li>
+            <li><a id="footerImprint" class="text-white btn"
+                   href="<%=request.getContextPath() + Paths.IMPRINT_PAGE%>"
+                   style="padding-top: .5em; padding-bottom: .5em;">Imprint and Privacy Policy</a></li>
+        </ul>
     </div>
-</div>
+</nav>

@@ -69,6 +69,8 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 <%
     classViewer.setClassCode(game.getCUT());
@@ -136,7 +138,7 @@
 
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
 
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Existing Mutants</h3>
@@ -157,4 +159,4 @@
     </div>
 </div>
 
-<%@ include file="/jsp/battleground/footer_game.jsp" %>
+<%@ include file="/jsp/footer_game.jsp" %>

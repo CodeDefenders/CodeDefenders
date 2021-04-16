@@ -46,7 +46,7 @@
     int numGamesQueued = KillmapDAO.getNumGameKillmapJobsQueued();
 %>
 
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminKillMaps"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
@@ -163,7 +163,7 @@
             <div class="panel-heading">
                 Classes
                 <div style="float: right;">
-                    <input type="search" id="search-classes" class="form-control" placeholder="Search" style="height: .65em; width: 10em; display: inline;">
+                    <input type="search" id="search-classes" class="form-control" placeholder="Search" style="height: 1.5em; width: 10em; display: inline;">
                     <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
                         <label class="btn btn-xs btn-default">
                             <input id="toggle-progress-classes" type="checkbox"> Show progress
@@ -186,7 +186,7 @@
             <div class="panel-heading">
                 Games
                 <div style="float: right;">
-                    <input type="search" id="search-games" class="form-control" placeholder="Search" style="height: .65em; width: 10em; display: inline;">
+                    <input type="search" id="search-games" class="form-control" placeholder="Search" style="height: 1.5em; width: 10em; display: inline;">
                     <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
                         <label class="btn btn-xs btn-default">
                             <input id="toggle-progress-games" type="checkbox"> Show progress

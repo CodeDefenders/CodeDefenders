@@ -16,8 +16,7 @@ import org.slf4j.LoggerFactory;
 public class GameProducer implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(GameProducer.class);
 
-    @Inject
-    private EventDAO eventDAO;
+    private final EventDAO eventDAO;
 
     @Inject
     private UserRepository userRepo;
@@ -25,6 +24,11 @@ public class GameProducer implements Serializable {
     private Integer gameId = null;
     private AbstractGame game = null;
     private boolean gameQueried = false;
+
+    @Inject
+    public GameProducer(EventDAO eventDAO) {
+        this.eventDAO = eventDAO;
+    }
 
     /**
      * Tries to find a game for the former set gameId {@link #setGameId(Integer)} and cast it to the required type.

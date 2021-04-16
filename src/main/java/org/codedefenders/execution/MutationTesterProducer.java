@@ -30,18 +30,18 @@ import org.codedefenders.persistence.database.UserRepository;
 
 public class MutationTesterProducer {
 
-    @Inject
-    private Configuration config;
+    private final Configuration config;
+    private final BackendExecutorService backend;
+    private final ExecutorService testExecutorThreadPool;
+    private final EventDAO eventDAO;
 
     @Inject
-    private BackendExecutorService backend;
-
-    @Inject
-    @ThreadPool("test-executor")
-    private ExecutorService testExecutorThreadPool;
-
-    @Inject
-    private EventDAO eventDAO;
+    public MutationTesterProducer(Configuration config, BackendExecutorService backend, @ThreadPool("test-excutor") ExecutorService testExecutorThreadPool, EventDAO eventDAO) {
+        this.config = config;
+        this.backend = backend;
+        this.testExecutorThreadPool = testExecutorThreadPool;
+        this.eventDAO = eventDAO;
+    }
 
     @Inject
     private UserRepository userRepo;

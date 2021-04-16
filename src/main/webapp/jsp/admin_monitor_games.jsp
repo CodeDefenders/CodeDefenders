@@ -34,7 +34,7 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
@@ -57,9 +57,10 @@
         </div>
         <% } else { %>
         <table id="table-multiplayer"
-               class="table-hover table-striped table-responsive table-paragraphs games-table display table-condensed">
+               class="table-hover table-responsive table-center display"
+               style="width: 100%;">
             <thead>
-            <tr style="border-bottom: 1px solid black">
+            <tr>
                 <th><input type="checkbox" id="selectAllGamesMultiplayer">
                 </th>
                 <th>ID</th>
@@ -101,7 +102,7 @@
                     <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
                        href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%= gid %>">Observe</a>
                 </td>
-                <td class="col-sm-2">
+                <td>
                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gid%>">
                         <%=cut.getAlias()%>
                     </a>
@@ -126,33 +127,42 @@
                         </div>
                     </div>
                 </td>
-                <td class="col-sm-1"><%= multiplayerGameCreatorNames.get(gid) %>
+                <td><%= multiplayerGameCreatorNames.get(gid) %>
                 </td>
-                <td class="col-sm-1"><%=g.getAttackerPlayers().size()%>
+                <td><%=g.getAttackerPlayers().size()%>
                 </td>
-                <td class="col-sm-1"><%=g.getDefenderPlayers().size()%>
+                <td><%=g.getDefenderPlayers().size()%>
                 </td>
                 <td><%= g.getLevel() %>
                 </td>
-                <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
+                <td style="padding-top:4px; padding-bottom:4px">
                     <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
                             onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
                         <span class="<%=startStopButtonIcon%>"></span>
 
                     </button>
                 </td>
-                    <%List<List<String>> playersInfo = multiplayerPlayerInfoForGame.get(gid);
-                if(!playersInfo.isEmpty()){%>
-            <tr id="playersTableActive" hidden>
-                <th colspan="3">Game Score</th>
-                <th style="border-bottom: 1px solid black">Name</th>
-                <th style="border-bottom: 1px solid black">Submissions</th>
-                <th style="border-bottom: 1px solid black">Last Action</th>
-                <th style="border-bottom: 1px solid black">Points</th>
-                <th style="border-bottom: 1px solid black">Total Score</th>
-                <th style="border-bottom: 1px solid black">Switch Role</th>
-                <th style="border-bottom: 1px solid black"></th>
-            </tr>
+                </tr>
+                <%
+                    List<List<String>> playersInfo = multiplayerPlayerInfoForGame.get(gid);
+                    if (!playersInfo.isEmpty()) {
+                %>
+                <tr class="players-table" hidden>
+                    <td colspan="9">
+                        <table class="table" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th>Game Score</th>
+                                    <th>Name</th>
+                                    <th>Submissions</th>
+                                    <th>Last Action</th>
+                                    <th>Points</th>
+                                    <th>Total Score</th>
+                                    <th>Switch Role</th>
+                                    <th>Remove Player</th>
+                                </tr>
+                            </thead>
+                            <tbody>
             <%
                 }
                 boolean firstAttacker = true;
@@ -199,21 +209,18 @@
                     String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
                     int gameScore = AdminMonitorGames.getPlayerScore(g, pid);
             %>
-            <tr style="height: 3px;" id="playersTableActive" hidden></tr>
-            <tr id="playersTableActive" hidden>
+            <tr>
             <%	if ( firstAttacker && role.equals( Role.ATTACKER ) ) {%>
-                <td colspan = "3"><%= gameScoreAttack %></td>
+                <td style="background: <%= color %>;"><%= gameScoreAttack %></td>
             <%	firstAttacker = false;
 				}
 				else if ( firstDefender && role.equals( Role.DEFENDER ) ) {%>
-                <td colspan = "3"><%= gameScoreDefense %></td>
+                <td style="background: <%= color %>;"><%= gameScoreDefense %></td>
             <%  firstDefender = false;
                 } else { %>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td style="border: none;"></td>
             <%  } %>
-                <td style="background: <%= color %>; border-top-left-radius: 7px;border-bottom-left-radius: 7px;">
+                <td style="background: <%= color %>;">
                     <%= userName %>
                 </td>
                 <td style="background: <%= color %>"><%= submissionsCount %>
@@ -235,7 +242,7 @@
                         <span class="glyphicon glyphicon-transfer"></span>
                     </button>
                 </td>
-                <td style="background: <%= color %>; border-top-right-radius: 7px;border-bottom-right-radius: 7px;">
+                <td style="background: <%= color %>;">
 
                     <button class="btn btn-sm btn-danger" value="<%=pid + "-" + gid%>"
                             onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
@@ -247,6 +254,10 @@
                 </td>
             </tr>
             <% } %>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
             <% } %>
             </tbody>
         </table>
@@ -272,9 +283,9 @@
         </div>
         <% } else { %>
         <table id="table-melee"
-               class="table-hover table-striped table-responsive table-paragraphs games-table display table-condensed">
+               class="table-hover table-responsive table-center display">
             <thead>
-            <tr style="border-bottom: 1px solid black">
+            <tr>
                 <th><input type="checkbox" id="selectAllGamesMelee">
                 </th>
                 <th>ID</th>
@@ -355,15 +366,21 @@
                 </td>
                     <%List<List<String>> playersInfo = meleePlayersInfoForGame.get(gid);
                 if(!playersInfo.isEmpty()){%>
-            <tr id="playersTableActive" hidden>
-                <th colspan="3">Game Score</th>
-                <th style="border-bottom: 1px solid black">Name</th>
-                <th style="border-bottom: 1px solid black">Submissions</th>
-                <th style="border-bottom: 1px solid black">Last Action</th>
-                <th style="border-bottom: 1px solid black">Points</th>
-                <th style="border-bottom: 1px solid black">Total Score</th>
-                <th style="border-bottom: 1px solid black"></th>
-            </tr>
+            <tr class="players-table" hidden>
+                <td colspan="8">
+                    <table class="table" style="margin: 0;">
+                        <thead>
+                        <tr>
+                            <th>Game Score</th>
+                            <th>Name</th>
+                            <th>Submissions</th>
+                            <th>Last Action</th>
+                            <th>Points</th>
+                            <th>Total Score</th>
+                            <th>Remove Player</th>
+                        </tr>
+                        </thead>
+                        <tbody>
             <%
                 }
                 boolean firstPlayer = true;
@@ -404,19 +421,16 @@
                     int totalScore = Integer.parseInt(playerInfo.get(4));
                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
             %>
-            <tr style="height: 3px;" id="playersTableActive" hidden></tr>
-            <tr id="playersTableActive" hidden>
+            <tr>
                 <%	if (firstPlayer && role.equals(Role.PLAYER)) { %>
-                <td colspan = "3"><%= gameScore %></td>
+                <td><%= gameScore %></td>
                 <%
                     firstPlayer = false;
                     } else {
                 %>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td style="border: none;"></td>
                 <%  } %>
-                <td style="border-top-left-radius: 7px;border-bottom-left-radius: 7px;">
+                <td>
                     <%= userName %>
                 </td>
                 <td><%= submissionsCount %>
@@ -427,7 +441,7 @@
                 </td>
                 <td><%= totalScore %>
                 </td>
-                <td style="border-top-right-radius: 7px;border-bottom-right-radius: 7px;">
+                <td>
 
                     <button class="btn btn-sm btn-danger" value="<%=pid + "-" + gid%>"
                             onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
@@ -439,6 +453,10 @@
                 </td>
             </tr>
             <% } %>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
             <% } %>
             </tbody>
         </table>
@@ -479,35 +497,56 @@
                 document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
             });
 
-            $('#togglePlayersActiveMultiplayer').click(function () {
-                var showPlayers = localStorage.getItem("showActivePlayersMultiplayer") === "true";
-                localStorage.setItem("showActivePlayersMultiplayer", showPlayers ? "false" : "true");
-                $('#table-multiplayer').find("[id=playersTableActive]").toggle();
-                setActivePlayersSpan()
-            });
-
-            $('#togglePlayersActiveMelee').click(function () {
-                var showPlayers = localStorage.getItem("showActivePlayersMelee") === "true";
-                localStorage.setItem("showActivePlayersMelee", showPlayers ? "false" : "true");
-                $('#table-melee').find("[id=playersTableActive]").toggle();
-                setActivePlayersSpan()
-            });
-
-            function setActivePlayersSpan() {
-                var showPlayers = localStorage.getItem("showActivePlayersMultiplayer") === "true";
-                var buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
-                var span = document.getElementById("togglePlayersActiveMultiplayerSpan");
-                if (span) {
-                    span.setAttribute("class", buttonClass);
+            const showMultiplayerDetails = function (showDetails) {
+                if (showDetails) {
+                    $('#table-multiplayer .players-table').removeAttr('hidden');
+                } else {
+                    $('#table-multiplayer .players-table').attr('hidden', '');
                 }
+            };
 
-                showPlayers = localStorage.getItem("showActivePlayersMelee") === "true";
-                buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
-                span = document.getElementById("togglePlayersActiveMeleeSpan");
+            const showMeleeDetails = function (showDetails) {
+                if (showDetails) {
+                    $('#table-melee .players-table').removeAttr('hidden');
+                } else {
+                    $('#table-melee .players-table').attr('hidden', '');
+                }
+            };
+
+            function setMultiplayerGlyphicon(showDetails) {
+                const span = document.getElementById("togglePlayersActiveMultiplayerSpan");
                 if (span) {
-                    span.setAttribute("class", buttonClass);
+                    span.setAttribute("class", showDetails
+                            ? "glyphicon glyphicon-eye-close"
+                            : "glyphicon glyphicon-eye-open");
                 }
             }
+
+            function setMeleeGlyphicon(showDetails) {
+                const span = document.getElementById("togglePlayersActiveMeleeSpan");
+                if (span) {
+                    span.setAttribute("class", showDetails
+                            ? "glyphicon glyphicon-eye-close"
+                            : "glyphicon glyphicon-eye-open");
+                }
+            }
+
+            $('#togglePlayersActiveMultiplayer').on('click', function () {
+                const playersShown = localStorage.getItem("showActivePlayersMultiplayer") === "true";
+                const showPlayers = !playersShown;
+                localStorage.setItem("showActivePlayersMultiplayer", JSON.stringify(showPlayers));
+                showMultiplayerDetails(showPlayers);
+                setMultiplayerGlyphicon(showPlayers)
+            });
+
+            $('#togglePlayersActiveMelee').on('click', function () {
+                const playersShown = localStorage.getItem("showActivePlayersMelee") === "true";
+                const showPlayers = !playersShown;
+                localStorage.setItem("showActivePlayersMelee", JSON.stringify(showPlayers));
+                showMeleeDetails(showPlayers);
+                setMeleeGlyphicon(showPlayers)
+            });
+
 
             /* Check only in the local table if all checkboxes are checked. */
             function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
@@ -532,14 +571,13 @@
             }
 
             $(document).ready(function () {
-                if (localStorage.getItem("showActivePlayersMultiplayer") === "true") {
-                    $('#table-multiplayer').find("[id=playersTableActive]").show();
-                }
-                if (localStorage.getItem("showActivePlayersMelee") === "true") {
-                    $('#table-melee').find("[id=playersTableActive]").show();
-                }
+                const showMultiplayer = localStorage.getItem("showActivePlayersMultiplayer") === "true";
+                showMultiplayerDetails(showMultiplayer);
+                setMultiplayerGlyphicon(showMultiplayer);
 
-                setActivePlayersSpan();
+                const showMelee = localStorage.getItem("showActivePlayersMelee") === "true";
+                showMeleeDetails(showMelee);
+                setMeleeGlyphicon(showMelee);
             });
 
             $('.modal').on('shown.bs.modal', function () {

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<powermock.version>1.7.4</powermock.version>
+		<powermock.version>2.0.9</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
 		<slf4j.version>1.7.26</slf4j.version>
 
@@ -295,7 +295,7 @@
 					<plugin>
 						<groupId>org.jacoco</groupId>
 						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.4</version>
+						<version>0.8.6</version>
 						<configuration>
 							<excludes>
 								<exclude>target/classes/data/generated_mutants_2016.zip@**/*</exclude>
@@ -360,12 +360,12 @@
 										<requireFilesExist>
 											<files>
 												<file>src/test/resources/itests/lib/hamcrest-all-1.3.jar</file>
-												<file>src/test/resources/itests/lib/junit-4.12.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.agent-0.7.7.201606060606.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.ant-0.7.7.201606060606.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.core-0.7.7.201606060606.jar</file>
-												<file>src/test/resources/itests/lib/org.jacoco.report-0.7.7.201606060606.jar</file>
-												<file>src/test/resources/itests/lib/mockito-all-1.9.5.jar</file>
+												<file>src/test/resources/itests/lib/junit-4.13.1.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.agent-0.8.6.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.ant-0.8.6.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.core-0.8.6.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.report-0.8.6.jar</file>
+												<file>src/test/resources/itests/lib/mockito-all-1.10.19.jar</file>
 											</files>
 										</requireFilesExist>
 									</rules>
@@ -514,7 +514,7 @@
 		<!-- Context and Dependency Injection (CDI) -->
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
-			<artifactId>weld-servlet-shaded</artifactId>
+			<artifactId>weld-servlet-core</artifactId>
 			<version>3.0.5.Final</version>
 		</dependency>
 		<!-- Not sure if this creates a conflict -->
@@ -615,7 +615,7 @@
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.20.0-GA</version>
+			<version>3.27.0-GA</version>
 		</dependency>
 
 		<dependency>
@@ -627,7 +627,7 @@
 		<dependency>
 			<groupId>org.jacoco</groupId>
 			<artifactId>org.jacoco.core</artifactId>
-			<version>0.7.7.201606060606</version>
+			<version>0.8.6</version>
 		</dependency>
 		<!-- End Java Source Code / Coverage Analysis -->
 
@@ -790,9 +790,15 @@
 		<!-- This provides mockito 1.10.19 -->
 		<dependency>
 			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
+			<artifactId>powermock-api-mockito2</artifactId>
 			<version>${powermock.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.objenesis</groupId>
+					<artifactId>objenesis</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- Used for database tests. TODO: Shall we keep this around now that we use docker ? -->
@@ -819,6 +825,12 @@
 			<artifactId>selenium-java</artifactId>
 			<version>3.11.0</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.bytebuddy</groupId>
+					<artifactId>byte-buddy</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

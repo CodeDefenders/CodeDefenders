@@ -26,11 +26,14 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
+<link href="${pageContext.request.contextPath}/css/uploadcut.css" rel="stylesheet">
+
 <div>
-	<div class="w-100 up">
+    <div class="container">
 		<h2>Upload Class</h2>
 		<div id="divUpload">
-			<form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="form-upload" method="post" enctype="multipart/form-data">
+			<form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="form-upload" method="post" enctype="multipart/form-data"
+                  style="padding: 15px; margin: 0 auto; max-width: 60rem;">
 				<span class="label label-danger" id="invalid_alias" style="color: white;visibility: hidden">Name with no whitespaces or special characters.</span>
 				<input id="classAlias" onkeyup="validateAlias()" name="classAlias" type="text" class="form-control" placeholder="Optional class alias, otherwise class name is used" >
 				<!--
@@ -167,7 +170,7 @@
 			</form>
 		</div>
 	</div>
-	<div class="w-100">
+	<div class="container">
 		<h2>Uploaded Classes</h2>
 		<!-- Deactivated because single player mode is not activated currently
 		<span>Preparing classes for the single player mode (action 'Prepare AI') may take a long time.</span>
@@ -178,7 +181,7 @@
 				Map<Integer, Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
 				Map<Integer, Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
 			%>
-			<table class="table table-striped table-hover table-responsive table-paragraphs games-table" id = "tableUploadedClasses">
+			<table class="table table-striped table-hover table-responsive table-center" id = "tableUploadedClasses">
 				<thead>
 				<tr>
 					<th class="col-sm-1 col-sm-offset-2">ID</th>
@@ -231,7 +234,7 @@
 							<%--
 							<td>
 								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() + Paths.AI_PREPARER%>" method="post" >
-									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
+									<button type="submit" class="btn btn-primary btn-game pull-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
 											<% //if (PrepareAI.isPrepared(c)) { %> disabled <% //} %>>
 										Prepare AI
 									</button>

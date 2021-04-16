@@ -33,15 +33,7 @@ import org.slf4j.LoggerFactory;
  * Created by thomas on 06/03/2017.
  */
 public class Event {
-
-    private static final HashMap<Role, String> ROLE_COLORS = new HashMap<>();
     protected static final Logger logger = LoggerFactory.getLogger(Event.class);
-
-    static {
-        ROLE_COLORS.put(Role.ATTACKER, "#FF0000");
-        ROLE_COLORS.put(Role.DEFENDER, "#0000FF");
-        ROLE_COLORS.put(Role.OBSERVER, "#00FF00");
-    }
 
     @Override
     public String toString() {
@@ -119,10 +111,21 @@ public class Event {
 
             String userLabel = (user == null) ? "Unknown"
                     : (user.name.equals(currentUserName)) ? "You" : user.name;
-            String color = (user == null) ? "#000000" : ROLE_COLORS.get(role);
+
+            String roleClass;
+            switch (role) {
+                case ATTACKER:
+                    roleClass = " class=\"fg-attacker\"";
+                    break;
+                case DEFENDER:
+                    roleClass = " class=\"fg-defender\"";
+                    break;
+                default:
+                    roleClass = "";
+            }
 
             procMessage = procMessage.replace("@event_user",
-                    "<span style='color: " + color + "'>@" + userLabel + "</span>");
+                    "<span" + roleClass + ">@" + userLabel + "</span>");
         }
 
         if (emphasise) {

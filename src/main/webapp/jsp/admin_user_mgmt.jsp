@@ -27,7 +27,7 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminUserMgmt"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
@@ -89,7 +89,7 @@
         <input type="hidden" name="formType" value="manageUsers">
 
         <table id="tableUsers"
-               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-center dataTable display">
             <thead>
             <tr>
                 <th>ID</th>

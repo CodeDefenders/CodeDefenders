@@ -122,6 +122,10 @@
     font-size: 15px;
     float: left;
 }
+/* The line-height broke in MR !603. Not sure what caused it to break, but this fixes it for now.  */
+.timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon .fa {
+    line-height: 45px;
+}
 .timeline-centered .timeline-entry .timeline-entry-inner .timeline-icon.bg-primary {
     background-color: #dc6767;
     color: #fff;
