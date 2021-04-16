@@ -514,7 +514,7 @@
 		<!-- Context and Dependency Injection (CDI) -->
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
-			<artifactId>weld-servlet-shaded</artifactId>
+			<artifactId>weld-servlet-core</artifactId>
 			<version>3.0.5.Final</version>
 		</dependency>
 		<!-- Not sure if this creates a conflict -->
