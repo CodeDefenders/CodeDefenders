@@ -53,7 +53,6 @@ import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;

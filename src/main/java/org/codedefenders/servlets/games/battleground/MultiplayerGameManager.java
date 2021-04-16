@@ -54,7 +54,6 @@ import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;

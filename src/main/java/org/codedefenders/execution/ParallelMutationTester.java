@@ -30,11 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
-import javax.enterprise.inject.Alternative;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -70,7 +67,8 @@ public class ParallelMutationTester extends MutationTester //
     private ExecutorService testExecutorThreadPool;
 
     // TODO Move the Executor service before useMutantCoverage
-    public ParallelMutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
+    public ParallelMutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
+            boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
         super(backend, userRepo, eventDAO, useMutantCoverage);
         this.testExecutorThreadPool = testExecutorThreadPool;
     }

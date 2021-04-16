@@ -63,11 +63,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -76,7 +74,7 @@ import static org.junit.Assume.assumeTrue;
  */
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class, CodeValidator.class })
+@PrepareForTest({DatabaseConnection.class, CodeValidator.class})
 public class DatabaseTest {
     private static long START_TIME = (int) 1e15;
     private static long END_TIME = (int) 1e30;
@@ -203,9 +201,9 @@ public class DatabaseTest {
 
         MultiplayerGame multiplayerGameFromDB = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
         assertEquals(multiplayerGameFromDB.getPrize(), multiplayerGame.getPrize(), 1e-10);
-        assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest() , multiplayerGame.getMaxAssertionsPerTest());
+        assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest(), multiplayerGame.getMaxAssertionsPerTest());
         assertEquals(multiplayerGameFromDB.isChatEnabled(), multiplayerGame.isChatEnabled());
-        assertEquals(multiplayerGameFromDB.getMutantValidatorLevel() , multiplayerGame.getMutantValidatorLevel());
+        assertEquals(multiplayerGameFromDB.getMutantValidatorLevel(), multiplayerGame.getMutantValidatorLevel());
     }
 
     //FIXME
@@ -315,7 +313,7 @@ public class DatabaseTest {
                 Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
         assertTrue(mutant1.insert());
         assertTrue(mutant2.insert());
-        Mutant[] ml = { mutant1, mutant2 };
+        Mutant[] ml = {mutant1, mutant2};
         assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
         assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml));
     }
@@ -390,11 +388,11 @@ public class DatabaseTest {
         assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
         int score = mutant1.getScore();
         // Prevent score update
-        mutant1.setScore( 10 );
+        mutant1.setScore(10);
         assertFalse(mutant1.update());
         //
 
-        Mutant storedMutant = MutantDAO.getMutantById( mutant1.getId() );
+        Mutant storedMutant = MutantDAO.getMutantById(mutant1.getId());
         assertEquals("Score does not match", score, storedMutant.getScore());
         //
         assertEquals(mutant1, storedMutant);
@@ -482,7 +480,7 @@ public class DatabaseTest {
         int pidAttacker = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
         int cutID = cut1.getId();
 
-        Mutant mutant1 = new Mutant(999,  cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+        Mutant mutant1 = new Mutant(999, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
                 Mutant.Equivalence.ASSUMED_NO, 1, 99, pidAttacker);
         assertTrue(mutant1.insert());
 

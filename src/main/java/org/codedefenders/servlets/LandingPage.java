@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.service.UserService;

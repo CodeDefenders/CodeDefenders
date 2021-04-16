@@ -23,13 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.enterprise.inject.Alternative;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -75,7 +72,8 @@ public class MutationTester implements IMutationTester {
 
     protected boolean useMutantCoverage;
 
-    public MutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO, boolean useMutantCoverage) {
+    public MutationTester(BackendExecutorService backend, UserRepository userRepo, EventDAO eventDAO,
+            boolean useMutantCoverage) {
         this.backend = backend;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
@@ -357,7 +355,7 @@ public class MutationTester implements IMutationTester {
         final TargetExecution executedTarget = backend.testMutant(mutant, test);
 
         Integer gameId = test.getGameId();
-        String scoringMessage = String.join(":", new String[] { "" + test.getId(), "" + mutant.getId() });
+        String scoringMessage = String.join(":", new String[]{"" + test.getId(), "" + mutant.getId()});
         Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
         // If the test did NOT pass, the mutant was detected and should be
