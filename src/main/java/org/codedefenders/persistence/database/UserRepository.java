@@ -49,7 +49,7 @@ public class UserRepository {
 
         userIdForPlayerIdCache = CacheBuilder.newBuilder()
                 .maximumSize(400)
-                .recordStats()
+                //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
                 .build();
     }
 

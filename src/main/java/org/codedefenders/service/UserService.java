@@ -46,7 +46,7 @@ public class UserService {
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
                 .maximumSize(200)
-                .recordStats()
+                //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
                 .build();
     }
 
