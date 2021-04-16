@@ -31,6 +31,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.dbutils.QueryRunner;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.codedefenders.configuration.Configuration;
 import org.flywaydb.core.Flyway;
@@ -45,7 +46,8 @@ import com.mysql.cj.jdbc.Driver;
 public class ConnectionFactory {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
-    BasicDataSource dataSource;
+    private BasicDataSource dataSource;
+    private final QueryRunner queryRunner;
 
     @Inject
     public ConnectionFactory(Configuration config) {
@@ -63,6 +65,11 @@ public class ConnectionFactory {
             dataSource.setMaxWaitMillis(config.getDatabaseConnectionTimeout());
 
             migrate(config.getDbName());
+
+            queryRunner = new QueryRunner(dataSource);
+        } else {
+            // TODO: We should not reach this point
+            queryRunner = null;
         }
     }
 
@@ -83,6 +90,10 @@ public class ConnectionFactory {
 
     public Connection getConnection() throws SQLException {
         return dataSource.getConnection();
+    }
+
+    public QueryRunner getQueryRunner() {
+        return queryRunner;
     }
 
     private void migrate(String dbName) {
