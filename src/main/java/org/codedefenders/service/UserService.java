@@ -35,7 +35,6 @@ import com.google.common.cache.CacheBuilder;
 @ApplicationScoped
 public class UserService {
 
-    // TODO: This could use some tuning
     private final Cache<Integer, SimpleUser> simpleUserForUserIdCache;
 
     private final UserRepository userRepo;

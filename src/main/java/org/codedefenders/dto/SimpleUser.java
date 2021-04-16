@@ -19,6 +19,8 @@
 
 package org.codedefenders.dto;
 
+import java.util.Objects;
+
 import com.google.gson.annotations.Expose;
 
 /**
@@ -33,5 +35,22 @@ public class SimpleUser {
     public SimpleUser(int id, String name) {
         this.id = id;
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        SimpleUser user = (SimpleUser) other;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

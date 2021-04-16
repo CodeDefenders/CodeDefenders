@@ -38,7 +38,6 @@ import com.google.common.cache.CacheBuilder;
 @ApplicationScoped
 public class UserRepository {
 
-    // TODO: This could use some tuning:
     private final Cache<Integer, Integer> userIdForPlayerIdCache;
 
     private final ConnectionFactory connectionFactory;

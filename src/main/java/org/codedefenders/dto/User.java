@@ -19,6 +19,8 @@
 
 package org.codedefenders.dto;
 
+import java.util.Objects;
+
 import org.codedefenders.model.KeyMap;
 
 /**
@@ -42,5 +44,22 @@ public class User extends SimpleUser {
         this.emailValidated = emailValidated;
         this.allowContact = allowContact;
         this.keyMap = keyMap;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        User user = (User) other;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
