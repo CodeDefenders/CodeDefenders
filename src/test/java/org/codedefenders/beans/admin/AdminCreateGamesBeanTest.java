@@ -20,13 +20,13 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,14 +50,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
         AdminDAO.class,
         GameDAO.class,
         MultiplayerGameDAO.class,
-        MeleeGameDAO.class,
-        UserDAO.class
+        MeleeGameDAO.class
 })
 public class AdminCreateGamesBeanTest {
     private AdminCreateGamesBean adminCreateGamesBean;
     private StagedGameList stagedGameList;
 
     private HashMap<Integer, UserInfo> userInfos;
+
+    private UserRepository userRepo;
 
     @Before
     public void mockDatabase() {
@@ -67,7 +68,6 @@ public class AdminCreateGamesBeanTest {
         PowerMockito.mockStatic(GameDAO.class);
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(MeleeGameDAO.class);
-        PowerMockito.mockStatic(UserDAO.class);
         PowerMockito.mockStatic(AdminCreateGamesBean.class);
     }
 
@@ -85,8 +85,9 @@ public class AdminCreateGamesBeanTest {
         MessagesBean messagesBean = PowerMockito.mock(MessagesBean.class);
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);
         EventDAO eventDAO = PowerMockito.mock(EventDAO.class);
+        userRepo = PowerMockito.mock(UserRepository.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO);
+        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
@@ -223,7 +224,7 @@ public class AdminCreateGamesBeanTest {
 
         PowerMockito.when(MultiplayerGameDAO.storeMultiplayerGame(Matchers.any(MultiplayerGame.class))).thenReturn(0);
         PowerMockito.when(GameDAO.addPlayerToGame(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(Role.class))).thenReturn(true);
-        PowerMockito.when(UserDAO.getUserById(Matchers.anyInt())).thenReturn(new UserEntity(""));
+        PowerMockito.when(userRepo.getUserById(Matchers.anyInt())).thenReturn(new UserEntity(""));
         adminCreateGamesBean = PowerMockito.spy(adminCreateGamesBean);
 
         adminCreateGamesBean.createStagedGames(stagedGames);
@@ -326,10 +327,10 @@ public class AdminCreateGamesBeanTest {
     }
 
     private void testAssignRoles(RoleAssignmentMethod roleAssignmentMethod,
-                                 Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
-                                 int attackersPerGame, int defendersPerGame,
-                                 int expectedNumAttackers, int expectedNumDefenders,
-                                 Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
+            Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
+            int attackersPerGame, int defendersPerGame,
+            int expectedNumAttackers, int expectedNumDefenders,
+            Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
         int numUsers = users.size() + attackers.size() + defenders.size();
         Set<UserInfo> usersBefore = new HashSet<>(users);
         Set<UserInfo> attackersBefore = new HashSet<>(attackers);
@@ -351,18 +352,18 @@ public class AdminCreateGamesBeanTest {
     }
 
     private void testAssignRoles_Random(Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
-                                        int attackersPerGame, int defendersPerGame,
-                                        int expectedNumAttackers, int expectedNumDefenders) {
+            int attackersPerGame, int defendersPerGame,
+            int expectedNumAttackers, int expectedNumDefenders) {
         testAssignRoles(RoleAssignmentMethod.RANDOM, users, attackers, defenders, attackersPerGame, defendersPerGame,
                 expectedNumAttackers, expectedNumDefenders, new HashSet<>(), new HashSet<>());
     }
 
     private void testAssignRoles_Opposite(Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
-                                        int attackersPerGame, int defendersPerGame,
-                                        int expectedNumAttackers, int expectedNumDefenders,
-                                        Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
-        testAssignRoles(RoleAssignmentMethod.OPPOSITE, users, attackers, defenders, attackersPerGame,defendersPerGame,
-            expectedNumAttackers, expectedNumDefenders, expectedAttackers, expectedDefenders);
+            int attackersPerGame, int defendersPerGame,
+            int expectedNumAttackers, int expectedNumDefenders,
+            Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
+        testAssignRoles(RoleAssignmentMethod.OPPOSITE, users, attackers, defenders, attackersPerGame, defendersPerGame,
+                expectedNumAttackers, expectedNumDefenders, expectedAttackers, expectedDefenders);
     }
 
     @Test

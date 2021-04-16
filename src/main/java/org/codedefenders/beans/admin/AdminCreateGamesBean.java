@@ -71,17 +71,16 @@ public class AdminCreateGamesBean implements Serializable {
     private final MessagesBean messages;
     private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
+    private final UserRepository userRepo;
 
     @Inject
-    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils, EventDAO eventDAO) {
+    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils, EventDAO eventDAO, UserRepository userRepo) {
         this.login = login;
         this.messages = messages;
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
+        this.userRepo = userRepo;
     }
-
-    @Inject
-    private UserRepository userRepo;
 
     /**
      * The staged game list managed by the bean.
