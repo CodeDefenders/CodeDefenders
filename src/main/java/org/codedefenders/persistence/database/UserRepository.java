@@ -38,14 +38,20 @@ import com.google.common.cache.CacheBuilder;
 @ApplicationScoped
 public class UserRepository {
 
-    @Inject
-    private ConnectionFactory connectionFactory;
-
     // TODO: This could use some tuning:
-    private final Cache<Integer, Integer> playerIdCache = CacheBuilder.newBuilder()
-            .maximumSize(100)
-            .recordStats()
-            .build();
+    private final Cache<Integer, Integer> userIdForPlayerIdCache;
+
+    private final ConnectionFactory connectionFactory;
+
+    @Inject
+    public UserRepository(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+
+        userIdForPlayerIdCache = CacheBuilder.newBuilder()
+                .maximumSize(400)
+                .recordStats()
+                .build();
+    }
 
     public UserEntity getUserById(int userId) {
         return UserDAO.getUserById(userId);
@@ -69,7 +75,7 @@ public class UserRepository {
         try {
             // If the key wasn't in the "easy to compute" group, we need to
             // do things the hard way.
-            return playerIdCache.get(playerId, () -> {
+            return userIdForPlayerIdCache.get(playerId, () -> {
                 Integer userId;
                 try (Connection conn = connectionFactory.getConnection()) {
                     userId = queryRunner.query(conn, query, new ScalarHandler<>(), playerId);

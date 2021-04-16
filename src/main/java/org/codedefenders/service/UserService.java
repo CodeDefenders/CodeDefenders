@@ -19,7 +19,6 @@
 
 package org.codedefenders.service;
 
-import java.sql.SQLException;
 import java.util.concurrent.ExecutionException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -37,13 +36,19 @@ import com.google.common.cache.CacheBuilder;
 public class UserService {
 
     // TODO: This could use some tuning
-    private final Cache<Integer, SimpleUser> simpleUserCache = CacheBuilder.newBuilder()
-            .maximumSize(200)
-            .recordStats()
-            .build();
+    private final Cache<Integer, SimpleUser> simpleUserForUserIdCache;
+
+    private final UserRepository userRepo;
 
     @Inject
-    UserRepository userRepo;
+    public UserService(UserRepository userRepo) {
+        this.userRepo = userRepo;
+
+        simpleUserForUserIdCache = CacheBuilder.newBuilder()
+                .maximumSize(200)
+                .recordStats()
+                .build();
+    }
 
     public User getUserById(int userId) {
         UserEntity user = userRepo.getUserById(userId);
@@ -58,7 +63,7 @@ public class UserService {
         try {
             // If the key wasn't in the "easy to compute" group, we need to
             // do things the hard way.
-            return simpleUserCache.get(userId, () -> {
+            return simpleUserForUserIdCache.get(userId, () -> {
                 UserEntity user = userRepo.getUserById(userId);
                 if (user == null) {
                     throw new Exception();
