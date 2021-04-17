@@ -21,11 +21,6 @@
 /* Child table styles (for child tables of like in admin analytics)
 ----------------------------------------------------------------------------- */
 
-/* Indent for row details */
-table .indented {
-    margin-left: 50px;
-}
-
 /* Child table margins and padding */
 .table-child-details {
     padding-top: 1em;
@@ -58,4 +53,16 @@ table .indented {
 }
 .table-child-details > tbody > tr:last-child {
     border-bottom: none;
+}
+
+/* Style for the toggle button of child tables.
+----------------------------------------------------------------------------- */
+
+.toggle-details {
+    cursor: pointer;
+    color: #6c757d; /* Color of .text-muted in Bootstrap 5. */
+    transition: color .15s ease-in-out;
+}
+.toggle-details:hover {
+    color: black;
 }

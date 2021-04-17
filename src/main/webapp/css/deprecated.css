@@ -5,3 +5,8 @@
 .btn-bold {
     font-weight: 700;
 }
+
+/* Indent for row details */
+table .indented {
+    margin-left: 50px;
+}

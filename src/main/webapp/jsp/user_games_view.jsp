@@ -58,7 +58,8 @@
     <table id="my-games" class="table table-responsive table-center">
         <thead>
             <tr>
-                <th>ID</th>
+                <th style="width: 3rem;"></th>
+                <th style="width: 4rem;">ID</th>
                 <th>Creator</th>
                 <th>Class</th>
                 <th>Players</th>
@@ -70,7 +71,7 @@
             <c:choose>
                 <c:when test="${empty activeGames}">
                     <tr>
-                        <td colspan="100%"> You are currently not active in any games.</td>
+                        <td colspan="7"> You are currently not active in any games.</td>
                     </tr>
                 </c:when>
                 <c:otherwise>
@@ -85,10 +86,11 @@
                     %>
                         <tr id="<%="game-"+gameId%>">
                             <td id="toggle-game-<%=gameId%>" class="toggle-details">
-                                <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right"></span><%=gameId%>
+                                <i class="toggle-details-icon fa fa-chevron-right"></i>
                             </td>
-                            <td class="col-sm-1"><%=info.creatorName()%></td>
-                            <td class="col-sm-2">
+                            <td><%=gameId%></td>
+                            <td><%=info.creatorName()%></td>
+                            <td>
                                 <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=info.cutAlias()%></a>
                                 <div id="modalCUTFor<%=gameId%>" class="modal fade" role="dialog">
                                     <div class="modal-dialog">
@@ -322,8 +324,9 @@
                         %>
                             <tr id="<%="game-"+gameId%>">
                                 <td id="toggle-game-<%=gameId%>" class="toggle-details">
-                                    <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span><%=gameId%>
+                                    <i class="toggle-details-icon fa fa-chevron-right"></i>
                                 </td>
+                                <td><%=gameId%></td>
                                 <td><%=info.creatorName()%></td>
                                 <td>
                                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=info.cutAlias()%></a>
@@ -463,12 +466,13 @@
         if (gamesJoinable) {
     %>
 
-        <h2 class="mt-4 mb-3">Open Battleground Games</h2>
+        <h2 class="mt-5 mb-3">Open Battleground Games</h2>
         <table id="tableOpenBattleground"
                class="table table-responsive table-center">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th style="width: 3rem;"></th>
+                    <th style="width: 4rem;">ID</th>
                     <th>Creator</th>
                     <th>Class</th>
                     <th>Attackers</th>
@@ -480,7 +484,7 @@
                 <c:choose>
                     <c:when test="${empty openMultiplayerGames}">
                         <tr>
-                            <td colspan="100%"> There are currently no open battleground games.</td>
+                            <td colspan="7"> There are currently no open battleground games.</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -494,9 +498,9 @@
                         %>
                             <tr id="game-<%=gameId%>">
                                 <td id="toggle-game-<%=gameId%>" class="toggle-details">
-                                    <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span>
-                                    <%=gameId%>
+                                    <i class="toggle-details-icon fa fa-chevron-right"></i>
                                 </td>
+                                <td><%=gameId%></td>
                                 <td><%=info.creatorName()%></td>
                                 <td>
                                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=info.cutAlias()%></a>
@@ -673,11 +677,12 @@
             </tbody>
         </table>
 
-        <h2 class="mt-4 mb-3">Open Melee Games</h2>
+        <h2 class="mt-5 mb-3">Open Melee Games</h2>
         <table id="tableOpenMelee"
                class="table table-responsive table-center">
             <tr>
-                <th>ID</th>
+                <th style="width: 3rem;"></th>
+                <th style="width: 4rem;">ID</th>
                 <th>Creator</th>
                 <th>Class</th>
                 <th>Players</th>
@@ -686,7 +691,7 @@
             <c:choose>
                 <c:when test="${empty openMeleeGames}">
                     <tr>
-                        <td colspan="100%"> There are currently no open melee games.</td>
+                        <td colspan="6"> There are currently no open melee games.</td>
                     </tr>
                 </c:when>
                 <c:otherwise>
@@ -698,9 +703,9 @@
                     %>
                         <tr id="<%="game-"+info.gameId()%>">
                             <td id="toggle-game-<%=gameId%>" class="toggle-details">
-                                <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span>
-                                <%=gameId%>
+                                <i class="toggle-details-icon fa fa-chevron-right"></i>
                             </td>
+                            <td><%=gameId%></td>
                             <td><%=info.creatorName()%></td>
                             <td>
                                 <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=info.gameId()%>">
@@ -814,15 +819,17 @@
             });
 
             $('table td.toggle-details').on('click', function () {
-                let id = '.' + $(this).attr('id');
-                if ($(id).is(':visible')) {
-                    $(this).find('span').removeClass('glyphicon-chevron-down');
-                    $(this).find('span').addClass('glyphicon-chevron-right');
-                    $(id).hide()
+                const details = $('.' + $(this).attr('id'));
+                const icon = $(this).find('.toggle-details-icon')
+
+                if (details.is(':visible')) {
+                    icon.removeClass('fa-chevron-down');
+                    icon.addClass('fa-chevron-right');
+                    details.hide()
                 } else {
-                    $(this).find('span').removeClass('glyphicon-chevron-right');
-                    $(this).find('span').addClass('glyphicon-chevron-down');
-                    $(id).show()
+                    icon.removeClass('fa-chevron-right');
+                    icon.addClass('fa-chevron-down');
+                    details.show()
                 }
             });
 
