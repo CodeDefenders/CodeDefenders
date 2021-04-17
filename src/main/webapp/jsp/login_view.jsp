@@ -296,7 +296,7 @@
         passwordInput.addEventListener('input', validateConfirmPassword);
         confirmPasswordInput.addEventListener('input', validateConfirmPassword);
 
-        new bootstrap.Modal(document.getElementById('changepw-modal')).show();
+        new bootstrap.Modal('#changepw-modal').show();
     });
 </script>
 
