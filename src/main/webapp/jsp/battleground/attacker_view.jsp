@@ -120,7 +120,7 @@
 
         <% if (showTestAccordion) { %>
             <div id="tests-div">
-                <h3>JUnit tests </h3>
+                <h3>JUnit Tests</h3>
                 <t:test_accordion/>
             </div>
         <% } %>

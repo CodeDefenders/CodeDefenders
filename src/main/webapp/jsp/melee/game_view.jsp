@@ -62,11 +62,11 @@
     history.setPlayers(Collections.singletonList(player), otherPlayers);
 %>
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
-
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
 <jsp:include page="/jsp/melee/header_game.jsp"/>
+
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>

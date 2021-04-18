@@ -69,8 +69,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
-
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 <%
     classViewer.setClassCode(game.getCUT());
@@ -132,6 +130,8 @@
 
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
 
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
@@ -146,7 +146,7 @@
         </div>
 
         <div id="tests-div">
-            <h3>JUnit tests </h3>
+            <h3>JUnit Tests</h3>
             <t:test_accordion/>
         </div>
     </div>

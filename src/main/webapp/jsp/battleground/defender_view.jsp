@@ -147,7 +147,7 @@
     </div>
 
     <div class="col-md-6">
-        <h3>JUnit tests </h3>
+        <h3>JUnit Tests</h3>
         <t:test_accordion/>
     </div>
 </div>

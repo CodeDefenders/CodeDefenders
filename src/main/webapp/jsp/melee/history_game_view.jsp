@@ -109,9 +109,9 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
-
 <jsp:include page="/jsp/melee/header_game.jsp"/>
+
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
@@ -126,7 +126,7 @@
         </div>
 
         <div id="tests-div">
-            <h3>JUnit tests </h3>
+            <h3>JUnit Tests</h3>
             <t:test_accordion/>
         </div>
     </div>

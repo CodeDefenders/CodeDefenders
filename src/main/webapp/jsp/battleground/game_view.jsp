@@ -51,9 +51,9 @@
     history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
-
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
+
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
