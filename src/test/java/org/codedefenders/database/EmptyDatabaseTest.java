@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 public class EmptyDatabaseTest {
 
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     /**
      * Checks whether the {@code empty.db} script creates an empty database.

@@ -39,7 +39,7 @@ import static org.junit.Assert.assertNotNull;
 @RunWith(PowerMockRunner.class)
 public class CreatePreparedStatementTest {
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     @Test
     public void testCreatePreparedStatementSingle() throws Exception {

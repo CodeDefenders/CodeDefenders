@@ -78,7 +78,7 @@ public class ExecutionTest {
     private IMutationTester mutationTester;
 
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     // PROBLEM: @ClassRule cannot be used with PowerMock ...
     private static File codedefendersHome;

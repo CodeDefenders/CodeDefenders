@@ -18,20 +18,32 @@
  */
 package org.codedefenders.rules;
 
-import org.junit.rules.ExternalResource;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbutils.QueryRunner;
+import org.codedefenders.database.ConnectionFactory;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.junit.rules.ExternalResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ch.vorburger.exec.ManagedProcessException;
 import ch.vorburger.mariadb4j.DB;
 import ch.vorburger.mariadb4j.DBConfigurationBuilder;
 
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
+
 /**
  * @author Jose Rojas, Alessio Gambi
  */
 public class DatabaseRule extends ExternalResource {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseRule.class);
 
     // These ensures we do not mess up with the timeZone problem during integration testing
     private static final String[] DEFAULT_OPTIONS = new String[]{
@@ -42,71 +54,86 @@ public class DatabaseRule extends ExternalResource {
             "generateSimpleParameterMetadata=true"
     };
 
-    private DB db;
-    private DBConfigurationBuilder config;
+    private DB embeddedDatabase;
+    private String dbConnectionUrl;
 
-    private String dbName;
-    private String username;
-    private String password;
-    private String initFile;
-    private String connectionOptions;
+    private final String dbName = "codedefenders";
+    private final String username = "root";
+    private final String password = "";
 
-    public DatabaseRule(String dbName, String initFile, String[] options) {
-        this(dbName, "root", "", initFile, options);
+    private String connectionOptions = "";
+
+    public DatabaseRule() {
+        this(DEFAULT_OPTIONS);
     }
 
-    public DatabaseRule(String dbName, String initFile) {
-        this(dbName, "root", "", initFile, DEFAULT_OPTIONS);
-    }
-
-    public DatabaseRule(String dbName, String username, String password, String initFile, String[] connectionOptions) {
-        this.dbName = dbName;
-        this.initFile = initFile;
-        StringBuilder bob = new StringBuilder();
-        if (connectionOptions != null && connectionOptions.length > 0) {
-            bob.append("?");
-            for (String option : connectionOptions) {
-                bob.append(option).append("&");
-            }
-            // Remove trailing "&"
-            bob.deleteCharAt(bob.lastIndexOf("&"));
+    public DatabaseRule(String[] options) {
+        if (options != null && options.length > 0) {
+            connectionOptions = "?" + String.join("&", options);
         }
-        this.connectionOptions = bob.toString();
+    }
+
+    public ConnectionFactory getConnectionFactory() throws SQLException {
+        QueryRunner queryRunner = new QueryRunner(getDataSource());
+
+        ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
+        when(connectionFactory.getConnection()).thenAnswer(invocation -> getConnection());
+        when(connectionFactory.getQueryRunner()).thenReturn(queryRunner);
+        return connectionFactory;
+    }
+
+    public DataSource getDataSource() throws SQLException {
+        DataSource dataSourceMock = mock(DataSource.class);
+        when(dataSourceMock.getConnection()).thenAnswer(invocation -> getConnection());
+        return dataSourceMock;
+    }
+
+    public Connection getConnection() throws SQLException {
+        logger.debug(dbConnectionUrl);
+        return DriverManager.getConnection(dbConnectionUrl, username, password);
     }
 
     @Override
     public void before() throws Exception {
-        config = DBConfigurationBuilder.newBuilder();
-        config.addArg("--user=root");
-        config.setPort(0); // 0 => autom. detect free port
-        db = DB.newEmbeddedDB(config.build());
-        db.start();
-        db.createDB(dbName);
-        db.source(initFile, username, password, dbName);
+        logger.debug("Started Embedded Database creation");
+
+        DBConfigurationBuilder databaseConfig = DBConfigurationBuilder.newBuilder();
+        // This is necessary to allow the database to run as root, which can be the case if these tests are run inside
+        // an (docker) container e.g. in the CI.
+        databaseConfig.addArg("--user=root");
+        // Setting this to 0 will let the DB to dynamically pick an open port
+        // For debugging the database, it can be helpful to change this to a static value
+        databaseConfig.setPort(0);
+
+        embeddedDatabase = DB.newEmbeddedDB(databaseConfig.build());
+        embeddedDatabase.start();
+        embeddedDatabase.createDB(dbName);
+
+        dbConnectionUrl = databaseConfig.getURL(dbName) + connectionOptions;
+        logger.debug("Finished Embedded Database creation");
+
+        // Load the
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        logger.debug("Started Database Migrations");
+        FluentConfiguration flywayConfig = Flyway.configure();
+        flywayConfig.dataSource(dbConnectionUrl, username, password);
+        flywayConfig.locations("classpath:db/migrations");
+
+        Flyway flyway = flywayConfig.load();
+        // For the Tests we always clean the database
+        flyway.clean();
+        flyway.migrate();
+        logger.debug("Finished Database Migrations");
     }
 
     @Override
     public void after() {
         try {
-            db.stop();
+            logger.debug("Stopping Embedded Database");
+            embeddedDatabase.stop();
         } catch (ManagedProcessException e) {
             // quiet
         }
-    }
-
-    // we can add additional connectionOptions to the URL as
-    // parameters:+"[?][parameter=value[&parameter=value]]"
-    // for example, to return the updated query - not the matched ones
-    // +"?""useAffectedRows=true"
-    public Connection getConnection() throws SQLException {
-        try {
-            // Phil: required to load driver for consecutive tests using the database rule.
-            // Otherwise thrown: "java.sql.SQLException: No suitable driver found for jdbc:mysql://localhost:33095/..."
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        String connectionURL = config.getURL(dbName) + connectionOptions;
-        return DriverManager.getConnection(connectionURL, username, password);
     }
 }

@@ -115,7 +115,7 @@ public class DatabaseTest {
     // This will re-create the same DB from scratch every time... is this really
     // necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     @Before
     public void mockDBConnections() throws Exception {

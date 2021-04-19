@@ -85,7 +85,7 @@ public class ClassUploadManagerTest {
     private HttpSession session;
 
     @Rule // Look for the file on the classpath
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     // PROBLEM: @ClassRule cannot be used with PowerMock ...
     private static File codedefendersHome;

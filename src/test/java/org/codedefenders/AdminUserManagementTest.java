@@ -51,7 +51,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ AdminDAO.class, EmailUtils.class, DatabaseConnection.class })
+@PrepareForTest({AdminDAO.class, EmailUtils.class, DatabaseConnection.class})
 public class AdminUserManagementTest {
 
     /**
@@ -119,7 +119,7 @@ public class AdminUserManagementTest {
     // String email = propertiesCaptor.getValue();
     // }
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     @Before
     public void mockDBConnections() throws Exception {

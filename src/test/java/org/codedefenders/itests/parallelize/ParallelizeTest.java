@@ -102,7 +102,7 @@ public class ParallelizeTest {
     // This really should be only per class, not per test... in each test we can
     // truncate the tables ?
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     private static File codedefendersHome;
 
