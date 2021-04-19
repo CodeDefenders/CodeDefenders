@@ -29,27 +29,36 @@
     generated through JavaScript.
 --%>
 
-<style type="text/css">
+<style>
     <%-- Prefix all classes with "ta-" to avoid conflicts.
     We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
 
-    /* Customization of Bootstrap 5 accordion style. */
+    /* Customization of Bootstrap 5 accordion style.
+    ----------------------------------------------------------------------------- */
+
     #tests-accordion .accordion-button {
         padding: .6rem .8rem;
         background-color: rgba(0,0,0,.03);
     }
+
+    /* Clear the box shadow from .accordion-button. This removes the blue outline when selecting a button, and the
+       border between the header and content of accordion items when expanded. */
     #tests-accordion .accordion-button {
         box-shadow: none;
     }
+    /* Add back the border between header and content of accordion items. */
     #tests-accordion .accordion-body {
         border-top: 1px solid rgba(0, 0, 0, .125);
     }
-    .accordion-button:not(.collapsed)::after {
+    /* Always display the chevron icon in black. */
+    #tests-accordion .accordion-button:not(.collapsed)::after {
         /* Copied from Bootstrap 5. */
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
 
-    /* Categories style. */
+    /* Categories.
+    ----------------------------------------------------------------------------- */
+
     #tests-accordion .accordion-button:not(.ta-covered) {
         color: #B0B0B0;
     }
@@ -57,7 +66,9 @@
         color: black;
     }
 
-    /* Tables style. */
+    /* Tables.
+    ----------------------------------------------------------------------------- */
+
     #tests-accordion thead {
         display: none;
     }
@@ -74,7 +85,9 @@
         border-bottom: none;
     }
 
-    /* Inline elements style. */
+    /* Inline elements.
+    ----------------------------------------------------------------------------- */
+
     #tests-accordion .ta-column-name {
         color: #B0B0B0;
     }
@@ -86,15 +99,16 @@
 </style>
 
 <div class="accordion" id="tests-accordion">
-    <c:forEach var="category" items="${testAccordion.categories}">
+    <c:forEach items="${testAccordion.categories}" var="category">
         <div class="accordion-item">
             <h2 class="accordion-header" id="ta-heading-${category.id}">
                 <button class="${category.testIds.size() == 0 ? "" : "ta-covered"} accordion-button collapsed"
                         type="button" data-bs-toggle="collapse"
                         data-bs-target="#ta-collapse-${category.id}"
                         aria-controls="ta-collapse-${category.id}">
+                    <%-- ${empty …} doesn't work with Set --%>
                     <c:if test="${!(category.testIds.size() == 0)}">
-                        <span class="badge bg-defender ta-count me-2">${category.testIds.size()}</span>
+                        <span class="badge bg-defender me-2 ta-count">${category.testIds.size()}</span>
                     </c:if>
                     ${category.description}
                 </button>
@@ -229,11 +243,9 @@
                 lineNumbers: true,
                 matchBrackets: true,
                 mode: "text/x-java",
-                readOnly: true,
-
+                readOnly: true
             });
             editor.setSize('max-content', 'max-content');
-            window.editor = editor;
 
             /* Refresh the CodeMirror instance once the modal is displayed.
              * If this is not done, it will display an empty textarea until it is clicked. */
