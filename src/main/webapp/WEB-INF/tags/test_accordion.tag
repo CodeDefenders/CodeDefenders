@@ -29,10 +29,6 @@
     generated through JavaScript.
 --%>
 
-<%--
-<jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>
---%>
-
 <style type="text/css">
     <%-- Prefix all classes with "ta-" to avoid conflicts.
     We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
@@ -129,12 +125,12 @@
         const testModals = new Map();
 
         /* Functions to generate table columns. */
-        const genId             = row => 'Test ' + row.id;
-        const genCreator        = row => <%-- '<span class="ta-column-name">Creator:</span> ' + --%> row.creator.name;
-        const genPoints         = row => '<span class="ta-column-name">Points:</span> '  + row.points;
-        const genCoveredMutants = row => '<span class="ta-covered-link" data-bs-toggle="popover"><span class="ta-column-name">Covered:</span> ' + row.coveredMutantIds.length + '</span>';
-        const genKilledMutants  = row => '<span class="ta-killed-link" data-bs-toggle="popover"><span class="ta-column-name">Killed:</span> ' + row.killedMutantIds.length + '</span>';
-        const genViewButton     = row => row.canView ? '<button class="ta-view-button btn btn-ssm btn-primary">View</button>' : '';
+        const genId             = row => `Test \${row.id}`;
+        const genCreator        = row => row.creator.name;
+        const genPoints         = row => `<span class="ta-column-name">Points:</span> \${row.points}`;
+        const genCoveredMutants = row => `<span class="ta-covered-link" data-bs-toggle="popover"><span class="ta-column-name">Covered:</span> \${row.coveredMutantIds.length}</span>`;
+        const genKilledMutants  = row => `<span class="ta-killed-link" data-bs-toggle="popover"><span class="ta-column-name">Killed:</span> \${row.killedMutantIds.length}</span>`;
+        const genViewButton     = row => row.canView ? '<button class="ta-view-button btn btn-xs btn-primary">View</button>' : '';
         const genSmells         = row => {
             const numSmells = row.smells.length;
             let smellLevel;
@@ -149,7 +145,7 @@
                 smellLevel = 'Good';
                 smellColor = 'btn-success';
             }
-            return '<a class="ta-smells-link btn btn-ssm ' + smellColor + '" data-bs-toggle="popover">' + smellLevel + '</a>';
+            return `<a class="ta-smells-link btn btn-xs \${smellColor}" data-bs-toggle="popover">\${smellLevel}</a>`;
         };
 
         /**
@@ -209,18 +205,18 @@
             }
 
             modal = $(
-                `<div class="modal mutant-modal fade" role="dialog">
-                    <div class="modal-dialog" style="width: max-content; max-width: 90%; min-width: 500px;">
+                `<div class="modal fade" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-responsive">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Test ` + test.id + ` (by ` + test.creatorName + `)</h4>
+                                <h5 class="modal-title">Test \${test.id} (by \${test.creator.name})</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="test-` + test.id + `"></textarea></pre>
+                                <pre class="readonly-pre"><textarea name="test-\${test.id}"></textarea></pre>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -237,18 +233,11 @@
 
             });
             editor.setSize('max-content', 'max-content');
+            window.editor = editor;
 
-            <%-- TODO: Is there a better solution for this? --%>
             /* Refresh the CodeMirror instance once the modal is displayed.
              * If this is not done, it will display an empty textarea until it is clicked. */
-            new MutationObserver((mutations, observer) => {
-                for (const mutation of mutations) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        editor.refresh();
-                        observer.disconnect();
-                    }
-                }
-            }).observe(modal.get(0), {attributes: true});
+            modal.get(0).addEventListener('shown.bs.modal', event => editor.refresh());
 
             TestAPI.getAndSetEditorValue(textarea, editor);
             modal.modal('show');

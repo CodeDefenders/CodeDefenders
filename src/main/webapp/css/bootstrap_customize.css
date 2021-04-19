@@ -11,6 +11,17 @@ bootstrap classes
     font-size: 12px;
 }
 
+/* Modals
+----------------------------------------------------------------------------- */
+
+/* Modals that change the size based on the content width.
+   Use style="min-width: ...;" to customize the minimum width. */
+.modal-dialog-responsive {
+    min-width: 500px;
+    max-width: calc(100% - 4rem);
+    width: max-content;
+}
+
 /* Navbar
 ----------------------------------------------------------------------------- */
 
