@@ -26,14 +26,14 @@
 <div class="btn-toolbar" role="toolbar">
 
     <div class="btn-group" role="group">
-        <div data-toggle="modal" href="#editorHelpConfig" class="btn btn-ssm btn-default">
+        <div data-toggle="modal" href="#editorHelpConfig" class="btn btn-xs btn-default">
             Keyboard Shortcuts <span class="glyphicon glyphicon-question-sign"></span>
         </div>
     </div>
 
     <div class="btn-group" role="group" aria-label="Second group">
         <div id="keymap-drowdown" class="dropdown">
-            <button class="btn btn-default btn-ssm dropdown-toggle" type="button" id="editorModeMenu" data-toggle="dropdown">
+            <button class="btn btn-default btn-xs dropdown-toggle" type="button" id="editorModeMenu" data-toggle="dropdown">
                 <span class="caret"></span>
                 Editor Mode: <span id="current-keymap" >${login.user.keyMap.CMName}</span>
             </button>
