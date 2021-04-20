@@ -33,7 +33,6 @@ import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -278,6 +277,8 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testInsertPlayer() throws Exception {
+        UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+
         assumeTrue(creator.insert());
         assumeTrue(user1.insert());
         assumeTrue(cut1.insert());
@@ -289,7 +290,7 @@ public class DatabaseTest {
         assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
         int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
         assertTrue(playerID > 0);
-        assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
+        assertEquals(userRepo.getUserIdForPlayerId(playerID).intValue(), user1.getId());
         assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
         assertEquals(PlayerDAO.getPlayerPoints(playerID), 0);
         PlayerDAO.increasePlayerPoints(13, playerID);
