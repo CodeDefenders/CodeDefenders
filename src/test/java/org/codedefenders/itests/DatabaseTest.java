@@ -65,10 +65,7 @@ import org.powermock.reflect.Whitebox;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 /**
@@ -141,45 +138,6 @@ public class DatabaseTest {
     private GameClass cut2;
     private Mutant mutant1;
     private org.codedefenders.game.Test test;
-
-
-    @Test
-    public void testInsertUser() throws Exception {
-        UserRepository userRepo = new UserRepository(db.getConnectionFactory());
-
-        Integer userId = userRepo.insert(user1);
-        assertNotNull(userId);
-        user1.setId(userId);
-        UserEntity userFromDB = userRepo.getUserById(userId);
-        assertEquals(user1.getId(), userFromDB.getId());
-        assertEquals(user1.getUsername(), userFromDB.getUsername());
-        assertEquals(user1.getEmail(), userFromDB.getEmail());
-        // FIXME this is never written to the DB
-        // assertEquals(user1.isValidated(), userFromDB.isValidated());
-        assertTrue(UserEntity.passwordMatches("TEST_PASSWORD", userFromDB.getEncodedPassword()));
-        assertNotEquals("Password should not be stored in plain text", "TEST_PASSWORD", userFromDB.getEncodedPassword());
-        // FIXME Split this in two tests
-        // assertFalse("Inserting a user twice should fail", user1.insert());
-    }
-
-    @Test
-    public void testUpdateUser() throws SQLException {
-        UserRepository userRepo = new UserRepository(db.getConnectionFactory());
-        Integer userId = userRepo.insert(user1);
-        assumeNotNull(userId);
-        user1.setId(userId);
-
-        user1.setEncodedPassword(UserEntity.encodePassword("TEST_PASSWORD" + "_new"));
-        user1.setUsername(user1.getUsername() + "_new");
-        user1.setEmail(user1.getEmail() + "_new");
-
-        assertTrue(userRepo.update(user1));
-        UserEntity userFromDB = userRepo.getUserById(user1.getId());
-        assertEquals(user1.getId(), userFromDB.getId());
-        assertEquals(user1.getUsername(), userFromDB.getUsername());
-        assertEquals(user1.getEmail(), userFromDB.getEmail());
-        assertEquals(user1.getEncodedPassword(), userFromDB.getEncodedPassword());
-    }
 
     //FIXME
     @Ignore

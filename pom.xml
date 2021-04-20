@@ -780,6 +780,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- More/Better Assertions -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.7.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Mocking frameworks -->
 		<dependency>
 			<groupId>org.powermock</groupId>

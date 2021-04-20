@@ -72,6 +72,7 @@ public class UserRepository {
         return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap);
     }
 
+    // TODO: This gives no information why we couldn't insert the UserEntity into the database
     public Integer insert(UserEntity userEntity) {
         if (userEntity.getId() > 0) {
             // TODO: Should we allow this?
