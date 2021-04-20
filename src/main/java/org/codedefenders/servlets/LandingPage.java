@@ -85,7 +85,7 @@ public class LandingPage extends HttpServlet {
 
             Map<Integer, String> gameCreatorNames = availableMultiplayerGames.stream()
                     .collect(Collectors.toMap(AbstractGame::getId,
-                            game -> userService.getSimpleUserById(game.getCreatorId()).name
+                            game -> userService.getSimpleUserById(game.getCreatorId()).getName()
 
                     ));
 

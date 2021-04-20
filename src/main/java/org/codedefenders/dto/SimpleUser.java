@@ -28,25 +28,21 @@ import com.google.gson.annotations.Expose;
  */
 public class SimpleUser {
     @Expose
-    public final int id;
+    private final int id;
     @Expose
-    public final String name;
+    private final String name;
 
     public SimpleUser(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-        SimpleUser user = (SimpleUser) other;
-        return id == user.id;
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

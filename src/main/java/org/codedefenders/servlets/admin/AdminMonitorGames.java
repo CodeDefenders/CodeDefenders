@@ -83,7 +83,7 @@ public class AdminMonitorGames extends HttpServlet {
 
         Map<Integer, String> multiplayerGameCreatorNames = multiplayerGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
-                        game -> userService.getSimpleUserById(game.getCreatorId()).name));
+                        game -> userService.getSimpleUserById(game.getCreatorId()).getName()));
 
         Map<Integer, List<List<String>>> multiplayerPlayersInf = multiplayerGames.stream()
                 .map(AbstractGame::getId)
@@ -104,7 +104,7 @@ public class AdminMonitorGames extends HttpServlet {
         List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
         Map<Integer, String> meleeGameCreatorNames = meleeGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
-                        game -> userService.getSimpleUserById(game.getCreatorId()).name));
+                        game -> userService.getSimpleUserById(game.getCreatorId()).getName()));
 
         Map<Integer, List<List<String>>> meleePlayersInfoForGame = meleeGames.stream()
                 .map(AbstractGame::getId)

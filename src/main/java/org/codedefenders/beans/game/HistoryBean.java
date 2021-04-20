@@ -60,7 +60,7 @@ public class HistoryBean {
         if (e.getUserId() < 100) {
             return null;
         }
-        String userName = userService.getSimpleUserById(e.getUserId()).name;
+        String userName = userService.getSimpleUserById(e.getUserId()).getName();
         String userMessage = userName + " ";
         String colour = "gray";
         switch (e.getEventType()) {

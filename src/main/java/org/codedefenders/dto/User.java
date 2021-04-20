@@ -28,13 +28,13 @@ import org.codedefenders.model.KeyMap;
  */
 public class User extends SimpleUser {
 
-    public final Boolean active;
+    private final Boolean active;
 
-    public final String email;
-    public final Boolean emailValidated;
-    public final Boolean allowContact;
+    private final String email;
+    private final Boolean emailValidated;
+    private final Boolean allowContact;
 
-    public final KeyMap keyMap;
+    private final KeyMap keyMap;
 
     public User(int id, String name, Boolean active, String email, Boolean emailValidated,
             Boolean allowContact, KeyMap keyMap) {
@@ -46,6 +46,26 @@ public class User extends SimpleUser {
         this.keyMap = keyMap;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Boolean getEmailValidated() {
+        return emailValidated;
+    }
+
+    public Boolean getAllowContact() {
+        return allowContact;
+    }
+
+    public KeyMap getKeyMap() {
+        return keyMap;
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {
@@ -55,11 +75,11 @@ public class User extends SimpleUser {
             return false;
         }
         User user = (User) other;
-        return id == user.id;
+        return getId() == user.getId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 }

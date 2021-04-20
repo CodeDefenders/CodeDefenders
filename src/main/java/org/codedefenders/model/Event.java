@@ -110,7 +110,7 @@ public class Event {
             SimpleUser user = userService.getSimpleUserById(userId);
 
             String userLabel = (user == null) ? "Unknown"
-                    : (user.name.equals(currentUserName)) ? "You" : user.name;
+                    : (user.getName().equals(currentUserName)) ? "You" : user.getName();
 
             String roleClass;
             switch (role) {
