@@ -47,6 +47,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -66,7 +67,9 @@ import org.powermock.reflect.Whitebox;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 
 /**
@@ -143,8 +146,12 @@ public class DatabaseTest {
 
     @Test
     public void testInsertUser() throws Exception {
-        assertTrue(user1.insert());
-        UserEntity userFromDB = UserDAO.getUserById(user1.getId());
+        UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+
+        Integer userId = userRepo.insert(user1);
+        assertNotNull(userId);
+        user1.setId(userId);
+        UserEntity userFromDB = userRepo.getUserById(userId);
         assertEquals(user1.getId(), userFromDB.getId());
         assertEquals(user1.getUsername(), userFromDB.getUsername());
         assertEquals(user1.getEmail(), userFromDB.getEmail());
@@ -157,15 +164,18 @@ public class DatabaseTest {
     }
 
     @Test
-    public void testUpdateUser() {
-        assumeTrue(user1.insert());
+    public void testUpdateUser() throws SQLException {
+        UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+        Integer userId = userRepo.insert(user1);
+        assumeNotNull(userId);
+        user1.setId(userId);
 
         user1.setEncodedPassword(UserEntity.encodePassword("TEST_PASSWORD" + "_new"));
         user1.setUsername(user1.getUsername() + "_new");
         user1.setEmail(user1.getEmail() + "_new");
 
-        assertTrue(user1.update());
-        UserEntity userFromDB = UserDAO.getUserById(user1.getId());
+        assertTrue(userRepo.update(user1));
+        UserEntity userFromDB = userRepo.getUserById(user1.getId());
         assertEquals(user1.getId(), userFromDB.getId());
         assertEquals(user1.getUsername(), userFromDB.getUsername());
         assertEquals(user1.getEmail(), userFromDB.getEmail());

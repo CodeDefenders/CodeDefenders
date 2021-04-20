@@ -90,6 +90,55 @@ public class UserRepository {
         return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap);
     }
 
+    public Integer insert(UserEntity userEntity) {
+        if (userEntity.getId() > 0) {
+            // TODO: Should we allow this?
+            throw new IllegalArgumentException("Can't insert user with id > 0");
+        }
+        String query = "INSERT INTO users "
+                + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?);";
+        try {
+            return connectionFactory.getQueryRunner()
+                    .insert(query, resultSet -> DatabaseUtils.nextFromRS(resultSet, rs -> rs.getInt(1)),
+                            userEntity.getUsername(),
+                            userEntity.getEncodedPassword(),
+                            userEntity.getEmail(),
+                            userEntity.isValidated(),
+                            userEntity.isActive(),
+                            userEntity.getAllowContact(),
+                            userEntity.getKeyMap().name());
+        } catch (SQLException e) {
+            logger.error("SQLException while trying to insert new User", e);
+        }
+        return null;
+    }
+
+    public boolean update(UserEntity userEntity) {
+        String query = "UPDATE users "
+                + "SET Username = ?, "
+                + "  Email = ?, "
+                + "  Password = ?, "
+                + "  Validated = ?, "
+                + "  Active = ?, "
+                + "  AllowContact = ?, "
+                + "  KeyMap = ?"
+                + "WHERE User_ID = ?;";
+        try {
+            return connectionFactory.getQueryRunner().update(query,
+                    userEntity.getUsername(),
+                    userEntity.getEmail(),
+                    userEntity.getEncodedPassword(),
+                    userEntity.isValidated(),
+                    userEntity.isActive(),
+                    userEntity.getAllowContact(),
+                    userEntity.getKeyMap().name(),
+                    userEntity.getId()) == 1;
+        } catch (SQLException e) {
+            logger.error("SQLException while trying to update UserEntity", e);
+        }
+        return false;
+    }
 
     public UserEntity getUserById(int userId) {
         String query = "SELECT * "

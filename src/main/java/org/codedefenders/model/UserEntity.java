@@ -23,8 +23,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Objects;
 
+import javax.enterprise.inject.spi.CDI;
+
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,7 +61,7 @@ public class UserEntity implements Serializable {
     }
 
     public UserEntity(int id, String username, String encodedPassword, String email, boolean validated,
-                boolean active, boolean allowContact, KeyMap keyMap) {
+            boolean active, boolean allowContact, KeyMap keyMap) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -69,7 +72,21 @@ public class UserEntity implements Serializable {
         this.keyMap = keyMap;
     }
 
+    /**
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#insert(UserEntity)} instead.
+     */
+    @Deprecated
     public boolean insert() {
+        // TODO: Remove workaround
+        Integer result = CDI.current().select(UserRepository.class).get().insert(this);
+        if (result == null) {
+            return false;
+        } else {
+            id = result;
+            return true;
+        }
+
+        /*
         // TODO Phil 12/12/18: Update this like Test#insert() to use DAO insert method but update identifier
         DatabaseValue[] valueList;
         String query;
@@ -95,9 +112,15 @@ public class UserEntity implements Serializable {
         } else {
             return false;
         }
+         */
     }
 
+    /**
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#update(UserEntity)} instead.
+     */
     public boolean update() {
+        return CDI.current().select(UserRepository.class).get().update(this);
+        /*
         DatabaseValue[] valueList;
         Connection conn = DB.getConnection();
 
@@ -123,6 +146,7 @@ public class UserEntity implements Serializable {
         };
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
         return DB.executeUpdate(stmt, conn);
+         */
     }
 
     public boolean isValidated() {
