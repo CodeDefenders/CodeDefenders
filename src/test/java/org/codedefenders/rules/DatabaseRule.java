@@ -74,18 +74,14 @@ public class DatabaseRule extends ExternalResource {
     }
 
     public ConnectionFactory getConnectionFactory() throws SQLException {
-        QueryRunner queryRunner = new QueryRunner(getDataSource());
+        DataSource dataSourceMock = mock(DataSource.class);
+        when(dataSourceMock.getConnection()).thenAnswer(invocation -> getConnection());
+        QueryRunner queryRunner = new QueryRunner(dataSourceMock);
 
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         when(connectionFactory.getConnection()).thenAnswer(invocation -> getConnection());
         when(connectionFactory.getQueryRunner()).thenReturn(queryRunner);
         return connectionFactory;
-    }
-
-    public DataSource getDataSource() throws SQLException {
-        DataSource dataSourceMock = mock(DataSource.class);
-        when(dataSourceMock.getConnection()).thenAnswer(invocation -> getConnection());
-        return dataSourceMock;
     }
 
     public Connection getConnection() throws SQLException {
