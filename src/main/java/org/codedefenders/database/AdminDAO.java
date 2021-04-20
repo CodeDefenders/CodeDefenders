@@ -31,10 +31,11 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
-import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE;
+
+import static org.codedefenders.persistence.database.UserRepository.userFromRS;
 
 public class AdminDAO {
 
@@ -109,7 +110,7 @@ public class AdminDAO {
     }
 
     private static UserInfo userInfoFromRS(ResultSet rs) throws SQLException {
-        final UserEntity user = UserRepository.nextFromRS(rs, UserRepository::userFromRS);
+        final UserEntity user = userFromRS(rs);
 
         final Timestamp ts = rs.getTimestamp("lastLogin");
         final Instant lastLogin = ts != null ? ts.toInstant() : null;
@@ -309,9 +310,9 @@ public class AdminDAO {
             case STRING_VALUE:
                 return new AdminSystemSettings.SettingsDTO(name, rs.getString(settingType.name()));
             case INT_VALUE:
-                return new AdminSystemSettings.SettingsDTO(name,rs.getInt(settingType.name()));
+                return new AdminSystemSettings.SettingsDTO(name, rs.getInt(settingType.name()));
             case BOOL_VALUE:
-                return new AdminSystemSettings.SettingsDTO(name,rs.getBoolean(settingType.name()));
+                return new AdminSystemSettings.SettingsDTO(name, rs.getBoolean(settingType.name()));
             default:
                 return null;
         }

@@ -28,7 +28,6 @@ import java.util.concurrent.ExecutionException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.model.KeyMap;
@@ -38,6 +37,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+
+import static org.codedefenders.persistence.database.DatabaseUtils.listFromRS;
+import static org.codedefenders.persistence.database.DatabaseUtils.nextFromRS;
 
 @ApplicationScoped
 public class UserRepository {
@@ -57,30 +59,10 @@ public class UserRepository {
                 .build();
     }
 
-    // TODO extract to utility class?!
-    // TODO does common-dbutils already offers something like this?!
-    public static <T> T nextFromRS(ResultSet rs, ResultSetHandler<T> handler) throws SQLException {
-        if (rs.next()) {
-            return handler.handle(rs);
-        } else {
-            return null;
-        }
-    }
-
-    // TODO extract to utility class?!
-    // TODO does common-dbutils already offers something like this?!
-    public static <T> List<T> listFromRS(ResultSet rs, ResultSetHandler<T> handler) throws SQLException {
-        List<T> result = new ArrayList<>();
-        while (rs.next()) {
-            result.add(handler.handle(rs));
-        }
-        return result;
-    }
-
     public static UserEntity userFromRS(ResultSet rs) throws SQLException {
         int userId = rs.getInt("User_ID");
-        String password = rs.getString("Password");
         String userName = rs.getString("Username");
+        String password = rs.getString("Password");
         String email = rs.getString("Email");
         boolean validated = rs.getBoolean("Validated");
         boolean active = rs.getBoolean("Active");
@@ -100,7 +82,7 @@ public class UserRepository {
                 + "VALUES (?, ?, ?, ?, ?, ?, ?);";
         try {
             return connectionFactory.getQueryRunner()
-                    .insert(query, resultSet -> DatabaseUtils.nextFromRS(resultSet, rs -> rs.getInt(1)),
+                    .insert(query, resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
                             userEntity.getUsername(),
                             userEntity.getEncodedPassword(),
                             userEntity.getEmail(),
@@ -145,7 +127,7 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE User_ID = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet,UserRepository::userFromRS), userId);
+            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
         } catch (SQLException e) {
             logger.error("SQLException while loading user", e);
             return null;
@@ -169,13 +151,14 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE Email = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet ,UserRepository::userFromRS), email);
+            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
         } catch (SQLException e) {
             logger.error("SQLException", e);
             return null;
         }
     }
 
+    // TODO: Relocate into `PlayerRepository`?!
     public Integer getUserIdForPlayerId(int playerId) {
         String query = "SELECT users.User_ID AS User_ID "
                 + "FROM users, players "
