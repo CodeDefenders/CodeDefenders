@@ -412,7 +412,6 @@ public class Compiler {
                 for (Path p : Files.list(oldPath.getParent()).filter(predicate).collect(Collectors.toSet())) {
                     Path toPath = Paths.get(
                             newPath.toString().replace(newPath.getFileName().toString(), p.getFileName().toString()));
-                    Files.createDirectories(p.getParent());
                     Files.move(p, toPath);
                 }
             } catch (IOException e) {
