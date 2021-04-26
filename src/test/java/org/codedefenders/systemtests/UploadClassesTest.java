@@ -18,9 +18,11 @@
  */
 package org.codedefenders.systemtests;
 
+/*
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.configuration.DockerComposeFiles;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+ */
 
 import org.junit.ClassRule;
 import org.junit.Ignore;
@@ -49,6 +51,7 @@ import static org.junit.Assert.assertTrue;
 @Category(SystemTest.class)
 public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 
+    /*
 	@ClassRule
 	public static DockerComposeRule docker = DockerComposeRule.builder()//
 			.files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
@@ -60,6 +63,7 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 			.waitingForService("frontend", HealthChecks.toRespond2xxOverHttp(8080,
 					t -> t.inFormat("http://$HOST:$EXTERNAL_PORT/codedefenders")))
 			.build();
+     */
 
 	/**
 	 * Upload a valid class.
