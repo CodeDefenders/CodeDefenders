@@ -29,6 +29,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -402,6 +405,16 @@ public class Compiler {
 
                 Files.createDirectories(newPath.getParent());
                 Files.move(oldPath, newPath);
+
+                //Move compiled subclasses
+                String pattern = dependency.getName().replace(".java", "") + "\\$.+\\.class";
+                Predicate<Path> predicate = (Path p) -> p.getFileName().toString().matches(pattern);
+                for (Path p : Files.list(oldPath.getParent()).filter(predicate).collect(Collectors.toSet())) {
+                    Path toPath = Paths.get(
+                            newPath.toString().replace(newPath.getFileName().toString(), p.getFileName().toString()));
+                    Files.createDirectories(p.getParent());
+                    Files.move(p, toPath);
+                }
             } catch (IOException e) {
                 if (logError) {
                     logger.error("Failed to move dependency class.", e);
