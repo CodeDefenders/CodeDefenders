@@ -32,29 +32,34 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+/*
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.DockerPort;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+ */
 
 /**
- * 
+ *
  * @author gambi
- * 
+ *
  *         Base class to implement system tests using docker-compose and
  *         selenium stand-alone. <strong>Note</strong> this class initializes
  *         code-defenders with an empty database and without preloaded classes.
- * 
+ *
  *         The assumption is that there's always AT MOST ONE system test running
- * 
+ *
  */
 public abstract class AbstractEmptyDBSystemTest {
 
+    /*
 	@ClassRule
 	public static DockerComposeRule docker = DockerComposeRule.builder()//
+     */
 			/*
 			 * Replace docker-compose.yml with docker-compose-debug.yml to
 			 * access chrome with VNCViewer
 			 */
+    /*
 			.file("src/test/resources/systemtests/docker-compose.yml")//
 			.waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())//
 			.waitingForService("db", HealthChecks.toHaveAllPortsOpen()) //
@@ -66,6 +71,7 @@ public abstract class AbstractEmptyDBSystemTest {
 			})) //
 			// .saveLogsTo("/tmp/test.log")// This is mostly for debugging
 			.build();
+	*/
 
 	/*
 	 * This is package protected to enable custom settings of driver in
