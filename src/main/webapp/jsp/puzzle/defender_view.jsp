@@ -125,7 +125,6 @@
             <h3>Class Under Test</h3>
             <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-            <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         </div>
 
         <div class="col-md-6" id="ut-div">

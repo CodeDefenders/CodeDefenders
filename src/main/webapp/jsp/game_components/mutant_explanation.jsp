@@ -27,23 +27,6 @@
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 
-<style>
-    .mutantCUTLegendDesc {
-        font-weight: bold;
-        margin-right: .5rem;
-    }
-    .mutantCUTLegend > * {
-        vertical-align: middle;
-    }
-    .validatorLevelTag {
-        display: inline-block;
-        padding: 0;
-        margin-top: -2px;
-        padding-left: 3px;
-        padding-right: 3px;
-    }
-</style>
-
 <%
     String levelStyling;
     switch (mutantExplanation.getCodeValidatorLevel()) {
@@ -60,32 +43,38 @@
         levelStyling = "btn-primary";
     }
 %>
-<div>
-	<div class="mutantCUTLegend">
-		<span class="mutantCUTImage mutantImageAlive"></span>
-		<span class="mutantCUTLegendDesc">Live</span>
-		<span class="mutantCUTImage mutantImageKilled"></span>
-		<span class="mutantCUTLegendDesc">Killed</span>
-		<span class="mutantCUTImage mutantImageFlagged"></span>
-		<span class="mutantCUTLegendDesc">Claimed Equivalent</span>
-		<span class="mutantCUTImage mutantImageEquiv"></span>
-		<span class="mutantCUTLegendDesc">Equivalent</span>
-	</div>
 
-    <div style="float:right">
-         <div style="display: inline-block;"> Mutant restrictions:</div>
-         <div
-            data-toggle="modal" href="#validatorExplanation"
-            title="Click the question sign for more information on the levels"
-            class="validatorLevelTag btn <%=levelStyling%>">
-            <%=StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase())%>
-        </div>
-         <div style="display: inline-block;">
-             <a data-toggle="modal" href="#validatorExplanation" style="color:black">
-                 <span class="glyphicon glyphicon-question-sign"></span>
-             </a>
-         </div>
-     </div>
+<div class="d-flex justify-content-between flex-wrap gap-1">
+
+    <div class="mutantCUTLegend">
+        <span class="text-nowrap">
+            <span class="mutantCUTImage mutantImageAlive align-middle"></span>
+            <span class="mutantCUTLegendDesc align-middle me-1">Live</span>
+        </span>
+        <span class="text-nowrap">
+            <span class="mutantCUTImage mutantImageKilled align-middle"></span>
+            <span class="mutantCUTLegendDesc align-middle me-1">Killed</span>
+        </span>
+        <span class="text-nowrap">
+            <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
+            <span class="mutantCUTLegendDesc align-middle me-1">Claimed Equivalent</span>
+        </span>
+        <span class="text-nowrap">
+            <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
+            <span class="mutantCUTLegendDesc align-middle">Equivalent</span>
+        </span>
+    </div>
+
+    <div>
+         <span class="align-middle me-1">Mutant restrictions:</span>
+         <button data-toggle="modal" href="#validatorExplanation"
+                 title="Click for more information on the levels"
+                 class="btn btn-xs <%=levelStyling%> align-middle">
+             <%= StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase()) %>
+             <i class="fa fa-question-circle ms-1"></i>
+         </button>
+    </div>
+
 </div>
 
 <div class="modal fade" id="validatorExplanation" role="dialog"
