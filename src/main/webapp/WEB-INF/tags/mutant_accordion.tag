@@ -52,10 +52,10 @@
     /* Categories.
     ----------------------------------------------------------------------------- */
 
-    #mutants-accordion .accordion-button:not(.ta-covered) {
+    #mutants-accordion .accordion-button:not(.ma-covered) {
         color: #B0B0B0;
     }
-    #mutants-accordion .accordion-button.ta-covered {
+    #mutants-accordion .accordion-button.ma-covered {
         color: black;
     }
 
@@ -81,7 +81,7 @@
     /* Inline elements.
     ----------------------------------------------------------------------------- */
 
-    #mutants-accordion .ta-column-name {
+    #mutants-accordion .ma-column-name {
         color: #B0B0B0;
     }
     #mutants-accordion .ma-mutant-link {
@@ -132,8 +132,8 @@
 
         /* Functions to generate table columns. */
         const genId = row => `<span class="ma-mutant-link">Mutant \${row.id}</span>
-                <span class="ma-column-name"> by </span> \${row.creator.name}
-                \${row.killedByName ? ' <span class="ma-column-name"> killed by </span> ' + row.killedByName : ''}`;
+                <span class="ma-column-name mx-2">by</span>\${row.creator.name}
+                \${row.killedByName ? '<span class="ma-column-name mx-2">killed by</span>' + row.killedByName : ''}`;
         const genPoints = row => `<span class="ma-column-name">Points:</span> \${row.points}`;
         const genLines = row => row.description;
         const genIcon = row => {
@@ -171,7 +171,7 @@
 
                     </c:if>
                 case "KILLED":
-                    return '<button class="ma-view-test-button btn btn-default btn-xs pull-right">View Killing Test</button>';
+                    return '<button class="ma-view-test-button btn btn-secondary btn-xs">View Killing Test</button>';
                 default:
                     return '';
             }
