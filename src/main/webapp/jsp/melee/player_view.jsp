@@ -218,17 +218,16 @@
 			</pre>
             <script>
                 $('#diff-collapse').on('shown.bs.collapse', function () {
-                    var codeMirrorContainer = $(this).find(
-                            ".CodeMirror")[0];
-                    if (codeMirrorContainer
-                            && codeMirrorContainer.CodeMirror) {
+                    var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+                    if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
                         codeMirrorContainer.CodeMirror.refresh();
                     } else {
                         var showDiff = CodeMirror.fromTextArea(document
                                 .getElementById('diff'), {
                             lineNumbers: false,
                             mode: "text/x-diff",
-                            readOnly: true
+                            readOnly: true,
+                            autoRefresh: true
                         });
                         showDiff.setSize("100%", 210);
                     }

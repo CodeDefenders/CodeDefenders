@@ -163,7 +163,8 @@
             let editor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: false,
                 readOnly: true,
-                mode: "text/x-java"
+                mode: "text/x-java",
+                autoRefresh: true
             });
             editor.setSize("100%", 500);
             ClassAPI.getAndSetEditorValue(textarea, editor);

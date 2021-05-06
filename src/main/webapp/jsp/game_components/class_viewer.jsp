@@ -100,7 +100,8 @@
         matchBrackets: true,
         mode: "text/x-java",
         readOnly: 'nocursor',
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
+        autoRefresh: true
     });
     editorSUT.setSize("100%", 500);
 
@@ -117,10 +118,10 @@
                 lineNumbers: true,
                 matchBrackets: true,
                 mode: "text/x-java",
-                readOnly: 'nocursor'
+                readOnly: 'nocursor',
+                autoRefresh: true
             });
-            editor<%=depName%>.setSize("100%", 457); // next to the test editor the cm editor would be too big
-            editor<%=depName%>.refresh();
+            editor<%=depName%>.setSize("100%", 500); // next to the test editor the cm editor would be too big
 
             autocompletedClasses['<%=depName%>'] =  editor<%=depName%>.getTextArea().value;
         <% } %>

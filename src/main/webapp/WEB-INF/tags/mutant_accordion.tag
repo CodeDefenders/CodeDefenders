@@ -226,13 +226,9 @@
                 matchBrackets: true,
                 mode: "text/x-diff",
                 readOnly: true,
-
+                autoRefresh: true
             });
             editor.setSize('max-content', 'max-content');
-
-            /* Refresh the CodeMirror instance once the modal is displayed.
-             * If this is not done, it will display an empty textarea until it is clicked. */
-            modal.get(0).addEventListener('shown.bs.modal', event => editor.refresh());
 
             MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
             modal.modal('show');
@@ -277,13 +273,9 @@
                 matchBrackets: true,
                 mode: "text/x-java",
                 readOnly: true,
-
+                autoRefresh: true
             });
             editor.setSize('max-content', 'max-content');
-
-            /* Refresh the CodeMirror instance once the modal is displayed.
-             * If this is not done, it will display an empty textarea until it is clicked. */
-            modal.get(0).addEventListener('shown.bs.modal', event => editor.refresh());
 
             TestAPI.getAndSetEditorValue(textarea, editor);
             modal.modal('show');

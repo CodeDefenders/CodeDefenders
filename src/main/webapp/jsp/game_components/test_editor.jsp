@@ -102,7 +102,8 @@
             "Tab": "insertSoftTab"
         },
         keyMap: "${login.user.keyMap.CMName}",
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
+        autoRefresh: true
     });
 
 

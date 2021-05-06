@@ -182,7 +182,8 @@
             "Tab": "insertSoftTab"
         },
         keyMap: "${login.user.keyMap.CMName}",
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
+        autoRefresh: true
     });
 
     editorMutant.setSize("100%", 500);
@@ -241,7 +242,8 @@
                     lineNumbers: true,
                     matchBrackets: true,
                     mode: "text/x-java",
-                    readOnly: true
+                    readOnly: true,
+                    autoRefresh: true
                 });
                 editor<%=depName%>.setSize("100%", 500); // next to the test editor the cm editor would be too big
                 editor<%=depName%>.refresh();

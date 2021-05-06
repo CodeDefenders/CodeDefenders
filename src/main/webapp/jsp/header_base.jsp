@@ -66,6 +66,7 @@
     <script src="webjars/codemirror/5.22.0/addon/edit/closebrackets.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/addon/hint/show-hint.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/addon/hint/anyword-hint.js" type="text/javascript" ></script>
+    <script src="webjars/codemirror/5.22.0/addon/display/autorefresh.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/keymap/emacs.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/keymap/sublime.js" type="text/javascript" ></script>
     <script src="webjars/codemirror/5.22.0/keymap/vim.js" type="text/javascript" ></script>

@@ -124,7 +124,8 @@
                         var showDiff = CodeMirror.fromTextArea(document.getElementById('diff'), {
                             lineNumbers: false,
                             mode: "text/x-diff",
-                            readOnly: true
+                            readOnly: true,
+                            autoRefresh: true
                         });
                         showDiff.setSize("100%", 210);
                     }
