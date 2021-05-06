@@ -22,7 +22,7 @@
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
-<div class="card">
+<div class="card codemirror-card">
 
     <%-- no dependencies -> no tabs --%>
     <% if (!classViewer.hasDependencies()) { %>
@@ -35,7 +35,7 @@
     <% } else { %>
 
         <div class="card-header">
-            <ul class="nav nav-pills nav-fill" role="tablist">
+            <ul class="nav nav-pills nav-fill gap-1" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link px-2 py-1 active" data-bs-toggle="tab"
                             id="${classViewer.className}-tab"
@@ -103,7 +103,6 @@
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
         autoRefresh: true
     });
-    editorSUT.setSize("100%", "100%");
 
     /* If global autocompletedClasses exists, get it, otherwise, create it. */
     const autocompletedClasses = window.autocompletedClasses = window.autocompletedClasses || {};
@@ -121,7 +120,6 @@
                 readOnly: 'nocursor',
                 autoRefresh: true
             });
-            editor.setSize("100%", 500);
 
             autocompletedClasses['<%=depName%>'] =  editor.getTextArea().value;
         <% } %>

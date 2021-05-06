@@ -26,7 +26,7 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
-<div class="card">
+<div class="card codemirror-card">
     <div class="card-body p-0">
         <pre class="m-0"><textarea id="test-code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
     </div>
@@ -160,8 +160,6 @@
             updateAutocompleteList();
         }
     });
-
-    editorTest.setSize("100%", 500);
 
 })();
 </script>
