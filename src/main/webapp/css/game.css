@@ -1,5 +1,5 @@
 #game-container {
     padding-left: 30px;
     padding-right: 30px;
-    width: 100%;
+    max-width: 1660px;
 }

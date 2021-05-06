@@ -40,7 +40,7 @@
 
 <jsp:include page="/jsp/header_main.jsp" />
 
-<div id="game-container" class="container"> <%-- closed in footer --%>
+<div id="game-container" class="container-fluid"> <%-- closed in footer --%>
     <div class="row">
 			<%
 			    if (game.getCreatorId() == login.getUserId()) {

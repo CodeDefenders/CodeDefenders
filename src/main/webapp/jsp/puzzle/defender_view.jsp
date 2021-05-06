@@ -114,7 +114,7 @@
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
-<div id="game-container">
+<div id="game-container" class="container-fluid">
     <div class="row">
         <h4 class="col-md-2"><b><%=title%></b></h4>
         <h4><%=description%></h4>
