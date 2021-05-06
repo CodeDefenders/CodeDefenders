@@ -114,25 +114,19 @@
 
         <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
                 String depName = dependency.getKey(); %>
-            let editor<%=depName%> = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
+            let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
                 lineNumbers: true,
                 matchBrackets: true,
                 mode: "text/x-java",
                 readOnly: 'nocursor',
                 autoRefresh: true
             });
-            editor<%=depName%>.setSize("100%", 500); // next to the test editor the cm editor would be too big
+            editor.setSize("100%", 500); // next to the test editor the cm editor would be too big
 
-            autocompletedClasses['<%=depName%>'] =  editor<%=depName%>.getTextArea().value;
+            autocompletedClasses['<%=depName%>'] =  editor.getTextArea().value;
         <% } %>
 
     <% } %>
-
-    <%-- Without the hideAfterRendering class attribute the editor is only rendered
-         when the editor is displayed and actively clicked on.--%>
-    $('.hideAfterRendering').each(function () {
-        $(this).removeClass('active')
-    });
 
 })();
 </script>
