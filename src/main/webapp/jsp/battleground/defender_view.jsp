@@ -112,13 +112,13 @@
 
 
 <div class="row">
-    <div class="col-md-6" id="cut-div">
+    <div class="col-lg-6" id="cut-div">
         <h3>Class Under Test</h3>
         <jsp:include page="../game_components/class_viewer.jsp"/>
         <jsp:include page="../game_components/game_highlighting.jsp"/>
     </div>
 
-    <div class="col-md-6" id="utest-div">
+    <div class="col-lg-6" id="utest-div">
 
         <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
         <h3>Write a new JUnit test here
@@ -140,12 +140,12 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6" id="mutants-div">
+    <div class="col-lg-6" id="mutants-div">
         <h3>Existing Mutants</h3>
         <t:mutant_accordion/>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <h3>JUnit Tests</h3>
         <t:test_accordion/>
     </div>

@@ -122,7 +122,7 @@
     </div>
     <hr class="hr-primary" style="margin: 5px">
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
             <t:mutant_accordion/>
@@ -136,7 +136,7 @@
         <% } %>
     </div>
 
-    <div class="col-md-6" id="cut-div">
+    <div class="col-lg-6" id="cut-div">
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
         <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">

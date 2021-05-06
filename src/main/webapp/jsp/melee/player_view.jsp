@@ -195,7 +195,7 @@
     <%-- Equivalence Duel view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-md-6" id="equivmut-div">
+    <div class="col-lg-6" id="equivmut-div">
         <h3>
             Mutant <%=equivMutant.getId()%>
             <!-- check for automatically triggered equivalence duels -->
@@ -267,7 +267,7 @@
     </div>
 
     <%-- TODO: What to show besides the test editor in the quivalence duel? --%>
-    <div class="col-md-6" id="cut-div">
+    <div class="col-lg-6" id="cut-div">
         <h3>Class Under Test</h3>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
@@ -279,7 +279,7 @@
     <%-- Attacker view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-md-6" id="newmut-div" style="margin-top: 20px;">
+    <div class="col-lg-6" id="newmut-div" style="margin-top: 20px;">
         <div class="row" style="display: contents">
             <h3 style="margin-bottom: 0; display: inline">Create a mutant
                 here</h3>
@@ -349,7 +349,7 @@
     <%-- Defender view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-md-6" id="utest-div">
+    <div class="col-lg-6" id="utest-div">
 
         <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
         <h3 style="margin-bottom: 17px;">
@@ -379,12 +379,12 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6" id="mutants-div">
+    <div class="col-lg-6" id="mutants-div">
         <h3>Existing Mutants</h3>
         <t:mutant_accordion/>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <h3>JUnit Tests</h3>
         <t:test_accordion/>
     </div>

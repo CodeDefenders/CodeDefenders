@@ -112,7 +112,7 @@
 
 
 <div class="row">
-    <div class="col-md-6" style="margin-top: 10px;">
+    <div class="col-lg-6" style="margin-top: 10px;">
         <div id="mutants-div">
             <h3 style="margin-top: 0px;margin-bottom: 17px;">Existing Mutants</h3>
             <t:mutant_accordion/>
@@ -126,7 +126,7 @@
         <% } %>
     </div>
 
-    <div class="col-md-6" id="newmut-div" style="margin-top: 10px;">
+    <div class="col-lg-6" id="newmut-div" style="margin-top: 10px;">
         <div class="row" style="display: contents">
             <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
 

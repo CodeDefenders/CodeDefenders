@@ -119,7 +119,7 @@
 
 <div class="row">
 
-    <div class="col-md-6">
+    <div class="col-lg-6">
         <div id="mutants-div">
             <h3>Existing Mutants</h3>
             <t:mutant_accordion/>
@@ -131,7 +131,7 @@
         </div>
     </div>
 
-    <div class="col-md-6" id="cut-div">
+    <div class="col-lg-6" id="cut-div">
         <h3>Class Under Test</h3>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>

@@ -99,7 +99,7 @@
 
 
 <div class="row">
-    <div class="col-md-6" id="equivmut-div">
+    <div class="col-lg-6" id="equivmut-div">
         <h3>Mutant <%= equivMutant.getId() %>
         <!-- check for automatically triggered equivalence duels -->
         <% if (equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID) { %>
@@ -153,7 +153,7 @@
         </div>
     </div>
 
-    <div class="col-md-6" id="cut-div">
+    <div class="col-lg-6" id="cut-div">
         <h3>Class Under Test</h3>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
