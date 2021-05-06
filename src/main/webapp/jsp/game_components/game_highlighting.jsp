@@ -129,36 +129,49 @@
          * @param {HTMLElement} mutantIcons The mutant icons.
          */
         const addPopoverTriggerToMutantIcons = function (mutantIcons) {
-            $(mutantIcons).find('.mutant-icon').popover({
-                /* Append to body instead of the element itself, so that the icons don't overlap modals. */
-                container: document.body,
-                placement: 'right',
-                trigger: 'manual',
-                html: true,
-                title: createPopoverTitle,
-                content: createPopoverContent
-            }).on('mouseenter', function () {
-                clearTimeouts();
+            for (const mutantIcon of mutantIcons.querySelectorAll('.mutant-icon')) {
 
-                /* Hide all other pop-overs. */
-                $('.mutant-icon').not(this).popover('hide');
+                mutantIcon.popover = new bootstrap.Popover(mutantIcon, {
+                    /* Append to body instead of the element itself, so that the icons don't overlap modals. */
+                    container: document.body,
+                    placement: 'right',
+                    trigger: 'manual',
+                    html: true,
+                    title: createPopoverTitle,
+                    content: createPopoverContent
+                });
 
-                /* Show this pop-over. */
-                $(this).popover('show');
-
-                /* Clear timeouts when pop-over is hovered so it won't be hidden by the timeout. */
-                $('.popover').on('mouseenter', () => {
+                /* Activate popovers manually so we can make them stay as long as they are hovered. */
+                mutantIcon.addEventListener('mouseenter', function (event) {
                     clearTimeouts();
-                }).on('mouseleave', () => {
+
+                    /* Hide all other pop-overs. */
+                    for (const otherMutantIcon of document.querySelectorAll('.mutant-icon')) {
+                        if (mutantIcon !== otherMutantIcon) {
+                            otherMutantIcon.popover.hide();
+                        }
+                    }
+
+                    mutantIcon.popover.show();
+
+                    /* Clear timeouts when pop-over is hovered so it won't be hidden by the timeout. */
+                    for (const popoverElement of document.getElementsByClassName('popover')) {
+                        popoverElement.addEventListener('mouseenter', function (event) {
+                            clearTimeouts();
+                        });
+                        popoverElement.addEventListener('mouseleave', function (event) {
+                            addTimeout(() => {
+                                mutantIcon.popover.hide();
+                            }, 500);
+                        });
+                    }
+                });
+                mutantIcon.addEventListener('mouseleave', function (event) {
                     addTimeout(() => {
-                        $(this).popover('hide');
+                        mutantIcon.popover.hide();
                     }, 500);
                 });
-            }).on('mouseleave', function () {
-                addTimeout(() => {
-                    $(this).popover('hide');
-                }, 500);
-            });
+            }
         };
 
         /**
