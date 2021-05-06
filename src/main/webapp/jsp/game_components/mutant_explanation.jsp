@@ -67,8 +67,8 @@
 
     <div>
          <span class="align-middle me-1">Mutant restrictions:</span>
-         <button data-toggle="modal" href="#validatorExplanation"
-                 title="Click for more information on the levels"
+         <button data-bs-toggle="modal" data-bs-target="#validator-explanation-modal"
+                 title="Click for more information"
                  class="btn btn-xs <%=levelStyling%> align-middle">
              <%= StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase()) %>
              <i class="fa fa-question-circle ms-1"></i>
@@ -77,13 +77,12 @@
 
 </div>
 
-<div class="modal fade" id="validatorExplanation" role="dialog"
-	aria-labelledby="validatorExplanation" aria-hidden="true">
+<div id="validator-explanation-modal" class="modal fade" tabindex="-1" aria-labelledby="validator-explanation-modal-title" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Mutant Validator Explanation</h4>
+                <h5 class="modal-title" id="validator-explanation-modal-title">Mutant Validator Explanation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 
 			<div class="modal-body">
@@ -91,11 +90,8 @@
 			</div>
 
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
 		</div>
 	</div>
 </div>
-
-
-
