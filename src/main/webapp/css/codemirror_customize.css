@@ -1,6 +1,17 @@
 /* (Page-wide) CodeMirror customizations
 ============================================================================= */
 
+/* Add a bit more padding on the left side.
+----------------------------------------------------------------------------- */
+
+.CodeMirror-gutters {
+    padding-right: .2em;
+    padding-left: .2em;
+}
+pre.CodeMirror-line {
+    padding-left: .4em;
+}
+
 /* Mutant Icons
 ----------------------------------------------------------------------------- */
 
