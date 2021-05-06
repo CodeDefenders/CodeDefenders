@@ -158,6 +158,5 @@
             <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
         </form>
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
-        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
 </div>

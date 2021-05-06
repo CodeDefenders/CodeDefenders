@@ -103,7 +103,7 @@
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
         autoRefresh: true
     });
-    editorSUT.setSize("100%", 500);
+    editorSUT.setSize("100%", "100%");
 
     /* If global autocompletedClasses exists, get it, otherwise, create it. */
     const autocompletedClasses = window.autocompletedClasses = window.autocompletedClasses || {};
@@ -121,7 +121,7 @@
                 readOnly: 'nocursor',
                 autoRefresh: true
             });
-            editor.setSize("100%", 500); // next to the test editor the cm editor would be too big
+            editor.setSize("100%", 500);
 
             autocompletedClasses['<%=depName%>'] =  editor.getTextArea().value;
         <% } %>

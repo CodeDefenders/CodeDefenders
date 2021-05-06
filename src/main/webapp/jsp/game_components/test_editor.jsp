@@ -26,7 +26,14 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
-<pre><textarea id="test-code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
+<div class="card">
+    <div class="card-body p-0">
+        <pre class="m-0"><textarea id="test-code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
+    </div>
+    <div class="card-footer">
+        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
+    </div>
+</div>
 
 <script>
 (function () {
@@ -53,7 +60,7 @@
 
     let autocompleteList = [];
 
-    filterOutComments = function(text) {
+    const filterOutComments = function(text) {
         let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
         return text.replace(commentRegex, "");
     };
