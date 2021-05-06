@@ -168,6 +168,4 @@
 
 </div>
 
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
-
 <%@ include file="/jsp/footer_game.jsp" %>

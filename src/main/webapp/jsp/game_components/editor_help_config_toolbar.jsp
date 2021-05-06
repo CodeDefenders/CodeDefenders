@@ -25,33 +25,33 @@
 
 <div class="btn-toolbar" role="toolbar">
 
-    <div class="btn-group" role="group">
-        <div data-toggle="modal" href="#editorHelpConfig" class="btn btn-xs btn-default">
-            Keyboard Shortcuts <span class="glyphicon glyphicon-question-sign"></span>
-        </div>
+    <div class="btn-group me-2" role="group">
+        <button data-bs-toggle="modal" data-bs-target="#editor-help-modal" class="btn btn-xs btn-secondary">
+            Keyboard Shortcuts
+            <i class="fa fa-question-circle ms-1"></i>
+        </button>
     </div>
 
-    <div class="btn-group" role="group" aria-label="Second group">
-        <div id="keymap-drowdown" class="dropdown">
-            <button class="btn btn-default btn-xs dropdown-toggle" type="button" id="editorModeMenu" data-toggle="dropdown">
-                <span class="caret"></span>
-                Editor Mode: <span id="current-keymap" >${login.user.keyMap.CMName}</span>
+    <div class="btn-group" role="group">
+        <div id="keymap-dropdown" class="dropdown">
+            <button class="btn btn-xs btn-secondary dropdown-toggle" type="button" id="editor-mode-menu" data-bs-toggle="dropdown" aria-expanded="false">
+                Editor Mode: <span id="current-keymap">${login.user.keyMap.CMName}</span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="editorModeMenu">
-                <li><a>${login.user.keyMap.CMName}</a></li>
-                <li role="separator" class="divider"></li>
+            <ul class="dropdown-menu" aria-labelledby="editor-mode-menu">
+                <li><a class="dropdown-item" href="#">${login.user.keyMap.CMName}</a></li>
+                <li class="dropdown-divider"></li>
                 <%
                     for (KeyMap km : KeyMap.values()) {
                         if (km != login.getUser().getKeyMap()) {
                 %>
                         <li>
-                            <a>
-                                <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
-                                    <input type="hidden" class="form-control" name="formType" value="updateKeyMap">
-                                    <input type="hidden" class="form-control" name="editorKeyMap" value="<%=km.name()%>">
-                                    <button style="width: 100%; all: inherit" type="submit"><%=km.getCMName()%></button>
-                                </form>
-                            </a>
+                            <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
+                                <input type="hidden" class="form-control" name="formType" value="updateKeyMap">
+                                <input type="hidden" class="form-control" name="editorKeyMap" value="<%=km.name()%>">
+                                <button class="dropdown-item" type="submit">
+                                    <%=km.getCMName()%>
+                                </button>
+                            </form>
                         </li>
                 <%
                         }
@@ -62,3 +62,5 @@
     </div>
 
 </div>
+
+<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>

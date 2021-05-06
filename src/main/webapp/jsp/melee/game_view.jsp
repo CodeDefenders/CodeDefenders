@@ -77,7 +77,6 @@
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%
     if (role.equals(Role.OBSERVER)) {

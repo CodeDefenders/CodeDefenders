@@ -63,7 +63,6 @@
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
