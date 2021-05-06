@@ -28,7 +28,7 @@
     <% if (!classViewer.hasDependencies()) { %>
 
         <div class="card-body p-0">
-            <pre class="m-0"><textarea id="sut" name="cut" title="cut" cols="80" rows="30">${classViewer.classCode}</textarea></pre>
+            <pre class="m-0" readonly><textarea id="sut" name="cut" title="cut" cols="80" rows="30">${classViewer.classCode}</textarea></pre>
         </div>
 
     <%-- dependencies exist -> tab system --%>
@@ -65,7 +65,7 @@
                      id="${classViewer.className}"
                      aria-labelledby="${classViewer.className}-tab"
                      role="tabpanel">
-                    <pre class="m-0"><textarea id="sut" name="cut" title="cut" cols="80" rows="30">${classViewer.classCode}</textarea></pre>
+                    <pre class="m-0" readonly><textarea id="sut" name="cut" title="cut" cols="80" rows="30">${classViewer.classCode}</textarea></pre>
                 </div>
                 <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
                         String depName = dependency.getKey();
@@ -74,7 +74,7 @@
                          id="<%=depName%>"
                          aria-labelledby="<%=depName%>-tab"
                          role="tabpanel">
-                         <pre class="m-0"><textarea id="text-<%=depName%>"
+                         <pre class="m-0" readonly><textarea id="text-<%=depName%>"
                                                     name="text-<%=depName%>"
                                                     title="text-<%=depName%>"
                                                     cols="80" rows="30"><%=depCode%></textarea></pre>
