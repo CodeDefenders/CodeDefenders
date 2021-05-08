@@ -30,9 +30,6 @@
     <div class="card-body p-0">
         <pre class="m-0"><textarea id="test-code" name="test" title="test">${testEditor.testCode}</textarea></pre>
     </div>
-    <div class="card-footer">
-        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
-    </div>
 </div>
 
 <script>

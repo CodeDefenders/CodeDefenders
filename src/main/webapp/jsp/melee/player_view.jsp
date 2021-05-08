@@ -340,7 +340,6 @@
             <jsp:include
                     page="/jsp/game_components/mutant_error_highlighting.jsp"/>
         </form>
-        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
 
     <%-- -------------------------------------------------------------------------------- --%>
@@ -367,8 +366,6 @@
             <input type="hidden" name="formType" value="createTest"> <input
                 type="hidden" name="gameId" value="<%=game.getId()%>"/>
         </form>
-        <jsp:include
-                page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 

@@ -90,5 +90,7 @@
                    data-target="#playerFeedback">
                     Feedback
                 </a>
+
+                <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
             </div>
     </div>

@@ -99,5 +99,7 @@
 
                 <a href="#" class="btn btn-default pull-right" id="btnFeedback"
 					data-toggle="modal" data-target="#playerFeedback"> Feedback </a>
+
+                <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
             </div>
     </div>
