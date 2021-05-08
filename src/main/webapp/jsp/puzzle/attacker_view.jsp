@@ -161,7 +161,6 @@
             <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         </form>
-        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 </div>
 

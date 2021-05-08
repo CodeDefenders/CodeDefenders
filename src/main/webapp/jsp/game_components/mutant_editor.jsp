@@ -90,6 +90,10 @@
 
     <% } %>
 
+    <div class="card-footer">
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
+    </div>
+
 </div>
 
 
