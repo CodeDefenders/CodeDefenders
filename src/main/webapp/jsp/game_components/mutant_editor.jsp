@@ -70,7 +70,7 @@
                      id="${mutantEditor.className}"
                      aria-labelledby="${mutantEditor.className}-tab"
                      role="tabpanel">
-                    <pre class="m-0" readonly><textarea id="mutant-code" name="mutant" title="mutant" cols="80" rows="30">${mutantEditor.mutantCode}</textarea></pre>
+                    <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
                 </div>
                 <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
                     String depName = dependency.getKey();
@@ -79,10 +79,10 @@
                          id="<%=depName%>"
                          aria-labelledby="<%=depName%>-tab"
                          role="tabpanel">
-                             <pre class="m-0" readonly><textarea id="text-<%=depName%>"
-                                                                 name="text-<%=depName%>"
-                                                                 title="text-<%=depName%>"
-                                                                 cols="80" rows="30"><%=depCode%></textarea></pre>
+                             <pre class="m-0"><textarea id="text-<%=depName%>"
+                                                        name="text-<%=depName%>"
+                                                        title="text-<%=depName%>"
+                                                        readonly><%=depCode%></textarea></pre>
                     </div>
                 <% } %>
             </div>
@@ -260,7 +260,7 @@
                     lineNumbers: true,
                     matchBrackets: true,
                     mode: "text/x-java",
-                    readOnly: true,
+                    readOnly: 'nocursor',
                     autoRefresh: true
                 });
 
