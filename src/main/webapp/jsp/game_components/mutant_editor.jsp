@@ -27,50 +27,70 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 
-<%-- no dependencies -> no tabs --%>
-<% if (!mutantEditor.hasDependencies()) { %>
+<div class="card codemirror-card">
 
-    <pre style="margin-top: 10px;"><textarea id="mutant-code" name="mutant" title="mutant" cols="80"
-                                             rows="50">${mutantEditor.mutantCode}</textarea></pre>
+    <%-- no dependencies -> no tabs --%>
+    <% if (!mutantEditor.hasDependencies()) { %>
 
-<%-- dependencies exist -> tab system --%>
-<% } else { %>
+        <div class="card-body p-0">
+            <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant" cols="80" rows="50">${mutantEditor.mutantCode}</textarea></pre>
+        </div>
 
-    <div>
-        <ul class="nav nav-tabs" style="margin-top: 15px">
-            <li role="presentation" class="active">
-                <a href="#${mutantEditor.className}" aria-controls="${mutantEditor.className}"
-                   role="tab" data-toggle="tab">${mutantEditor.className}</a>
-            </li>
-            <% for (String depName : mutantEditor.getDependencies().keySet()) {%>
-                <li role="presentation">
-                    <a href="#<%=depName%>" aria-controls="<%=depName%>" role="tab" data-toggle="tab"><%=depName%></a>
+    <%-- dependencies exist -> tab system --%>
+    <% } else { %>
+
+        <div class="card-header">
+            <ul class="nav nav-pills nav-fill gap-1" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-2 py-1 active" data-bs-toggle="tab"
+                            id="${mutantEditor.className}-tab"
+                            data-bs-target="#${mutantEditor.className}"
+                            aria-controls="${mutantEditor.className}"
+                            type="button" role="tab" aria-selected="true">
+                        ${mutantEditor.className}
+                    </button>
                 </li>
-            <% }%>
-        </ul>
+                <% for (String depName : mutantEditor.getDependencies().keySet()) { %>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link px-2 py-1" data-bs-toggle="tab"
+                            id="<%=depName%>-tab"
+                            data-bs-target="#<%=depName%>"
+                            aria-controls="<%=depName%>"
+                            type="button" role="tab" aria-selected="true">
+                        <%=depName%>
+                    </button>
+                </li>
+                <% } %>
+            </ul>
+        </div>
 
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="${mutantEditor.className}" data-toggle="tab">
-                    <pre><textarea id="mutant-code" name="mutant" title="mutant" cols="80"
-                                   rows="50">${mutantEditor.mutantCode}</textarea></pre>
-            </div>
-            <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
+        <div class="card-body p-0">
+            <div class="tab-content">
+                <div class="tab-pane active"
+                     id="${mutantEditor.className}"
+                     aria-labelledby="${mutantEditor.className}-tab"
+                     role="tabpanel">
+                    <pre class="m-0" readonly><textarea id="mutant-code" name="mutant" title="mutant" cols="80" rows="30">${mutantEditor.mutantCode}</textarea></pre>
+                </div>
+                <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
                     String depName = dependency.getKey();
                     String depCode = dependency.getValue(); %>
-
-                <div role="tabpanel" class="tab-pane active hideAfterRendering" id="<%=depName%>" data-toggle="tab">
-                            <pre class="readonly-pre"><textarea class="readonly-textarea" id="text-<%=depName%>"
-                                                                name="text-<%=depName%>"
-                                                                title="text-<%=depName%>" cols="80"
-                                                                rows="30"><%=depCode%></textarea></pre>
-                </div>
-            <% } %>
+                    <div class="tab-pane"
+                         id="<%=depName%>"
+                         aria-labelledby="<%=depName%>-tab"
+                         role="tabpanel">
+                             <pre class="m-0" readonly><textarea id="text-<%=depName%>"
+                                                                 name="text-<%=depName%>"
+                                                                 title="text-<%=depName%>"
+                                                                 cols="80" rows="30"><%=depCode%></textarea></pre>
+                    </div>
+                <% } %>
+            </div>
         </div>
-    </div>
 
-<% } %>
+    <% } %>
 
-
+</div>
 
 
 <script>
@@ -186,8 +206,6 @@
         autoRefresh: true
     });
 
-    editorMutant.setSize("100%", 500);
-
     editorMutant.on('beforeChange', function (cm, change) {
         let text = cm.getValue();
         let lines = text.split(/\r|\r\n|\n/);
@@ -245,23 +263,11 @@
                     readOnly: true,
                     autoRefresh: true
                 });
-                editor<%=depName%>.setSize("100%", 500); // next to the test editor the cm editor would be too big
-                editor<%=depName%>.refresh();
 
                 autocompletedClasses['<%=depName%>'] =  editor<%=depName%>.getTextArea().value;
         <% } %>
 
     <% } %>
-
-
-    /* ==================== Finishing up ==================== */
-
-    // Please don't blame me.
-    // Without the hideAfterRendering class attribute the editor is only rendered
-    // when the editor is displayed and actively clicked on
-    $('.hideAfterRendering').each(function () {
-        $(this).removeClass('active')
-    });
 
 })();
 </script>
