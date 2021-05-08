@@ -67,7 +67,7 @@
 
     <div>
          <span class="align-middle me-1">Mutant restrictions:</span>
-         <button data-bs-toggle="modal" data-bs-target="#validator-explanation-modal"
+         <button type="button" data-bs-toggle="modal" data-bs-target="#validator-explanation-modal"
                  title="Click for more information"
                  class="btn btn-xs <%=levelStyling%> align-middle">
              <%= StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase()) %>

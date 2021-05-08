@@ -26,7 +26,7 @@
 <div class="btn-toolbar" role="toolbar">
 
     <div class="btn-group me-2" role="group">
-        <button data-bs-toggle="modal" data-bs-target="#editor-help-modal" class="btn btn-xs btn-secondary">
+        <button type="button" data-bs-toggle="modal" data-bs-target="#editor-help-modal" class="btn btn-xs btn-secondary">
             Keyboard Shortcuts
             <i class="fa fa-question-circle ms-1"></i>
         </button>
@@ -38,8 +38,12 @@
                 Editor Mode: <span id="current-keymap">${login.user.keyMap.CMName}</span>
             </button>
             <ul class="dropdown-menu" aria-labelledby="editor-mode-menu">
-                <li><a class="dropdown-item" href="#">${login.user.keyMap.CMName}</a></li>
+                <li><span class="dropdown-item">${login.user.keyMap.CMName}</span></li>
                 <li class="dropdown-divider"></li>
+                <%-- FIXME: Workaround: The keymap forms are now nested in the "defend" form and since nested forms are
+                not officially a thing, the first nested form tag is somehow removed. So we insert a dummy form tag that
+                can be removed instead. --%>
+                <form style="display: none;"></form>
                 <%
                     for (KeyMap km : KeyMap.values()) {
                         if (km != login.getUser().getKeyMap()) {
