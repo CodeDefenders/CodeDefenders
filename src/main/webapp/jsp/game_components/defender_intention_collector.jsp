@@ -26,11 +26,9 @@
     var theForm = document.getElementById('def');
 
     // prepend note for line selection above CUT
-    var lineChooseNote = "<span id='lineChooseNote' class='panel panel-default' style='padding: 5px; margin-left: 20px; color: #00289c'>" +
-        "<i class='glyphicon glyphicon-arrow-down' style='margin: 5px 3px 20px 0'></i>" +
-        "Indicate which line you are defending to enable test editor</span>";
+    var lineChooseNote = '<div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c"><i class="fa fa-arrow-down"></i> Indicate which line you are defending to enable test editor</div>';
 
-    $(lineChooseNote).insertAfter('#cut-div h3');
+    $(lineChooseNote).insertAfter('#cut-div .game-component-header');
 
     var input = document.createElement("input");
     input.setAttribute("type", "hidden");
@@ -87,7 +85,7 @@
     function makeMarker() {
         var marker = document.createElement("div");
         marker.style.color = "#002cae";
-        marker.innerHTML = "<span class=\"glyphicon glyphicon-triangle-right marker\" aria-hidden=\"true\"> </span>";
+        marker.innerHTML = '<i class="fa fa-arrow-right marker ps-1"></i>';
         return marker;
     }
 
@@ -109,7 +107,7 @@
             // Disable the button
             submitTestButton.disabled = true;
             // Standard text
-            submitTestButton.innerText = "Defend !";
+            submitTestButton.innerText = "Defend";
 
             $('#def pre').addClass('readonly-pre');
 
@@ -119,7 +117,7 @@
             // Enable the button
             submitTestButton.disabled = false;
             // Update the text inside the Defend button to show the selected line as well
-            submitTestButton.innerText = "Defend Line " + sLine + " !";
+            submitTestButton.innerText = "Defend Line " + sLine;
 
             $('#def pre').removeClass('readonly-pre');
 
@@ -140,9 +138,9 @@
 
     function toggleLineChooseNote() {
         if (!isLineSelected()) {
-            $('#lineChooseNote').show();
+            $('#line-choose-note').show();
         } else {
-            $('#lineChooseNote').hide();
+            $('#line-choose-note').hide();
         }
     }
 
