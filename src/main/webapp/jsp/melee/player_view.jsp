@@ -279,51 +279,45 @@
     <%-- Attacker view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-lg-6" id="newmut-div" style="margin-top: 20px;">
-        <div class="row" style="display: contents">
-            <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
+    <div class="col-lg-6" id="newmut-div">
 
-            <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
-            <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
-            <button type="submit" class="btn btn-primary btn-bold pull-right"
-                    id="submitMutant" form="atk"
-                    onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
-                    style="float: right; margin-right: 5px"
-                    <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
-                Attack!
-            </button>
+        <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
 
-            <!-- Reset button -->
-            <form id="reset"
-                  action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
-                  method="post" style="float: right; margin-right: 5px">
-                <button class="btn btn-primary btn-warning btn-bold pull-right"
-                        id="btnReset">Reset
+        <div class="d-flex justify-content-between flex-wrap gap-1 mb-2">
+            <h3 class="d-inline m-0">Create a mutant here</h3>
+            <div class="d-flex align-items-center flex-wrap gap-2">
+
+                <div class="form-check form-switch"
+                     data-bs-toggle="tooltip" data-bs-html="true"
+                     title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
+                    <input class="form-check-input" type="checkbox" id="highlighting-switch">
+                    <label class="form-check-label" for="highlighting-switch" id="highlighting-switch-label">Enemy Coverage</label>
+                </div>
+                <script>
+                    $('#highlighting-switch').change(function () {
+                        const codeMirror = $('#newmut-div .CodeMirror')[0].CodeMirror;
+                        codeMirror.clearCoverage();
+                        if (this.checked) {
+                            codeMirror.highlightAlternativeCoverage();
+                        } else {
+                            codeMirror.highlightCoverage();
+                        }
+                    })
+                </script>
+
+                <form id="reset" action="<%=request.getContextPath() + Paths.MELEE_GAME%>" method="post">
+                    <input type="hidden" name="formType" value="reset">
+                    <input type="hidden" name="gameId" value="<%=game.getId()%>">
+                    <button class="btn btn-warning" id="btnReset">Reset</button>
+                </form>
+
+                <button type="submit" class="btn btn-primary" id="submitMutant" form="atk"
+                        onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
+                        <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
+                    Attack
                 </button>
-                <input type="hidden" name="formType" value="reset">
-                <input type="hidden" name="gameId" value="<%=game.getId()%>"/>
-            </form>
 
-            <div class="form-check form-switch"
-                 data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
-                 title="<p>Switch between showing coverage of your tests and enemy tests.</p><p><i>If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>">
-                <input class="form-check-input" type="checkbox" id="highlighting-switch">
-                <label class="form-check-label" for="highlighting-switch" id="highlighting-switch-label">Your Coverage</label>
             </div>
-
-            <script>
-                $('#highlighting-switch').change(function () {
-                    const codeMirror = $('#newmut-div .CodeMirror')[0].CodeMirror;
-                    codeMirror.clearCoverage();
-                    if (this.checked) {
-                        codeMirror.highlightAlternativeCoverage();
-                        document.getElementById("highlighting-switch-label").innerText = "Enemy Coverage"
-                    } else {
-                        codeMirror.highlightCoverage();
-                        document.getElementById("highlighting-switch-label").innerText = "Your Coverage"
-                    }
-                })
-            </script>
         </div>
 
         <form id="atk"
