@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
@@ -48,6 +48,13 @@
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
     User equivDefender = (User) request.getAttribute("equivDefender");
+
+    String mutantClaimedMessage = null;
+    if (openEquivalenceDuel) {
+        mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
+                ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
+                : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getUsername();
+    }
 
     final User user = login.getUser();
     // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
@@ -185,95 +192,68 @@
 <% previousSubmission.clear(); %>
 
 
-<%-- All the views must be on the same row --%>
-
 <div class="row">
 
-    <% if (openEquivalenceDuel) { %>
+<% if (openEquivalenceDuel) { %>
 
     <%-- -------------------------------------------------------------------------------- --%>
     <%-- Equivalence Duel view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
     <div class="col-lg-6" id="equivmut-div">
-        <h3>
-            Mutant <%=equivMutant.getId()%>
-            <!-- check for automatically triggered equivalence duels -->
-            <% if (equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID) { %>
-            automatically claimed equivalent
-            <% } else { %>
-            claimed equivalent by <%=equivDefender.getUsername()%>
-            <% } %>
-        </h3>
-        <div
-                style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
-            <p><%=String.join("\n", equivMutant.getHTMLReadout())%>
-            </p>
-            <a class="btn btn-default" data-toggle="collapse"
-               href="#diff-collapse">Show Diff</a>
-            <p></p>
-            <pre id="diff-collapse" class="readonly-pre collapse">
-				<textarea id="diff" class="mutdiff readonly-textarea"
-                          title="mutdiff"><%=equivMutant.getHTMLEscapedPatchString()%></textarea>
-			</pre>
+        <div class="game-component-header"><h3><%=mutantClaimedMessage%></h3></div>
+
+        <div class="equivalence-container">
+
+            <h3>Diff</h3>
+            <div class="card">
+                <div class="card-body p-0">
+                    <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff" readonly><%=equivMutant.getHTMLEscapedPatchString()%></textarea></pre>
+                </div>
+            </div>
+
             <script>
-                $('#diff-collapse').on('shown.bs.collapse', function () {
-                    var codeMirrorContainer = $(this).find(".CodeMirror")[0];
-                    if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                        codeMirrorContainer.CodeMirror.refresh();
-                    } else {
-                        var showDiff = CodeMirror.fromTextArea(document
-                                .getElementById('diff'), {
-                            lineNumbers: false,
-                            mode: "text/x-diff",
-                            readOnly: true,
-                            autoRefresh: true
-                        });
-                        showDiff.setSize("100%", 210);
-                    }
-                });
+                (function () {
+                    const codemirror = CodeMirror.fromTextArea(document.getElementById('diff'), {
+                        lineNumbers: true,
+                        mode: "text/x-diff",
+                        readOnly: 'nocursor',
+                        autoRefresh: true
+                    });
+                    codemirror.setSize('100%', '100%');
+                })();
             </script>
 
             <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
-            <h3>Not equivalent? Write a killing test here:</h3>
-            <form id="equivalenceForm"
-                  action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>"
-                  method="post">
+
+            <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
+            <form id="equivalenceForm" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post">
                 <input type="hidden" name="formType" value="resolveEquivalence">
                 <input type="hidden" name="gameId" value="<%=game.getId()%>">
-                <input type="hidden" id="equivMutantId" name="equivMutantId"
-                       value="<%=equivMutant.getId()%>">
+                <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%=equivMutant.getId()%>">
 
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
-                <button class="btn btn-danger" name="acceptEquivalent"
-                        type="submit"
-                        onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">
-                    Accept
-                    Equivalence
-                </button>
-                <button class="btn btn-primary btn-bold pull-right"
-                        name="rejectEquivalent" type="submit"
-                        onclick="testProgressBar(); return true;">Submit Killing
-                    Test
-                </button>
-
-                <div>Note: If the game finishes with this equivalence
-                    unsolved, you will lose points!
+                <div class="d-flex justify-content-between mt-2 mb-2">
+                    <button class="btn btn-danger" name="acceptEquivalent" type="submit"
+                            onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
+                    <button class="btn btn-primary" name="rejectEquivalent" type="submit"
+                            onclick="testProgressBar(); this.disabled=true;">Submit Killing Test</button>
                 </div>
+
+                <span>Note: If the game finishes with this equivalence unsolved, you will lose points!</span>
             </form>
         </div>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 
-    <%-- TODO: What to show besides the test editor in the quivalence duel? --%>
     <div class="col-lg-6" id="cut-div">
         <h3>Class Under Test</h3>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
     </div>
 
-    <% } else { %>
+<% } else { %>
 
     <%-- -------------------------------------------------------------------------------- --%>
     <%-- Attacker view --%>
@@ -311,7 +291,7 @@
                     <button class="btn btn-warning" id="btnReset">Reset</button>
                 </form>
 
-                <button type="submit" class="btn btn-attacker btn-game" id="submitMutant" form="atk"
+                <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
                         onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
                     Attack
@@ -343,7 +323,7 @@
         <div class="game-component-header">
             <h3>Write a new JUnit test here</h3>
             <div>
-                <button type="submit" class="btn btn-defender btn-game"
+                <button type="submit" class="btn btn-defender btn-highlight"
                         id="submitTest" form="def"
                         onclick="window.testProgressBar(); this.form.submit(); this.disabled = true;"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
@@ -363,7 +343,7 @@
 
     </div>
 
-    <% } %>
+<% } %>
 
 </div>
 

@@ -27,12 +27,12 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 
-<div class="card codemirror-card">
+<div class="card minheight-card">
 
     <%-- no dependencies -> no tabs --%>
     <% if (!mutantEditor.hasDependencies()) { %>
 
-        <div class="card-body p-0">
+        <div class="card-body p-0 codemirror-extender">
             <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant" cols="80" rows="50">${mutantEditor.mutantCode}</textarea></pre>
         </div>
 
@@ -64,7 +64,7 @@
             </ul>
         </div>
 
-        <div class="card-body p-0">
+        <div class="card-body p-0 codemirror-extender">
             <div class="tab-content">
                 <div class="tab-pane active"
                      id="${mutantEditor.className}"

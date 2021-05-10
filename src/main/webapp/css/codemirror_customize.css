@@ -192,3 +192,29 @@ pre.CodeMirror-line {
 .readonly-pre .CodeMirror {
     background: #F5F5F5;
 }
+
+/* Make the CodeMirror element determine its size according to the parent
+   element instead of the other way around.
+
+   Use as:
+   <div class=".codemirror-extender">
+       ...
+           <div class=".CodeMirror">
+           ...
+           </div>
+       ...
+   </div>
+----------------------------------------------------------------------------- */
+
+/* Make CodeMirror instances take 100% of parent element space.
+   stackoverflow.com/questions/4804581/css-expand-float-child-div-height-to-parents-height */
+.codemirror-extender {
+    position: relative;
+}
+.codemirror-extender .CodeMirror {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}

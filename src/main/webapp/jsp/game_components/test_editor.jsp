@@ -26,8 +26,8 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
-<div class="card codemirror-card">
-    <div class="card-body p-0">
+<div class="card minheight-card">
+    <div class="card-body p-0 codemirror-extender">
         <pre class="m-0"><textarea id="test-code" name="test" title="test">${testEditor.testCode}</textarea></pre>
     </div>
 </div>

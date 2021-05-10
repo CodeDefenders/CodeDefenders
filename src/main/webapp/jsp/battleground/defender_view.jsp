@@ -125,7 +125,7 @@
             <h3>Write a new JUnit test here</h3>
             <div>
 
-                <button type="submit" class="btn btn-defender btn-game" id="submitTest" form="def"
+                <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
                     onclick="window.testProgressBar(); this.form.submit(); this.disabled = true;"
                     <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend

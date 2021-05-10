@@ -12,44 +12,6 @@
     max-width: 1660px;
 }
 
-/* Make cards with editors the same height, independent of the existence of
-   headers and footers.
-
-   Use as:
-   <div class="card codemirror-card">
-       ...
-       <div class="card-body">
-           <!-- CodeMirror container here -->
-       </div>
-       ...
-   </div>
------------------------------------------------------------------------------ */
-
-.codemirror-card {
-    min-height: 600px;
-}
-
-/* If header + footer exceed 100px, we don't care if all cards are the same
-   size and make the editor 500px high anyways. This is to escape edge-cases
-   with 20+ dependencies taking up a lot of header space and thus making the
-   editor very small. */
-.codemirror-card .card-body {
-    min-height: 500px;
-}
-
-/* Make CodeMirror instances take 100% of the card body space.
-   stackoverflow.com/questions/4804581/css-expand-float-child-div-height-to-parents-height */
-.codemirror-card .card-body {
-    position: relative;
-}
-.codemirror-card .card-body .CodeMirror {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
 /* Component header with controls
 
    Use as:
@@ -84,11 +46,12 @@
     gap: .5rem; /* Corresponds to .gap-2 in Bootstrap. */
 }
 
-/* Submit buttons that stick out a little bit
+/* Container for highlighting the components for resolving an equivalence duel
 ----------------------------------------------------------------------------- */
 
-.btn-game {
-    font-weight: bold;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+.equivalence-container {
+    border: 5px dashed #f00;
+    border-radius: 5px;
+    width: 100%;
+    padding: .5rem 1rem;
 }

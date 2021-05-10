@@ -134,7 +134,7 @@
             <div>
 
                 <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
-                <button type="submit" class="btn btn-attacker btn-game" id="submitMutant" form="atk"
+                <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
                         onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
                         <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Attack

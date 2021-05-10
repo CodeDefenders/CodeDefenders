@@ -22,12 +22,12 @@
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
-<div class="card codemirror-card">
+<div class="card minheight-card">
 
     <%-- no dependencies -> no tabs --%>
     <% if (!classViewer.hasDependencies()) { %>
 
-        <div class="card-body p-0">
+        <div class="card-body p-0 codemirror-extender">
             <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
         </div>
 
@@ -59,7 +59,7 @@
             </ul>
         </div>
 
-        <div class="card-body p-0">
+        <div class="card-body p-0 codemirror-extender">
             <div class="tab-content">
                 <div class="tab-pane active"
                      id="${classViewer.className}"
