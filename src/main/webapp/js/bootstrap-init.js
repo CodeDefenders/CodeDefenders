@@ -20,3 +20,14 @@ $(document).ready(function() {
         }, false);
     }
 });
+
+/*
+ * Initialize tooltips.
+ *
+ * Adopted from https://getbootstrap.com/docs/5.0/components/tooltips
+ */
+$(document).ready(function() {
+    for (const tooltipTriggerEl of document.querySelectorAll('[data-bs-toggle="tooltip"]')) {
+        new bootstrap.Tooltip(tooltipTriggerEl);
+    }
+});

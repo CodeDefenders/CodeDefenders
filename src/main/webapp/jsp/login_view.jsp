@@ -29,8 +29,6 @@
     int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 %>
 
-<script type="text/javascript" src="${pageContext.request.contextPath}/js/form-validation.js"></script>
-
 <div id="login" class="container">
     <div class="mx-auto" style="max-width: 25rem;">
         <h2>Sign in</h2>

@@ -281,8 +281,7 @@
 
     <div class="col-lg-6" id="newmut-div" style="margin-top: 20px;">
         <div class="row" style="display: contents">
-            <h3 style="margin-bottom: 0; display: inline">Create a mutant
-                here</h3>
+            <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
 
             <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
             <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
@@ -305,27 +304,26 @@
                 <input type="hidden" name="gameId" value="<%=game.getId()%>"/>
             </form>
 
-            <div id="switchHighlightDiv"
-                 data-toggle="tooltip" data-placement="top" title="Switch between showing coverage of your and the enemy tests. If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant."
-                 style="float: right; margin-right: 5px">
-                <input id="switchHighlighting" type="checkbox" name="coverage" class="form-control"
-                       data-toggle="toggle" data-on="Enemy coverage" data-off="My coverage"
-                       data-onstyle="default" data-offstyle="default" data-width="150" <%-- <= Why? WTF --%>
-                       >
-                <script>
-                    (function () {
-                        $('#switchHighlighting').change(function () {
-                            const codeMirror = $('#newmut-div .CodeMirror')[0].CodeMirror;
-                            codeMirror.clearCoverage();
-                            if (this.checked) {
-                                codeMirror.highlightAlternativeCoverage();
-                            } else {
-                                codeMirror.highlightCoverage();
-                            }
-                        })
-                    })();
-                </script>
+            <div class="form-check form-switch"
+                 data-bs-toggle="tooltip" data-bs-placement="top" data-bs-html="true"
+                 title="<p>Switch between showing coverage of your tests and enemy tests.</p><p><i>If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>">
+                <input class="form-check-input" type="checkbox" id="highlighting-switch">
+                <label class="form-check-label" for="highlighting-switch" id="highlighting-switch-label">Your Coverage</label>
             </div>
+
+            <script>
+                $('#highlighting-switch').change(function () {
+                    const codeMirror = $('#newmut-div .CodeMirror')[0].CodeMirror;
+                    codeMirror.clearCoverage();
+                    if (this.checked) {
+                        codeMirror.highlightAlternativeCoverage();
+                        document.getElementById("highlighting-switch-label").innerText = "Enemy Coverage"
+                    } else {
+                        codeMirror.highlightCoverage();
+                        document.getElementById("highlighting-switch-label").innerText = "Your Coverage"
+                    }
+                })
+            </script>
         </div>
 
         <form id="atk"
