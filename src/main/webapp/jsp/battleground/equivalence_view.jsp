@@ -154,7 +154,7 @@
     </div>
 
     <div class="col-lg-6" id="cut-div">
-        <h3>Class Under Test</h3>
+        <div class="game-component-header"><h3>Class Under Test</h3></div>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp" />

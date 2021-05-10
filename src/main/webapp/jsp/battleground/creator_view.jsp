@@ -82,19 +82,19 @@
 <div class="row">
 	<div class="col-lg-6">
 		<div id="mutants-div">
-			<h3>Existing Mutants</h3>
+            <div class="game-component-header"><h3>Existing Mutants</h3></div>
             <t:mutant_accordion/>
 		</div>
 
 		<div id="tests-div">
-            <h3>JUnit Tests</h3>
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
 		</div>
 	</div>
 
 	<div class="col-lg-6" id="cut-div">
-		<h3>Class Under Test</h3>
-		<jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+        <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
 		<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
 	</div>
 </div>

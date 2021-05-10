@@ -122,20 +122,27 @@
     <hr class="hr-primary" style="margin: 5px">
     <div class="row">
         <div class="col-lg-6" id="cut-div">
-            <h3>Class Under Test</h3>
+            <div class="game-component-header"><h3>Class Under Test</h3></div>
             <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         </div>
 
         <div class="col-lg-6" id="ut-div">
             <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
-            <h3>Write a new JUnit test here
-                <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitTest" form="def"
-                        onClick="testProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
-                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Defend!
-                </button>
-            </h3>
+
+            <div class="game-component-header">
+                <h3>Write a new JUnit test here</h3>
+                <div>
+
+                    <button type="submit" class="btn btn-defender btn-game" id="submitTest" form="def"
+                            onclick="testProgressBar(); this.form.submit(); this.disabled=true;"
+                            <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                        Defend
+                    </button>
+
+                </div>
+            </div>
+
             <form id="def"
                   action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>"
                   method="post">
@@ -149,12 +156,12 @@
 
     <div class="row">
         <div class="col-lg-6" id="mutants-div">
-            <h3>Existing Mutants</h3>
+            <div class="game-component-header"><h3>Existing Mutants</h3></div>
             <t:mutant_accordion/>
         </div>
 
         <div class="col-lg-6">
-            <h3>JUnit Tests</h3>
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
         </div>
     </div>

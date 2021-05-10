@@ -2,6 +2,8 @@
 ============================================================================= */
 
 /* Game container
+
+   Use as: <div id="game-container" class="container-fluid">
 ----------------------------------------------------------------------------- */
 
 #game-container {
@@ -12,6 +14,15 @@
 
 /* Make cards with editors the same height, independent of the existence of
    headers and footers.
+
+   Use as:
+   <div class="card codemirror-card">
+       ...
+       <div class="card-body">
+           <!-- CodeMirror container here -->
+       </div>
+       ...
+   </div>
 ----------------------------------------------------------------------------- */
 
 .codemirror-card {
@@ -37,4 +48,47 @@
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+/* Component header with controls
+
+   Use as:
+   <div class="game-component-header">
+       <h3>Component Title</h3>
+       <div>
+           <!-- Controls for the component here (the whole div is optional) -->
+       </div>
+   </div>
+----------------------------------------------------------------------------- */
+
+.game-component-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .25rem; /* Corresponds to .gap-1 in Bootstrap. */
+    margin-bottom: .5rem; /* Corresponds to .mb-2 in Bootstrap. */
+    min-height: 2.5rem; /* To make headers without buttons the same height as headers with buttons. */
+}
+
+.game-component-header > h3 {
+    display: inline;
+    margin: 0;
+}
+
+.game-component-header > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem; /* Corresponds to .gap-2 in Bootstrap. */
+}
+
+/* Submit buttons that stick out a little bit
+----------------------------------------------------------------------------- */
+
+.btn-game {
+    font-weight: bold;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
 }

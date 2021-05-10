@@ -283,9 +283,9 @@
 
         <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
 
-        <div class="d-flex justify-content-between flex-wrap gap-1 mb-2">
-            <h3 class="d-inline m-0">Create a mutant here</h3>
-            <div class="d-flex align-items-center flex-wrap gap-2">
+        <div class="game-component-header">
+            <h3>Create a mutant here</h3>
+            <div>
 
                 <div class="form-check form-switch"
                      data-bs-toggle="tooltip" data-bs-html="true"
@@ -311,7 +311,7 @@
                     <button class="btn btn-warning" id="btnReset">Reset</button>
                 </form>
 
-                <button type="submit" class="btn btn-primary" id="submitMutant" form="atk"
+                <button type="submit" class="btn btn-attacker btn-game" id="submitMutant" form="atk"
                         onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
                     Attack
@@ -328,9 +328,7 @@
 
             <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-            <!-- THE FOLLOWING IS DUPLICATED ! -->
-            <jsp:include
-                    page="/jsp/game_components/mutant_error_highlighting.jsp"/>
+            <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
         </form>
     </div>
 
@@ -341,15 +339,18 @@
     <div class="col-lg-6" id="utest-div">
 
         <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
-        <h3 style="margin-bottom: 17px;">
-            Write a new JUnit test here
-            <button type="submit" class="btn btn-primary btn-bold pull-right"
-                    id="submitTest" form="def"
-                    onClick="window.testProgressBar(); this.form.submit(); this.disabled = true; this.value = 'Defending...';"
-                    <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
-                Defend!
-            </button>
-        </h3>
+
+        <div class="game-component-header">
+            <h3>Write a new JUnit test here</h3>
+            <div>
+                <button type="submit" class="btn btn-defender btn-game"
+                        id="submitTest" form="def"
+                        onclick="window.testProgressBar(); this.form.submit(); this.disabled = true;"
+                        <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
+                    Defend
+                </button>
+            </div>
+        </div>
 
         <form id="def"
               action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
@@ -359,6 +360,7 @@
                 type="hidden" name="gameId" value="<%=game.getId()%>"/>
         </form>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
+
     </div>
 
     <% } %>
@@ -367,12 +369,12 @@
 
 <div class="row">
     <div class="col-lg-6" id="mutants-div">
-        <h3>Existing Mutants</h3>
+        <div class="game-component-header"><h3>Existing Mutants</h3></div>
         <t:mutant_accordion/>
     </div>
 
     <div class="col-lg-6">
-        <h3>JUnit Tests</h3>
+        <div class="game-component-header"><h3>JUnit Tests</h3></div>
         <t:test_accordion/>
     </div>
 </div>

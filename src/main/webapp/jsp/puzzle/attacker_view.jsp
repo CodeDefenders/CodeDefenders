@@ -121,48 +121,56 @@
         <h4><%=description%></h4>
     </div>
     <hr class="hr-primary" style="margin: 5px">
-<div class="row">
-    <div class="col-lg-6">
-        <div id="mutants-div">
-            <h3>Mutants</h3>
-            <t:mutant_accordion/>
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div id="mutants-div">
+                <div class="game-component-header"><h3>Mutants</h3></div>
+                <t:mutant_accordion/>
+            </div>
+
+            <% if (showTestAccordion) { %>
+            <div id="tests-div">
+                <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                <t:test_accordion/>
+            </div>
+            <% } %>
         </div>
 
-        <% if (showTestAccordion) { %>
-        <div id="tests-div">
-            <h3>JUnit Tests</h3>
-            <t:test_accordion/>
+        <div class="col-lg-6" id="cut-div">
+            <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
+
+            <div class="game-component-header">
+                <h3>Create a mutant here</h3>
+                <div>
+
+                    <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
+                        <input type="hidden" name="formType" value="reset">
+                        <input type="hidden" name="gameId" value="<%= game.getId() %>">
+                        <button class="btn btn-warning" id="btnReset">
+                            Reset
+                        </button>
+                    </form>
+
+                    <button type="submit" class="btn btn-attacker btn-game" id="submitMutant" form="atk"
+                            onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
+                            <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                        Attack
+                    </button>
+
+                </div>
+            </div>
+
+
+            <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
+                <input type="hidden" name="formType" value="createMutant">
+                <input type="hidden" name="gameId" value="<%= game.getId() %>">
+
+                <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
+                <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+            </form>
         </div>
-        <% } %>
     </div>
-
-    <div class="col-lg-6" id="cut-div">
-        <h3 style="margin-bottom: 0;">Create a mutant here</h3>
-
-        <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
-            <input type="hidden" name="formType" value="reset">
-            <input type="hidden" name="gameId" value="<%= game.getId() %>">
-            <button class="btn btn-primary btn-warning btn-bold pull-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
-                Reset
-            </button>
-        </form>
-
-        <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
-        <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
-            <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitMutant" form="atk"
-                    onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
-                <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                Attack!
-            </button>
-
-            <input type="hidden" name="formType" value="createMutant">
-            <input type="hidden" name="gameId" value="<%= game.getId() %>">
-
-            <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
-            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-        </form>
-    </div>
-</div>
 
 </div>
 
