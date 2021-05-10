@@ -134,14 +134,28 @@
                 <input type="hidden" name="formType" value="resolveEquivalence">
                 <input type="hidden" name="gameId" value="<%=game.getId()%>">
                 <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%=equivMutant.getId()%>">
+                <input type="hidden" id="resolveAction" name="resolveAction" value="">
 
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                 <div class="d-flex justify-content-between mt-2 mb-2">
-                    <button class="btn btn-danger" name="acceptEquivalent" type="submit"
-                            onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
-                    <button class="btn btn-primary" name="rejectEquivalent" type="submit"
-                            onclick="testProgressBar(); this.disabled=true;">Submit Killing Test</button>
+                    <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent</button>
+                    <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test</button>
+                    <script>
+                        document.getElementById("accept-equivalent-button").addEventListener('click', function (event) {
+                            if (confirm('Accepting Equivalence will lose all mutant points. Are you sure?')) {
+                                this.form['resolveAction'].value = 'accept';
+                                this.form.submit();
+                                this.disabled = true;
+                            }
+                        });
+                        document.getElementById("reject-equivalent-button").addEventListener('click', function (event) {
+                            testProgressBar();
+                            this.form['resolveAction'].value = 'reject';
+                            this.form.submit();
+                            this.disabled = true;
+                        });
+                    </script>
                 </div>
 
                 <span>Note: If the game finishes with this equivalence unsolved, you will lose points!</span>
