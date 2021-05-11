@@ -2,9 +2,9 @@
 ============================================================================= */
 
 /* Game container
-
-   Use as: <div id="game-container" class="container-fluid">
 ----------------------------------------------------------------------------- */
+
+/* <div id="game-container" class="container-fluid"> */
 
 #game-container {
     padding-left: 30px;
@@ -13,15 +13,16 @@
 }
 
 /* Component header with controls
-
-   Use as:
-   <div class="game-component-header">
-       <h3>Component Title</h3>
-       <div>
-           <!-- Controls for the component here (the whole div is optional) -->
-       </div>
-   </div>
 ----------------------------------------------------------------------------- */
+
+/*
+ * <div class="game-component-header">
+ *     <h3>Component Title</h3>
+ *     <div>
+ *         <!-- Controls for the component here (the whole div is optional) -->
+ *     </div>
+ * </div>
+ */
 
 .game-component-header {
     display: flex;

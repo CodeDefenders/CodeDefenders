@@ -195,16 +195,16 @@ pre.CodeMirror-line {
 
 /* Make the CodeMirror element determine its size according to the parent
    element instead of the other way around.
-
-   Use as:
-   <div class=".codemirror-extender">
-       ...
-           <div class=".CodeMirror">
-           ...
-           </div>
-       ...
-   </div>
 ----------------------------------------------------------------------------- */
+
+/*
+ * <div class=".codemirror-extender">
+ *     <div class=".CodeMirror">
+ *         ...
+ *     </div>
+ * </div>
+ * editor.setSize('100%', '100%');
+ */
 
 /* Make CodeMirror instances take 100% of parent element space.
    stackoverflow.com/questions/4804581/css-expand-float-child-div-height-to-parents-height */
