@@ -133,13 +133,6 @@
             <h3>Create a mutant here</h3>
             <div>
 
-                <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
-                <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
-                        onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
-                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Attack
-                </button>
-
                 <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
                     <button class="btn btn-warning" id="btnReset">
                         Reset
@@ -147,6 +140,13 @@
                     <input type="hidden" name="formType" value="reset">
                     <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
                 </form>
+
+                <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
+                <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
+                        onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
+                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                    Attack
+                </button>
 
             </div>
         </div>

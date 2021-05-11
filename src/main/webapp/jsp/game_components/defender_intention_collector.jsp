@@ -26,7 +26,7 @@
     var theForm = document.getElementById('def');
 
     // prepend note for line selection above CUT
-    var lineChooseNote = '<div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c"><i class="fa fa-arrow-down"></i> Indicate which line you are defending to enable test editor</div>';
+    var lineChooseNote = '<div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c"><i class="fa fa-arrow-down"></i> Indicate which line you are defending to enable test editor. Click on a line number.</div>';
 
     $(lineChooseNote).insertAfter('#cut-div .game-component-header');
 
@@ -39,7 +39,7 @@
     theForm.appendChild(input);
 
     // Update Left Code Mirror to enable line selection on gutter
-    var editor = document.querySelector('#sut').nextSibling.CodeMirror;
+    var editor = document.querySelector("#sut + .CodeMirror").CodeMirror;
 
     toggleIntentionClass();
     // Trigger the logic that updates the UI at last

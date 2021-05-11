@@ -60,18 +60,16 @@ function updateAttackForm(value){
 
     attackDropDown.setAttribute("id", "attackDropDown");
     attackDropDown.setAttribute("class", "dropdown");
-    attackDropDown.setAttribute("style", "float: right; margin-right: 5px");
 
     var attackDropDownButton = document.createElement('button');
     attackDropDownButton.setAttribute("type", "button");
-    attackDropDownButton.setAttribute("class", "btn btn-primary btn-bold pull-right dropdown-toggle");
-    attackDropDownButton.setAttribute("data-toggle", "dropdown");
+    attackDropDownButton.setAttribute("class", "btn btn-attacker btn-highlight dropdown-toggle");
+    attackDropDownButton.setAttribute("data-bs-toggle", "dropdown");
     // Note the ID !
-    attackDropDownButton.setAttribute("id", "submitMutantTemp" );
+    attackDropDownButton.setAttribute("id", "submitMutantTemp");
     attackDropDownButton.setAttribute("form", "atk");
-    attackDropDownButton.setAttribute("aria-haspopup", "true");
     attackDropDownButton.setAttribute("aria-expanded", "false");
-    attackDropDownButton.innerHTML="Attack <span class=\"glyphicon glyphicon-triangle-bottom\" style=\"font-size: small\"/></span>";
+    attackDropDownButton.innerText = "Attack";
 
 
     // Attach the button to the drop down
@@ -89,7 +87,7 @@ function updateAttackForm(value){
 
     // create <ul> element containing list of intention options
     var intentionList = document.createElement('ul');
-    intentionList.setAttribute("class", "dropdown-menu dropdown-menu-right");
+    intentionList.setAttribute("class", "dropdown-menu");
     intentionList.setAttribute("aria-labelledby", "submitMutant");
     // append <ul> to dropDown attack button
     attackDropDown.appendChild(intentionList);
