@@ -37,7 +37,7 @@
         <div class="card-header">
             <ul class="nav nav-pills nav-fill gap-1" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link px-2 py-1 active" data-bs-toggle="tab"
+                    <button class="nav-link py-1 active" data-bs-toggle="tab"
                             id="${classViewer.className}-tab"
                             data-bs-target="#${classViewer.className}"
                             aria-controls="${classViewer.className}"
@@ -47,7 +47,7 @@
                 </li>
                 <% for (String depName : classViewer.getDependencies().keySet()) { %>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link px-2 py-1" data-bs-toggle="tab"
+                        <button class="nav-link py-1" data-bs-toggle="tab"
                                 id="<%=depName%>-tab"
                                 data-bs-target="#<%=depName%>"
                                 aria-controls="<%=depName%>"
