@@ -181,14 +181,6 @@ pre.CodeMirror-line {
 /* Style for read-only CodeMirror instances
 ----------------------------------------------------------------------------- */
 
-.readonly-pre .CodeMirror-focused .CodeMirror-cursor {
-    visibility: hidden; /* hide cursor */
-}
-
-.readonly-pre .CodeMirror-lines {
-    cursor : default; /* default pointer */
-}
-
 .readonly-pre .CodeMirror {
     background: #F5F5F5;
 }

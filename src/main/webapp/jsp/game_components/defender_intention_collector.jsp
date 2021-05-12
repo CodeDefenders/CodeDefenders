@@ -26,7 +26,7 @@
     var theForm = document.getElementById('def');
 
     // prepend note for line selection above CUT
-    var lineChooseNote = '<div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c"><i class="fa fa-arrow-down"></i> Indicate which line you are defending to enable test editor. Click on a line number.</div>';
+    var lineChooseNote = '<div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c"><i class="fa fa-arrow-down me-1"></i> Indicate which line you are defending to enable test editor. Click on a line number.</div>';
 
     $(lineChooseNote).insertAfter('#cut-div .game-component-header');
 
@@ -40,6 +40,7 @@
 
     // Update Left Code Mirror to enable line selection on gutter
     var editor = document.querySelector("#sut + .CodeMirror").CodeMirror;
+    var testEditor = document.querySelector("#test-code + .CodeMirror").CodeMirror;
 
     toggleIntentionClass();
     // Trigger the logic that updates the UI at last
@@ -109,7 +110,8 @@
             // Standard text
             submitTestButton.innerText = "Defend";
 
-            $('#def pre').addClass('readonly-pre');
+            testEditor.setOption('readOnly', 'nocursor');
+            document.querySelector('#def pre').classList.add('readonly-pre');
 
             // Update the value of the hidden field
             input.setAttribute("value", "");
@@ -119,7 +121,8 @@
             // Update the text inside the Defend button to show the selected line as well
             submitTestButton.innerText = "Defend Line " + sLine;
 
-            $('#def pre').removeClass('readonly-pre');
+            testEditor.setOption('readOnly', false);
+            document.querySelector('#def pre').classList.remove('readonly-pre');
 
             // Update the value of the hidden field
             input.setAttribute("value", sLine);
