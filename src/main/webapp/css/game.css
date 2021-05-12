@@ -31,7 +31,9 @@
     flex-wrap: wrap;
     gap: .25rem; /* Corresponds to .gap-1 in Bootstrap. */
     margin-bottom: .5rem; /* Corresponds to .mb-2 in Bootstrap. */
-    min-height: 2.5rem; /* To make headers without buttons the same height as headers with buttons. */
+    margin-top: 1.5rem;
+    min-height: 2.5rem; /* To make headers with buttons the same height as headers without buttons. */
+    align-items: center;
 }
 
 .game-component-header > h3 {
