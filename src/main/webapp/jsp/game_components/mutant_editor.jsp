@@ -32,7 +32,7 @@
     <%-- no dependencies -> no tabs --%>
     <% if (!mutantEditor.hasDependencies()) { %>
 
-        <div class="card-body p-0 codemirror-extender">
+        <div class="card-body p-0 codemirror-fill">
             <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant" cols="80" rows="50">${mutantEditor.mutantCode}</textarea></pre>
         </div>
 
@@ -64,7 +64,7 @@
             </ul>
         </div>
 
-        <div class="card-body p-0 codemirror-extender">
+        <div class="card-body p-0 codemirror-fill">
             <div class="tab-content">
                 <div class="tab-pane active"
                      id="${mutantEditor.className}"

@@ -209,7 +209,11 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="mutant-\${mutant.id}"></textarea></pre>
+                                <div class="card">
+                                    <div class="card-body p-0 codemirror-expand codemirror-modal-size">
+                                        <pre class="m-0"><textarea name="mutant-\${mutant.id}"></textarea></pre>
+                                    </div>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -228,7 +232,6 @@
                 readOnly: true,
                 autoRefresh: true
             });
-            editor.setSize('max-content', 'max-content');
 
             MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
             modal.modal('show');
@@ -255,8 +258,12 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="test-\${test.id}"></textarea></pre>
-                                <pre class="readonly-pre terminal-pre">\${test.killMessage}</pre>
+                                <div class="card mb-3">
+                                    <div class="card-body p-0 codemirror-expand codemirror-modal-size">
+                                        <pre class="m-0"><textarea name="test-\${test.id}"></textarea></pre>
+                                    </div>
+                                </div>
+                                <pre class="m-0 terminal-pre">\${test.killMessage}</pre>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -275,7 +282,6 @@
                 readOnly: true,
                 autoRefresh: true
             });
-            editor.setSize('max-content', 'max-content');
 
             TestAPI.getAndSetEditorValue(textarea, editor);
             modal.modal('show');
