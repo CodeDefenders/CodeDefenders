@@ -236,7 +236,7 @@
 
     <t:modal title="User Info Format Explanation" id="user-info-format">
         <jsp:attribute name="content">
-            <p>List of usernames, passwords and (optional) emails.</p>
+            <p>List of usernames, passwords (at least 8 charakter) and (optional) emails.</p>
             <ul>
                 <li>Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).</li>
                 <li>Users are separated by new lines.</li>
