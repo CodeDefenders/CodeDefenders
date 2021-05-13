@@ -3,7 +3,7 @@
 <%--@elvariable id="messages" type="org.codedefenders.beans.message.MessagesBean"--%>
 
 <c:if test="${messages.count > 0}">
-    <div class="m-3" id="messages">
+    <div class="mx-3" id="messages">
         <c:forEach items="${messages.messages}" var="message">
             <div id="message-${message.id}" class="alert alert-primary alert-dismissible fade show" role="alert">
                 <%-- Don't escape text here; message.getText() already escapes the text. --%>
