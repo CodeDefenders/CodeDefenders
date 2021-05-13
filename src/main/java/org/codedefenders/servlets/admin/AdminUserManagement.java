@@ -72,7 +72,6 @@ public class AdminUserManagement extends HttpServlet {
 
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
-
     private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
     private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n "
             + "An account has been created for you with Username %s and Password %s.\n"
@@ -267,7 +266,9 @@ public class AdminUserManagement extends HttpServlet {
         final String password = credentials[1].trim();
         if (!validator.validPassword(password)) {
             logger.info("Failed to create user. Password invalid:" + password);
-            messages.add("Password for user " + username + " invalid, user not created");
+            messages.add("Password for user " + username + " invalid, user not created. Please notice that only >= "
+                    + AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()
+                    + " alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed");
             return;
         }
 

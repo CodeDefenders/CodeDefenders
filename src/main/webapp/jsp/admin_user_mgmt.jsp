@@ -236,11 +236,15 @@
 
     <t:modal title="User Info Format Explanation" id="user-info-format">
         <jsp:attribute name="content">
-            <p>List of usernames, passwords (at least 8 charakter) and (optional) emails.</p>
+            <p>List of usernames, passwords and (optional) emails.</p>
             <ul>
                 <li>Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).</li>
                 <li>Users are separated by new lines.</li>
                 <li>If an email is provided and sending emails is enabled, created users receive an email with their credentials.</li>
+                <li>The password rules are: At least
+                <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>
+                alphanumeric characters (a-z, A-Z, 0-9) without whitespaces.
+                </li>
             </ul>
             <p class="mb-2">Valid input format examples:</p>
             <pre class="bg-light p-3 m-0"><code>username,password
