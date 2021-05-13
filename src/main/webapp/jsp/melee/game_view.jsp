@@ -64,7 +64,7 @@
 
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
-<jsp:include page="/jsp/melee/header_game.jsp"/>
+<jsp:include page="/jsp/header_game.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 

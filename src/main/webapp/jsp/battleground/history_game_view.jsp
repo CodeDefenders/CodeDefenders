@@ -128,7 +128,7 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<jsp:include page="/jsp/battleground/header_game.jsp"/>
+<jsp:include page="/jsp/header_game.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
