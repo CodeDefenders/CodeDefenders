@@ -245,6 +245,7 @@
                 <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>
                 alphanumeric characters (a-z, A-Z, 0-9) without whitespaces.
                 </li>
+                <li> Please consider that you can't reuse an username from an inactive user. <li
             </ul>
             <p class="mb-2">Valid input format examples:</p>
             <pre class="bg-light p-3 m-0"><code>username,password
