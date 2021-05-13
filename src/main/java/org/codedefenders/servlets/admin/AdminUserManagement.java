@@ -282,6 +282,11 @@ public class AdminUserManagement extends HttpServlet {
                 messages.add("Email '" + email + "' already in use.");
                 return;
             }
+            if (!validator.validEmailAddress(email)) {
+                logger.info("Failed to create user. Email invalid:" + email);
+                messages.add("Email for user " + username + " invalid, user not created.");
+                return;
+            }
         } else {
             email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
         }
