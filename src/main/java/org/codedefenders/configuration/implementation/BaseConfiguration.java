@@ -70,7 +70,9 @@ abstract class BaseConfiguration extends Configuration {
                     field.set(this, prop);
                 } else if (prop.getClass() == String.class) {
                     String value = (String) prop;
-                    if (t == Boolean.class) {
+                    if (value.isEmpty()) {
+                        field.set(this, null);
+                    } else if (t == Boolean.class) {
                         // TODO: Maybe only parse true, false, enabled, disabled and ignore the others?
                         field.set(this, Boolean.parseBoolean(value) || prop.equals("enabled"));
                     } else if (t == Integer.class) {
