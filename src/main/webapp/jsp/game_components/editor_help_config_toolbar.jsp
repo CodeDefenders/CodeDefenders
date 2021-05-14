@@ -26,7 +26,7 @@
 
 <div class="btn-group" role="group">
     <div id="keymap-dropdown" class="btn-group" role="group">
-        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="editor-mode-menu" data-bs-toggle="dropdown" aria-expanded="false">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle text-nowrap" type="button" id="editor-mode-menu" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa fa-cog"></i>
             Editor Mode:
             <span id="current-keymap">${login.user.keyMap.CMName}</span>

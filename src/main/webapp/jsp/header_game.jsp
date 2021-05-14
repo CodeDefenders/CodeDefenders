@@ -80,7 +80,7 @@
         %>
 
         <div class="btn-group">
-            <button class="btn btn-sm btn-outline-secondary" id="btnScoreboard"
+            <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
                     data-bs-toggle="modal" data-bs-target="#scoreboard">
                 <i class="fa fa-book"></i>
                 Scoreboard
@@ -91,20 +91,20 @@
             </button>
         </div>
 
-        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnHistory"
+        <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnHistory"
                 data-bs-toggle="modal" data-bs-target="#history">
             <i class="fa fa-history"></i>
             Timeline
         </button>
 
         <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
-           class="btn btn-sm btn-outline-secondary" id="btnProjectExport"
+           class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
            title="Export as a Gradle project to import into an IDE.">
             <i class="fa fa-download"></i>
             Gradle Export
         </a>
 
-        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnFeedback"
+        <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnFeedback"
                 data-bs-toggle="modal" data-bs-target="#playerFeedback">
             <i class="fa fa-comments"></i>
             Feedback
