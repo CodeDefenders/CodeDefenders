@@ -17,7 +17,7 @@
         $(document).ready(() => {
             <c:forEach items="${messages.messages}" var="message">
                 <c:if test="${message.fadeOut}">
-                    setTimeout(() => function () {
+                    setTimeout(function () {
                         const element = document.getElementById('message-${message.id}');
                         const alert = new bootstrap.Alert(element);
                         alert.close();
