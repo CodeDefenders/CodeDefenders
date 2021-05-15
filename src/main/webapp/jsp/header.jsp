@@ -59,12 +59,12 @@
             notificationCount.innerText = count;
 
             if (count > 0) {
-                notificationCount.classList.remove('badge-default');
-                notificationCount.classList.add('badge-warning');
+                notificationCount.classList.remove('bg-secondary');
+                notificationCount.classList.add('bg-warning');
                 notificationSeparator.style.display = null;
             } else {
-                notificationCount.classList.remove('badge-warning');
-                notificationCount.classList.add('badge-default');
+                notificationCount.classList.remove('bg-warning');
+                notificationCount.classList.add('bg-secondary');
                 notificationSeparator.style.display = 'none';
             }
         });
