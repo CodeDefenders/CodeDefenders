@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <%@ page import="org.codedefenders.game.GameState"%>
 <%@ page import="org.codedefenders.game.Role"%>
 <%@ page import="org.codedefenders.util.Paths"%>
@@ -106,10 +108,11 @@
 
         <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnFeedback"
                 data-bs-toggle="modal" data-bs-target="#playerFeedback">
-            <i class="fa fa-comments"></i>
+            <i class="fa fa-comment"></i>
             Feedback
         </button>
 
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
 
+        <t:game_chat/>
     </div>

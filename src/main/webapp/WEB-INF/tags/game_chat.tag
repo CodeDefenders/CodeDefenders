@@ -95,13 +95,11 @@
     </div>
 </div>
 
-<div id="chat-indicator" style="position: fixed; left: 0; bottom: -1px; z-index: 10; cursor: pointer;">
-    <div class="card" style="margin: 0; border-top-left-radius: 0; border-bottom: none;">
-        <div class="card-header" style="padding: .5em .7em .4em .5em; border-bottom: none;">
-            Chat&nbsp;&nbsp;<span id="chat-count" class="badge bg-secondary" style="padding-top: .5em;">0</span>
-        </div>
-    </div>
-</div>
+<button type="button" id="chat-indicator" class="btn btn-sm btn-outline-secondary">
+    <i class="fa fa-comments"></i>
+    Chat
+    <span id="chat-count" class="badge bg-secondary">0</span>
+</button>
 
 <script>
 (function () {

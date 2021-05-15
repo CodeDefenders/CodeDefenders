@@ -57,7 +57,6 @@
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
-<t:game_chat/>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
