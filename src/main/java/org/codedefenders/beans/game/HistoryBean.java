@@ -262,10 +262,10 @@ public class HistoryBean {
 
         public String getFormat() {
             // For the game_history.jsp in the format "2014-01-10T03:45"
-            return "\"" + time.getYear()
+            return time.getYear()
                     + "-" + String.format("%02d", time.getMonth().ordinal())
                     + "-" + String.format("%02d", time.getDayOfMonth()) + "T"
-                    + getTime() + "\"";
+                    + getTime();
         }
 
         public String getUserMessage() {
