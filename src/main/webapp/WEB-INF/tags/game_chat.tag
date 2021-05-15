@@ -15,33 +15,6 @@
         padding-bottom: 2px;
     }
 
-    #chat .chat-message .chat-message-name::after {
-        content: ":";
-        padding-right: .25em;
-    }
-
-    /* Message prefixes. */
-    #chat .chat-message-all .chat-message-name::before {
-        content: "[All]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-attacker .chat-message-name::before {
-        content: "[Attacker]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-defender .chat-message-name::before {
-        content: "[Defender]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-player .chat-message-name::before {
-        content: "[Player]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-observer .chat-message-name::before {
-        content: "[Observer]";
-        padding-right: .25em;
-    }
-
     /* Role colors. */
     #chat .chat-message-attacker .chat-message-name {
         color: #bf0035;
@@ -216,26 +189,29 @@
         /**
          * Creates a DOM element for a message and caches it. Returns the cached element if present.
          * @param {object} message The message.
-         * @return {HTMLSpanElement} The rendered message.
+         * @return {HTMLDivElement} The rendered message.
          */
         renderMessage (message) {
             if (message._cache) {
                 return message._cache;
             }
 
+            const lowerCaseRole = message.role.toLowerCase();
+            const capitalizedRole = lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1);
+
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('chat-message');
             if (message.system) {
                 msgDiv.classList.add('chat-message-system');
             } else {
-                msgDiv.classList.add('chat-message-' + message.role.toLowerCase());
+                msgDiv.classList.add('chat-message-' + lowerCaseRole);
                 msgDiv.classList.add(message.isAllChat ? 'chat-message-all' : 'chat-message-team');
             }
 
             if (!message.system) {
                 const msgName = document.createElement('span');
                 msgName.classList.add('chat-message-name');
-                msgName.textContent = message.senderName;
+                msgName.textContent = `[\${capitalizedRole}] \${message.senderName}: `;
                 msgDiv.appendChild(msgName);
             }
 
