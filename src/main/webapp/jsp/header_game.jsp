@@ -53,7 +53,7 @@
 <jsp:include page="/jsp/header_main.jsp" />
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
-    <div class="w-100 d-flex justify-content-center gap-2">
+    <div class="d-flex flex-wrap justify-content-center gap-2">
 
         <%
             if (game.getCreatorId() == login.getUserId()) {
