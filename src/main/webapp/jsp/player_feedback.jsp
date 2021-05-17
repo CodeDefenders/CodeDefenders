@@ -169,8 +169,8 @@
 
                 <% } %>
 
-                            <div class="overflow-auto">
-                                <table class="table table-bordered table-responsive table-center">
+                            <div class="overflow-auto mb-3">
+                                <table class="table table-bordered table-responsive table-center m-0">
                                     <thead>
                                         <tr>
                                             <th>${playerFeedback.canSeeFeedback() ? "Player" : ""}</th>
