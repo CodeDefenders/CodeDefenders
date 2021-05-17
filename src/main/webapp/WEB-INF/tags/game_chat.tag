@@ -196,8 +196,8 @@
                 return message._cache;
             }
 
-            const lowerCaseRole = message.role.toLowerCase();
-            const capitalizedRole = lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1);
+            const lowerCaseRole = message.system ? '' : message.role.toLowerCase();
+            const capitalizedRole = message.system ? '' : lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1);
 
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('chat-message');
