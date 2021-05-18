@@ -75,7 +75,8 @@
                     <% if (isClassUploadEnabled) { %>
                         <span class="input-group-text" style="cursor: pointer;"
                               title="Upload a class.">
-                            <a class="text-decoration-none" href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">
+                            <a class="stretched-link text-decoration-none"
+                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">
                                 <i class="fa fa-upload"></i>
                             </a>
                         </span>
@@ -121,7 +122,8 @@
                         <% } %>
                     </select>
                     <span class="input-group-text" style="cursor: pointer;">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#validatorExplanation">
+                        <a class="stretched-link text-decoration-none text-reset"
+                           data-bs-toggle="modal" data-bs-target="#validatorExplanation">
                             <span class="fa fa-question-circle"></span>
                         </a>
                     </span>
@@ -149,7 +151,8 @@
                     <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
                            value="0" min="0" required>
                     <span class="input-group-text" style="cursor: pointer;">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
+                        <a class="stretched-link text-decoration-none text-reset"
+                           data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
                             <span class="fa fa-question-circle"></span>
                         </a>
                     </span>
