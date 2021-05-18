@@ -26,6 +26,7 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Melee Game"); %>
@@ -39,7 +40,7 @@
     if (gameClasses.isEmpty()) {
         if (isClassUploadEnabled) {
 %>
-<div id="creategame" class="container">
+<div class="container">
     <p>
         Before you can start games, please <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center">upload a class under
         test</a>.
@@ -48,7 +49,7 @@
 <%
         } else {
 %>
-<div id="creategame" class="container">
+<div class="container">
     <p>
         Games can only be started once at least one class under test has been uploaded.
     </p>
@@ -57,153 +58,148 @@
         }
     } else {
 %>
-<div id="creategame" class="container">
+<div class="container">
     <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
-          class="form-creategame"
-          style="padding: 15px; margin: 0 auto; max-width: 75rem;">
+          class="mx-auto mt-3 mb-3" style="max-width: 40rem;">
         <input type="hidden" name="formType" value="createGame">
-        <table style="border-collapse: separate; border-spacing: 20px; font-size: 16px; text-align: center; line-height: 27px;">
-            <tr>
-                <td width="25%">Java Class</td>
-                <td id="classTd">
-                    <select selectpicker id="class" name="class" class="form-control" data-size="large">
-                        <% for (GameClass c : gameClasses) { %>
-                        <option value="<%=c.getId()%>"><%=c.getAlias()%>
-                        </option>
-                        <%}%>
-                    </select>
-                </td>
-                <%if (isClassUploadEnabled) {%>
-                    <td width="17%">
-                        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center">Upload Class</a>
-                    </td>
-                <%}%>
-            </tr>
-            <!--
-            <tr>
-                <td>Line Coverage Goal</td><td><input class="ws-2" type="number" value="0.8" min="0.1" max="1.0" step="0.1" name="line_cov" style="text-align: center"/></td>
-            </tr>
-            <tr>
-                <td>Mutation Goal</td><td><input class="ws-2" type="number" value="0.5" min="0.1" max="1.0" step="0.1" name="mutant_cov" style="text-align: center"></td>
-            </tr>
-            -->
-            <tr>
-                <td>Include predefined mutants (if available)</td>
-                <td>
-                    <input type="checkbox" id="withMutants" name="withMutants"
-                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </td>
-            </tr>
-            <tr>
-                <td>Include predefined tests (if available)</td>
-                <td>
-                    <input type="checkbox" id="withTests" name="withTests"
-                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </td>
-            </tr>
-            <tr>
-                <td>Level</td>
-                <td id="levelTd">
-                    <input type="checkbox" id="level" name="level" class="form-control" data-size="large"
-                           data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info"
-                           data-offstyle="warning">
-                </td>
-            </tr>
-            <tr>
-                <td title="Maximum number of assertions per test. Increase this for difficult to test classes.">
-                    Max. Assertions per Test
-                </td>
-                <td id="maxAssertionsPerTestTd">
-                    <input class="form-control" type="number" value="<%=DEFAULT_NB_ASSERTIONS%>"
-                           name="maxAssertionsPerTest"
-                           id="maxAssertionsPerTest" min=1 required/>
-                </td>
-            </tr>
-            <tr>
-                <td title="Click the question sign for more information on the levels">
-                    Mutant validator
-                </td>
-                <td id="mutantValidatorLevelTd">
-                    <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
-                            data-size="medium">
-                        <%for (CodeValidatorLevel cvl : CodeValidatorLevel.values()) {%>
-                        <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
-                            <%=cvl.name().toLowerCase()%>
-                        </option>
-                        <%}%>
-                    </select>
-                </td>
-                <td>
-                    <a data-toggle="modal" href="#validatorExplanation" style="color:black">
-                        <span class="glyphicon glyphicon-question-sign"></span>
-                    </a>
-                </td>
-            </tr>
-            <tr>
-                <td title="Chose your role for this game">
-                    Role selection
-                </td>
-                <td id="roleSelectionTd">
-                    <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
-                            data-size="medium">
-                        <% for (Role role : Role.meleeRoles()) { %>
-                            <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
-                                <%=role.getFormattedString()%>
-                            </option>
+        <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
+
+        <div class="row mb-3">
+            <label class="col-sm-4 col-form-label" id="class-label" for="class-select">Class Under Test</label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <select class="form-select" id="class-select" name="class">
+                        <% for (GameClass clazz : gameClasses) { %>
+                            <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
                         <% } %>
                     </select>
-                </td>
-            </tr>
-            <input type="hidden" name="roleSelection" value="OBSERVER">
-            <tr>
-                <td title="Players can chat with their team and with all players in the game">
-                    Chat
-                </td>
-                <td id="chatEnabledTd">
-                    <input type="checkbox" id="chatEnabled" name="chatEnabled"
-                           class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
-                           data-onstyle="primary" data-offstyle="" checked>
-                </td>
-            </tr>
+                    <% if (isClassUploadEnabled) { %>
+                        <span class="input-group-text" style="cursor: pointer;"
+                              title="Upload a class.">
+                            <a class="text-decoration-none" href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">
+                                <i class="fa fa-upload"></i>
+                            </a>
+                        </span>
+                    <% } %>
+                </div>
+            </div>
+        </div>
 
-            <%-- TODO Enable this after adding support for capturing players intention to melee games
-            <tr>
-                <td>Enable Capturing Players Intention</td>
-                <td>
-                    <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
-                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
-                           data-onstyle="primary" data-offstyle="">
-                </td>
-            </tr>
-            --%>
-            <tr>
-                <td title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
-                    Threshold for Auto. Equiv. Duels
-                </td>
-                <td id="automaticEquivalenceTriggerTd">
-                    <input class="form-control" type="number" value="0"
-                           name="automaticEquivalenceTrigger"
-                           id="automaticEquivalenceTrigger" min=0 required/>
-                </td>
-                <td>
-                    <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
-                        <span class="glyphicon glyphicon-question-sign"></span>
-                    </a>
-                </td>
-            </tr>
-            <!--  -->
-            <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
-            <tr>
-                <td>
-                    <button id="createButton" class="btn btn-lg btn-primary btn-block" type="submit" value="Create">
-                        Create
-                    </button>
-                </td>
-            </tr>
-        </table>
+        <div class="row mb-3">
+            <div class="offset-sm-4 col-sm-8">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="predefined-mutants-switch" name="withMutants">
+                    <label class="form-check-label" for="predefined-mutants-switch">Include predefined mutants (if available)</label>
+                </div>
+            </div>
+            <div class="offset-sm-4 col-sm-8">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="predefined-tests-switch" name="withTests">
+                    <label class="form-check-label" for="predefined-tests-switch">Include predefined tests (if available)</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label class="col-sm-4 col-form-label" id="level-label" for="level-select">Level</label>
+            <div class="col-sm-8">
+                <%-- TODO: change the servlet to use select parameters here. --%>
+                <select id="level-select" name="level" class="form-select">
+                    <option value="<%=GameLevel.EASY.name()%>"><%=GameLevel.EASY.getFormattedString()%></option>
+                    <option value="<%=GameLevel.HARD.name()%>" selected><%=GameLevel.HARD.getFormattedString()%></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label class="col-sm-4 col-form-label" id="mutant-validator-label" for="mutant-validator-select">
+                Mutant Validator
+            </label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <select class="form-select" id="mutant-validator-select" name="mutantValidatorLevel">
+                        <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
+                        <option value=<%=level.name()%> <%=level.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                            <%=level.getDisplayName()%>
+                        </option>
+                        <% } %>
+                    </select>
+                    <span class="input-group-text" style="cursor: pointer;">
+                        <a data-bs-toggle="modal" data-bs-target="#validatorExplanation">
+                            <span class="fa fa-question-circle"></span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3"
+             title="Maximum number of assertions per test. Increase this for difficult to test classes.">
+            <label class="col-sm-4 col-form-label" id="max-assertions-label" for="max-assertions-input">
+                Max. Assertions Per Test
+            </label>
+            <div class="col-sm-8">
+                <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
+                       value="<%=DEFAULT_NB_ASSERTIONS%>" min="1" required>
+            </div>
+        </div>
+
+        <div class="row mb-3"
+             title="Number of covering tests at which an automatic equivalence duel is triggered for an alive mutant. Use 0 to deactivate.">
+            <label class="col-sm-4 col-form-label" id="equiv-threshold-label" for="equiv-threshold-input">
+                Auto Equiv. Threshold
+            </label>
+            <div class="col-sm-8">
+                <div class="input-group">
+                    <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
+                           value="0" min="0" required>
+                    <span class="input-group-text" style="cursor: pointer;">
+                        <a data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
+                            <span class="fa fa-question-circle"></span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3"
+             title="Allows players to chat within their team and with the enemy team.">
+            <div class="offset-sm-4 col-sm-8">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled">
+                    <label class="form-check-label" for="chat-switch">Enable Chat</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3"
+             title="Select the role the creator (you) will have in the game.">
+            <label class="col-sm-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
+            <div class="col-sm-8">
+                <select class="form-select" id="role-select" name="roleSelection">
+                    <% for (Role role : Role.meleeRoles()) { %>
+                        <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
+                            <%=role.getFormattedString()%>
+                        </option>
+                    <% } %>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
+
+        <%-- TODO Enable this after adding support for capturing players intention to melee games
+        <tr>
+            <td>Capture Players Intention</td>
+            <td>
+                <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
+                       class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
+                       data-onstyle="primary" data-offstyle="">
+            </td>
+        </tr>
+        --%>
     </form>
+
     <%-- Place the modal DIVs here to avoid interference with the CSS rules of the form --%>
     <div class="modal fade" id="validatorExplanation" role="dialog"
         aria-labelledby="validatorExplanation" aria-hidden="true">
