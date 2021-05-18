@@ -73,7 +73,7 @@
                         <% } %>
                     </select>
                     <% if (isClassUploadEnabled) { %>
-                        <span class="input-group-text position-relative" style="cursor: pointer;"
+                        <span class="input-group-text position-relative cursor-pointer"
                               title="Upload a class.">
                             <a class="stretched-link text-decoration-none"
                                href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">
@@ -102,16 +102,14 @@
             <div class="col-sm-8">
                 <%-- TODO: change the servlet to use select parameters here. --%>
                 <select id="level-select" name="level" class="form-select">
-                    <option value="<%=GameLevel.EASY.name()%>"><%=GameLevel.EASY.getFormattedString()%></option>
-                    <option value="<%=GameLevel.HARD.name()%>" selected><%=GameLevel.HARD.getFormattedString()%></option>
+                    <option value="<%=GameLevel.EASY%>"><%=GameLevel.EASY.getFormattedString()%></option>
+                    <option value="<%=GameLevel.HARD%>" selected><%=GameLevel.HARD.getFormattedString()%></option>
                 </select>
             </div>
         </div>
 
         <div class="row mb-3">
-            <label class="col-sm-4 col-form-label" id="mutant-validator-label" for="mutant-validator-select">
-                Mutant Validator
-            </label>
+            <label class="col-sm-4 col-form-label" id="mutant-validator-label" for="mutant-validator-select">Mutant Validator Level</label>
             <div class="col-sm-8">
                 <div class="input-group">
                     <select class="form-select" id="mutant-validator-select" name="mutantValidatorLevel">
@@ -121,10 +119,10 @@
                         </option>
                         <% } %>
                     </select>
-                    <span class="input-group-text position-relative" style="cursor: pointer;">
+                    <span class="input-group-text position-relative cursor-pointer">
                         <a class="stretched-link text-decoration-none text-reset"
                            data-bs-toggle="modal" data-bs-target="#validatorExplanation">
-                            <span class="fa fa-question-circle"></span>
+                            <i class="fa fa-question-circle"></i>
                         </a>
                     </span>
                 </div>
@@ -150,7 +148,7 @@
                 <div class="input-group">
                     <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
                            value="0" min="0" required>
-                    <span class="input-group-text position-relative" style="cursor: pointer;">
+                    <span class="input-group-text position-relative cursor-pointer">
                         <a class="stretched-link text-decoration-none text-reset"
                            data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
                             <span class="fa fa-question-circle"></span>
@@ -194,7 +192,7 @@
             <div class="col-sm-8 d-flex align-items-center">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
-                    <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Player's Intentions</label>
+                    <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players' Intentions</label>
                 </div>
             </div>
         </div>

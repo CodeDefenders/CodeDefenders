@@ -103,3 +103,10 @@ bootstrap classes
 .minheight-card .card-body {
     min-height: 600px;
 }
+
+/* Extra Bootstrap-Style Util Classes
+----------------------------------------------------------------------------- */
+
+.cursor-pointer {
+    cursor: pointer;
+}
