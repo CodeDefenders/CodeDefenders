@@ -36,37 +36,36 @@
 <%
     List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
     boolean isClassUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
+%>
 
+<div class="container">
+
+<%
     if (gameClasses.isEmpty()) {
         if (isClassUploadEnabled) {
 %>
-<div class="container">
     <p>
-        Before you can start games, please <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center">upload a class under
-        test</a>.
+        Before you can start games, please
+        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center">upload a class under test</a>.
     </p>
-</div>
 <%
         } else {
 %>
-<div class="container">
     <p>
         Games can only be started once at least one class under test has been uploaded.
     </p>
-</div>
 <%
         }
     } else {
 %>
-<div class="container">
     <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
-          class="mx-auto mt-3 mb-3" style="max-width: 40rem;">
+          class="mx-auto mt-4" style="max-width: 40rem;">
         <input type="hidden" name="formType" value="createGame">
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 
         <div class="row mb-3">
             <label class="col-sm-4 col-form-label" id="class-label" for="class-select">Class Under Test</label>
-            <div class="col-sm-8">
+            <div class="col-sm-8 mb-3">
                 <div class="input-group">
                     <select class="form-select" id="class-select" name="class">
                         <% for (GameClass clazz : gameClasses) { %>
@@ -83,9 +82,6 @@
                     <% } %>
                 </div>
             </div>
-        </div>
-
-        <div class="row mb-3">
             <div class="offset-sm-4 col-sm-8">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="predefined-mutants-switch" name="withMutants">
@@ -125,7 +121,7 @@
                         <% } %>
                     </select>
                     <span class="input-group-text" style="cursor: pointer;">
-                        <a data-bs-toggle="modal" data-bs-target="#validatorExplanation">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#validatorExplanation">
                             <span class="fa fa-question-circle"></span>
                         </a>
                     </span>
@@ -144,8 +140,7 @@
             </div>
         </div>
 
-        <div class="row mb-3"
-             title="Number of covering tests at which an automatic equivalence duel is triggered for an alive mutant. Use 0 to deactivate.">
+        <div class="row mb-3">
             <label class="col-sm-4 col-form-label" id="equiv-threshold-label" for="equiv-threshold-input">
                 Auto Equiv. Threshold
             </label>
@@ -154,7 +149,7 @@
                     <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
                            value="0" min="0" required>
                     <span class="input-group-text" style="cursor: pointer;">
-                        <a data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
                             <span class="fa fa-question-circle"></span>
                         </a>
                     </span>
@@ -164,7 +159,8 @@
 
         <div class="row mb-3"
              title="Allows players to chat within their team and with the enemy team.">
-            <div class="offset-sm-4 col-sm-8">
+            <label class="col-sm-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
+            <div class="col-sm-8 d-flex align-items-center">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled">
                     <label class="form-check-label" for="chat-switch">Enable Chat</label>
@@ -189,61 +185,55 @@
         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
 
         <%-- TODO Enable this after adding support for capturing players intention to melee games
-        <tr>
-            <td>Capture Players Intention</td>
-            <td>
-                <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
-                       class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
-                       data-onstyle="primary" data-offstyle="">
-            </td>
-        </tr>
+        <div class="row mb-3"
+             title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
+            <label class="col-sm-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture Intentions</label>
+            <div class="col-sm-8 d-flex align-items-center">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
+                    <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Player's Intentions</label>
+                </div>
+            </div>
+        </div>
         --%>
     </form>
 
-    <%-- Place the modal DIVs here to avoid interference with the CSS rules of the form --%>
-    <div class="modal fade" id="validatorExplanation" role="dialog"
-        aria-labelledby="validatorExplanation" aria-hidden="true">
+    <div class="modal fade" id="validatorExplanation" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Mutant Validator Explanation</h4>
+                    <h5 class="modal-title">Mutant Validator Explanation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <%@ include file="/jsp/validator_explanation.jsp"%>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
-	<div class="modal fade" id="automaticEquivalenceTriggerExplanation"
-		role="dialog" aria-labelledby="automaticEquivalenceTriggerExplanation"
-		aria-hidden="true">
+	<div class="modal fade" id="automaticEquivalenceTriggerExplanation" tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title">Threshold for Triggering Equivalence
-						Duels Automatically Explanation</h4>
+					<h5 class="modal-title">Auto Equivalence Duel Threshold Explanation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 				</div>
-
-				<div class="modal-body">
+				<div class="modal-body p-4">
 					<%@ include file="/jsp/automatic_duels_explanation.jsp"%>
 				</div>
-
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 				</div>
 			</div>
 		</div>
-	</div>
-	<%--  --%>
-</div>
+    </div>
 <%
     }
 %>
+
+</div>
+
 <%@ include file="/jsp/footer.jsp" %>
