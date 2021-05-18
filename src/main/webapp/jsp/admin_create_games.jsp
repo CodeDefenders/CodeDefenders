@@ -131,7 +131,7 @@
                     <div class="card-body row">
 
                         <div class="col-sm-12 mb-3">
-                            <label for="gameType-group" class="form-label">Game Type</label>
+                            <label class="form-label" for="gameType-group">Game Type</label>
                             <div id="gameType-group">
                                 <div class="form-check">
                                     <input type="radio" class="form-check-input" id="gameType-radio-battleground" name="gameType"
@@ -182,7 +182,7 @@
                         </div>
 
                         <div class="col-sm-12 mb-3">
-                            <label for="level-group" class="form-label">Level</label>
+                            <label class="form-label" for="level-group">Game Level</label>
                             <div id="level-group">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
@@ -210,7 +210,7 @@
                                 <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio"
-                                               id="mutant-validator-radio-<%=level.name().toLowerCase()%>" name="level"
+                                               id="mutant-validator-radio-<%=level.name().toLowerCase()%>" name="mutantValidatorLevel"
                                                value="<%=level.name()%>"
                                                <%=level == CodeValidatorLevel.MODERATE ? "checked" : ""%>>
                                         <label class="form-check-label" for="mutant-validator-radio-<%=level.name().toLowerCase()%>">
@@ -295,7 +295,7 @@
 
                         <div class="col-sm-12 mb-3 multiplayer-specific"
                              title="Method of assigning roles to players.">
-                            <label for="roleAssignmentMethod-group" class="form-label">
+                            <label class="form-label" for="roleAssignmentMethod-group">
                                 <a class="text-decoration-none text-reset cursor-pointer"
                                    data-bs-toggle="modal" data-bs-target="#roleAssignmentExplanation">
                                     Role Assignment
@@ -321,7 +321,7 @@
 
                         <div class="col-sm-12 mb-3"
                              title="Method of assigning players to teams. Click the question mark for more information.">
-                            <label for="teamAssignmentMethod-group" class="form-label">
+                            <label class="form-label" for="teamAssignmentMethod-group">
                                 <a class="text-decoration-none text-reset cursor-pointer"
                                    data-bs-toggle="modal" data-bs-target="#teamAssignmentExplanation">
                                     Team Assignment

@@ -97,37 +97,45 @@
             </div>
         </div>
 
-        <div class="row mb-3">
-            <label class="col-sm-4 col-form-label" id="level-label" for="level-select">Level</label>
+        <fieldset class="row mb-3">
+            <legend class="col-sm-4 col-form-label pt-0" id="level-label">Game Level</legend>
             <div class="col-sm-8">
-                <%-- TODO: change the servlet to use select parameters here. --%>
-                <select id="level-select" name="level" class="form-select">
-                    <option value="<%=GameLevel.EASY%>"><%=GameLevel.EASY.getFormattedString()%></option>
-                    <option value="<%=GameLevel.HARD%>" selected><%=GameLevel.HARD.getFormattedString()%></option>
-                </select>
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <label class="col-sm-4 col-form-label" id="mutant-validator-label" for="mutant-validator-select">Mutant Validator Level</label>
-            <div class="col-sm-8">
-                <div class="input-group">
-                    <select class="form-select" id="mutant-validator-select" name="mutantValidatorLevel">
-                        <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
-                            <option value=<%=level.name()%> <%=level.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
-                                <%=level.getDisplayName()%>
-                            </option>
-                        <% } %>
-                    </select>
-                    <span class="input-group-text position-relative cursor-pointer">
-                        <a class="stretched-link text-decoration-none text-reset"
-                           data-bs-toggle="modal" data-bs-target="#validatorExplanation">
-                            <i class="fa fa-question-circle"></i>
-                        </a>
-                    </span>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
+                           value="<%=GameLevel.HARD%>"
+                           checked>
+                    <label class="form-check-label" for="level-radio-hard">Hard</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="level-radio-easy" name="level"
+                           value="<%=GameLevel.EASY%>">
+                    <label class="form-check-label" for="level-radio-easy">Easy</label>
                 </div>
             </div>
-        </div>
+        </fieldset>
+
+        <fieldset class="row mb-3">
+            <legend class="col-sm-4 col-form-label pt-0" id="mutant-validator-label">
+                <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
+                   data-bs-toggle="modal" data-bs-target="#validatorExplanation">
+                    Mutant Validator Level
+                    <i class="fa fa-question-circle ms-1"></i>
+                </a>
+            </legend>
+            <div class="col-sm-8">
+                <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio"
+                               id="mutant-validator-radio-<%=level.name().toLowerCase()%>" name="mutantValidatorLevel"
+                               value="<%=level.name()%>"
+                            <%=level == CodeValidatorLevel.MODERATE ? "checked" : ""%>>
+                        <label class="form-check-label" for="mutant-validator-radio-<%=level.name().toLowerCase()%>">
+                            <%=level.getDisplayName()%>
+                        </label>
+                    </div>
+                <% } %>
+            </div>
+        </fieldset>
 
         <div class="row mb-3"
              title="Maximum number of assertions per test. Increase this for difficult to test classes.">
@@ -141,22 +149,20 @@
         </div>
 
         <div class="row mb-3">
-            <label class="col-sm-4 col-form-label" id="equiv-threshold-label" for="equiv-threshold-input">Auto Equiv. Threshold</label>
+            <label class="col-sm-4 col-form-label" id="equiv-threshold-label" for="equiv-threshold-input">
+                <a class="text-decoration-none text-reset cursor-pointer"
+                   data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
+                    Auto Equiv. Threshold
+                    <span class="fa fa-question-circle ms-1"></span>
+                </a>
+            </label>
             <div class="col-sm-8">
-                <div class="input-group">
-                    <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
-                           value="0" min="0" required>
-                    <span class="input-group-text position-relative cursor-pointer">
-                        <a class="stretched-link text-decoration-none text-reset"
-                           data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
-                            <span class="fa fa-question-circle"></span>
-                        </a>
-                    </span>
-                </div>
+                <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
+                       value="0" min="0" required>
             </div>
         </div>
 
-        <div class="row mb-2"
+        <div class="row mb-1"
              title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
             <label class="col-sm-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture Intentions</label>
             <div class="col-sm-8 d-flex align-items-center">
