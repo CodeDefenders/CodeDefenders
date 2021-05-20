@@ -59,15 +59,15 @@
     } else {
 %>
     <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
-          class="mx-auto mt-4" style="max-width: 40rem;">
+          class="mx-auto mt-4 needs-validation" style="max-width: 40rem;">
         <input type="hidden" name="formType" value="createGame">
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 
         <div class="row mb-3">
             <label class="col-sm-4 col-form-label" id="class-label" for="class-select">Class Under Test</label>
             <div class="col-sm-8 mb-3">
-                <div class="input-group">
-                    <select class="form-select" id="class-select" name="class">
+                <div class="input-group has-validation">
+                    <select class="form-select" id="class-select" name="class" required>
                         <% for (GameClass clazz : gameClasses) { %>
                             <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
                         <% } %>
@@ -81,6 +81,7 @@
                             </a>
                         </span>
                     <% } %>
+                    <div class="invalid-feedback">Please select a class.</div>
                 </div>
             </div>
             <div class="offset-sm-4 col-sm-8">
@@ -102,14 +103,15 @@
             <div class="col-sm-8">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
-                           value="<%=GameLevel.HARD%>"
+                           value="<%=GameLevel.HARD%>" required
                            checked>
                     <label class="form-check-label" for="level-radio-hard">Hard</label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" id="level-radio-easy" name="level"
-                           value="<%=GameLevel.EASY%>">
+                           value="<%=GameLevel.EASY%>" required>
                     <label class="form-check-label" for="level-radio-easy">Easy</label>
+                    <div class="invalid-feedback">Please select a level.</div>
                 </div>
             </div>
         </fieldset>
@@ -127,11 +129,14 @@
                     <div class="form-check">
                         <input class="form-check-input" type="radio"
                                id="mutant-validator-radio-<%=level.name().toLowerCase()%>" name="mutantValidatorLevel"
-                               value="<%=level.name()%>"
+                               value="<%=level.name()%>" required
                             <%=level == CodeValidatorLevel.MODERATE ? "checked" : ""%>>
                         <label class="form-check-label" for="mutant-validator-radio-<%=level.name().toLowerCase()%>">
                             <%=level.getDisplayName()%>
                         </label>
+                        <% if (level == CodeValidatorLevel.values()[CodeValidatorLevel.values().length - 1]) { %>
+                            <div class="invalid-feedback">Please select a mutant validator level.</div>
+                        <% } %>
                     </div>
                 <% } %>
             </div>
@@ -145,6 +150,7 @@
             <div class="col-sm-8">
                 <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
                        value="<%=DEFAULT_NB_ASSERTIONS%>" min="1" required>
+                <div class="invalid-feedback">Please provide a valid number. Must be greater than zero.</div>
             </div>
         </div>
 
@@ -159,6 +165,7 @@
             <div class="col-sm-8">
                 <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
                        value="0" min="0" required>
+                <div class="invalid-feedback">Please provide a valid number. Must be positive or zero.</div>
             </div>
         </div>
 
@@ -188,13 +195,14 @@
              title="Select the role the creator (you) will have in the game.">
             <label class="col-sm-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
             <div class="col-sm-8">
-                <select class="form-select" id="role-select" name="roleSelection">
+                <select class="form-select" id="role-select" name="roleSelection" required>
                     <% for (Role role : Role.meleeRoles()) { %>
                         <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
                             <%=role.getFormattedString()%>
                         </option>
                     <% } %>
                 </select>
+                <div class="invalid-feedback">Please select a role.</div>
             </div>
         </div>
 
