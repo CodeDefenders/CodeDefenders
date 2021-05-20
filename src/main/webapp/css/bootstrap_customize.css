@@ -110,3 +110,10 @@ bootstrap classes
 .cursor-pointer {
     cursor: pointer;
 }
+
+/* Popovers
+----------------------------------------------------------------------------- */
+
+.popover-fluid {
+    max-width: max-content;
+}

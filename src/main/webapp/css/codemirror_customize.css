@@ -15,61 +15,36 @@ pre.CodeMirror-line {
 /* Mutant Icons
 ----------------------------------------------------------------------------- */
 
-.mutant-icons {
-    margin-left: 3px;
-    display: inline-block;
+.gh-mutant-icons {
+    display: flex;
+    width: max-content;
+    align-content: center;
+    gap: 1px;
+    margin-left: 1px;
 }
-.mutant-icon {
-    display: inline-block;
-}
-.mutant-icon-image {
-    width: 18px;
-    height: 18px;
-    max-width: 18px;
-    max-height: 18px;
-    display: inline-block;
-}
-.mutant-icon-count {
-    /* Font */
-    color: #FFFFFF;
-    font-weight: bold;
-    text-align: center;
-
-    /* Outline */
-    background-color: #FF0000;
-    padding-left: 1px;
-    padding-right: 1px;
-    border-radius: 7px;
-
-    /* Positioning */
-    vertical-align: top;
-    margin-left: -8px;
+.gh-mutant-icon {
     position: relative;
-    top: -5px;
-    left: 3px;
 }
+.gh-mutant-icon::after {
+    content: attr(data-count);
 
-/* Mutant Popovers
------------------------------------------------------------------------------ */
+    /* Position */
+    position: absolute;
+    top: 0;
+    left: 100%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
 
-.mutant-popover-body {
-    margin-right: -14px;
-    padding-right: 14px;
-    max-height: 400px;
-    overflow: auto;
-}
-.mutant-popover-body > table {
-    font-size: 14px;
-}
-.mutant-popover-body > table > thead {
+    /* Font */
+    color: white;
     font-weight: bold;
-}
-.mutant-popover-body > table td {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-}
-.popover {
-    max-width: 100%;
+    font-size: .75em;
+    line-height: 1;
+
+    /* Background */
+    background-color: #dc3545;
+    padding: .25rem;
+    border-radius: 50rem;
 }
 
 /* Highlighting colors / decorations
