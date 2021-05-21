@@ -2,7 +2,7 @@
 bootstrap classes
 ============================================================================= */
 
-/* Buttons
+/* Form elements
 ----------------------------------------------------------------------------- */
 
 /* Buttons smaller than btn-sm. */
@@ -15,6 +15,14 @@ bootstrap classes
 .btn-highlight {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+}
+
+/* Input styled to be a large as a .btn-xs */
+.input-xs {
+    width: 15em;
+    padding: 1px 4px;
+    font-size: 12px;
+    vertical-align: middle;
 }
 
 /* Modals

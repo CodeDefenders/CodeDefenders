@@ -55,38 +55,36 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between">
             Staged Games
-            <div style="float: right;">
-                <button id="select-visible-games" class="btn btn-xs btn-default" style="margin-right: 1em;">
+            <div class="d-flex gap-2">
+                <button id="select-visible-games" class="btn btn-xs btn-secondary">
                     Select Visible
                 </button>
-                <button id="deselect-visible-games" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                <button id="deselect-visible-games" class="btn btn-xs btn-secondary">
                     Deselect Visible
                 </button>
-                <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
-                    <label class="btn btn-xs btn-default">
-                        <input id="toggle-hide-players" type="checkbox">
-                        Hide Players&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-close"></span>
-                    </label>
-                </div>
-                <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
-                       style="height: 1.5em; width: 10em; display: inline;">
+                <input type="checkbox" id="toggle-hide-players" class="btn-check" autocomplete="off">
+                <label for="toggle-hide-players" class="btn btn-xs btn-outline-secondary">
+                    Hide Players
+                    <i class="fa fa-eye-slash"></i>
+                </label>
+                <input type="search" id="search-staged-games" class="form-control input-xs" placeholder="Search">
             </div>
         </div>
         <div class="card-body">
             <table id="table-staged-games" class="table table-responsive"></table>
 
-            <form class="form-inline" style="margin-top: 1em;">
-                <div class="form-group">
+            <form class="row g-2 mt-3">
+                <div class="col-auto">
                     <button class="btn btn-md btn-primary" type="button" name="create-games-button"
-                            id="create-games-button" style="margin-top: 1em" disabled>
+                            id="create-games-button" disabled>
                         Create Games
                     </button>
                 </div>
-                <div class="form-group">
+                <div class="col-auto">
                     <button class="btn btn-md btn-danger" type="button" name="delete-games-button"
-                            id="delete-games-button" style="margin-top: 1em" disabled>
+                            id="delete-games-button" disabled>
                         Delete Games
                     </button>
                 </div>
@@ -95,24 +93,22 @@
     </div>
 
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between">
             Unassigned Users
-            <div style="float: right;">
-                <button id="select-visible-users" class="btn btn-xs btn-default" style="margin-right: 1em;">
+            <div class="d-flex gap-2">
+                <button id="select-visible-users" class="btn btn-xs btn-secondary">
                     Select Visible
                 </button>
-                <button id="deselect-visible-users" class="btn btn-xs btn-default" style="margin-right: 1em;">
+                <button id="deselect-visible-users" class="btn btn-xs btn-secondary">
                     Deselect Visible
                 </button>
-                <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
-                    <label class="btn btn-xs btn-default"
-                           title="Show users that are part of an existing active game.">
-                        <input id="toggle-show-assigned-users" type="checkbox">
-                        Show Assigned Users (Active Games)&nbsp;&nbsp;<span class="glyphicon glyphicon-eye-open"></span>
-                    </label>
-                </div>
-                <input type="search" id="search-users" class="form-control" placeholder="Search"
-                       style="height: 1.5em; width: 10em; display: inline;">
+                <input type="checkbox" id="toggle-show-assigned-users" class="btn-check" autocomplete="off">
+                <label for="toggle-show-assigned-users" class="btn btn-xs btn-outline-secondary"
+                       title="Show users that are part of an existing active game.">
+                    Show Assigned Users (Active Games)
+                    <i class="fa fa-eye"></i>
+                </label>
+                <input type="search" id="search-users" class="form-control input-xs" placeholder="Search">
             </div>
         </div>
         <div class="card-body">
@@ -415,7 +411,7 @@
                     <%@ include file="/jsp/validator_explanation.jsp"%>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -433,7 +429,7 @@
                     <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -461,7 +457,7 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -496,7 +492,7 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -515,7 +511,7 @@
                     users selected in the table, will be assigned to created staged games.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -538,7 +534,7 @@
                     The settings for the staged games are specified in the left card.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -559,7 +555,7 @@
                     The settings for the staged games are specified in the left card.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -747,7 +743,7 @@
             addToGameCell.style.width = '0px';
             addToGameCell.innerHTML =
                 `<button disabled class="add-player-button btn btn-sm btn-primary" title="Add player to selected game">
-                     <span class="glyphicon glyphicon-plus"></span>
+                     <i class="fa fa-plus"></i>
                  </button>`;
 
             return table.outerHTML;
@@ -867,7 +863,7 @@
             switchRolesCell.style.width = '0px';
             switchRolesCell.innerHTML =
                     `<button class="switch-role-button btn btn-sm btn-primary" title="Switch role of player">
-                         <span class="glyphicon glyphicon-transfer"></span>
+                         <i class="fa fa-exchange"></i>
                      </button>`;
 
             /* Hide switch role button for melee games. */
@@ -879,7 +875,7 @@
             removeCell.style.width = '0px';
             removeCell.innerHTML =
                     `<button class="remove-player-button btn btn-sm btn-danger" title="Remove player from game">
-                         <span class="glyphicon glyphicon-trash"></span>
+                         <i class="fa fa-trash"></i>
                      </button>`;
 
             const moveGameIdCell = tr.insertCell();
@@ -909,7 +905,7 @@
             moveButtonCell.style.width = '0px';
             moveButtonCell.innerHTML =
                     `<button disabled class="move-player-button btn btn-sm btn-primary" title="Move player to selected game">
-                         <span class="glyphicon glyphicon-arrow-right"></span>
+                         <i class="fa fa-arrow-right"></i>
                      </button>`;
         };
 
@@ -1080,7 +1076,7 @@
                     {
                         data: null,
                         orderable: false,
-                        defaultContent: '<span class="btn btn-xs btn-default show-settings">Show</span>',
+                        defaultContent: '<span class="btn btn-xs btn-secondary show-settings">Show</span>',
                         type: 'html',
                         title: 'Settings'
                     },
