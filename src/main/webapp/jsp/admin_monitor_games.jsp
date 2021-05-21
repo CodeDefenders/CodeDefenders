@@ -29,6 +29,8 @@
 <%@ page import="java.time.Duration" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminMonitorGames" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -143,7 +145,20 @@
                         </tr>
                         <%
                             List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
-                            if (!playerInfos.isEmpty()) {
+                            Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
+                                    info -> Integer.parseInt(info.get(0)),
+                                    info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
+                            ));
+                            if (!userIdByPlayerId.values().stream().anyMatch(
+                                    userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
+                        %>
+                            <tr class="players-table" hidden>
+                                <td colspan="9" class="text-muted ps-5">
+                                    There are no players active in this game.
+                                </td>
+                            </tr>
+                        <%
+                            } else {
                         %>
                             <tr class="players-table" hidden>
                                 <td colspan="9" class="p-0 ps-5">
@@ -178,10 +193,10 @@
                                                 }
 
                                                 for (List<String> playerInfo : playerInfos) {
-                                                    int pid = Integer.parseInt(playerInfo.get(0));
+                                                    int playerId = Integer.parseInt(playerInfo.get(0));
+                                                    int userID = userIdByPlayerId.get(playerId);
 
                                                     // Do not visualize system users.
-                                                    int userID = UserDAO.getUserForPlayer( pid ).getId();
                                                     // Note this does not prevent someone to forge move player requests which remove system users from the game
                                                     if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
                                                         continue;
@@ -205,7 +220,7 @@
                                                     int totalScore = Integer.parseInt(playerInfo.get(4));
                                                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
                                                     String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
-                                                    int gameScore = AdminMonitorGames.getPlayerScore(g, pid);
+                                                    int gameScore = AdminMonitorGames.getPlayerScore(g, playerId);
                                             %>
                                                 <tr>
                                                     <%
@@ -231,21 +246,21 @@
                                                     <td style="background: <%=color%>;"><%=gameScore%></td>
                                                     <td style="background: <%=color%>;"><%=totalScore%></td>
                                                     <td style="background: <%=color%>;">
-                                                        <button class="btn btn-sm btn-danger" value="<%=pid + "-" + gid + "-" + role%>"
+                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
                                                                 onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                                                                     'This will also delete ALL of his tests, mutants and claimed equivalences ' +
                                                                     'and might create inconsistencies in the Game.');"
-                                                                id="<%="switch_player_"+pid+"_game_"+gid%>"
+                                                                id="<%="switch_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserSwitchButton">
                                                             <i class="fa fa-exchange"></i>
                                                         </button>
                                                     </td>
                                                     <td style="background: <%=color%>;">
-                                                        <button class="btn btn-sm btn-danger" value="<%=pid + "-" + gid%>"
+                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
                                                                 onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                                                                     'This will also delete ALL of his tests, mutants and claimed equivalences ' +
                                                                     'and might create inconsistencies in the Game.');"
-                                                                id="<%="remove_player_"+pid+"_game_"+gid%>"
+                                                                id="<%="remove_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserRemoveButton">
                                                             Remove
                                                         </button>
@@ -370,7 +385,20 @@
                         </tr>
                         <%
                             List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
-                            if (!playerInfos.isEmpty()) {
+                            Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
+                                    info -> Integer.parseInt(info.get(0)),
+                                    info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
+                            ));
+                            if (!userIdByPlayerId.values().stream().anyMatch(
+                                    userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
+                        %>
+                            <tr class="players-table" hidden>
+                                <td colspan="9" class="text-muted ps-5">
+                                    There are no players active in this game.
+                                </td>
+                            </tr>
+                        <%
+                            } else {
                         %>
                             <tr class="players-table" hidden>
                                 <td colspan="8" class="p-0 ps-5">
@@ -400,10 +428,10 @@
                                                 }
 
                                                 for (List<String> playerInfo : playerInfos) {
-                                                    int pid = Integer.parseInt(playerInfo.get(0));
+                                                    int playerId = Integer.parseInt(playerInfo.get(0));
+                                                    int userID = userIdByPlayerId.get(playerId);
 
                                                     // Do not visualize system users.
-                                                    int userID = UserDAO.getUserForPlayer(pid).getId();
                                                     // Note this does not prevent someone to forge move player requests which remove system users from the game
                                                     if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
                                                         continue;
@@ -446,11 +474,11 @@
                                                     <td></td>
                                                     <td><%=totalScore%></td>
                                                     <td>
-                                                        <button class="btn btn-sm btn-danger" value="<%=pid + "-" + gid%>"
+                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
                                                                 onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                                                                     'This will also delete ALL of his tests, mutants and claimed equivalences ' +
                                                                     'and might create inconsistencies in the Game.');"
-                                                                id="<%="remove_player_"+pid+"_game_"+gid%>"
+                                                                id="<%="remove_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserRemoveButton">
                                                             Remove
                                                         </button>
@@ -474,7 +502,7 @@
         %>
 
         <% if (!multiplayerGames.isEmpty() || !meleeGames.isEmpty()) { %>
-            <div class="row g-2">
+            <div class="row g-2 mt-3">
                 <div class="col-auto">
                     <button class="btn btn-md btn-primary" type="submit" name="games_btn" id="start_games_btn"
                             disabled value="Start Games">
