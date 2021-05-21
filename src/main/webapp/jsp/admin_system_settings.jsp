@@ -20,6 +20,8 @@
 --%>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
@@ -27,8 +29,10 @@
     <% request.setAttribute("adminActivePage", "adminSystemSettings"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <h3>System Settings</h3>
-    <form id="changeSettings" name="changeSettings" action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" onsubmit="return validateForm()" method="post">
+    <form id="changeSettings" name="changeSettings"
+          class="mx-auto" style="max-width: 60rem;"
+          action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post"
+          onsubmit="return validateForm()">
         <script>
             function validateForm() {
                 var form = document.forms['changeSettings'];
@@ -69,65 +73,94 @@
         </script>
         <input type="hidden" name="formType" value="saveSettings">
 
-        <% for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
-            if( AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals( setting.getName())){
-                continue; // Do not show Killmap Setting here
-            }
-            String readableName = setting.getName().name().toLowerCase().replace("_", " ");
-            String explanation = setting.getName().toString();
-
-            switch (setting.getType()) {
-                case STRING_VALUE:
-                    if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
-                        setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {%>
-        <div class="form-group" id="<%="group_"+setting.getName().name()%>">
-            <label for="<%=setting.getName().name()%>" title="<%=explanation%>"><%=readableName%>
-            </label>
-            <textarea class="form-control" rows="3" name="<%=setting.getName().name()%>"
-                      id="<%=setting.getName().name()%>"><%=setting.getStringValue()%></textarea>
-        </div>
-
-        <% } else {%>
-        <div class="input-group" id="<%="group_"+setting.getName().name()%>">
-            <span class="input-group-addon" style=" width: 250px; text-align: left;"
-                  title="<%=explanation%>"><%=readableName%> </span>
-            <input class="form-control" name="<%=setting.getName().name()%>"
-                   <%if (!setting.getName().name().startsWith("EMAIL_")) {%>required <%}%>
-                   style = "padding-left:10px"
-                   type="<%=setting.getName().name().contains("PASSWORD") ? "password" : "text"%>"
-                   id="<%=setting.getName().name()%>" value="<%=setting.getStringValue()%>">
-        </div>
         <%
+            for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
+
+                // Do not show Killmap Setting here.
+                if (AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals(setting.getName())) {
+                    continue;
                 }
-                break;
-            case BOOL_VALUE:
-        %>
-        <div class="input-group" id="<%="group_"+setting.getName().name()%>">
-            <span class="input-group-addon" style=" width: 250px; text-align: left;"
-                  title="<%=explanation%>"><%=readableName%> </span>
-            <input type="checkbox" id="<%=setting.getName().name()%>" name="<%=setting.getName().name()%>"
-                   class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-                   data-onstyle="primary" data-offstyle=""
-                <%=setting.getBoolValue() ? "checked" : ""%>>
-        </div>
 
-        <% break;
-            case INT_VALUE: %>
-        <div class="input-group" id="<%="group_"+setting.getName().name()%>">
-            <span class="input-group-addon" style=" width: 250px; text-align: left;"
-                  title="<%=explanation%>"><%=readableName%> </span>
-            <input type="number" value="<%=setting.getIntValue()%>" id="<%=setting.getName().name()%>"
-                   name="<%=setting.getName().name()%>" min="0" required class="form-control" style="width: 80px"/>
-        </div>
+                String readableName = Arrays.stream(setting.getName().name().split("_"))
+                        .map(s -> s.charAt(0) + s.substring(1).toLowerCase())
+                        .collect(Collectors.joining(" "));
+
+                String explanation = setting.getName().toString();
+        %>
+            <div class="row mb-3">
+                <label class="col-sm-4 col-form-label" id="class-label"
+                       for="<%=setting.getName().name()%>"
+                       title="<%=explanation%>">
+                    <%=readableName%>
+                </label>
         <%
-                    break;
+
+                switch (setting.getType()) {
+                    case STRING_VALUE:
+                        if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
+                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {
+        %>
+                <div class="col-sm-8 mb-3">
+                    <textarea class="form-control" rows="3"
+                              name="<%=setting.getName().name()%>"
+                              id="<%=setting.getName().name()%>"><%=setting.getStringValue()%></textarea>
+                </div>
+        <%
+                        } else {
+        %>
+                <div class="col-sm-8 mb-3">
+                    <input type="<%=setting.getName().name().contains("PASSWORD") ? "password" : "text"%>"
+                           class="form-control"
+                           name="<%=setting.getName().name()%>"
+                           id="<%=setting.getName().name()%>"
+                            <%=setting.getName().name().startsWith("EMAIL_") ? "" : "required"%>
+                           value="<%=setting.getStringValue()%>">
+                </div>
+        <%
+                        }
+                        break;
+                    case BOOL_VALUE:
+        %>
+                <div class="col-sm-8 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="<%=setting.getName().name()%>"
+                               name="<%=setting.getName().name()%>"
+                               <%=setting.getBoolValue() ? "checked" : ""%>>
+                        <label class="form-check-label" for="<%=setting.getName().name()%>">
+                            <%=readableName%>
+                        </label>
+                    </div>
+                </div>
+        <%
+                        break;
+                    case INT_VALUE:
+        %>
+                <div class="col-sm-8 mb-3">
+                    <input type="number"
+                           class="form-control"
+                           name="<%=setting.getName().name()%>"
+                           id="<%=setting.getName().name()%>"
+                           value="<%=setting.getIntValue()%>">
+                </div>
+        <%
+                        break;
+                }
+        %>
+            </div>
+        <%
             }
         %>
-        <br>
-        <%}%>
-        <button type="submit" class="btn btn-primary" name="saveSettingsBtn" id="saveSettingsBtn"> Save
-        </button>
-        <a class="btn btn-default" id="cancelBtn" onclick="window.location.reload();">Cancel</a>
+
+        <div class="row g-2">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary" name="saveSettingsBtn" id="saveSettingsBtn">Save</button>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-secondary" id="cancelBtn" onclick="window.location.reload();">Cancel</button>
+            </div>
+        </div>
     </form>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

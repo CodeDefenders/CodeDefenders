@@ -70,7 +70,7 @@
             <li><a class="dropdown-item" id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
         </ul>
     </li>
-    <li class="nav-item <%=active(activePage,"adminSystemSettings")%>">
-        <a class="nav-link" id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
+    <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"adminSystemSettings")%>" id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
     </li>
 </ul>
