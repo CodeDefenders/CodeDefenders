@@ -87,7 +87,7 @@ public class AdminUserManagement extends HttpServlet {
             user = userRepo.getUserById(Integer.parseInt(editUser));
         }
 
-        request.setAttribute("user", user);
+        request.setAttribute("editedUser", user);
 
         request.getRequestDispatcher(Constants.ADMIN_USER_JSP).forward(request, response);
     }

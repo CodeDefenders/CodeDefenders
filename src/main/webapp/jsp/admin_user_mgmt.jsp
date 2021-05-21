@@ -32,7 +32,7 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <%
-        UserEntity u = (UserEntity) request.getAttribute("user");
+        UserEntity u = (UserEntity) request.getAttribute("editedUser");
         if (u != null) {
     %>
     <h3>Edit Info for User <%=u.getId()%>
