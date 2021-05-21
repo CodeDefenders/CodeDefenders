@@ -20,7 +20,8 @@ bootstrap classes
 /* Input styled to be a large as a .btn-xs */
 .input-xs {
     width: 15em;
-    padding: 1px 4px;
+    padding-top: 1px;
+    padding-bottom: 1px;
     font-size: 12px;
     vertical-align: middle;
 }

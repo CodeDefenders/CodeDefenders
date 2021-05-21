@@ -722,7 +722,7 @@
                                             </div>
                                             <div class="modal-body">
                                                 <pre class="readonly-pre"><textarea
-                                                        class="readonly-textarea classPreview"
+                                                        class="readonly-textarea"
                                                         id="sut<%=info.gameId()%>"
                                                         name="cut<%=info.gameId()%>" cols="80"
                                                         rows="30"><%=info.cutSource()%></textarea></pre>
