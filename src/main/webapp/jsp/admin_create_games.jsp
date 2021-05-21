@@ -979,7 +979,7 @@
 
         const createSettingsTable = function (gameSettings) {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-condensed');
+            table.classList.add('table', 'table-condensed', 'm-0');
 
             let tr = table.insertRow();
             tr.insertCell().textContent = 'Game Type';
@@ -1025,7 +1025,7 @@
             tr.insertCell().textContent = 'Start Game';
             tr.insertCell().textContent = gameSettings.startGame;
 
-            return table.outerHTML;
+            return table;
         };
 
         /* Restore the state of show/hide toggles for the tables. */
