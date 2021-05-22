@@ -24,6 +24,8 @@
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.util.Constants" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -36,53 +38,117 @@
     <%
         String editUser = request.getParameter("editUser");
         if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
-            User u = UserDAO.getUserById(Integer.parseInt(editUser));
-            if (u != null) {
+            User user = UserDAO.getUserById(Integer.parseInt(editUser));
+            int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
+            if (user != null) {
     %>
-    <h3>Edit Info for User <%=u.getId()%>
-    </h3>
+        <h3>Editing User <%=user.getId()%></h3>
 
-    <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
-        <input type="hidden" name="formType" value="editUser">
-        <input type="hidden" name="uid" value="<%=u.getId()%>">
-        <div class="input-group">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i> </span>
-            <input style ="padding-left:5px" id="name" type="text" class="form-control" name="name" value="<%=u.getUsername()%>">
-        </div>
-        <br>
-        <div class="input-group">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-            <input style ="padding-left:5px" id="email" type="email" class="form-control" name="email" value="<%=u.getEmail()%>">
-        </div>
-        <br>
-        <div class="input-group">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-            <input style ="padding-left:5px" id="password" type="password" class="form-control"
-                   name="password" placeholder="unchanged" onkeyup="check()">
-        </div>
-        <span class = "label label-danger" style = "color: white" id = "pw_confirm_message"></span>
-        <br>
-        <div class="input-group">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-            <input style ="padding-left:5px" id="confirm_password" type="password" class="form-control"
-                   name="confirm_password" placeholder="confirm password" onkeyup="check()">
-        </div>
-        <br>
-        <button type="submit" class="btn btn-primary btn-block" name = "submit_edit_user" id = "submit_edit_user"> Submit</button>
+        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" class="needs-validation mb-4">
+            <input type="hidden" name="formType" value="editUser">
+            <input type="hidden" name="uid" value="<%=user.getId()%>">
 
-        <script>
-            function check() {
-                if (document.getElementById('password').value ===
-                    document.getElementById('confirm_password').value) {
-                    document.getElementById('pw_confirm_message').innerHTML = '';
-                    document.getElementById('submit_edit_user').disabled = false;
-                } else {
-                    document.getElementById('pw_confirm_message').innerHTML = 'Passwords don\'t match!';
-                    document.getElementById('submit_edit_user').disabled = true;
-                }
-            }
-        </script>
-    </form>
+            <div class="row mb-3">
+                <div class="col-sm-12">
+                    <label for="name" class="form-label">Username</label>
+                    <div class="input-group has-validation">
+                        <span class="input-group-text">
+                            <i class="fa fa-user"></i>
+                        </span>
+                        <input id="name" type="text" class="form-control" name="name" value="<%=user.getUsername()%>" placeholder="Username"
+                               required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
+                        <div class="invalid-feedback">
+                            Please enter a valid username.
+                        </div>
+                    </div>
+                    <div class="form-text">
+                        3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-12">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group has-validation">
+                        <span class="input-group-text">
+                            <i class="fa fa-envelope"></i>
+                        </span>
+                        <input id="email" type="email" class="form-control" name="email" value="<%=user.getEmail()%>" placeholder="Email"
+                               required>
+                        <div class="invalid-feedback">
+                            Please enter a valid email address.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-12">
+                    <label for="password" class="form-label">Password (leave empty for unchanged)</label>
+                    <div class="input-group has-validation">
+                        <span class="input-group-text">
+                            <i class="fa fa-key"></i>
+                        </span>
+                        <input id="password" type="password" class="form-control"
+                               name="password" placeholder="Password"
+                               minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                        <div class="invalid-feedback">
+                            Please enter a valid password.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <div class="col-sm-12">
+                    <div class="input-group has-validation">
+                        <span class="input-group-text">
+                            <i class="fa fa-key"></i>
+                        </span>
+                        <input id="confirm_password" type="password" class="form-control"
+                               name="confirm_password" placeholder="Confirm Password">
+                        <div class="invalid-feedback" id="confirm-password-feedback">
+                            Please confirm your password.
+                        </div>
+                    </div>
+                    <div class="form-text">
+                        <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-2">
+                <div class="col-auto">
+                    <a href="<%=request.getContextPath() + Paths.ADMIN_USERS%>" class="btn btn-secondary">Cancel</a>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary btn-block" name="submit_edit_user" id="submit_edit_user">Save</button>
+                </div>
+            </div>
+
+            <script>
+                $(document).ready(() => {
+                    const passwordInput = document.getElementById('password');
+                    const confirmPasswordInput = document.getElementById('confirm_password');
+                    const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
+
+                    const validateConfirmPassword = function () {
+                        if (passwordInput.value === confirmPasswordInput.value)  {
+                            confirmPasswordInput.setCustomValidity('');
+                            confirmPasswordFeedback.innerText = '';
+                        } else {
+                            confirmPasswordInput.setCustomValidity('password-mismatch');
+                            confirmPasswordFeedback.innerText = "Passwords don't match.";
+                        }
+                    };
+
+                    passwordInput.addEventListener('input', validateConfirmPassword);
+                    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+                });
+            </script>
+        </form>
     <%
             }
         }
@@ -93,90 +159,78 @@
     <form id="manageUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="manageUsers">
 
-        <table id="tableUsers"
-               class="table table-striped table-hover table-responsive table-center dataTable display">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>EMail</th>
-                <th>Total Score</th>
-                <th>Last Login</th>
-                <th></th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <%
-                List<UserInfo> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
-                if (unassignedUsersInfo.isEmpty()) {
-            %>
-
-            <div class="panel panel-default">
-                <div class="panel-body" style="    color: gray;    text-align: center;">
-                    There are currently no created users.
+        <%
+            List<UserInfo> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
+            if (unassignedUsersInfo.isEmpty()) {
+        %>
+                <div class="card">
+                    <div class="card-body text-muted text-center">
+                        There are currently no created users.
+                    </div>
                 </div>
-            </div>
-
-            <%
+        <%
             } else {
-                for (UserInfo userInfo : unassignedUsersInfo) {
-                    int userId = userInfo.getUser().getId();
-                    String username = userInfo.getUser().getUsername();
-                    String email = userInfo.getUser().getEmail();
-                    boolean active = userInfo.getUser().isActive();
-                    String lastLogin = userInfo.getLastLoginString();
-                    int totalScore = userInfo.getTotalScore();
-            %>
-
-            <tr id="<%="user_row_"+userId%>" <%=active ? "" : "class=\"danger\""%>>
-                <td class="col-sm-1"><%= userId%>
-                    <input type="hidden" name="added_uid" value=<%=userId%>>
-                </td>
-                <td class="col-sm-2"><%= username %>
-                </td>
-                <td class="col-sm-1"><%= email %>
-                </td>
-                <td class="col-sm-1"><%= totalScore %>
-                </td>
-                <td class="col-sm-2"><%= lastLogin %>
-                </td>
-                <td style="padding-top:4px; padding-bottom:4px">
-                    <button class="btn btn-sm btn-primary" id="<%="edit_user_"+userId%>" name="editUserInfo" type="submit" value="<%=userId%>">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </button>
-                </td>
-                <td style="padding-top:4px; padding-bottom:4px">
-                    <% if (login.getUserId() != userId) { %>
-                    <button class="btn btn-sm btn-danger" id="<%="inactive_user_"+userId%>" type="submit" value="<%=userId%>" name="setUserInactive"
-                            <% if(!active) { %>
-                            title="User is already set inactive." disabled
-                            <% } %>
-                            onclick="return confirm('Are you sure you want to set <%=username%>\'s account to inactive?');"
-                        >
-                        <span class="glyphicon glyphicon-trash"></span>
-                    </button>
-                    <%}%>
-                </td>
-            </tr>
-
-            <%
-                    }
-                }
-            %>
-            </tbody>
-        </table>
+        %>
+            <table id="tableUsers" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Total Score</th>
+                        <th>Last Login</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        for (UserInfo userInfo : unassignedUsersInfo) {
+                            int userId = userInfo.getUser().getId();
+                            String username = userInfo.getUser().getUsername();
+                            String email = userInfo.getUser().getEmail();
+                            boolean active = userInfo.getUser().isActive();
+                            String lastLogin = userInfo.getLastLoginString();
+                            int totalScore = userInfo.getTotalScore();
+                    %>
+                        <tr id="<%="user_row_"+userId%>" <%=active ? "" : "class=\"text-muted\""%>>
+                            <td>
+                                <%=userId%>
+                                <input type="hidden" name="added_uid" value=<%=userId%>>
+                            </td>
+                            <td><%=username%></td>
+                            <td><%=email%></td>
+                            <td><%=totalScore%></td>
+                            <td><%=lastLogin%></td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" id="<%="edit_user_"+userId%>" name="editUserInfo" type="submit" value="<%=userId%>">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <% if (login.getUserId() != userId) { %>
+                                    <button class="btn btn-sm btn-danger" id="<%="inactive_user_"+userId%>" type="submit" value="<%=userId%>" name="setUserInactive"
+                                            <% if (!active) { %>
+                                                title="User is already set inactive." disabled
+                                            <% } %>
+                                            onclick="return confirm('Are you sure you want to set <%=username%>\'s account to inactive?');">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <%
+                        }
+                    %>
+                </tbody>
+            </table>
+        <%
+            }
+        %>
 
         <script>
-        (function () {
-
             $(document).ready(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-
                 $('#tableUsers').DataTable({
-                    pagingType: "full_numbers",
-                    lengthChange: false,
                     searching: true,
                     order: [[4, "desc"]],
                     "columnDefs": [{
@@ -185,53 +239,56 @@
                     }, {
                         "targets": 6,
                         "orderable": false
-                    }]
+                    }],
+                    scrollY: '800px',
+                    scrollCollapse: true,
+                    paging: false,
+                    language: {info: 'Showing _TOTAL_ entries'}
                 });
             });
-
-        })();
         </script>
-
     </form>
 
-    <h3>Create Accounts</h3>
+    <h3 class="mt-4">Create Accounts</h3>
 
     <form id="createUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="createUsers">
 
-        <div class="form-group">
-            <label for="user_name_list">List of user credentials. Show help</label>
-            <a data-toggle="collapse" href="#demo" style="color:black">
-                <span class="glyphicon glyphicon-question-sign"></span>
-            </a>
-            <div id="demo" class="collapse">
-                List of usernames, passwords and emails (optional).
-                <br>
-                Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).
-                Users are separated by new lines.
-                <p>
-                If an email is provided and sending emails is enabled, created users receive an email with their credentials.
-                <p>
-                Valid input examples:
-                <br>
-                <code>username,password
-                    <br>
-                    username2,password,example@mail.com
-                    <br>
-                    username3;password
-                    <br>
-                    username4;password;example@mail.com
-                </code>
-
+        <div class="row mb-3">
+            <div class="col-sm-12">
+                <label for="user_name_list" class="form-label">
+                    <a data-bs-toggle="collapse" data-bs-target="#demo" class="text-decoration-none text-reset cursor-pointer">
+                        List of user credentials
+                        <span class="fa fa-question-circle"></span>
+                    </a>
+                </label>
+                <div id="demo" class="collapse card mb-2">
+                    <div class="card-body">
+                        <p>List of usernames, passwords and (optional) emails.</p>
+                        <p class="m-0">Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).</p>
+                        <p class="m-0">Users are separated by new lines.</p>
+                        <p>If an email is provided and sending emails is enabled, created users receive an email with their credentials.</p>
+                        <p class="mb-2">Valid input format examples:</p>
+                        <pre class="m-0"><code>username,password
+username2,password,example@mail.com
+username3;password
+username4;password;example@mail.com</code></pre>
+                    </div>
+                </div>
+                <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
+                          oninput="document.getElementById('submit_users_btn').disabled = this.value.length === 0;"></textarea>
             </div>
-            <textarea class="form-control" rows="10" id="user_name_list" name="user_name_list"
-                      oninput="document.getElementById('submit_users_btn').disabled = false;"></textarea>
         </div>
 
-        <button class="btn btn-md btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled>
-            Create Accounts
-        </button>
+        <div class="row">
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled>
+                    Create Accounts
+                </button>
+            </div>
+        </div>
 
     </form>
 </div>
+
 <%@ include file="/jsp/footer.jsp" %>

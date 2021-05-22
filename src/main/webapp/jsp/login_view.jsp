@@ -90,7 +90,7 @@
                     <div class="mb-3">
                         <label for="createacc-username-input" class="form-label">Username</label>
                         <input type="text" class="form-control" id="createacc-username-input" name="username" placeholder="Username"
-                               required  minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
+                               required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
                         <div class="invalid-feedback">
                             Please enter a valid username.
                         </div>
