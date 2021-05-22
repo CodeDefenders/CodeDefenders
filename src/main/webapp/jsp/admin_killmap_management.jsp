@@ -50,30 +50,38 @@
     <% request.setAttribute("adminActivePage", "adminKillMaps"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <div class="panel panel-default" style="margin-top: 25px;">
-        <div class="panel-body">
-            <%= numClassesQueued %> <%= pluralize(numClassesQueued, "Class", "Classes") %> and
-            <%= numGamesQueued %> <%= pluralize(numGamesQueued, "Game", "Games") %> currently queued.
-            <br>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Killmap Status</h5>
 
-            <% if (processorEnabled) { %>
-                Killmap Processing is <span class="text-success">enabled</span>
-            <% } else { %>
-                Killmap Processing is <span class="text-danger">disabled</span>
-            <% } %>
+            <p class="m-0">
+                <%= numClassesQueued %> <%= pluralize(numClassesQueued, "Class", "Classes") %> and
+                <%= numGamesQueued %> <%= pluralize(numGamesQueued, "Game", "Games") %> currently queued.
+            </p>
 
-            <% if (currentJob != null) {
+            <p class="m-0">
+                <% if (processorEnabled) { %>
+                    Killmap Processing is <span class="text-success">enabled</span>.
+                <% } else { %>
+                    Killmap Processing is <span class="text-danger">disabled</span>.
+                <% } %>
+            </p>
+
+            <%
+                if (currentJob != null) {
                     String jobType;
                     switch (currentJob.getType()) {
                         case CLASS: jobType = "Class"; break;
                         case GAME: jobType = "Game"; break;
                         default: jobType = "[Unknown]";
-                    } %>
-                <br> Currently processing: <%= jobType %> with ID <%= currentJob.getId() %>
-            <% } %>
-            <p></p>
+                    }
+            %>
+                <p>Currently processing: <%=jobType%> with ID <%=currentJob.getId()%></p>
+            <%
+                }
+            %>
 
-            <form id="killmap-processor-settings" name="killmap-processor-settings" title="<%= processorExplanation %>"
+            <form id="killmap-processor-settings" class="mt-3" name="killmap-processor-settings" title="<%=processorExplanation%>"
                   method="post">
                 <input type="hidden" name="formType" value="toggleKillMapProcessing">
                 <% if (processorEnabled) { %>
@@ -89,20 +97,22 @@
         </div>
     </div>
 
-
-    <ul class="nav nav-tabs" style="margin-top: 25px; margin-bottom: 25px;">
-        <li <%= currentPage == KillmapPage.MANUAL ? "class=\"active\"" : "" %>>
-            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual" %>">
+    <ul class="nav nav-tabs my-4">
+        <li class="nav-item">
+            <a class="nav-link <%=currentPage == KillmapPage.MANUAL ? "active" : ""%>"
+               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">
                 Enter IDs
             </a>
         </li>
-        <li <%= currentPage == KillmapPage.AVAILABLE ? "class=\"active\"" : "" %>>
-            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/available" %>">
+        <li class="nav-item">
+            <a class="nav-link <%=currentPage == KillmapPage.AVAILABLE ? "active" : ""%>"
+               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/available"%>">
                 Select Classes / Games
             </a>
         </li>
-        <li <%= currentPage == KillmapPage.QUEUE ? "class=\"active\"" : "" %>>
-            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/queue" %>">
+        <li class="nav-item">
+            <a class="nav-link <%=currentPage == KillmapPage.QUEUE ? "active" : ""%>"
+               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/queue"%>">
                 Queued Killmap Jobs
             </a>
         </li>
@@ -110,130 +120,150 @@
 
     <% if (currentPage == KillmapPage.MANUAL) { %>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card mb-3">
+            <div class="card-header">
                 Classes
             </div>
-            <div class="panel-body">
-                <div class="form-group">
-                    <label for="class-ids">Class IDs</label>
-                    <a data-toggle="collapse" href="#class-ids-explanation" style="color: black;">
-                        <span class="glyphicon glyphicon-question-sign"></span>
-                    </a>
-                    <div id="class-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
-                        <div class="panel-body" style="padding: 10px;">
-                            Comma separated list of class IDs to generate killmaps for.
-                            Newlines and whitespaces are allowed.
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-12">
+                        <label for="class-ids" class="form-label">
+                            <a data-bs-toggle="collapse" data-bs-target="#class-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
+                                Class IDs
+                                <span class="fa fa-question-circle ms-1"></span>
+                            </a>
+                        </label>
+                        <div id="class-ids-explanation" class="collapse card mb-2">
+                            <div class="card-body">
+                                Comma separated list of class IDs to generate killmaps for.
+                                Newlines and whitespaces are allowed.
+                            </div>
                         </div>
+                        <textarea name="ids" id="class-ids" class="form-control" placeholder="Class IDs" rows="3"></textarea>
                     </div>
-                    <textarea name="ids" id="class-ids" class="form-control" placeholder="Class IDs" rows="3"></textarea>
                 </div>
-
-                <button id="queue-ids-classes" class="btn btn-primary">Queue</button>
-                <button id="delete-ids-classes" class="btn btn-danger">Delete</button>
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <button id="queue-ids-classes" class="btn btn-primary">Queue</button>
+                    </div>
+                    <div class="col-auto">
+                        <button id="delete-ids-classes" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">
+
+        <div class="card">
+            <div class="card-header">
                 Games
             </div>
-            <div class="panel-body">
-                <div class="form-group">
-                    <label for="game-ids">Game IDs</label>
-                    <a data-toggle="collapse" href="#game-ids-explanation" style="color: black;">
-                        <span class="glyphicon glyphicon-question-sign"></span>
-                    </a>
-                    <div id="game-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
-                        <div class="panel-body" style="padding: 10px;">
-                            Comma separated list of game IDs to generate killmaps for.
-                            Newlines and whitespaces are allowed.
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-12">
+                        <label for="game-ids" class="form-label">
+                            <a data-bs-toggle="collapse" data-bs-target="#game-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
+                                Game IDs
+                                <span class="fa fa-question-circle ms-1"></span>
+                            </a>
+                        </label>
+                        <div id="game-ids-explanation" class="collapse card mb-2">
+                            <div class="card-body">
+                                Comma separated list of game IDs to generate killmaps for.
+                                Newlines and whitespaces are allowed.
+                            </div>
                         </div>
+                        <textarea name="ids" id="game-ids" class="form-control" placeholder="Game IDs" rows="3"></textarea>
                     </div>
-                    <textarea name="ids" id="game-ids" class="form-control" placeholder="Game IDs" rows="3"></textarea>
                 </div>
-
-                <button id="queue-ids-games" class="btn btn-primary">Queue</button>
-                <button id="delete-ids-games" class="btn btn-danger">Delete</button>
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <button id="queue-ids-games" class="btn btn-primary">Queue</button>
+                    </div>
+                    <div class="col-auto">
+                        <button id="delete-ids-games" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
             </div>
         </div>
 
     <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
                 Classes
-                <div style="float: right;">
-                    <input type="search" id="search-classes" class="form-control" placeholder="Search" style="height: 1.5em; width: 10em; display: inline;">
-                    <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
-                        <label class="btn btn-xs btn-default">
-                            <input id="toggle-progress-classes" type="checkbox"> Show progress
-                        </label>
-                    </div>
-                    <button id="invert-selection-classes" class="btn btn-xs btn-default" style="margin-left: 1em;">Invert Selection</button>
+                <div>
+                    <input type="checkbox" id="toggle-progress-classes" class="btn-check" autocomplete="off">
+                    <label for="toggle-progress-classes" class="btn btn-xs btn-outline-secondary me-2">
+                        Show progress
+                    </label>
+                    <button id="invert-selection-classes" class="btn btn-xs btn-secondary me-2">Invert Selection</button>
                     <% if (currentPage == KillmapPage.AVAILABLE) { %>
-                        <button id="queue-selection-classes" class="btn btn-xs btn-primary" style="margin-left: 1em;">Queue Selected</button>
-                        <button id="delete-selection-classes" class="btn btn-xs btn-danger">Delete Selected</button>
+                        <button id="queue-selection-classes" class="btn btn-xs btn-primary">Queue Selected</button>
+                        <button id="delete-selection-classes" class="btn btn-xs btn-danger me-2">Delete Selected</button>
                     <% } else { %>
-                        <button id="cancel-selection-classes" class="btn btn-xs btn-primary" style="margin-left: 1em;">Cancel Selected</button>
+                        <button id="cancel-selection-classes" class="btn btn-xs btn-primary me-2">Cancel Selected</button>
                     <% } %>
+                    <input type="search" id="search-classes" class="form-control input-xs" placeholder="Search">
                 </div>
             </div>
-            <div class="panel-body">
-                <table id="table-classes" class="table table-striped table-responsive"></table>
+            <div class="card-body">
+                <table id="table-classes" class="table table-striped"></table>
             </div>
         </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
                 Games
-                <div style="float: right;">
-                    <input type="search" id="search-games" class="form-control" placeholder="Search" style="height: 1.5em; width: 10em; display: inline;">
-                    <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
-                        <label class="btn btn-xs btn-default">
-                            <input id="toggle-progress-games" type="checkbox"> Show progress
-                        </label>
-                    </div>
-                    <button id="invert-selection-games" class="btn btn-xs btn-default" style="margin-left: 1em;">Invert Selection</button>
+                <div>
+                    <input type="checkbox" id="toggle-progress-games" class="btn-check" autocomplete="off">
+                    <label for="toggle-progress-games" class="btn btn-xs btn-outline-secondary me-2">
+                        Show progress
+                    </label>
+                    <button id="invert-selection-games" class="btn btn-xs btn-secondary me-2">Invert Selection</button>
                     <% if (currentPage == KillmapPage.AVAILABLE) { %>
-                        <button id="queue-selection-games" class="btn btn-xs btn-primary" style="margin-left: 1em;">Queue Selected</button>
-                        <button id="delete-selection-games" class="btn btn-xs btn-danger">Delete Selected</button>
+                        <button id="queue-selection-games" class="btn btn-xs btn-primary">Queue Selected</button>
+                        <button id="delete-selection-games" class="btn btn-xs btn-danger me-2">Delete Selected</button>
                     <% } else { %>
-                        <button id="cancel-selection-games" class="btn btn-xs btn-primary" style="margin-left: 1em;">Cancel Selected</button>
+                        <button id="cancel-selection-games" class="btn btn-xs btn-primary me-2">Cancel Selected</button>
                     <% } %>
+                    <input type="search" id="search-games" class="form-control input-xs" placeholder="Search">
                 </div>
             </div>
-            <div class="panel-body">
-                <table id="table-games" class="table table-striped table-responsive"></table>
+            <div class="card-body">
+                <table id="table-games" class="table table-striped"></table>
             </div>
         </div>
 
-        <a data-toggle="collapse" href="#downloads" style="color: black;">
-            <span class="glyphicon glyphicon-download"></span> Download Tables
+        <a data-bs-toggle="collapse" data-bs-target="#downloads" class="btn btn-sm btn-outline-secondary mt-4">
+            <i class="fa fa-download"></i>
+            Download Tables
         </a>
-        <div id="downloads" class="collapse panel panel-default" style="margin-top: 10px;">
-            <div class="panel-body">
-                <div style="display: inline-block; margin-right: 25px;">
-                    <label>Classes</label>
-                    <br>
-                    <div class="btn-group">
-                        <a download="classes.csv"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=csv"
-                           type="button" class="btn btn-default" id="download-classes-csv">Download as CSV</a>
-                        <a download="classes.json"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json"
-                           type="button" class="btn btn-default" id="download-classes-json">Download as JSON</a>
+        <div id="downloads" class="collapse card mt-2">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <label class="form-label col-sm-12">Classes</label>
+                    <div class="col-auto">
+                        <div class="btn-group">
+                            <a download="classes.csv"
+                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=csv"
+                               class="btn btn-sm btn-outline-secondary" id="download-classes-csv">Download as CSV</a>
+                            <a download="classes.json"
+                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json"
+                               class="btn btn-sm btn-outline-secondary" id="download-classes-json">Download as JSON</a>
+                        </div>
                     </div>
                 </div>
-
-                <div style="display: inline-block;">
-                    <label>Games</label>
-                    <br>
-                    <div class="btn-group">
-                        <a download="games.csv"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=csv"
-                           type="button" class="btn btn-default" id="download-games-csv">Download as CSV</a>
-                        <a download="games.json"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json"
-                           type="button" class="btn btn-default" id="download-games-json">Download as JSON</a>
+                <div class="row">
+                    <label class="form-label col-sm-12">Games</label>
+                    <div class="col-auto">
+                        <div class="btn-group">
+                            <a download="games.csv"
+                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=csv"
+                               class="btn btn-sm btn-outline-secondary" id="download-games-csv">Download as CSV</a>
+                            <a download="games.json"
+                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json"
+                               class="btn btn-sm btn-outline-secondary" id="download-games-json">Download as JSON</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -362,7 +392,7 @@
                 dataSrc: 'data'
             },
             columns: [
-                { data: null,             defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                { data: null,             defaultContent: '<div class="form-check"><input type="checkbox" class="form-check-input select-for-queue"></div>' },
                 { data: 'classId',        title: 'Class' },
                 { data: classNameFromRow, title: 'Name' },
                 { data: 'nrMutants',      title: 'Mutants' },
@@ -382,7 +412,7 @@
                 dataSrc: 'data'
             },
             columns: [
-                { data: null,            defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                { data: null,            defaultContent: '<div class="form-check"><input type="checkbox" class="form-check-input select-for-queue"></div>' },
                 { data: 'gameId',        title: 'Game' },
                 { data: 'gameMode',      title: 'Mode' },
                 { data: 'nrMutants',     title: 'Mutants' },

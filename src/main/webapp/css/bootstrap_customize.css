@@ -24,6 +24,7 @@ bootstrap classes
     padding-bottom: 1px;
     font-size: 12px;
     vertical-align: middle;
+    display: inline-block;
 }
 
 /* Modals
@@ -94,11 +95,11 @@ bootstrap classes
 
 /* Color rows by .odd/.even instead of :nth-of-type(2n+1).
    Use :nth-of-type(n) to increase CSS specificity. */
-.table-striped > tbody > .odd:nth-of-type(n) {
-    background: transparent;
+.table-striped > tbody > .odd:nth-of-type(n) > td {
+    box-shadow: rgba(0, 0, 0, 0.05) 0 0 0 9999px inset;
 }
 .table-striped > tbody > .even:nth-of-type(n) {
-    background-color: #f4f4f4;
+    box-shadow: none;
 }
 
 /* Cards
