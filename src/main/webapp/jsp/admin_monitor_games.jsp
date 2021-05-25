@@ -592,12 +592,12 @@
 
         $(document).ready(function () {
             const showMultiplayer = localStorage.getItem("showActivePlayersMultiplayer") === "true";
+            document.getElementById('togglePlayersActiveMultiplayer').checked = showMultiplayer;
             showMultiplayerDetails(showMultiplayer);
-            setMultiplayerIcon(showMultiplayer);
 
             const showMelee = localStorage.getItem("showActivePlayersMelee") === "true";
+            document.getElementById('togglePlayersActiveMelee').checked = showMelee;
             showMeleeDetails(showMelee);
-            setMeleeIcon(showMelee);
         });
 
         $('.modal').on('shown.bs.modal', function () {
