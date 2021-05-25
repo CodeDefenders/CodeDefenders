@@ -94,4 +94,20 @@ public class PropertiesFileConfigurationTest {
     public void legacyBooleanParsingFalse() {
         assertFalse(config2.isBlockAttacker());
     }
+
+    @Test
+    public void emptyStringShouldParseToNull() {
+        StubConfigFileResolver mCfgFileResolverSetProp = new StubConfigFileResolver();
+        mCfgFileResolverSetProp.setConfigFileContent(
+                "cluster.timeout=4\n");
+
+        StubConfigFileResolver mCfgFileResolverUnsetProp = new StubConfigFileResolver();
+        mCfgFileResolverUnsetProp.setConfigFileContent(
+                "cluster.timeout=\n");
+
+        PropertiesFileConfiguration configWithOverWritten = new PropertiesFileConfiguration(Arrays.asList(mCfgFileResolverSetProp, mCfgFileResolverUnsetProp));
+        configWithOverWritten.init();
+
+        assertEquals(-1, configWithOverWritten.getClusterTimeout());
+    }
 }
