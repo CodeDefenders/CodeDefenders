@@ -32,123 +32,121 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <h3>Classes</h3>
-    <div>
-        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Click here</a> to upload a new class.
-    </div>
 
-    <table id="tableClasses"
-               class="table table-striped table-hover table-responsive table-center dataTable display">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Alias</th>
-                <th>Games w/ class</th>
-                <th>Delete / Set as inactive</th>
-            </tr>
-        </thead>
-        <tbody>
+    <%
+        if (allClasses.isEmpty()) {
+    %>
 
-            <%
-                if (allClasses.isEmpty()) {
-            %>
-
-            <div class="panel panel-default">
-                <div class="panel-body" style="    color: gray;    text-align: center;">
-                    There are currently no classes yet.
-                    <p>
-                    <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Upload them here.</a>
-                </div>
+        <div class="card">
+            <div class="card-body text-center text-muted">
+                There are no classes yet.
+                <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Click here</a>
+                to upload a new class.
             </div>
+        </div>
 
-            <%
-            } else {
-                for (GameClassInfo classInfo : allClasses) {
-                    int classId = classInfo.getGameClass().getId();
-                    String name = classInfo.getGameClass().getName();
-                    String alias = classInfo.getGameClass().getAlias();
-                    boolean active = classInfo.getGameClass().isActive();
-                    int gamesWithClass = classInfo.getGamesWithClass();
-                    boolean deletable = classInfo.isDeletable();
-            %>
+    <%
+        } else {
+    %>
 
-            <tr id="<%="class_row_"+classId%>" <%=active ? "" : "class=\"danger\""%>>
-                <td class="col-sm-1"><%= classId%>
-                </td>
-                <td class="col-sm-2"><%= name %>
-                </td>
-                <td class="col-sm-2">
-                    <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=classId%>">
-                        <%=alias%>
-                    </a>
-                    <div id="modalCUTFor<%=classId%>" class="modal fade" role="dialog" style="text-align: left;" >
-                        <div class="modal-dialog">
-                            <!-- Modal content-->
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title"><%=alias%></h4>
-                                </div>
-                                <div class="modal-body">
-                                <pre class="readonly-pre"><textarea
-                                    class="readonly-textarea classPreview"
-                                    id="sut<%=classId%>"
-                                    name="cut<%=classId%>" cols="80"
-                                    rows="30"></textarea></pre>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <table id="tableClasses" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Alias</th>
+                    <th>#Games</th>
+                    <th>Manage Class</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <%
+                    for (GameClassInfo classInfo : allClasses) {
+                        int classId = classInfo.getGameClass().getId();
+                        String name = classInfo.getGameClass().getName();
+                        String alias = classInfo.getGameClass().getAlias();
+                        boolean active = classInfo.getGameClass().isActive();
+                        int gamesWithClass = classInfo.getGamesWithClass();
+                        boolean deletable = classInfo.isDeletable();
+                %>
+
+                    <tr id="<%="class_row_" + classId%>" <%=active ? "" : "class=\"text-muted\""%>>
+                        <td><%=classId%></td>
+                        <td><%=name%></td>
+                        <td>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#modalCUTFor<%=classId%>">
+                                <%=alias%>
+                            </a>
+                            <div id="modalCUTFor<%=classId%>" class="modal fade" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title"><%=alias%></h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                        <pre class="readonly-pre"><textarea
+                                            class="readonly-textarea classPreview"
+                                            id="sut<%=classId%>"
+                                            name="cut<%=classId%>" cols="80"
+                                            rows="30"></textarea></pre>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </td>
-                <td class="col-sm-2"><%= gamesWithClass %>
-                </td>
-                <%
-                    if (deletable) {
-                %>
-                <td class="col-sm-2" style="padding-top:4px; padding-bottom:4px">
-                    <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
-                        <input type="hidden" name="formType" value="classRemoval">
+                        </td>
+                        <td><%=gamesWithClass%></td>
+                        <td>
+                            <%
+                                if (deletable) {
+                            %>
+                                <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
+                                    <input type="hidden" name="formType" value="classRemoval">
+                                    <button class="btn btn-sm btn-danger" id="<%="delete_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
+                                            title="Delete class from the system. This class won't be available for games afterwards."
+                                            onclick="return confirm('Are you sure you want to delete class \'<%=name%>\' forever? This cannot be undone.');">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            <%
+                                } else {
+                            %>
+                                <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
+                                    <input type="hidden" name="formType" value="classInactive">
 
-                        <button class="btn btn-sm btn-danger" id="<%="delete_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
-                                title="Delete Class from the system. No one can create games with this class anymore."
-                                onclick="return confirm('Are you sure you want to delete class \'<%=name%>\' forever? You must re-upload it.');" >
-                            <span class="glyphicon glyphicon-trash"></span>
-                        </button>
-                    </form>
-                </td>
-                <%
-                    } else { // not deletable, so set as inactive
-                %>
-                <td class="col-sm-2" style="padding-top:4px; padding-bottom:4px">
-                    <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
-                        <input type="hidden" name="formType" value="classInactive">
-
-                    <button class="btn btn-sm btn-danger" id="<%="inactive_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
-                            <% if(!active) { %>
-                            title="Class is already set as inactive." disabled
-                            <% } else { %>
-                            title="Set class as inactive. No one can create games with this class anymore."
+                                    <button class="btn btn-sm btn-danger" id="<%="inactive_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
+                                            <% if (!active) { %>
+                                                title="Class is already inactive." disabled
+                                            <% } else { %>
+                                                title="Set class as inactive. This class won't be available for games afterwards."
+                                            <% } %>
+                                            onclick="return confirm('Are you sure you want to set class \'<%=name%>\' to inactive?');">
+                                        <i class="fa fa-power-off"></i>
+                                    </button>
+                                </form>
                             <%
                                 }
                             %>
-                            onclick="return confirm('Are you sure you want to set class \'<%=name%>\' to inactive?');">
-                        <span class="glyphicon glyphicon-trash"></span>
-                    </button>
-                    </form>
-                </td>
+                        </td>
+                    </tr>
                 <%
                     }
                 %>
-            </tr>
-            <%
-                    }
-                }
-            %>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+
+        <p>
+            <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Click here</a>
+            to upload a new class.
+        </p>
+    <%
+        }
+    %>
+
 </div>
 
 <script>

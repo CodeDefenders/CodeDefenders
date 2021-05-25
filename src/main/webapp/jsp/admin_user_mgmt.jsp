@@ -214,7 +214,7 @@
                                                 title="User is already set inactive." disabled
                                             <% } %>
                                             onclick="return confirm('Are you sure you want to set <%=username%>\'s account to inactive?');">
-                                        <i class="fa fa-trash"></i>
+                                        <i class="fa fa-power-off"></i>
                                     </button>
                                 <% } %>
                             </td>
