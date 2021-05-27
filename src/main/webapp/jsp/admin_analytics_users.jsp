@@ -26,8 +26,7 @@
 
     <h3>Users</h3>
 
-    <table id="tableUsers"
-           class="table table-striped table-hover table-responsive">
+    <table id="tableUsers" class="table table-striped">
         <thead>
             <tr>
                 <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
@@ -41,11 +40,16 @@
         </thead>
     </table>
 
-    <div class="btn-group">
-        <a download="user-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?fileType=csv"
-            type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="user-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?fileType=json"
-           type="button" class="btn btn-default" id="download-json">Download as JSON</a>
+    <div class="row mb-3 mt-4">
+        <label class="form-label col-sm-12">Download Table</label>
+        <div class="col-auto">
+            <div class="btn-group">
+                <a download="user-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">Download as CSV</a>
+                <a download="user-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?fileType=json"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">Download as JSON</a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -144,9 +148,13 @@
                 }
             ],
             "pageLength": 50,
-            "order": [[ 1, "asc" ]]
+            "order": [[ 1, "asc" ]],
+            "scrollY": '600px',
+            "scrollCollapse": true,
+            "paging": false,
+            "language": {"info": "Showing _TOTAL_ entries"}
         });
-        window.a = table;
+
         setupChildRows(table, format);
     });
 

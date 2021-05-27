@@ -26,8 +26,7 @@
 
     <h3>Classes</h3>
 
-    <table id="tableClasses"
-           class="table table-striped table-hover table-responsive">
+    <table id="tableClasses" class="table table-striped">
         <thead>
             <tr>
                 <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
@@ -42,11 +41,16 @@
         </thead>
     </table>
 
-    <div class="btn-group">
-        <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
-            type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=json"
-           type="button" class="btn btn-default" id="download-json">Download as JSON</a>
+    <div class="row mb-3 mt-4">
+        <label class="form-label col-sm-12">Download Table</label>
+        <div class="col-auto">
+            <div class="btn-group">
+                <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">Download as CSV</a>
+                <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=json"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">Download as JSON</a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -158,7 +162,11 @@
                 }
             ],
             "pageLength": 50,
-            "order": [[ 1, "asc" ]]
+            "order": [[ 1, "asc" ]],
+            "scrollY": '600px',
+            "scrollCollapse": true,
+            "paging": false,
+            "language": {"info": "Showing _TOTAL_ entries"}
         });
 
         setupChildRows(table, format);

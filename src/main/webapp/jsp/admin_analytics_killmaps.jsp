@@ -26,8 +26,7 @@
 
     <h3>Useful Actions</h3>
 
-    <table id="tableKillmaps"
-           class="table table-striped table-hover table-responsive">
+    <table id="tableKillmaps" class="table table-striped">
         <thead>
             <tr>
                 <th>User ID</th>
@@ -42,38 +41,53 @@
         </thead>
     </table>
 
-    <div class="btn-group">
-        <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
-            type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
-           type="button" class="btn btn-default" id="download-json">Download as JSON</a>
-    </div>
-    <div style="display: inline-block; margin-left: 10px;">
-        <a data-toggle="collapse" href="#explanation" style="color: black">
-            <span class="glyphicon glyphicon-question-sign"></span>
-        </a>
+    <div class="row mb-3 mt-4">
+        <label class="form-label col-sm-12">Download Table</label>
+        <div class="col-auto">
+            <div class="btn-group">
+                <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">Download as CSV</a>
+                <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">Download as JSON</a>
+            </div>
+        </div>
     </div>
 
-    <div id="explanation" class="collapse panel panel-default" style="margin-top: 10px;">
-        <div class="panel-body" style="padding: 10px;">
-            This table uses data from the class killmaps to determine the number of useful tests and mutants per
-            player, class and role.
-            <p></p>
-            <table>
-                <tr>
-                    <td><b>Useful Tests:</b></td>
-                    <td>Number of tests, which killed at least one mutant.</td>
-                </tr>
-                <tr>
-                    <td><b>Useful Mutants:</b></td>
-                    <td>Number of mutants, which were killed by at least one test,
-                        but were covered and not killed by at least one other test.</td>
-                </tr>
-                <tr>
-                    <td><b>Useful Actions:</b></td>
-                    <td>Sum of useful tests and useful mutants.</td>
-                </tr>
-            </table>
+    <div class="accordion mt-4">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="explanation-heading">
+                <button class="accordion-button collapsed" type="button"
+                        data-bs-toggle="collapse" data-bs-target="#explanation-collapse"
+                        aria-expanded="false" aria-controls="explanation-collapse">
+                    Explanation
+                    <i class="fa fa-question-circle ms-1"></i>
+                </button>
+            </h2>
+            <div id="explanation-collapse" class="accordion-collapse collapse" aria-labelledby="explanation-heading">
+                <div class="accordion-body">
+                    <p>
+                        This table uses data from the class killmaps to determine the number of useful tests and mutants per
+                        player, class and role.
+                    </p>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td class="pe-2"><b>Useful Tests:</b></td>
+                                <td>Number of tests, which killed at least one mutant.</td>
+                            </tr>
+                            <tr>
+                                <td class="pe-2"><b>Useful Mutants:</b></td>
+                                <td>Number of mutants, which were killed by at least one test,
+                                    but were covered and not killed by at least one other test.</td>
+                            </tr>
+                            <tr>
+                                <td class="pe-2"><b>Useful Actions:</b></td>
+                                <td>Sum of useful tests and useful mutants.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -106,7 +120,11 @@
                 { className: "text-right", "targets": [0,2,5,6,7] },
             ], */
             "pageLength": 50,
-            "order": [[1, "asc"]]
+            "order": [[1, "asc"]],
+            "scrollY": '600px',
+            "scrollCollapse": true,
+            "paging": false,
+            "language": {"info": "Showing _TOTAL_ entries"}
         });
     });
 
