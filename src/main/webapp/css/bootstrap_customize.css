@@ -95,10 +95,20 @@ bootstrap classes
 
 /* Color rows by .odd/.even instead of :nth-of-type(2n+1).
    Use :nth-of-type(n) to increase CSS specificity. */
-.table-striped > tbody > .odd:nth-of-type(n) > td {
+/* Color odd rows. */
+.table-striped > tbody > tr.odd:nth-of-type(n) > td {
     box-shadow: rgba(0, 0, 0, 0.05) 0 0 0 9999px inset;
 }
-.table-striped > tbody > .even:nth-of-type(n) {
+/* Color even rows. */
+.table-striped > tbody > tr.even:nth-of-type(n) > td {
+    box-shadow: none;
+}
+/* Color odd child rows. */
+.table-striped > tbody > tr.odd:nth-of-type(n) + tr:not(.even):not(.odd) > td {
+    box-shadow: rgba(0, 0, 0, 0.05) 0 0 0 9999px inset;
+}
+/* Color even child rows. */
+.table-striped > tbody > tr.even:nth-of-type(n) + tr:not(.even):not(.odd) > td {
     box-shadow: none;
 }
 

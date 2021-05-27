@@ -1,23 +1,6 @@
 /* (Page-wide) DataTables customizations
 ============================================================================= */
 
-/* Background color of child tables
------------------------------------------------------------------------------ */
-
-/* Inherit row color to all child tables. */
-.table table > tbody > tr:nth-of-type(n) {
-    background-color: inherit;
-}
-
-/* Color child table rows the same color as their leading row.
-   Use :nth-of-type(n) to increase CSS specificity. */
-.table-striped > tbody > .odd:nth-of-type(n) + tr:not(.odd):not(.even) {
-    background: transparent;
-}
-.table-striped > tbody > .even:nth-of-type(n) + tr:not(.odd):not(.even) {
-    background-color: #f4f4f4;
-}
-
 /* Child table styles (for child tables of like in admin analytics)
 ----------------------------------------------------------------------------- */
 
