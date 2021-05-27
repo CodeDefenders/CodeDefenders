@@ -70,7 +70,7 @@
 
 		<tr id="game-<%=gameId%>">
             <td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details">
-                <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"> </span><%=gameId%></td>
+                <i class="toggle-details-icon fa fa-chevron-right"> </i><%=gameId%></td>
             <td class="col-sm-2"><%= g.creatorName()%></td>
             <td class="col-sm-2">
                 <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=g.cutAlias()%></a>
@@ -257,7 +257,7 @@
 
         <tr id="game-<%=gameId%>">
             <td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details">
-                <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"> </span><%=gameId%></td>
+                <i style="margin-right: 5px" class="toggle-details-icon fa fa-chevron-right"> </i><%=gameId%></td>
             <td class="col-sm-2"><%= g.creatorName()%></td>
             <td class="col-sm-2">
                 <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=g.cutAlias()%></a>

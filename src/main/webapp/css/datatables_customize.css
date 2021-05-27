@@ -1,11 +1,12 @@
 /* (Page-wide) DataTables customizations
 ============================================================================= */
 
-/* Child table styles (for child tables of like in admin analytics)
+/* Child table styles (for child tables like in admin analytics)
 ----------------------------------------------------------------------------- */
 
 /* Child table margins and padding */
 .table-child-details {
+    margin-left: 50px;
     padding-top: 1em;
     padding-bottom: 1.5em;
 }
@@ -29,6 +30,8 @@
 .table-child-details > tbody > tr {
     border-top: solid #dddddd;
     border-bottom: solid #dddddd;
+    border-left: none;
+    border-right: none;
     border-width: 1px;
 }
 .table-child-details > tbody > tr:first-child {
@@ -41,11 +44,13 @@
 /* Style for the toggle button of child tables.
 ----------------------------------------------------------------------------- */
 
-.toggle-details {
+.toggle-details,
+.toggle-all-details {
     cursor: pointer;
     color: #6c757d; /* Color of .text-muted in Bootstrap 5. */
     transition: color .15s ease-in-out;
 }
-.toggle-details:hover {
+.toggle-details:hover,
+.toggle-all-details:hover {
     color: black;
 }

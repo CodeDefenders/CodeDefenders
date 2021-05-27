@@ -30,7 +30,7 @@
            class="table table-striped table-hover table-responsive">
         <thead>
             <tr>
-                <th id="toggle-all-details"><span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span></th>
+                <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
                 <th>ID</th>
                 <th>Name (Alias)</th>
                 <th>Games Played</th>
@@ -61,67 +61,67 @@
         var rating3 = data.ratings.gameEngaging;
 
         return '' +
-            '<table class="table-child-details indented">'+
-                '<thead>'+
-                    '<tr>'+
-                        '<th>Win Rates</td>'+
-                    '</tr>'+
-                '</thead>'+
-                '<tbody>'+
-                    '<tr>'+
-                        '<td>Attacker Wins:</td>'+
-                        '<td>'+dtValAndPerc(data.attackerWins, data.nrGames)+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Defender Wins:</td>'+
-                        '<td>'+dtValAndPerc(data.defenderWins, data.nrGames)+'</td>'+
-                    '</tr>'+
-                '</tbody>'+
-                '<thead>'+
-                    '<tr>'+
-                        '<th>Feedback</td>'+
-                    '</tr>'+
-                '</thead>'+
-                '<tbody>'+
-                    '<tr>'+
-                        '<td>Mutation Difficulty:</td>'+
-                        '<td>'+dtDiv(rating1.sum, rating1.count, 'NA')+'</td>'+
-                        '<td>Number of votes:</td>'+
-                        '<td>'+rating1.count+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Test Difficulty:</td>'+
-                        '<td>'+dtDiv(rating2.sum, rating2.count, 'NA')+'</td>'+
-                        '<td>Number of votes:</td>'+
-                        '<td>'+rating2.count+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Game is engaging:</td>'+
-                        '<td>'+dtDiv(rating3.sum, rating3.count, 'NA')+'</td>'+
-                        '<td>Number of votes:</td>'+
-                        '<td>'+rating3.count+'</td>'+
-                    '</tr>'+
-                '</tbody>'+
-                '<thead>'+
-                    '<tr>'+
-                        '<th>Mutants</td>'+
-                    '</tr>'+
-                '</thead>'+
-                '<tbody>'+
-                    '<tr>'+
-                        '<td>Mutants Alive:</td>'+
-                        '<td>'+dtValAndPerc(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
-                        '<td>Per Game:</td>'+
-                        '<td>'+dtDiv(data.mutantsAlive, data.nrGames)+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Mutants Equivalent:</td>'+
-                        '<td>'+dtValAndPerc(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
-                        '<td>Per Game:</td>'+
-                        '<td>'+dtDiv(data.mutantsEquivalent, data.nrGames)+'</td>'+
-                    '</tr>'+
-                '</tbody>'+
-            '</table>';
+            `<table class="table-child-details">
+                <thead>
+                    <tr>
+                        <th>Win Rates</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Attacker Wins:</td>
+                        <td>\${dtValAndPercent(data.attackerWins, data.nrGames)}</td>
+                    </tr>
+                    <tr>
+                        <td>Defender Wins:</td>
+                        <td>\${dtValAndPercent(data.defenderWins, data.nrGames)}</td>
+                    </tr>
+                </tbody>
+                <thead>
+                    <tr>
+                        <th>Feedback</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mutation Difficulty:</td>
+                        <td>\${dtDiv(rating1.sum, rating1.count, 'NA')}</td>
+                        <td>Number of votes:</td>
+                        <td>\${rating1.count}</td>
+                    </tr>
+                    <tr>
+                        <td>Test Difficulty:</td>
+                        <td>\${dtDiv(rating2.sum, rating2.count, 'NA')}</td>
+                        <td>Number of votes:</td>
+                        <td>\${rating2.count}</td>
+                    </tr>
+                    <tr>
+                        <td>Game is engaging:</td>
+                        atd>\${dtDiv(rating3.sum, rating3.count, 'NA')}</td>
+                        <td>Number of votes:</td>
+                        <td>\${rating3.count}</td>
+                    </tr>
+                </tbody>
+                <thead>
+                    <tr>
+                        <th>Mutants</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mutants Alive:</td>
+                        <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
+                        <td>Per Game:</td>
+                        <td>\${dtDiv(data.mutantsAlive, data.nrGames)}</td>
+                    </tr>
+                    <tr>
+                        <td>Mutants Equivalent:</td>
+                        <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
+                        <td>Per Game:</td>
+                        <td>\${dtDiv(data.mutantsEquivalent, data.nrGames)}</td>
+                    </tr>
+                </tbody>
+            </table>`;
     }
 
     $(document).ready(function() {
@@ -135,24 +135,24 @@
                     "className":      'toggle-details',
                     "orderable":      false,
                     "data":           null,
-                    "defaultContent": '<span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span>'
+                    "defaultContent": '<i class="toggle-details-icon fa fa-chevron-right"></i>'
                 },
                 { "data": "id" },
                 { "data":
-                        function(row, type, val, meta) {
+                        function (row, type, val, meta) {
                             return row.classname + ' (' + row.classalias + ')';
                         }
                 },
                 { "data": "nrGames" },
                 { "data": "testsSubmitted" },
                 { "data":
-                        function(row, type, val, meta) {
+                        function (row, type, val, meta) {
                             return dtDiv(row.testsSubmitted, row.nrGames);
                         }
                 },
                 { "data": "mutantsSubmitted" },
                 { "data":
-                        function(row, type, val, meta) {
+                        function (row, type, val, meta) {
                             return dtDiv(row.mutantsSubmitted, row.nrGames);
                         }
                 }
@@ -161,7 +161,7 @@
             "order": [[ 1, "asc" ]]
         });
 
-        setupChildRows("#tableClasses", table, format);
+        setupChildRows(table, format);
     });
 
 })();
