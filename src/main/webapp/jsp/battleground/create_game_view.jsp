@@ -58,7 +58,7 @@
         }
     } else {
 %>
-    <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
+    <form id="create" action="<%=request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post"
           class="mx-auto mt-4 needs-validation" style="max-width: 40rem;">
         <input type="hidden" name="formType" value="createGame">
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
