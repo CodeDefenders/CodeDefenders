@@ -52,10 +52,22 @@
     boolean gamesCreatable = (boolean) request.getAttribute("gamesCreatable");
 %>
 
+<%!
+    /* Quick fix to get striped tables to display properly without DataTables.
+       Later, the tables on this page should be converted to DataTables. */
+    int row = 1;
+    String oddEven() {
+        return row++ % 2 == 0 ? "even" : "odd";
+    }
+    void resetOddEven() {
+        row = 1;
+    }
+%>
+
 <div class="container">
 
     <h2 class="mb-3">My Games</h2>
-    <table id="my-games" class="table">
+    <table id="my-games" class="table table-striped">
         <thead>
             <tr>
                 <th style="width: 3rem;"></th>
@@ -68,9 +80,10 @@
             </tr>
         </thead>
         <tbody>
+            <% resetOddEven(); %>
             <c:choose>
                 <c:when test="${empty activeGames}">
-                    <tr>
+                    <tr class="<%=oddEven()%>">
                         <td colspan="7" class="text-center"> You are currently not active in any games.</td>
                     </tr>
                 </c:when>
@@ -84,7 +97,7 @@
                                 Map<Integer, PlayerScore> attackerScores = ((UserMultiplayerGameInfo) info).getMutantScores();
                                 Map<Integer, PlayerScore> defenderScores = ((UserMultiplayerGameInfo) info).getTestScores();
                     %>
-                        <tr id="<%="game-"+gameId%>">
+                        <tr id="<%="game-"+gameId%>" class="<%=oddEven()%>">
                             <td id="toggle-game-<%=gameId%>" class="toggle-details">
                                 <i class="toggle-details-icon fa fa-chevron-right"></i>
                             </td>
@@ -322,7 +335,7 @@
                             } else if (info instanceof UserMeleeGameInfo) {
                                 List<Player> players = ((UserMeleeGameInfo) info).players();
                         %>
-                            <tr id="<%="game-"+gameId%>">
+                            <tr id="<%="game-"+gameId%>" class="<%=oddEven()%>">
                                 <td id="toggle-game-<%=gameId%>" class="toggle-details">
                                     <i class="toggle-details-icon fa fa-chevron-right"></i>
                                 </td>
@@ -467,7 +480,7 @@
     %>
 
         <h2 class="mt-5 mb-3">Open Battleground Games</h2>
-        <table id="tableOpenBattleground" class="table">
+        <table id="tableOpenBattleground" class="table table-striped">
             <thead>
                 <tr>
                     <th style="width: 3rem;"></th>
@@ -480,9 +493,10 @@
                 </tr>
             </thead>
             <tbody>
+                <% resetOddEven(); %>
                 <c:choose>
                     <c:when test="${empty openMultiplayerGames}">
-                        <tr>
+                        <tr class="<%=oddEven()%>">
                             <td colspan="7" class="text-center"> There are currently no open battleground games.</td>
                         </tr>
                     </c:when>
@@ -495,7 +509,7 @@
                                 Map<Integer, PlayerScore> attackerScores = info.getMutantScores();
                                 Map<Integer, PlayerScore> defenderScores = info.getTestScores();
                         %>
-                            <tr id="game-<%=gameId%>">
+                            <tr id="game-<%=gameId%>" class="<%=oddEven()%>">
                                 <td id="toggle-game-<%=gameId%>" class="toggle-details">
                                     <i class="toggle-details-icon fa fa-chevron-right"></i>
                                 </td>
@@ -676,108 +690,112 @@
         </table>
 
         <h2 class="mt-5 mb-3">Open Melee Games</h2>
-        <table id="tableOpenMelee"
-               class="table table-responsive table-center">
-            <tr>
-                <th style="width: 3rem;"></th>
-                <th style="width: 4rem;">ID</th>
-                <th>Creator</th>
-                <th>Class</th>
-                <th>Players</th>
-                <th>Level</th>
-            </tr>
-            <c:choose>
-                <c:when test="${empty openMeleeGames}">
-                    <tr>
-                        <td colspan="6" class="text-center"> There are currently no open melee games.</td>
-                    </tr>
-                </c:when>
-                <c:otherwise>
-                    <%
-                        for (UserMeleeGameInfo info : openMeleeGames) {
-                            int gameId = info.gameId();
-                            List<Player> players = info.players();
+        <table id="tableOpenMelee" class="table table-striped">
+            <thead>
+                <tr>
+                    <th style="width: 3rem;"></th>
+                    <th style="width: 4rem;">ID</th>
+                    <th>Creator</th>
+                    <th>Class</th>
+                    <th>Players</th>
+                    <th>Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% resetOddEven(); %>
+                <c:choose>
+                    <c:when test="${empty openMeleeGames}">
+                        <tr class="<%=oddEven()%>">
+                            <td colspan="6" class="text-center"> There are currently no open melee games.</td>
+                        </tr>
+                    </c:when>
+                    <c:otherwise>
+                        <%
+                            for (UserMeleeGameInfo info : openMeleeGames) {
+                                int gameId = info.gameId();
+                                List<Player> players = info.players();
 
-                    %>
-                        <tr id="<%="game-"+info.gameId()%>">
-                            <td id="toggle-game-<%=gameId%>" class="toggle-details">
-                                <i class="toggle-details-icon fa fa-chevron-right"></i>
-                            </td>
-                            <td><%=gameId%></td>
-                            <td><%=info.creatorName()%></td>
-                            <td>
-                                <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=info.gameId()%>">
-                                    <%=info.cutAlias()%>
-                                </a>
-                                <div id="modalCUTFor<%=info.gameId()%>" class="modal fade" role="dialog">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal">&times;
-                                                </button>
-                                                <h4 class="modal-title"><%=info.cutAlias()%>
-                                                </h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <pre class="readonly-pre"><textarea
-                                                        class="readonly-textarea"
-                                                        id="sut<%=info.gameId()%>"
-                                                        name="cut<%=info.gameId()%>" cols="80"
-                                                        rows="30"><%=info.cutSource()%></textarea></pre>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        %>
+                            <tr id="<%="game-"+info.gameId()%>" class="<%=oddEven()%>">
+                                <td id="toggle-game-<%=gameId%>" class="toggle-details">
+                                    <i class="toggle-details-icon fa fa-chevron-right"></i>
+                                </td>
+                                <td><%=gameId%></td>
+                                <td><%=info.creatorName()%></td>
+                                <td>
+                                    <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=info.gameId()%>">
+                                        <%=info.cutAlias()%>
+                                    </a>
+                                    <div id="modalCUTFor<%=info.gameId()%>" class="modal fade" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal">&times;
+                                                    </button>
+                                                    <h4 class="modal-title"><%=info.cutAlias()%>
+                                                    </h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <pre class="readonly-pre"><textarea
+                                                            class="readonly-textarea"
+                                                            id="sut<%=info.gameId()%>"
+                                                            name="cut<%=info.gameId()%>" cols="80"
+                                                            rows="30"><%=info.cutSource()%></textarea></pre>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </td>
-                            <td>
-                                <form id="joinGameForm_player_<%=info.gameId()%>"
-                                      action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>" method="post">
-                                    <input type="hidden" name="formType" value="joinGame">
-                                    <input type="hidden" name="gameId" value=<%=info.gameId()%>>
-                                    <input type="hidden" name="player" value=1>
-                                    <%=info.players().size()%>
-                                    <button type="submit" id="<%="join-"+info.gameId()%>"
-                                            class="btn btn-primary btn-sm btn-attacker"
-                                            value="Join">
-                                        Join
-                                    </button>
-                                </form>
-                            </td>
-                            <td><%=info.gameLevel().getFormattedString() %></td>
-                        </tr>
-                        <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                            <td colspan="6">
-                                <div class="child-row-wrapper">
-                                    <table id="game-<%=gameId%>-players" class="child-row-table">
-                                        <thead>
-                                            <tr>
-                                                <th>Player</th>
-                                                <th class="text-end">Points</th>
-                                            </tr>
-                                        </thead>
-                                        <% if (players.isEmpty()) { %>
-                                            <tr>
-                                                <td colspan="2" class="text-center">There are no Players. Go Join!</td>
-                                            </tr>
-                                        <% } %>
-                                        <% for (Player player : players) { %>
-                                            <tr>
-                                                <td><%=player.getUser().getUsername()%></td>
-                                                <td class="text-end"><%=player.getPoints()%></td>
-                                            </tr>
-                                        <% } %>
-                                    </table>
-                                </div>
-                            </td>
-                        </tr>
-                    <%
-                        }
-                    %>
-                </c:otherwise>
-            </c:choose>
+                                </td>
+                                <td>
+                                    <form id="joinGameForm_player_<%=info.gameId()%>"
+                                          action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>" method="post">
+                                        <input type="hidden" name="formType" value="joinGame">
+                                        <input type="hidden" name="gameId" value=<%=info.gameId()%>>
+                                        <input type="hidden" name="player" value=1>
+                                        <%=info.players().size()%>
+                                        <button type="submit" id="<%="join-"+info.gameId()%>"
+                                                class="btn btn-primary btn-sm btn-attacker"
+                                                value="Join">
+                                            Join
+                                        </button>
+                                    </form>
+                                </td>
+                                <td><%=info.gameLevel().getFormattedString() %></td>
+                            </tr>
+                            <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+                                <td colspan="6">
+                                    <div class="child-row-wrapper">
+                                        <table id="game-<%=gameId%>-players" class="child-row-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Player</th>
+                                                    <th class="text-end">Points</th>
+                                                </tr>
+                                            </thead>
+                                            <% if (players.isEmpty()) { %>
+                                                <tr>
+                                                    <td colspan="2" class="text-center">There are no Players. Go Join!</td>
+                                                </tr>
+                                            <% } %>
+                                            <% for (Player player : players) { %>
+                                                <tr>
+                                                    <td><%=player.getUser().getUsername()%></td>
+                                                    <td class="text-end"><%=player.getPoints()%></td>
+                                                </tr>
+                                            <% } %>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        <%
+                            }
+                        %>
+                    </c:otherwise>
+                </c:choose>
+            </tbody>
         </table>
 
     <%
