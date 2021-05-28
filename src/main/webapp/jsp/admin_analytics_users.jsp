@@ -60,67 +60,69 @@
 
     function format(data) {
         return '' +
-            `<table class="table-child-details">
-                <thead>
-                    <tr>
-                        <th>Games Played</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Games as Attacker:</td>
-                        <td>\${dtValAndPercent(data.attackerGamesPlayed, data.gamesPlayed)}</td>
-                        <td>Games as Defender:</td>
-                        <td>\${dtValAndPercent(data.defenderGamesPlayed, data.gamesPlayed)}</td>
-                    </tr>
-                </tbody>
-                <thead>
-                    <tr>
-                        <th>Mutants</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Mutants Submitted:</td>
-                        <td>\${data.mutantsSubmitted}</td>
-                        <td>Per Game (as Attacker):</td>
-                        <td>\${dtDiv(data.mutantsSubmitted, data.attackerGamesPlayed)}</td>
-                    </tr>
-                    <tr>
-                        <td>Alive Mutants:</td>
-                        <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
-                        <td>Per Game (as Attacker):</td>
-                        <td>\${dtDiv(data.mutantsAlive, data.attackerGamesPlayed)}</td>
-                    </tr>
-                    <tr>
-                        <td>Equivalent Mutants:</td>
-                        <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
-                        <td>Per Game (as Attacker):</td>
-                        <td>\${dtDiv(data.mutantsEquivalent, data.attackerGamesPlayed)}</td>
-                    </tr>
-                </tbody>
-                <thead>
-                    <tr>
-                        <th>Tests</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Tests Submitted:</td>
-                        <td>\${data.testsSubmitted}</td>
-                        <td>Per Game (as Defender):</td>
-                        <td>\${dtDiv(data.testsSubmitted, data.defenderGamesPlayed)}</td>
-                    </tr>
-                    <tr>
-                        <td>Mutants Killed:</td>
-                        <td>\${data.mutantsKilled}</td>
-                        <td>Per Game (as Defender):</td>
-                        <td>\${dtDiv(data.mutantsKilled, data.defenderGamesPlayed)}</td>
-                        <td>Per Test:</td>
-                        <td>\${dtDiv(data.mutantsKilled, data.testsSubmitted)}</td>
-                    </tr>
-                </tbody>
-            </table>`;
+            `<div class="child-row-wrapper">
+                <table class="child-row-details">
+                    <thead>
+                        <tr>
+                            <th>Games Played</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Games as Attacker:</td>
+                            <td>\${dtValAndPercent(data.attackerGamesPlayed, data.gamesPlayed)}</td>
+                            <td>Games as Defender:</td>
+                            <td>\${dtValAndPercent(data.defenderGamesPlayed, data.gamesPlayed)}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th>Mutants</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mutants Submitted:</td>
+                            <td>\${data.mutantsSubmitted}</td>
+                            <td>Per Game (as Attacker):</td>
+                            <td>\${dtDiv(data.mutantsSubmitted, data.attackerGamesPlayed)}</td>
+                        </tr>
+                        <tr>
+                            <td>Alive Mutants:</td>
+                            <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
+                            <td>Per Game (as Attacker):</td>
+                            <td>\${dtDiv(data.mutantsAlive, data.attackerGamesPlayed)}</td>
+                        </tr>
+                        <tr>
+                            <td>Equivalent Mutants:</td>
+                            <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
+                            <td>Per Game (as Attacker):</td>
+                            <td>\${dtDiv(data.mutantsEquivalent, data.attackerGamesPlayed)}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th>Tests</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Tests Submitted:</td>
+                            <td>\${data.testsSubmitted}</td>
+                            <td>Per Game (as Defender):</td>
+                            <td>\${dtDiv(data.testsSubmitted, data.defenderGamesPlayed)}</td>
+                        </tr>
+                        <tr>
+                            <td>Mutants Killed:</td>
+                            <td>\${data.mutantsKilled}</td>
+                            <td>Per Game (as Defender):</td>
+                            <td>\${dtDiv(data.mutantsKilled, data.defenderGamesPlayed)}</td>
+                            <td>Per Test:</td>
+                            <td>\${dtDiv(data.mutantsKilled, data.testsSubmitted)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>`;
     }
 
     $(document).ready(function() {

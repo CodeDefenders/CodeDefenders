@@ -65,67 +65,69 @@
         var rating3 = data.ratings.gameEngaging;
 
         return '' +
-            `<table class="table-child-details">
-                <thead>
-                    <tr>
-                        <th>Win Rates</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Attacker Wins:</td>
-                        <td>\${dtValAndPercent(data.attackerWins, data.nrGames)}</td>
-                    </tr>
-                    <tr>
-                        <td>Defender Wins:</td>
-                        <td>\${dtValAndPercent(data.defenderWins, data.nrGames)}</td>
-                    </tr>
-                </tbody>
-                <thead>
-                    <tr>
-                        <th>Feedback</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Mutation Difficulty:</td>
-                        <td>\${dtDiv(rating1.sum, rating1.count, 'NA')}</td>
-                        <td>Number of votes:</td>
-                        <td>\${rating1.count}</td>
-                    </tr>
-                    <tr>
-                        <td>Test Difficulty:</td>
-                        <td>\${dtDiv(rating2.sum, rating2.count, 'NA')}</td>
-                        <td>Number of votes:</td>
-                        <td>\${rating2.count}</td>
-                    </tr>
-                    <tr>
-                        <td>Game is engaging:</td>
-                        atd>\${dtDiv(rating3.sum, rating3.count, 'NA')}</td>
-                        <td>Number of votes:</td>
-                        <td>\${rating3.count}</td>
-                    </tr>
-                </tbody>
-                <thead>
-                    <tr>
-                        <th>Mutants</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Mutants Alive:</td>
-                        <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
-                        <td>Per Game:</td>
-                        <td>\${dtDiv(data.mutantsAlive, data.nrGames)}</td>
-                    </tr>
-                    <tr>
-                        <td>Mutants Equivalent:</td>
-                        <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
-                        <td>Per Game:</td>
-                        <td>\${dtDiv(data.mutantsEquivalent, data.nrGames)}</td>
-                    </tr>
-                </tbody>
-            </table>`;
+            `<div class="child-row-wrapper">
+                <table class="child-row-details">
+                    <thead>
+                        <tr>
+                            <th>Win Rates</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Attacker Wins:</td>
+                            <td>\${dtValAndPercent(data.attackerWins, data.nrGames)}</td>
+                        </tr>
+                        <tr>
+                            <td>Defender Wins:</td>
+                            <td>\${dtValAndPercent(data.defenderWins, data.nrGames)}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th>Feedback</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mutation Difficulty:</td>
+                            <td>\${dtDiv(rating1.sum, rating1.count, 'NA')}</td>
+                            <td>Number of votes:</td>
+                            <td>\${rating1.count}</td>
+                        </tr>
+                        <tr>
+                            <td>Test Difficulty:</td>
+                            <td>\${dtDiv(rating2.sum, rating2.count, 'NA')}</td>
+                            <td>Number of votes:</td>
+                            <td>\${rating2.count}</td>
+                        </tr>
+                        <tr>
+                            <td>Game is engaging:</td>
+                            <td>\${dtDiv(rating3.sum, rating3.count, 'NA')}</td>
+                            <td>Number of votes:</td>
+                            <td>\${rating3.count}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th>Mutants</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mutants Alive:</td>
+                            <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
+                            <td>Per Game:</td>
+                            <td>\${dtDiv(data.mutantsAlive, data.nrGames)}</td>
+                        </tr>
+                        <tr>
+                            <td>Mutants Equivalent:</td>
+                            <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
+                            <td>Per Game:</td>
+                            <td>\${dtDiv(data.mutantsEquivalent, data.nrGames)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>`;
     }
 
     $(document).ready(function() {
