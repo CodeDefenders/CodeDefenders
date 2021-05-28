@@ -159,6 +159,9 @@ public class AdminMonitorGames extends HttpServlet {
                     game.setUserRepository(userRepo);
                     if (!game.addPlayer(userId, newRole)) {
                         messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
+                    } else {
+                        messages.add("The game with id " + gameToRemoveFromId + " doesn't exist! Could not switch user" 
+                                + " role. \n Please check the logs!");
                     }
                 }
             }
