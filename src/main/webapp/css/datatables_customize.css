@@ -10,28 +10,27 @@
     padding-bottom: .25em;
 }
 
-/* Child row details (for child rows like in admin analytics).
+/* Child row details (for child rows like in admin analytics or game overview).
 ----------------------------------------------------------------------------- */
 
-/* Child table margins and padding */
-.child-row-details > tbody > tr > td {
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-    padding-top: .3em;
-    white-space: nowrap;
-}
+/* Padding and layout. */
+
+/* Regular cells. */
+.child-row-details > tbody > tr > td,
 .child-row-details > thead > tr > th {
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-    padding-top: 1em;
     white-space: nowrap;
+    padding: .15em 1.5em;
 }
-/* No top padding for the first row. */
-.child-row-details > thead:first-child > tr:first-child > th {
+/* No top padding for the very first row. */
+.child-row-details > thead:first-child > tr:first-child > th,
+.child-row-details > tbody:first-child > tr:first-child > td {
     padding-top: 0;
 }
-/* Smaller padding for the first and last cell of each row,
-   so the border doesn't extend too much. */
+/* Space between table sections (multiple thead elements). */
+.child-row-details > thead:not(:first-child) > tr:first-child > th {
+    padding-top: 1em;
+}
+/* Smaller padding for the first and last cell of each row, so the border doesn't extend too much. */
 .child-row-details > thead > tr > th:first-child,
 .child-row-details > tbody > tr > td:first-child {
     padding-left: .75em;
@@ -41,62 +40,16 @@
     padding-right: .75em;
 }
 
-/* Borders between child table rows */
+/* Borders. */
+
+/* Borders for regular rows. */
 .child-row-details > tbody > tr {
     border-top: solid 1px #dddddd;
     border-bottom: solid 1px #dddddd;
 }
-.child-row-details > tbody > tr:first-child {
-    border-top: none;
-}
+/* No border after the last row. */
 .child-row-details > tbody > tr:last-child {
     border-bottom: none;
-}
-
-/* Child row tables (for child rows like in the game overview).
------------------------------------------------------------------------------ */
-
-/* Child table margins and padding */
-.child-row-table > tbody > tr > td {
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: .3em;
-    white-space: nowrap;
-}
-.child-row-table > thead > tr > th {
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: 1em;
-    white-space: nowrap;
-}
-/* No top padding for the first row. */
-.child-row-table > thead:first-child > tr:first-child > th {
-    padding-top: 0;
-}
-/* Smaller padding for the first and last cell of each row,
-   so the border doesn't extend too much. */
-.child-row-table > thead > tr > th:first-child,
-.child-row-table > tbody > tr > td:first-child {
-    padding-left: .75em;
-}
-.child-row-table > thead > tr > th:last-child,
-.child-row-table > tbody > tr > td:last-child {
-    padding-right: .75em;
-}
-
-/* Borders between child table rows */
-.child-row-table > thead > tr:last-child {
-    border-bottom: solid 1px black;
-}
-.child-row-table > tbody > tr:first-child {
-    border-top: none;
-}
-.child-row-table > tbody > tr:last-child {
-    border-bottom: none;
-}
-.child-row-table > tbody > tr {
-    border-top: solid 1px #dddddd;
-    border-bottom: solid 1px #dddddd;
 }
 
 /* Style for the toggle button of child tables.
