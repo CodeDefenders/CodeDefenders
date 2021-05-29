@@ -222,7 +222,7 @@
                         <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                             <td colspan="7">
                                 <div class="child-row-wrapper">
-                                    <table class="child-row-table">
+                                    <table class="child-row-details">
                                         <thead>
                                             <tr>
                                                 <th>Attacker</th>
@@ -431,9 +431,9 @@
                                 </td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                                <td colspan="6">
+                                <td colspan="7">
                                     <div class="child-row-wrapper">
-                                        <table id="game-<%=gameId%>-players" class="child-row-table">
+                                        <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
                                                 <tr>
                                                     <th>Player</th>
@@ -573,9 +573,9 @@
                                 <td><%=info.gameLevel().getFormattedString() %></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                                <td colspan="6">
+                                <td colspan="7">
                                     <div class="child-row-wrapper">
-                                        <table class="child-row-table">
+                                        <table class="child-row-details">
                                             <thead>
                                                 <tr>
                                                     <th>Attacker</th>
@@ -768,7 +768,7 @@
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                                 <td colspan="6">
                                     <div class="child-row-wrapper">
-                                        <table id="game-<%=gameId%>-players" class="child-row-table">
+                                        <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
                                                 <tr>
                                                     <th>Player</th>
