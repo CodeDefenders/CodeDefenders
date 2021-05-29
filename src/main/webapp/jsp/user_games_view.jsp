@@ -67,7 +67,7 @@
 <div class="container">
 
     <h2 class="mb-3">My Games</h2>
-    <table id="my-games" class="table table-striped">
+    <table id="my-games" class="table table-striped table-v-align-middle">
         <thead>
             <tr>
                 <th style="width: 3rem;"></th>
@@ -480,7 +480,7 @@
     %>
 
         <h2 class="mt-5 mb-3">Open Battleground Games</h2>
-        <table id="tableOpenBattleground" class="table table-striped">
+        <table id="tableOpenBattleground" class="table table-striped table-v-align-middle">
             <thead>
                 <tr>
                     <th style="width: 3rem;"></th>
@@ -690,7 +690,7 @@
         </table>
 
         <h2 class="mt-5 mb-3">Open Melee Games</h2>
-        <table id="tableOpenMelee" class="table table-striped">
+        <table id="tableOpenMelee" class="table table-striped table-v-align-middle">
             <thead>
                 <tr>
                     <th style="width: 3rem;"></th>

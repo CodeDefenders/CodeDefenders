@@ -4,9 +4,11 @@
 /* Tables
 ----------------------------------------------------------------------------- */
 
-.table-center td,
-.table-center th {
-    text-align: center;
+/* Vertically align table content in the middle.
+   Useful when some cells have taller content than others, e.g. buttons. */
+.table-v-align-middle > thead > tr > th,
+.table-v-align-middle > tbody > tr > td {
+    vertical-align: middle;
 }
 
 /* Attacker- and defender-colored elements

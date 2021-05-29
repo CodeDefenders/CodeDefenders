@@ -60,7 +60,6 @@
     cursor: pointer;
     color: #6c757d; /* Color of .text-muted in Bootstrap 5. */
     transition: color .15s ease-in-out;
-    vertical-align: center;
 }
 .toggle-details:hover,
 .toggle-all-details:hover {

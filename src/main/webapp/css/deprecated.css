@@ -10,3 +10,8 @@
 table .indented {
     margin-left: 50px;
 }
+
+.table-center td,
+.table-center th {
+    text-align: center;
+}
