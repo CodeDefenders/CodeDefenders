@@ -85,25 +85,20 @@
 
             <div class="row mb-3">
                 <div class="col-sm-12">
-                    <label for="password" class="form-label">Password (leave empty for unchanged)</label>
+                    <label for="password" class="form-label">Password</label>
                     <div class="input-group has-validation">
                         <span class="input-group-text">
                             <i class="fa fa-key"></i>
                         </span>
                         <input id="password" type="password" class="form-control"
-                               name="password" placeholder="Password"
+                               name="password" placeholder="Password (leave empty for unchanged)"
                                minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
                         <div class="invalid-feedback">
                             Please enter a valid password.
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="row mb-3">
-                <label for="confirm_password" class="form-label">Confirm Password</label>
-                <div class="col-sm-12">
-                    <div class="input-group has-validation">
+                    <div class="input-group has-validation mt-2">
                         <span class="input-group-text">
                             <i class="fa fa-key"></i>
                         </span>

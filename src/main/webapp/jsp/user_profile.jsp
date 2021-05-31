@@ -30,111 +30,110 @@
 %>
 
 <div class="container">
-    <div id="user-information-container">
-        <h2>Profile Information</h2>
+    <h2>Profile</h2>
 
-        <h4>Played games</h4>
-        <p>
-            You can look at your <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
-        </p>
+    <h3 class="mt-4">Played games</h3>
+    <p>
+        You can find a list of your past games in the
+        <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
+    </p>
 
-    </div>
+    <h3 class="mt-4">Account Information</h3>
 
-    <div id="update-profile-container">
-        <h2>Update Profile</h2>
-        <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
-            <input type="hidden" class="form-control" name="formType" value="updateProfile">
+    <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post" class="row g-3 needs-validation">
+        <input type="hidden" class="form-control" name="formType" value="updateProfile">
 
-            <div>
-                <h4>Update E-Mail Preferences</h4>
-                <div class="form-group row">
-                    <label for="updatedEmail" class="col-sm-2 col-form-label">E-Mail</label>
-                    <div class="col-sm-10">
-                        <input type="email" class="form-control" id="updatedEmail" name="updatedEmail" placeholder="<%=login.getUser().getEmail()%>">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact" value="true"
-                        <%=login.getUser().getAllowContact() ? "checked" : ""%>>
-                    <label class="form-check-label" for="allowContact">
-                        Allow us to contact your email address.
-                    </label>
-                </div>
+        <div class="col-sm-12">
+            <label for="updatedEmail" class="form-label">E-Mail</label>
+            <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
+                   placeholder="<%=login.getUser().getEmail()%> (leave empty for unchanged)">
+
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
+                    <%=login.getUser().getAllowContact() ? "checked" : ""%>>
+                <label class="form-check-label" for="allowContact">
+                    Allow us to contact your email address.
+                </label>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <label for="updatedPassword" class="form-label">Password</label>
+            <input type="password" class="form-control" id="updatedPassword"
+                   name="updatedPassword" placeholder="Password (leave empty for unchanged)"
+                   minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+            <div class="invalid-feedback">
+                Please enter a valid password.
             </div>
 
-            <div>
-                <h4>Update Password</h4>
-                <div class="form-group row">
-                    <label for="updatedPassword" class="col-sm-2 col-form-label">New Password</label>
-                    <div class="col-sm-10">
-                        <input onkeyup="validatePassword()" type="password" class="form-control" id="updatedPassword"
-                               name="updatedPassword" placeholder="Password" minlength="<%=pwMinLength%>">
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label for="repeatedPassword" class="col-sm-2 col-form-label">Repeat Password</label>
-                    <div class="col-sm-10">
-                        <input onkeyup="validatePassword()" type="password" class="form-control" id="repeatedPassword"
-                               name="repeatedPassword" placeholder="Password">
-                    </div>
-                </div>
-                <span class="label label-danger" id="pw_confirm_message" style="color: white;visibility: hidden">Passwords do not match!</span>
+            <input type="password" class="form-control mt-2" id="repeatedPassword"
+                   name="repeatedPassword" placeholder="Confirm Password">
+            <div class="invalid-feedback" id="confirm-password-feedback">
+                Please confirm your password.
+            </div>
+            <div class="form-text">
+                <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+            </div>
+        </div>
 
-                <script type="text/javascript">
-                    function validatePassword() {
-                        if(document.getElementById('updatedPassword').value === '') {
-                            document.getElementById('pw_confirm_message').style.visibility = "hidden";
-                            document.getElementById('submitUpdateProfile').disabled = false;
-                            return;
-                        }
+        <div class="col-sm-12">
+            <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Profile</button>
+        </div>
 
-                        if (document.getElementById('updatedPassword').value === document.getElementById('repeatedPassword').value) {
-                            document.getElementById('pw_confirm_message').style.visibility = "hidden";
-                            document.getElementById('submitUpdateProfile').disabled = false;
-                        } else {
-                            document.getElementById('pw_confirm_message').style.visibility = "visible";
-                            document.getElementById('submitUpdateProfile').disabled = true;
-                        }
+        <script>
+            $(document).ready(() => {
+                const passwordInput = document.getElementById('updatedPassword');
+                const confirmPasswordInput = document.getElementById('repeatedPassword');
+                const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
+
+                const validateConfirmPassword = function () {
+                    if (passwordInput.value === confirmPasswordInput.value)  {
+                        confirmPasswordInput.setCustomValidity('');
+                        confirmPasswordFeedback.innerText = '';
+                    } else {
+                        confirmPasswordInput.setCustomValidity('password-mismatch');
+                        confirmPasswordFeedback.innerText = "Passwords don't match.";
                     }
-                </script>
-            </div>
+                };
 
-            <div class="form-group row">
-                <div class="col-sm-10">
-                    <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Profile</button>
-                </div>
-            </div>
-        </form>
-    </div>
+                passwordInput.addEventListener('input', validateConfirmPassword);
+                confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+            });
+        </script>
+    </form>
 
-    <div>
-        <h3>Delete your account</h3>
+    <h3 class="mt-4">Account Deletion</h3>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#delete-user-container">
-                    View Account Deletion
-                </button>
-            </div>
-            <div class="collapse" id="delete-user-container">
-                <div class="panel-body">
-                    <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
-                        <p>
-                            This action cannot be reversed.
-                            <br>
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#account-deletion-modal">
+        Delete Account
+    </button>
+
+    <div class="modal" id="account-deletion-modal" tabindex="-1">
+        <div class="modal-dialog">
+
+            <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
+                <input type="hidden" class="form-control" name="formType" value="deleteAccount">
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Account Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><b>This cannot be undone.</b><p>
+                        <p class="mb-0">
                             We will delete all personalized information related to your account.
                             Please be aware that you will no longer be able to log in again.
-                            To play further games, you'd have to create a new account.
-                        </p>
-                        <input type="hidden" class="form-control" name="formType" value="deleteAccount">
-                        <div class="form-group row">
-                            <div class="col-sm-10">
-                                <button type="submit" class="btn btn-danger">Delete Account</button>
-                            </div>
-                        </div>
-                    </form>
+                            To play further games, you will have to create a new account.
+                        <p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Delete Account</button>
+                    </div>
                 </div>
-            </div>
+
+            </form>
         </div>
     </div>
 
