@@ -44,22 +44,17 @@
     %>
         <h3>Editing User <%=user.getId()%></h3>
 
-        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" class="needs-validation mb-4">
+        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" class="needs-validation mb-4" autocomplete="off">
             <input type="hidden" name="formType" value="editUser">
             <input type="hidden" name="uid" value="<%=user.getId()%>">
 
             <div class="row mb-3">
                 <div class="col-sm-12">
                     <label for="name" class="form-label">Username</label>
-                    <div class="input-group has-validation">
-                        <span class="input-group-text">
-                            <i class="fa fa-user"></i>
-                        </span>
-                        <input id="name" type="text" class="form-control" name="name" value="<%=user.getUsername()%>" placeholder="Username"
-                               required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
-                        <div class="invalid-feedback">
-                            Please enter a valid username.
-                        </div>
+                    <input id="name" type="text" class="form-control" name="name" value="<%=user.getUsername()%>" placeholder="Username"
+                           required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
+                    <div class="invalid-feedback">
+                        Please enter a valid username.
                     </div>
                     <div class="form-text">
                         3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters.
@@ -70,15 +65,10 @@
             <div class="row mb-3">
                 <div class="col-sm-12">
                     <label for="email" class="form-label">Email</label>
-                    <div class="input-group has-validation">
-                        <span class="input-group-text">
-                            <i class="fa fa-envelope"></i>
-                        </span>
-                        <input id="email" type="email" class="form-control" name="email" value="<%=user.getEmail()%>" placeholder="Email"
-                               required>
-                        <div class="invalid-feedback">
-                            Please enter a valid email address.
-                        </div>
+                    <input id="email" type="email" class="form-control" name="email" value="<%=user.getEmail()%>" placeholder="Email"
+                           required>
+                    <div class="invalid-feedback">
+                        Please enter a valid email address.
                     </div>
                 </div>
             </div>
@@ -86,30 +76,22 @@
             <div class="row mb-3">
                 <div class="col-sm-12">
                     <label for="password" class="form-label">Password</label>
-                    <div class="input-group has-validation">
-                        <span class="input-group-text">
-                            <i class="fa fa-key"></i>
-                        </span>
-                        <input id="password" type="password" class="form-control"
-                               name="password" placeholder="Password (leave empty for unchanged)"
-                               minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
-                        <div class="invalid-feedback">
-                            Please enter a valid password.
-                        </div>
+                    <input id="password" type="password" class="form-control"
+                           name="password" placeholder="Password"
+                           minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                    <div class="invalid-feedback">
+                        Please enter a valid password.
                     </div>
 
-                    <div class="input-group has-validation mt-2">
-                        <span class="input-group-text">
-                            <i class="fa fa-key"></i>
-                        </span>
-                        <input id="confirm_password" type="password" class="form-control"
-                               name="confirm_password" placeholder="Confirm Password">
-                        <div class="invalid-feedback" id="confirm-password-feedback">
-                            Please confirm your password.
-                        </div>
+                    <input id="confirm_password" type="password" class="form-control mt-2"
+                           name="confirm_password" placeholder="Confirm Password">
+                    <div class="invalid-feedback" id="confirm-password-feedback">
+                        Please confirm your password.
                     </div>
                     <div class="form-text">
                         <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                        <br>
+                        Leave empty to keep unchanged.
                     </div>
                 </div>
             </div>

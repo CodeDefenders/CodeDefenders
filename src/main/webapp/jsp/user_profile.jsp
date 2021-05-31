@@ -40,13 +40,13 @@
 
     <h3 class="mt-4">Account Information</h3>
 
-    <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post" class="row g-3 needs-validation">
+    <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post" class="row g-3 needs-validation" autocomplete="off">
         <input type="hidden" class="form-control" name="formType" value="updateProfile">
 
         <div class="col-sm-12">
             <label for="updatedEmail" class="form-label">E-Mail</label>
             <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
-                   placeholder="<%=login.getUser().getEmail()%> (leave empty for unchanged)">
+                   value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
 
             <div class="form-check mt-2">
                 <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
@@ -73,6 +73,8 @@
             </div>
             <div class="form-text">
                 <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                <br>
+                Leave empty to keep unchanged.
             </div>
         </div>
 
@@ -120,12 +122,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p><b>This cannot be undone.</b><p>
+                        <p><b>This cannot be undone.</b></p>
                         <p class="mb-0">
                             We will delete all personalized information related to your account.
                             Please be aware that you will no longer be able to log in again.
                             To play further games, you will have to create a new account.
-                        <p>
+                        </p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
