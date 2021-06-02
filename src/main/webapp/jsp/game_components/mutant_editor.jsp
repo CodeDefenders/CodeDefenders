@@ -27,7 +27,7 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 
-<div class="card minheight-card">
+<div class="card game-component-card">
 
     <%-- no dependencies -> no tabs --%>
     <% if (!mutantEditor.hasDependencies()) { %>

@@ -49,6 +49,21 @@
     gap: .5rem; /* Corresponds to .gap-2 in Bootstrap. */
 }
 
+/* Game component cards.
+----------------------------------------------------------------------------- */
+
+/* Ensure a minimum height of a card, to make cards with smaller content the same size. */
+.game-component-card {
+    min-height: 700px;
+    resize: vertical;
+    overflow: auto;
+}
+/* If header + footer exceed 100px, we don't care if all cards are the same size
+   and make the content 600px high anyways. */
+.game-component-card .card-body {
+    min-height: 600px;
+}
+
 /* Container for highlighting the components for resolving an equivalence duel
 ----------------------------------------------------------------------------- */
 

@@ -22,7 +22,7 @@
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
-<div class="card minheight-card">
+<div class="card game-component-card">
 
     <%-- no dependencies -> no tabs --%>
     <% if (!classViewer.hasDependencies()) { %>

@@ -112,18 +112,6 @@ bootstrap classes
     box-shadow: none;
 }
 
-/* Cards
------------------------------------------------------------------------------ */
-
-/* Ensures a minimum height of a card, to make cards with smaller content the same size. */
-.minheight-card {
-    min-height: 700px;
-}
-/* If header + footer exceed 100px, we don't care if all cards are the same size and make the content 500px high anyways. */
-.minheight-card .card-body {
-    min-height: 600px;
-}
-
 /* Extra Bootstrap-Style Util Classes
 ----------------------------------------------------------------------------- */
 
