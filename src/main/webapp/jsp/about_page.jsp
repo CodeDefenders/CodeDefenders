@@ -18,8 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.util.Properties" %>
@@ -36,71 +34,73 @@
 <% } %>
 
 <div class="container">
-    <h2 style="text-align: center">About CodeDefenders</h2>
 
-    <div class="panel panel-default" style="padding:25px;">
+    <h2 class="mb-3">About CodeDefenders</h2>
+     <%
+        String version = GameClass.class.getPackage().getImplementationVersion();
 
-        <div class="panel-body">
+        // version may now be null: https://stackoverflow.com/questions/21907528/war-manifest-mf-and-version?rq=1
+        if (version == null) {
+            Properties prop = new Properties();
+            try {
+                prop.load(request.getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
+                version = prop.getProperty("Implementation-Version");
+            } catch (IOException e) {
+                // Ignore -- if we have no version, then we show no version section
+            }
+        }
+        if (version != null) {
+    %>
+        <h3>Version</h3>
+        <p>
+            This is Code Defenders version <%=version%>.
+        </p>
+    <%
+        }
+    %>
 
-             <%
-                String version = GameClass.class.getPackage().getImplementationVersion();
+    <h3>Source Code</h3>
+    <p>
+        CodeDefenders is developed and maintained at the
+        <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software Engineering&nbspII</a>
+        at the University of Passau and the
+        <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
+    </p>
+    <p>
+        Code Defenders is an open source project.
+        See the
+        <a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a>
+        project page.
+    </p>
 
-                // version may now be null: https://stackoverflow.com/questions/21907528/war-manifest-mf-and-version?rq=1
-                if (version == null) {
-                    Properties prop = new Properties();
-                    try {
-                        prop.load(request.getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
-                        version = prop.getProperty("Implementation-Version");
-                    } catch (IOException e) {
-                        // Ignore -- if we have no version, then we show no version section
-                    }
-                }
-                if (version != null) {
-            %>
-                <h3>Version</h3>
-                <p>
-                    This is Code Defenders version <%= version%>.
-                </p>
-            <%
-                }
-            %>
+    <h3>Contributors</h3>
+    <ul>
+        <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser (University of Passau)</a></li>
+        <li><a href="http://jmrojas.github.io/">Jose Miguel Rojas (University of Leicester)</a></li>
+    </ul>
+    <ul>
+        <li>Ben Clegg (The University of Sheffield)</li>
+        <li>Alexander Degenhart (University of Passau)</li>
+        <li>Sabina Galdobin (University of Passau)</li>
+        <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi (University of Passau)</a></li>
+        <li>Marvin Kreis (University of Passau)</li>
+        <li>Kassian K&ouml;ck (University of Passau)</li>
+        <li>Rob Sharp (The University of Sheffield)</li>
+        <li>Lorenz Wendlinger (University of Passau)</li>
+        <li><a href="https://github.com/werli">Phil Werli</a> (University of Passau)</li>
+        <li>Thomas White (The University of Sheffield)</li>
+    </ul>
 
-            <h3>Source Code</h3>
-            <p>
-            CodeDefenders is developed and maintained at the <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software Engineering&nbspII</a> at the University of Passau and the <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
-            </p>
-            <p>
-            Code Defenders is an open source project. See the <a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.
-            </p>
+    <h3>Supporters</h3>
+    <ul>
+        <li><a href="https://impress-project.eu/">IMPRESS Project</a> (Improving Engagement of Students in Software Engineering Courses through Gamification)</li>
+        <li><a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a></li>
+        <li><a href="http://royalsociety.org/">Royal Society (Grant RG160969)</a></li>
+    </ul>
 
-            <h3>Contributors</h3>
-            <ul>
-                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser (University of Passau)</a></li>
-                <li><a href="http://jmrojas.github.io/">Jose Miguel Rojas (University of Leicester)</a></li>
-            </ul>
-            <ul>
-                <li>Ben Clegg (The University of Sheffield)</li>
-                <li>Alexander Degenhart (University of Passau)</li>
-                <li>Sabina Galdobin (University of Passau)</li>
-                <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi (University of Passau)</a></li>
-                <li>Marvin Kreis (University of Passau)</li>
-                <li>Kassian K&ouml;ck (University of Passau)</li>
-                <li>Rob Sharp (The University of Sheffield)</li>
-                <li>Lorenz Wendlinger (University of Passau)</li>
-                <li><a href="https://github.com/werli">Phil Werli</a> (University of Passau)</li>
-                <li>Thomas White (The University of Sheffield)</li>
-            </ul>
-
-            <h3>Supporters</h3>
-            <ul>
-                <li><a href="https://impress-project.eu/">IMPRESS Project</a> (Improving Engagement of Students in Software Engineering Courses through Gamification)</li>
-                <li><a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a></li>
-                <li><a href="http://royalsociety.org/">Royal Society (Grant RG160969)</a></li>
-            </ul>
-
-            <jsp:include page="research.jsp"/>
-        </div>
-
+    <h3>Research</h3>
+    <div class="ps-3">
+        <jsp:include page="research.jsp"/>
     </div>
 
 </div>

@@ -22,17 +22,16 @@
 <link href="${pageContext.request.contextPath}/css/research.css" rel="stylesheet">
 
 <div id="research" class="paper-list">
-	<div id="researchBox" style="font-size: 12px;">
-        <ul class="papercite_bibliography p-0">
-            <li>
-                <a href="http://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title='Download PDF'>
-                    <img src='images/pdf.png' alt="[PDF]"/>
-                </a>
-                Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
-                <span class="paper_title">&#8220;Gamifying a Software Testing Course with Code Defenders,&#8221;</span>
-                In <span class="paper_venue">Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)</span>, ACM, 2019.
-                <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('sigcse19_bibtex'));">[Bibtex]</a>
-                <div id="sigcse19_bibtex" class="bibtex_hide" >
+    <ul class="papercite_bibliography">
+        <li>
+            <a href="http://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="Download PDF" class="pdf_link">
+                <img src='images/pdf.png' alt="[PDF]"/>
+            </a>
+            Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
+            <span class="paper_title">&#8220;Gamifying a Software Testing Course with Code Defenders,&#8221;</span>
+            In <span class="paper_venue">Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)</span>, ACM, 2019.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#sigcse19_bibtex">[Bibtex]</a>
+            <div id="sigcse19_bibtex" class="bibtex collapse" >
 <pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
     author = {Gordon Fraser and Alessio Gambi and Marvin Kreis and Jos{\'e} Miguel Rojas},
     title = {Gamifying a Software Testing Course with Code Defenders},
@@ -42,17 +41,18 @@
     note = {To appear},
     year = {2019}
 }</code></pre>
-                </div>
-            </li>
-            <li>
-                <a href="http://study.code-defenders.org/papers/ECSEE18_Course.pdf" title='Download PDF'>
-                    <img src='images/pdf.png' alt="[PDF]"/>
-                </a>
-                Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
-                <span class="paper_title">&#8220;A Preliminary Report on Gamifying a Software Testing Course with the Code Defenders Testing Game,&#8221;</span>
-                In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>, pp. 50-54, ACM, 2018.
-                <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('ecsee18_course'));">[Bibtex]</a>
-                <div id="ecsee18_course" class="bibtex_hide" >
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+        </li>
+        <li>
+            <a href="http://study.code-defenders.org/papers/ECSEE18_Course.pdf" title="Download PDF" class="pdf_link">
+                <img src='images/pdf.png' alt="[PDF]"/>
+            </a>
+            Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
+            <span class="paper_title">&#8220;A Preliminary Report on Gamifying a Software Testing Course with the Code Defenders Testing Game,&#8221;</span>
+            In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>, pp. 50-54, ACM, 2018.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#ecsee18_course">[Bibtex]</a>
+            <div id="ecsee18_course" class="bibtex collapse" >
 <pre class="tex"><code>@inproceedings{ECSEE2018_CodeDefenders,
     author = {Gordon Fraser and Alessio Gambi and Jos{\'e} Miguel Rojas},
     title = {A Preliminary Report on Gamifying a Software Testing Course with the Code Defenders Testing Game},
@@ -62,17 +62,18 @@
     publisher = {ACM},
     year = {2018}
 }</code></pre>
-                </div>
-            </li>
-            <li>
-                <a href="http://study.code-defenders.org/papers/ICSE17_Education.pdf" title='Download PDF'>
-                    <img src='images/pdf.png' alt="[PDF]"/>
-                </a>
-                Benjamin Clegg, Jos&eacute; Miguel Rojas, Gordon Fraser.
-                <span class="paper_title">&#8220;Teaching Software Testing Concepts Using a Mutation Testing Game,&#8221;</span>
-                In <span class="paper_venue">Proc. of the International Conference on Software Engineering: Software Engineering and Education Track (ICSE-SEET)</span>, pp. 33-36, IEEE Press, 2017.
-                <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('icse17_edu_bibtex'));">[Bibtex]</a>
-                <div id="icse17_edu_bibtex" class="bibtex_hide" >
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+        </li>
+        <li>
+            <a href="http://study.code-defenders.org/papers/ICSE17_Education.pdf" title="Download PDF" class="pdf_link">
+                <img src='images/pdf.png' alt="[PDF]"/>
+            </a>
+            Benjamin Clegg, Jos&eacute; Miguel Rojas, Gordon Fraser.
+            <span class="paper_title">&#8220;Teaching Software Testing Concepts Using a Mutation Testing Game,&#8221;</span>
+            In <span class="paper_venue">Proc. of the International Conference on Software Engineering: Software Engineering and Education Track (ICSE-SEET)</span>, pp. 33-36, IEEE Press, 2017.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#icse17_edu_bibtex">[Bibtex]</a>
+            <div id="icse17_edu_bibtex" class="bibtex collapse" >
 <pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
     author = {Benjamin Clegg, Jos{\'e} Miguel Rojas and Gordon Fraser},
     title = {Teaching Software Testing Concepts Using a Mutation Testing Game},
@@ -82,17 +83,18 @@
     publisher = {IEEE Press},
     year = {2017}
 }</code></pre>
-                </div>
-            </li>
-            <li>
-                <a href="http://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf" title='Download PDF'>
-                    <img src='images/pdf.png' alt="[PDF]"/>
-                </a>
-                Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
-                <span class="paper_title">&#8220;Code Defenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game,&#8221;</span>
-                In <span class="paper_venue">Proc. of the International Conference on Software Engineering (ICSE)</span>, pp. 677-688, IEEE, 2017.
-                <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('icse17_bibtex'));">[Bibtex]</a>
-                <div id="icse17_bibtex" class="bibtex_hide" >
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+        </li>
+        <li>
+            <a href="http://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf" title="Download PDF" class="pdf_link">
+                <img src='images/pdf.png' alt="[PDF]"/>
+            </a>
+            Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
+            <span class="paper_title">&#8220;Code Defenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game,&#8221;</span>
+            In <span class="paper_venue">Proc. of the International Conference on Software Engineering (ICSE)</span>, pp. 677-688, IEEE, 2017.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#icse17_bibtex">[Bibtex]</a>
+            <div id="icse17_bibtex" class="bibtex collapse" >
 <pre class="tex"><code>@inproceedings{ICSE2017_CodeDefenders,
     author = {Jos{\'e} Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser},
     title = {{C}ode {D}efenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game},
@@ -101,34 +103,36 @@
     publisher = {IEEE},
     year = {2017}
 }</code></pre>
-                </div>
-            </li>
-            <li>
-                <a href="http://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf" title='Download PDF'>
-                    <img src='images/pdf.png' alt="[PDF]"/>
-                </a>
-                Jos&eacute; Miguel Rojas and Gordon Fraser.
-                <span class="paper_title">&#8220;Teaching Software Testing with a Mutation Testing Game,&#8221;</span>
-                In <span class="paper_venue">Proc. of the Annual Workshop of the Psychology of Programming Interest Group</span>,  2016.
-                <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('ppig16_bibtex'));">[Bibtex]</a>
-                <div id="ppig16_bibtex" class="bibtex_hide" >
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+        </li>
+        <li>
+            <a href="http://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf" title="Download PDF" class="pdf_link">
+                <img src='images/pdf.png' alt="[PDF]"/>
+            </a>
+            Jos&eacute; Miguel Rojas and Gordon Fraser.
+            <span class="paper_title">&#8220;Teaching Software Testing with a Mutation Testing Game,&#8221;</span>
+            In <span class="paper_venue">Proc. of the Annual Workshop of the Psychology of Programming Interest Group</span>,  2016.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#ppig16_bibtex">[Bibtex]</a>
+            <div id="ppig16_bibtex" class="bibtex collapse" >
 <pre class="tex"><code>@inproceedings{PPIG16_TeachingTesting,
     author = {Jos{\'e} Miguel Rojas and Gordon Fraser},
     title = {Teaching Software Testing with a Mutation Testing Game},
     booktitle = {Psychology of Programming Interest Group 2016 (PPIG)},
     year = {2016}
 }</code></pre>
-                </div>
-            </li>
-            <li>
-                <a href="http://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf" title='Download PDF'>
-                    <img src='images/pdf.png' alt="[PDF]"/>
-                </a>
-                Jos&eacute; Miguel Rojas and Gordon Fraser.
-                <span class="paper_title">&#8220;Teaching Mutation Testing using Gamification,&#8221;</span>
-                In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>,  2016.
-                <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('ecsee16_bibtex'));">[Bibtex]</a>
-                <div id="ecsee16_bibtex" class="bibtex_hide" >
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+        </li>
+        <li>
+            <a href="http://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf" title="Download PDF" class="pdf_link">
+                <img src='images/pdf.png' alt="[PDF]"/>
+            </a>
+            Jos&eacute; Miguel Rojas and Gordon Fraser.
+            <span class="paper_title">&#8220;Teaching Mutation Testing using Gamification,&#8221;</span>
+            In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>,  2016.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#ecsee16_bibtex">[Bibtex]</a>
+            <div id="ecsee16_bibtex" class="bibtex collapse" >
 <pre class="tex"><code>@inproceedings{ECSEE16_MutationEducation,
     author = {Jos{\'e} Miguel Rojas and Gordon Fraser},
     title = {Teaching Mutation Testing using Gamification},
@@ -137,17 +141,18 @@
     publisher = {Shaker Publishing},
     note = {To appear}
 }</code></pre>
-                </div>
-            </li>
-            <li>
-                <a href="http://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf" title='Download PDF'>
-                    <img src='images/pdf.png' alt="[PDF]"/>
-                </a>
-                Jos&eacute; Miguel Rojas and Gordon Fraser.
-                <span class="paper_title">&#8220;Code Defenders: A Mutation Testing Game,&#8221;</span>
-                In <span class="paper_venue">Proc. of The 11th International Workshop on Mutation Analysis</span>, pp. 162-167, IEEE, 2016.
-                <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('mutation16_bibtex'));">[Bibtex]</a>
-                <div id="mutation16_bibtex" class="bibtex_hide" >
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+        </li>
+        <li>
+            <a href="http://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf" title="Download PDF" class="pdf_link">
+                <img src='images/pdf.png' alt="[PDF]"/>
+            </a>
+            Jos&eacute; Miguel Rojas and Gordon Fraser.
+            <span class="paper_title">&#8220;Code Defenders: A Mutation Testing Game,&#8221;</span>
+            In <span class="paper_venue">Proc. of The 11th International Workshop on Mutation Analysis</span>, pp. 162-167, IEEE, 2016.
+            <a href="#" data-bs-toggle="collapse" data-bs-target="#mutation16_bibtex">[Bibtex]</a>
+            <div id="mutation16_bibtex" class="bibtex collapse" >
 <pre class="tex"><code>@inproceedings{Mutation16_CodeDefenders,
     author = {Jos{\'e} Miguel Rojas and Gordon Fraser},
     title = {Code Defenders: A Mutation Testing Game},
@@ -156,35 +161,24 @@
     publisher = {IEEE},
     pages = {162--167}
 }</code></pre>
-                </div>
-            </li>
-        </ul>
-    </div>
+                <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
+            </div>
+        </li>
+    </ul>
 </div>
 
 <script>
-    function openResearchBox() {
-        $('#researchBox').collapse('show')
-        const toggle = document.getElementById('researchBoxToggle');
-        toggle.setAttribute('class', 'glyphicon glyphicon-chevron-up');
-    }
+    function copyBibtex(buttonEl) {
+        const texEl = buttonEl.parentElement.querySelector('.tex');
 
-    function changeChevron() {
-        const toggle = document.getElementById('researchBoxToggle');
-        const currentClass = toggle.getAttribute("class");
-        const newClass = currentClass === 'glyphicon glyphicon-chevron-down'
-                ? 'glyphicon glyphicon-chevron-up'
-                : 'glyphicon glyphicon-chevron-down';
-        toggle.setAttribute('class', newClass);
-    }
+        navigator.clipboard.writeText(texEl.textContent);
 
-    function toggleBibtex(div) {
-        const className = div.getAttribute("class");
-        if (className === "bibtex_hide") {
-            div.className = "bibtex_show";
-        }
-        else{
-            div.className = "bibtex_hide";
+        if (buttonEl.textTimeout === undefined) {
+            buttonEl.innerText = 'Copied.';
+            buttonEl.textTimeout = setTimeout(() => {
+                buttonEl.innerText = 'Copy';
+                delete buttonEl.textTimeout;
+            }, 1000);
         }
     }
 </script>

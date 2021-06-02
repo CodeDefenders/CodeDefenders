@@ -44,11 +44,11 @@
 
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#research" onclick="openResearchBox()">Research</a>
+                    <a class="nav-link" href="#research">Research</a>
                 </li>
             </ul>
             <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="login">Login</a>
                     </li>

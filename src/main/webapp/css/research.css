@@ -1,32 +1,38 @@
 .papercite_bibliography {
-    list-style-type: none;
-}
-
-.papercite_bibliography li {
-    font: 14px/1.5 Helvetica, sans-serif;
     color: #555;
-    margin-bottom: 20px;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+.papercite_bibliography li {
+    margin-bottom: 1.5em;
 }
 .papercite_bibliography li:last-child {
     margin-bottom: 0;
 }
 
-.bibtex_hide {
-    display: none;
-}
-
-.bibtex_show {
-    text-align: left;
-}
-
-.tex {
+.bibtex {
+    position: relative;
     margin-top: .5rem;
+}
+.tex {
+    padding: 1em 1.5em;
+    background-color: #eeeff0;
+}
+.btn-bibtex-copy {
+    position: absolute;
+    top: .65em;
+    right: .65em;
+    background-color: white;
 }
 
 .paper_title {
     font-weight: bold;
 }
-
 .paper_venue {
     font-style: italic;
 }
+.pdf_link {
+    text-decoration: none;
+}
+
