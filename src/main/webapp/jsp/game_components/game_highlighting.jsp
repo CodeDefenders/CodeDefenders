@@ -207,29 +207,29 @@
 
             const head =
                 `<thead>
-                     <tr>
-                         <td>Creator</td>
-                         <td class="text-end">ID</td>
-                         <td class="text-end">Score</td>
-                         <td class="text-end">Changed Lines</td>
-                     </tr>
-                 </thead>`;
+                    <tr>
+                        <td>Creator</td>
+                        <td class="text-end">ID</td>
+                        <td class="text-end">Score</td>
+                        <td class="text-end">Changed Lines</td>
+                    </tr>
+                </thead>`;
 
             const rows = [];
             for (const mutant of mutantsOnLine) {
                 rows.push(
                     `<tr>
-                         <td>\${mutant.creatorName}</td>
-                         <td class="text-end">\${mutant.id}</td>
-                         <td class="text-end">\${mutant.score}</td>
-                         <td class="text-end">\${mutant.lines}</td>
-                     </tr>`
+                        <td>\${mutant.creatorName}</td>
+                        <td class="text-end">\${mutant.id}</td>
+                        <td class="text-end">\${mutant.score}</td>
+                        <td class="text-end">\${mutant.lines}</td>
+                    </tr>`
                 );
             }
 
             const table =
                 `<div>
-                    <table class="table table-sm m-0">
+                    <table class="table table-sm table-no-last-border m-0">
                         \${head}
                         <tbody>
                              \${rows.join('\n')}
@@ -266,7 +266,8 @@
                         <input type="hidden" name="equivLines" value="\${line}">
                         <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
                         <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
-                            <div class="\${IconClasses.FLAG.join(' ')}"></div> Claim Equivalent
+                            <div class="\${IconClasses.FLAG.join(' ')}"></div>
+                            <span>Claim Equivalent</span>
                         </button>
                     </form>`;
             <% } else { %>

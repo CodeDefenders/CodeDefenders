@@ -112,6 +112,12 @@ bootstrap classes
     box-shadow: none;
 }
 
+
+/* Tables with no bottom border on the last row. */
+.table-no-last-border > tbody:last-of-type > tr:last-child > td {
+    border-bottom: none;
+}
+
 /* Extra Bootstrap-Style Util Classes
 ----------------------------------------------------------------------------- */
 
