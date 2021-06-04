@@ -115,11 +115,14 @@
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
 <div id="game-container" class="container-fluid">
-    <div class="row">
-        <h4 class="col-md-2"><b><%=title%></b></h4>
-        <h4><%=description%></h4>
+
+    <h4><b><%=title%></b></h4>
+    <div class="d-flex justify-content-between align-items-end gap-3">
+        <h4 class="m-0"><%=description%></h4>
+        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
-    <hr class="hr-primary" style="margin: 5px">
+    <hr>
+
     <div class="row">
         <div class="col-lg-6" id="cut-div">
             <div class="game-component-header"><h3>Class Under Test</h3></div>

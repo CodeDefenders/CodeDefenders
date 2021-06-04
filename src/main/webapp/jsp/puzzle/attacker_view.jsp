@@ -112,15 +112,16 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<div id="game-container" class="container-fluid">
-
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
-    <div class="row">
-        <h4 class="col-md-2"><b><%=title%></b></h4>
-        <h4><%=description%></h4>
+<div id="game-container" class="container-fluid">
+
+    <h4><b><%=title%></b></h4>
+    <div class="d-flex justify-content-between align-items-end gap-3">
+        <h4 class="m-0"><%=description%></h4>
+        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
-    <hr class="hr-primary" style="margin: 5px">
+    <hr>
 
     <div class="row">
         <div class="col-lg-6">
@@ -130,10 +131,10 @@
             </div>
 
             <% if (showTestAccordion) { %>
-            <div id="tests-div">
-                <div class="game-component-header"><h3>JUnit Tests</h3></div>
-                <t:test_accordion/>
-            </div>
+                <div id="tests-div">
+                    <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                    <t:test_accordion/>
+                </div>
             <% } %>
         </div>
 
@@ -160,7 +161,6 @@
 
                 </div>
             </div>
-
 
             <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
                 <input type="hidden" name="formType" value="createMutant">
