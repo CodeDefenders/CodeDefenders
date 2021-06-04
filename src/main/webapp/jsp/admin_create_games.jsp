@@ -29,6 +29,7 @@
 <%@ page import="org.codedefenders.validation.code.CodeValidator" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
 
@@ -399,167 +400,83 @@
         </div> <%-- row --%>
     </form>
 
-    <div class="modal fade" id="validatorExplanation" role="dialog"
-        aria-labelledby="validatorExplanation" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Mutant Validator Explanation</h4>
-                </div>
-                <div class="modal-body">
-                    <%@ include file="/jsp/validator_explanation.jsp"%>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="validatorExplanation" title="Mutant Validator Explanation">
+        <jsp:attribute name="content">
+            <%@ include file="/jsp/validator_explanation.jsp"%>
+        </jsp:attribute>
+    </t:modal>
 
-    <div class="modal fade" id="automaticEquivalenceTriggerExplanation" role="dialog"
-        aria-labelledby="automaticEquivalenceTriggerExplanation" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Equivalence Duel Threshold Explanation</h4>
-                </div>
-                <div class="modal-body">
-                    <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="automaticEquivalenceTriggerExplanation" title="Equivalence Duel Threshold Explanation">
+        <jsp:attribute name="content">
+            <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
+        </jsp:attribute>
+    </t:modal>
 
-    <div class="modal fade" id="roleAssignmentExplanation" role="dialog"
-         aria-labelledby="roleAssignmentExplanation" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Role Assignment Explanation</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Specifies how roles are assigned to players:</p>
-                    <ul>
-                        <li>
-                            <b>Random:</b>
-                            Players are assigned roles randomly.
-                        </li>
-                        <li>
-                            <b>Opposite:</b>
-                            Players are assigned the opposite of their last played role, if possible.
-                        </li>
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="roleAssignmentExplanation" title="Role Assignment Explanation">
+        <jsp:attribute name="content">
+            <p>Specifies how roles are assigned to players:</p>
+            <ul>
+                <li>
+                    <b>Random:</b>
+                    Players are assigned roles randomly.
+                </li>
+                <li>
+                    <b>Opposite:</b>
+                    Players are assigned the opposite of their last played role, if possible.
+                </li>
+            </ul>
+        </jsp:attribute>
+    </t:modal>
 
-    <div class="modal fade" id="teamAssignmentExplanation" role="dialog"
-         aria-labelledby="teamAssignmentExplanation" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Team Assignment Explanation</h4>
-                </div>
-                <div class="modal-body">
-                    <p>Specifies how players are assigned to teams:</p>
-                    <ul>
-                        <li>
-                            <b>Random:</b>
-                            Players are assigned to teams randomly.
-                        </li>
-                        <li>
-                            <b>Scores Descending:</b>
-                            Players are assigned to teams based on their total score in past games.
-                            The players with the highest scores are assigned to the first games,
-                            the players with the lowest scores are assigned to the last games.
-                        </li>
-                        <li>
-                            <b>Scores block shuffled:</b>
-                            Players are grouped on their total score in past games,
-                            then block shuffled and assigned to teams.
-                        </li>
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="teamAssignmentExplanation" title="Team Assignment Explanation">
+        <jsp:attribute name="content">
+            <p>Specifies how players are assigned to teams:</p>
+            <ul>
+                <li>
+                    <b>Random:</b>
+                    Players are assigned to teams randomly.
+                </li>
+                <li>
+                    <b>Scores Descending:</b>
+                    Players are assigned to teams based on their total score in past games.
+                    The players with the highest scores are assigned to the first games,
+                    the players with the lowest scores are assigned to the last games.
+                </li>
+                <li>
+                    <b>Scores block shuffled:</b>
+                    Players are grouped on their total score in past games,
+                    then block shuffled and assigned to teams.
+                </li>
+            </ul>
+        </jsp:attribute>
+    </t:modal>
 
-    <div class="modal fade" id="userNamesExplanation" role="dialog"
-         aria-labelledby="userNamesExplanation" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">User Name Explanation</h4>
-                </div>
-                <div class="modal-body">
-                    Newline-separated list of usernames or emails. The users with these names/emails, as well as the
-                    users selected in the table, will be assigned to created staged games.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="userNamesExplanation" title="User Names Explanation">
+        <jsp:attribute name="content">
+            Newline-separated list of usernames or emails. The users with these names/emails, as well as the
+            users selected in the table, will be assigned to created staged games.
+        </jsp:attribute>
+    </t:modal>
 
-    <div class="modal fade" id="stageGamesWithUsersExplanation" role="dialog"
-         aria-labelledby="stageGamesWithUsersExplanation" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Stage Games With Users Explanation</h4>
-                </div>
-                <div class="modal-body">
-                    Selected users from the table, as well as users entered in the text area, will be assigned to new
-                    staged games. The number of games is decided by the number of users and the selected method of
-                    distributing the users to teams.
-                    <br/>
-                    <br/>
-                    The settings for the staged games are specified in the left card.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="stageGamesWithUsersExplanation" title="Stage Games With Users Explanation">
+        <jsp:attribute name="content">
+            <p>
+                Selected users from the table, as well as users entered in the text area, will be assigned to new
+                staged games. The number of games is decided by the number of users and the selected method of
+                distributing the users to teams.
+            </p>
+            <p class="mb-0">
+                The settings for the staged games are specified in the left card.
+            </p>
+        </jsp:attribute>
+    </t:modal>
 
-    <div class="modal fade" id="stageEmptyGamesExplanation" role="dialog"
-         aria-labelledby="stageEmptyGamesExplanation" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Stage Empty Games Explanation</h4>
-                </div>
-                <div class="modal-body">
-                    Create a number staged games without users assigned to them.
-                    <br/>
-                    <br/>
-                    The settings for the staged games are specified in the left card.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="stageEmptyGamesExplanation" title="Stage Empty Games Explanation">
+        <jsp:attribute name="content">
+            <p>Create a number staged games without users assigned to them.</p>
+            <p class="mb-0">The settings for the staged games are specified in the left card.</p>
+        </jsp:attribute>
+    </t:modal>
 
     <script>
         /**
