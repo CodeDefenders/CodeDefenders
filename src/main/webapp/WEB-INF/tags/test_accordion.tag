@@ -142,8 +142,8 @@
         const genId             = row => `Test \${row.id}`;
         const genCreator        = row => row.creator.name;
         const genPoints         = row => `<span class="ta-column-name">Points:</span> \${row.points}`;
-        const genCoveredMutants = row => `<span class="ta-covered-link" data-bs-toggle="popover"><span class="ta-column-name">Covered:</span> \${row.coveredMutantIds.length}</span>`;
-        const genKilledMutants  = row => `<span class="ta-killed-link" data-bs-toggle="popover"><span class="ta-column-name">Killed:</span> \${row.killedMutantIds.length}</span>`;
+        const genCoveredMutants = row => `<span class="ta-covered-link"><span class="ta-column-name">Covered:</span> \${row.coveredMutantIds.length}</span>`;
+        const genKilledMutants  = row => `<span class="ta-killed-link"><span class="ta-column-name">Killed:</span> \${row.killedMutantIds.length}</span>`;
         const genViewButton     = row => row.canView ? '<button class="ta-view-button btn btn-xs btn-primary">View</button>' : '';
         const genSmells         = row => {
             const numSmells = row.smells.length;
@@ -159,7 +159,7 @@
                 smellLevel = 'Good';
                 smellColor = 'btn-success';
             }
-            return `<a class="ta-smells-link btn btn-xs \${smellColor}" data-bs-toggle="popover">\${smellLevel}</a>`;
+            return `<a class="ta-smells-link btn btn-xs \${smellColor}">\${smellLevel}</a>`;
         };
 
         /**

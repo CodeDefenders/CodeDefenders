@@ -131,3 +131,13 @@ bootstrap classes
 .popover-fluid {
     max-width: max-content;
 }
+
+/* Tooltips
+----------------------------------------------------------------------------- */
+
+/* Make tooltips with two lines look a bit less awkward.
+   Use :nth-of-type(n) to increase CSS specificity. */
+.tooltip-inner:nth-of-type(n) {
+    padding: .35rem .5rem;
+    line-height: 1.25;
+}

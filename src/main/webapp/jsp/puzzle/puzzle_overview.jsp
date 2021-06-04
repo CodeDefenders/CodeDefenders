@@ -72,7 +72,12 @@
 
                 %>
                     <tr>
-                        <td><div data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=chapter.getDescription()%>"><%=chapter.getTitle()%></div></td>
+                        <td>
+                            <div data-bs-toggle="tooltip"
+                                 title="<%=chapter.getDescription()%>">
+                                <%=chapter.getTitle()%>
+                            </div>
+                        </td>
                         <td>
                             <div class="d-flex flex-wrap gap-1">
                                 <%
@@ -88,7 +93,10 @@
                                 %>
                                                 <a class="btn btn-sm <%=color%>"
                                                    href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
-                                                   data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=description%>"><%=title%></a>
+                                                   data-bs-toggle="tooltip"
+                                                   title="<%=description%>">
+                                                    <%=title%>
+                                                </a>
                                 <%
                                         } else if (!puzzleEntry.isLocked()) {
                                             final int puzzleId = puzzleEntry.getPuzzleId();
@@ -99,11 +107,18 @@
                                 %>
                                             <a class="btn btn-sm <%=color%>"
                                                href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
-                                               data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=description%>"><%=title%></a>
+                                               data-bs-toggle="tooltip"
+                                               title="<%=description%>">
+                                                <%=title%>
+                                            </a>
                                 <%
                                         } else {
                                 %>
-                                            <a disabled class="btn btn-sm btn-secondary" data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=description%>"><%=title%></a>
+                                            <a disabled class="btn btn-sm btn-secondary"
+                                               data-bs-toggle="tooltip"
+                                               title="<%=description%>">
+                                                <%=title%>
+                                            </a>
                                 <%
                                         }
                                     }
