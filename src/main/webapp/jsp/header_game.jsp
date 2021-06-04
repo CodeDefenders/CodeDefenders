@@ -87,8 +87,8 @@
                 <i class="fa fa-book"></i>
                 Scoreboard
             </button>
-            <button class="btn btn-sm btn-outline-secondary" id="btnScoringTooltip"
-                    data-bs-toggle="modal" data-bs-target="#scoringTooltip">
+            <button class="btn btn-sm btn-outline-secondary" id="btnScoringModal"
+                    data-bs-toggle="modal" data-bs-target="#scoringModal">
                 <i class="fa fa-question-circle"></i>
             </button>
         </div>
@@ -112,13 +112,13 @@
             Feedback
         </button>
 
-        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
+        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
 
         <t:game_chat/>
 
-        <t:modal title="Scoring System" id="scoringTooltip">
+        <t:modal title="Scoring System" id="scoringModal">
             <jsp:attribute name="content">
-                <jsp:include page="/jsp/scoring_tooltip.jsp"/>
+                <jsp:include page="/jsp/scoring_system.jsp"/>
             </jsp:attribute>
         </t:modal>
     </div>

@@ -119,7 +119,7 @@
     <h4><b><%=title%></b></h4>
     <div class="d-flex justify-content-between align-items-end gap-3">
         <h4 class="m-0"><%=description%></h4>
-        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
+        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
     </div>
     <hr>
 
