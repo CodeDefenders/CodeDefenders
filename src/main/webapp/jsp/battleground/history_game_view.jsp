@@ -132,7 +132,6 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 

@@ -113,7 +113,6 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 

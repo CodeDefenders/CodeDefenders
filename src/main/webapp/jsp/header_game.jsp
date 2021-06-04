@@ -115,4 +115,10 @@
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
 
         <t:game_chat/>
+
+        <t:modal title="Scoring System" id="scoringTooltip">
+            <jsp:attribute name="content">
+                <jsp:include page="/jsp/scoring_tooltip.jsp"/>
+            </jsp:attribute>
+        </t:modal>
     </div>

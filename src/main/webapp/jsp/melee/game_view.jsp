@@ -71,7 +71,6 @@
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
