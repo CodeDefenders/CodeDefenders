@@ -38,83 +38,88 @@
         Associated puzzles are sorted on the puzzle identifier.
 
 --%>
-<!doctype html>
 <jsp:include page="/jsp/header_main.jsp"/>
+
 <%
-{
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
 %>
 
 <div class="container">
-    <h2 class="full-width page-title">Puzzles</h2>
-    <table id="puzzles" class="table table-striped table-hover table-responsive table-center">
-        <tr>
-            <%
-                if (puzzleChapterEntries.isEmpty()) {
-            %>
-            <th colspan="100%"> Currently there are no puzzles available. </th>
-            <%
-            } else { //
-            %>
-            <th>Lecture</th>
-            <th>Levels</th>
-        </tr>
-        <tr>
-            <%
-                for (PuzzleChapterEntry puzzleChapterEntry : puzzleChapterEntries) {
-                    final PuzzleChapter chapter = puzzleChapterEntry.getChapter();
 
-            %>
-            <td><div data-toggle="popover" data-placement="top" data-content="<%=chapter.getDescription()%>"><%=chapter.getTitle()%></div></td>
-            <td>
+    <h2 class="mb-3">Puzzles</h2>
+    <table id="puzzles" class="table table-striped table-v-align-middle">
+        <%
+            if (puzzleChapterEntries.isEmpty()) {
+        %>
+            <tbody>
+                <tr>
+                    <td colspan="2" class="text-center">Currently there are no puzzles available.</td>
+                </tr>
+            </tbody>
+        <%
+            } else {
+        %>
+            <thead>
+                <tr>
+                    <th>Lecture</th>
+                    <th>Levels</th>
+                </tr>
+            </thead>
+            <tbody>
                 <%
-                    for (PuzzleEntry puzzleEntry : puzzleChapterEntry.getPuzzleEntries()) {
-                        final String title = puzzleEntry.getPuzzle().getTitle();
-                        final String description = puzzleEntry.getPuzzle().getDescription();
-                        // I have no idea what's this PuzzleEntry class... is kind of a wrapped around puzzle and puzzlegame? is it an object used for rendering ?
-                        if (puzzleEntry.getType() == PuzzleEntry.Type.GAME ){
-                            final String color = (puzzleEntry.getState().equals(GameState.ACTIVE) ? "btn-info" : "btn-primary");
-                            final int puzzleId = puzzleEntry.getPuzzleId();
-                            %>
-                            <a class="btn btn-sm <%=color%>"
-                               href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
-                                data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
-                            <%
-                        } else if(!puzzleEntry.isLocked()) {
-                            final int puzzleId = puzzleEntry.getPuzzleId();
-                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
-                            String color = "btn-primary";
-                            if (playedGame != null  && playedGame.getState().equals(GameState.SOLVED)) {
-                                color = "btn-success";
-                            }
-                            %>
-                            <a class="btn btn-sm <%=color%>"
-                               href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
-                                data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
-                            <%
-                        } else{
-                            %>
-                            <a disabled class="btn btn-sm btn-secondary" data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
-                            <%
-                        }
+                    for (PuzzleChapterEntry puzzleChapterEntry : puzzleChapterEntries) {
+                        final PuzzleChapter chapter = puzzleChapterEntry.getChapter();
+
+                %>
+                    <tr>
+                        <td><div data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=chapter.getDescription()%>"><%=chapter.getTitle()%></div></td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-1">
+                                <%
+                                    for (PuzzleEntry puzzleEntry : puzzleChapterEntry.getPuzzleEntries()) {
+                                        final String title = puzzleEntry.getPuzzle().getTitle();
+                                        final String description = puzzleEntry.getPuzzle().getDescription();
+
+                                        if (puzzleEntry.getType() == PuzzleEntry.Type.GAME) {
+                                            final String color = puzzleEntry.getState().equals(GameState.ACTIVE)
+                                                    ? "btn-info"
+                                                    : "btn-primary";
+                                            final int puzzleId = puzzleEntry.getPuzzleId();
+                                %>
+                                                <a class="btn btn-sm <%=color%>"
+                                                   href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
+                                                   data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=description%>"><%=title%></a>
+                                <%
+                                        } else if (!puzzleEntry.isLocked()) {
+                                            final int puzzleId = puzzleEntry.getPuzzleId();
+                                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, login.getUserId());
+                                            String color = playedGame != null && playedGame.getState().equals(GameState.SOLVED)
+                                                    ? "btn-success"
+                                                    : "btn-primary";
+                                %>
+                                            <a class="btn btn-sm <%=color%>"
+                                               href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
+                                               data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=description%>"><%=title%></a>
+                                <%
+                                        } else {
+                                %>
+                                            <a disabled class="btn btn-sm btn-secondary" data-bs-toggle="popover" data-bs-placement="top" data-bs-content="<%=description%>"><%=title%></a>
+                                <%
+                                        }
+                                    }
+                                %>
+                            </div>
+                        </td>
+                    </tr>
+                <%
                     }
                 %>
-            </td>
-        </tr>
+            </tbody>
         <%
-            } }
+            }
         %>
     </table>
-    <script>
-        $(function () {
-            $('[data-toggle="popover"]').popover({
-                trigger: 'hover'
-            })
-        })
-    </script>
+
 </div>
 
-<%
-}
-%>
 <%@include file="/jsp/footer.jsp" %>
