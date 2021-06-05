@@ -83,7 +83,6 @@
                 var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.USEREVENT%>&timestamp=0";
                 updateUserNotifications(url);
             }
-            $('[data-toggle="tooltip"]').tooltip();
         }
     );
 
