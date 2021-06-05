@@ -169,13 +169,13 @@
 
                 <% } %>
 
-                            <div class="overflow-auto mb-3">
-                                <table class="table table-bordered table-responsive table-center m-0">
+                            <div class="table-responsive mb-3">
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <th>${playerFeedback.canSeeFeedback() ? "Player" : ""}</th>
                                             <% for (Type f : Type.TYPES) { %>
-                                                <th title="<%=f.description()%>"><%=f.displayName()%></th>
+                                                <th class="text-center" title="<%=f.description()%>"><%=f.displayName()%></th>
                                             <% } %>
                                         </tr>
                                     </thead>
@@ -193,7 +193,7 @@
                                                     for (Type type : Type.TYPES) {
                                                         Integer ratingValue = playerRatings.get(type);
                                                 %>
-                                                    <td>
+                                                    <td class="text-center">
                                                         <% if (ratingValue != null) { %>
                                                             <div class="d-flex justify-content-center">
                                                                 <fieldset class="rating rating-static">

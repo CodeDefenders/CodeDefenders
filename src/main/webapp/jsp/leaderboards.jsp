@@ -27,8 +27,7 @@
 
 <div class="container">
     <h3>Battlegrounds</h3>
-    <table id="tableMPLeaderboard"
-           class="table table-striped table-hover table-responsive table-center dataTable display">
+    <table id="tableMPLeaderboard" class="table table-striped">
         <thead>
         <tr>
             <th class="col-sm-2">User</th>
