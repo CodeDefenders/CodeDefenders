@@ -92,7 +92,6 @@
 
     <link href="css/page.css" rel="stylesheet">
     <link href="css/common.css" rel="stylesheet">
-    <link href="css/deprecated.css" rel="stylesheet">
 
     <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
     <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>
