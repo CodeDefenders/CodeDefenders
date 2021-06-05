@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
 <%@ page import="org.codedefenders.model.Player" %>
@@ -91,26 +94,13 @@
                 <td><%=gameId%></td>
                 <td><%= g.creatorName()%></td>
                 <td>
-                    <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=g.cutAlias()%></a>
-                    <div id="modalCUTFor<%=gameId%>" class="modal fade" role="dialog">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title"><%=g.cutAlias()%></h4>
-                                </div>
-                                <div class="modal-body">
-                                <pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
-                                                                    id="sut<%=gameId%>"
-                                                                    name="cut<%=g.cutId()%>" cols="80"
-                                                                    rows="30"></textarea></pre>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gameId%>">
+                        <%=g.cutAlias()%>
+                    </a>
+                    <% pageContext.setAttribute("classId", g.cutId()); %>
+                    <% pageContext.setAttribute("classAlias", g.cutAlias()); %>
+                    <% pageContext.setAttribute("gameId", gameId); %>
+                    <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
                 </td>
                 <td><%=attackers.size()%></td>
                 <td><%=defenders.size()%></td>
@@ -281,27 +271,13 @@
                     <td><%=gameId%></td>
                     <td><%=g.creatorName()%></td>
                     <td>
-                        <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=g.cutAlias()%></a>
-                        <div id="modalCUTFor<%=gameId%>" class="modal fade" role="dialog">
-                            <div class="modal-dialog">
-                                <!-- Modal content-->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <h4 class="modal-title"><%=g.cutAlias()%></h4>
-                                    </div>
-                                    <div class="modal-body">
-                                    <pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
-                                                                        id="sut<%=gameId%>"
-                                                                        name="cut<%=g.cutId()%>" cols="80"
-                                                                        rows="30"></textarea></pre>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gameId%>">
+                            <%=g.cutAlias()%>
+                        </a>
+                        <% pageContext.setAttribute("classId", g.cutId()); %>
+                        <% pageContext.setAttribute("classAlias", g.cutAlias()); %>
+                        <% pageContext.setAttribute("gameId", gameId); %>
+                        <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
                     </td>
                     <td><%=players.size()%></td>
                     <td><%=g.gameLevel().getFormattedString()%></td>
@@ -352,40 +328,23 @@
     </table>
 
     <script>
-(function () {
+    (function () {
 
-    $('.modal').on('shown.bs.modal', function () {
-        let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-            codeMirrorContainer.CodeMirror.refresh();
-        } else {
-            let textarea = $(this).find('textarea')[0];
-            let editor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: false,
-                readOnly: true,
-                mode: "text/x-java",
-                autoRefresh: true
-            });
-            editor.setSize("100%", 500);
-            ClassAPI.getAndSetEditorValue(textarea, editor);
-        }
-    });
+        $('table td.toggle-details').on('click', function () {
+            let id = '.' + $(this).attr('id');
+            if ($(id).is(':visible')) {
+                $(this).find('.toggle-details-icon').removeClass('fa-chevron-down');
+                $(this).find('.toggle-details-icon').addClass('fa-chevron-right');
+                $(id).hide()
+            } else {
+                $(this).find('.toggle-details-icon').removeClass('fa-chevron-right');
+                $(this).find('.toggle-details-icon').addClass('fa-chevron-down');
+                $(id).show()
+            }
+        });
 
-    $('table td.toggle-details').on('click', function () {
-        let id = '.' + $(this).attr('id');
-        if ($(id).is(':visible')) {
-            $(this).find('.toggle-details-icon').removeClass('fa-chevron-down');
-            $(this).find('.toggle-details-icon').addClass('fa-chevron-right');
-            $(id).hide()
-        } else {
-            $(this).find('.toggle-details-icon').removeClass('fa-chevron-right');
-            $(this).find('.toggle-details-icon').addClass('fa-chevron-down');
-            $(id).show()
-        }
-    });
-
-})();
-</script>
+    })();
+    </script>
 
 </div>
 

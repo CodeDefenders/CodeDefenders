@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
 
@@ -75,29 +78,12 @@
                         <td><%=classId%></td>
                         <td><%=name%></td>
                         <td>
-                            <a href="#" data-bs-toggle="modal" data-bs-target="#modalCUTFor<%=classId%>">
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-<%=classId%>">
                                 <%=alias%>
                             </a>
-                            <div id="modalCUTFor<%=classId%>" class="modal fade" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title"><%=alias%></h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                        <pre class="readonly-pre"><textarea
-                                            class="readonly-textarea classPreview"
-                                            id="sut<%=classId%>"
-                                            name="cut<%=classId%>" cols="80"
-                                            rows="30"></textarea></pre>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <% pageContext.setAttribute("classId", classId); %>
+                            <% pageContext.setAttribute("classAlias", alias); %>
+                            <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-${classId}"/>
                         </td>
                         <td><%=gamesWithClass%></td>
                         <td>
@@ -148,28 +134,5 @@
     %>
 
 </div>
-
-<script>
-(function () {
-
-    $('.modal').on('shown.bs.modal', function () {
-        let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-            codeMirrorContainer.CodeMirror.refresh();
-        } else {
-            let textarea = $(this).find('textarea')[0];
-            let editor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: false,
-                readOnly: true,
-                mode: "text/x-java",
-                autoRefresh: true
-            });
-            editor.setSize("100%", 500);
-            ClassAPI.getAndSetEditorValue(textarea, editor);
-        }
-    });
-
-})();
-</script>
 
 <%@ include file="/jsp/footer.jsp" %>

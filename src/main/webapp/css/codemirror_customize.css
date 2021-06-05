@@ -176,7 +176,7 @@ pre.CodeMirror-line {
  *       Don't use [editor.setSize(..., ...);].
  *       Add .codemirror-fill to the parent element.
 
- * - Size depending on content:
+ * - Size depending on content but constrained to min/max height/width:
  *       Don't use [editor.setSize(..., ...);].
  *       Add .codemirror-expand and [style="--cm-min-height: ..."] etc. to the parent element.
  *       (Or use a predefined class that sets the CSS variables instead of the style attribute.)
@@ -205,10 +205,22 @@ pre.CodeMirror-line {
     min-width: var(--cm-min-width, unset);
     max-width: var(--cm-max-width, unset);
 }
-/* Reasonable size for CodeMirror centered modals. */
-.codemirror-modal-size {
+/* Reasonable sizes for CodeMirror centered modals. */
+.codemirror-class-modal-size {
+    --cm-min-height: 100px;
+    --cm-max-height: 800px; /* Comfortable max-height for 1080p screens. */
+    --cm-min-width: 700px;  /* Fits about 80 chars of code. */
+    --cm-max-width: 1000px; /* Fits about 120 chars of code. */
+}
+.codemirror-test-modal-size {
     --cm-min-height: 100px;
     --cm-max-height: 800px;
-    --cm-min-width: min(500px, 90vw);
-    --cm-max-width: min(1000px, 90vw);
+    --cm-min-width: 500px;
+    --cm-max-width: 1000px;
+}
+.codemirror-mutant-modal-size {
+    --cm-min-height: 100px;
+    --cm-max-height: 800px;
+    --cm-min-width: 400px;
+    --cm-max-width: 1000px;
 }

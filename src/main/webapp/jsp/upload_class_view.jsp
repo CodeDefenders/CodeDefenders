@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="java.util.List" %>
@@ -53,7 +56,7 @@
                 <label class="form-label" for="fileUploadCUT">Java File</label>
                 <input id="fileUploadCUT" name="fileUploadCUT" type="file" class="form-control" accept=".java" required>
                 <div class="invalid-feedback">Please provide a <code>.java</code> file.</div>
-                <div class="form-text">The <code>.java</code> file of the class.</div>
+                <div class="form-text">The .java file of the class.</div>
             </div>
 
             <div class="col-sm-12 col-md-6">
@@ -202,28 +205,12 @@
                 <tr>
                     <td><%=c.getId()%></td>
                     <td>
-                        <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=c.getId()%>">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-<%=c.getId()%>">
                             <%=c.getBaseName()%> <%=c.getBaseName().equals(c.getAlias()) ? "" : "(alias "+c.getAlias()+")"%>
                         </a>
-                        <div id="modalCUTFor<%=c.getId()%>" class="modal fade" role="dialog" style="text-align: left;" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <h4 class="modal-title"><%=c.getBaseName()%></h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <pre class="readonly-pre"><textarea
-                                                class="readonly-textarea classPreview" id="sut<%=c.getId()%>"
-                                                name="cut<%=c.getId()%>" cols="80"
-                                                rows="30"></textarea></pre>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <% pageContext.setAttribute("classId", c.getId()); %>
+                        <% pageContext.setAttribute("classAlias", c.getAlias()); %>
+                        <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-${classId}"/>
                     </td>
                     <td><%=GameClassDAO.getMappedDependencyIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantIdsForClassId(c.getId()).size()%></td>
                     <td><%=mutationDiff != null ? String.valueOf(mutationDiff) : ""%></td>
@@ -240,23 +227,6 @@
 </div>
 
 <script>
-    $('.modal').on('shown.bs.modal', function() {
-        let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-            codeMirrorContainer.CodeMirror.refresh();
-        } else {
-            let textarea = $(this).find('textarea')[0];
-            let editor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: false,
-                readOnly: true,
-                mode: "text/x-java",
-                autoRefresh: true
-            });
-            editor.setSize("100%", 500);
-            ClassAPI.getAndSetEditorValue(textarea, editor);
-        }
-    });
-
     $(document).ready(function () {
         $('#tableUploadedClasses').DataTable({
             paging: false,
