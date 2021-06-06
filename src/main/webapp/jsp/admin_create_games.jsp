@@ -754,9 +754,9 @@
             const tr = table.insertRow();
             tr.setAttribute('data-user-id', userInfo.user.id);
             if (role === Role.ATTACKER.name) {
-                tr.style.backgroundColor = '#EDCECE';
+                tr.classList.add('bg-attacker-light');
             } else if (role === Role.DEFENDER.name) {
-                tr.style.backgroundColor = '#CED6ED';
+                tr.classList.add('bg-defender-light');
             }
 
             const userNameCell = tr.insertCell();

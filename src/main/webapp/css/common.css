@@ -17,9 +17,15 @@
 .bg-attacker {
     background-color: var(--bg-attacker);
 }
+.bg-attacker-light {
+    background-color: var(--bg-attacker-light);
+}
 
 .bg-defender {
     background-color: var(--bg-defender);
+}
+.bg-defender-light {
+    background-color: var(--bg-defender-light);
 }
 
 .fg-attacker {

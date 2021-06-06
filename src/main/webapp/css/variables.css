@@ -4,20 +4,22 @@
 :root {
     /* Used e.g. in header/footer. */
     --bg-codedefenders: #03a9f4;
-    --bg-codedefenders-bright: #24baff;
-    --bg-codedefenders-brighter: #48c3fd;
+    --bg-codedefenders-light: #24baff;
+    --bg-codedefenders-lighter: #48c3fd;
 
     /* Used e.g. in buttons */
     --bg-attacker: #b94258;
     --bg-attacker-dark: #9d384b;
     --bg-attacker-contrast: #ac2c44;
     --bg-attacker-contrast-dark: #8c1f35;
+    --bg-defender-light: #ced6ed;
 
     /* Used e.g. in buttons. */
     --bg-defender: #3479a2;
     --bg-defender-dark: #296486;
     --bg-defender-contrast: #29698f;
     --bg-defender-contrast-dark: #1b5171;
+    --bg-attacker-light: #edcece;
 
     /* Used e.g. in in-game scoreboard. */
     --fg-attacker: #e41d41;

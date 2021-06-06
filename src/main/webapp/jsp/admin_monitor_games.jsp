@@ -219,7 +219,7 @@
 
                                                     int totalScore = Integer.parseInt(playerInfo.get(4));
                                                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
-                                                    String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
+                                                    String color = role == Role.ATTACKER ? "bg-attacker-light" : "bg-defender-light";
                                                     int gameScore = AdminMonitorGames.getPlayerScore(g, playerId);
                                             %>
                                                 <tr>
@@ -227,12 +227,12 @@
                                                         if (firstAttacker && role.equals(Role.ATTACKER)) {
                                                             firstAttacker = false;
                                                     %>
-                                                        <td style="background: <%=color%>;"><%=gameScoreAttack%></td>
+                                                        <td class="<%=color%>"><%=gameScoreAttack%></td>
                                                     <%
                                                         } else if (firstDefender && role.equals(Role.DEFENDER)) {
                                                             firstDefender = false;
                                                     %>
-                                                        <td style="background: <%=color%>;"><%=gameScoreDefense%></td>
+                                                        <td class="<%=color%>"><%=gameScoreDefense%></td>
                                                     <%
                                                         } else {
                                                     %>
@@ -240,12 +240,12 @@
                                                     <%
                                                         }
                                                     %>
-                                                    <td style="background: <%=color%>;"><%=userName%></td>
-                                                    <td style="background: <%=color%>;"><%=submissionsCount%></td>
-                                                    <td style="background: <%=color%>;"><%=lastSubmissionTS%></td>
-                                                    <td style="background: <%=color%>;"><%=gameScore%></td>
-                                                    <td style="background: <%=color%>;"><%=totalScore%></td>
-                                                    <td style="background: <%=color%>;">
+                                                    <td class="<%=color%>"><%=userName%></td>
+                                                    <td class="<%=color%>"><%=submissionsCount%></td>
+                                                    <td class="<%=color%>"><%=lastSubmissionTS%></td>
+                                                    <td class="<%=color%>"><%=gameScore%></td>
+                                                    <td class="<%=color%>"><%=totalScore%></td>
+                                                    <td class="<%=color%>">
                                                         <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
                                                                 onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                                                                     'This will also delete ALL of his tests, mutants and claimed equivalences ' +
@@ -255,7 +255,7 @@
                                                             <i class="fa fa-exchange"></i>
                                                         </button>
                                                     </td>
-                                                    <td style="background: <%=color%>;">
+                                                    <td class="<%=color%>">
                                                         <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
                                                                 onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                                                                     'This will also delete ALL of his tests, mutants and claimed equivalences ' +
