@@ -15,25 +15,25 @@
 ----------------------------------------------------------------------------- */
 
 .bg-attacker {
-    background-color: var(--bg-attacker);
+    background-color: var(--bg-attacker) !important;
 }
 .bg-attacker-light {
-    background-color: var(--bg-attacker-light);
+    background-color: var(--bg-attacker-light) !important;
 }
 
 .bg-defender {
-    background-color: var(--bg-defender);
+    background-color: var(--bg-defender) !important;
 }
 .bg-defender-light {
-    background-color: var(--bg-defender-light);
+    background-color: var(--bg-defender-light) !important;
 }
 
 .fg-attacker {
-    color: var(--fg-attacker);
+    color: var(--fg-attacker) !important;
 }
 
 .fg-defender {
-    color: var(--fg-defender);
+    color: var(--fg-defender) !important;
 }
 
 .btn-attacker {

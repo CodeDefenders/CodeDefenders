@@ -132,7 +132,7 @@ bootstrap classes
 ----------------------------------------------------------------------------- */
 
 .cursor-pointer {
-    cursor: pointer;
+    cursor: pointer !important;
 }
 
 /* Popovers
