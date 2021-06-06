@@ -149,22 +149,26 @@
                                 <%
                                                 } else {
                                 %>
-                                    Joined as attacker
+                                    <div class="d-flex flex-column gap-1">
+                                        <span>Joined as attacker</span>
                                 <%
                                                     if (gamesJoinable) {
                                 %>
-                                <form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>"
-                                      method="post">
-                                    <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-                                    <input type="hidden" name="gameId" value="<%=gameId%>">
-                                    <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-attacker-"+gameId%>" type="submit"
-                                            form="attLeave"
-                                            value="Leave">
-                                        Leave battleground
-                                    </button>
-                                </form>
+                                        <form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>"
+                                              method="post">
+                                            <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+                                            <input type="hidden" name="gameId" value="<%=gameId%>">
+                                            <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-attacker-"+gameId%>" type="submit"
+                                                    form="attLeave"
+                                                    value="Leave">
+                                                Leave battleground
+                                            </button>
+                                        </form>
                                 <%
                                                         }
+                                %>
+                                    </div>
+                                <%
                                                 }
                                                 break;
                                             case DEFENDER:
@@ -177,22 +181,26 @@
                                 <%
                                                 } else {
                                 %>
-                                    Joined as defender
+                                    <div class="d-flex flex-column gap-1">
+                                        <span>Joined as defender</span>
                                 <%
                                                     if (gamesJoinable) {
                                 %>
-                                    <form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>"
-                                          method="post">
-                                        <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-                                        <input type="hidden" name="gameId" value="<%=gameId%>">
-                                        <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-defender-"+gameId%>" type="submit"
-                                                form="defLeave"
-                                                value="Leave">
-                                            Leave battleground
-                                        </button>
-                                    </form>
+                                            <form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>"
+                                                  method="post">
+                                                <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+                                                <input type="hidden" name="gameId" value="<%=gameId%>">
+                                                <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-defender-"+gameId%>" type="submit"
+                                                        form="defLeave"
+                                                        value="Leave">
+                                                    Leave battleground
+                                                </button>
+                                            </form>
                                 <%
                                                     }
+                                %>
+                                    </div>
+                                <%
                                             }
                                             break;
                                         case OBSERVER:
@@ -341,20 +349,24 @@
                                     <%
                                                     } else {
                                     %>
-                                        Joined melee game
+                                        <div class="d-flex flex-column gap-1">
+                                            <span>Joined as player</span>
                                     <%
                                                         if (gamesJoinable) {
                                     %>
-                                        <form id="leave" action="<%= request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post">
-                                            <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-                                            <input type="hidden" name="gameId" value="<%=gameId%>">
-                                            <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-"+gameId%>" type="submit" form="leave"
-                                                    value="Leave">
-                                                Leave Melee Game
-                                            </button>
-                                        </form>
+                                            <form id="leave" action="<%= request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post">
+                                                <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+                                                <input type="hidden" name="gameId" value="<%=gameId%>">
+                                                <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-"+gameId%>" type="submit" form="leave"
+                                                        value="Leave">
+                                                    Leave Melee Game
+                                                </button>
+                                            </form>
                                     <%
                                                         }
+                                    %>
+                                        </div>
+                                    <%
                                                     }
                                                     break;
                                             }
