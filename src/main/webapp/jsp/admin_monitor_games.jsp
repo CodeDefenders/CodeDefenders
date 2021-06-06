@@ -39,6 +39,11 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
+<%
+    List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
+    List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
+%>
+
 <%!
     /* Quick fix to get striped tables to display properly without DataTables.
        Later, the tables on this page should be converted to DataTables. */
@@ -59,438 +64,418 @@
         <input type="hidden" name="formType" value="startStopGame">
 
         <h3 class="mb-3">Current Multiplayer Games</h3>
-        <%
-            List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
-            if (multiplayerGames.isEmpty()) {
-        %>
-            <div class="card">
-                <div class="card-body text-muted text-center">
-                    There are currently no unfinished multiplayer games.
-                </div>
-            </div>
-        <%
-            } else {
-        %>
-            <table id="table-multiplayer" class="table table-v-align-middle table-striped">
-                <thead>
+        <table id="table-multiplayer" class="table table-v-align-middle table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="selectAllGamesMultiplayer">
+                        </div>
+                    </th>
+                    <th>ID</th>
+                    <th></th>
+                    <th>Class</th>
+                    <th>Creator</th>
+                    <th>Attackers</th>
+                    <th>Defenders</th>
+                    <th>Level</th>
+                    <th>
+                        <input type="checkbox" id="togglePlayersActiveMultiplayer" class="btn-check" autocomplete="off">
+                        <label for="togglePlayersActiveMultiplayer" class="btn btn-sm btn-outline-secondary"
+                               title="Show list of Players for each Game.">
+                            <i class="fa fa-eye"></i>
+                        </label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <% resetOddEven(); %>
+                <% if (multiplayerGames.isEmpty()) { %>
                     <tr>
-                        <th>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="selectAllGamesMultiplayer">
-                            </div>
-                        </th>
-                        <th>ID</th>
-                        <th></th>
-                        <th>Class</th>
-                        <th>Creator</th>
-                        <th>Attackers</th>
-                        <th>Defenders</th>
-                        <th>Level</th>
-                        <th>
-                            <input type="checkbox" id="togglePlayersActiveMultiplayer" class="btn-check" autocomplete="off">
-                            <label for="togglePlayersActiveMultiplayer" class="btn btn-sm btn-outline-secondary"
-                                   title="Show list of Players for each Game.">
-                                <i class="fa fa-eye"></i>
-                            </label>
-                        </th>
+                        <td colspan="100" class="text-center">
+                            There are currently no unfinished multiplayer games you control.
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <% resetOddEven(); %>
+                <% } %>
+                <%
+                    for (MultiplayerGame g : multiplayerGames) {
+                        GameClass cut = g.getCUT();
+                        String startStopButtonIcon = g.getState().equals(GameState.ACTIVE) ?
+                                "fa fa-stop" : "fa fa-play";
+                        String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
+                                "btn btn-sm btn-danger" : "btn btn-sm btn-primary";
+                        String startStopButtonAction = g.getState().equals(GameState.ACTIVE) ?
+                                "return confirm('Are you sure you want to stop this Game?');" : "";
+                        int gid = g.getId();
+                %>
+                    <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
+                        <td>
+                            <div class="form-check">
+                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%=gid%>" class="form-check-input"
+                                       onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
+                                           document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+                                           setSelectAllCheckbox('selectedGames', 'selectAllGamesMultiplayer')">
+                            </div>
+                        </td>
+                        <td><%=gid%></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
+                               href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gid%>">
+                                Observe
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">
+                                <%=cut.getAlias()%>
+                            </a>
+                            <% pageContext.setAttribute("classId", g.getCUT().getId()); %>
+                            <% pageContext.setAttribute("classAlias", cut.getAlias()); %>
+                            <% pageContext.setAttribute("gameId", gid); %>
+                            <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
+                        </td>
+                        <td><%=UserDAO.getUserById(g.getCreatorId()).getUsername()%></td>
+                        <td><%=g.getAttackerPlayers().size()%></td>
+                        <td><%=g.getDefenderPlayers().size()%></td>
+                        <td><%=g.getLevel()%></td>
+                        <td>
+                            <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
+                                    onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
+                                <i class="<%=startStopButtonIcon%>"></i>
+                            </button>
+                        </td>
+                    </tr>
                     <%
-                        for (MultiplayerGame g : multiplayerGames) {
-                            GameClass cut = g.getCUT();
-                            String startStopButtonIcon = g.getState().equals(GameState.ACTIVE) ?
-                                    "fa fa-stop" : "fa fa-play";
-                            String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
-                                    "btn btn-sm btn-danger" : "btn btn-sm btn-primary";
-                            String startStopButtonAction = g.getState().equals(GameState.ACTIVE) ?
-                                    "return confirm('Are you sure you want to stop this Game?');" : "";
-                            int gid = g.getId();
+                        List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
+                        Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
+                                info -> Integer.parseInt(info.get(0)),
+                                info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
+                        ));
+                        if (!userIdByPlayerId.values().stream().anyMatch(
+                                userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
                     %>
-                        <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
-                            <td>
-                                <div class="form-check">
-                                    <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%=gid%>" class="form-check-input"
-                                           onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-                                               document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
-                                               setSelectAllCheckbox('selectedGames', 'selectAllGamesMultiplayer')">
+                        <tr class="players-table" hidden>
+                            <td colspan="100" class="text-center">There are no players active in this game.</td>
+                        </tr>
+                    <%
+                        } else {
+                    %>
+                        <tr class="players-table" hidden>
+                            <td colspan="100">
+                                <div class="child-row-wrapper py-0">
+                                    <table class="table m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Game Score</th>
+                                                <th>Name</th>
+                                                <th>Submissions</th>
+                                                <th>Last Action</th>
+                                                <th>Points</th>
+                                                <th>Total Score</th>
+                                                <th>Switch Role</th>
+                                                <th>Remove Player</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%
+                                                boolean firstAttacker = true;
+                                                boolean firstDefender = true;
+
+                                                // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
+                                                int gameScoreAttack = 0;
+                                                int gameScoreDefense = 0;
+
+                                                for (List<String> playerInfo : playerInfos) {
+                                                    if (Role.ATTACKER.equals(Role.valueOf(playerInfo.get(2)))) {
+                                                        gameScoreAttack = gameScoreAttack + Integer.parseInt(playerInfo.get(4));
+                                                    } else if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
+                                                        gameScoreDefense = gameScoreDefense + Integer.parseInt(playerInfo.get(4));
+                                                    }
+                                                }
+
+                                                for (List<String> playerInfo : playerInfos) {
+                                                    int playerId = Integer.parseInt(playerInfo.get(0));
+                                                    int userID = userIdByPlayerId.get(playerId);
+
+                                                    // Do not visualize system users.
+                                                    // Note this does not prevent someone to forge move player requests which remove system users from the game
+                                                    if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
+                                                        continue;
+                                                    }
+
+                                                    String userName = playerInfo.get(1);
+                                                    Role role = Role.valueOf(playerInfo.get(2));
+                                                    String ts = playerInfo.get(3);
+
+                                                    String lastSubmissionTS;
+                                                    if (ts.equalsIgnoreCase("never")) {
+                                                        lastSubmissionTS = ts;
+                                                    } else {
+                                                        Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
+                                                        Instant now = Instant.now();
+                                                        Duration duration = Duration.between(then, now);
+                                                        lastSubmissionTS = String.format("%02dh %02dm %02ds",
+                                                                duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
+                                                    }
+
+                                                    int totalScore = Integer.parseInt(playerInfo.get(4));
+                                                    int submissionsCount = Integer.parseInt(playerInfo.get(5));
+                                                    String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
+                                                    int gameScore = AdminMonitorGames.getPlayerScore(g, playerId);
+                                            %>
+                                                <tr>
+                                                    <%
+                                                        if (firstAttacker && role.equals(Role.ATTACKER)) {
+                                                            firstAttacker = false;
+                                                    %>
+                                                        <td style="background: <%=color%>;"><%=gameScoreAttack%></td>
+                                                    <%
+                                                        } else if (firstDefender && role.equals(Role.DEFENDER)) {
+                                                            firstDefender = false;
+                                                    %>
+                                                        <td style="background: <%=color%>;"><%=gameScoreDefense%></td>
+                                                    <%
+                                                        } else {
+                                                    %>
+                                                        <td style="border: none;"></td>
+                                                    <%
+                                                        }
+                                                    %>
+                                                    <td style="background: <%=color%>;"><%=userName%></td>
+                                                    <td style="background: <%=color%>;"><%=submissionsCount%></td>
+                                                    <td style="background: <%=color%>;"><%=lastSubmissionTS%></td>
+                                                    <td style="background: <%=color%>;"><%=gameScore%></td>
+                                                    <td style="background: <%=color%>;"><%=totalScore%></td>
+                                                    <td style="background: <%=color%>;">
+                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
+                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
+                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
+                                                                    'and might create inconsistencies in the Game.');"
+                                                                id="<%="switch_player_"+playerId+"_game_"+gid%>"
+                                                                name="activeGameUserSwitchButton">
+                                                            <i class="fa fa-exchange"></i>
+                                                        </button>
+                                                    </td>
+                                                    <td style="background: <%=color%>;">
+                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
+                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
+                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
+                                                                    'and might create inconsistencies in the Game.');"
+                                                                id="<%="remove_player_"+playerId+"_game_"+gid%>"
+                                                                name="activeGameUserRemoveButton">
+                                                            Remove
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            <%
+                                                }
+                                            %>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </td>
-                            <td><%=gid%></td>
-                            <td>
-                                <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                                   href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gid%>">
-                                    Observe
-                                </a>
-                            </td>
-                            <td>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">
-                                    <%=cut.getAlias()%>
-                                </a>
-                                <% pageContext.setAttribute("classId", g.getCUT().getId()); %>
-                                <% pageContext.setAttribute("classAlias", cut.getAlias()); %>
-                                <% pageContext.setAttribute("gameId", gid); %>
-                                <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
-                            </td>
-                            <td><%=UserDAO.getUserById(g.getCreatorId()).getUsername()%></td>
-                            <td><%=g.getAttackerPlayers().size()%></td>
-                            <td><%=g.getDefenderPlayers().size()%></td>
-                            <td><%=g.getLevel()%></td>
-                            <td>
-                                <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
-                                        onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
-                                    <i class="<%=startStopButtonIcon%>"></i>
-                                </button>
-                            </td>
                         </tr>
-                        <%
-                            List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
-                            Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
-                                    info -> Integer.parseInt(info.get(0)),
-                                    info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
-                            ));
-                            if (!userIdByPlayerId.values().stream().anyMatch(
-                                    userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
-                        %>
-                            <tr class="players-table" hidden>
-                                <td colspan="9" class="text-muted ps-5">
-                                    There are no players active in this game.
-                                </td>
-                            </tr>
-                        <%
-                            } else {
-                        %>
-                            <tr class="players-table" hidden>
-                                <td colspan="9">
-                                    <div class="child-row-wrapper py-0">
-                                        <table class="table m-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Game Score</th>
-                                                    <th>Name</th>
-                                                    <th>Submissions</th>
-                                                    <th>Last Action</th>
-                                                    <th>Points</th>
-                                                    <th>Total Score</th>
-                                                    <th>Switch Role</th>
-                                                    <th>Remove Player</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <%
-                                                    boolean firstAttacker = true;
-                                                    boolean firstDefender = true;
-
-                                                    // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
-                                                    int gameScoreAttack = 0;
-                                                    int gameScoreDefense = 0;
-
-                                                    for (List<String> playerInfo : playerInfos) {
-                                                        if (Role.ATTACKER.equals(Role.valueOf(playerInfo.get(2)))) {
-                                                            gameScoreAttack = gameScoreAttack + Integer.parseInt(playerInfo.get(4));
-                                                        } else if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
-                                                            gameScoreDefense = gameScoreDefense + Integer.parseInt(playerInfo.get(4));
-                                                        }
-                                                    }
-
-                                                    for (List<String> playerInfo : playerInfos) {
-                                                        int playerId = Integer.parseInt(playerInfo.get(0));
-                                                        int userID = userIdByPlayerId.get(playerId);
-
-                                                        // Do not visualize system users.
-                                                        // Note this does not prevent someone to forge move player requests which remove system users from the game
-                                                        if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
-                                                            continue;
-                                                        }
-
-                                                        String userName = playerInfo.get(1);
-                                                        Role role = Role.valueOf(playerInfo.get(2));
-                                                        String ts = playerInfo.get(3);
-
-                                                        String lastSubmissionTS;
-                                                        if (ts.equalsIgnoreCase("never")) {
-                                                            lastSubmissionTS = ts;
-                                                        } else {
-                                                            Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
-                                                            Instant now = Instant.now();
-                                                            Duration duration = Duration.between(then, now);
-                                                            lastSubmissionTS = String.format("%02dh %02dm %02ds",
-                                                                    duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
-                                                        }
-
-                                                        int totalScore = Integer.parseInt(playerInfo.get(4));
-                                                        int submissionsCount = Integer.parseInt(playerInfo.get(5));
-                                                        String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
-                                                        int gameScore = AdminMonitorGames.getPlayerScore(g, playerId);
-                                                %>
-                                                    <tr>
-                                                        <%
-                                                            if (firstAttacker && role.equals(Role.ATTACKER)) {
-                                                                firstAttacker = false;
-                                                        %>
-                                                            <td style="background: <%=color%>;"><%=gameScoreAttack%></td>
-                                                        <%
-                                                            } else if (firstDefender && role.equals(Role.DEFENDER)) {
-                                                                firstDefender = false;
-                                                        %>
-                                                            <td style="background: <%=color%>;"><%=gameScoreDefense%></td>
-                                                        <%
-                                                            } else {
-                                                        %>
-                                                            <td style="border: none;"></td>
-                                                        <%
-                                                            }
-                                                        %>
-                                                        <td style="background: <%=color%>;"><%=userName%></td>
-                                                        <td style="background: <%=color%>;"><%=submissionsCount%></td>
-                                                        <td style="background: <%=color%>;"><%=lastSubmissionTS%></td>
-                                                        <td style="background: <%=color%>;"><%=gameScore%></td>
-                                                        <td style="background: <%=color%>;"><%=totalScore%></td>
-                                                        <td style="background: <%=color%>;">
-                                                            <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
-                                                                    onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                        'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                        'and might create inconsistencies in the Game.');"
-                                                                    id="<%="switch_player_"+playerId+"_game_"+gid%>"
-                                                                    name="activeGameUserSwitchButton">
-                                                                <i class="fa fa-exchange"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td style="background: <%=color%>;">
-                                                            <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
-                                                                    onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                        'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                        'and might create inconsistencies in the Game.');"
-                                                                    id="<%="remove_player_"+playerId+"_game_"+gid%>"
-                                                                    name="activeGameUserRemoveButton">
-                                                                Remove
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                <%
-                                                    }
-                                                %>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </td>
-                            </tr>
-                    <%
-                            }
+                <%
                         }
-                    %>
-                </tbody>
-            </table>
-        <%
-            }
-        %>
+                    }
+                %>
+            </tbody>
+        </table>
 
         <%-- ------------------------------------------------------------------------------------------------------ --%>
 
         <h3 class="mb-3 mt-4">Current Melee Games</h3>
-        <%
-            List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
-            if (meleeGames.isEmpty()) {
-        %>
-            <div class="card">
-                <div class="card-body text-muted text-center">
-                    There are currently no unfinished melee games.
-                </div>
-            </div>
-        <%
-            } else {
-        %>
-            <table id="table-melee" class="table table-v-align-middle table-striped">
-                <thead>
+        <table id="table-melee" class="table table-v-align-middle table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="selectAllGamesMelee">
+                        </div>
+                    </th>
+                    <th>ID</th>
+                    <th></th>
+                    <th>Class</th>
+                    <th>Creator</th>
+                    <th>Players</th>
+                    <th>Level</th>
+                    <th>
+                        <input type="checkbox" id="togglePlayersActiveMelee" class="btn-check" autocomplete="off">
+                        <label for="togglePlayersActiveMelee" class="btn btn-sm btn-outline-secondary"
+                               title="Show list of Players for each Game.">
+                            <i class="fa fa-eye"></i>
+                        </label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <% resetOddEven(); %>
+                <% if (meleeGames.isEmpty()) { %>
                     <tr>
-                        <th>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="selectAllGamesMelee">
-                            </div>
-                        </th>
-                        <th>ID</th>
-                        <th></th>
-                        <th>Class</th>
-                        <th>Creator</th>
-                        <th>Players</th>
-                        <th>Level</th>
-                        <th>
-                            <input type="checkbox" id="togglePlayersActiveMelee" class="btn-check" autocomplete="off">
-                            <label for="togglePlayersActiveMelee" class="btn btn-sm btn-outline-secondary"
-                                   title="Show list of Players for each Game.">
-                                <i class="fa fa-eye"></i>
-                            </label>
-                        </th>
+                        <td colspan="100" class="text-center">
+                            There are currently no unfinished melee games you control.
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <% resetOddEven(); %>
+                <% } %>
+                <%
+                    for (MeleeGame g : meleeGames) {
+                        GameClass cut = g.getCUT();
+                        String startStopButtonIcon = g.getState().equals(GameState.ACTIVE) ?
+                                "fa fa-stop" : "fa fa-play";
+                        String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
+                                "btn btn-sm btn-danger" : "btn btn-sm btn-primary";
+                        String startStopButtonAction = g.getState().equals(GameState.ACTIVE) ?
+                                "return confirm('Are you sure you want to stop this Game?');" : "";
+                        int gid = g.getId();
+                %>
+                    <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
+                        <td>
+                            <div class="form-check">
+                                <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" class="form-check-input"
+                                       onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
+                                           document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+                                           setSelectAllCheckbox('selectedGames', 'selectAllGamesMelee')">
+                            </div>
+                        </td>
+                        <td><%=gid%></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
+                               href="<%=request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gid%>">
+                                Observe
+                            </a>
+                        </td>
+                        <td>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">
+                                <%=cut.getAlias()%>
+                            </a>
+                            <% pageContext.setAttribute("classId", g.getCUT().getId()); %>
+                            <% pageContext.setAttribute("classAlias", cut.getAlias()); %>
+                            <% pageContext.setAttribute("gameId", gid); %>
+                            <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
+                        </td>
+                        <td><%=UserDAO.getUserById(g.getCreatorId()).getUsername()%></td>
+                        <td><%=g.getPlayers().size()%></td>
+                        <td><%=g.getLevel()%></td>
+                        <td>
+                            <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
+                                    onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
+                                <i class="<%=startStopButtonIcon%>"></i>
+                            </button>
+                        </td>
+                    </tr>
                     <%
-                        for (MeleeGame g : meleeGames) {
-                            GameClass cut = g.getCUT();
-                            String startStopButtonIcon = g.getState().equals(GameState.ACTIVE) ?
-                                    "fa fa-stop" : "fa fa-play";
-                            String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
-                                    "btn btn-sm btn-danger" : "btn btn-sm btn-primary";
-                            String startStopButtonAction = g.getState().equals(GameState.ACTIVE) ?
-                                    "return confirm('Are you sure you want to stop this Game?');" : "";
-                            int gid = g.getId();
+                        List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
+                        Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
+                                info -> Integer.parseInt(info.get(0)),
+                                info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
+                        ));
+                        if (!userIdByPlayerId.values().stream().anyMatch(
+                                userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
                     %>
-                        <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
-                            <td>
-                                <div class="form-check">
-                                    <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" class="form-check-input"
-                                           onchange="document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
-                                               document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
-                                               setSelectAllCheckbox('selectedGames', 'selectAllGamesMelee')">
+                        <tr class="players-table" hidden>
+                            <td colspan="100" class="text-center">There are no players active in this game.</td>
+                        </tr>
+                    <%
+                        } else {
+                    %>
+                        <tr class="players-table" hidden>
+                            <td colspan="100">
+                                <div class="child-row-wrapper py-0">
+                                    <table class="table m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Game Score</th>
+                                                <th>Name</th>
+                                                <th>Submissions</th>
+                                                <th>Last Action</th>
+                                                <th>Points</th>
+                                                <th>Total Score</th>
+                                                <th>Remove Player</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <%
+                                                boolean firstPlayer = true;
+
+                                                // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
+                                                int gameScore = 0;
+
+                                                for (List<String> playerInfo : playerInfos) {
+                                                    if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
+                                                        gameScore = gameScore + Integer.parseInt(playerInfo.get(4));
+                                                    }
+                                                }
+
+                                                for (List<String> playerInfo : playerInfos) {
+                                                    int playerId = Integer.parseInt(playerInfo.get(0));
+                                                    int userID = userIdByPlayerId.get(playerId);
+
+                                                    // Do not visualize system users.
+                                                    // Note this does not prevent someone to forge move player requests which remove system users from the game
+                                                    if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
+                                                        continue;
+                                                    }
+
+                                                    String userName = playerInfo.get(1);
+                                                    Role role = Role.valueOf(playerInfo.get(2));
+                                                    String ts = playerInfo.get(3);
+
+                                                    String lastSubmissionTS;
+                                                    if (ts.equalsIgnoreCase("never")) {
+                                                        lastSubmissionTS = ts;
+                                                    } else {
+                                                        Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
+                                                        Instant now = Instant.now();
+                                                        Duration duration = Duration.between(then, now);
+                                                        lastSubmissionTS = String.format("%02dh %02dm %02ds",
+                                                                duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
+                                                    }
+
+                                                    int totalScore = Integer.parseInt(playerInfo.get(4));
+                                                    int submissionsCount = Integer.parseInt(playerInfo.get(5));
+                                            %>
+                                                <tr>
+                                                    <%
+                                                        if (firstPlayer && role.equals(Role.PLAYER)) {
+                                                            firstPlayer = false;
+                                                    %>
+                                                        <td><%=gameScore%></td>
+                                                    <%
+                                                        } else {
+                                                    %>
+                                                        <td style="border: none;"></td>
+                                                    <%
+                                                        }
+                                                    %>
+                                                    <td><%=userName%></td>
+                                                    <td><%= submissionsCount%></td>
+                                                    <td><%=lastSubmissionTS%></td>
+                                                    <td></td>
+                                                    <td><%=totalScore%></td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
+                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
+                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
+                                                                    'and might create inconsistencies in the Game.');"
+                                                                id="<%="remove_player_"+playerId+"_game_"+gid%>"
+                                                                name="activeGameUserRemoveButton">
+                                                            Remove
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            <%
+                                                }
+                                            %>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </td>
-                            <td><%=gid%></td>
-                            <td>
-                                <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                                   href="<%=request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gid%>">
-                                    Observe
-                                </a>
-                            </td>
-                            <td>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">
-                                    <%=cut.getAlias()%>
-                                </a>
-                                <% pageContext.setAttribute("classId", g.getCUT().getId()); %>
-                                <% pageContext.setAttribute("classAlias", cut.getAlias()); %>
-                                <% pageContext.setAttribute("gameId", gid); %>
-                                <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
-                            </td>
-                            <td><%=UserDAO.getUserById(g.getCreatorId()).getUsername()%></td>
-                            <td><%=g.getPlayers().size()%></td>
-                            <td><%=g.getLevel()%></td>
-                            <td>
-                                <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
-                                        onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
-                                    <i class="<%=startStopButtonIcon%>"></i>
-                                </button>
-                            </td>
                         </tr>
-                        <%
-                            List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
-                            Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
-                                    info -> Integer.parseInt(info.get(0)),
-                                    info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
-                            ));
-                            if (!userIdByPlayerId.values().stream().anyMatch(
-                                    userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
-                        %>
-                            <tr class="players-table" hidden>
-                                <td colspan="9" class="text-muted ps-5">
-                                    There are no players active in this game.
-                                </td>
-                            </tr>
-                        <%
-                            } else {
-                        %>
-                            <tr class="players-table" hidden>
-                                <td colspan="8">
-                                    <div class="child-row-wrapper py-0">
-                                        <table class="table m-0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Game Score</th>
-                                                    <th>Name</th>
-                                                    <th>Submissions</th>
-                                                    <th>Last Action</th>
-                                                    <th>Points</th>
-                                                    <th>Total Score</th>
-                                                    <th>Remove Player</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <%
-                                                    boolean firstPlayer = true;
-
-                                                    // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
-                                                    int gameScore = 0;
-
-                                                    for (List<String> playerInfo : playerInfos) {
-                                                        if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
-                                                            gameScore = gameScore + Integer.parseInt(playerInfo.get(4));
-                                                        }
-                                                    }
-
-                                                    for (List<String> playerInfo : playerInfos) {
-                                                        int playerId = Integer.parseInt(playerInfo.get(0));
-                                                        int userID = userIdByPlayerId.get(playerId);
-
-                                                        // Do not visualize system users.
-                                                        // Note this does not prevent someone to forge move player requests which remove system users from the game
-                                                        if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
-                                                            continue;
-                                                        }
-
-                                                        String userName = playerInfo.get(1);
-                                                        Role role = Role.valueOf(playerInfo.get(2));
-                                                        String ts = playerInfo.get(3);
-
-                                                        String lastSubmissionTS;
-                                                        if (ts.equalsIgnoreCase("never")) {
-                                                            lastSubmissionTS = ts;
-                                                        } else {
-                                                            Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
-                                                            Instant now = Instant.now();
-                                                            Duration duration = Duration.between(then, now);
-                                                            lastSubmissionTS = String.format("%02dh %02dm %02ds",
-                                                                    duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
-                                                        }
-
-                                                        int totalScore = Integer.parseInt(playerInfo.get(4));
-                                                        int submissionsCount = Integer.parseInt(playerInfo.get(5));
-                                                %>
-                                                    <tr>
-                                                        <%
-                                                            if (firstPlayer && role.equals(Role.PLAYER)) {
-                                                                firstPlayer = false;
-                                                        %>
-                                                            <td><%=gameScore%></td>
-                                                        <%
-                                                            } else {
-                                                        %>
-                                                            <td style="border: none;"></td>
-                                                        <%
-                                                            }
-                                                        %>
-                                                        <td><%=userName%></td>
-                                                        <td><%= submissionsCount%></td>
-                                                        <td><%=lastSubmissionTS%></td>
-                                                        <td></td>
-                                                        <td><%=totalScore%></td>
-                                                        <td>
-                                                            <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
-                                                                    onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                        'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                        'and might create inconsistencies in the Game.');"
-                                                                    id="<%="remove_player_"+playerId+"_game_"+gid%>"
-                                                                    name="activeGameUserRemoveButton">
-                                                                Remove
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                <%
-                                                    }
-                                                %>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </td>
-                            </tr>
-                    <%
-                            }
+                <%
                         }
-                    %>
-                </tbody>
-            </table>
-        <%
-            }
-        %>
+                    }
+                %>
+            </tbody>
+        </table>
 
         <% if (!multiplayerGames.isEmpty() || !meleeGames.isEmpty()) { %>
             <div class="row g-2 mt-3">

@@ -70,11 +70,6 @@
                         <th>Duels Won / Lost / Ongoing</th>
                         <th>Total Points</th>
                     </tr>
-                    <% if (attackers.isEmpty()) { %>
-                        <tr class="attacker">
-                            <td colspan="4"></td>
-                        </tr>
-                    <% } %>
                     <%
                         for (Player attacker : attackers) {
                             int playerId = attacker.getId();
@@ -120,11 +115,6 @@
                         <th>Duels Won / Lost / Ongoing</th>
                         <th>Total Points</th>
                     </tr>
-                    <% if (defenders.isEmpty()) { %>
-                        <tr class="defender">
-                            <td colspan="5"></td>
-                        </tr>
-                    <% } %>
                     <%
                         for (Player defender : defenders) {
                             int playerId = defender.getId();

@@ -73,7 +73,9 @@
                             if (openGames.isEmpty()) {
                         %>
                             <tr>
-                                <td colspan="100%"> Currently there are no open games.</td>
+                                <td colspan="100" class="text-center">
+                                    There are currently no open games.
+                                </td>
                             </tr>
                         <%
                             } else {

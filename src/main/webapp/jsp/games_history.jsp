@@ -78,7 +78,7 @@
             %>
 
                 <tr class="<%=oddEven()%>">
-                    <td colspan="8">Empty multi-player games history.</td>
+                    <td colspan="100" class="text-center">Your battleground game history is empty.</td>
                 </tr>
 
             <%
@@ -118,7 +118,7 @@
                 </tr>
 
                 <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                    <td colspan="8">
+                    <td colspan="100">
                         <div class="child-row-wrapper">
                             <table class="child-row-details">
                                 <thead>
@@ -131,10 +131,10 @@
                                 </thead>
                                 <tbody>
                                     <%
-                                        if(attackers.isEmpty()) {
+                                        if (attackers.isEmpty()) {
                                     %>
                                         <tr>
-                                            <td colspan="4" class="text-center">There are no Attackers.</td>
+                                            <td colspan="100" class="text-center">There are no Attackers.</td>
                                         </tr>
                                     <%
                                         } else {
@@ -163,10 +163,10 @@
                                 </thead>
                                 <tbody>
                                     <%
-                                        if(defenders.isEmpty()){
+                                        if (defenders.isEmpty()) {
                                     %>
                                         <tr>
-                                            <td colspan="4" class="text-center">There are no Defenders.</td>
+                                            <td colspan="100" class="text-center">There are no Defenders.</td>
                                         </tr>
                                     <%
                                         } else {
@@ -218,7 +218,7 @@
             %>
 
                 <tr class="<%=oddEven()%>">
-                    <td colspan="7">Empty multi-player games history.</td>
+                    <td colspan="100" class="text-center">Your melee game history is empty.</td>
                 </tr>
 
             <%
@@ -251,7 +251,7 @@
                 </tr>
 
                 <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                    <td colspan="7">
+                    <td colspan="100">
                         <div class="child-row-wrapper">
                             <table class="child-row-details">
                                 <thead>
@@ -265,7 +265,7 @@
                                         if (players.isEmpty()) {
                                     %>
                                         <tr>
-                                            <td colspan="2" class="text-center">There are no Players.</td>
+                                            <td colspan="100" class="text-center">There are no Players.</td>
                                         </tr>
                                     <%
                                         } else {

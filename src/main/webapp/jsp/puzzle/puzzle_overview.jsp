@@ -52,9 +52,7 @@
             if (puzzleChapterEntries.isEmpty()) {
         %>
             <tbody>
-                <tr>
-                    <td colspan="2" class="text-center">Currently there are no puzzles available.</td>
-                </tr>
+                <tr><td colspan="100" class="text-center">There are currently no puzzles available.</td></tr>
             </tbody>
         <%
             } else {

@@ -195,7 +195,9 @@
             <%
                 if (gameClasses.isEmpty()) {
             %>
-                <tr><td colspan="7">No classes uploaded.</td></tr>
+                <tr>
+                    <td colspan="100" class="text-center">No classes uploaded.</td>
+                </tr>
             <%
                 } else {
                     for (GameClass c : gameClasses) {

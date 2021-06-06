@@ -135,74 +135,60 @@
     <form id="manageUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="manageUsers">
 
-        <%
-            List<UserInfo> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
-            if (unassignedUsersInfo.isEmpty()) {
-        %>
-                <div class="card">
-                    <div class="card-body text-muted text-center">
-                        There are currently no created users.
-                    </div>
-                </div>
-        <%
-            } else {
-        %>
-            <table id="tableUsers" class="table table-striped table-v-align-middle">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Total Score</th>
-                        <th>Last Login</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <%
-                        for (UserInfo userInfo : unassignedUsersInfo) {
-                            int userId = userInfo.getUser().getId();
-                            String username = userInfo.getUser().getUsername();
-                            String email = userInfo.getUser().getEmail();
-                            boolean active = userInfo.getUser().isActive();
-                            String lastLogin = userInfo.getLastLoginString();
-                            int totalScore = userInfo.getTotalScore();
-                    %>
-                        <tr id="<%="user_row_"+userId%>" <%=active ? "" : "class=\"text-muted\""%>>
-                            <td>
-                                <%=userId%>
-                                <input type="hidden" name="added_uid" value=<%=userId%>>
-                            </td>
-                            <td><%=username%></td>
-                            <td><%=email%></td>
-                            <td><%=totalScore%></td>
-                            <td><%=lastLogin%></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" id="<%="edit_user_"+userId%>" name="editUserInfo" type="submit" value="<%=userId%>">
-                                    <i class="fa fa-edit"></i>
+        <table id="tableUsers" class="table table-striped table-v-align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Total Score</th>
+                    <th>Last Login</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    List<UserInfo> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
+                    for (UserInfo userInfo : unassignedUsersInfo) {
+                        int userId = userInfo.getUser().getId();
+                        String username = userInfo.getUser().getUsername();
+                        String email = userInfo.getUser().getEmail();
+                        boolean active = userInfo.getUser().isActive();
+                        String lastLogin = userInfo.getLastLoginString();
+                        int totalScore = userInfo.getTotalScore();
+                %>
+                    <tr id="<%="user_row_"+userId%>" <%=active ? "" : "class=\"text-muted\""%>>
+                        <td>
+                            <%=userId%>
+                            <input type="hidden" name="added_uid" value=<%=userId%>>
+                        </td>
+                        <td><%=username%></td>
+                        <td><%=email%></td>
+                        <td><%=totalScore%></td>
+                        <td><%=lastLogin%></td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" id="<%="edit_user_"+userId%>" name="editUserInfo" type="submit" value="<%=userId%>">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                        </td>
+                        <td>
+                            <% if (login.getUserId() != userId) { %>
+                                <button class="btn btn-sm btn-danger" id="<%="inactive_user_"+userId%>" type="submit" value="<%=userId%>" name="setUserInactive"
+                                        <% if (!active) { %>
+                                            title="User is already set inactive." disabled
+                                        <% } %>
+                                        onclick="return confirm('Are you sure you want to set <%=username%>\'s account to inactive?');">
+                                    <i class="fa fa-power-off"></i>
                                 </button>
-                            </td>
-                            <td>
-                                <% if (login.getUserId() != userId) { %>
-                                    <button class="btn btn-sm btn-danger" id="<%="inactive_user_"+userId%>" type="submit" value="<%=userId%>" name="setUserInactive"
-                                            <% if (!active) { %>
-                                                title="User is already set inactive." disabled
-                                            <% } %>
-                                            onclick="return confirm('Are you sure you want to set <%=username%>\'s account to inactive?');">
-                                        <i class="fa fa-power-off"></i>
-                                    </button>
-                                <% } %>
-                            </td>
-                        </tr>
-                    <%
-                        }
-                    %>
-                </tbody>
-            </table>
-        <%
-            }
-        %>
+                            <% } %>
+                        </td>
+                    </tr>
+                <%
+                    }
+                %>
+            </tbody>
+        </table>
 
         <script>
             $(document).ready(function () {

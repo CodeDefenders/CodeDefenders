@@ -89,7 +89,7 @@
             <c:choose>
                 <c:when test="${empty activeGames}">
                     <tr class="<%=oddEven()%>">
-                        <td colspan="7" class="text-center"> You are currently not active in any games.</td>
+                        <td colspan="100" class="text-center"> You are currently not active in any games.</td>
                     </tr>
                 </c:when>
                 <c:otherwise>
@@ -211,7 +211,7 @@
                             </td>
                         </tr>
                         <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                            <td colspan="7">
+                            <td colspan="100">
                                 <div class="child-row-wrapper">
                                     <table class="child-row-details">
                                         <thead>
@@ -227,7 +227,7 @@
                                                 if (attackers.isEmpty()) {
                                             %>
                                                 <tr>
-                                                    <td colspan="4" class="text-center">There are no Attackers.</td>
+                                                    <td colspan="100" class="text-center">There are no Attackers.</td>
                                                 </tr>
                                             <%
                                                 } else {
@@ -259,7 +259,7 @@
                                                 if (defenders.isEmpty()) {
                                             %>
                                                 <tr>
-                                                    <td colspan="4" class="text-center">There are no Defenders.</td>
+                                                    <td colspan="100" class="text-center">There are no Defenders.</td>
                                                 </tr>
                                             <%
                                                 } else {
@@ -370,7 +370,7 @@
                                 </td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                                <td colspan="7">
+                                <td colspan="100">
                                     <div class="child-row-wrapper">
                                         <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
@@ -382,7 +382,7 @@
                                             <tbody>
                                                 <% if (players.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="2" class="text-center">There are no Players.</td>
+                                                        <td colspan="100" class="text-center">There are no Players.</td>
                                                     </tr>
                                                 <% } %>
                                                 <% for (Player player : players) { %>
@@ -438,7 +438,7 @@
                 <c:choose>
                     <c:when test="${empty openMultiplayerGames}">
                         <tr class="<%=oddEven()%>">
-                            <td colspan="7" class="text-center"> There are currently no open battleground games.</td>
+                            <td colspan="100" class="text-center"> There are currently no open battleground games.</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -498,7 +498,7 @@
                                 <td><%=info.gameLevel().getFormattedString() %></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                                <td colspan="7">
+                                <td colspan="100">
                                     <div class="child-row-wrapper">
                                         <table class="child-row-details">
                                             <thead>
@@ -512,7 +512,7 @@
                                             <tbody>
                                                 <% if (attackers.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="4" class="text-center">There are no Attackers. Go Join!</td>
+                                                        <td colspan="100" class="text-center">There are no Attackers. Go Join!</td>
                                                     </tr>
                                                 <%
                                                     } else {
@@ -542,7 +542,7 @@
                                             <tbody>
                                                 <% if (defenders.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="4" class="text-center">There are no Defenders. Go Join!</td>
+                                                        <td colspan="100" class="text-center">There are no Defenders. Go Join!</td>
                                                     </tr>
                                                 <%
                                                     } else {
@@ -590,7 +590,7 @@
                 <c:choose>
                     <c:when test="${empty openMeleeGames}">
                         <tr class="<%=oddEven()%>">
-                            <td colspan="6" class="text-center"> There are currently no open melee games.</td>
+                            <td colspan="100" class="text-center"> There are currently no open melee games.</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -632,7 +632,7 @@
                                 <td><%=info.gameLevel().getFormattedString() %></td>
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                                <td colspan="6">
+                                <td colspan="100">
                                     <div class="child-row-wrapper">
                                         <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
@@ -644,7 +644,7 @@
                                             <tbody>
                                                 <% if (players.isEmpty()) { %>
                                                     <tr>
-                                                        <td colspan="2" class="text-center">There are no Players. Go Join!</td>
+                                                        <td colspan="100" class="text-center">There are no Players. Go Join!</td>
                                                     </tr>
                                                 <% } %>
                                                 <% for (Player player : players) { %>
