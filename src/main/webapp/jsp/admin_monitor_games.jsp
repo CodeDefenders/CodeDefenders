@@ -162,116 +162,118 @@
                             } else {
                         %>
                             <tr class="players-table" hidden>
-                                <td colspan="9" class="p-0 ps-5">
-                                    <table class="table m-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Game Score</th>
-                                                <th>Name</th>
-                                                <th>Submissions</th>
-                                                <th>Last Action</th>
-                                                <th>Points</th>
-                                                <th>Total Score</th>
-                                                <th>Switch Role</th>
-                                                <th>Remove Player</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <%
-                                                boolean firstAttacker = true;
-                                                boolean firstDefender = true;
-
-                                                // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
-                                                int gameScoreAttack = 0;
-                                                int gameScoreDefense = 0;
-
-                                                for (List<String> playerInfo : playerInfos) {
-                                                    if (Role.ATTACKER.equals(Role.valueOf(playerInfo.get(2)))) {
-                                                        gameScoreAttack = gameScoreAttack + Integer.parseInt(playerInfo.get(4));
-                                                    } else if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
-                                                        gameScoreDefense = gameScoreDefense + Integer.parseInt(playerInfo.get(4));
-                                                    }
-                                                }
-
-                                                for (List<String> playerInfo : playerInfos) {
-                                                    int playerId = Integer.parseInt(playerInfo.get(0));
-                                                    int userID = userIdByPlayerId.get(playerId);
-
-                                                    // Do not visualize system users.
-                                                    // Note this does not prevent someone to forge move player requests which remove system users from the game
-                                                    if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
-                                                        continue;
-                                                    }
-
-                                                    String userName = playerInfo.get(1);
-                                                    Role role = Role.valueOf(playerInfo.get(2));
-                                                    String ts = playerInfo.get(3);
-
-                                                    String lastSubmissionTS;
-                                                    if (ts.equalsIgnoreCase("never")) {
-                                                        lastSubmissionTS = ts;
-                                                    } else {
-                                                        Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
-                                                        Instant now = Instant.now();
-                                                        Duration duration = Duration.between(then, now);
-                                                        lastSubmissionTS = String.format("%02dh %02dm %02ds",
-                                                                duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
-                                                    }
-
-                                                    int totalScore = Integer.parseInt(playerInfo.get(4));
-                                                    int submissionsCount = Integer.parseInt(playerInfo.get(5));
-                                                    String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
-                                                    int gameScore = AdminMonitorGames.getPlayerScore(g, playerId);
-                                            %>
+                                <td colspan="9">
+                                    <div class="child-row-wrapper py-0">
+                                        <table class="table m-0">
+                                            <thead>
                                                 <tr>
-                                                    <%
-                                                        if (firstAttacker && role.equals(Role.ATTACKER)) {
-                                                            firstAttacker = false;
-                                                    %>
-                                                        <td style="background: <%=color%>;"><%=gameScoreAttack%></td>
-                                                    <%
-                                                        } else if (firstDefender && role.equals(Role.DEFENDER)) {
-                                                            firstDefender = false;
-                                                    %>
-                                                        <td style="background: <%=color%>;"><%=gameScoreDefense%></td>
-                                                    <%
-                                                        } else {
-                                                    %>
-                                                        <td style="border: none;"></td>
-                                                    <%
-                                                        }
-                                                    %>
-                                                    <td style="background: <%=color%>;"><%=userName%></td>
-                                                    <td style="background: <%=color%>;"><%=submissionsCount%></td>
-                                                    <td style="background: <%=color%>;"><%=lastSubmissionTS%></td>
-                                                    <td style="background: <%=color%>;"><%=gameScore%></td>
-                                                    <td style="background: <%=color%>;"><%=totalScore%></td>
-                                                    <td style="background: <%=color%>;">
-                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
-                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                    'and might create inconsistencies in the Game.');"
-                                                                id="<%="switch_player_"+playerId+"_game_"+gid%>"
-                                                                name="activeGameUserSwitchButton">
-                                                            <i class="fa fa-exchange"></i>
-                                                        </button>
-                                                    </td>
-                                                    <td style="background: <%=color%>;">
-                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
-                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                    'and might create inconsistencies in the Game.');"
-                                                                id="<%="remove_player_"+playerId+"_game_"+gid%>"
-                                                                name="activeGameUserRemoveButton">
-                                                            Remove
-                                                        </button>
-                                                    </td>
+                                                    <th>Game Score</th>
+                                                    <th>Name</th>
+                                                    <th>Submissions</th>
+                                                    <th>Last Action</th>
+                                                    <th>Points</th>
+                                                    <th>Total Score</th>
+                                                    <th>Switch Role</th>
+                                                    <th>Remove Player</th>
                                                 </tr>
-                                            <%
-                                                }
-                                            %>
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                <%
+                                                    boolean firstAttacker = true;
+                                                    boolean firstDefender = true;
+
+                                                    // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
+                                                    int gameScoreAttack = 0;
+                                                    int gameScoreDefense = 0;
+
+                                                    for (List<String> playerInfo : playerInfos) {
+                                                        if (Role.ATTACKER.equals(Role.valueOf(playerInfo.get(2)))) {
+                                                            gameScoreAttack = gameScoreAttack + Integer.parseInt(playerInfo.get(4));
+                                                        } else if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
+                                                            gameScoreDefense = gameScoreDefense + Integer.parseInt(playerInfo.get(4));
+                                                        }
+                                                    }
+
+                                                    for (List<String> playerInfo : playerInfos) {
+                                                        int playerId = Integer.parseInt(playerInfo.get(0));
+                                                        int userID = userIdByPlayerId.get(playerId);
+
+                                                        // Do not visualize system users.
+                                                        // Note this does not prevent someone to forge move player requests which remove system users from the game
+                                                        if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
+                                                            continue;
+                                                        }
+
+                                                        String userName = playerInfo.get(1);
+                                                        Role role = Role.valueOf(playerInfo.get(2));
+                                                        String ts = playerInfo.get(3);
+
+                                                        String lastSubmissionTS;
+                                                        if (ts.equalsIgnoreCase("never")) {
+                                                            lastSubmissionTS = ts;
+                                                        } else {
+                                                            Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
+                                                            Instant now = Instant.now();
+                                                            Duration duration = Duration.between(then, now);
+                                                            lastSubmissionTS = String.format("%02dh %02dm %02ds",
+                                                                    duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
+                                                        }
+
+                                                        int totalScore = Integer.parseInt(playerInfo.get(4));
+                                                        int submissionsCount = Integer.parseInt(playerInfo.get(5));
+                                                        String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
+                                                        int gameScore = AdminMonitorGames.getPlayerScore(g, playerId);
+                                                %>
+                                                    <tr>
+                                                        <%
+                                                            if (firstAttacker && role.equals(Role.ATTACKER)) {
+                                                                firstAttacker = false;
+                                                        %>
+                                                            <td style="background: <%=color%>;"><%=gameScoreAttack%></td>
+                                                        <%
+                                                            } else if (firstDefender && role.equals(Role.DEFENDER)) {
+                                                                firstDefender = false;
+                                                        %>
+                                                            <td style="background: <%=color%>;"><%=gameScoreDefense%></td>
+                                                        <%
+                                                            } else {
+                                                        %>
+                                                            <td style="border: none;"></td>
+                                                        <%
+                                                            }
+                                                        %>
+                                                        <td style="background: <%=color%>;"><%=userName%></td>
+                                                        <td style="background: <%=color%>;"><%=submissionsCount%></td>
+                                                        <td style="background: <%=color%>;"><%=lastSubmissionTS%></td>
+                                                        <td style="background: <%=color%>;"><%=gameScore%></td>
+                                                        <td style="background: <%=color%>;"><%=totalScore%></td>
+                                                        <td style="background: <%=color%>;">
+                                                            <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
+                                                                    onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
+                                                                        'This will also delete ALL of his tests, mutants and claimed equivalences ' +
+                                                                        'and might create inconsistencies in the Game.');"
+                                                                    id="<%="switch_player_"+playerId+"_game_"+gid%>"
+                                                                    name="activeGameUserSwitchButton">
+                                                                <i class="fa fa-exchange"></i>
+                                                            </button>
+                                                        </td>
+                                                        <td style="background: <%=color%>;">
+                                                            <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
+                                                                    onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
+                                                                        'This will also delete ALL of his tests, mutants and claimed equivalences ' +
+                                                                        'and might create inconsistencies in the Game.');"
+                                                                    id="<%="remove_player_"+playerId+"_game_"+gid%>"
+                                                                    name="activeGameUserRemoveButton">
+                                                                Remove
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <%
+                                                    }
+                                                %>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </td>
                             </tr>
                     <%
@@ -388,94 +390,96 @@
                             } else {
                         %>
                             <tr class="players-table" hidden>
-                                <td colspan="8" class="p-0 ps-5">
-                                    <table class="table m-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Game Score</th>
-                                                <th>Name</th>
-                                                <th>Submissions</th>
-                                                <th>Last Action</th>
-                                                <th>Points</th>
-                                                <th>Total Score</th>
-                                                <th>Remove Player</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <%
-                                                boolean firstPlayer = true;
-
-                                                // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
-                                                int gameScore = 0;
-
-                                                for (List<String> playerInfo : playerInfos) {
-                                                    if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
-                                                        gameScore = gameScore + Integer.parseInt(playerInfo.get(4));
-                                                    }
-                                                }
-
-                                                for (List<String> playerInfo : playerInfos) {
-                                                    int playerId = Integer.parseInt(playerInfo.get(0));
-                                                    int userID = userIdByPlayerId.get(playerId);
-
-                                                    // Do not visualize system users.
-                                                    // Note this does not prevent someone to forge move player requests which remove system users from the game
-                                                    if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
-                                                        continue;
-                                                    }
-
-                                                    String userName = playerInfo.get(1);
-                                                    Role role = Role.valueOf(playerInfo.get(2));
-                                                    String ts = playerInfo.get(3);
-
-                                                    String lastSubmissionTS;
-                                                    if (ts.equalsIgnoreCase("never")) {
-                                                        lastSubmissionTS = ts;
-                                                    } else {
-                                                        Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
-                                                        Instant now = Instant.now();
-                                                        Duration duration = Duration.between(then, now);
-                                                        lastSubmissionTS = String.format("%02dh %02dm %02ds",
-                                                                duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
-                                                    }
-
-                                                    int totalScore = Integer.parseInt(playerInfo.get(4));
-                                                    int submissionsCount = Integer.parseInt(playerInfo.get(5));
-                                            %>
+                                <td colspan="8">
+                                    <div class="child-row-wrapper py-0">
+                                        <table class="table m-0">
+                                            <thead>
                                                 <tr>
-                                                    <%
-                                                        if (firstPlayer && role.equals(Role.PLAYER)) {
-                                                            firstPlayer = false;
-                                                    %>
-                                                        <td><%=gameScore%></td>
-                                                    <%
-                                                        } else {
-                                                    %>
-                                                        <td style="border: none;"></td>
-                                                    <%
-                                                        }
-                                                    %>
-                                                    <td><%=userName%></td>
-                                                    <td><%= submissionsCount%></td>
-                                                    <td><%=lastSubmissionTS%></td>
-                                                    <td></td>
-                                                    <td><%=totalScore%></td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
-                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                    'and might create inconsistencies in the Game.');"
-                                                                id="<%="remove_player_"+playerId+"_game_"+gid%>"
-                                                                name="activeGameUserRemoveButton">
-                                                            Remove
-                                                        </button>
-                                                    </td>
+                                                    <th>Game Score</th>
+                                                    <th>Name</th>
+                                                    <th>Submissions</th>
+                                                    <th>Last Action</th>
+                                                    <th>Points</th>
+                                                    <th>Total Score</th>
+                                                    <th>Remove Player</th>
                                                 </tr>
-                                            <%
-                                                }
-                                            %>
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                <%
+                                                    boolean firstPlayer = true;
+
+                                                    // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
+                                                    int gameScore = 0;
+
+                                                    for (List<String> playerInfo : playerInfos) {
+                                                        if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
+                                                            gameScore = gameScore + Integer.parseInt(playerInfo.get(4));
+                                                        }
+                                                    }
+
+                                                    for (List<String> playerInfo : playerInfos) {
+                                                        int playerId = Integer.parseInt(playerInfo.get(0));
+                                                        int userID = userIdByPlayerId.get(playerId);
+
+                                                        // Do not visualize system users.
+                                                        // Note this does not prevent someone to forge move player requests which remove system users from the game
+                                                        if (userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID) {
+                                                            continue;
+                                                        }
+
+                                                        String userName = playerInfo.get(1);
+                                                        Role role = Role.valueOf(playerInfo.get(2));
+                                                        String ts = playerInfo.get(3);
+
+                                                        String lastSubmissionTS;
+                                                        if (ts.equalsIgnoreCase("never")) {
+                                                            lastSubmissionTS = ts;
+                                                        } else {
+                                                            Instant then = Instant.ofEpochMilli(Long.parseLong(ts));
+                                                            Instant now = Instant.now();
+                                                            Duration duration = Duration.between(then, now);
+                                                            lastSubmissionTS = String.format("%02dh %02dm %02ds",
+                                                                    duration.toHours(), duration.toMinutes() % 60, duration.getSeconds() % 60);
+                                                        }
+
+                                                        int totalScore = Integer.parseInt(playerInfo.get(4));
+                                                        int submissionsCount = Integer.parseInt(playerInfo.get(5));
+                                                %>
+                                                    <tr>
+                                                        <%
+                                                            if (firstPlayer && role.equals(Role.PLAYER)) {
+                                                                firstPlayer = false;
+                                                        %>
+                                                            <td><%=gameScore%></td>
+                                                        <%
+                                                            } else {
+                                                        %>
+                                                            <td style="border: none;"></td>
+                                                        <%
+                                                            }
+                                                        %>
+                                                        <td><%=userName%></td>
+                                                        <td><%= submissionsCount%></td>
+                                                        <td><%=lastSubmissionTS%></td>
+                                                        <td></td>
+                                                        <td><%=totalScore%></td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid%>"
+                                                                    onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
+                                                                        'This will also delete ALL of his tests, mutants and claimed equivalences ' +
+                                                                        'and might create inconsistencies in the Game.');"
+                                                                    id="<%="remove_player_"+playerId+"_game_"+gid%>"
+                                                                    name="activeGameUserRemoveButton">
+                                                                Remove
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <%
+                                                    }
+                                                %>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </td>
                             </tr>
                     <%

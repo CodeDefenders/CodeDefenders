@@ -131,7 +131,7 @@
                                 </thead>
                                 <tbody>
                                     <%
-                                        if(attackers.isEmpty()){
+                                        if(attackers.isEmpty()) {
                                     %>
                                         <tr>
                                             <td colspan="4" class="text-center">There are no Attackers.</td>
