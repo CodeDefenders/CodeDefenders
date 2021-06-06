@@ -39,6 +39,18 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
+<%!
+    /* Quick fix to get striped tables to display properly without DataTables.
+       Later, the tables on this page should be converted to DataTables. */
+    int row = 1;
+    String oddEven() {
+        return row++ % 2 == 0 ? "even" : "odd";
+    }
+    void resetOddEven() {
+        row = 1;
+    }
+%>
+
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
@@ -59,7 +71,7 @@
         <%
             } else {
         %>
-            <table id="table-multiplayer" class="table">
+            <table id="table-multiplayer" class="table table-v-align-middle table-striped">
                 <thead>
                     <tr>
                         <th>
@@ -84,6 +96,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <% resetOddEven(); %>
                     <%
                         for (MultiplayerGame g : multiplayerGames) {
                             GameClass cut = g.getCUT();
@@ -95,7 +108,7 @@
                                     "return confirm('Are you sure you want to stop this Game?');" : "";
                             int gid = g.getId();
                     %>
-                        <tr id="<%="game_row_"+gid%>">
+                        <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
                             <td>
                                 <div class="form-check">
                                     <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%=gid%>" class="form-check-input"
@@ -286,7 +299,7 @@
         <%
             } else {
         %>
-            <table id="table-melee" class="table">
+            <table id="table-melee" class="table table-v-align-middle table-striped">
                 <thead>
                     <tr>
                         <th>
@@ -310,6 +323,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <% resetOddEven(); %>
                     <%
                         for (MeleeGame g : meleeGames) {
                             GameClass cut = g.getCUT();
@@ -321,7 +335,7 @@
                                     "return confirm('Are you sure you want to stop this Game?');" : "";
                             int gid = g.getId();
                     %>
-                        <tr id="<%="game_row_"+gid%>">
+                        <tr id="<%="game_row_"+gid%>" class="<%=oddEven()%>">
                             <td>
                                 <div class="form-check">
                                     <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" class="form-check-input"

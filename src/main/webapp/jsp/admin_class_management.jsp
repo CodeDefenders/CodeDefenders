@@ -52,7 +52,7 @@
         } else {
     %>
 
-        <table id="tableClasses" class="table table-striped">
+        <table id="tableClasses" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
                     <th>ID</th>

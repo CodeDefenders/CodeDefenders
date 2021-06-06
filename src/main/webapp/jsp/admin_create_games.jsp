@@ -74,7 +74,7 @@
             </div>
         </div>
         <div class="card-body">
-            <table id="table-staged-games" class="table table-responsive"></table>
+            <table id="table-staged-games" class="table table-v-align-middle"></table>
 
             <form class="row g-2 mt-3">
                 <div class="col-auto">
@@ -113,7 +113,7 @@
             </div>
         </div>
         <div class="card-body">
-            <table id="table-users" class="table table-responsive"></table>
+            <table id="table-users" class="table table-v-align-middle"></table>
         </div>
     </div>
 

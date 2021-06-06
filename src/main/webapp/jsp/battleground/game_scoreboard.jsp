@@ -61,7 +61,7 @@
                         <%=testScores.getOrDefault(-1, zeroDummyScore).getTotalScore()%>
                     </span>
                 </div>
-                <table class="scoreboard table table-responsive m-0 text-white">
+                <table class="scoreboard table m-0 text-white">
 
                     <tr class="attacker header">
                         <th>Attackers</th>
@@ -84,18 +84,18 @@
                                     && MutantDAO.getMutantsByGameAndUser(scoreboard.getGameId(), attackerUser.getId()).isEmpty()) {
                                continue;
                             }
+
+                            PlayerScore mutantsScore = mutantScores.getOrDefault(playerId, zeroDummyScore);
+                            PlayerScore testsScore = testScores.getOrDefault(playerId, zeroDummyScore);
                     %>
                         <tr class="attacker">
                             <td><%=attackerUser.getUsername()%></td>
-                            <td><%=mutantScores.getOrDefault(playerId, zeroDummyScore).getQuantity()%></td>
-                            <td><%=mutantScores.getOrDefault(playerId, zeroDummyScore).getMutantKillInformation()%></td>
+                            <td><%=mutantsScore.getQuantity()%></td>
+                            <td><%=mutantsScore.getMutantKillInformation()%></td>
                             <!-- Equivalence duels -->
-                            <td><%=mutantScores.getOrDefault(playerId, zeroDummyScore).getDuelInformation()%></td>
+                            <td><%=mutantsScore.getDuelInformation()%></td>
                             <!-- Total Points -->
-                            <td>
-                                <%=mutantScores.getOrDefault(playerId, zeroDummyScore).getTotalScore() +
-                                   testScores.getOrDefault(playerId, zeroDummyScore).getTotalScore()%>
-                            </td>
+                            <td><%=mutantsScore.getTotalScore() + testsScore.getTotalScore()%></td>
                         </tr>
                     <%
                         }
@@ -134,14 +134,16 @@
                                     && TestDAO.getTestsForGameAndUser(scoreboard.getGameId(), defenderUser.getId()).isEmpty()) {
                                 continue;
                             }
+
+                            PlayerScore testsScore = testScores.getOrDefault(playerId, zeroDummyScore);
                     %>
                         <tr class="defender">
                             <td><%=defenderUser.getUsername()%></td>
-                            <td><%=testScores.getOrDefault(playerId, zeroDummyScore).getQuantity()%></td>
-                            <td><%=testScores.getOrDefault(playerId, zeroDummyScore).getMutantKillInformation()%></td>
+                            <td><%=testsScore.getQuantity()%></td>
+                            <td><%=testsScore.getMutantKillInformation()%></td>
                             <!-- Equivalence duels -->
-                            <td><%=testScores.getOrDefault(playerId, zeroDummyScore).getDuelInformation()%></td>
-                            <td><%=testScores.getOrDefault(playerId, zeroDummyScore).getTotalScore()%></td>
+                            <td><%=testsScore.getDuelInformation()%></td>
+                            <td><%=testsScore.getTotalScore()%></td>
                         </tr>
                     <%
                         }

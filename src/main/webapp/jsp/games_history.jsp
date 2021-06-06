@@ -34,6 +34,10 @@
 <%
     List<UserMultiplayerGameInfo> games = ((List<UserMultiplayerGameInfo>) request.getAttribute("finishedBattlegroundGames"));
     List<UserMeleeGameInfo> meleeGames = ((List<UserMeleeGameInfo>) request.getAttribute("finishedMeleeGames"));
+
+    PlayerScore zeroDummyScore = new PlayerScore(-1);
+    zeroDummyScore.setMutantKillInformation("0/0/0");
+    zeroDummyScore.setDuelInformation("0/0/0");
 %>
 
 <%!
@@ -52,202 +56,162 @@
 
 <div class="container">
 
-<h3>Battlegrounds</h3>
-<table class="table table-striped table-v-align-middle">
-    <thead>
-        <tr>
-            <th style="width: 3rem;"></th>
-            <th style="width: 4rem;">ID</th>
-            <th>Owner</th>
-            <th>Class</th>
-            <th>Attackers</th>
-            <th>Defenders</th>
-            <th>Level</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% resetOddEven(); %>
-
-        <%
-            if (games.isEmpty()) {
-        %>
-
-            <tr class="<%=oddEven()%>">
-                <td colspan="8">Empty multi-player games history.</td>
+    <h3>Battlegrounds</h3>
+    <table class="table table-striped table-v-align-middle">
+        <thead>
+            <tr>
+                <th style="width: 3rem;"></th>
+                <th style="width: 4rem;">ID</th>
+                <th>Owner</th>
+                <th>Class</th>
+                <th>Attackers</th>
+                <th>Defenders</th>
+                <th>Level</th>
+                <th>Actions</th>
             </tr>
+        </thead>
+        <tbody>
+            <% resetOddEven(); %>
 
-        <%
-            } else {
-                for (UserMultiplayerGameInfo g : games) {
-                    int gameId = g.gameId();
-                    List<Player> attackers = g.attackers();
-                    List<Player> defenders = g.defenders();
-                    Map<Integer, PlayerScore> attackerScores = g.getMutantScores();
-                    Map<Integer, PlayerScore> defenderScores = g.getTestScores();
-        %>
+            <%
+                if (games.isEmpty()) {
+            %>
 
-            <tr id="game-<%=gameId%>" class="<%=oddEven()%>">
-                <td id="toggle-game-<%=gameId%>" class="toggle-details">
-                    <i class="toggle-details-icon fa fa-chevron-right"></i>
-                </td>
-                <td><%=gameId%></td>
-                <td><%= g.creatorName()%></td>
-                <td>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gameId%>">
-                        <%=g.cutAlias()%>
-                    </a>
-                    <% pageContext.setAttribute("classId", g.cutId()); %>
-                    <% pageContext.setAttribute("classAlias", g.cutAlias()); %>
-                    <% pageContext.setAttribute("gameId", gameId); %>
-                    <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
-                </td>
-                <td><%=attackers.size()%></td>
-                <td><%=defenders.size()%></td>
-                <td><%=g.gameLevel().getFormattedString()%></td>
-                <td>
-                    <a class="btn btn-sm btn-secondary" id="<%="results_"+gameId%>"
-                       href="<%=request.getContextPath() + Paths.BATTLEGROUND_HISTORY%>?gameId=<%=gameId%>">
-                        View Results
-                    </a>
-                </td>
-            </tr>
+                <tr class="<%=oddEven()%>">
+                    <td colspan="8">Empty multi-player games history.</td>
+                </tr>
 
-            <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                <td colspan="8">
-                    <div class="child-row-wrapper">
-                        <table class="child-row-details">
-                            <thead>
-                                <tr>
-                                    <th class="text-end">Attacker</th>
-                                    <th class="text-end">Mutants</th>
-                                    <th class="text-end">Alive Mutants</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%
-                                    if(attackers.isEmpty()){
-                                %>
+            <%
+                } else {
+                    for (UserMultiplayerGameInfo g : games) {
+                        int gameId = g.gameId();
+                        List<Player> attackers = g.attackers();
+                        List<Player> defenders = g.defenders();
+                        Map<Integer, PlayerScore> attackerScores = g.getMutantScores();
+                        Map<Integer, PlayerScore> defenderScores = g.getTestScores();
+            %>
+
+                <tr id="game-<%=gameId%>" class="<%=oddEven()%>">
+                    <td id="toggle-game-<%=gameId%>" class="toggle-details">
+                        <i class="toggle-details-icon fa fa-chevron-right"></i>
+                    </td>
+                    <td><%=gameId%></td>
+                    <td><%= g.creatorName()%></td>
+                    <td>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gameId%>">
+                            <%=g.cutAlias()%>
+                        </a>
+                        <% pageContext.setAttribute("classId", g.cutId()); %>
+                        <% pageContext.setAttribute("classAlias", g.cutAlias()); %>
+                        <% pageContext.setAttribute("gameId", gameId); %>
+                        <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
+                    </td>
+                    <td><%=attackers.size()%></td>
+                    <td><%=defenders.size()%></td>
+                    <td><%=g.gameLevel().getFormattedString()%></td>
+                    <td>
+                        <a class="btn btn-sm btn-secondary" id="<%="results_"+gameId%>"
+                           href="<%=request.getContextPath() + Paths.BATTLEGROUND_HISTORY%>?gameId=<%=gameId%>">
+                            View Results
+                        </a>
+                    </td>
+                </tr>
+
+                <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+                    <td colspan="8">
+                        <div class="child-row-wrapper">
+                            <table class="child-row-details">
+                                <thead>
                                     <tr>
-                                        <td colspan="4" class="text-center">There are no Attackers.</td>
+                                        <th class="text-end">Attacker</th>
+                                        <th class="text-end">Mutants</th>
+                                        <th class="text-end">Alive Mutants</th>
+                                        <th>Points</th>
                                     </tr>
-                                <%
-                                    } else {
-                                        for (Player attacker : attackers) {
-                                            int playerId = attacker.getId();
-                                            PlayerScore playerScore = attackerScores.get(playerId);
-                                            boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
-                                %>
-                                    <tr>
-                                        <td>
-                                            <%=attacker.getUser().getUsername()%>
-                                        </td>
-                                        <td class="text-end">
-                                            <% if (scoresExists) { %>
-                                                <%=playerScore.getQuantity() %>
-                                            <% } else { %>
-                                                0
-                                            <% } %>
-                                        </td>
-                                        <td class="text-end">
-                                            <% if (scoresExists) { %>
-                                                <%=playerScore.getMutantKillInformation().split("/")[0]%>
-                                            <% } else { %>
-                                                0
-                                            <% } %>
-                                        </td>
-                                        <td class="text-end">
-                                            <% if (scoresExists) { %>
-                                                <%=playerScore.getTotalScore()%>
-                                            <% } else { %>
-                                                0
-                                            <% } %>
-                                        </td>
-                                    </tr>
-                                <%
+                                </thead>
+                                <tbody>
+                                    <%
+                                        if(attackers.isEmpty()){
+                                    %>
+                                        <tr>
+                                            <td colspan="4" class="text-center">There are no Attackers.</td>
+                                        </tr>
+                                    <%
+                                        } else {
+                                            for (Player attacker : attackers) {
+                                                int playerId = attacker.getId();
+                                                PlayerScore playerScore = attackerScores.getOrDefault(playerId, zeroDummyScore);
+                                    %>
+                                        <tr>
+                                            <td><%=attacker.getUser().getUsername()%></td>
+                                            <td class="text-end"><%=playerScore.getQuantity() %></td>
+                                            <td class="text-end"><%=playerScore.getMutantKillInformation().split("/")[0]%></td>
+                                            <td class="text-end"><%=playerScore.getTotalScore()%></td>
+                                        </tr>
+                                    <%
+                                            }
                                         }
-                                    }
-                                %>
-                            </tbody>
-                            <thead>
-                                <tr>
-                                    <th>Defender</th>
-                                    <th class="text-end">Tests</th>
-                                    <th class="text-end">Mutants Killed</th>
-                                    <th class="text-end">Points</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%
-                                    if(defenders.isEmpty()){
-                                %>
+                                    %>
+                                </tbody>
+                                <thead>
                                     <tr>
-                                        <td colspan="4" class="text-center">There are no Defenders.</td>
+                                        <th>Defender</th>
+                                        <th class="text-end">Tests</th>
+                                        <th class="text-end">Mutants Killed</th>
+                                        <th class="text-end">Points</th>
                                     </tr>
-                                <%
-                                    } else {
-                                        for (Player defender : defenders) {
-                                            int playerId = defender.getId();
-                                            PlayerScore playerScore = defenderScores.get(playerId);
-                                            boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
-                                %>
-                                    <tr>
-                                        <td><%=defender.getUser().getUsername()%></td>
-                                        <td class="text-end">
-                                            <% if (scoresExists) { %>
-                                                <%=playerScore.getQuantity() %>
-                                            <% } else { %>
-                                                0
-                                            <% } %>
-                                        </td>
-                                        <td class="text-end">
-                                            <% if (scoresExists) { %>
-                                                <%=playerScore.getMutantKillInformation()%>
-                                            <% } else { %>
-                                                0
-                                            <% } %>
-                                        </td>
-                                        <td class="text-end">
-                                            <% if (scoresExists) { %>
-                                                <%=playerScore.getTotalScore()%>
-                                            <% } else { %>
-                                                0
-                                            <% } %>
-                                        </td>
-                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <%
+                                        if(defenders.isEmpty()){
+                                    %>
+                                        <tr>
+                                            <td colspan="4" class="text-center">There are no Defenders.</td>
+                                        </tr>
+                                    <%
+                                        } else {
+                                            for (Player defender : defenders) {
+                                                int playerId = defender.getId();
+                                                PlayerScore playerScore = defenderScores.getOrDefault(playerId, zeroDummyScore);
+                                    %>
+                                        <tr>
+                                            <td><%=defender.getUser().getUsername()%></td>
+                                            <td class="text-end"><%=playerScore.getQuantity() %></td>
+                                            <td class="text-end"><%=playerScore.getMutantKillInformation()%></td>
+                                            <td class="text-end"><%=playerScore.getTotalScore()%></td>
+                                        </tr>
 
-                                <%
+                                    <%
+                                            }
                                         }
-                                    }
-                                %>
-                            </tbody>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-        <%
+                                    %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            <%
+                    }
                 }
-            }
-        %>
-    </tbody>
-</table>
+            %>
+        </tbody>
+    </table>
 
-<h3 class="mt-4">Melee games</h3>
-<table class="table table-striped table-v-align-middle">
-    <thead>
-        <tr>
-            <th style="width: 3rem;"></th>
-            <th style="width: 4rem;">ID</th>
-            <th>Owner</th>
-            <th>Class</th>
-            <th>Players</th>
-            <th>Level</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% resetOddEven(); %>
+    <h3 class="mt-4">Melee games</h3>
+    <table class="table table-striped table-v-align-middle">
+        <thead>
+            <tr>
+                <th style="width: 3rem;"></th>
+                <th style="width: 4rem;">ID</th>
+                <th>Owner</th>
+                <th>Class</th>
+                <th>Players</th>
+                <th>Level</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% resetOddEven(); %>
 
             <%
                 if (meleeGames.isEmpty()) {

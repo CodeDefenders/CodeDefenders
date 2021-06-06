@@ -51,6 +51,10 @@
 
     boolean gamesJoinable = (boolean) request.getAttribute("gamesJoinable");
     boolean gamesCreatable = (boolean) request.getAttribute("gamesCreatable");
+
+    PlayerScore zeroDummyScore = new PlayerScore(-1);
+    zeroDummyScore.setMutantKillInformation("0/0/0");
+    zeroDummyScore.setDuelInformation("0/0/0");
 %>
 
 <%!
@@ -229,33 +233,13 @@
                                                 } else {
                                                     for (Player attacker : attackers) {
                                                         int playerId = attacker.getId();
-                                                        PlayerScore playerScores = attackerScores.get(playerId);
-                                                        boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
+                                                        PlayerScore playerScores = attackerScores.getOrDefault(playerId, zeroDummyScore);
                                             %>
                                             <tr>
                                                 <td><%=attacker.getUser().getUsername()%></td>
-                                                <td class="text-end">
-                                                    <% if (scoresExists) { %>
-                                                        <%=playerScores.getQuantity() %>
-                                                    <% } else { %>
-                                                        0
-                                                    <% } %>
-                                                </td>
-                                                <td class="text-end">
-                                                    <% if (scoresExists) { %>
-                                                        <%-- Well it is a string ... So split it to get the alive Mutants--%>
-                                                        <%=playerScores.getMutantKillInformation().split("/")[0]%>
-                                                    <% } else { %>
-                                                        0
-                                                    <% } %>
-                                                </td>
-                                                <td class="text-end">
-                                                    <% if (scoresExists) { %>
-                                                        <%=playerScores.getTotalScore()%>
-                                                    <% } else { %>
-                                                        0
-                                                    <% } %>
-                                                </td>
+                                                <td class="text-end"><%=playerScores.getQuantity() %></td>
+                                                <td class="text-end"><%=playerScores.getMutantKillInformation().split("/")[0]%></td>
+                                                <td class="text-end"><%=playerScores.getTotalScore()%></td>
                                             </tr>
                                             <%
                                                     }
@@ -281,32 +265,13 @@
                                                 } else {
                                                     for (Player defender : defenders) {
                                                         int playerId = defender.getId();
-                                                        PlayerScore playerScores = defenderScores.get(playerId);
-                                                        boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
+                                                        PlayerScore playerScores = defenderScores.getOrDefault(playerId, zeroDummyScore);
                                             %>
                                                 <tr>
                                                     <td><%=defender.getUser().getUsername()%></td>
-                                                    <td class="text-end">
-                                                        <% if (scoresExists) { %>
-                                                            <%=playerScores.getQuantity() %>
-                                                        <% } else { %>
-                                                            0
-                                                        <% } %>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <% if (scoresExists) { %>
-                                                            <%=playerScores.getMutantKillInformation()%>
-                                                        <% } else { %>
-                                                            0
-                                                        <% } %>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <% if (scoresExists) { %>
-                                                            <%=playerScores.getTotalScore()%>
-                                                        <% } else { %>
-                                                            0
-                                                        <% } %>
-                                                    </td>
+                                                    <td class="text-end"><%=playerScores.getQuantity() %></td>
+                                                    <td class="text-end"><%=playerScores.getMutantKillInformation()%></td>
+                                                    <td class="text-end"><%=playerScores.getTotalScore()%></td>
                                                 </tr>
                                             <%
                                                     }
@@ -551,35 +516,13 @@
                                                     } else {
                                                         for (Player attacker : attackers) {
                                                             int playerId = attacker.getId();
-                                                            PlayerScore playerScores = attackerScores.get(playerId);
-                                                            boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
+                                                            PlayerScore playerScores = attackerScores.getOrDefault(playerId, zeroDummyScore);
                                                 %>
                                                     <tr>
-                                                        <td>
-                                                            <%=attacker.getUser().getUsername()%>
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <% if (scoresExists) { %>
-                                                                <%=playerScores.getQuantity() %>
-                                                            <% } else { %>
-                                                                0
-                                                            <% } %>
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <% if (scoresExists) { %>
-                                                                <%-- Well it is a string ... So split it to get the alive Mutants--%>
-                                                                <%=playerScores.getMutantKillInformation().split("/")[0]%>
-                                                            <% } else { %>
-                                                                0
-                                                            <% } %>
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <% if (scoresExists) { %>
-                                                                <%=playerScores.getTotalScore()%>
-                                                            <% } else { %>
-                                                                0
-                                                            <% } %>
-                                                        </td>
+                                                        <td><%=attacker.getUser().getUsername()%></td>
+                                                        <td class="text-end"><%=playerScores.getQuantity() %></td>
+                                                        <td class="text-end"><%=playerScores.getMutantKillInformation().split("/")[0]%></td>
+                                                        <td class="text-end"><%=playerScores.getTotalScore()%></td>
                                                     </tr>
                                                 <%
                                                         }
@@ -603,32 +546,13 @@
                                                     } else {
                                                         for (Player defender : defenders) {
                                                             int playerId = defender.getId();
-                                                            PlayerScore playerScores = defenderScores.get(playerId);
-                                                            boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
+                                                            PlayerScore playerScores = defenderScores.getOrDefault(playerId, zeroDummyScore);
                                                 %>
                                                 <tr>
                                                     <td><%=defender.getUser().getUsername()%></td>
-                                                    <td class="text-end">
-                                                        <% if (scoresExists) { %>
-                                                            <%=playerScores.getQuantity() %>
-                                                        <% } else { %>
-                                                            0
-                                                        <% } %>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <% if (scoresExists) { %>
-                                                            <%=playerScores.getMutantKillInformation()%>
-                                                        <% } else { %>
-                                                            0
-                                                        <% } %>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <% if (scoresExists) { %>
-                                                            <%=playerScores.getTotalScore()%>
-                                                        <% } else { %>
-                                                            0
-                                                        <% } %>
-                                                    </td>
+                                                    <td class="text-end"><%=playerScores.getQuantity() %></td>
+                                                    <td class="text-end"><%=playerScores.getMutantKillInformation()%></td>
+                                                    <td class="text-end"><%=playerScores.getTotalScore()%></td>
                                                 </tr>
                                                 <%
                                                         }

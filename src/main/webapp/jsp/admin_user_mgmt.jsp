@@ -25,7 +25,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.util.Constants" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -148,7 +147,7 @@
         <%
             } else {
         %>
-            <table id="tableUsers" class="table table-striped">
+            <table id="tableUsers" class="table table-striped table-v-align-middle">
                 <thead>
                     <tr>
                         <th>ID</th>
