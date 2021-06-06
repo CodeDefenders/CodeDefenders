@@ -72,7 +72,7 @@
             </div>
         </div>
         <div class="card-body">
-            <table id="table-staged-games" class="table table-v-align-middle"></table>
+            <table id="table-staged-games" class="table"></table>
 
             <form class="row g-2 mt-3">
                 <div class="col-auto">
@@ -892,7 +892,7 @@
 
         const createSettingsTable = function (gameSettings) {
             const table = document.createElement('table');
-            table.classList.add('table', 'table-condensed', 'm-0');
+            table.classList.add('table', 'table-sm', 'table-no-last-border', 'm-0');
 
             let tr = table.insertRow();
             tr.insertCell().textContent = 'Game Type';
