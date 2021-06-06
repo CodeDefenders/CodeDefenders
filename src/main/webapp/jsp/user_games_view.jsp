@@ -89,7 +89,7 @@
             <c:choose>
                 <c:when test="${empty activeGames}">
                     <tr class="<%=oddEven()%>">
-                        <td colspan="100" class="text-center"> You are currently not active in any games.</td>
+                        <td colspan="100" class="text-center">You are currently not active in any games.</td>
                     </tr>
                 </c:when>
                 <c:otherwise>
@@ -129,7 +129,7 @@
                                     <form id="adminStartBtn-<%=gameId%>"
                                           action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
                                           method="post">
-                                        <button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=gameId%>"
+                                        <button type="submit" class="btn btn-sm btn-success text-nowrap" id="startGame-<%=gameId%>"
                                                 form="adminStartBtn-<%=gameId%>">
                                             Start battleground game
                                         </button>
@@ -142,9 +142,10 @@
                                             case ATTACKER:
                                                 if (info.gameState() != GameState.CREATED) {
                                 %>
-                                    <a class="btn btn-sm btn-attacker" id="<%="attack-"+gameId%>"
-                                       href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Attack
-                                        in battleground</a>
+                                    <a class="btn btn-sm btn-attacker text-nowrap" id="<%="attack-"+gameId%>"
+                                       href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%=gameId%>">
+                                        Attack in battleground
+                                    </a>
                                 <%
                                                 } else {
                                 %>
@@ -156,7 +157,7 @@
                                       method="post">
                                     <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
                                     <input type="hidden" name="gameId" value="<%=gameId%>">
-                                    <button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+gameId%>" type="submit"
+                                    <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-attacker-"+gameId%>" type="submit"
                                             form="attLeave"
                                             value="Leave">
                                         Leave battleground
@@ -169,9 +170,10 @@
                                             case DEFENDER:
                                                 if (info.gameState() != GameState.CREATED) {
                                 %>
-                                    <a class="btn btn-sm btn-defender" id="<%="defend-"+gameId%>"
-                                       href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Defend
-                                        in battleground</a>
+                                    <a class="btn btn-sm btn-defender text-nowrap" id="<%="defend-"+gameId%>"
+                                       href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gameId%>">
+                                        Defend in battleground
+                                    </a>
                                 <%
                                                 } else {
                                 %>
@@ -183,7 +185,7 @@
                                           method="post">
                                         <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
                                         <input type="hidden" name="gameId" value="<%=gameId%>">
-                                        <button class="btn btn-sm btn-danger" id="<%="leave-defender-"+gameId%>" type="submit"
+                                        <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-defender-"+gameId%>" type="submit"
                                                 form="defLeave"
                                                 value="Leave">
                                             Leave battleground
@@ -196,7 +198,7 @@
                                         case OBSERVER:
                                             if (info.creatorId() == info.userId()) {
                                 %>
-                                    <a class="btn btn-sm btn-primary" id="<%="observe-"+gameId%>"
+                                    <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
                                        href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">
                                         Observe battleground
                                     </a>
@@ -283,7 +285,6 @@
                             </td>
                         </tr>
                         <%
-                            // Closes Instance of UserMultiplayerGameInfo
                             } else if (info instanceof UserMeleeGameInfo) {
                                 List<Player> players = ((UserMeleeGameInfo) info).players();
                         %>
@@ -308,11 +309,10 @@
                                     <%
                                         if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
                                     %>
-                                        <%-- THE CREATOR CAN START A GAME  --%>
                                         <form id="adminStartBtn-<%=gameId%>"
                                               action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>"
                                               method="post">
-                                            <button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=gameId%>"
+                                            <button type="submit" class="btn btn-sm btn-success text-nowrap" id="startGame-<%=gameId%>"
                                                     form="adminStartBtn-<%=gameId%>">
                                                 Start melee game
                                             </button>
@@ -324,8 +324,8 @@
                                             switch (info.userRole()) {
                                                 case OBSERVER:
                                     %>
-                                        <a class="btn btn-sm btn-primary" id="<%="observe-"+gameId%>"
-                                           href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">
+                                        <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
+                                           href="<%= request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%= gameId %>">
                                             Observe melee game
                                         </a>
                                     <%
@@ -334,13 +334,12 @@
                                                     // Game is already running, the user is a player, so she can play
                                                     if (info.gameState() != GameState.CREATED) {
                                     %>
-                                        <a class="btn btn-sm btn-attacker" id="<%="play-"+gameId%>"
-                                           href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play in melee
-                                            game</a>
-                                        <%
+                                        <a class="btn btn-sm btn-attacker text-nowrap" id="<%="play-"+gameId%>"
+                                           href="<%= request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gameId%>">
+                                            Play in melee game
+                                        </a>
+                                    <%
                                                     } else {
-                                        // The game is not running, but the user is a player, she has to wait to the game to start
-                                        // TODO Somehow this is never shown ?
                                     %>
                                         Joined melee game
                                     <%
@@ -349,7 +348,7 @@
                                         <form id="leave" action="<%= request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post">
                                             <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
                                             <input type="hidden" name="gameId" value="<%=gameId%>">
-                                            <button class="btn btn-sm btn-danger" id="<%="leave-"+gameId%>" type="submit" form="leave"
+                                            <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-"+gameId%>" type="submit" form="leave"
                                                     value="Leave">
                                                 Leave Melee Game
                                             </button>
@@ -357,12 +356,6 @@
                                     <%
                                                         }
                                                     }
-                                                    break;
-                                                default: // The user is not yet a player, so she may join the game
-                                    %>
-                                        <a class="btn btn-sm btn-attacker" id="<%="play-"+gameId%>"
-                                           href="<%= request.getContextPath()  + Paths.MELEE_GAME%>?gameId=<%= gameId %>">Play</a>
-                                    <%
                                                     break;
                                             }
                                         }
@@ -397,8 +390,8 @@
                                 </td>
                             </tr>
                     <%
-                            } // Closes instanceof  UserMeleeGameInfo
-                        } // Closses FOR block
+                            }
+                        }
                     %>
                 </c:otherwise>
             </c:choose>
@@ -438,7 +431,7 @@
                 <c:choose>
                     <c:when test="${empty openMultiplayerGames}">
                         <tr class="<%=oddEven()%>">
-                            <td colspan="100" class="text-center"> There are currently no open battleground games.</td>
+                            <td colspan="100" class="text-center">There are currently no open battleground games.</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -590,7 +583,7 @@
                 <c:choose>
                     <c:when test="${empty openMeleeGames}">
                         <tr class="<%=oddEven()%>">
-                            <td colspan="100" class="text-center"> There are currently no open melee games.</td>
+                            <td colspan="100" class="text-center">There are currently no open melee games.</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -623,7 +616,7 @@
                                         <input type="hidden" name="player" value=1>
                                         <%=info.players().size()%>
                                         <button type="submit" id="<%="join-"+info.gameId()%>"
-                                                class="btn btn-primary btn-sm btn-attacker"
+                                                class="btn btn-primary btn-sm"
                                                 value="Join">
                                             Join
                                         </button>

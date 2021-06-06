@@ -189,19 +189,23 @@
     <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
 
         <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between">
+            <div class="card-header d-flex justify-content-between flex-wrap gap-1">
                 Classes
-                <div>
-                    <input type="checkbox" id="toggle-progress-classes" class="btn-check" autocomplete="off">
-                    <label for="toggle-progress-classes" class="btn btn-xs btn-outline-secondary me-2">
-                        Show progress
-                    </label>
-                    <button id="invert-selection-classes" class="btn btn-xs btn-secondary me-2">Invert Selection</button>
+                <div class="d-flex flex-wrap gap-2">
+                    <div>
+                        <input type="checkbox" id="toggle-progress-classes" class="btn-check" autocomplete="off">
+                        <label for="toggle-progress-classes" class="btn btn-xs btn-outline-secondary">
+                            Show progress
+                        </label>
+                    </div>
+                    <button id="invert-selection-classes" class="btn btn-xs btn-secondary">Invert Selection</button>
                     <% if (currentPage == KillmapPage.AVAILABLE) { %>
-                        <button id="queue-selection-classes" class="btn btn-xs btn-primary">Queue Selected</button>
-                        <button id="delete-selection-classes" class="btn btn-xs btn-danger me-2">Delete Selected</button>
+                        <div class="text-nowrap">
+                            <button id="queue-selection-classes" class="btn btn-xs btn-primary">Queue Selected</button>
+                            <button id="delete-selection-classes" class="btn btn-xs btn-danger">Delete Selected Killmaps</button>
+                        </div>
                     <% } else { %>
-                        <button id="cancel-selection-classes" class="btn btn-xs btn-primary me-2">Cancel Selected</button>
+                        <button id="cancel-selection-classes" class="btn btn-xs btn-primary">Cancel Selected</button>
                     <% } %>
                     <input type="search" id="search-classes" class="form-control input-xs" placeholder="Search">
                 </div>
@@ -212,19 +216,23 @@
         </div>
 
         <div class="card">
-            <div class="card-header d-flex justify-content-between">
+            <div class="card-header d-flex justify-content-between flex-wrap gap-1">
                 Games
-                <div>
-                    <input type="checkbox" id="toggle-progress-games" class="btn-check" autocomplete="off">
-                    <label for="toggle-progress-games" class="btn btn-xs btn-outline-secondary me-2">
-                        Show progress
-                    </label>
-                    <button id="invert-selection-games" class="btn btn-xs btn-secondary me-2">Invert Selection</button>
+                <div class="d-flex flex-wrap gap-2">
+                    <div>
+                        <input type="checkbox" id="toggle-progress-games" class="btn-check" autocomplete="off">
+                        <label for="toggle-progress-games" class="btn btn-xs btn-outline-secondary">
+                            Show progress
+                        </label>
+                    </div>
+                    <button id="invert-selection-games" class="btn btn-xs btn-secondary">Invert Selection</button>
                     <% if (currentPage == KillmapPage.AVAILABLE) { %>
-                        <button id="queue-selection-games" class="btn btn-xs btn-primary">Queue Selected</button>
-                        <button id="delete-selection-games" class="btn btn-xs btn-danger me-2">Delete Selected</button>
+                        <div class="text-nowrap">
+                            <button id="queue-selection-games" class="btn btn-xs btn-primary">Queue Selected</button>
+                            <button id="delete-selection-games" class="btn btn-xs btn-danger">Delete Selected Killmaps</button>
+                        </div>
                     <% } else { %>
-                        <button id="cancel-selection-games" class="btn btn-xs btn-primary me-2">Cancel Selected</button>
+                        <button id="cancel-selection-games" class="btn btn-xs btn-primary">Cancel Selected</button>
                     <% } %>
                     <input type="search" id="search-games" class="form-control input-xs" placeholder="Search">
                 </div>

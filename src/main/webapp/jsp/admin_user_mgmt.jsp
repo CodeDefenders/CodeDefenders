@@ -100,7 +100,7 @@
                     <a href="<%=request.getContextPath() + Paths.ADMIN_USERS%>" class="btn btn-secondary">Cancel</a>
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary btn-block" name="submit_edit_user" id="submit_edit_user">Save</button>
+                    <button type="submit" class="btn btn-primary" name="submit_edit_user" id="submit_edit_user">Save</button>
                 </div>
             </div>
 

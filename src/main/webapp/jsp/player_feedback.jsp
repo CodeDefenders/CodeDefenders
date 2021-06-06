@@ -169,7 +169,7 @@
 
                 <% } %>
 
-                            <div class="table-responsive mb-3">
+                            <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>

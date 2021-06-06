@@ -110,7 +110,7 @@
                     <td><%=defenders.size()%></td>
                     <td><%=g.gameLevel().getFormattedString()%></td>
                     <td>
-                        <a class="btn btn-sm btn-secondary" id="<%="results_"+gameId%>"
+                        <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
                            href="<%=request.getContextPath() + Paths.BATTLEGROUND_HISTORY%>?gameId=<%=gameId%>">
                             View Results
                         </a>
@@ -246,7 +246,10 @@
                     <td><%=players.size()%></td>
                     <td><%=g.gameLevel().getFormattedString()%></td>
                     <td>
-                        <a class="btn btn-sm btn-secondary" id="<%="results_"+gameId%>" href="<%=request.getContextPath() + Paths.MELEE_HISTORY%>?gameId=<%= gameId %>">View Results</a>
+                        <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
+                           href="<%=request.getContextPath() + Paths.MELEE_HISTORY%>?gameId=<%=gameId%>">
+                            View Results
+                        </a>
                     </td>
                 </tr>
 

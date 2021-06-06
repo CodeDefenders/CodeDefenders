@@ -29,28 +29,28 @@
     <h3>Battlegrounds</h3>
     <table id="tableMPLeaderboard" class="table table-striped">
         <thead>
-        <tr>
-            <th class="col-sm-2">User</th>
-            <th class="col-sm-1">Mutants</th>
-            <th class="col-sm-2">Attacker Score</th>
-            <th class="col-sm-1">Tests</th>
-            <th class="col-sm-2">Defender Score</th>
-            <th class="col-sm-2">Mutants Killed</th>
-            <th class="col-sm-2">Total Score</th>
-        </tr>
+            <tr>
+                <th>User</th>
+                <th>Mutants</th>
+                <th>Attacker Score</th>
+                <th>Tests</th>
+                <th>Defender Score</th>
+                <th>Mutants Killed</th>
+                <th>Total Score</th>
+            </tr>
         </thead>
         <tbody>
-        <c:forEach var="entry" items="${leaderboardEntries}">
-            <tr>
-                <td>${entry.username}</td>
-                <td>${entry.mutantsSubmitted}</td>
-                <td>${entry.attackerScore}</td>
-                <td>${entry.testsSubmitted}</td>
-                <td>${entry.defenderScore}</td>
-                <td>${entry.mutantsKilled}</td>
-                <td>${entry.totalPoints}</td>
-            </tr>
-        </c:forEach>
+            <c:forEach var="entry" items="${leaderboardEntries}">
+                <tr>
+                    <td>${entry.username}</td>
+                    <td>${entry.mutantsSubmitted}</td>
+                    <td>${entry.attackerScore}</td>
+                    <td>${entry.testsSubmitted}</td>
+                    <td>${entry.defenderScore}</td>
+                    <td>${entry.mutantsKilled}</td>
+                    <td>${entry.totalPoints}</td>
+                </tr>
+            </c:forEach>
         </tbody>
     </table>
 
@@ -70,6 +70,6 @@
 
         })();
     </script>
-
 </div>
+
 <%@ include file="/jsp/footer.jsp" %>

@@ -56,20 +56,18 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between">
+        <div class="card-header d-flex justify-content-between flex-wrap gap-1">
             Staged Games
-            <div class="d-flex gap-2">
-                <button id="select-visible-games" class="btn btn-xs btn-secondary">
-                    Select Visible
-                </button>
-                <button id="deselect-visible-games" class="btn btn-xs btn-secondary">
-                    Deselect Visible
-                </button>
-                <input type="checkbox" id="toggle-hide-players" class="btn-check" autocomplete="off">
-                <label for="toggle-hide-players" class="btn btn-xs btn-outline-secondary">
-                    Hide Players
-                    <i class="fa fa-eye-slash"></i>
-                </label>
+            <div class="d-flex flex-wrap gap-2">
+                <button id="select-visible-games" class="btn btn-xs btn-secondary">Select Visible</button>
+                <button id="deselect-visible-games" class="btn btn-xs btn-secondary">Deselect Visible</button>
+                <div>
+                    <input type="checkbox" id="toggle-hide-players" class="btn-check" autocomplete="off">
+                    <label for="toggle-hide-players" class="btn btn-xs btn-outline-secondary">
+                        Hide Players
+                        <i class="fa fa-eye-slash"></i>
+                    </label>
+                </div>
                 <input type="search" id="search-staged-games" class="form-control input-xs" placeholder="Search">
             </div>
         </div>
@@ -94,21 +92,19 @@
     </div>
 
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between">
+        <div class="card-header d-flex justify-content-between flex-wrap gap-1">
             Unassigned Users
-            <div class="d-flex gap-2">
-                <button id="select-visible-users" class="btn btn-xs btn-secondary">
-                    Select Visible
-                </button>
-                <button id="deselect-visible-users" class="btn btn-xs btn-secondary">
-                    Deselect Visible
-                </button>
-                <input type="checkbox" id="toggle-show-assigned-users" class="btn-check" autocomplete="off">
-                <label for="toggle-show-assigned-users" class="btn btn-xs btn-outline-secondary"
-                       title="Show users that are part of an existing active game.">
-                    Show Assigned Users (Active Games)
-                    <i class="fa fa-eye"></i>
-                </label>
+            <div class="d-flex flex-wrap gap-2">
+                <button id="select-visible-users" class="btn btn-xs btn-secondary">Select Visible</button>
+                <button id="deselect-visible-users" class="btn btn-xs btn-secondary">Deselect Visible</button>
+                <div>
+                    <input type="checkbox" id="toggle-show-assigned-users" class="btn-check" autocomplete="off">
+                    <label for="toggle-show-assigned-users" class="btn btn-xs btn-outline-secondary"
+                           title="Show users that are part of an existing active game.">
+                        Show Assigned Users (Active Games)
+                        <i class="fa fa-eye"></i>
+                    </label>
+                </div>
                 <input type="search" id="search-users" class="form-control input-xs" placeholder="Search">
             </div>
         </div>
@@ -153,7 +149,7 @@
                                     <% } %>
                                 </select>
                                 <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
-                                    <span class="input-group-text position-relative" style="cursor: pointer;"
+                                    <span class="input-group-text position-relative cursor-pointer"
                                           title="Upload a class.">
                                         <a class="stretched-link text-decoration-none"
                                            href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">

@@ -171,7 +171,7 @@
 
                     </c:if>
                 case "KILLED":
-                    return '<button class="ma-view-test-button btn btn-secondary btn-xs">View Killing Test</button>';
+                    return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
                 default:
                     return '';
             }

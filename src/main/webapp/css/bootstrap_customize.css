@@ -118,6 +118,16 @@ bootstrap classes
     border-bottom: none;
 }
 
+
+/* Remove space inside .table-responsive to make it easier to place elements under it without the spacing changing
+   depending on screen width. Use :nth-of-type(n) to increase CSS specificity. */
+.table-responsive:nth-of-type(n) {
+    margin-bottom: 1rem;
+}
+.table-responsive > table {
+    margin-bottom: 0;
+}
+
 /* Extra Bootstrap-Style Util Classes
 ----------------------------------------------------------------------------- */
 
