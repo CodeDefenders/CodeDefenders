@@ -75,8 +75,8 @@
     <table id="my-games" class="table table-striped table-v-align-middle">
         <thead>
             <tr>
-                <th style="width: 3rem;"></th>
-                <th style="width: 4rem;">ID</th>
+                <th></th>
+                <th>ID</th>
                 <th>Creator</th>
                 <th>Class</th>
                 <th>Players</th>
@@ -417,8 +417,8 @@
         <table id="tableOpenBattleground" class="table table-striped table-v-align-middle">
             <thead>
                 <tr>
-                    <th style="width: 3rem;"></th>
-                    <th style="width: 4rem;">ID</th>
+                    <th></th>
+                    <th>ID</th>
                     <th>Creator</th>
                     <th>Class</th>
                     <th>Attackers</th>
@@ -570,8 +570,8 @@
         <table id="tableOpenMelee" class="table table-striped table-v-align-middle">
             <thead>
                 <tr>
-                    <th style="width: 3rem;"></th>
-                    <th style="width: 4rem;">ID</th>
+                    <th></th>
+                    <th>ID</th>
                     <th>Creator</th>
                     <th>Class</th>
                     <th>Players</th>
