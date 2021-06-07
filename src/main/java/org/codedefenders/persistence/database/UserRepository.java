@@ -44,6 +44,9 @@ import com.google.common.cache.LoadingCache;
 import static org.codedefenders.persistence.database.DatabaseUtils.listFromRS;
 import static org.codedefenders.persistence.database.DatabaseUtils.nextFromRS;
 
+/**
+ * Provides methods for querying and updating the {@code users} table in the database.
+ */
 @ApplicationScoped
 public class UserRepository {
     private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
@@ -74,8 +77,8 @@ public class UserRepository {
      * Maps a result set from the {@code users} table to a {@link UserEntity} objet.
      *
      * @param rs The result set to map.
-     * @return
-     * @throws SQLException
+     * @return A fully constructed {@code UserEntity}
+     * @throws SQLException if a {@code SQLException} occurs while accessing the {@code ResultSet}
      */
     public static UserEntity userFromRS(ResultSet rs) throws SQLException {
         int userId = rs.getInt("User_ID");
@@ -90,6 +93,16 @@ public class UserRepository {
         return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap);
     }
 
+    /**
+     * Insert a new {@link UserEntity} into the database.
+     *
+     * <p>The {@code id} of the provided {@code userEntity} has to be 0.
+     *
+     * @param userEntity The new {@code UserEntity} to store in the database.
+     * @return The id of the inserted {@code UserEntity} wrapped in an {@code Optional} or an empty optional if
+     * inserting the {@code userEntity} failed.
+     * @throws IllegalArgumentException if {@code userEntity.id} is greater then 0.
+     */
     // TODO: This gives no information why we couldn't insert the UserEntity into the database
     public Optional<Integer> insert(UserEntity userEntity) {
         if (userEntity.getId() > 0) {
@@ -115,6 +128,12 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Update the given {@code UserEntity} in the database.
+     *
+     * @param userEntity The {@code UserEntity} to update
+     * @return Whether updating the provided {@code UserEntity} was successful or not.
+     */
     public boolean update(UserEntity userEntity) {
         String query = "UPDATE users "
                 + "SET Username = ?, "
@@ -141,6 +160,9 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieve an {@code UserEntity} for a given {@code userId} from the database.
+     */
     public Optional<UserEntity> getUserById(int userId) {
         String query = "SELECT * "
                 + "FROM  users "
@@ -153,6 +175,9 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieve an {@code UserEntity} identified by the given {@code username} from the database.
+     */
     public Optional<UserEntity> getUserByName(String username) {
         String query = "SELECT * "
                 + "FROM  users "
@@ -165,6 +190,9 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieve an {@code UserEntity} identified by the given {@code email} from the database.
+     */
     public Optional<UserEntity> getUserByEmail(String email) {
         String query = "SELECT * "
                 + "FROM  users "
@@ -178,6 +206,9 @@ public class UserRepository {
     }
 
     // TODO: Relocate into `PlayerRepository`?!
+    /**
+     * Retrieve the id of the user which corresponds to the player identified by the given {@code playerId}.
+     */
     public Optional<Integer> getUserIdForPlayerId(int playerId) {
         try {
             return Optional.of(userIdForPlayerIdCache.get(playerId));
@@ -202,6 +233,11 @@ public class UserRepository {
         return Optional.ofNullable(userId);
     }
 
+    /**
+     * Retrieve a list of all users from the database.
+     *
+     * <p>This list includes system users.
+     */
     public List<UserEntity> getUsers() {
         String query = "SELECT * "
                 + "FROM  users;";
@@ -213,6 +249,11 @@ public class UserRepository {
         }
     }
 
+    /**
+     * Retrieve a list of unassigned users from the database.
+     *
+     * <p>This list includes neither system nor inactive users
+     */
     public List<UserEntity> getUnassignedUsers() {
         String query = "SELECT DISTINCT u.* "
                 + "FROM view_valid_users u "
