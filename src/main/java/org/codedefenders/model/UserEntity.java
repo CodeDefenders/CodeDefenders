@@ -34,6 +34,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+/**
+ * Represents a user object in the database.
+ *
+ * @apiNote Should not be used directly in the frontend, instead it should only be used in the database layer
+ * (repositories) and in the business layer (services), but shouldn't be exposed in the API from the later ones.
+ */
 public class UserEntity implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(UserEntity.class);
 

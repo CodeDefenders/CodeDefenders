@@ -21,6 +21,7 @@ package org.codedefenders.service;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
@@ -34,6 +35,9 @@ import org.codedefenders.persistence.database.UserRepository;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+/**
+ * Provides an API for user retrieval and management.
+ */
 @ApplicationScoped
 public class UserService {
 
@@ -46,15 +50,39 @@ public class UserService {
         this.userRepo = userRepo;
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
+                // Entries expire after a relative short time, since User(name) updates are not handled through this
+                // class so we can't invalidate the entries on updates. This could lead to some stale data presented in
+                // places where SimpleUser objects are used.
+                .expireAfterWrite(30, TimeUnit.SECONDS)
                 .maximumSize(200)
                 //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
                 .build();
     }
 
+    /**
+     * Query a {@link User} by its id.
+     *
+     * <p>In most cases where only the username is needed it is probably better to use {@link #getSimpleUserById(int)}.
+     *
+     * @param userId The id of the user to retrieve
+     * @return An {@code Optional} containing the user for the provided {@code userId} or an empty {@code Optional} if
+     * there exists no user for the given {@code userId}
+     */
+    @Nonnull
     public Optional<User> getUserById(int userId) {
         return userRepo.getUserById(userId).map(this::userFromUserEntity);
     }
 
+    /**
+     * Retrieve a {@link SimpleUser} by the given {@code userId}
+     *
+     * @param userId The Id of the user for which to lookup a simple representation.
+     * @return An {@code Optional} containing a simple representation of the user for the provided {@code userId} or an
+     * empty {@code Optional} if there exists no user for the given {@code userId}
+     * @implNote Since {@link SimpleUser} objects only contain limited information, they are cached, so calling this
+     * method multiple times is no big deal.
+     */
+    @Nonnull
     public Optional<SimpleUser> getSimpleUserById(final int userId) {
         try {
             // If the key wasn't in the "easy to compute" group, we need to
@@ -73,6 +101,17 @@ public class UserService {
 
     }
 
+    /**
+     * Lookup the {@code userId} which corresponds to the given {@code playerId} and then retrieve a {@link SimpleUser}
+     * for that {@code userId}.
+     *
+     * @param playerId The Id of the player for which to query a {@link SimpleUser} object.
+     * @return An {@code Optional} containing the user for the provided {@code playerId} or an empty {@code Optional} if
+     * there exists no user for the given {@code playerId}
+     * @see #getSimpleUserById(int)
+     * @apiNote This method will probably be moved from this class to a class which is more involved in game handling/
+     * managing like the {@code GameService} classes.
+     */
     public Optional<SimpleUser> getSimpleUserByPlayerId(final int playerId) {
         return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserByPlayerId);
     }
