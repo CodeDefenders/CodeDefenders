@@ -19,6 +19,8 @@
 
 package org.codedefenders.auth;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -64,22 +66,22 @@ public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
         if (token instanceof UsernamePasswordToken) {
             UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) token;
 
-            UserEntity activeUser = userRepo.getUserByName(usernamePasswordToken.getUsername());
+            Optional<UserEntity> activeUser = userRepo.getUserByName(usernamePasswordToken.getUsername());
 
-            if (activeUser == null) {
+            if (!activeUser.isPresent()) {
                 throw new UnknownAccountException("Username not found or password incorrect.");
             }
 
-            if (settingsRepository.isMailValidationRequired() && !activeUser.isValidated()) {
+            if (settingsRepository.isMailValidationRequired() && !activeUser.get().isValidated()) {
                 throw new LockedAccountException("Account email is not validated.");
             }
 
-            if (!activeUser.isActive()) {
+            if (!activeUser.get().isActive()) {
                 throw new LockedAccountException(
                         "Your account is inactive, login is only possible with an active account.");
             }
 
-            String dbPassword = activeUser.getEncodedPassword();
+            String dbPassword = activeUser.get().getEncodedPassword();
 
             if (UserEntity.passwordMatches(new String(usernamePasswordToken.getPassword()), dbPassword)) {
                 return new SimpleAuthenticationInfo(activeUser, usernamePasswordToken.getPassword(), getName());

@@ -19,6 +19,7 @@ package org.codedefenders.servlets.registration;
  */
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Random;
 
 import javax.inject.Inject;
@@ -77,19 +78,19 @@ public class PasswordServlet extends HttpServlet {
             case "resetPassword":
                 email = request.getParameter("accountEmail");
                 username = request.getParameter("accountUsername");
-                UserEntity u = userRepo.getUserByEmail(email);
-                if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
+                Optional<UserEntity> u = userRepo.getUserByEmail(email);
+                if (!u.isPresent() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
                     messages.add("No user was found for this username and email. Please check if the username and email match.");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
-                    DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
+                    DatabaseAccess.setPasswordResetSecret(u.get().getId(), resetPwSecret);
                     String hostAddr = request.getScheme() + "://" + request.getServerName() + ":"
                             + request.getServerPort() + request.getContextPath();
                     String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-                    String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
+                    String msg = String.format(CHANGE_PASSWORD_MSG, u.get().getUsername(), url,
                             AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
                                     .getIntValue());
-                    if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
+                    if (EmailUtils.sendEmail(u.get().getEmail(), "Code Defenders Password reset", msg)) {
                         messages.add("A password reset link has been sent to " + email);
                     } else {
                         messages.add("Something went wrong. No email could be sent.");
@@ -109,12 +110,14 @@ public class PasswordServlet extends HttpServlet {
                     if (!(validator.validPassword(password))) {
                         messages.add("Password not changed. Make sure it is valid.");
                     } else if (password.equals(confirm)) {
-                        UserEntity user = userRepo.getUserById(userId);
-                        user.setEncodedPassword(UserEntity.encodePassword(password));
-                        if (user.update()) {
-                            DatabaseAccess.setPasswordResetSecret(user.getId(), null);
-                            responseURL = request.getContextPath() + Paths.LOGIN;
-                            messages.add("Successfully changed your password.");
+                        Optional<UserEntity> user = userRepo.getUserById(userId);
+                        if (user.isPresent()) {
+                            user.get().setEncodedPassword(UserEntity.encodePassword(password));
+                            if (user.get().update()) {
+                                DatabaseAccess.setPasswordResetSecret(user.get().getId(), null);
+                                responseURL = request.getContextPath() + Paths.LOGIN;
+                                messages.add("Successfully changed your password.");
+                            }
                         }
                     } else {
                         messages.add("Your two password entries did not match");

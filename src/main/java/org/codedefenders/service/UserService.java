@@ -19,6 +19,7 @@
 
 package org.codedefenders.service;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -49,48 +50,38 @@ public class UserService {
                 .build();
     }
 
-    public User getUserById(int userId) {
-        UserEntity user = userRepo.getUserById(userId);
-        if (user != null) {
-            return userFromUserEntity(user);
-        } else {
-            return null;
-        }
+    public Optional<User> getUserById(int userId) {
+        return userRepo.getUserById(userId).map(this::userFromUserEntity);
     }
 
-    public SimpleUser getSimpleUserById(final int userId) {
+    public Optional<SimpleUser> getSimpleUserById(final int userId) {
         try {
             // If the key wasn't in the "easy to compute" group, we need to
             // do things the hard way.
-            return simpleUserForUserIdCache.get(userId, () -> {
-                UserEntity user = userRepo.getUserById(userId);
-                if (user == null) {
+            return Optional.of(simpleUserForUserIdCache.get(userId, () -> {
+                Optional<UserEntity> user = userRepo.getUserById(userId);
+                if (!user.isPresent()) {
                     throw new Exception();
                 } else {
-                    return simpleUserFromUserEntity(user);
+                    return simpleUserFromUserEntity(user.get());
                 }
-            });
+            }));
         } catch (ExecutionException e) {
-            return null;
+            return Optional.empty();
         }
 
     }
 
-    public SimpleUser getSimpleUserByPlayerId(final int playerId) {
-        Integer userId = userRepo.getUserIdForPlayerId(playerId);
-        if (userId == null) {
-            return null;
-        } else {
-            return getSimpleUserById(userId);
-        }
+    public Optional<SimpleUser> getSimpleUserByPlayerId(final int playerId) {
+        return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserByPlayerId);
     }
 
-    private User userFromUserEntity(UserEntity user) {
+    private User userFromUserEntity(@Nonnull UserEntity user) {
         return new User(user.getId(), user.getUsername(), user.isActive(), user.getEmail(), user.isValidated(),
                 user.getAllowContact(), user.getKeyMap());
     }
 
-    private SimpleUser simpleUserFromUserEntity(UserEntity user) {
+    private SimpleUser simpleUserFromUserEntity(@Nonnull UserEntity user) {
         return new SimpleUser(user.getId(), user.getUsername());
     }
 }

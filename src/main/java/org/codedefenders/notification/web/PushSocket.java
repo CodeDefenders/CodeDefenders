@@ -19,6 +19,7 @@
 package org.codedefenders.notification.web;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -128,18 +129,18 @@ public class PushSocket {
             return;
         }
 
-        UserEntity user = userRepo.getUserById(userId);
+        Optional<UserEntity> user = userRepo.getUserById(userId);
 
-        if (user == null) {
+        if (!user.isPresent()) {
             logger.info("Invalid user id for session " + session);
             session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid user id"));
             return;
         }
 
-        this.user = user;
+        this.user = user.get();
         this.ticket = ticket;
-        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user, ticket);
-        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user, ticket);
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user.get(), ticket);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user.get(), ticket);
         this.session = session;
 
         open = true;

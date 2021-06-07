@@ -189,9 +189,10 @@ public class MultiplayerGameManager extends HttpServlet {
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    UserEntity defender = userRepo.getUserById(userRepo.getUserIdForPlayerId(defenderId));
+                    Optional<UserEntity> defender = userRepo.getUserIdForPlayerId(defenderId).flatMap(userId -> userRepo.getUserById(userId));
 
-                    request.setAttribute("equivDefender", defender);
+                    // TODO
+                    request.setAttribute("equivDefender", defender.get());
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
@@ -280,8 +281,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
                 // Send the notification about the flagged mutant to attacker
-                int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
-                Event event = new Event(-1, game.getId(), mutantOwnerId,
+                Optional<Integer> mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
+                Event event = new Event(-1, game.getId(), mutantOwnerId.orElse(0),
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
                                 + "tests so it was automatically claimed as equivalent.",
@@ -766,10 +767,10 @@ public class MultiplayerGameManager extends HttpServlet {
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
                         int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
-                        int userId = userRepo.getUserIdForPlayerId(defenderId);
+                        Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
                         notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
-                        Event notifDefenderEquiv = new Event(-1, game.getId(), userId, notification,
+                        Event notifDefenderEquiv = new Event(-1, game.getId(), userId.orElse(0), notification,
                                 EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(notifDefenderEquiv);
@@ -1013,9 +1014,9 @@ public class MultiplayerGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                UserEntity mutantOwner = userRepo.getUserById(userRepo.getUserIdForPlayerId(m.getPlayerId()));
+                                Optional<UserEntity> mutantOwner = userRepo.getUserIdForPlayerId(m.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
 
-                                Event event = new Event(-1, gameId, mutantOwner.getId(),
+                                Event event = new Event(-1, gameId, mutantOwner.map(UserEntity::getId).orElse(0),
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));

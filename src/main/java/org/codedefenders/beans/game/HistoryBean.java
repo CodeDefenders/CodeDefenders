@@ -12,6 +12,7 @@ import javax.enterprise.context.RequestScoped;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -60,7 +61,9 @@ public class HistoryBean {
         if (e.getUserId() < 100) {
             return null;
         }
-        String userName = userService.getSimpleUserById(e.getUserId()).getName();
+        String userName = userService.getSimpleUserById(e.getUserId())
+                .map(SimpleUser::getName)
+                .orElse("Unknown user");
         String userMessage = userName + " ";
         String colour = "gray";
         switch (e.getEventType()) {
@@ -225,7 +228,7 @@ public class HistoryBean {
         private final String colour;
 
         public HistoryBeanEventDTO(String userName, Timestamp time, String message, EventType type, String alignment,
-                                   String colour) {
+                String colour) {
             this.userName = userName;
             this.time = time.toLocalDateTime();
             LocalDateTime now = LocalDateTime.now();

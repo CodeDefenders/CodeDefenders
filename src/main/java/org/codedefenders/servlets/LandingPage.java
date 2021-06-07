@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.service.UserService;
@@ -85,9 +86,9 @@ public class LandingPage extends HttpServlet {
 
             Map<Integer, String> gameCreatorNames = availableMultiplayerGames.stream()
                     .collect(Collectors.toMap(AbstractGame::getId,
-                            game -> userService.getSimpleUserById(game.getCreatorId()).getName()
-
-                    ));
+                            game -> userService.getSimpleUserById(game.getCreatorId())
+                                    .map(SimpleUser::getName)
+                                    .orElse("Unknown user")));
 
             request.setAttribute("gameCreatorNames", gameCreatorNames);
 

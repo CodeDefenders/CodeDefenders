@@ -21,6 +21,7 @@ package org.codedefenders.game.multiplayer;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
@@ -326,14 +327,14 @@ public class MeleeGame extends AbstractGame {
     }
 
     protected boolean canJoinGame(int userId) {
-        return !requiresValidation || userRepository.getUserById(userId).isValidated();
+        return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     public boolean addPlayer(int userId) {
         if (canJoinGame(userId) && addPlayerForce(userId, Role.PLAYER)) {
-            UserEntity u = userRepository.getUserById(userId);
+            Optional<UserEntity> u = userRepository.getUserById(userId);
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event e = new Event(-1, id, userId, u.getUsername() + " joined melee game", EventType.PLAYER_JOINED,
+            Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined melee game", EventType.PLAYER_JOINED,
                     EventStatus.GAME, timestamp);
             eventDAO.insert(e);
             Event notif = new Event(-1, id, userId, "You joined melee game", EventType.PLAYER_JOINED, EventStatus.NEW,

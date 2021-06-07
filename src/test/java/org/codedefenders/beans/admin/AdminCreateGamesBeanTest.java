@@ -224,7 +224,7 @@ public class AdminCreateGamesBeanTest {
 
         PowerMockito.when(MultiplayerGameDAO.storeMultiplayerGame(Matchers.any(MultiplayerGame.class))).thenReturn(0);
         PowerMockito.when(GameDAO.addPlayerToGame(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(Role.class))).thenReturn(true);
-        PowerMockito.when(userRepo.getUserById(Matchers.anyInt())).thenReturn(new UserEntity(""));
+        PowerMockito.when(userRepo.getUserById(Matchers.anyInt())).thenReturn(Optional.of(new UserEntity("")));
         adminCreateGamesBean = PowerMockito.spy(adminCreateGamesBean);
 
         adminCreateGamesBean.createStagedGames(stagedGames);

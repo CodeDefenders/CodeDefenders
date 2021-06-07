@@ -248,7 +248,7 @@ public class DatabaseTest {
         assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
         int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
         assertTrue(playerID > 0);
-        assertEquals(userRepo.getUserIdForPlayerId(playerID).intValue(), user1.getId());
+        assertEquals(userRepo.getUserIdForPlayerId(playerID).get().intValue(), user1.getId());
         assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
         assertEquals(PlayerDAO.getPlayerPoints(playerID), 0);
         PlayerDAO.increasePlayerPoints(13, playerID);

@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -43,6 +44,7 @@ import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.game.AbstractGame;
@@ -83,7 +85,9 @@ public class AdminMonitorGames extends HttpServlet {
 
         Map<Integer, String> multiplayerGameCreatorNames = multiplayerGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
-                        game -> userService.getSimpleUserById(game.getCreatorId()).getName()));
+                        game -> userService.getSimpleUserById(game.getCreatorId())
+                                .map(SimpleUser::getName)
+                                .orElse("Unknown user")));
 
         Map<Integer, List<List<String>>> multiplayerPlayersInf = multiplayerGames.stream()
                 .map(AbstractGame::getId)
@@ -94,7 +98,7 @@ public class AdminMonitorGames extends HttpServlet {
                 .map(list -> list.get(0))
                 .map(Integer::parseInt)
                 .distinct()
-                .collect(Collectors.toMap(pid -> pid, pid -> userRepo.getUserIdForPlayerId(pid)));
+                .collect(Collectors.toMap(pid -> pid, pid -> userRepo.getUserIdForPlayerId(pid).orElse(0)));
 
         request.setAttribute("multiplayerGames", multiplayerGames);
         request.setAttribute("multiplayerGameCreatorNames", multiplayerGameCreatorNames);
@@ -104,7 +108,9 @@ public class AdminMonitorGames extends HttpServlet {
         List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
         Map<Integer, String> meleeGameCreatorNames = meleeGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
-                        game -> userService.getSimpleUserById(game.getCreatorId()).getName()));
+                        game -> userService.getSimpleUserById(game.getCreatorId())
+                                .map(SimpleUser::getName)
+                                .orElse("Unknown user")));
 
         Map<Integer, List<List<String>>> meleePlayersInfoForGame = meleeGames.stream()
                 .map(AbstractGame::getId)
@@ -115,7 +121,7 @@ public class AdminMonitorGames extends HttpServlet {
                 .map(list -> list.get(0))
                 .map(Integer::parseInt)
                 .distinct()
-                .collect(Collectors.toMap(pid -> pid, pid -> userRepo.getUserIdForPlayerId(pid)));
+                .collect(Collectors.toMap(pid -> pid, pid -> userRepo.getUserIdForPlayerId(pid).orElse(0)));
 
         request.setAttribute("meleeGames", meleeGames);
         request.setAttribute("meleeGameCreatorNames", meleeGameCreatorNames);
@@ -147,20 +153,20 @@ public class AdminMonitorGames extends HttpServlet {
         if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
             int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
             int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
-            int userId = userRepo.getUserIdForPlayerId(playerToRemoveId);
+            Optional<Integer> userId = userRepo.getUserIdForPlayerId(playerToRemoveId);
             if (!deletePlayer(playerToRemoveId, gameToRemoveFromId)) {
                 messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
-            } else if (switchUser) {
+            } else if (switchUser && userId.isPresent()) {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
                         ? Role.DEFENDER : Role.ATTACKER;
                 game = GameDAO.getGame(gameToRemoveFromId);
                 if (game != null) {
                     game.setEventDAO(eventDAO);
                     game.setUserRepository(userRepo);
-                    if (!game.addPlayer(userId, newRole)) {
-                        messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
+                    if (!game.addPlayer(userId.get(), newRole)) {
+                        messages.add("Inserting user " + userId.get() + " failed! \n Please check the logs!");
                     } else {
-                        messages.add("The game with id " + gameToRemoveFromId + " doesn't exist! Could not switch user" 
+                        messages.add("The game with id " + gameToRemoveFromId + " doesn't exist! Could not switch user"
                                 + " role. \n Please check the logs!");
                     }
                 }

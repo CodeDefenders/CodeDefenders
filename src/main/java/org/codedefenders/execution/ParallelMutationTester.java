@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -83,7 +84,11 @@ public class ParallelMutationTester extends MutationTester //
         List<Mutant> killedMutants = new ArrayList<Mutant>();
 
         // Acquire and release the connection
-        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(test.getPlayerId()));
+        Optional<UserEntity> u =userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
+        if (!u.isPresent()) {
+            // TODO
+            throw new RuntimeException();
+        }
 
         // Fork and Join parallelization
         Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
@@ -170,8 +175,8 @@ public class ParallelMutationTester extends MutationTester //
                 messages.add(TEST_KILLED_ZERO_MESSAGE);
             }
         } else {
-            Event notif = new Event(-1, game.getId(), u.getId(),
-                    u.getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
+            Event notif = new Event(-1, game.getId(), u.get().getId(),
+                    u.get().getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
                     EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
             eventDAO.insert(notif);
             if (killed == 1) {
@@ -200,7 +205,11 @@ public class ParallelMutationTester extends MutationTester //
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
-        UserEntity u = userRepo.getUserById(userRepo.getUserIdForPlayerId(mutant.getPlayerId()));
+        Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutant.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
+        if (!u.isPresent()) {
+            // TODO
+            throw new RuntimeException();
+        }
 
         final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
         for (Test test : tests) {
@@ -268,8 +277,8 @@ public class ParallelMutationTester extends MutationTester //
                         test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
                     }
 
-                    Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()),
-                            u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
+                    Event notif = new Event(-1, game.getId(), userRepo.getUserIdForPlayerId(test.getPlayerId()).orElse(0),
+                            u.get().getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
                             EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notif);
 
@@ -309,7 +318,7 @@ public class ParallelMutationTester extends MutationTester //
         } else {
             messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests));
         }
-        Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
+        Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
     }

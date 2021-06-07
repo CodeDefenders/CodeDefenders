@@ -23,16 +23,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 
 public class DatabaseUtils {
 
-    public static <T> T nextFromRS(ResultSet rs, ResultSetHandler<T> handler) throws SQLException {
+    public static <T> Optional<T> nextFromRS(ResultSet rs, ResultSetHandler<T> handler) throws SQLException {
         if (rs.next()) {
-            return handler.handle(rs);
+            return Optional.ofNullable(handler.handle(rs));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 

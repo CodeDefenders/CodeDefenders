@@ -21,6 +21,7 @@ package org.codedefenders.game.multiplayer;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameDAO;
@@ -299,11 +300,11 @@ public class MultiplayerGame extends AbstractGame {
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
-        UserEntity u = userRepository.getUserById(userId);
+        Optional<UserEntity> u = userRepository.getUserById(userId);
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role, et, EventStatus.GAME,
+        Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined the game as " + role, et, EventStatus.GAME,
                 timestamp);
         eventDAO.insert(e);
 
@@ -321,7 +322,7 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     private boolean canJoinGame(int userId) {
-        return !requiresValidation || userRepository.getUserById(userId).isValidated();
+        return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override

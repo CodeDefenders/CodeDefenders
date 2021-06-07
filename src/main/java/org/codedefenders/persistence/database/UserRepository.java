@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -73,7 +74,7 @@ public class UserRepository {
     }
 
     // TODO: This gives no information why we couldn't insert the UserEntity into the database
-    public Integer insert(UserEntity userEntity) {
+    public Optional<Integer> insert(UserEntity userEntity) {
         if (userEntity.getId() > 0) {
             // TODO: Should we allow this?
             throw new IllegalArgumentException("Can't insert user with id > 0");
@@ -94,7 +95,7 @@ public class UserRepository {
         } catch (SQLException e) {
             logger.error("SQLException while trying to insert new User", e);
         }
-        return null;
+        return Optional.empty();
     }
 
     public boolean update(UserEntity userEntity) {
@@ -123,7 +124,7 @@ public class UserRepository {
         return false;
     }
 
-    public UserEntity getUserById(int userId) {
+    public Optional<UserEntity> getUserById(int userId) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE User_ID = ?;";
@@ -131,11 +132,11 @@ public class UserRepository {
             return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
         } catch (SQLException e) {
             logger.error("SQLException while loading user", e);
-            return null;
+            return Optional.empty();
         }
     }
 
-    public UserEntity getUserByName(String username) {
+    public Optional<UserEntity> getUserByName(String username) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE Username = ?;";
@@ -143,11 +144,11 @@ public class UserRepository {
             return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), username);
         } catch (SQLException e) {
             logger.error("SQLException", e);
-            return null;
+            return Optional.empty();
         }
     }
 
-    public UserEntity getUserByEmail(String email) {
+    public Optional<UserEntity> getUserByEmail(String email) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE Email = ?;";
@@ -155,12 +156,12 @@ public class UserRepository {
             return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
         } catch (SQLException e) {
             logger.error("SQLException", e);
-            return null;
+            return Optional.empty();
         }
     }
 
     // TODO: Relocate into `PlayerRepository`?!
-    public Integer getUserIdForPlayerId(int playerId) {
+    public Optional<Integer> getUserIdForPlayerId(int playerId) {
         String query = "SELECT users.User_ID AS User_ID "
                 + "FROM users, players "
                 + "WHERE players.User_ID = users.User_ID "
@@ -169,7 +170,7 @@ public class UserRepository {
         try {
             // If the key wasn't in the "easy to compute" group, we need to
             // do things the hard way.
-            return userIdForPlayerIdCache.get(playerId, () -> {
+            return Optional.of(userIdForPlayerIdCache.get(playerId, () -> {
                 Integer userId;
                 userId = connectionFactory.getQueryRunner().query(query, new ScalarHandler<>(), playerId);
                 if (userId == null) {
@@ -177,10 +178,10 @@ public class UserRepository {
                 } else {
                     return userId;
                 }
-            });
+            }));
         } catch (ExecutionException e) {
             logger.error("SQLException", e);
-            return null;
+            return Optional.empty();
         }
     }
 

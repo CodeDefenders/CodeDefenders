@@ -199,9 +199,9 @@ public class MeleeGameManager extends HttpServlet {
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    UserEntity defender = userRepo.getUserById(userRepo.getUserIdForPlayerId(defenderId));
+                    Optional<UserEntity> defender = userRepo.getUserIdForPlayerId(defenderId).flatMap(optUserId -> userRepo.getUserById(optUserId));
                     // TODO This should be a better name
-                    request.setAttribute("equivDefender", defender);
+                    request.setAttribute("equivDefender", defender.get());
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
@@ -222,11 +222,17 @@ public class MeleeGameManager extends HttpServlet {
         // We need to compute/set this here for the `player_view.jsp`.
         List<Test> playerTests = game.getTests()
                 .stream()
-                .filter(t -> userRepo.getUserIdForPlayerId(t.getPlayerId()) == userId)
+                .filter(t -> {
+                    Optional<Integer> optUserId = userRepo.getUserIdForPlayerId(t.getPlayerId());
+                    return optUserId.isPresent() && optUserId.get() == userId;
+                })
                 .collect(Collectors.toList());
         List<Test> enemyTests = game.getTests()
                 .stream()
-                .filter(t -> userRepo.getUserIdForPlayerId(t.getPlayerId()) != userId)
+                .filter(t -> {
+                    Optional<Integer> optUserId = userRepo.getUserIdForPlayerId(t.getPlayerId());
+                    return optUserId.isPresent() && optUserId.get() != userId;
+                })
                 .collect(Collectors.toList());
         request.setAttribute("playerTests", playerTests);
         request.setAttribute("enemyTests", enemyTests);
@@ -254,11 +260,11 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         final String action = ServletUtils.formType(request);
-        final UserEntity user = userRepo.getUserById(login.getUserId());
+        final Optional<UserEntity> user = userRepo.getUserById(login.getUserId());
 
         final int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
-        if (playerId == -1) {
+        if (playerId == -1 || !user.isPresent()) {
             // Something odd with the registration - TODO
             logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
             Redirect.redirectBack(request, response);
@@ -267,12 +273,12 @@ public class MeleeGameManager extends HttpServlet {
 
         switch (action) {
             case "createMutant": {
-                createMutant(request, response, user, game, playerId);
+                createMutant(request, response, user.get(), game, playerId);
                 triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
-                createTest(request, response, user, game);
+                createTest(request, response, user.get(), game);
                 // After a test is submitted, there's the chance that one or more mutants
                 // already survived enough tests
                 triggerAutomaticMutantEquivalenceForGame(game);
@@ -316,7 +322,7 @@ public class MeleeGameManager extends HttpServlet {
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
                 // Send the notification about the flagged mutant to attacker
-                int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
+                int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
                 Event event = new Event(-1, game.getId(), mutantOwnerId,
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
@@ -677,7 +683,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         messages.add(MUTANT_COMPILED_MESSAGE);
-        final String notificationMsg = userRepo.getUserById(user.getId()).getUsername() + " created a mutant.";
+        final String notificationMsg = userRepo.getUserById(user.getId()).map(UserEntity::getUsername).orElse("") + " created a mutant.";
         // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
         Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
@@ -744,10 +750,10 @@ public class MeleeGameManager extends HttpServlet {
                     m.kill(Mutant.Equivalence.DECLARED_YES);
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
-                    UserEntity eventUser = userRepo.getUserById(login.getUserId());
+                    Optional<UserEntity> eventUser = userRepo.getUserById(login.getUserId());
 
                     Event notifEquiv = new Event(-1, game.getId(), login.getUserId(),
-                            eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.",
+                            eventUser.map(UserEntity::getUsername).orElse("") + " accepts that their mutant " + m.getId() + " is equivalent.",
                             EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notifEquiv);
@@ -890,7 +896,7 @@ public class MeleeGameManager extends HttpServlet {
                     // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points
                     // added.
                     newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
-                    final String message = userRepo.getUserById(login.getUserId()).getUsername() + " killed mutant "
+                    final String message = userRepo.getUserById(login.getUserId()).map(UserEntity::getUsername).orElse("") + " killed mutant "
                             + mPending.getId() + " in an equivalence duel.";
                     Event notif = new Event(-1, gameId, login.getUserId(), message,
                             EventType.PLAYER_WON_EQUIVALENT_DUEL, EventStatus.GAME,
@@ -914,7 +920,7 @@ public class MeleeGameManager extends HttpServlet {
                         logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
                                 newTest.getId(), mPending.getId());
                         mPending.kill(ASSUMED_YES);
-                        final String message = userRepo.getUserById(login.getUserId()).getUsername()
+                        final String message = userRepo.getUserById(login.getUserId()).map(UserEntity::getUsername).orElse("")
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
                         Event notif = new Event(-1, gameId, login.getUserId(), message,
                                 EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
@@ -1003,9 +1009,9 @@ public class MeleeGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                UserEntity mutantOwner = userRepo.getUserById(userRepo.getUserIdForPlayerId(m.getPlayerId()));
+                                Optional<UserEntity> mutantOwner = userRepo.getUserIdForPlayerId(m.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
 
-                                Event event = new Event(-1, gameId, mutantOwner.getId(),
+                                Event event = new Event(-1, gameId, mutantOwner.map(UserEntity::getId).orElse(0),
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));
@@ -1037,7 +1043,7 @@ public class MeleeGameManager extends HttpServlet {
 
         int nClaimed = claimedMutants.get();
         if (nClaimed > 0) {
-            String flaggingChatMessage = userRepo.getUserById(login.getUserId()).getUsername() + " flagged " + nClaimed
+            String flaggingChatMessage = userRepo.getUserById(login.getUserId()).map(UserEntity::getUsername).orElse("") + " flagged " + nClaimed
                     + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
                     EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,

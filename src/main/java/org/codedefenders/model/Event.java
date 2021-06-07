@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
@@ -107,10 +108,10 @@ public class Event {
         }
 
         if (procMessage.contains("@event_user")) {
-            SimpleUser user = userService.getSimpleUserById(userId);
+            Optional<SimpleUser> user = userService.getSimpleUserById(userId);
 
-            String userLabel = (user == null) ? "Unknown"
-                    : (user.getName().equals(currentUserName)) ? "You" : user.getName();
+            String userLabel = (!user.isPresent()) ? "Unknown"
+                    : (user.get().getName().equals(currentUserName)) ? "You" : user.get().getName();
 
             String roleClass;
             switch (role) {

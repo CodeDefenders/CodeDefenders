@@ -84,7 +84,7 @@ public class AdminUserManagement extends HttpServlet {
         UserEntity user = null;
         String editUser = request.getParameter("editUser");
         if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
-            user = userRepo.getUserById(Integer.parseInt(editUser));
+            user = userRepo.getUserById(Integer.parseInt(editUser)).get();
         }
 
         request.setAttribute("editedUser", user);
@@ -158,12 +158,12 @@ public class AdminUserManagement extends HttpServlet {
     }
 
     private boolean setUserInactive(int userId) {
-        final UserEntity user = userRepo.getUserById(userId);
-        if (user == null) {
+        final Optional<UserEntity> user = userRepo.getUserById(userId);
+        if (!user.isPresent()) {
             return false;
         }
-        user.setActive(false);
-        return user.update();
+        user.get().setActive(false);
+        return user.get().update();
 
     }
 
@@ -171,10 +171,11 @@ public class AdminUserManagement extends HttpServlet {
 
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
-        UserEntity u = userRepo.getUserById(userId);
-        if (u == null) {
+        Optional<UserEntity> user = userRepo.getUserById(userId);
+        if (!user.isPresent()) {
             return "Error. User " + userId + " cannot be retrieved from database.";
         }
+        UserEntity u = user.get();
 
         String name = request.getParameter("name");
         String email = request.getParameter("email");
@@ -318,9 +319,10 @@ public class AdminUserManagement extends HttpServlet {
 
         if (AdminDAO.setUserPassword(uid, UserEntity.encodePassword(newPassword))) {
             if (AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue()) {
-                UserEntity u = userRepo.getUserById(uid);
-                String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
-                EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
+                userRepo.getUserById(uid).ifPresent(user -> {
+                    String msg = String.format(PASSWORD_RESET_MSG, user.getUsername(), newPassword);
+                    EmailUtils.sendEmail(user.getEmail(), "Code Defenders Password reset", msg);
+                });
             }
             return "User " + uid + "'s password set to: " + newPassword;
         }
