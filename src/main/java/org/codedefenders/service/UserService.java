@@ -119,6 +119,7 @@ public class UserService {
      * managing like the {@code GameService} classes.
      * @see #getSimpleUserById(int)
      */
+    // TODO: Relocate into sth like `PlayerService` or the `GameService`s
     public Optional<SimpleUser> getSimpleUserByPlayerId(final int playerId) {
         return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserByPlayerId);
     }

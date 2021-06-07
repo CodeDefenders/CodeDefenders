@@ -93,68 +93,15 @@ public class UserEntity implements Serializable {
             id = result.get();
             return true;
         }
-
-        /*
-        // TODO Phil 12/12/18: Update this like Test#insert() to use DAO insert method but update identifier
-        DatabaseValue[] valueList;
-        String query;
-        Connection conn = DB.getConnection();
-
-        if (id <= 0) {
-            query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
-            valueList = new DatabaseValue[]{DatabaseValue.of(username),
-                    DatabaseValue.of(encodedPassword),
-                    DatabaseValue.of(email)};
-        } else {
-            query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
-            valueList = new DatabaseValue[]{DatabaseValue.of(id),
-                    DatabaseValue.of(username),
-                    DatabaseValue.of(encodedPassword),
-                    DatabaseValue.of(email)};
-        }
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        int key = DB.executeUpdateGetKeys(stmt, conn);
-        if (key != -1) {
-            this.id = key;
-            return true;
-        } else {
-            return false;
-        }
-         */
     }
 
     /**
      * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#update(UserEntity)} instead.
      */
+    @Deprecated
     public boolean update() {
+        // TODO: Remove workaround
         return CDI.current().select(UserRepository.class).get().update(this);
-        /*
-        DatabaseValue[] valueList;
-        Connection conn = DB.getConnection();
-
-        String query = String.join("\n",
-                "UPDATE users",
-                "SET Username = ?,",
-                "  Email = ?,",
-                "  Password = ?,",
-                "  Validated = ?,",
-                "  Active = ?,",
-                "  AllowContact = ?,",
-                "  KeyMap = ?",
-                "WHERE User_ID = ?;");
-        valueList = new DatabaseValue[]{
-                DatabaseValue.of(username),
-                DatabaseValue.of(email),
-                DatabaseValue.of(encodedPassword),
-                DatabaseValue.of(validated),
-                DatabaseValue.of(active),
-                DatabaseValue.of(allowContact),
-                DatabaseValue.of(keyMap.name()),
-                DatabaseValue.of(id)
-        };
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        return DB.executeUpdate(stmt, conn);
-         */
     }
 
     public boolean isValidated() {
