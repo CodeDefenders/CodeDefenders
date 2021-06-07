@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.codedefenders.DatabaseTest;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.rules.DatabaseRule;
 import org.junit.Before;
@@ -132,7 +133,9 @@ public class UserRepositoryIT {
         Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
 
-        assertFalse(userRepo.insert(user).isPresent());
+        assertThrows(UncheckedSQLException.class, () -> {
+            userRepo.insert(user);
+        });
     }
 
     @Test
@@ -176,7 +179,7 @@ public class UserRepositoryIT {
 
         user2.setEmail(email1);
 
-        assertFalse(userRepo.update(user2));
+        assertThrows(UncheckedSQLException.class, () -> userRepo.update(user2));
     }
 
     @Test
