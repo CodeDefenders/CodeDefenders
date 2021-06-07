@@ -30,47 +30,8 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <form id="changeSettings" name="changeSettings"
-          class="mx-auto" style="max-width: 60rem;"
-          action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post"
-          onsubmit="return validateForm()">
-        <script>
-            function validateForm() {
-                var form = document.forms['changeSettings'];
-                var mailEnabled = form["<%=AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED.name()%>"].checked;
-                var address = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS.name()%>"];
-                var password = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD.name()%>"];
-                var smtpHost = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST.name()%>"];
-                var smtpPort = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT.name()%>"];
-
-                if (mailEnabled) {
-                    if (address.value === "") {
-                        address.parentElement.style.border = "1px solid red";
-                    } else {
-                        address.parentElement.style.border = '0px';
-                    }
-
-                    if (smtpHost.value === "") {
-                        smtpHost.parentElement.style.border = "1px solid red";
-                    } else {
-                        smtpHost.parentElement.style.border ='0px';
-                    }
-
-                    if (smtpPort.value === "") {
-                        smtpPort.parentElement.style.border = "1px solid red";
-                    } else {
-                        smtpPort.parentElement.style.border ='0px';
-                    }
-
-                    return address.value !== "" && smtpHost.value !== "" && smtpPort.value !== 0;
-                } else {
-                    address.parentElement.style.border = '0px';
-                    password.parentElement.style.border ='0px';
-                    smtpHost.parentElement.style.border ='0px';
-                    smtpPort.parentElement.style.border ='0px';
-                    return true;
-                }
-            }
-        </script>
+          class="needs-validation mx-auto" style="max-width: 60rem;"
+          action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post">
         <input type="hidden" name="formType" value="saveSettings">
 
         <%
@@ -103,7 +64,8 @@
                 <div class="col-sm-8 mb-3">
                     <textarea class="form-control" rows="3"
                               name="<%=setting.getName().name()%>"
-                              id="<%=setting.getName().name()%>"><%=setting.getStringValue()%></textarea>
+                              id="<%=setting.getName().name()%>"
+                              autocomplete="off"><%=setting.getStringValue()%></textarea>
                 </div>
         <%
                         } else {
@@ -113,8 +75,14 @@
                            class="form-control"
                            name="<%=setting.getName().name()%>"
                            id="<%=setting.getName().name()%>"
-                            <%=setting.getName().name().startsWith("EMAIL_") ? "" : "required"%>
-                           value="<%=setting.getStringValue()%>">
+                           value="<%=setting.getStringValue()%>"
+                           autocomplete="off">
+                    <% if (setting.getName().name().startsWith("EMAIL")) { %>
+                        <div class="invalid-feedback">
+                            This setting is required for sending emails.
+                            Please provide a valid value, or disable emails.
+                        </div>
+                    <% } %>
                 </div>
         <%
                         }
@@ -127,7 +95,8 @@
                                class="form-check-input"
                                id="<%=setting.getName().name()%>"
                                name="<%=setting.getName().name()%>"
-                               <%=setting.getBoolValue() ? "checked" : ""%>>
+                               <%=setting.getBoolValue() ? "checked" : ""%>
+                               autocomplete="off">
                         <label class="form-check-label" for="<%=setting.getName().name()%>">
                             <%=readableName%>
                         </label>
@@ -142,7 +111,14 @@
                            class="form-control"
                            name="<%=setting.getName().name()%>"
                            id="<%=setting.getName().name()%>"
-                           value="<%=setting.getIntValue()%>">
+                           value="<%=setting.getIntValue()%>"
+                           autocomplete="off">
+                    <% if (setting.getName().name().startsWith("EMAIL")) { %>
+                        <div class="invalid-feedback">
+                            This setting is required for sending emails.
+                            Please provide a valid value, or disable emails.
+                        </div>
+                    <% } %>
                 </div>
         <%
                         break;
@@ -162,5 +138,31 @@
             </div>
         </div>
     </form>
+
+    <script>
+        $(document).ready(() => {
+            const emailSwitch = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED.name()%>');
+            const otherEmailInputs = [
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS.name()%>'),
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD.name()%>'),
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST.name()%>'),
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT.name()%>')
+            ];
+
+            const validateEmailSettings = function () {
+                for (const emailInput of otherEmailInputs) {
+                    const valid = !emailSwitch.checked || emailInput.value.trim().length > 0;
+                    emailInput.setCustomValidity(valid ? '' : 'value-missing');
+                }
+            };
+
+            emailSwitch.addEventListener('change', validateEmailSettings);
+            for (const emailInput of otherEmailInputs) {
+                emailInput.addEventListener('input', validateEmailSettings);
+            }
+
+            validateEmailSettings();
+        });
+    </script>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

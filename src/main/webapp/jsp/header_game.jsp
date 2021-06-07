@@ -92,6 +92,11 @@
                 <i class="fa fa-question-circle"></i>
             </button>
         </div>
+        <t:modal title="Scoring System" id="scoringModal">
+            <jsp:attribute name="content">
+                <jsp:include page="/jsp/scoring_system.jsp"/>
+            </jsp:attribute>
+        </t:modal>
 
         <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnHistory"
                 data-bs-toggle="modal" data-bs-target="#history">
@@ -115,10 +120,4 @@
         <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
 
         <t:game_chat/>
-
-        <t:modal title="Scoring System" id="scoringModal">
-            <jsp:attribute name="content">
-                <jsp:include page="/jsp/scoring_system.jsp"/>
-            </jsp:attribute>
-        </t:modal>
     </div>

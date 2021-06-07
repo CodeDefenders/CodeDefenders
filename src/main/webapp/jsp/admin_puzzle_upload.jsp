@@ -33,7 +33,7 @@
         <input type="hidden" name="formType" value="uploadPuzzles">
 
         <div class="row g-3">
-            <div class="col-auto flex-grow-1">
+            <div class="col flex-grow-1">
                 <input class="form-control" type="file" id="fileUploadPuzzles" name="fileUploadPuzzles" accept=".zip">
             </div>
             <div class="col-auto">

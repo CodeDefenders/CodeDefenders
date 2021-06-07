@@ -141,7 +141,7 @@
                         </div>
 
                         <h4 class="mt-4 mb-3">Upload Tests (optional)</h4>
-                        <div class="row g-3 mb-3">
+                        <div class="row g-3">
                             <div class="col-sm-12">
                                 <input id="fileUploadTest" name="fileUploadTest" type="file" class="form-control" accept=".zip">
                             </div>
@@ -235,7 +235,6 @@
             order: [[0, 'desc']],
             scrollY: '600px',
             scrollCollapse: true,
-            paging: false,
             language: {info: 'Showing _TOTAL_ entries'}
         });
     });

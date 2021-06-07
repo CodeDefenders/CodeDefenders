@@ -44,11 +44,13 @@
         <input type="hidden" class="form-control" name="formType" value="updateProfile">
 
         <div class="col-sm-12">
-            <label for="updatedEmail" class="form-label">Email</label>
-            <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
-                   value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
+            <div class="mb-2">
+                <label for="updatedEmail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
+                       value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
+            </div>
 
-            <div class="form-check mt-2">
+            <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
                     <%=login.getUser().getAllowContact() ? "checked" : ""%>>
                 <label class="form-check-label" for="allowContact">
@@ -58,23 +60,27 @@
         </div>
 
         <div class="col-sm-12">
-            <label for="updatedPassword" class="form-label">Password</label>
-            <input type="password" class="form-control" id="updatedPassword"
-                   name="updatedPassword" placeholder="Password (leave empty for unchanged)"
-                   minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
-            <div class="invalid-feedback">
-                Please enter a valid password.
+            <div class="mb-2">
+                <label for="updatedPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="updatedPassword"
+                       name="updatedPassword" placeholder="Password (leave empty for unchanged)"
+                       minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                <div class="invalid-feedback">
+                    Please enter a valid password.
+                </div>
             </div>
 
-            <input type="password" class="form-control mt-2" id="repeatedPassword"
-                   name="repeatedPassword" placeholder="Confirm Password">
-            <div class="invalid-feedback" id="confirm-password-feedback">
-                Please confirm your password.
-            </div>
-            <div class="form-text">
-                <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
-                <br>
-                Leave empty to keep unchanged.
+            <div>
+                <input type="password" class="form-control" id="repeatedPassword"
+                       name="repeatedPassword" placeholder="Confirm Password">
+                <div class="invalid-feedback" id="confirm-password-feedback">
+                    Please confirm your password.
+                </div>
+                <div class="form-text">
+                    <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                    <br>
+                    Leave empty to keep unchanged.
+                </div>
             </div>
         </div>
 
@@ -112,11 +118,10 @@
 
     <div class="modal" id="account-deletion-modal" tabindex="-1">
         <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
+                    <input type="hidden" class="form-control" name="formType" value="deleteAccount">
 
-            <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
-                <input type="hidden" class="form-control" name="formType" value="deleteAccount">
-
-                <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Account Deletion</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -133,9 +138,8 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-danger">Delete Account</button>
                     </div>
-                </div>
-
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 

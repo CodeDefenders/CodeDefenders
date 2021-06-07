@@ -34,42 +34,48 @@
         <h2>Sign in</h2>
         <form action="<%=request.getContextPath() + Paths.LOGIN%>" method="post" id="login-form" class="needs-validation">
 
-            <div class="mb-3">
-                <label for="login-username-input" class="form-label">Username</label>
-                <input type="text" class="form-control" id="login-username-input" name="username" placeholder="Username"
-                       required>
-                <div class="invalid-feedback">
-                    Please enter your username.
+            <div class="row g-3">
+                <div class="col-12">
+                    <label for="login-username-input" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="login-username-input" name="username" placeholder="Username"
+                           required>
+                    <div class="invalid-feedback">
+                        Please enter your username.
+                    </div>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label for="login-password-input" class="form-label">Password</label>
-                <input type="password" class="form-control" id="login-password-input" name="password" placeholder="Password"
-                       required>
-                <div class="invalid-feedback">
-                    Please enter your password.
+                <div class="col-12">
+                    <label for="login-password-input" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="login-password-input" name="password" placeholder="Password"
+                           required>
+                    <div class="invalid-feedback">
+                        Please enter your password.
+                    </div>
                 </div>
-            </div>
 
-            <div class="mb-3 form-check">
-                <input type="checkbox" class="form-check-input" id="login-consent-checkbox" checked
-                       required>
-                <label for="login-consent-checkbox" class="form-check-label">
-                    I understand and consent that the mutants and tests I create in the game will be used for research purposes.
-                </label>
-            </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="login-consent-checkbox" checked
+                               required>
+                        <label for="login-consent-checkbox" class="form-check-label">
+                            I understand and consent that the mutants and tests I create in the game will be used for research purposes.
+                        </label>
+                    </div>
+                </div>
 
-            <button id="login-button" type="submit" class="btn btn-primary btn-lg w-100 mb-3">Sign in</button>
+                <div class="col-12">
+                    <button id="login-button" type="submit" class="btn btn-primary btn-lg w-100">Sign in</button>
+                </div>
 
-            <div class="d-flex justify-content-between">
-                <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
-                    <a id="createacc-link" href="#" data-bs-toggle="modal" data-bs-target="#createacc-modal">Create an account</a>
-                <% } %>
+                <div class="col-12 d-flex justify-content-between">
+                    <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
+                        <a id="createacc-link" href="#" data-bs-toggle="modal" data-bs-target="#createacc-modal">Create an account</a>
+                    <% } %>
 
-                <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) { %>
-                    <a id="password-forgotten-link" href="#" data-bs-toggle="modal" data-bs-target="#resetpw-modal">Password forgotten</a>
-                <% } %>
+                    <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) { %>
+                        <a id="password-forgotten-link" href="#" data-bs-toggle="modal" data-bs-target="#resetpw-modal">Password forgotten</a>
+                    <% } %>
+                </div>
             </div>
 
         </form>
@@ -81,50 +87,55 @@
         <div class="modal-content">
             <form action="<%=request.getContextPath() + Paths.USER%>" method="post" class="needs-validation">
                 <input type="hidden" name="formType" value="create">
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="createacc-modal-title">Create a new account</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
-                    <div class="mb-3">
-                        <label for="createacc-username-input" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="createacc-username-input" name="username" placeholder="Username"
-                               required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
-                        <div class="invalid-feedback">
-                            Please enter a valid username.
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="createacc-username-input" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="createacc-username-input" name="username" placeholder="Username"
+                                   required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
+                            <div class="invalid-feedback">
+                                Please enter a valid username.
+                            </div>
+                            <div class="form-text">
+                                3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters.
+                            </div>
                         </div>
-                        <div class="form-text">
-                            3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters.
-                        </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="createacc-email-input" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="createacc-email-input" name="email" placeholder="Email"
-                               required>
-                        <div class="invalid-feedback">
-                            Please enter a valid email address.
+                        <div class="col-12">
+                            <label for="createacc-email-input" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="createacc-email-input" name="email" placeholder="Email"
+                                   required>
+                            <div class="invalid-feedback">
+                                Please enter a valid email address.
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-2">
-                        <label for="createacc-password-input" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="createacc-password-input" name="password" placeholder="Password"
-                               required minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
-                        <div class="invalid-feedback">
-                            Please enter a valid password.
-                        </div>
-                    </div>
+                        <div class="col-12">
+                            <div class="mb-2">
+                                <label for="createacc-password-input" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="createacc-password-input" name="password" placeholder="Password"
+                                       required minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                                <div class="invalid-feedback">
+                                    Please enter a valid password.
+                                </div>
+                            </div>
 
-                    <div class="mb-3">
-                        <input type="password" class="form-control" id="createacc-confirm-password-input" name="confirm" placeholder="Confirm Password"
-                               required>
-                        <div class="invalid-feedback" id="createacc-confirm-password-feedback">
-                            Please confirm your password.
-                        </div>
-                        <div class="form-text">
-                            <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                            <div>
+                                <input type="password" class="form-control" id="createacc-confirm-password-input" name="confirm" placeholder="Confirm Password"
+                                       required>
+                                <div class="invalid-feedback" id="createacc-confirm-password-feedback">
+                                    Please confirm your password.
+                                </div>
+                                <div class="form-text">
+                                    <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -168,33 +179,36 @@
         <div class="modal-content">
             <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation">
                 <input type="hidden" name="formType" value="resetPassword">
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="resetpw-modal-title">Reset your password</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
-                    <div class="mb-3">
-                        <label for="resetpw-username-input" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="resetpw-username-input" name="accountUsername" placeholder="Username"
-                               required autofocus>
-                        <div class="invalid-feedback">
-                            Please enter your username.
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="resetpw-username-input" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="resetpw-username-input" name="accountUsername" placeholder="Username"
+                                   required autofocus>
+                            <div class="invalid-feedback">
+                                Please enter your username.
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-3">
-                        <label for="resetpw-email-input" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="resetpw-email-input" name="accountEmail" placeholder="Email"
-                               required>
-                        <div class="invalid-feedback" id="resetpw-email-feedback">
-                            Please enter your email address.
+                        <div class="col-12">
+                            <label for="resetpw-email-input" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="resetpw-email-input" name="accountEmail" placeholder="Email"
+                                   required>
+                            <div class="invalid-feedback" id="resetpw-email-feedback">
+                                Please enter your email address.
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-1">
-                        <div class="form-text">
-                            This will send a mail with a link to change your password to your email account.
+                        <div class="col-12">
+                            <div class="form-text">
+                                This will send a mail with a link to change your password to your email account.
+                            </div>
                         </div>
                     </div>
 
@@ -235,29 +249,34 @@
             <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation">
                 <input type="hidden" name="resetPwSecret" id="resetPwSecret" value="<%=resetPw%>">
                 <input type="hidden" name="formType" value="changePassword">
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="changepw-modal-title">Reset your password</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
 
-                    <div class="mb-2">
-                        <label for="changepw-password-input" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="changepw-password-input" name="inputPasswordChange" placeholder="Password"
-                               required minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
-                        <div class="invalid-feedback">
-                            Please enter a valid password.
-                        </div>
-                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="mb-2">
+                                <label for="changepw-password-input" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="changepw-password-input" name="inputPasswordChange" placeholder="Password"
+                                       required minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                                <div class="invalid-feedback">
+                                    Please enter a valid password.
+                                </div>
+                            </div>
 
-                    <div class="mb-3">
-                        <input type="password" class="form-control" id="changepw-confirm-password-input" name="inputConfirmPasswordChange" placeholder="Confirm Password"
-                               required>
-                        <div class="invalid-feedback" id="changepw-confirm-password-feedback">
-                            Please confirm your password.
-                        </div>
-                        <div class="form-text">
-                            <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                            <div>
+                                <input type="password" class="form-control" id="changepw-confirm-password-input" name="inputConfirmPasswordChange" placeholder="Confirm Password"
+                                       required>
+                                <div class="invalid-feedback" id="changepw-confirm-password-feedback">
+                                    Please confirm your password.
+                                </div>
+                                <div class="form-text">
+                                    <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                                </div>
+                            </div>
                         </div>
                     </div>
 

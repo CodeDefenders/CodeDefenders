@@ -47,8 +47,8 @@
             <input type="hidden" name="formType" value="editUser">
             <input type="hidden" name="uid" value="<%=user.getId()%>">
 
-            <div class="row mb-3">
-                <div class="col-sm-12">
+            <div class="row g-3">
+                <div class="col-12">
                     <label for="name" class="form-label">Username</label>
                     <input id="name" type="text" class="form-control" name="name" value="<%=user.getUsername()%>" placeholder="Username"
                            required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
@@ -59,10 +59,8 @@
                         3-20 alphanumerics starting with a lowercase letter (a-z), no space or special characters.
                     </div>
                 </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="col-sm-12">
+                <div class="col-12">
                     <label for="email" class="form-label">Email</label>
                     <input id="email" type="email" class="form-control" name="email" value="<%=user.getEmail()%>" placeholder="Email"
                            required>
@@ -70,36 +68,34 @@
                         Please enter a valid email address.
                     </div>
                 </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="col-sm-12">
-                    <label for="password" class="form-label">Password</label>
-                    <input id="password" type="password" class="form-control"
-                           name="password" placeholder="Password"
-                           minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
-                    <div class="invalid-feedback">
-                        Please enter a valid password.
+                <div class="col-12">
+                    <div class="mb-2">
+                        <label for="password" class="form-label">Password</label>
+                        <input id="password" type="password" class="form-control"
+                               name="password" placeholder="Password"
+                               minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                        <div class="invalid-feedback">
+                            Please enter a valid password.
+                        </div>
                     </div>
 
-                    <input id="confirm_password" type="password" class="form-control mt-2"
-                           name="confirm_password" placeholder="Confirm Password">
-                    <div class="invalid-feedback" id="confirm-password-feedback">
-                        Please confirm your password.
-                    </div>
-                    <div class="form-text">
-                        <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
-                        <br>
-                        Leave empty to keep unchanged.
+                    <div>
+                        <input id="confirm_password" type="password" class="form-control"
+                               name="confirm_password" placeholder="Confirm Password">
+                        <div class="invalid-feedback" id="confirm-password-feedback">
+                            Please confirm your password.
+                        </div>
+                        <div class="form-text">
+                            <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
+                            <br>
+                            Leave empty to keep unchanged.
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="row g-2">
-                <div class="col-auto">
-                    <a href="<%=request.getContextPath() + Paths.ADMIN_USERS%>" class="btn btn-secondary">Cancel</a>
-                </div>
-                <div class="col-auto">
+                <div class="col-12">
+                    <a href="<%=request.getContextPath() + Paths.ADMIN_USERS%>" class="btn btn-secondary me-2">Cancel</a>
                     <button type="submit" class="btn btn-primary" name="submit_edit_user" id="submit_edit_user">Save</button>
                 </div>
             </div>
@@ -216,7 +212,7 @@
     <form id="createUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="createUsers">
 
-        <div class="row mb-3">
+        <div class="row g-3">
             <div class="col-sm-12">
                 <label for="user_name_list" class="form-label">
                     <a data-bs-toggle="collapse" data-bs-target="#demo" class="text-decoration-none text-reset cursor-pointer">
@@ -240,10 +236,8 @@ username4;password;example@mail.com</code></pre>
                 <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
                           oninput="document.getElementById('submit_users_btn').disabled = this.value.length === 0;"></textarea>
             </div>
-        </div>
 
-        <div class="row">
-            <div class="col-auto">
+            <div class="col-12">
                 <button class="btn btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled>
                     Create Accounts
                 </button>
