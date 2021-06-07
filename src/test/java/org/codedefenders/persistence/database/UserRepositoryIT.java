@@ -109,10 +109,10 @@ public class UserRepositoryIT {
     public void insertAndQueryUserByEmail() {
         UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
 
-        Integer userId = userRepo.insert(user).get();
+        Integer userId = userRepo.insert(user).orElse(null);
         assertNotNull(userId, "Couldn't store user to the database");
 
-        UserEntity userFromDB = userRepo.getUserByEmail(email1).get();
+        UserEntity userFromDB = userRepo.getUserByEmail(email1).orElse(null);
         assertAll(
                 () -> assertEquals(userId.intValue(), userFromDB.getId()),
                 () -> assertEntityAttributesEqual(user, userFromDB),
@@ -122,17 +122,17 @@ public class UserRepositoryIT {
 
     @Test
     public void queryNonExistentUserId() {
-        assertNull(userRepo.getUserById(4684487));
+        assertFalse(userRepo.getUserById(4684487).isPresent());
     }
 
     @Test
     public void insertUserTwice() {
         UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
 
-        Integer userId = userRepo.insert(user).get();
+        Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
 
-        assertNull(userRepo.insert(user));
+        assertFalse(userRepo.insert(user).isPresent());
     }
 
     @Test
@@ -147,7 +147,7 @@ public class UserRepositoryIT {
     public void updateUser() {
         UserEntity user = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
 
-        Integer userId = userRepo.insert(user).get();
+        Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
         user.setId(userId);
         user.setEncodedPassword(UserEntity.encodePassword(password2));
@@ -166,11 +166,11 @@ public class UserRepositoryIT {
     @Test
     public void updateUserViolatesDBConstraint() {
         UserEntity user1 = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
-        Integer userId1 = userRepo.insert(user1).get();
+        Integer userId1 = userRepo.insert(user1).orElse(null);
         assumeTrue(userId1 != null);
         user1.setId(userId1);
         UserEntity user2 = new UserEntity(username2, UserEntity.encodePassword(password2), email2);
-        Integer userId2 = userRepo.insert(user2).get();
+        Integer userId2 = userRepo.insert(user2).orElse(null);
         assumeTrue(userId2 != null);
         user2.setId(userId2);
 
@@ -182,10 +182,10 @@ public class UserRepositoryIT {
     @Test
     public void queryUserList() {
         UserEntity user1 = new UserEntity(username1, UserEntity.encodePassword(password1), email1);
-        Integer userId1 = userRepo.insert(user1).get();
+        Integer userId1 = userRepo.insert(user1).orElse(null);
         assumeTrue(userId1 != null);
         UserEntity user2 = new UserEntity(username2, UserEntity.encodePassword(password2), email2);
-        Integer userId2 = userRepo.insert(user2).get();
+        Integer userId2 = userRepo.insert(user2).orElse(null);
         assumeTrue(userId2 != null);
 
         List<UserEntity> users = userRepo.getUsers();
