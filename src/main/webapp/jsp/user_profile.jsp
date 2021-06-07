@@ -44,7 +44,7 @@
         <input type="hidden" class="form-control" name="formType" value="updateProfile">
 
         <div class="col-sm-12">
-            <label for="updatedEmail" class="form-label">E-Mail</label>
+            <label for="updatedEmail" class="form-label">Email</label>
             <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
                    value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
 
