@@ -217,7 +217,7 @@
                 <label for="user_name_list" class="form-label">
                     <a data-bs-toggle="collapse" data-bs-target="#demo" class="text-decoration-none text-reset cursor-pointer">
                         List of user credentials
-                        <span class="fa fa-question-circle"></span>
+                        <span class="fa fa-question-circle ms-1"></span>
                     </a>
                 </label>
                 <div id="demo" class="collapse card mb-2">
