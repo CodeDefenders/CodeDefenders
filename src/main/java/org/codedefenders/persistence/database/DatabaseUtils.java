@@ -25,11 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.dbutils.ResultSetHandler;
 
 public class DatabaseUtils {
 
-    public static <T> Optional<T> nextFromRS(ResultSet rs, ResultSetHandler<T> handler) throws SQLException {
+    /**
+     * Map the first entry of a given {@link ResultSet} {@code rs} with the given {@code handler} to an object and
+     * return it wrapped in an Optional if {@code rs} has a next row, or return an empty {@code Optional} if {@code rs}
+     * has no next row.
+     *
+     * @throws SQLException if an {@code SQLException} occurs while accessing the {@code ResultSet}
+     */
+    public static <T> Optional<T> nextFromRS(@Nonnull ResultSet rs, @Nonnull ResultSetHandler<T> handler)
+            throws SQLException {
         if (rs.next()) {
             return Optional.ofNullable(handler.handle(rs));
         } else {
@@ -37,6 +47,13 @@ public class DatabaseUtils {
         }
     }
 
+    /**
+     * Map all entries of the given {@link ResultSet} with the given {@code handler} to objects and collect them in a
+     * {@code List}.
+     *
+     * @throws SQLException if an {@code SQLException} occurs while accessing the {@code ResultSet}
+     */
+    @Nonnull
     public static <T> List<T> listFromRS(ResultSet rs, ResultSetHandler<T> handler) throws SQLException {
         List<T> result = new ArrayList<>();
         while (rs.next()) {
