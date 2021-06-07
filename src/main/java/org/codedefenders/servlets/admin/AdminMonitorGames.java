@@ -154,7 +154,7 @@ public class AdminMonitorGames extends HttpServlet {
             int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
             int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
             Optional<Integer> userId = userRepo.getUserIdForPlayerId(playerToRemoveId);
-            if (!deletePlayer(playerToRemoveId, gameToRemoveFromId)) {
+            if (userId.isPresent() && !deletePlayer(playerToRemoveId, gameToRemoveFromId, userId.get())) {
                 messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
             } else if (switchUser && userId.isPresent()) {
                 Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
@@ -231,23 +231,23 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
 
-    private static boolean deletePlayer(int pid, int gid) {
-        for (Test t : TestDAO.getTestsForGame(gid)) {
-            if (t.getPlayerId() == pid) {
+    private static boolean deletePlayer(int playerId, int gameId, int userId) {
+        for (Test t : TestDAO.getTestsForGame(gameId)) {
+            if (t.getPlayerId() == playerId) {
                 AdminDAO.deleteTestTargetExecutions(t.getId());
             }
         }
-        for (Mutant m : MutantDAO.getValidMutantsForGame(gid)) {
-            if (m.getPlayerId() == pid) {
+        for (Mutant m : MutantDAO.getValidMutantsForGame(gameId)) {
+            if (m.getPlayerId() == playerId) {
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
             }
         }
-        DatabaseAccess.removePlayerEventsForGame(gid, pid);
-        AdminDAO.deleteAttackerEquivalences(pid);
-        AdminDAO.deleteDefenderEquivalences(pid);
-        AdminDAO.deletePlayerTest(pid);
-        AdminDAO.deletePlayerMutants(pid);
-        return AdminDAO.deletePlayer(pid);
+        DatabaseAccess.removePlayerEventsForGame(gameId, userId);
+        AdminDAO.deleteAttackerEquivalences(playerId);
+        AdminDAO.deleteDefenderEquivalences(playerId);
+        AdminDAO.deletePlayerTest(playerId);
+        AdminDAO.deletePlayerMutants(playerId);
+        return AdminDAO.deletePlayer(playerId);
     }
 
     public static int getPlayerScore(MultiplayerGame mg, int pid) {

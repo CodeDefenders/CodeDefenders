@@ -125,7 +125,9 @@ public class MutationTester implements IMutationTester {
         }
 
         for (Mutant mutant : mutants) {
-            if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+            // Skip mutants which changed lines does not match with covered lines by the test
+            // Exception for mutants who modify static variables (which also requires a recompile)
+            if (!mutant.doesRequireRecompilation() && useMutantCoverage && !test.isMutantCovered(mutant)) {
                 // System.out.println("Skipping non-covered mutant "
                 // + mutant.getId() + ", test " + test.getId());
                 continue;

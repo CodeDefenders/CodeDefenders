@@ -178,11 +178,13 @@ public class Configuration {
                             validationErrors.add("Can't get a valid connection within 10 seconds!");
                         }
                     } catch (SQLException e) {
+                        logger.debug("The following SQLException occurred while trying to validate "
+                                + "the database connection", e);
                         if (e.getMessage().contains("Access denied")) {
                             validationErrors.add("Can't connect to the database. " + e.getMessage());
                         } else {
-                            validationErrors.add("Can't connect to the database. "
-                                    + "Please check the database and the connection settings.");
+                            validationErrors.add("Can't connect to the database. " + e.getMessage() + "\n"
+                                    + "Please check the database and the connection settings. ");
                         }
                     }
                 } catch (ClassNotFoundException e) {
