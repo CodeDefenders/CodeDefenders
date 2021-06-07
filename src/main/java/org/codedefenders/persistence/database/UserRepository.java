@@ -219,18 +219,16 @@ public class UserRepository {
 
     @Nonnull
     Optional<Integer> getUserIdForPlayerIdInternal(int playerId) {
-        Integer userId;
         String query = "SELECT users.User_ID AS User_ID "
                 + "FROM users, players "
                 + "WHERE players.User_ID = users.User_ID "
                 + "AND players.ID = ?";
         try {
-            userId = connectionFactory.getQueryRunner().query(query, new ScalarHandler<>(), playerId);
+            return Optional.ofNullable(connectionFactory.getQueryRunner().query(query, new ScalarHandler<>(), playerId));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
-        return Optional.ofNullable(userId);
     }
 
     /**
