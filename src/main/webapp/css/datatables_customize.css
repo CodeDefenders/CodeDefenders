@@ -65,3 +65,7 @@
 .toggle-all-details:hover {
     color: black;
 }
+.toggle-details-icon {
+    width: 1rem;
+    text-align: center;
+}
