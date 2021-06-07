@@ -31,17 +31,21 @@ import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * Provides an API for user retrieval and management.
  */
 @ApplicationScoped
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    private final Cache<Integer, SimpleUser> simpleUserForUserIdCache;
+    private final LoadingCache<Integer, SimpleUser> simpleUserForUserIdCache;
 
     private final UserRepository userRepo;
 
@@ -56,7 +60,15 @@ public class UserService {
                 .expireAfterWrite(30, TimeUnit.SECONDS)
                 .maximumSize(200)
                 //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
-                .build();
+                .build(
+                        new CacheLoader<Integer, SimpleUser>() {
+                            @Override
+                            public SimpleUser load(@Nonnull Integer userId) throws Exception {
+                                return getSimpleUserByIdInternal(userId)
+                                        .orElseThrow(() -> new Exception("No user found for given userId"));
+                            }
+                        }
+                );
     }
 
     /**
@@ -85,20 +97,15 @@ public class UserService {
     @Nonnull
     public Optional<SimpleUser> getSimpleUserById(final int userId) {
         try {
-            // If the key wasn't in the "easy to compute" group, we need to
-            // do things the hard way.
-            return Optional.of(simpleUserForUserIdCache.get(userId, () -> {
-                Optional<UserEntity> user = userRepo.getUserById(userId);
-                if (!user.isPresent()) {
-                    throw new Exception();
-                } else {
-                    return simpleUserFromUserEntity(user.get());
-                }
-            }));
+            return Optional.of(simpleUserForUserIdCache.get(userId));
         } catch (ExecutionException e) {
             return Optional.empty();
         }
+    }
 
+    @Nonnull
+    Optional<SimpleUser> getSimpleUserByIdInternal(final int userId) {
+        return userRepo.getUserById(userId).map(this::simpleUserFromUserEntity);
     }
 
     /**
@@ -108,9 +115,9 @@ public class UserService {
      * @param playerId The Id of the player for which to query a {@link SimpleUser} object.
      * @return An {@code Optional} containing the user for the provided {@code playerId} or an empty {@code Optional} if
      * there exists no user for the given {@code playerId}
-     * @see #getSimpleUserById(int)
      * @apiNote This method will probably be moved from this class to a class which is more involved in game handling/
      * managing like the {@code GameService} classes.
+     * @see #getSimpleUserById(int)
      */
     public Optional<SimpleUser> getSimpleUserByPlayerId(final int playerId) {
         return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserByPlayerId);

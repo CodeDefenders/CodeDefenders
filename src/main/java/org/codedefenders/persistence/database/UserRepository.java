@@ -21,23 +21,25 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.codedefenders.database.ConnectionFactory;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import static org.codedefenders.persistence.database.DatabaseUtils.listFromRS;
 import static org.codedefenders.persistence.database.DatabaseUtils.nextFromRS;
@@ -46,7 +48,7 @@ import static org.codedefenders.persistence.database.DatabaseUtils.nextFromRS;
 public class UserRepository {
     private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
 
-    private final Cache<Integer, Integer> userIdForPlayerIdCache;
+    private final LoadingCache<Integer, Integer> userIdForPlayerIdCache;
 
     private final ConnectionFactory connectionFactory;
 
@@ -57,9 +59,24 @@ public class UserRepository {
         userIdForPlayerIdCache = CacheBuilder.newBuilder()
                 .maximumSize(400)
                 //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
-                .build();
+                .build(
+                        new CacheLoader<Integer, Integer>() {
+                            @Override
+                            public Integer load(@Nonnull Integer playerId) throws Exception {
+                                return getUserIdForPlayerIdInternal(playerId)
+                                        .orElseThrow(() -> new Exception("No userId found for given playerId"));
+                            }
+                        }
+                );
     }
 
+    /**
+     * Maps a result set from the {@code users} table to a {@link UserEntity} objet.
+     *
+     * @param rs The result set to map.
+     * @return
+     * @throws SQLException
+     */
     public static UserEntity userFromRS(ResultSet rs) throws SQLException {
         int userId = rs.getInt("User_ID");
         String userName = rs.getString("Username");
@@ -93,9 +110,9 @@ public class UserRepository {
                             userEntity.getAllowContact(),
                             userEntity.getKeyMap().name());
         } catch (SQLException e) {
-            logger.error("SQLException while trying to insert new User", e);
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
-        return Optional.empty();
     }
 
     public boolean update(UserEntity userEntity) {
@@ -119,9 +136,9 @@ public class UserRepository {
                     userEntity.getKeyMap().name(),
                     userEntity.getId()) == 1;
         } catch (SQLException e) {
-            logger.error("SQLException while trying to update UserEntity", e);
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
-        return false;
     }
 
     public Optional<UserEntity> getUserById(int userId) {
@@ -131,8 +148,8 @@ public class UserRepository {
         try {
             return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
         } catch (SQLException e) {
-            logger.error("SQLException while loading user", e);
-            return Optional.empty();
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
@@ -143,8 +160,8 @@ public class UserRepository {
         try {
             return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), username);
         } catch (SQLException e) {
-            logger.error("SQLException", e);
-            return Optional.empty();
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
@@ -155,34 +172,34 @@ public class UserRepository {
         try {
             return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
         } catch (SQLException e) {
-            logger.error("SQLException", e);
-            return Optional.empty();
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
     // TODO: Relocate into `PlayerRepository`?!
     public Optional<Integer> getUserIdForPlayerId(int playerId) {
+        try {
+            return Optional.of(userIdForPlayerIdCache.get(playerId));
+        } catch (ExecutionException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Nonnull
+    Optional<Integer> getUserIdForPlayerIdInternal(int playerId) {
+        Integer userId;
         String query = "SELECT users.User_ID AS User_ID "
                 + "FROM users, players "
                 + "WHERE players.User_ID = users.User_ID "
                 + "AND players.ID = ?";
-
         try {
-            // If the key wasn't in the "easy to compute" group, we need to
-            // do things the hard way.
-            return Optional.of(userIdForPlayerIdCache.get(playerId, () -> {
-                Integer userId;
-                userId = connectionFactory.getQueryRunner().query(query, new ScalarHandler<>(), playerId);
-                if (userId == null) {
-                    throw new Exception();
-                } else {
-                    return userId;
-                }
-            }));
-        } catch (ExecutionException e) {
-            logger.error("SQLException", e);
-            return Optional.empty();
+            userId = connectionFactory.getQueryRunner().query(query, new ScalarHandler<>(), playerId);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
+        return Optional.ofNullable(userId);
     }
 
     public List<UserEntity> getUsers() {
@@ -191,8 +208,8 @@ public class UserRepository {
         try {
             return connectionFactory.getQueryRunner().query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
-            logger.error("SQLException", e);
-            return new ArrayList<>();
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
@@ -213,8 +230,8 @@ public class UserRepository {
         try {
             return connectionFactory.getQueryRunner().query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
-            logger.error("SQLException", e);
-            return new ArrayList<>();
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 }
