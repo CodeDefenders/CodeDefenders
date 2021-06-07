@@ -107,7 +107,7 @@
         <div class="collapse navbar-collapse" id="header-navbar-controls">
 
             <ul class="navbar-nav me-auto">
-                <li class="nav-item nav-item-highlight dropdown">
+                <li class="nav-item nav-item-highlight dropdown me-3">
                     <a class="nav-link dropdown-toggle" id="header-multiplayer" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         Multiplayer
                     </a>

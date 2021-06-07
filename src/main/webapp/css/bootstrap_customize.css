@@ -67,17 +67,14 @@ bootstrap classes
 @media (min-width: 768px) {
     /* Highlighted (important) nav items. */
     .navbar-cd .nav-item-highlight > .nav-link {
-        background-color: var(--bg-codedefenders-light);
         padding: .25rem .75rem;
-        border: 1px solid #ffffff10;
+        color: white;
+        border: 1px solid white;
         border-radius: .2rem;
-        margin-right: .75rem;
     }
-    .navbar-cd .nav-item-highlight:hover > .nav-link {
-        background-color: var(--bg-codedefenders-lighter);
-    }
+    .navbar-cd .nav-item-highlight:hover > .nav-link,
     .navbar-cd .nav-item-highlight.dropdown > .nav-link.show {
-        background-color: var(--bg-codedefenders-lighter);
+        background-color: var(--bg-codedefenders-light);
     }
 }
 
