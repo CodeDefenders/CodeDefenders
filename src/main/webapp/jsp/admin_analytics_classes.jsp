@@ -41,14 +41,22 @@
         </thead>
     </table>
 
-    <div class="row mb-3 mt-4">
-        <label class="form-label col-sm-12">Download Table</label>
+    <div class="row mt-4">
         <div class="col-auto">
             <div class="btn-group">
                 <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
-                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">Download as CSV</a>
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download">
+                    <i class="fa fa-download me-1"></i>
+                    Download table
+                </a>
+                <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
+                    as CSV
+                </a>
                 <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=json"
-                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">Download as JSON</a>
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
+                    as JSON
+                </a>
             </div>
         </div>
     </div>

@@ -242,37 +242,45 @@
             </div>
         </div>
 
-        <a data-bs-toggle="collapse" data-bs-target="#downloads" class="btn btn-sm btn-outline-secondary mt-4">
-            <i class="fa fa-download"></i>
-            Download Tables
-        </a>
-        <div id="downloads" class="collapse card mt-2">
-            <div class="card-body">
-                <div class="row mb-3">
-                    <label class="form-label col-sm-12">Classes</label>
-                    <div class="col-auto">
-                        <div class="btn-group">
-                            <a download="classes.csv"
-                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=csv"
-                               class="btn btn-sm btn-outline-secondary" id="download-classes-csv">Download as CSV</a>
-                            <a download="classes.json"
-                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json"
-                               class="btn btn-sm btn-outline-secondary" id="download-classes-json">Download as JSON</a>
-                        </div>
-                    </div>
+        <div class="row g-2 mt-4">
+            <div class="col-12">
+                <div class="btn-group">
+                    <a download="classes.csv"
+                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
+                       class="btn btn-sm btn-outline-secondary" id="download-classes">
+                        <i class="fa fa-download me-1"></i>
+                        Download classes table
+                    </a>
+                    <a download="classes.csv"
+                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
+                       class="btn btn-sm btn-outline-secondary" id="download-classes-csv">
+                        as CSV
+                    </a>
+                    <a download="classes.json"
+                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=json"
+                       class="btn btn-sm btn-outline-secondary" id="download-classes-json">
+                        as JSON
+                    </a>
                 </div>
-                <div class="row">
-                    <label class="form-label col-sm-12">Games</label>
-                    <div class="col-auto">
-                        <div class="btn-group">
-                            <a download="games.csv"
-                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=csv"
-                               class="btn btn-sm btn-outline-secondary" id="download-games-csv">Download as CSV</a>
-                            <a download="games.json"
-                               href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json"
-                               class="btn btn-sm btn-outline-secondary" id="download-games-json">Download as JSON</a>
-                        </div>
-                    </div>
+            </div>
+            <div class="col-12">
+                <div class="btn-group">
+                    <a download="games.csv"
+                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
+                       class="btn btn-sm btn-outline-secondary" id="download-games">
+                        <i class="fa fa-download me-1"></i>
+                        Download games table
+                    </a>
+                    <a download="games.csv"
+                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
+                       class="btn btn-sm btn-outline-secondary" id="download-games-csv">
+                        as CSV
+                    </a>
+                    <a download="games.json"
+                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=json"
+                       class="btn btn-sm btn-outline-secondary" id="download-games-json">
+                        as JSON
+                    </a>
                 </div>
             </div>
         </div>

@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="container">
@@ -41,55 +44,56 @@
         </thead>
     </table>
 
-    <div class="row mb-3 mt-4">
-        <label class="form-label col-sm-12">Download Table</label>
-        <div class="col-auto">
+    <div class="row g-3 mt-4">
+        <div class="col-12">
+            <a data-bs-toggle="modal" data-bs-target="#useful-actions-explanation" class="btn btn-outline-secondary btn-sm">
+                What are useful actions?
+            </a>
+        </div>
+        <div class="col-12">
             <div class="btn-group">
                 <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
-                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">Download as CSV</a>
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download">
+                    <i class="fa fa-download me-1"></i>
+                    Download table
+                </a>
+                <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
+                    as CSV
+                </a>
                 <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
-                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">Download as JSON</a>
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
+                    as JSON
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="accordion mt-4">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="explanation-heading">
-                <button class="accordion-button collapsed" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#explanation-collapse"
-                        aria-expanded="false" aria-controls="explanation-collapse">
-                    Explanation
-                    <i class="fa fa-question-circle ms-1"></i>
-                </button>
-            </h2>
-            <div id="explanation-collapse" class="accordion-collapse collapse" aria-labelledby="explanation-heading">
-                <div class="accordion-body">
-                    <p>
-                        This table uses data from the class killmaps to determine the number of useful tests and mutants per
-                        player, class and role.
-                    </p>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td class="pe-2"><b>Useful Tests:</b></td>
-                                <td>Number of tests, which killed at least one mutant.</td>
-                            </tr>
-                            <tr>
-                                <td class="pe-2"><b>Useful Mutants:</b></td>
-                                <td>Number of mutants, which were killed by at least one test,
-                                    but were covered and not killed by at least one other test.</td>
-                            </tr>
-                            <tr>
-                                <td class="pe-2"><b>Useful Actions:</b></td>
-                                <td>Sum of useful tests and useful mutants.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal title="Useful Actions Explanation" id="useful-actions-explanation">
+        <jsp:attribute name="content">
+            <p>
+                This table uses data from the class killmaps to determine the number of useful tests and mutants per
+                player, class and role.
+            </p>
+            <table class="table table-no-last-border mb-0">
+                <tbody>
+                <tr>
+                    <td class="text-nowrap"><b>Useful Tests:</b></td>
+                    <td>Number of tests, which killed at least one mutant.</td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap"><b>Useful Mutants:</b></td>
+                    <td>Number of mutants, which were killed by at least one test,
+                        but were covered and not killed by at least one other test.</td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap"><b>Useful Actions:</b></td>
+                    <td>Sum of useful tests and useful mutants.</td>
+                </tr>
+                </tbody>
+            </table>
+        </jsp:attribute>
+    </t:modal>
 </div>
 
 <script>
