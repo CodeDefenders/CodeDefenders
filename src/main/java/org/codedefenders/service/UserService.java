@@ -22,6 +22,7 @@ package org.codedefenders.service;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -76,11 +77,13 @@ public class UserService {
         return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserByPlayerId);
     }
 
+    @Nonnull
     private User userFromUserEntity(@Nonnull UserEntity user) {
         return new User(user.getId(), user.getUsername(), user.isActive(), user.getEmail(), user.isValidated(),
                 user.getAllowContact(), user.getKeyMap());
     }
 
+    @Nonnull
     private SimpleUser simpleUserFromUserEntity(@Nonnull UserEntity user) {
         return new SimpleUser(user.getId(), user.getUsername());
     }
