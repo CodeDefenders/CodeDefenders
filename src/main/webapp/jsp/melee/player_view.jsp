@@ -281,11 +281,13 @@
             <h3>Create a mutant here</h3>
             <div>
 
-                <div class="form-check form-switch"
-                     data-bs-toggle="tooltip" data-bs-html="true"
+                <div data-bs-toggle="tooltip" data-bs-html="true"
                      title='<p>Switch between showing coverage of your tests (off) and enemy tests (on).</p><p class="mb-0"><i>Note: If you add/remove lines while creating a mutant the coverage highlighting may be misaligned until you submit the mutant.</i></p>'>
-                    <input class="form-check-input" type="checkbox" id="highlighting-switch">
-                    <label class="form-check-label" for="highlighting-switch" id="highlighting-switch-label">Enemy Coverage</label>
+                    <input class="btn-check" type="checkbox" id="highlighting-switch">
+                    <label class="btn btn-outline-secondary" for="highlighting-switch">
+                        Enemy Coverage
+                        <i class="fa fa-check ms-1 btn-check-active"></i>
+                    </label>
                 </div>
                 <script>
                     $('#highlighting-switch').change(function () {

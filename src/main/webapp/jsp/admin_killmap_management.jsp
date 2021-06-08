@@ -196,6 +196,7 @@
                         <input type="checkbox" id="toggle-progress-classes" class="btn-check" autocomplete="off">
                         <label for="toggle-progress-classes" class="btn btn-xs btn-outline-secondary">
                             Show progress
+                            <i class="fa fa-check btn-check-active"></i>
                         </label>
                     </div>
                     <button id="invert-selection-classes" class="btn btn-xs btn-secondary">Invert Selection</button>
@@ -223,6 +224,7 @@
                         <input type="checkbox" id="toggle-progress-games" class="btn-check" autocomplete="off">
                         <label for="toggle-progress-games" class="btn btn-xs btn-outline-secondary">
                             Show progress
+                            <i class="fa fa-check btn-check-active"></i>
                         </label>
                     </div>
                     <button id="invert-selection-games" class="btn btn-xs btn-secondary">Invert Selection</button>

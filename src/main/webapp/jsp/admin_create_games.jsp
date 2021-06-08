@@ -65,7 +65,7 @@
                     <input type="checkbox" id="toggle-hide-players" class="btn-check" autocomplete="off">
                     <label for="toggle-hide-players" class="btn btn-xs btn-outline-secondary">
                         Hide Players
-                        <i class="fa fa-eye-slash"></i>
+                        <i class="fa fa-check btn-check-active"></i>
                     </label>
                 </div>
                 <input type="search" id="search-staged-games" class="form-control input-xs" placeholder="Search">
@@ -103,8 +103,8 @@
                     <input type="checkbox" id="toggle-show-assigned-users" class="btn-check" autocomplete="off">
                     <label for="toggle-show-assigned-users" class="btn btn-xs btn-outline-secondary"
                            title="Show users that are part of an existing active game.">
-                        Show Assigned Users (Active Games)
-                        <i class="fa fa-eye"></i>
+                        Show Assigned Users (in active games)
+                        <i class="fa fa-check btn-check-active"></i>
                     </label>
                 </div>
                 <input type="search" id="search-users" class="form-control input-xs" placeholder="Search">

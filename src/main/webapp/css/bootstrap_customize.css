@@ -27,6 +27,29 @@ bootstrap classes
     display: inline-block;
 }
 
+/* Display icons (and other things) depending on if a btn-check is checked or not.
+   Use as:
+   <input type="checkbox" class="btn-check">
+   <label class="btn">
+       <span class="btn-check-active">
+           Active-only content here.
+       </span>
+       <span class="btn-check-inactive">
+           Inactive-only content here.
+       </span>
+   </div>
+*/
+.btn-check + .btn .btn-check-active,
+.btn-check:active + .btn .btn-check-inactive,
+.btn-check:checked + .btn .btn-check-inactive {
+    display: none;
+}
+.btn-check + .btn .btn-check-inactive,
+.btn-check:active + .btn .btn-check-active,
+.btn-check:checked + .btn .btn-check-active {
+    display: initial;
+}
+
 /* Modals
 ----------------------------------------------------------------------------- */
 

@@ -83,7 +83,8 @@
                         <input type="checkbox" id="togglePlayersActiveMultiplayer" class="btn-check" autocomplete="off">
                         <label for="togglePlayersActiveMultiplayer" class="btn btn-sm btn-outline-secondary"
                                title="Show list of Players for each Game.">
-                            <i class="fa fa-eye"></i>
+                            <i class="fa fa-expand btn-check-inactive"></i>
+                            <i class="fa fa-compress btn-check-active"></i>
                         </label>
                     </th>
                 </tr>
@@ -302,7 +303,8 @@
                         <input type="checkbox" id="togglePlayersActiveMelee" class="btn-check" autocomplete="off">
                         <label for="togglePlayersActiveMelee" class="btn btn-sm btn-outline-secondary"
                                title="Show list of Players for each Game.">
-                            <i class="fa fa-eye"></i>
+                            <i class="fa fa-expand btn-check-inactive"></i>
+                            <i class="fa fa-compress btn-check-active"></i>
                         </label>
                     </th>
                 </tr>
