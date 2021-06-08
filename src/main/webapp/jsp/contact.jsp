@@ -46,27 +46,27 @@
 		<input type="hidden" name="formType" value="login">
 
         <div class="row g-3">
-            <div class="col-sm-12">
+            <div class="col-12">
                 <label class="form-label" for="name-input">Name</label>
                 <input type="text" id="name-input" name="name" class="form-control" placeholder="Name" required autofocus>
             </div>
 
-            <div class="col-sm-12">
+            <div class="col-12">
                 <label class="form-label" for="email-input">Email</label>
                 <input type="email" id="email-input" name="email" class="form-control" placeholder="Email" required>
             </div>
 
-            <div class="col-sm-12">
+            <div class="col-12">
                 <label class="form-label" for="subject-input">Subject</label>
                 <input type="text" id="subject-input" name="subject" class="form-control" placeholder="Subject" required>
             </div>
 
-            <div class="col-sm-12">
+            <div class="col-12">
                 <label class="form-label" for="message-input">Message</label>
                 <textarea id="message-input" name="message" class="form-control" placeholder="Message" rows="8" required></textarea>
             </div>
 
-            <div class="col-sm-12">
+            <div class="col-12">
                 <button class="btn btn-primary" type="submit">Send</button>
             </div>
         </div>

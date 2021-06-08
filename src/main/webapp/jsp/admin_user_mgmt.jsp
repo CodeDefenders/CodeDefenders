@@ -214,7 +214,7 @@
         <input type="hidden" name="formType" value="createUsers">
 
         <div class="row g-3">
-            <div class="col-sm-12">
+            <div class="col-12">
                 <label for="user_name_list" class="form-label">
                     <a data-bs-toggle="collapse" data-bs-target="#demo" class="text-decoration-none text-reset cursor-pointer">
                         List of user credentials

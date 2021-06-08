@@ -117,7 +117,7 @@
 
     <form id="form-settings">
         <div class="row">
-            <div class="col-sm-12 col-md-6">
+            <div class="col-md-6 col-sm-12">
 
                 <div class="card mb-4">
                     <div class="card-header">
@@ -266,7 +266,7 @@
                 </div>
 
             </div> <%-- column --%>
-            <div class="col-sm-12 col-md-6">
+            <div class="col-md-6 col-sm-12">
 
                 <div class="card mb-4">
                     <div class="card-header">

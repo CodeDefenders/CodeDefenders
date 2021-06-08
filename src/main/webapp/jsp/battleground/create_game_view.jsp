@@ -64,8 +64,8 @@
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 
         <div class="row mb-3">
-            <label class="col-sm-4 col-form-label" id="class-label" for="class-select">Class Under Test</label>
-            <div class="col-sm-8 mb-3">
+            <label class="col-4 col-form-label" id="class-label" for="class-select">Class Under Test</label>
+            <div class="col-8 mb-3">
                 <div class="input-group has-validation">
                     <select class="form-select" id="class-select" name="class" required>
                         <% for (GameClass clazz : gameClasses) { %>
@@ -84,13 +84,13 @@
                     <div class="invalid-feedback">Please select a class.</div>
                 </div>
             </div>
-            <div class="offset-sm-4 col-sm-8">
+            <div class="offset-4 col-8">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="predefined-mutants-switch" name="withMutants">
                     <label class="form-check-label" for="predefined-mutants-switch">Include predefined mutants (if available)</label>
                 </div>
             </div>
-            <div class="offset-sm-4 col-sm-8">
+            <div class="offset-4 col-8">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="predefined-tests-switch" name="withTests">
                     <label class="form-check-label" for="predefined-tests-switch">Include predefined tests (if available)</label>
@@ -99,8 +99,8 @@
         </div>
 
         <fieldset class="row mb-3">
-            <legend class="col-sm-4 col-form-label pt-0" id="level-label">Game Level</legend>
-            <div class="col-sm-8">
+            <legend class="col-4 col-form-label pt-0" id="level-label">Game Level</legend>
+            <div class="col-8">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
                            value="<%=GameLevel.HARD%>" required
@@ -117,14 +117,14 @@
         </fieldset>
 
         <fieldset class="row mb-3">
-            <legend class="col-sm-4 col-form-label pt-0" id="mutant-validator-label">
+            <legend class="col-4 col-form-label pt-0" id="mutant-validator-label">
                 <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
                    data-bs-toggle="modal" data-bs-target="#validatorExplanation">
                     Mutant Validator Level
                     <i class="fa fa-question-circle ms-1"></i>
                 </a>
             </legend>
-            <div class="col-sm-8">
+            <div class="col-8">
                 <% for (CodeValidatorLevel level : CodeValidatorLevel.values()) { %>
                     <div class="form-check">
                         <input class="form-check-input" type="radio"
@@ -144,10 +144,10 @@
 
         <div class="row mb-3"
              title="Maximum number of assertions per test. Increase this for difficult to test classes.">
-            <label class="col-sm-4 col-form-label" id="max-assertions-label" for="max-assertions-input">
+            <label class="col-4 col-form-label" id="max-assertions-label" for="max-assertions-input">
                 Max. Assertions Per Test
             </label>
-            <div class="col-sm-8">
+            <div class="col-8">
                 <input type="number" class="form-control" id="max-assertions-input" name="maxAssertionsPerTest"
                        value="<%=DEFAULT_NB_ASSERTIONS%>" min="1" required>
                 <div class="invalid-feedback">Please provide a valid number. Must be greater than zero.</div>
@@ -155,14 +155,14 @@
         </div>
 
         <div class="row mb-3">
-            <label class="col-sm-4 col-form-label" id="equiv-threshold-label" for="equiv-threshold-input">
+            <label class="col-4 col-form-label" id="equiv-threshold-label" for="equiv-threshold-input">
                 <a class="text-decoration-none text-reset cursor-pointer"
                    data-bs-toggle="modal" data-bs-target="#automaticEquivalenceTriggerExplanation">
                     Auto Equiv. Threshold
                     <span class="fa fa-question-circle ms-1"></span>
                 </a>
             </label>
-            <div class="col-sm-8">
+            <div class="col-8">
                 <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
                        value="0" min="0" required>
                 <div class="invalid-feedback">Please provide a valid number. Must be positive or zero.</div>
@@ -171,8 +171,8 @@
 
         <div class="row mb-1"
              title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
-            <label class="col-sm-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture Intentions</label>
-            <div class="col-sm-8 d-flex align-items-center">
+            <label class="col-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture Intentions</label>
+            <div class="col-8 d-flex align-items-center">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
                     <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players' Intentions</label>
@@ -182,8 +182,8 @@
 
         <div class="row mb-3"
              title="Allows players to chat within their team and with the enemy team.">
-            <label class="col-sm-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
-            <div class="col-sm-8 d-flex align-items-center">
+            <label class="col-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
+            <div class="col-8 d-flex align-items-center">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled">
                     <label class="form-check-label" for="chat-switch">Enable Chat</label>
@@ -193,8 +193,8 @@
 
         <div class="row mb-3"
              title="Select the role the creator (you) will have in the game.">
-            <label class="col-sm-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
-            <div class="col-sm-8">
+            <label class="col-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
+            <div class="col-8">
                 <select class="form-select" id="role-select" name="roleSelection" required>
                     <% for (Role role : Role.meleeRoles()) { %>
                         <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>

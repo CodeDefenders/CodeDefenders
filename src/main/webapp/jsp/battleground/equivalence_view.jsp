@@ -103,7 +103,7 @@
 
 
 <div class="row">
-    <div class="col-lg-6" id="equivmut-div">
+    <div class="col-lg-6 col-sm-12" id="equivmut-div">
         <div class="game-component-header"><h3><%=mutantClaimedMessage%></h3></div>
 
         <div class="equivalence-container">
@@ -164,7 +164,7 @@
         </div>
     </div>
 
-    <div class="col-lg-6" id="cut-div">
+    <div class="col-lg-6 col-sm-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>

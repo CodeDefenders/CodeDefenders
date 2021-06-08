@@ -126,7 +126,7 @@
             </div>
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <label for="class-ids" class="form-label">
                             <a data-bs-toggle="collapse" data-bs-target="#class-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
                                 Class IDs
@@ -159,7 +159,7 @@
             </div>
             <div class="card-body">
                 <div class="row mb-3">
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <label for="game-ids" class="form-label">
                             <a data-bs-toggle="collapse" data-bs-target="#game-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
                                 Game IDs

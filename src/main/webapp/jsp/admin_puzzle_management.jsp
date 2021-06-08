@@ -192,13 +192,13 @@
                 </div>
                 <div class="modal-body">
                     <div class="row mb-3">
-                        <div class="col-sm-6">
+                        <div class="col-6">
                             <label for="chapterIdForPuzzle\${puzzle.id}" class="form-label">Chapter ID</label>
                             <input type="number" class="form-control"
                                 id="chapterIdForPuzzle\${puzzle.id}"
                                 value="\${puzzle.chapterId}" placeholder="Identifier of a chapter or empty.">
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-6">
                             <label for="positionForPuzzle\${puzzle.id}" class="form-label">Position in Chapter</label>
                             <input type="number" class="form-control"
                                 id="positionForPuzzle\${puzzle.id}" value="\${puzzle.position}"
@@ -207,7 +207,7 @@
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-sm-12">
+                        <div class="col-12">
                             <label for="titleForPuzzle\${puzzle.id}" class="form-label">Title</label>
                             <input type="text" class="form-control"
                                 id="titleForPuzzle\${puzzle.id}" value="\${puzzle.title}">
@@ -215,7 +215,7 @@
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-sm-12">
+                        <div class="col-12">
                             <label for="descriptionForPuzzle\${puzzle.id}" class="form-label">Description</label>
                             <input type="text" class="form-control"
                                 id="descriptionForPuzzle\${puzzle.id}" value="\${puzzle.description}">
@@ -223,7 +223,7 @@
                     </div>
 
                     <div class="row mb-3">
-                        <div class="col-sm-12">
+                        <div class="col-12">
                             <label for="maxAssertionsPerTestForPuzzle\${puzzle.id}" class="form-label">Max. Assertions</label>
                             <input type="number" class="form-control"
                                 id="maxAssertionsPerTestForPuzzle\${puzzle.id}" value="\${puzzle.maxAssertionsPerTest}">
@@ -231,12 +231,12 @@
                     </div>
 
                     <div class="row g-3 mb-2">
-                        <div class="col-sm-6">
+                        <div class="col-6">
                             <label for="editableLinesStartForPuzzle\${puzzle.id}" class="form-label">First Editable Line</label>
                             <input type="number" class="form-control"
                                 id="editableLinesStartForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesStart}">
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-6">
                             <label for="editableLinesEndForPuzzle\${puzzle.id}" class="form-label">Last Editable Line</label>
                             <input type="number" class="form-control"
                                 id="editableLinesEndForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesEnd}">

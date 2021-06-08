@@ -41,7 +41,7 @@
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 
         <div class="row mb-3 g-3">
-            <div class="col-sm-12">
+            <div class="col-12">
                 <label class="form-label" for="classAlias">Class Alias</label>
                 <input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Class Alias"
                        pattern="[a-zA-Z0-9]*">
@@ -53,14 +53,14 @@
                 </div>
             </div>
 
-            <div class="col-sm-12">
+            <div class="col-12">
                 <label class="form-label" for="fileUploadCUT">Java File</label>
                 <input id="fileUploadCUT" name="fileUploadCUT" type="file" class="form-control" accept=".java" required>
                 <div class="invalid-feedback">Please provide a <code>.java</code> file.</div>
                 <div class="form-text">The .java file of the class.</div>
             </div>
 
-            <div class="col-sm-12 col-md-6">
+            <div class="col-md-6 col-sm-12">
                 <label for="testingFramework" class="form-label">Testing Framework</label>
                 <select id="testingFramework" name="testingFramework" class="form-select" required>
                     <% for (TestingFramework tf : TestingFramework.values()) { %>
@@ -72,7 +72,7 @@
                 <div class="form-text">The testing framework that will be used in games with the class.</div>
             </div>
 
-            <div class="col-sm-12 col-md-6">
+            <div class="col-md-6 col-sm-12">
                 <label for="assertionLibrary" class="form-label">Assertion Library</label>
                 <select id="assertionLibrary" name="assertionLibrary" class="form-select" required>
                     <% for (AssertionLibrary al : AssertionLibrary.values()) { %>
@@ -97,10 +97,10 @@
 
                 <h4 class="mt-4 mb-3">Upload Dependencies (optional)</h4>
                 <div class="row g-3 mb-3">
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="form-control" accept=".zip">
                     </div>
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <p>If the class under test has dependencies, you can upload them here.</p>
                         <ul>
                             <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
@@ -117,10 +117,10 @@
 
                 <h4 class="mt-4 mb-3">Upload Mutants (optional)</h4>
                 <div class="row g-3 mb-3">
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="form-control" accept=".zip">
                     </div>
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <p>Mutants uploaded with a class under test can be used to initialize games with existing mutants.</p>
                         <ul>
                             <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
@@ -137,10 +137,10 @@
 
                 <h4 class="mt-4 mb-3">Upload Tests (optional)</h4>
                 <div class="row g-3">
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <input id="fileUploadTest" name="fileUploadTest" type="file" class="form-control" accept=".zip">
                     </div>
-                    <div class="col-sm-12">
+                    <div class="col-12">
                         <p>Tests uploaded with a class under test can be used to initialize games with existing tests.</p>
                         <ul>
                             <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>

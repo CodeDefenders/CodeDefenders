@@ -43,7 +43,7 @@
     <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post" class="row g-3 needs-validation" autocomplete="off">
         <input type="hidden" class="form-control" name="formType" value="updateProfile">
 
-        <div class="col-sm-12">
+        <div class="col-12">
             <div class="mb-2">
                 <label for="updatedEmail" class="form-label">Email</label>
                 <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
@@ -59,7 +59,7 @@
             </div>
         </div>
 
-        <div class="col-sm-12">
+        <div class="col-12">
             <div class="mb-2">
                 <label for="updatedPassword" class="form-label">Password</label>
                 <input type="password" class="form-control" id="updatedPassword"
@@ -84,7 +84,7 @@
             </div>
         </div>
 
-        <div class="col-sm-12">
+        <div class="col-12">
             <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Profile</button>
         </div>
 

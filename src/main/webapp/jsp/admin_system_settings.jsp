@@ -49,7 +49,7 @@
                 String explanation = setting.getName().toString();
         %>
             <div class="row mb-3">
-                <label class="col-sm-4 col-form-label" id="class-label"
+                <label class="col-4 col-form-label" id="class-label"
                        for="<%=setting.getName().name()%>"
                        title="<%=explanation%>">
                     <%=readableName%>
@@ -61,7 +61,7 @@
                         if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
                             setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {
         %>
-                <div class="col-sm-8 mb-3">
+                <div class="col-8">
                     <textarea class="form-control" rows="3"
                               name="<%=setting.getName().name()%>"
                               id="<%=setting.getName().name()%>"
@@ -70,7 +70,7 @@
         <%
                         } else {
         %>
-                <div class="col-sm-8 mb-3">
+                <div class="col-8">
                     <input type="<%=setting.getName().name().contains("PASSWORD") ? "password" : "text"%>"
                            class="form-control"
                            name="<%=setting.getName().name()%>"
@@ -89,7 +89,7 @@
                         break;
                     case BOOL_VALUE:
         %>
-                <div class="col-sm-8 d-flex align-items-center">
+                <div class="col-8 d-flex align-items-center">
                     <div class="form-check form-switch">
                         <input type="checkbox"
                                class="form-check-input"
@@ -106,7 +106,7 @@
                         break;
                     case INT_VALUE:
         %>
-                <div class="col-sm-8 mb-3">
+                <div class="col-8">
                     <input type="number"
                            class="form-control"
                            name="<%=setting.getName().name()%>"
