@@ -14,6 +14,11 @@
         padding-top: 2px;
         padding-bottom: 2px;
     }
+    #chat .chat-tab-button {
+        border-radius: 50rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
+    }
 
     /* Role colors. */
     #chat .chat-message-attacker .chat-message-name {
@@ -38,12 +43,12 @@
     <div class="card m-0">
         <c:choose>
             <c:when test="${gameChat.showTabs}">
-                <div id="chat-handle" class="card-header p-1 d-flex align-items-center">
-                    <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-outline-success ms-1 active"
+                <div id="chat-handle" class="card-header p-1 ps-2 d-flex align-items-center gap-2">
+                    <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-outline-success active"
                             title="Show all message.">All</button>
-                    <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-outline-danger ms-1"
+                    <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-outline-danger"
                             title="Show messages from the perspective of the attacker team.">Attackers</button>
-                    <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-outline-primary ms-1"
+                    <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-outline-primary"
                             title="Show messages from the perspective of the defender team.">Defenders</button>
                     <button id="chat-close" type="button" class="btn-close m-1 ms-auto"></button>
                 </div>
