@@ -30,7 +30,7 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <form id="changeSettings" name="changeSettings"
-          class="needs-validation mx-auto" style="max-width: 60rem;"
+          class="needs-validation" style="max-width: 60rem;"
           action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post">
         <input type="hidden" name="formType" value="saveSettings">
 
