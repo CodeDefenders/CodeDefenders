@@ -45,87 +45,79 @@
         </div>
     </form>
 
-    <div class="accordion">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="explanation-heading">
-                <button class="accordion-button collapsed" type="button"
-                        data-bs-toggle="collapse" data-bs-target="#explanation-collapse"
-                        aria-expanded="false" aria-controls="explanation-collapse">
-                    Puzzle Upload Format
-                </button>
-            </h2>
-            <div id="explanation-collapse" class="accordion-collapse collapse" aria-labelledby="explanation-heading">
-                <div class="accordion-body">
-                    <h4>Classes Under Test (CUTs)</h4>
-                    <ul>
-                        <li>Directory <code>cuts/</code></li>
-                        <li>File convention: <code>cuts/&#60cut_alias&#62/&#60filename&#62</code></li>
-                    </ul>
+    <details>
+        <summary>
+            Puzzle Upload Format
+        </summary>
+        <div class="mt-3">
+            <h4>Classes Under Test (CUTs)</h4>
+            <ul>
+                <li>Directory <code>cuts/</code></li>
+                <li>File convention: <code>cuts/&#60cut_alias&#62/&#60filename&#62</code></li>
+            </ul>
 
-                    <h4>Mutants</h4>
-                    <ul>
-                        <li>Directory <code>mutants/</code></li>
-                        <li>Requires <code>&#60cut_alias&#62</code> to refer to a CUT in this zip file.</li>
-                        <li>File convention: <code>mutants/&#60cut_alias&#62/&#60position&#62/&#60filename&#62</code></li>
-                    </ul>
+            <h4>Mutants</h4>
+            <ul>
+                <li>Directory <code>mutants/</code></li>
+                <li>Requires <code>&#60cut_alias&#62</code> to refer to a CUT in this zip file.</li>
+                <li>File convention: <code>mutants/&#60cut_alias&#62/&#60position&#62/&#60filename&#62</code></li>
+            </ul>
 
-                    <h4>Tests</h4>
-                    <ul>
-                        <li>Directory <code>tests/</code></li>
-                        <li>Requires <code>&#60cut_alias&#62</code> to refer to a CUT in this zip file.</li>
-                        <li>File convention: <code>tests/&#60cut_alias&#62/&#60position&#62/&#60filename&#62</code></li>
-                    </ul>
+            <h4>Tests</h4>
+            <ul>
+                <li>Directory <code>tests/</code></li>
+                <li>Requires <code>&#60cut_alias&#62</code> to refer to a CUT in this zip file.</li>
+                <li>File convention: <code>tests/&#60cut_alias&#62/&#60position&#62/&#60filename&#62</code></li>
+            </ul>
 
-                    <h4>Puzzle Chapters</h4>
+            <h4>Puzzle Chapters</h4>
+            <ul>
+                <li>Directory <code>puzzleChapters/</code></li>
+                <li>File convention: <code>puzzleChapters/&#60filename&#62.properties</code></li>
+                <li>File name is ignored</li>
+                <li>Mandatory properties:
                     <ul>
-                        <li>Directory <code>puzzleChapters/</code></li>
-                        <li>File convention: <code>puzzleChapters/&#60filename&#62.properties</code></li>
-                        <li>File name is ignored</li>
-                        <li>Mandatory properties:
-                            <ul>
-                                <li><code>chapterId</code> (unique integer value)</li>
-                            </ul>
-                        </li>
-                        <li>Optional properties:
-                            <ul>
-                                <li><code>title</code></li>
-                                <li><code>position</code> (integer value used to sort puzzle chapters)</li>
-                                <li><code>description</code></li>
-                            </ul>
-                        </li>
+                        <li><code>chapterId</code> (unique integer value)</li>
                     </ul>
+                </li>
+                <li>Optional properties:
+                    <ul>
+                        <li><code>title</code></li>
+                        <li><code>position</code> (integer value used to sort puzzle chapters)</li>
+                        <li><code>description</code></li>
+                    </ul>
+                </li>
+            </ul>
 
-                    <h4>Puzzles</h4>
-                    <ul class="mb-0">
-                        <li>Directory <code>puzzles/</code></li>
-                        <li>Requires <code>&#60cut_alias&#62</code> to refer to an existing CUT.</li>
-                        <li>File convention: <code>puzzles/&#60cut_alias&#62/&#60puzzle_alias_ext&#62.properties</code></li>
-                        <li><code>&#60puzzle_alias_ext&#62</code> is used for the puzzle alias, which is constructed as follows:
-                            <code>&#60cut_alias&#62_puzzle_&#60puzzle_alias_ext&#62</code></li>
-                        <li>Mandatory properties:
-                            <ul>
-                                <li><code>activeRole</code> ('DEFENDER' or 'ATTACKER')</li>
-                                <li><code>gameLevel</code> ('EASY' or 'HARD')</li>
-                                <li><code>chapterId</code> (has to be of an existing chapter)</li>
-                            </ul>
-                        </li>
-                        <li>Optional properties:
-                            <ul>
-                                <li><code>mutants</code> (comma separated list of positions of mutants for the existing CUT)
-                                </li>
-                                <li><code>tests</code> (comma separated list of positions of tests for the existing CUT)</li>
-                                <li><code>title</code></li>
-                                <li><code>description</code></li>
-                                <li><code>editableLinesStart</code> (first line the user can edit)</li>
-                                <li><code>editableLinesEnd</code> (last line the user can edit)</li>
-                                <li><code>position</code> (position in the puzzle chapter)</li>
-                            </ul>
-                        </li>
+            <h4>Puzzles</h4>
+            <ul class="mb-0">
+                <li>Directory <code>puzzles/</code></li>
+                <li>Requires <code>&#60cut_alias&#62</code> to refer to an existing CUT.</li>
+                <li>File convention: <code>puzzles/&#60cut_alias&#62/&#60puzzle_alias_ext&#62.properties</code></li>
+                <li><code>&#60puzzle_alias_ext&#62</code> is used for the puzzle alias, which is constructed as follows:
+                    <code>&#60cut_alias&#62_puzzle_&#60puzzle_alias_ext&#62</code></li>
+                <li>Mandatory properties:
+                    <ul>
+                        <li><code>activeRole</code> ('DEFENDER' or 'ATTACKER')</li>
+                        <li><code>gameLevel</code> ('EASY' or 'HARD')</li>
+                        <li><code>chapterId</code> (has to be of an existing chapter)</li>
                     </ul>
-                </div>
-            </div>
+                </li>
+                <li>Optional properties:
+                    <ul>
+                        <li><code>mutants</code> (comma separated list of positions of mutants for the existing CUT)
+                        </li>
+                        <li><code>tests</code> (comma separated list of positions of tests for the existing CUT)</li>
+                        <li><code>title</code></li>
+                        <li><code>description</code></li>
+                        <li><code>editableLinesStart</code> (first line the user can edit)</li>
+                        <li><code>editableLinesEnd</code> (last line the user can edit)</li>
+                        <li><code>position</code> (position in the puzzle chapter)</li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-    </div>
+    </details>
 
 </div>
 

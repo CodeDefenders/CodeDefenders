@@ -84,85 +84,77 @@
             </div>
         </div>
 
-        <div class="accordion">
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="advanced-options-heading">
-                    <button class="accordion-button collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#advanced-options-collapse"
-                            aria-expanded="false" aria-controls="advanced-options-collapse">
-                        Advanced Upload Options
-                    </button>
-                </h2>
-                <div id="advanced-options-collapse" class="accordion-collapse collapse" aria-labelledby="advanced-options-heading">
-                    <div class="accordion-body">
-                        <div class="form-check">
-                            <input class="form-check-input" id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking">
-                            <label class="form-check-label" for="mockingEnabled">Enable Mocking for this class</label>
-                        </div>
+        <details>
+            <summary>
+                Advanced Upload Options
+            </summary>
+            <div class="mt-3">
+                <div class="form-check">
+                    <input class="form-check-input" id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking">
+                    <label class="form-check-label" for="mockingEnabled">Enable Mocking for this class</label>
+                </div>
 
-                        <h4 class="mt-4 mb-3">Upload Dependencies (optional)</h4>
-                        <div class="row g-3 mb-3">
-                            <div class="col-sm-12">
-                                <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="form-control" accept=".zip">
-                            </div>
-                            <div class="col-sm-12">
-                                <p>If the class under test has dependencies, you can upload them here.</p>
-                                <ul>
-                                    <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
-                                    <li>Dependencies may contain packages.</li>
-                                </ul>
-                                <p>Example:</p>
-                                <pre class="mb-0 p-3 bg-light">deps
+                <h4 class="mt-4 mb-3">Upload Dependencies (optional)</h4>
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-12">
+                        <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="form-control" accept=".zip">
+                    </div>
+                    <div class="col-sm-12">
+                        <p>If the class under test has dependencies, you can upload them here.</p>
+                        <ul>
+                            <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
+                            <li>Dependencies may contain packages.</li>
+                        </ul>
+                        <p>Example:</p>
+                        <pre class="mb-0 p-3 bg-light">deps
 &#x251c;&#x2500; Event.java
 &#x2514;&#x2500; events
     &#x251c;&#x2500; StartEvent.java
     &#x2514;&#x2500; StopEvent.java</pre>
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
-                        <h4 class="mt-4 mb-3">Upload Mutants (optional)</h4>
-                        <div class="row g-3 mb-3">
-                            <div class="col-sm-12">
-                                <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="form-control" accept=".zip">
-                            </div>
-                            <div class="col-sm-12">
-                                <p>Mutants uploaded with a class under test can be used to initialize games with existing mutants.</p>
-                                <ul>
-                                    <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
-                                    <li>All mutants must have the same class name as the class under test.</li>
-                                </ul>
-                                <p>Example:</p>
-                                <pre class="mb-0 p-3 bg-light">mutants
+                <h4 class="mt-4 mb-3">Upload Mutants (optional)</h4>
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-12">
+                        <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="form-control" accept=".zip">
+                    </div>
+                    <div class="col-sm-12">
+                        <p>Mutants uploaded with a class under test can be used to initialize games with existing mutants.</p>
+                        <ul>
+                            <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
+                            <li>All mutants must have the same class name as the class under test.</li>
+                        </ul>
+                        <p>Example:</p>
+                        <pre class="mb-0 p-3 bg-light">mutants
 &#x251c;&#x2500; 01
 &#x2502;   &#x2514;&#x2500; EventBus.java
 &#x2514;&#x2500; 02
     &#x2514;&#x2500; EventBus.java</pre>
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
-                        <h4 class="mt-4 mb-3">Upload Tests (optional)</h4>
-                        <div class="row g-3">
-                            <div class="col-sm-12">
-                                <input id="fileUploadTest" name="fileUploadTest" type="file" class="form-control" accept=".zip">
-                            </div>
-                            <div class="col-sm-12">
-                                <p>Tests uploaded with a class under test can be used to initialize games with existing tests.</p>
-                                <ul>
-                                    <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
-                                    <li>Multiple tests can have the same name, but they don't have to.</li>
-                                </ul>
-                                <p>Example:</p>
-                                <pre class="mb-0 p-3 bg-light">tests
+                <h4 class="mt-4 mb-3">Upload Tests (optional)</h4>
+                <div class="row g-3">
+                    <div class="col-sm-12">
+                        <input id="fileUploadTest" name="fileUploadTest" type="file" class="form-control" accept=".zip">
+                    </div>
+                    <div class="col-sm-12">
+                        <p>Tests uploaded with a class under test can be used to initialize games with existing tests.</p>
+                        <ul>
+                            <li>The dependencies are uploaded inside of a <code>zip</code> file, the folder structure of which is irrelevant.</li>
+                            <li>Multiple tests can have the same name, but they don't have to.</li>
+                        </ul>
+                        <p>Example:</p>
+                        <pre class="mb-0 p-3 bg-light">tests
 &#x251c;&#x2500; 01
 &#x2502;   &#x2514;&#x2500; TestEventBus.java
 &#x2514;&#x2500; 02
     &#x2514;&#x2500; TestEventBus.java</pre>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </details>
 
         <div class="row mt-3">
             <div class="col-auto">
