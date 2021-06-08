@@ -36,7 +36,8 @@
     <h2>Upload Class</h2>
     <form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>"
           method="post" enctype="multipart/form-data"
-          class="needs-validation">
+          class="needs-validation"
+          style="max-width: 50rem;">
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 
         <div class="row mb-3 g-3">

@@ -43,7 +43,8 @@
     %>
         <h3>Editing User <%=user.getId()%></h3>
 
-        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" class="needs-validation mb-4" autocomplete="off">
+        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" class="needs-validation mb-4"
+              autocomplete="off" style="max-width: 50rem;">
             <input type="hidden" name="formType" value="editUser">
             <input type="hidden" name="uid" value="<%=user.getId()%>">
 
