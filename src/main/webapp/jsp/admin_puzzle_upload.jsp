@@ -51,8 +51,7 @@
                 <button class="accordion-button collapsed" type="button"
                         data-bs-toggle="collapse" data-bs-target="#explanation-collapse"
                         aria-expanded="false" aria-controls="explanation-collapse">
-                    Puzzle upload convention description
-                    <i class="fa fa-question-circle ms-1"></i>
+                    Puzzle Upload Format
                 </button>
             </h2>
             <div id="explanation-collapse" class="accordion-collapse collapse" aria-labelledby="explanation-heading">
@@ -97,7 +96,7 @@
                     </ul>
 
                     <h4>Puzzles</h4>
-                    <ul>
+                    <ul class="mb-0">
                         <li>Directory <code>puzzles/</code></li>
                         <li>Requires <code>&#60cut_alias&#62</code> to refer to an existing CUT.</li>
                         <li>File convention: <code>puzzles/&#60cut_alias&#62/&#60puzzle_alias_ext&#62.properties</code></li>
