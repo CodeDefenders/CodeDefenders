@@ -28,12 +28,23 @@
     background-color: var(--bg-defender-light) !important;
 }
 
+.bg-player {
+    background-color: var(--bg-player) !important;
+}
+.bg-player-light {
+    background-color: var(--bg-player-light) !important;
+}
+
 .fg-attacker {
     color: var(--fg-attacker) !important;
 }
 
 .fg-defender {
     color: var(--fg-defender) !important;
+}
+
+.fg-player {
+    color: var(--fg-player) !important;
 }
 
 .btn-attacker {
@@ -56,6 +67,17 @@
     color: white;
     background-color: var(--bg-defender-dark);
     border-color: var(--bg-defender-contrast-dark);
+}
+
+.btn-player {
+    color: white;
+    background-color: var(--bg-player);
+    border-color: var(--bg-player-contrast);
+}
+.btn-player:hover {
+    color: white;
+    background-color: var(--bg-player-dark);
+    border-color: var(--bg-player-contrast-dark);
 }
 
 /* Mutant icons

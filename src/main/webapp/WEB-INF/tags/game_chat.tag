@@ -22,13 +22,13 @@
 
     /* Role colors. */
     #chat .chat-message-attacker .chat-message-name {
-        color: #bf0035;
+        color: var(--fg-attacker);
     }
     #chat .chat-message-defender .chat-message-name {
-        color: #0041db;
+        color: var(--fg-defender);
     }
     #chat .chat-message-player .chat-message-name {
-        color: #1e9f02;
+        color: var(--fg-player);
     }
     #chat .chat-message-observer .chat-message-name {
         color: #ff8300;
@@ -45,7 +45,7 @@
             <c:when test="${gameChat.showTabs}">
                 <div id="chat-handle" class="card-header p-1 ps-2 d-flex align-items-center gap-2">
                     <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-outline-success active"
-                            title="Show all message.">All</button>
+                            title="Show all messages.">All</button>
                     <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-outline-danger"
                             title="Show messages from the perspective of the attacker team.">Attackers</button>
                     <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-outline-primary"

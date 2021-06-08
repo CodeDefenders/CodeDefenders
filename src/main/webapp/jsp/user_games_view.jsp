@@ -342,7 +342,7 @@
                                                     // Game is already running, the user is a player, so she can play
                                                     if (info.gameState() != GameState.CREATED) {
                                     %>
-                                        <a class="btn btn-sm btn-attacker text-nowrap" id="<%="play-"+gameId%>"
+                                        <a class="btn btn-sm btn-player text-nowrap" id="<%="play-"+gameId%>"
                                            href="<%= request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gameId%>">
                                             Play in melee game
                                         </a>
@@ -628,7 +628,7 @@
                                         <input type="hidden" name="player" value=1>
                                         <%=info.players().size()%>
                                         <button type="submit" id="<%="join-"+info.gameId()%>"
-                                                class="btn btn-primary btn-sm"
+                                                class="btn btn-defender btn-sm"
                                                 value="Join">
                                             Join
                                         </button>
