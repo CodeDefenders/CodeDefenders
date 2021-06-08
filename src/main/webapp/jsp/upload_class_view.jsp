@@ -115,8 +115,8 @@
                                 <pre class="mb-0 p-3 bg-light">deps
 &#x251c;&#x2500; Event.java
 &#x2514;&#x2500; events
-&#x251c;&#x2500; StartEvent.java
-&#x2514;&#x2500; StopEvent.java</pre>
+    &#x251c;&#x2500; StartEvent.java
+    &#x2514;&#x2500; StopEvent.java</pre>
                             </div>
                         </div>
 
@@ -136,7 +136,7 @@
 &#x251c;&#x2500; 01
 &#x2502;   &#x2514;&#x2500; EventBus.java
 &#x2514;&#x2500; 02
-&#x2514;&#x2500; EventBus.java</pre>
+    &#x2514;&#x2500; EventBus.java</pre>
                             </div>
                         </div>
 
@@ -156,7 +156,7 @@
 &#x251c;&#x2500; 01
 &#x2502;   &#x2514;&#x2500; TestEventBus.java
 &#x2514;&#x2500; 02
-&#x2514;&#x2500; TestEventBus.java</pre>
+    &#x2514;&#x2500; TestEventBus.java</pre>
                             </div>
                         </div>
                     </div>
