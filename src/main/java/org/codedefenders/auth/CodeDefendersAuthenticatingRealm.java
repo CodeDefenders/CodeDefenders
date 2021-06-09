@@ -48,11 +48,14 @@ import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 @Singleton
 public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
 
-    @Inject
-    SettingsRepository settingsRepository;
+    private final SettingsRepository settingsRepository;
+    private final UserRepository userRepository;
 
     @Inject
-    UserRepository userRepository;
+    public CodeDefendersAuthenticatingRealm(SettingsRepository settingsRepository, UserRepository userRepository) {
+        this.settingsRepository = settingsRepository;
+        this.userRepository = userRepository;
+    }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(final AuthenticationToken token)
