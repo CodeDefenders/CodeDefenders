@@ -54,9 +54,9 @@ public class UserServlet extends HttpServlet {
                 } else if (!password.equals(confirm)) {
                     // This check should be performed in the user interface too.
                     messages.add("Could not create user. Password entries did not match.");
-                } else if (userRepo.getUserByName(username) != null) {
+                } else if (userRepo.getUserByName(username).isPresent()) {
                     messages.add("Could not create user. Username is already taken.");
-                } else if (userRepo.getUserByEmail(email) != null) {
+                } else if (userRepo.getUserByEmail(email).isPresent()) {
                     messages.add("Could not create user. Email has already been used. You can reset your password.");
                 } else {
                     UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);

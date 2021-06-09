@@ -84,7 +84,7 @@ public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
             String dbPassword = activeUser.get().getEncodedPassword();
 
             if (UserEntity.passwordMatches(new String(usernamePasswordToken.getPassword()), dbPassword)) {
-                return new SimpleAuthenticationInfo(activeUser, usernamePasswordToken.getPassword(), getName());
+                return new SimpleAuthenticationInfo(activeUser.get(), usernamePasswordToken.getPassword(), getName());
             } else {
                 throw new IncorrectCredentialsException("Username not found or password incorrect.");
             }

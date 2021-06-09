@@ -91,7 +91,7 @@ public class UserProfileManager extends HttpServlet {
             return;
         }
 
-        if (userRepo.getUserById(login.getUserId()) == null) {
+        if (!userRepo.getUserById(login.getUserId()).isPresent()) {
             response.sendRedirect(request.getContextPath());
             return;
         }

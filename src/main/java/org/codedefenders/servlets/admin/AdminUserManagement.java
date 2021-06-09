@@ -186,11 +186,11 @@ public class AdminUserManagement extends HttpServlet {
             return "Passwords don't match";
         }
 
-        if (!name.equals(u.getUsername()) && userRepo.getUserByName(name) != null) {
+        if (!name.equals(u.getUsername()) && userRepo.getUserByName(name).isPresent()) {
             return "Username " + name + " is already taken";
         }
 
-        if (!email.equals(u.getEmail()) && userRepo.getUserByEmail(email) != null) {
+        if (!email.equals(u.getEmail()) && userRepo.getUserByEmail(email).isPresent()) {
             return "Email " + email + " is already in use";
         }
 
@@ -249,7 +249,7 @@ public class AdminUserManagement extends HttpServlet {
         }
 
         final String username = credentials[0].trim();
-        if (userRepo.getUserByName(username) != null) {
+        if (userRepo.getUserByName(username).isPresent()) {
             logger.info("Failed to create user. Username already in use:" + username);
             messages.add("Username '" + username + "' already in use.");
             return;
@@ -272,7 +272,7 @@ public class AdminUserManagement extends HttpServlet {
         final boolean hasMail = credentials.length == 3;
         if (hasMail) {
             email = credentials[2].trim();
-            if (userRepo.getUserByEmail(email) != null) {
+            if (userRepo.getUserByEmail(email).isPresent()) {
                 logger.info("Failed to create user. Email address already in use:" + email);
                 messages.add("Email '" + email + "' already in use.");
                 return;
