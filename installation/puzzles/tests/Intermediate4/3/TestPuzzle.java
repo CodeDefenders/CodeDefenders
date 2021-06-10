@@ -4,9 +4,9 @@ import static org.junit.Assert.*;
 public class TestPuzzle {
 
   @Test
-  public void test1() {
+  public void test3() {
     Puzzle b = new Puzzle();
-    assertEquals(5, b.run(5, 0));
+    assertEquals(5, b.run(5, 1));
   }
 
 }
