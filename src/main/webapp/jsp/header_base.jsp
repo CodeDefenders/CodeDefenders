@@ -47,8 +47,8 @@
     <link href="webjars/jquery-ui/1.12.1/jquery-ui.min.css" rel="stylesheet">
 
     <!-- Bootstrap -->
-    <script src="webjars/bootstrap/5.0.0-beta3/js/bootstrap.bundle.min.js"></script>
-    <link href="webjars/bootstrap/5.0.0-beta3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="webjars/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
+    <link href="webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap_customize.css" rel="stylesheet">
     <script type="text/javascript" src="js/bootstrap-init.js"></script>
 
