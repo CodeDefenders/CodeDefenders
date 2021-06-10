@@ -32,16 +32,16 @@
     int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 %>
 
-<div class="container">
+<div class="container form-width">
     <h2>${pageInfo.pageTitle}</h2>
 
-    <h3 class="mt-4">Played games</h3>
+    <h3 class="mt-4 mb-3">Played games</h3>
     <p>
         You can find a list of your past games in the
         <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
     </p>
 
-    <h3 class="mt-4">Account Information</h3>
+    <h3 class="mt-4 mb-3">Account Information</h3>
 
     <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post" class="row g-3 needs-validation" autocomplete="off">
         <input type="hidden" class="form-control" name="formType" value="updateProfile">
@@ -113,7 +113,7 @@
         </script>
     </form>
 
-    <h3 class="mt-4">Account Deletion</h3>
+    <h3 class="mt-4 mb-3">Account Deletion</h3>
 
     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#account-deletion-modal">
         Delete Account

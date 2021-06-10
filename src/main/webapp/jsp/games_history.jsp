@@ -58,7 +58,7 @@
 
     <h2 class="mb-4">${pageInfo.pageTitle}</h2>
 
-    <h3>Battlegrounds</h3>
+    <h3 class="mt-4 mb-3">Battlegrounds</h3>
     <table class="table table-striped table-v-align-middle">
         <thead>
             <tr>
@@ -199,7 +199,7 @@
         </tbody>
     </table>
 
-    <h3 class="mt-4">Melee games</h3>
+    <h3 class="mt-4 mb-3">Melee games</h3>
     <table class="table table-striped table-v-align-middle">
         <thead>
             <tr>

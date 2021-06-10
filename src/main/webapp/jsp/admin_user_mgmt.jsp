@@ -210,7 +210,7 @@
         </script>
     </form>
 
-    <h3 class="mt-4">Create Accounts</h3>
+    <h3 class="mt-4 mb-3">Create Accounts</h3>
 
     <form id="createUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="createUsers">

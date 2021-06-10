@@ -36,7 +36,7 @@
 
 <div class="container">
 
-    <h2 class="mb-4">${pageInfo.pageTitle}</h2>
+    <h2 class="mb-3">${pageInfo.pageTitle}</h2>
     <form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>"
           method="post" enctype="multipart/form-data"
           class="needs-validation form-width"

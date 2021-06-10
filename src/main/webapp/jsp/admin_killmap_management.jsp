@@ -123,7 +123,7 @@
 
     <% if (currentPage == KillmapPage.MANUAL) { %>
 
-        <div class="card mb-3">
+        <div class="card mb-4">
             <div class="card-header">
                 Classes
             </div>
@@ -191,7 +191,7 @@
 
     <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
 
-        <div class="card mb-3">
+        <div class="card mb-4">
             <div class="card-header d-flex justify-content-between flex-wrap gap-1">
                 Classes
                 <div class="d-flex flex-wrap gap-2">
