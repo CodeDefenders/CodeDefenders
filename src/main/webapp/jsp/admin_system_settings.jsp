@@ -23,6 +23,9 @@
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.stream.Collectors" %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("System Settings"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">

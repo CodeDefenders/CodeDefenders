@@ -35,7 +35,7 @@
 
 <div class="container">
 
-    <h2 class="mb-4">About CodeDefenders</h2>
+    <h2 class="mb-4">${pageInfo.pageTitle}</h2>
      <%
         String version = GameClass.class.getPackage().getImplementationVersion();
 

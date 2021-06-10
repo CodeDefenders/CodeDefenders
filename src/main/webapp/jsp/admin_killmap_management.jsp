@@ -25,6 +25,9 @@
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("KillMap Management"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <%

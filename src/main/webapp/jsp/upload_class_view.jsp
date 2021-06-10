@@ -27,17 +27,19 @@
 <%@ page import="org.codedefenders.game.*" %>
 <%@ page import="java.util.Map" %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Upload Class"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/uploadcut.css" rel="stylesheet">
 
 <div class="container">
 
-    <h2>Upload Class</h2>
+    <h2 class="mb-4">${pageInfo.pageTitle}</h2>
     <form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>"
           method="post" enctype="multipart/form-data"
-          class="needs-validation"
-          style="max-width: 50rem;">
+          class="needs-validation form-width">
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 
         <div class="row mb-3 g-3">

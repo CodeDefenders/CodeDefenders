@@ -32,9 +32,9 @@
 	<jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<div class="container" style="max-width: 50rem;">
+<div class="container form-width">
 
-	<h2>Contact Us</h2>
+	<h2>${pageInfo.pageTitle}</h2>
 	<p>
 		Code Defenders is an open source project; you can find details on the
 		<a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.

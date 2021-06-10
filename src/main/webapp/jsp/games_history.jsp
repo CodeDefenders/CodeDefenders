@@ -56,6 +56,8 @@
 
 <div class="container">
 
+    <h2 class="mb-4">${pageInfo.pageTitle}</h2>
+
     <h3>Battlegrounds</h3>
     <table class="table table-striped table-v-align-middle">
         <thead>

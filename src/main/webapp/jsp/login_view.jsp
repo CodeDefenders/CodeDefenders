@@ -29,57 +29,55 @@
     int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 %>
 
-<div id="login" class="container">
-    <div class="mx-auto" style="max-width: 25rem;">
-        <h2>Sign in</h2>
-        <form action="<%=request.getContextPath() + Paths.LOGIN%>" method="post" id="login-form" class="needs-validation">
+<div id="login" class="container" style="max-width: 25rem;">
+    <h2>Sign in</h2>
+    <form action="<%=request.getContextPath() + Paths.LOGIN%>" method="post" id="login-form" class="needs-validation">
 
-            <div class="row g-3">
-                <div class="col-12">
-                    <label for="login-username-input" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="login-username-input" name="username" placeholder="Username"
-                           required>
-                    <div class="invalid-feedback">
-                        Please enter your username.
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <label for="login-password-input" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="login-password-input" name="password" placeholder="Password"
-                           required>
-                    <div class="invalid-feedback">
-                        Please enter your password.
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="login-consent-checkbox" checked
-                               required>
-                        <label for="login-consent-checkbox" class="form-check-label">
-                            I understand and consent that the mutants and tests I create in the game will be used for research purposes.
-                        </label>
-                    </div>
-                </div>
-
-                <div class="col-12">
-                    <button id="login-button" type="submit" class="btn btn-primary btn-lg w-100">Sign in</button>
-                </div>
-
-                <div class="col-12 d-flex justify-content-between">
-                    <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
-                        <a id="createacc-link" href="#" data-bs-toggle="modal" data-bs-target="#createacc-modal">Create an account</a>
-                    <% } %>
-
-                    <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) { %>
-                        <a id="password-forgotten-link" href="#" data-bs-toggle="modal" data-bs-target="#resetpw-modal">Password forgotten</a>
-                    <% } %>
+        <div class="row g-3">
+            <div class="col-12">
+                <label for="login-username-input" class="form-label">Username</label>
+                <input type="text" class="form-control" id="login-username-input" name="username" placeholder="Username"
+                       required>
+                <div class="invalid-feedback">
+                    Please enter your username.
                 </div>
             </div>
 
-        </form>
-    </div>
+            <div class="col-12">
+                <label for="login-password-input" class="form-label">Password</label>
+                <input type="password" class="form-control" id="login-password-input" name="password" placeholder="Password"
+                       required>
+                <div class="invalid-feedback">
+                    Please enter your password.
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" id="login-consent-checkbox" checked
+                           required>
+                    <label for="login-consent-checkbox" class="form-check-label">
+                        I understand and consent that the mutants and tests I create in the game will be used for research purposes.
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <button id="login-button" type="submit" class="btn btn-primary btn-lg w-100">Sign in</button>
+            </div>
+
+            <div class="col-12 d-flex justify-content-between">
+                <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
+                    <a id="createacc-link" href="#" data-bs-toggle="modal" data-bs-target="#createacc-modal">Create an account</a>
+                <% } %>
+
+                <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) { %>
+                    <a id="password-forgotten-link" href="#" data-bs-toggle="modal" data-bs-target="#resetpw-modal">Password forgotten</a>
+                <% } %>
+            </div>
+        </div>
+
+    </form>
 </div>
 
 <div id="createacc-modal" class="modal fade" tabindex="-1" aria-labelledby="createacc-modal-title" aria-hidden="true">

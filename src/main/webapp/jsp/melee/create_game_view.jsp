@@ -38,20 +38,22 @@
     boolean isClassUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
 %>
 
-<div class="container">
+<div class="container form-width">
+
+    <h2 class="text-center mb-4">${pageInfo.pageTitle}</h2>
 
 <%
     if (gameClasses.isEmpty()) {
         if (isClassUploadEnabled) {
 %>
-    <p>
+    <p class="text-center">
         Before you can start games, please
         <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center">upload a class under test</a>.
     </p>
 <%
         } else {
 %>
-    <p>
+    <p class="text-center">
         Games can only be started once at least one class under test has been uploaded.
     </p>
 <%
@@ -59,7 +61,7 @@
     } else {
 %>
     <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
-          class="mx-auto mt-4 needs-validation" style="max-width: 40rem;">
+          class="needs-validation">
         <input type="hidden" name="formType" value="createGame">
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 

@@ -32,6 +32,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request" />
+<% pageInfo.setPageTitle("My Games"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <%
@@ -71,7 +74,7 @@
 
 <div class="container">
 
-    <h2 class="mb-3">My Games</h2>
+    <h2 class="mb-3">${pageInfo.pageTitle}</h2>
     <table id="my-games" class="table table-striped table-v-align-middle">
         <thead>
             <tr>

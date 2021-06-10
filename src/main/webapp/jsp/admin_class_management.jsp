@@ -24,6 +24,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Class Management"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <%

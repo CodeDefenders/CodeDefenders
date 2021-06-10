@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Puzzle Management"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">

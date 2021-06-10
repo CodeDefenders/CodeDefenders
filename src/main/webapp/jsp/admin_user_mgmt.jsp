@@ -28,6 +28,9 @@
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("User Management"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
@@ -43,8 +46,9 @@
     %>
         <h3>Editing User <%=user.getId()%></h3>
 
-        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" class="needs-validation mb-4"
-              autocomplete="off" style="max-width: 50rem;">
+        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post"
+              class="needs-validation form-width mb-4"
+              autocomplete="off">
             <input type="hidden" name="formType" value="editUser">
             <input type="hidden" name="uid" value="<%=user.getId()%>">
 

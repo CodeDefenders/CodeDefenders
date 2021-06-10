@@ -21,6 +21,9 @@
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("My Profile"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
@@ -30,7 +33,7 @@
 %>
 
 <div class="container">
-    <h2>Profile</h2>
+    <h2>${pageInfo.pageTitle}</h2>
 
     <h3 class="mt-4">Played games</h3>
     <p>

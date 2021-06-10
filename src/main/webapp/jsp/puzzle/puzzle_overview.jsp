@@ -38,6 +38,9 @@
         Associated puzzles are sorted on the puzzle identifier.
 
 --%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Puzzles"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <%
@@ -46,7 +49,7 @@
 
 <div class="container">
 
-    <h2 class="mb-3">Puzzles</h2>
+    <h2 class="mb-4">${pageInfo.pageTitle}</h2>
     <table id="puzzles" class="table table-striped table-v-align-middle">
         <%
             if (puzzleChapterEntries.isEmpty()) {

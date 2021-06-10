@@ -45,6 +45,9 @@
     final String description = puzzle.getDescription();
 %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
+
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 

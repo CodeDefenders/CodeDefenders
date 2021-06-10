@@ -37,6 +37,9 @@
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Monitor Games"); %>
+
 <jsp:include page="/jsp/header.jsp"/>
 
 <%
