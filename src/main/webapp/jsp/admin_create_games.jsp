@@ -118,7 +118,7 @@
         </div>
     </div>
 
-    <form id="form-settings">
+    <form id="form-settings" autocomplete="off">
         <div class="row">
             <div class="col-md-6 col-sm-12">
 

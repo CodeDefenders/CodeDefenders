@@ -212,7 +212,7 @@
 
     <h3 class="mt-4">Create Accounts</h3>
 
-    <form id="createUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
+    <form id="createUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="createUsers">
 
         <div class="row g-3">

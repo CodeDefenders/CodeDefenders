@@ -83,7 +83,7 @@
 <div id="createacc-modal" class="modal fade" tabindex="-1" aria-labelledby="createacc-modal-title" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 30rem;">
         <div class="modal-content">
-            <form action="<%=request.getContextPath() + Paths.USER%>" method="post" class="needs-validation">
+            <form action="<%=request.getContextPath() + Paths.USER%>" method="post" class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="create">
 
                 <div class="modal-header">
@@ -175,7 +175,7 @@
 <div id="resetpw-modal" class="modal fade" tabindex="-1" aria-labelledby="resetpw-modal-title" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 30rem;">
         <div class="modal-content">
-            <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation">
+            <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="resetPassword">
 
                 <div class="modal-header">
@@ -244,7 +244,7 @@
 <div id="changepw-modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="changepw-modal-title" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 30rem;">
         <div class="modal-content">
-            <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation">
+            <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation" autocomplete="off">
                 <input type="hidden" name="resetPwSecret" id="resetPwSecret" value="<%=resetPw%>">
                 <input type="hidden" name="formType" value="changePassword">
 

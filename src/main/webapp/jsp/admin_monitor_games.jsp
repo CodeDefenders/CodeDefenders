@@ -63,7 +63,7 @@
     <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post">
+    <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="startStopGame">
 
         <h3 class="mb-3">You Multiplayer Games</h3>

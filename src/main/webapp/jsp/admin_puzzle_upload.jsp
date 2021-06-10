@@ -32,7 +32,7 @@
     <p>Puzzle information is uploaded in a single zip file. For details on the convention, expand the description.</p>
 
     <form id="uploadPuzzles" name="uploadPuzzles" action="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_UPLOAD%>"
-          class="form-width mb-3" method="post" enctype="multipart/form-data">
+          class="form-width mb-3" method="post" enctype="multipart/form-data" autocomplete="off">
         <input type="hidden" name="formType" value="uploadPuzzles">
 
         <div class="row g-3 mb-3">

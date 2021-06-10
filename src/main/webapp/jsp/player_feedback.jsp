@@ -109,7 +109,7 @@
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="give-feedback" role="tabpanel" aria-labelledby="give-feedback-tab">
                             <span class="h4">How much do you agree with the following statements?</span>
-                            <form id="give-feedback-form" action="<%=request.getContextPath() + Paths.API_FEEDBACK%>" method="post">
+                            <form id="give-feedback-form" action="<%=request.getContextPath() + Paths.API_FEEDBACK%>" method="post" autocomplete="off">
                                 <input type="hidden" name="formType" value="sendFeedback">
                                 <input type="hidden" name="gameId" value="${playerFeedback.gameId}">
 
@@ -122,24 +122,19 @@
                                         <div><%=type.description()%></div>
                                         <fieldset class="rating rating-interactive">
                                             <input type="radio" id="star5_<%=type.name()%>" name="rating<%=type.name()%>" value=5
-                                                <%=oldValue == 5 ? "checked" : ""%>
-                                                   autocomplete="off">
+                                                <%=oldValue == 5 ? "checked" : ""%>>
                                             <label class="full" for="star5_<%=type.name()%>" title="very much"></label>
                                             <input type="radio" id="star4_<%=type.name()%>" name="rating<%=type.name()%>" value=4
-                                                <%=oldValue == 4 ? "checked" : ""%>
-                                                   autocomplete="off">
+                                                <%=oldValue == 4 ? "checked" : ""%>>
                                             <label class="full" for="star4_<%=type.name()%>" title="a lot"></label>
                                             <input type="radio" id="star3_<%=type.name()%>" name="rating<%=type.name()%>" value=3
-                                                <%=oldValue == 3 ? "checked" : ""%>
-                                                   autocomplete="off">
+                                                <%=oldValue == 3 ? "checked" : ""%>>
                                             <label class="full" for="star3_<%=type.name()%>" title="somewhat"></label>
                                             <input type="radio" id="star2_<%=type.name()%>" name="rating<%=type.name()%>" value=2
-                                                <%=oldValue == 2 ? "checked" : ""%>
-                                                   autocomplete="off">
+                                                <%=oldValue == 2 ? "checked" : ""%>>
                                             <label class="full" for="star2_<%=type.name()%>" title="a bit"></label>
                                             <input type="radio" id="star1_<%=type.name()%>" name="rating<%=type.name()%>" value=1
-                                                <%=oldValue == 1 ? "checked" : ""%>
-                                                   autocomplete="off">
+                                                <%=oldValue == 1 ? "checked" : ""%>>
                                             <label class="full" for="star1_<%=type.name()%>" title="not at all"></label>
                                         </fieldset>
                                     <%

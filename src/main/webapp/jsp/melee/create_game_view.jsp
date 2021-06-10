@@ -61,7 +61,7 @@
     } else {
 %>
     <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
-          class="needs-validation">
+          class="needs-validation" autocomplete="off">
         <input type="hidden" name="formType" value="createGame">
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 

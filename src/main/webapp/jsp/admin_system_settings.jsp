@@ -34,7 +34,8 @@
 
     <form id="changeSettings" name="changeSettings"
           class="needs-validation"
-          action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post">
+          action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post"
+          autocomplete="off">
         <input type="hidden" name="formType" value="saveSettings">
 
         <%
@@ -67,8 +68,7 @@
                 <div class="col-8">
                     <textarea class="form-control" rows="3"
                               name="<%=setting.getName().name()%>"
-                              id="<%=setting.getName().name()%>"
-                              autocomplete="off"><%=setting.getStringValue()%></textarea>
+                              id="<%=setting.getName().name()%>"><%=setting.getStringValue()%></textarea>
                 </div>
         <%
                         } else {
@@ -78,8 +78,7 @@
                            class="form-control"
                            name="<%=setting.getName().name()%>"
                            id="<%=setting.getName().name()%>"
-                           value="<%=setting.getStringValue()%>"
-                           autocomplete="off">
+                           value="<%=setting.getStringValue()%>">
                     <% if (setting.getName().name().startsWith("EMAIL")) { %>
                         <div class="invalid-feedback">
                             This setting is required for sending emails.
@@ -98,8 +97,7 @@
                                class="form-check-input"
                                id="<%=setting.getName().name()%>"
                                name="<%=setting.getName().name()%>"
-                               <%=setting.getBoolValue() ? "checked" : ""%>
-                               autocomplete="off">
+                               <%=setting.getBoolValue() ? "checked" : ""%>>
                         <label class="form-check-label" for="<%=setting.getName().name()%>">
                             <%=readableName%>
                         </label>
@@ -114,8 +112,7 @@
                            class="form-control"
                            name="<%=setting.getName().name()%>"
                            id="<%=setting.getName().name()%>"
-                           value="<%=setting.getIntValue()%>"
-                           autocomplete="off">
+                           value="<%=setting.getIntValue()%>">
                     <% if (setting.getName().name().startsWith("EMAIL")) { %>
                         <div class="invalid-feedback">
                             This setting is required for sending emails.
