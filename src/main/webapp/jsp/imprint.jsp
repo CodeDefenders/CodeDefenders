@@ -36,23 +36,27 @@
     String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
 %>
 
-<div class="container" style="max-width: 50rem;">
+<div class="container">
 
-    <h2>Imprint</h2>
+    <h3 class="mb-3">Imprint</h3>
 
-    <% if (siteNotice.isEmpty()) { %>
-        <p>Please add an imprint in the system settings.</p>
-    <% } else { %>
-        <p style="white-space: pre-wrap"><%=siteNotice%></p>
-    <% } %>
+    <div class="bg-light rounded-3 p-3 mb-3">
+        <% if (siteNotice.isEmpty()) { %>
+            <p class="mb-0">Please add an imprint in the system settings.</p>
+        <% } else { %>
+            <p style="white-space: pre-wrap" class="mb-0"><%=siteNotice%></p>
+        <% } %>
+    </div>
 
-    <h3 class="mt-4">Privacy Policy</h3>
+    <h3 class="mt-4 mb-3">Privacy Policy</h3>
 
-    <% if (privacyNotice.isEmpty()) { %>
-        <p>Please add a privacy policy in the system settings.</p>
-    <% } else { %>
-        <p style="white-space: pre-wrap"><%=privacyNotice%></p>
-    <% } %>
+    <div class="bg-light rounded-3 p-3 mb-3">
+        <% if (privacyNotice.isEmpty()) { %>
+            <p class="mb-0">Please add a privacy policy in the system settings.</p>
+        <% } else { %>
+            <p style="white-space: pre-wrap" class="mb-0"><%=privacyNotice%></p>
+        <% } %>
+    </div>
 
 </div>
 

@@ -32,7 +32,7 @@
 	<jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<div class="container" style=" max-width: 50%; min-width: 25%;">
+<div class="container" style="max-width: 50rem;">
 
 	<h2>Contact Us</h2>
 	<p>

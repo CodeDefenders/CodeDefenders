@@ -55,52 +55,54 @@
     </a>
 
     <div class="row g-4">
-        <div class="col-xl-6 col-sm-12">
+        <div class="col-xxl-6 col-sm-12">
             <div class="p-5 bg-light rounded-3">
                 <h2 class="mb-3">Active Multiplayer Games</h2>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Creator</th>
-                            <th>Class</th>
-                            <th>Attackers</th>
-                            <th>Defenders</th>
-                            <th>Level</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <%
-                            if (openGames.isEmpty()) {
-                        %>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td colspan="100" class="text-center">
-                                    There are currently no open games.
-                                </td>
+                                <th>Creator</th>
+                                <th>Class</th>
+                                <th>Attackers</th>
+                                <th>Defenders</th>
+                                <th>Level</th>
                             </tr>
-                        <%
-                            } else {
-                                for (MultiplayerGame game : openGames) {
-                                final GameClass cut = game.getCUT();
-                                int attackers = game.getAttackerPlayers().size();
-                                int defenders = game.getDefenderPlayers().size();
-                        %>
-                            <tr id="<%="game-"+game.getId()%>">
-                                <td><%=gameCreatorNames.get(game.getId())%></td>
-                                <td><span><%=cut.getAlias()%></span></td>
-                                <td><%=attackers%></td>
-                                <td><%=defenders%></td>
-                                <td><%=game.getLevel().getFormattedString()%></td>
-                            </tr>
-                        <%
+                        </thead>
+                        <tbody>
+                            <%
+                                if (openGames.isEmpty()) {
+                            %>
+                                <tr>
+                                    <td colspan="100" class="text-center">
+                                        There are currently no open games.
+                                    </td>
+                                </tr>
+                            <%
+                                } else {
+                                    for (MultiplayerGame game : openGames) {
+                                    final GameClass cut = game.getCUT();
+                                    int attackers = game.getAttackerPlayers().size();
+                                    int defenders = game.getDefenderPlayers().size();
+                            %>
+                                <tr id="<%="game-"+game.getId()%>">
+                                    <td><%=gameCreatorNames.get(game.getId())%></td>
+                                    <td><span><%=cut.getAlias()%></span></td>
+                                    <td><%=attackers%></td>
+                                    <td><%=defenders%></td>
+                                    <td><%=game.getLevel().getFormattedString()%></td>
+                                </tr>
+                            <%
+                                    }
                                 }
-                            }
-                        %>
-                    </tbody>
-                </table>
+                            %>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <div class="col-xl-6 col-sm-12">
+        <div class="col-xxl-6 col-sm-12">
             <div class="p-5 bg-light rounded-3">
                 <h2 class="mb-3">Research</h2>
                 <%@ include file="/jsp/research.jsp" %>

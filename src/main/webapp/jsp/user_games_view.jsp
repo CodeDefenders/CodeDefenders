@@ -477,12 +477,15 @@
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=info.gameId()%>>
                                         <input type="hidden" name="attacker" value=1>
-                                        <%=attackers.size()%>
-                                        <button type="submit" id="<%="join-attacker-"+info.gameId()%>"
-                                                class="btn btn-sm btn-attacker"
-                                                value="Join as Attacker">
-                                            Join
-                                        </button>
+
+                                        <span class="text-nowrap">
+                                            <%=attackers.size()%>
+                                            <button type="submit" id="<%="join-attacker-"+info.gameId()%>"
+                                                    class="btn btn-sm btn-attacker ms-1"
+                                                    value="Join as Attacker">
+                                                Join
+                                            </button>
+                                        </span>
                                     </form>
                                 </td>
                                 <td>
@@ -492,12 +495,15 @@
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=gameId%>>
                                         <input type="hidden" name="defender" value=1>
-                                        <%=defenders.size() %>
-                                        <button type="submit" id="<%="join-defender-"+gameId%>"
-                                                class="btn btn-sm btn-defender"
-                                                value="Join as Defender">
-                                            Join
-                                        </button>
+
+                                        <span class="text-nowrap">
+                                            <%=defenders.size() %>
+                                            <button type="submit" id="<%="join-defender-"+gameId%>"
+                                                    class="btn btn-sm btn-defender ms-1"
+                                                    value="Join as Defender">
+                                                Join
+                                            </button>
+                                        </span>
                                     </form>
                                 </td>
                                 <td><%=info.gameLevel().getFormattedString() %></td>
@@ -626,12 +632,15 @@
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=info.gameId()%>>
                                         <input type="hidden" name="player" value=1>
-                                        <%=info.players().size()%>
-                                        <button type="submit" id="<%="join-"+info.gameId()%>"
-                                                class="btn btn-defender btn-sm"
-                                                value="Join">
-                                            Join
-                                        </button>
+
+                                        <span class="text-nowrap">
+                                            <%=info.players().size()%>
+                                            <button type="submit" id="<%="join-"+info.gameId()%>"
+                                                    class="btn btn-defender btn-sm ms-1"
+                                                    value="Join">
+                                                Join
+                                            </button>
+                                        </span>
                                     </form>
                                 </td>
                                 <td><%=info.gameLevel().getFormattedString() %></td>
