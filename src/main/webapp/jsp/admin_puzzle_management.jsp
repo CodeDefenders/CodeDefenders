@@ -24,8 +24,6 @@
     <% request.setAttribute("adminActivePage", "adminPuzzles"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <h2 class="mb-3">Puzzle Management</h2>
-
     <h3 class="mb-3">Puzzle Chapters</h3>
     <table id="tableChapters" class="table table-striped table-v-align-middle">
         <thead>
@@ -40,7 +38,7 @@
         </thead>
     </table>
 
-    <h3 class="mt-4 mb-3">Puzzle</h3>
+    <h3 class="mt-4 mb-3">Puzzles</h3>
     <table id="tablePuzzles" class="table table-striped table-v-align-middle">
         <thead>
             <tr>

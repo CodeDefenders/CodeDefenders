@@ -63,7 +63,7 @@
     <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post">
         <input type="hidden" name="formType" value="startStopGame">
 
-        <h3 class="mb-3">Current Multiplayer Games</h3>
+        <h3 class="mb-3">You Multiplayer Games</h3>
         <table id="table-multiplayer" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
@@ -94,7 +94,7 @@
                 <% if (multiplayerGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            There are currently no unfinished multiplayer games you control.
+                            You don't control any unfinished multiplayer games at the moment.
                         </td>
                     </tr>
                 <% } %>
@@ -284,7 +284,7 @@
 
         <%-- ------------------------------------------------------------------------------------------------------ --%>
 
-        <h3 class="mb-3 mt-4">Current Melee Games</h3>
+        <h3 class="mb-3 mt-4">Your Melee Games</h3>
         <table id="table-melee" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
@@ -314,7 +314,7 @@
                 <% if (meleeGames.isEmpty()) { %>
                     <tr>
                         <td colspan="100" class="text-center">
-                            There are currently no unfinished melee games you control.
+                            You don't control any unfinished melee games at the moment.
                         </td>
                     </tr>
                 <% } %>

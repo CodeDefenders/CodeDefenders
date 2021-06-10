@@ -34,8 +34,6 @@
     <% request.setAttribute("adminActivePage", "adminClasses"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <h3>Classes</h3>
-
     <table id="tableClasses" class="table table-v-align-middle table-striped">
         <thead>
             <tr>

@@ -127,8 +127,6 @@
         }
     %>
 
-    <h3>Users</h3>
-
     <form id="manageUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="manageUsers">
 

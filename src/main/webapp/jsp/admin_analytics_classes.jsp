@@ -24,7 +24,7 @@
     <% request.setAttribute("adminActivePage", "adminAnalytics"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <h3>Classes</h3>
+    <h3>Class Analytics</h3>
 
     <table id="tableClasses" class="table table-striped">
         <thead>
