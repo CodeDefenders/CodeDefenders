@@ -38,7 +38,7 @@
         Associated puzzles are sorted on the puzzle identifier.
 
 --%>
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <%
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");

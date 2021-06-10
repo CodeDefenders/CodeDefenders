@@ -31,7 +31,7 @@
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Battleground Game"); %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <%
     List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();

@@ -50,7 +50,7 @@
     pageInfo.setPageTitle("Game " + game.getId() + " (" + role.getFormattedString() + ")");
 %>
 
-<jsp:include page="/jsp/header_main.jsp" />
+<jsp:include page="/jsp/header.jsp" />
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
     <div class="d-flex flex-wrap justify-content-center gap-2">

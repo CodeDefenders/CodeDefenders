@@ -21,7 +21,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminAnalytics"); %>

@@ -24,7 +24,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <%
     List<GameClassInfo> allClasses  = (List<GameClassInfo>) request.getAttribute("classInfos");

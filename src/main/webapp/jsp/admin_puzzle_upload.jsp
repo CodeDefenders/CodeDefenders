@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
 	<% request.setAttribute("adminActivePage", "adminPuzzles"); %>

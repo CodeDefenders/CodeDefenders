@@ -52,7 +52,7 @@
     }
 %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
 

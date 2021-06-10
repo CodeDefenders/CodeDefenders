@@ -23,7 +23,7 @@
 <%-- Attributes set in the servlet --%>
 <%--@elvariable id="leaderboardEntries" type="java.util.List<org.codedefenders.game.leaderboard.Entry>"--%>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
     <h3>Battlegrounds</h3>

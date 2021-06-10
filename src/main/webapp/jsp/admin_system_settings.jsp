@@ -23,7 +23,7 @@
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.stream.Collectors" %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminSystemSettings"); %>

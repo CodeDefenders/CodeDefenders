@@ -27,7 +27,7 @@
 <%@ page import="org.codedefenders.game.*" %>
 <%@ page import="java.util.Map" %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/uploadcut.css" rel="stylesheet">
 

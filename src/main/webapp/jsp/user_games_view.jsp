@@ -32,7 +32,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <%
     // Games active for this user (Created or joined)

@@ -25,7 +25,7 @@
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <%
     /* The current page. There are three pages:
