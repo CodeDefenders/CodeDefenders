@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--
     Shows a modal, which indicates that a game is finished.
@@ -25,23 +27,10 @@
 
 <jsp:useBean id="finishedModal" class="org.codedefenders.beans.game.FinishedModalBean" scope="request"/>
 
-<div id="finishedModal" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title">Game Over</h4>
-            </div>
-            <div class="modal-body">
-                <p>${finishedModal.message}</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<t:modal title="Game Over" id="finishedModal">
+    <jsp:attribute name="content">${finishedModal.message}</jsp:attribute>
+</t:modal>
 
 <script>
-    $('#finishedModal').modal('show');
+    new bootstrap.Modal('#finishedModal').show();
 </script>
