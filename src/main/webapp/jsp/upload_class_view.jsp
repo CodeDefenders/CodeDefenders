@@ -152,7 +152,9 @@
 					</button>
 				</span>
 
-				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
+                <input type="hidden" name="origin" value="<%=request.getParameter("origin")%>" />
+				<input type="checkbox" name="disableAutomaticRedirect" value="disabled" style="margin-right:5px;">I want to upload another class</input>
+				
 				<script>
                     function validateAlias() {
                         let classAlias = document.forms["formUpload"]["classAlias"].value;

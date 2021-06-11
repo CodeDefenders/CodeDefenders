@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,27 @@ public class Redirect {
         } else {
             logger.debug("Redirecting back to relative URL " + contextPath + "/" + referer);
             response.sendRedirect(contextPath + "/" + referer);
+        }
+    }
+    
+    /**
+     * Redirect to the provided target page
+     */
+    public static void redirectTo(HttpServletRequest request, HttpServletResponse response, String target) throws IOException {
+        // TODO: Should we check this is indeed a valid URL from Paths?
+        String contextPath = request.getContextPath();
+
+        if (target == null) {
+            logger.debug("Header does not specify a referer, redirecting back to " + contextPath);
+            response.sendRedirect(contextPath);
+
+        } else if (target.contains(contextPath)) {
+            logger.debug("Redirecting back to absolute URL " + target);
+            response.sendRedirect(target);
+
+        } else {
+            logger.debug("Redirecting back to relative URL " + contextPath + "/" + target);
+            response.sendRedirect(contextPath + "/" + target);
         }
     }
 }

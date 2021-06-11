@@ -41,7 +41,7 @@
 %>
 <div id="creategame" class="container">
     <p>
-        Before you can start games, please <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center new-account">upload a class under
+        Before you can start games, please <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>" class="text-center new-account">upload a class under
         test</a>.
     </p>
 </div>
@@ -75,7 +75,7 @@
                 </td>
                 <%if (isClassUploadEnabled) {%>
                     <td width="17%">
-                        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center new-account">Upload Class</a>
+                        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>" class="text-center new-account">Upload Class</a>
                     </td>
                 <%}%>
             </tr>

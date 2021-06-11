@@ -161,7 +161,7 @@
                                 <% } %>
                             </select>
                             <br/>
-                            <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?fromAdmin=true">Upload Class</a>
+                            <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.ADMIN_GAMES%>">Upload Class</a>
                         </div>
 
                         <div class="form-group"
