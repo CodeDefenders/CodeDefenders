@@ -51,6 +51,12 @@
 
     <h2 class="mb-3">${pageInfo.pageTitle}</h2>
     <table id="puzzles" class="table table-striped table-v-align-middle">
+        <thead>
+            <tr>
+                <th>Lecture</th>
+                <th>Levels</th>
+            </tr>
+        </thead>
         <%
             if (puzzleChapterEntries.isEmpty()) {
         %>
@@ -60,12 +66,6 @@
         <%
             } else {
         %>
-            <thead>
-                <tr>
-                    <th>Lecture</th>
-                    <th>Levels</th>
-                </tr>
-            </thead>
             <tbody>
                 <%
                     for (PuzzleChapterEntry puzzleChapterEntry : puzzleChapterEntries) {
