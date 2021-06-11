@@ -176,7 +176,7 @@
             <label class="col-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
             <div class="col-8 d-flex align-items-center">
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled">
+                    <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled" checked>
                     <label class="form-check-label" for="chat-switch">Enable Chat</label>
                 </div>
             </div>

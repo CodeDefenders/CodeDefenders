@@ -251,7 +251,7 @@
                             <div class="col-12"
                                  title="Allows players to chat within their team and with the enemy team.">
                                 <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled">
+                                    <input class="form-check-input" type="checkbox" id="chat-switch" name="chatEnabled" checked>
                                     <label class="form-check-label" for="chat-switch">Game Chat</label>
                                 </div>
                             </div>
