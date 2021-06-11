@@ -198,7 +198,7 @@
             <label class="col-4 col-form-label" id="role-label" for="role-select">Creator Role</label>
             <div class="col-8">
                 <select class="form-select" id="role-select" name="roleSelection" required>
-                    <% for (Role role : Role.meleeRoles()) { %>
+                    <% for (Role role : Role.multiplayerRoles()) { %>
                         <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
                             <%=role.getFormattedString()%>
                         </option>
