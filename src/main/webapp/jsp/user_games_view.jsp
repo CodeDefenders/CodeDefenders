@@ -639,7 +639,7 @@
                                         <span class="text-nowrap">
                                             <%=info.players().size()%>
                                             <button type="submit" id="<%="join-"+info.gameId()%>"
-                                                    class="btn btn-defender btn-sm ms-1"
+                                                    class="btn btn-player btn-sm ms-1"
                                                     value="Join">
                                                 Join
                                             </button>
