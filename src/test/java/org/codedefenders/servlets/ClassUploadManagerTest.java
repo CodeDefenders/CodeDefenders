@@ -23,7 +23,7 @@ import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.util.Constants;
 import org.junit.Assume;
 import org.junit.Before;

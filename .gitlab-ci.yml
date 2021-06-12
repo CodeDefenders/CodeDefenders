@@ -73,6 +73,7 @@ test-unit:
     # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
     - apt update && apt-get -y install libncurses5
     - mvn --no-transfer-progress test -Dcheckstyle.skip
+  after_script:
     # Print summary line, so GitLab can extract Code Coverage
     - cat target/site/jacoco-ut/index.html | grep -o '<tfoot>.*</tfoot>'
   artifacts:

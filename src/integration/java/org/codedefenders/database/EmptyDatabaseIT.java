@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -20,9 +20,11 @@ package org.codedefenders.database;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
-import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.DatabaseTest;
+import org.codedefenders.DatabaseRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.sql.Connection;
@@ -33,8 +35,9 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Jose Rojas
  */
+@Category(DatabaseTest.class)
 @RunWith(org.junit.runners.JUnit4.class)
-public class EmptyDatabaseTest {
+public class EmptyDatabaseIT {
 
     @Rule
     public DatabaseRule db = new DatabaseRule();

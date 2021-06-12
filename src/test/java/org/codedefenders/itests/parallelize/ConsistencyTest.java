@@ -71,7 +71,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.junit.Before;

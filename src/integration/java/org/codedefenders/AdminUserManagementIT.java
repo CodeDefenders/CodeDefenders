@@ -29,8 +29,6 @@ import javax.servlet.http.HttpSession;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminUserManagement;
 import org.codedefenders.util.EmailUtils;
@@ -49,10 +47,10 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-@Category(IntegrationTest.class)
+@Category(DatabaseTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AdminDAO.class, EmailUtils.class, DatabaseConnection.class})
-public class AdminUserManagementTest {
+public class AdminUserManagementIT {
 
     /**
      * I tried to mock away stuff but at the moment is not possible since basically

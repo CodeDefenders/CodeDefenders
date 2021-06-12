@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.codedefenders.DatabaseTest;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.DatabaseRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
