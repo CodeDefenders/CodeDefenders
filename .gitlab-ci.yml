@@ -9,10 +9,12 @@ include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 
 stages:
+  - validate
   - build
   - test
   - package
   - deploy
+  - visualize
 
 default:
   image: maven:3-jdk-11
@@ -25,66 +27,24 @@ variables:
   SAST_JAVA_VERSION: 11
 
 checkstyle:
-  stage: build
+  stage: validate
+  needs: []
   script:
-    - mvn validate
-  artifacts:
-    paths:
-      - target/checkstyle-*
-
-checkstyle-extract:
-  stage: test
-  when: always
-  script:
-    - |
-      file="";
-      first=1;
-      output="checkstyle-report.json"
-      path="$(pwd)";
-      echo "[" > "$output";
-      tail -n +3 target/checkstyle-result.xml | while read p; do
-      if echo "$p" | grep -q "<file name.*" ; then
-        file=$(expr "$p" : '<file name=\"\(.*\)\".*' | sed 's@'"$path"'@@g' );
-      echo "$file";
-      fi
-      if echo "$p" | grep -q "<error.*" ; then
-        line="$(expr "$p" : '.*line=\"\([0-9]*\)\".*')";
-        message="$(expr "$p" : '.*message=\"\(.*\)\" source.*' | sed -e 's/&apos;/`/g' -e 's/&lt;/</g' -e 's/&gt;/>/g' -e 's/&quot;/\\\"/g' -e 's/&amp;/\&/g')"
-      checksum=$(echo "$file $line $message" | sha1sum | awk '{print $1}')
-      if [ "$first" == 1 ] ; then
-        echo "{ \"description\": \"$message\", \"fingerprint\": \"$checksum\", \"location\": { \"path\": \"$file\", \"lines\": { \"begin\": \"$line\" } } }" >> "$output";
-      first=0;
-      else
-        echo ",{ \"description\": \"$message\", \"fingerprint\": \"$checksum\", \"location\": { \"path\": \"$file\", \"lines\": { \"begin\": \"$line\" } } }" >> "$output"
-      fi
-      fi
-      done ;
-      echo "]" >> "$output"
-  # This implies a dependency on the checkstyle job (an so downloads its artifacts)
-  needs:
-    - checkstyle
+    - mvn --no-transfer-progress validate -Dmaven.repo.local=./.m2/repository
+    - scripts/ci/generate-codequality-report-from-checkstyle.sh ./target/checkstyle-result.xml > checkstyle-report.json
   artifacts:
     reports:
       codequality:
         - checkstyle-report.json
 
 checkdbmigrationversions:
-  stage: test
+  stage: validate
+  needs: []
   script:
-    - |
-      output="$(find src/main/resources/db -name "V*" | sed -e 's/.*\(V[0-9._]*\)__.*/\1/' | sort | uniq -d)"
-      if [ -z "$output" ]
-      then
-        echo "No duplicate versions"
-        exit 0
-      else
-        echo "There are multiple migrationscripts with the same version:"
-        echo "$output"
-        exit 1
-      fi
+    - scripts/ci/check-database-migration-version-numbers.sh
 
 metrics:
-  stage: build
+  stage: validate
   script:
     - echo "files{language=\"java\"}" "$(find . -type f -name "*.java" | wc -l)" >> metrics.txt
     - echo "code_lines{language=\"java\"}" "$(find . -type f -name "*.java" | xargs cat | wc -l)" >> metrics.txt
@@ -93,24 +53,28 @@ metrics:
     reports:
       metrics: metrics.txt
 
+
 build:
   stage: build
   script:
-    - mvn --no-transfer-progress clean compile -Dcheckstyle.skip
+    - mvn --no-transfer-progress clean compile -Dcheckstyle.skip -Dmaven.repo.local=./.m2/repository
   artifacts:
     paths:
       - target/
     expire_in: 3 hrs
 
-test:
+
+test-unit:
   stage: test
-  script:
-    - apt update && apt-get -y install libncurses5
-    - mvn --no-transfer-progress test -Dcheckstyle.skip
-    - cat target/site/jacoco-ut/index.html | grep -o '<tfoot>.*</tfoot>'
   # This implies a dependency on the build job (an so downloads its artifacts)
   needs:
     - build
+  script:
+    # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
+    - apt update && apt-get -y install libncurses5
+    - mvn --no-transfer-progress test -Dcheckstyle.skip
+    # Print summary line, so GitLab can extract Code Coverage
+    - cat target/site/jacoco-ut/index.html | grep -o '<tfoot>.*</tfoot>'
   artifacts:
     paths:
       - target/surefire-reports/
@@ -121,8 +85,14 @@ test:
 
 spotbugs-sast:
   stage: test
-  dependencies: [ ]
-  needs: [ ]
+  needs:
+    - build
+  variables:
+    MAVEN_REPO_PATH: ./.m2/repository
+    COMPILE: "false"
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
   rules:
     - if: $CI_MERGE_REQUEST_IID
     - if: $CI_COMMIT_TAG
@@ -130,7 +100,6 @@ spotbugs-sast:
 
 gemnasium-maven-dependency_scanning:
   stage: test
-  dependencies: [ ]
   needs: [ ]
   rules:
     - if: $CI_MERGE_REQUEST_IID
@@ -139,12 +108,12 @@ gemnasium-maven-dependency_scanning:
 
 secret_detection:
   stage: test
-  dependencies: [ ]
   needs: [ ]
   rules:
     - if: $CI_MERGE_REQUEST_IID
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 
 package:
   stage: package
@@ -158,6 +127,7 @@ package:
   rules:
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 
 .deploy:
   stage: deploy
@@ -199,3 +169,17 @@ deploy-production:
   rules:
     - if: $CI_COMMIT_TAG
       when: manual
+
+
+# See: https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html#java-and-kotlin-examples
+coverage:
+  stage: visualize
+  needs:
+    - test-unit
+  image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
+  script:
+    # convert report from jacoco to cobertura, using relative project path
+    - python /opt/cover2cover.py target/site/jacoco-ut/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > target/site/cobertura.xml
+  artifacts:
+    reports:
+      cobertura: target/site/cobertura.xml
