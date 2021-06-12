@@ -64,7 +64,7 @@
                 <div id="chat-messages" style="word-wrap: break-word; padding: .5em .75em .5em .75em;"></div>
             </div>
         </div>
-        <div class="card-footer">
+        <div class="card-footer p-2">
             <c:choose>
                 <c:when test="${gameChat.showChannel}">
                     <div class="input-group">
