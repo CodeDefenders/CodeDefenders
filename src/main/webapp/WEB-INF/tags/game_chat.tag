@@ -202,7 +202,16 @@
             }
 
             const lowerCaseRole = message.system ? '' : message.role.toLowerCase();
-            const capitalizedRole = message.system ? '' : lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1);
+
+            let messageRole;
+            if (!message.system) {
+                if (message.isAllChat) {
+                    messageRole = 'All';
+                } else {
+                    // Capitalize role name.
+                    messageRole = lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1);
+                }
+            }
 
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('chat-message');
@@ -216,7 +225,7 @@
             if (!message.system) {
                 const msgName = document.createElement('span');
                 msgName.classList.add('chat-message-name');
-                msgName.textContent = `[\${capitalizedRole}] \${message.senderName}: `;
+                msgName.textContent = `[\${messageRole}] \${message.senderName}: `;
                 msgDiv.appendChild(msgName);
             }
 
