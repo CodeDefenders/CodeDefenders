@@ -384,6 +384,8 @@
 								</additionalClasspathElement>
 							</additionalClasspathElements>
 							<groups>org.codedefenders.DatabaseTest</groups>
+							<!-- Need to overwrite the excluded groups of the default invocation -->
+							<excludedGroups>org.codedefenders</excludedGroups>
 						</configuration>
 					</plugin>
 				</plugins>
