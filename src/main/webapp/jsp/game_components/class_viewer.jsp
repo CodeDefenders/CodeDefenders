@@ -35,7 +35,7 @@
     <% } else { %>
 
         <div class="card-header">
-            <ul class="nav nav-pills nav-fill gap-1" role="tablist">
+            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link py-1 active" data-bs-toggle="tab"
                             id="${classViewer.className}-tab"
