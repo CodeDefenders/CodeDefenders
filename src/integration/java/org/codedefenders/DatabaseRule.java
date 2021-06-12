@@ -128,11 +128,13 @@ public class DatabaseRule extends ExternalResource {
 
     @Override
     public void after() {
+        /*
         try {
             logger.debug("Stopping Embedded Database");
             embeddedDatabase.stop();
         } catch (ManagedProcessException e) {
             // quiet
         }
+         */
     }
 }

@@ -82,25 +82,44 @@ test-unit:
       junit:
         - target/surefire-reports/TEST-*.xml
 
-test-integration-database-mariadb-10-3:
+.test-integration-database:
   stage: test
   needs:
     - build
-  services:
-    - name: mariadb:10.3.27
-      alias: database
   variables:
     MYSQL_DATABASE: codedefenders
     MYSQL_ROOT_PASSWORD: ""
     MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
   script:
-    # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
-    - apt update && apt-get -y install libncurses5
     - mvn --no-transfer-progress verify -P it-database-only -Dcheckstyle.skip -DskipUnitTests
   artifacts:
     reports:
       junit:
         - target/failsafe-reports/TEST-*.xml
+
+test-integration-database-mariadb-10-3-27:
+  extends: .test-integration-database
+  services:
+    - name: mariadb:10.3.27
+      alias: database
+
+test-integration-database-mariadb-10-5-10:
+  extends: .test-integration-database
+  services:
+    - name: mariadb:10.5.10
+      alias: database
+
+test-integration-database-mysql-5-7:
+  extends: .test-integration-database
+  services:
+    - name: mysql:5.7
+      alias: database
+
+test-integration-database-mysql-8-0:
+  extends: .test-integration-database
+  services:
+    - name: mysql:8.0
+      alias: database
 
 spotbugs-sast:
   stage: test
