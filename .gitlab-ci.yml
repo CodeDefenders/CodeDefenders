@@ -64,7 +64,7 @@ build:
     expire_in: 3 hrs
 
 
-test-unit:
+unit-tests:
   stage: test
   # This implies a dependency on the build job (an so downloads its artifacts)
   needs:
@@ -82,7 +82,7 @@ test-unit:
       junit:
         - target/surefire-reports/TEST-*.xml
 
-.test-integration-database:
+.integration-tests_database:
   stage: test
   needs:
     - build
@@ -97,26 +97,26 @@ test-unit:
       junit:
         - target/failsafe-reports/TEST-*.xml
 
-test-integration-database-mariadb-10-3-27:
-  extends: .test-integration-database
+integration-tests_database_mariadb-10-3-27:
+  extends: .integration-tests_database
   services:
     - name: mariadb:10.3.27
       alias: database
 
-test-integration-database-mariadb-10-5-10:
-  extends: .test-integration-database
+integration-tests_database_mariadb-10-5-10:
+  extends: .integration-tests_database
   services:
     - name: mariadb:10.5.10
       alias: database
 
-test-integration-database-mysql-5-7:
-  extends: .test-integration-database
+integration-tests_database_mysql-5-7:
+  extends: .integration-tests_database
   services:
     - name: mysql:5.7
       alias: database
 
-test-integration-database-mysql-8-0:
-  extends: .test-integration-database
+integration-tests_database_mysql-8-0:
+  extends: .integration-tests_database
   services:
     - name: mysql:8.0
       alias: database
@@ -213,7 +213,7 @@ deploy-production:
 coverage:
   stage: visualize
   needs:
-    - test-unit
+    - unit-tests
   image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
   script:
     # convert report from jacoco to cobertura, using relative project path

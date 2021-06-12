@@ -19,6 +19,7 @@
 package org.codedefenders;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -27,8 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminUserManagement;
 import org.codedefenders.util.EmailUtils;
@@ -46,6 +49,9 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 @Category(DatabaseTest.class)
 @RunWith(PowerMockRunner.class)
@@ -174,7 +180,19 @@ public class AdminUserManagementIT {
         Mockito.when(request.getParameter("user_name_list")).thenReturn(userNameList);
 
         try {
-            new AdminUserManagement().doPost(request, response);
+            AdminUserManagement adminUserManagement = new AdminUserManagement();
+
+            Field fieldUserRepo = AdminUserManagement.class.getDeclaredField("userRepo");
+            fieldUserRepo.setAccessible(true);
+            UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+            fieldUserRepo.set(adminUserManagement, userRepo);
+
+            Field fieldMessages = AdminUserManagement.class.getDeclaredField("messages");
+            fieldMessages.setAccessible(true);
+            MessagesBean messagesBean = mock(MessagesBean.class);
+            fieldMessages.set(adminUserManagement, messagesBean);
+
+            adminUserManagement.doPost(request, response);
         } catch (IOException | ServletException e) {
             e.printStackTrace();
             Assert.fail("Exception raised");
@@ -182,6 +200,7 @@ public class AdminUserManagementIT {
 
         //PowerMockito.verifyStatic();
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        PowerMockito.verifyStatic(EmailUtils.class);
         EmailUtils.sendEmail(Mockito.anyString(), Mockito.anyString(), captor.capture());
         String email = captor.getValue();
         Assert.assertFalse(email.contains(Paths.ADMIN_USERS));

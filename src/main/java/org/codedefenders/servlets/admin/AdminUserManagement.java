@@ -282,7 +282,7 @@ public class AdminUserManagement extends HttpServlet {
         }
 
         final UserEntity user = new UserEntity(username, UserEntity.encodePassword(password), email);
-        final boolean createSuccess = user.insert();
+        final boolean createSuccess = userRepo.insert(user).isPresent();
 
         if (!createSuccess) {
             final String errorMsg = "Failed to create account for user '" + username + "'";
