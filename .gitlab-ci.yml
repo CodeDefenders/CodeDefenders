@@ -90,6 +90,10 @@ test-integration-database:
     # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
     - apt update && apt-get -y install libncurses5
     - mvn --no-transfer-progress verify -P it-database-only -Dcheckstyle.skip -DskipUnitTests
+  artifacts:
+    reports:
+      junit:
+        - target/failsafe-reports/TEST-*.xml
 
 spotbugs-sast:
   stage: test
