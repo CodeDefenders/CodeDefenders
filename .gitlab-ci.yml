@@ -70,8 +70,6 @@ test-unit:
   needs:
     - build
   script:
-    # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
-    - apt update && apt-get -y install libncurses5
     - mvn --no-transfer-progress test -Dcheckstyle.skip
   after_script:
     # Print summary line, so GitLab can extract Code Coverage
@@ -83,6 +81,15 @@ test-unit:
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
+
+test-integration-database:
+  stage: test
+  needs:
+    - build
+  script:
+    # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
+    - apt update && apt-get -y install libncurses5
+    - mvn --no-transfer-progress verify -P it-database-only -Dcheckstyle.skip -DskipUnitTests
 
 spotbugs-sast:
   stage: test

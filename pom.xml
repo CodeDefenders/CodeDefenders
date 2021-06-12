@@ -169,6 +169,8 @@
 						<additionalClasspathElement>${project.basedir}/src/integration/resources
 						</additionalClasspathElement>
 					</additionalClasspathElements>
+					<!-- DatabaseTests need to be enabled manually via the it-database-only profile -->
+					<excludedGroups>org.codedefenders.DatabaseTest</excludedGroups>
 				</configuration>
 			</plugin>
 
@@ -368,6 +370,26 @@
 	</build>
 
 	<profiles>
+		<profile>
+			<id>it-database-only</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<skipTests>${skipIntegrationTests}</skipTests>
+							<additionalClasspathElements>
+								<additionalClasspathElement>${project.basedir}/src/integration/resources
+								</additionalClasspathElement>
+							</additionalClasspathElements>
+							<groups>org.codedefenders.DatabaseTest</groups>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<!-- Solution inspired by: Taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
 		<!-- Integration Tests are run locally without docker or anything else -->
 		<profile>

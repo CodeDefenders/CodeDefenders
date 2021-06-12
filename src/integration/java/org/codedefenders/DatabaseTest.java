@@ -19,5 +19,10 @@
 
 package org.codedefenders;
 
+/**
+ * JUnit 4 marker interface.
+ *
+ * <p>Should be added to all classes which use {@link DatabaseRule}
+ */
 public interface DatabaseTest {
 }
