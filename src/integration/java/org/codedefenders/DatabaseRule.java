@@ -57,9 +57,9 @@ public class DatabaseRule extends ExternalResource {
     private DB embeddedDatabase;
     private String dbConnectionUrl;
 
-    private final String dbName = "database";
-    private final String username = "database";
-    private final String password = "database";
+    private final String dbName = "codedefenders";
+    private final String username = "root";
+    private final String password = "";
 
     private String connectionOptions = "";
 
@@ -108,7 +108,7 @@ public class DatabaseRule extends ExternalResource {
 
         dbConnectionUrl = databaseConfig.getURL(dbName) + connectionOptions;
          */
-        dbConnectionUrl = "jdbc:mysql://database:3306/database";
+        dbConnectionUrl = "jdbc:mysql://database:3306/codedefenders";
         logger.debug("Finished Embedded Database creation");
 
         // Load the

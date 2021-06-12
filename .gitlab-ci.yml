@@ -90,10 +90,9 @@ test-integration-database-mariadb-10-3:
     - name: mariadb:10.3.27
       alias: database
   variables:
-    MYSQL_RANDOM_ROOT_PASSWORD: YES
-    MYSQL_USER: database
-    MYSQL_PASSWORD: database
-    MYSQL_DATABASE: database
+    MYSQL_DATABASE: codedefenders
+    MYSQL_ROOT_PASSWORD: ""
+    MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
   script:
     # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
     - apt update && apt-get -y install libncurses5
