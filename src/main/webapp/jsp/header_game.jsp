@@ -90,7 +90,7 @@
                 <i class="fa fa-question-circle"></i>
             </button>
         </div>
-        <t:modal title="Scoring System" id="scoringModal">
+        <t:modal title="Scoring System" id="scoringModal" modalBodyClasses="bg-light">
             <jsp:attribute name="content">
                 <jsp:include page="/jsp/scoring_system.jsp"/>
             </jsp:attribute>

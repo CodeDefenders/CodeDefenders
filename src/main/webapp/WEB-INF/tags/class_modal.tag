@@ -7,7 +7,7 @@
 <%@ attribute name="htmlId" required="true" %>
 
 <div>
-    <t:modal title="${classAlias}" id="${htmlId}" type="modal-dialog-responsive">
+    <t:modal title="${classAlias}" id="${htmlId}" modalDialogClasses="modal-dialog-responsive">
         <jsp:attribute name="content">
             <div class="card">
                 <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
