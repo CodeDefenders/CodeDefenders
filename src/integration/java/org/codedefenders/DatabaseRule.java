@@ -57,9 +57,9 @@ public class DatabaseRule extends ExternalResource {
     private DB embeddedDatabase;
     private String dbConnectionUrl;
 
-    private final String dbName = "codedefenders";
-    private final String username = "root";
-    private final String password = "";
+    private final String dbName = "database";
+    private final String username = "database";
+    private final String password = "database";
 
     private String connectionOptions = "";
 
@@ -93,6 +93,7 @@ public class DatabaseRule extends ExternalResource {
     public void before() throws Exception {
         logger.debug("Started Embedded Database creation");
 
+        /*
         DBConfigurationBuilder databaseConfig = DBConfigurationBuilder.newBuilder();
         // This is necessary to allow the database to run as root, which can be the case if these tests are run inside
         // an (docker) container e.g. in the CI.
@@ -106,6 +107,8 @@ public class DatabaseRule extends ExternalResource {
         embeddedDatabase.createDB(dbName);
 
         dbConnectionUrl = databaseConfig.getURL(dbName) + connectionOptions;
+         */
+        dbConnectionUrl = "jdbc:mysql://database:3306/database";
         logger.debug("Finished Embedded Database creation");
 
         // Load the

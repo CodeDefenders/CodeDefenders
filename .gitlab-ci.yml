@@ -82,10 +82,18 @@ test-unit:
       junit:
         - target/surefire-reports/TEST-*.xml
 
-test-integration-database:
+test-integration-database-mariadb-10-3:
   stage: test
   needs:
     - build
+  services:
+    - name: mariadb:10.3.27
+      alias: database
+  variables:
+    MYSQL_RANDOM_ROOT_PASSWORD: YES
+    MYSQL_USER: database
+    MYSQL_PASSWORD: database
+    MYSQL_DATABASE: database
   script:
     # libncurses5 is a necessary dependency for the database tests (aka the ch.vorburger.mariaDB4j:mariaDB4j dependency)
     - apt update && apt-get -y install libncurses5
