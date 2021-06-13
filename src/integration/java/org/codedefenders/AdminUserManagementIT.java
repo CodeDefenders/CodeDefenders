@@ -47,12 +47,23 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
+/*
+`@PowerMockIgnore` is required to fix some strange exception caused by PowerMock:
+java.security.NoSuchAlgorithmException: class configured for TrustManagerFactory: sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory not a TrustManagerFactory
+
+This should be removed if we no longer depend on PowerMockS
+
+See also:
+https://stackoverflow.com/questions/14654639/when-a-trustmanagerfactory-is-not-a-trustmanagerfactory-java
+ */
+@PowerMockIgnore("javax.net.ssl.*")
 @Category(DatabaseTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AdminDAO.class, EmailUtils.class, DatabaseConnection.class})
