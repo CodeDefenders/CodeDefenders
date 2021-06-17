@@ -323,6 +323,17 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         cutDir = Paths.get(CUTS_DIR, classAlias);
+        if (Files.exists(cutDir)) {
+            logger.error("Attempting to store new class directory under '" + cutDir + "', but file/directory with the same path already exists. Deleting it.");
+            try {
+                org.apache.commons.io.FileUtils.forceDelete(cutDir.toFile());
+            } catch (IOException e) {
+                logger.error("Could not delete '" + cutDir + "'. Please remove the file/directory manually and try again.");
+                abortRequestAndCleanUp(request, response);
+                return;
+            }
+        }
+
         final String cutJavaFilePath;
         try {
             cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
