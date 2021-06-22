@@ -268,11 +268,11 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Test ` + test.id + ` (by ` + test.creatorName + `)</h4>
+                                <h4 class="modal-title">Test \${test.id} (by \${test.creatorName})</h4>
                             </div>
                             <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="test-` + test.id + `"></textarea></pre>
-                                <pre class="readonly-pre terminal-pre">` + test.killMessage + `</pre>
+                                <pre class="readonly-pre"><textarea name="test-\${test.id}"></textarea></pre>
+                                <pre class="readonly-pre terminal-pre"></pre>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -283,6 +283,8 @@
             modal.appendTo(document.body);
             testModals.set(test.id, modal);
 
+            const killMessage = modal.find('.modal-body .readonly-pre.terminal-pre').get(0);
+            killMessage.innerText = test.killMessage;
             const textarea = modal.find('textarea').get(0);
             const editor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: true,
