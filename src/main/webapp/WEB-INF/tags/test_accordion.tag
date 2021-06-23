@@ -213,7 +213,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Test ` + test.id + ` (by ` + test.creatorName + `)</h4>
+                                <h4 class="modal-title">Test ` + test.id + ` (by ` + test.creator.name + `)</h4>
                             </div>
                             <div class="modal-body">
                                 <pre class="readonly-pre"><textarea name="test-` + test.id + `"></textarea></pre>
