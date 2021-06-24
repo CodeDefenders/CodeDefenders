@@ -66,7 +66,7 @@ public class MultiplayerGameService extends AbstractGameService {
 
         return new TestDTO(test)
                 .setMutantData(game.getMutants())
-                .setViewable(game.getState() == GameState.FINISHED
+                .setViewable(game.isFinished()
                         || playerRole == Role.OBSERVER
                         || playerRole == Role.DEFENDER
                         || game.getLevel() == GameLevel.EASY
