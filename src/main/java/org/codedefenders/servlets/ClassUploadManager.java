@@ -329,6 +329,8 @@ public class ClassUploadManager extends HttpServlet {
                 org.apache.commons.io.FileUtils.forceDelete(cutDir.toFile());
             } catch (IOException e) {
                 logger.error("Could not delete '" + cutDir + "'. Please remove the file/directory manually and try again.");
+                messages.add("Class upload failed due to a file error. Please contact an admin and show them this message. Or try a different class alias.")
+                        .fadeOut(false);
                 abortRequestAndCleanUp(request, response);
                 return;
             }
