@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019,2021 Code Defenders contributors
+ * Copyright (C) 2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -17,13 +17,14 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders;
+package org.codedefenders.itests;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
@@ -71,10 +72,10 @@ import static org.junit.Assume.assumeTrue;
 /**
  * @author Jose Rojas
  */
-@Category(DatabaseTest.class)
+@Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DatabaseConnection.class, CodeValidator.class})
-public class DatabaseIT {
+public class DatabaseTest {
     private static long START_TIME = (int) 1e15;
     private static long END_TIME = (int) 1e30;
 
