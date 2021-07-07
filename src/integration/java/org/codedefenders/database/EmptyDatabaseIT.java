@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Code Defenders contributors
+ * Copyright (C) 2016-2019,2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -18,17 +18,17 @@
  */
 package org.codedefenders.database;
 
+import java.sql.Connection;
+import java.util.List;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
-import org.codedefenders.DatabaseTest;
 import org.codedefenders.DatabaseRule;
+import org.codedefenders.DatabaseTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-
-import java.sql.Connection;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
