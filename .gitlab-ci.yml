@@ -109,12 +109,6 @@ integration-tests_database_mariadb-10-5-10:
     - name: mariadb:10.5.10
       alias: database
 
-integration-tests_database_mysql-5-7:
-  extends: .integration-tests_database
-  services:
-    - name: mysql:5.7
-      alias: database
-
 integration-tests_database_mysql-8-0:
   extends: .integration-tests_database
   services:
