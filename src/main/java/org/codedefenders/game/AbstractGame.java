@@ -123,7 +123,7 @@ public abstract class AbstractGame {
         return this.mode;
     }
 
-    abstract public boolean isChatEnabled();
+    public abstract boolean isChatEnabled();
 
     protected void setMode(GameMode newMode) {
         this.mode = newMode;
