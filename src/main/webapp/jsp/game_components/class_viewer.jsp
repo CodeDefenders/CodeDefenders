@@ -110,10 +110,11 @@
 
     <%-- dependencies exist -> tab system --%>
     <% if (classViewer.hasDependencies()) { %>
+        let editor = null;
 
         <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
                 String depName = dependency.getKey(); %>
-            let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
+            editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
                 lineNumbers: true,
                 matchBrackets: true,
                 mode: "text/x-java",
@@ -121,7 +122,7 @@
                 autoRefresh: true
             });
 
-            autocompletedClasses['<%=depName%>'] =  editor.getTextArea().value;
+            autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
         <% } %>
 
     <% } %>
