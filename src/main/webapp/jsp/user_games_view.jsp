@@ -225,7 +225,7 @@
                         </tr>
                         <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                             <td colspan="100">
-                                <div class="child-row-wrapper">
+                                <div class="child-row-wrapper d-flex align-items-start gap-5">
                                     <table class="child-row-details">
                                         <thead>
                                             <tr>
@@ -259,6 +259,8 @@
                                                 }
                                             %>
                                         </tbody>
+                                    </table>
+                                    <table class="child-row-details">
                                         <thead>
                                             <tr>
                                                 <th>Defender</th>
@@ -513,7 +515,7 @@
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                                 <td colspan="100">
-                                    <div class="child-row-wrapper">
+                                    <div class="child-row-wrapper d-flex align-items-start gap-5">
                                         <table class="child-row-details">
                                             <thead>
                                                 <tr>
@@ -545,6 +547,8 @@
                                                     }
                                                 %>
                                             </tbody>
+                                        </table>
+                                        <table class="child-row-details">
                                             <thead>
                                                 <tr>
                                                     <th>Defender</th>
