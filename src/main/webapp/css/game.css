@@ -9,7 +9,7 @@
 #game-container {
     padding-left: 30px;
     padding-right: 30px;
-    max-width: 1660px;
+    max-width: 2000px; /* Enough to display 120 characters in editors. */
 }
 
 /* Component header with controls
