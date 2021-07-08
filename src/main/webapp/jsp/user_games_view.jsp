@@ -225,13 +225,13 @@
                         </tr>
                         <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                             <td colspan="100">
-                                <div class="child-row-wrapper d-flex align-items-start gap-5">
+                                <div class="child-row-wrapper d-flex flex-wrap align-items-start" style="gap: 1em 2.5em;">
                                     <table class="child-row-details">
                                         <thead>
                                             <tr>
-                                                <th>Attacker</th>
-                                                <th class="text-end">Mutants</th>
-                                                <th class="text-end">Alive Mutants</th>
+                                                <th style="min-width: 10em;">Attacker</th>
+                                                <th style="min-width: 7em;" class="text-end">Mutants</th>
+                                                <th style="min-width: 10em;" class="text-end">Alive Mutants</th>
                                                 <th class="text-end">Points</th>
                                             </tr>
                                         </thead>
@@ -263,9 +263,9 @@
                                     <table class="child-row-details">
                                         <thead>
                                             <tr>
-                                                <th>Defender</th>
-                                                <th class="text-end">Tests</th>
-                                                <th class="text-end">Mutants Killed</th>
+                                                <th style="min-width: 10em;">Defender</th>
+                                                <th style="min-width: 7em;" class="text-end">Tests</th>
+                                                <th style="min-width: 10em;" class="text-end">Mutants Killed</th>
                                                 <th class="text-end">Points</th>
                                             </tr>
                                         </thead>
@@ -385,7 +385,7 @@
                                         <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th>Player</th>
+                                                    <th style="min-width: 10em;">Player</th>
                                                     <th class="text-end">Points</th>
                                                 </tr>
                                             </thead>
@@ -515,14 +515,14 @@
                             </tr>
                             <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
                                 <td colspan="100">
-                                    <div class="child-row-wrapper d-flex align-items-start gap-5">
+                                    <div class="child-row-wrapper d-flex flex-wrap align-items-start" style="gap: 1em 2.5em;">
                                         <table class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th>Attacker</th>
-                                                    <th class="text-end">Mutants</th>
-                                                    <th class="text-end">Alive Mutants</th>
-                                                    <th class="text-end">Points</th>
+                                                    <th style="min-width: 10em;">Attacker</th>
+                                                    <th style="min-width: 7em;" class="text-end">Mutants</th>
+                                                    <th style="min-width: 10em;" class="text-end">Alive Mutants</th>
+                                                    <th style="min-width: 5.3em;" class="text-end">Points</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -551,10 +551,10 @@
                                         <table class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th>Defender</th>
-                                                    <th class="text-end">Tests</th>
-                                                    <th class="text-end">Mutants Killed</th>
-                                                    <th class="text-end">Points</th>
+                                                    <th style="min-width: 10em;">Defender</th>
+                                                    <th style="min-width: 7em;" class="text-end">Tests</th>
+                                                    <th style="min-width: 10em;" class="text-end">Mutants Killed</th>
+                                                    <th style="min-width: 5.3em;" class="text-end">Points</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -658,7 +658,7 @@
                                         <table id="game-<%=gameId%>-players" class="child-row-details">
                                             <thead>
                                                 <tr>
-                                                    <th>Player</th>
+                                                    <th style="min-width: 10em;">Player</th>
                                                     <th class="text-end">Points</th>
                                                 </tr>
                                             </thead>
