@@ -87,7 +87,7 @@
     <script type="text/javascript" src="webjars/momentjs/2.14.1/min/moment.min.js"></script> <!-- must come before datetime-moment -->
     <script type="text/javascript" src="webjars/datatables-plugins/1.10.24/sorting/datetime-moment.js"></script> <!-- must come after moment -->
     <link href="webjars/datatables/1.10.24/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="webjars/datatables-select/1.3.3/css/select.bootstrap5.min.css" rel="stylesheet" charset="utf-8"> <!-- charset is deprecated, but somehow it won't see it as UTF-8 without it -->
+    <link href="webjars/datatables-select/1.3.3/css/select.bootstrap5.min.css" rel="stylesheet">
     <link href="css/datatables_customize.css" rel="stylesheet">
 
     <link href="css/page.css" rel="stylesheet">

@@ -98,16 +98,28 @@
 	<!-- Set character encoding -->
 
 	<filter>
-		<filter-name>CharacterEncoding</filter-name>
+		<filter-name>RequestCharacterEncoding</filter-name>
 		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
 		<init-param>
 			<param-name>encoding</param-name>
 			<param-value>UTF-8</param-value>
 		</init-param>
 	</filter>
-
 	<filter-mapping>
-		<filter-name>CharacterEncoding</filter-name>
+		<filter-name>RequestCharacterEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>ResponseCharacterEncoding</filter-name>
+		<filter-class>org.codedefenders.configuration.SetResponseCharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>ResponseCharacterEncoding</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
