@@ -109,6 +109,9 @@
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
         autoRefresh: true
     });
+    if (window.hasOwnProperty('ResizeObserver')) {
+        new ResizeObserver(() => editorTest.refresh()).observe(editorTest.getWrapperElement());
+    }
 
 
     CodeMirror.commands.autocompleteTest = function (cm) {

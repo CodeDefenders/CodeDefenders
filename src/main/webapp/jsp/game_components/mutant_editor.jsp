@@ -209,6 +209,9 @@
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
         autoRefresh: true
     });
+    if (window.hasOwnProperty('ResizeObserver')) {
+        new ResizeObserver(() => editorMutant.refresh()).observe(editorMutant.getWrapperElement());
+    }
 
     editorMutant.on('beforeChange', function (cm, change) {
         let text = cm.getValue();
@@ -255,23 +258,29 @@
     /* ==================== Initialize dependency viewers ==================== */
 
     <%-- dependencies exist -> tab system --%>
-    <% if (mutantEditor.hasDependencies()) { %>
-
-        <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
-            String depName = dependency.getKey(); %>
-
-                let editor<%=depName%> = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
+    <%
+        if (mutantEditor.hasDependencies()) {
+            for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
+                String depName = dependency.getKey();
+    %>
+            {
+                let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
                     lineNumbers: true,
                     matchBrackets: true,
                     mode: "text/x-java",
                     readOnly: 'nocursor',
                     autoRefresh: true
                 });
+                if (window.hasOwnProperty('ResizeObserver')) {
+                    new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());
+                }
 
-                autocompletedClasses['<%=depName%>'] =  editor<%=depName%>.getTextArea().value;
-        <% } %>
-
-    <% } %>
+                autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
+            }
+    <%
+            }
+        }
+    %>
 
 })();
 </script>

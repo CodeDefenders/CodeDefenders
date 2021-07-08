@@ -103,29 +103,38 @@
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
         autoRefresh: true
     });
+    if (window.hasOwnProperty('ResizeObserver')) {
+        new ResizeObserver(() => editorSUT.refresh()).observe(editorSUT.getWrapperElement());
+    }
 
     /* If global autocompletedClasses exists, get it, otherwise, create it. */
     const autocompletedClasses = window.autocompletedClasses = window.autocompletedClasses || {};
     autocompletedClasses['${classViewer.className}'] = editorSUT.getTextArea().value;
 
     <%-- dependencies exist -> tab system --%>
-    <% if (classViewer.hasDependencies()) { %>
-        let editor = null;
+    <%
+        if (classViewer.hasDependencies()) {
+            for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
+                String depName = dependency.getKey();
+    %>
+            {
+                let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    mode: "text/x-java",
+                    readOnly: 'nocursor',
+                    autoRefresh: true
+                });
+                if (window.hasOwnProperty('ResizeObserver')) {
+                    new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());
+                }
 
-        <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
-                String depName = dependency.getKey(); %>
-            editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
-                lineNumbers: true,
-                matchBrackets: true,
-                mode: "text/x-java",
-                readOnly: 'nocursor',
-                autoRefresh: true
-            });
-
-            autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
-        <% } %>
-
-    <% } %>
+                autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
+            }
+    <%
+            }
+        }
+    %>
 
 })();
 </script>
