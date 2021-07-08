@@ -102,6 +102,7 @@
     <c:forEach items="${testAccordion.categories}" var="category">
         <div class="accordion-item">
             <h2 class="accordion-header" id="ta-heading-${category.id}">
+                <%-- ${empty …} doesn't work with Set --%>
                 <button class="${category.testIds.size() == 0 ? "" : "ta-covered"} accordion-button collapsed"
                         type="button" data-bs-toggle="collapse"
                         data-bs-target="#ta-collapse-${category.id}"

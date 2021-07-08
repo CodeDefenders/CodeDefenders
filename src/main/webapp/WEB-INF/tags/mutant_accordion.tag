@@ -93,6 +93,7 @@
     <c:forEach items="${mutantAccordion.categories}" var="category">
         <div class="accordion-item">
             <h2 class="accordion-header" id="ma-heading-${category.id}">
+                <%-- ${empty …} doesn't work with Set --%>
                 <button class="${category.mutantIds.size() == 0 ? "" : 'ma-covered'} accordion-button collapsed"
                         type="button" data-bs-toggle="collapse"
                         data-bs-target="#ma-collapse-${category.id}"
