@@ -56,8 +56,8 @@
     boolean gamesCreatable = (boolean) request.getAttribute("gamesCreatable");
 
     PlayerScore zeroDummyScore = new PlayerScore(-1);
-    zeroDummyScore.setMutantKillInformation("0/0/0");
-    zeroDummyScore.setDuelInformation("0/0/0");
+    zeroDummyScore.setMutantKillInformation("0 / 0 / 0");
+    zeroDummyScore.setDuelInformation("0 / 0 / 0");
 %>
 
 <%!

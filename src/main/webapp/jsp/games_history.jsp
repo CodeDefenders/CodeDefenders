@@ -36,8 +36,8 @@
     List<UserMeleeGameInfo> meleeGames = ((List<UserMeleeGameInfo>) request.getAttribute("finishedMeleeGames"));
 
     PlayerScore zeroDummyScore = new PlayerScore(-1);
-    zeroDummyScore.setMutantKillInformation("0/0/0");
-    zeroDummyScore.setDuelInformation("0/0/0");
+    zeroDummyScore.setMutantKillInformation("0 / 0 / 0");
+    zeroDummyScore.setDuelInformation("0 / 0 / 0");
 %>
 
 <%!
