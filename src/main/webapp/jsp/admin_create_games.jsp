@@ -120,7 +120,7 @@
 
     <form id="form-settings" autocomplete="off">
         <div class="row">
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-12">
 
                 <div class="card mb-4">
                     <div class="card-header">
@@ -269,7 +269,7 @@
                 </div>
 
             </div> <%-- column --%>
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-12">
 
                 <div class="card mb-4">
                     <div class="card-header">

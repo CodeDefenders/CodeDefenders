@@ -55,7 +55,7 @@
     </a>
 
     <div class="row g-4">
-        <div class="col-xxl-6 col-sm-12">
+        <div class="col-xxl-6 col-12">
             <div class="p-5 bg-light rounded-3">
                 <h2 class="mb-3">Active Multiplayer Games</h2>
                 <div class="table-responsive">
@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <div class="col-xxl-6 col-sm-12">
+        <div class="col-xxl-6 col-12">
             <div class="p-5 bg-light rounded-3">
                 <h2 class="mb-3">Research</h2>
                 <%@ include file="/jsp/research.jsp" %>

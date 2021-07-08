@@ -63,7 +63,7 @@
                 <div class="form-text">The .java file of the class.</div>
             </div>
 
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-12">
                 <label for="testingFramework" class="form-label">Testing Framework</label>
                 <select id="testingFramework" name="testingFramework" class="form-select" required>
                     <% for (TestingFramework tf : TestingFramework.values()) { %>
@@ -75,7 +75,7 @@
                 <div class="form-text">The testing framework that will be used in games with the class.</div>
             </div>
 
-            <div class="col-md-6 col-sm-12">
+            <div class="col-md-6 col-12">
                 <label for="assertionLibrary" class="form-label">Assertion Library</label>
                 <select id="assertionLibrary" name="assertionLibrary" class="form-select" required>
                     <% for (AssertionLibrary al : AssertionLibrary.values()) { %>
