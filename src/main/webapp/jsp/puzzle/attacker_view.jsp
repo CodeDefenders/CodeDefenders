@@ -127,7 +127,7 @@
     <hr>
 
     <div class="row">
-        <div class="col-lg-6 col-sm-12">
+        <div class="col-xl-6 col-12">
             <div id="mutants-div">
                 <div class="game-component-header"><h3>Mutants</h3></div>
                 <t:mutant_accordion/>
@@ -141,7 +141,7 @@
             <% } %>
         </div>
 
-        <div class="col-lg-6 col-sm-12" id="cut-div">
+        <div class="col-xl-6 col-12" id="cut-div">
             <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
 
             <div class="game-component-header">

@@ -200,7 +200,7 @@
     <%-- Equivalence Duel view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-lg-6 col-sm-12" id="equivmut-div">
+    <div class="col-xl-6 col-12" id="equivmut-div">
         <div class="game-component-header"><h3><%=mutantClaimedMessage%></h3></div>
 
         <div class="equivalence-container">
@@ -261,7 +261,7 @@
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
     </div>
 
-    <div class="col-lg-6 col-sm-12" id="cut-div">
+    <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
@@ -273,7 +273,7 @@
     <%-- Attacker view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-lg-6 col-sm-12" id="newmut-div">
+    <div class="col-xl-6 col-12" id="newmut-div">
 
         <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
 
@@ -332,7 +332,7 @@
     <%-- Defender view --%>
     <%-- -------------------------------------------------------------------------------- --%>
 
-    <div class="col-lg-6 col-sm-12" id="utest-div">
+    <div class="col-xl-6 col-12" id="utest-div">
 
         <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
 
@@ -364,12 +364,12 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6 col-sm-12" id="mutants-div">
+    <div class="col-xl-6 col-12" id="mutants-div">
         <div class="game-component-header"><h3>Existing Mutants</h3></div>
         <t:mutant_accordion/>
     </div>
 
-    <div class="col-lg-6 col-sm-12">
+    <div class="col-xl-6 col-12">
         <div class="game-component-header"><h3>JUnit Tests</h3></div>
         <t:test_accordion/>
     </div>
