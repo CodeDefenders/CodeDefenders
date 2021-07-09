@@ -18,9 +18,11 @@
  */
 package org.codedefenders.systemtests;
 
+/*
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.configuration.DockerComposeFiles;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+*/
 
 import org.codedefenders.util.Paths;
 import org.junit.ClassRule;
@@ -49,6 +51,7 @@ import static org.codedefenders.systemtests.SeleniumTestUtils.waitForVisible;
 @Category(SystemTest.class)
 public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 
+    /*
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()//
             .files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
@@ -59,6 +62,7 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
             .waitingForService("frontend", HealthChecks.toRespond2xxOverHttp(8080,
                     t -> t.inFormat("http://$HOST:$EXTERNAL_PORT/codedefenders")))
             .build();
+     */
 
     /**
      * Unsuccessful account registration due to missing data.

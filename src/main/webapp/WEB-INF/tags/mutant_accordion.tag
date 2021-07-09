@@ -152,7 +152,7 @@
                     return '<span class="mutantCUTImage mutantImageFlagged"></span>';
             }
         };
-        const genViewButton = row => row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm btn-right">View</button>' : '';
+        const genViewButton = row => row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm pull-right">View</button>' : '';
 
         const genAdditionalButton = row => {
             switch (row.state) {
@@ -164,10 +164,10 @@
                                     '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
                                     '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
                                     '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
-                                    '      <button type="submit" class="btn btn-default btn-ssm btn-right">Claim Equivalent</button>\n' +
+                                    '      <button type="submit" class="btn btn-default btn-ssm pull-right">Claim Equivalent</button>\n' +
                                     '   </form>';
                         } else {
-                            return '<button type="submit" class="btn btn-default btn-ssm btn-right" disabled>Claim Equivalent</button>';
+                            return '<button type="submit" class="btn btn-default btn-ssm pull-right" disabled>Claim Equivalent</button>';
                         }
                     } else {
                         return '';
@@ -175,7 +175,7 @@
 
                     </c:if>
                 case "KILLED":
-                    return '<button class="ma-view-test-button btn btn-default btn-ssm btn-right">View Killing Test</button>';
+                    return '<button class="ma-view-test-button btn btn-default btn-ssm pull-right">View Killing Test</button>';
                 default:
                     return '';
             }
@@ -268,11 +268,11 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Test ` + test.id + ` (by ` + test.creatorName + `)</h4>
+                                <h4 class="modal-title">Test \${test.id} (by \${test.creatorName})</h4>
                             </div>
                             <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="test-` + test.id + `"></textarea></pre>
-                                <pre class="readonly-pre build-trace">` + test.killMessage + `</pre>
+                                <pre class="readonly-pre"><textarea name="test-\${test.id}"></textarea></pre>
+                                <pre class="readonly-pre terminal-pre"></pre>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -283,6 +283,8 @@
             modal.appendTo(document.body);
             testModals.set(test.id, modal);
 
+            const killMessage = modal.find('.modal-body .readonly-pre.terminal-pre').get(0);
+            killMessage.innerText = test.killMessage;
             const textarea = modal.find('textarea').get(0);
             const editor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: true,

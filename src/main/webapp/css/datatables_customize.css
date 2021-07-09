@@ -1,20 +1,12 @@
-.dataTables_wrapper .input-sm[type="search"] {
-    height: 20px;
-}
+/* (Page-wide) DataTables customizations
+============================================================================= */
 
-
+/* Background color of child tables
+----------------------------------------------------------------------------- */
 
 /* Inherit row color to all child tables. */
 .table table > tbody > tr:nth-of-type(n) {
     background-color: inherit;
-}
-
-/* Color rows by .odd/.even instead of :nth-of-type(2n+1). */
-.table-striped > tbody > .odd:nth-of-type(n) {
-    background: transparent;
-}
-.table-striped > tbody > .even:nth-of-type(n) {
-    background-color: #f4f4f4;
 }
 
 /* Color child table rows the same color as their leading row.
@@ -26,12 +18,8 @@
     background-color: #f4f4f4;
 }
 
-/* Darker color on hover. */
-.table-hover > tbody > tr:hover > td {
-    background-color: #f2f2f2;
-}
-
-
+/* Child table styles (for child tables of like in admin analytics)
+----------------------------------------------------------------------------- */
 
 /* Indent for row details */
 table .indented {
@@ -39,13 +27,24 @@ table .indented {
 }
 
 /* Child table margins and padding */
+.table-child-details {
+    padding-top: 1em;
+    padding-bottom: 1.5em;
+}
 .table-child-details > tbody > tr > td {
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 4px;
 }
 .table-child-details > thead > tr > th {
     padding-left: 20px;
     padding-right: 20px;
+    padding-top: 12px;
+}
+.table-child-details > thead:first-child > tr:first-child > th {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 0;
 }
 
 /* Borders between child table rows */

@@ -43,8 +43,14 @@ public class ClassViewerBean {
         dependencies = new HashMap<>();
     }
 
+    /**
+     * Sets the className and classCode. Since the {@link GameClass#name} contains the fully qualified name, the
+     * package information must be removed.
+     * @param clazz The class under test
+     */
     public void setClassCode(GameClass clazz) {
-        className = clazz.getName();
+        String[] split = clazz.getName().split("\\.");
+        className = split[split.length - 1];
         classCode = StringEscapeUtils.escapeHtml(clazz.getSourceCode());
     }
 

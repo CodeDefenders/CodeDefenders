@@ -45,9 +45,9 @@
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
 %>
 
-<div class="w-100">
+<div class="container">
     <h2 class="full-width page-title">Puzzles</h2>
-    <table id="puzzles" class="table table-striped table-hover table-responsive table-paragraphs games-table">
+    <table id="puzzles" class="table table-striped table-hover table-responsive table-center">
         <tr>
             <%
                 if (puzzleChapterEntries.isEmpty()) {

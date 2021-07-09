@@ -25,10 +25,10 @@
 
 <jsp:include page="/jsp/header_main.jsp"/>
 
-<div class="w-100">
+<div class="container">
     <h3>Battlegrounds</h3>
     <table id="tableMPLeaderboard"
-           class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
+           class="table table-striped table-hover table-responsive table-center dataTable display">
         <thead>
         <tr>
             <th class="col-sm-2">User</th>

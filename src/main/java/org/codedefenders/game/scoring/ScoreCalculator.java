@@ -12,7 +12,6 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TestDAO;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
@@ -30,16 +29,19 @@ import org.codedefenders.model.Player;
 @RequestScoped
 public class ScoreCalculator {
 
+    private final IScoringPolicy scoringPolicy;
+
     @Inject
-    @Named("basic")
-    private IScoringPolicy scoringPolicy;
+    public ScoreCalculator(@Named("basic") IScoringPolicy scoringPolicy) {
+        this.scoringPolicy = scoringPolicy;
+    }
 
     /**
      * Calculate the score that the players gained by attacking, i.e., creating
      * mutants.
      */
     public Map<Integer, PlayerScore> getMutantScores(int gameId) {
-        Map<Integer, PlayerScore> mutantScores = new HashMap<Integer, PlayerScore>();
+        Map<Integer, PlayerScore> mutantScores = new HashMap<>();
 
         // Create the data structure to host their data
         for (Player player : GameDAO.getValidPlayersForGame(gameId)) {

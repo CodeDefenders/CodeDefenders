@@ -247,13 +247,13 @@
 
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
-                <button class="btn btn-danger btn-left" name="acceptEquivalent"
+                <button class="btn btn-danger" name="acceptEquivalent"
                         type="submit"
                         onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">
                     Accept
                     Equivalence
                 </button>
-                <button class="btn btn-primary btn-game btn-right"
+                <button class="btn btn-primary btn-bold pull-right"
                         name="rejectEquivalent" type="submit"
                         onclick="testProgressBar(); return true;">Submit Killing
                     Test
@@ -288,7 +288,7 @@
 
             <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
             <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
-            <button type="submit" class="btn btn-primary btn-game btn-right"
+            <button type="submit" class="btn btn-primary btn-bold pull-right"
                     id="submitMutant" form="atk"
                     onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
                     style="float: right; margin-right: 5px"
@@ -300,7 +300,7 @@
             <form id="reset"
                   action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
                   method="post" style="float: right; margin-right: 5px">
-                <button class="btn btn-primary btn-warning btn-game btn-right"
+                <button class="btn btn-primary btn-warning btn-bold pull-right"
                         id="btnReset">Reset
                 </button>
                 <input type="hidden" name="formType" value="reset">
@@ -356,7 +356,7 @@
         <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
         <h3 style="margin-bottom: 17px;">
             Write a new JUnit test here
-            <button type="submit" class="btn btn-primary btn-game btn-right"
+            <button type="submit" class="btn btn-primary btn-bold pull-right"
                     id="submitTest" form="def"
                     onClick="window.testProgressBar(); this.form.submit(); this.disabled = true; this.value = 'Defending...';"
                     <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
@@ -380,10 +380,7 @@
 
 </div>
 
-</div>
-<%-- TODO move the whole div here after changing the header --%>
-
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
     <div class="col-md-6" id="mutants-div">
         <h3>Existing Mutants</h3>
         <t:mutant_accordion/>
@@ -394,5 +391,3 @@
         <t:test_accordion/>
     </div>
 </div>
-
-<div>

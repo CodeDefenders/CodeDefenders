@@ -45,7 +45,8 @@ public class MeleeGameService extends AbstractGameService {
                 .setCovered(mutant.getCoveringTests(game.getTests(false)).stream()
                         .anyMatch(t -> player != null && t.getPlayerId() == player.getId()))
                 .setViewable(playerRole != Role.NONE
-                        && (game.getLevel() == GameLevel.EASY
+                        && (game.isFinished()
+                        || game.getLevel() == GameLevel.EASY
                         || (game.getLevel() == GameLevel.HARD
                         && (mutant.getCreatorId() == user.getId()
                         || playerRole.equals(Role.OBSERVER)
@@ -65,7 +66,7 @@ public class MeleeGameService extends AbstractGameService {
 
         return new TestDTO(test)
                 .setMutantData(game.getMutants())
-                .setViewable(game.getState() == GameState.FINISHED
+                .setViewable(game.isFinished()
                         || playerRole == Role.OBSERVER
                         || playerRole == Role.DEFENDER
                         || game.getLevel() == GameLevel.EASY

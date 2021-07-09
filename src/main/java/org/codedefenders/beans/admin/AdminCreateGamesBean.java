@@ -66,17 +66,18 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 @SessionScoped
 public class AdminCreateGamesBean implements Serializable {
 
-    @Inject
-    private LoginBean login;
+    private final LoginBean login;
+    private final MessagesBean messages;
+    private final GameManagingUtils gameManagingUtils;
+    private final EventDAO eventDAO;
 
     @Inject
-    private MessagesBean messages;
-
-    @Inject
-    private GameManagingUtils gameManagingUtils;
-
-    @Inject
-    private EventDAO eventDAO;
+    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils, EventDAO eventDAO) {
+        this.login = login;
+        this.messages = messages;
+        this.gameManagingUtils = gameManagingUtils;
+        this.eventDAO = eventDAO;
+    }
 
     /**
      * The staged game list managed by the bean.
