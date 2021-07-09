@@ -73,7 +73,7 @@ public class LandingPage extends HttpServlet {
                     .stream()
                     .filter(game -> !game.getDefenderPlayers().isEmpty())
                     .filter(game -> !game.getAttackerPlayers().isEmpty())
-                    .limit(10)
+                    .limit(15)
                     .collect(Collectors.toList());
 
             request.setAttribute("openMultiplayerGames", availableMultiplayerGames);
