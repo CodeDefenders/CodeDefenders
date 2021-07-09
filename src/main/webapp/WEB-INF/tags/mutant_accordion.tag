@@ -264,7 +264,7 @@
                                         <pre class="m-0"><textarea name="test-\${test.id}"></textarea></pre>
                                     </div>
                                 </div>
-                                <pre class="m-0 terminal-pre">\${test.killMessage}</pre>
+                                <pre class="m-0 terminal-pre"></pre>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -275,6 +275,8 @@
             modal.appendTo(document.body);
             testModals.set(test.id, modal);
 
+            const killMessage = modal.find('.modal-body .terminal-pre').get(0);
+            killMessage.innerText = test.killMessage;
             const textarea = modal.find('textarea').get(0);
             const editor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: true,

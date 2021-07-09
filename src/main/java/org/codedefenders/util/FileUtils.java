@@ -229,9 +229,9 @@ public class FileUtils {
 
     /**
      * Stores a file for given parameters on the hard drive.
+     * If the path up to the file does not exist, all non-existed parent directories are created.
      *
-     * @param folderPath  The path of the folder the file will be stored in as a {@link Path}. The folder must not
-     *                    already exist.
+     * @param folderPath  The path of the folder the file will be stored in as a {@link Path}.
      * @param fileName    The file name (e.g. {@code MyClass.java}).
      * @param fileContent The actual file content.
      * @return The path of the newly stored file.
@@ -247,12 +247,6 @@ public class FileUtils {
             return path;
         } catch (IOException e) {
             logger.error("Could not store file.", e);
-            try {
-                // removing folder again, if empty
-                Files.delete(folderPath);
-            } catch (DirectoryNotEmptyException ignored) {
-                // ignored
-            }
             throw e;
         }
     }
