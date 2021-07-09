@@ -86,10 +86,8 @@ public class MeleeGame extends AbstractGame {
     private float prize;
 
     private boolean requiresValidation;
-    private int maxAssertionsPerTest;
 
     private boolean chatEnabled;
-    private CodeValidatorLevel mutantValidatorLevel;
 
     private boolean capturePlayersIntention;
 
@@ -280,14 +278,6 @@ public class MeleeGame extends AbstractGame {
     @Override
     public boolean isChatEnabled() {
         return chatEnabled;
-    }
-
-    public int getMaxAssertionsPerTest() {
-        return maxAssertionsPerTest;
-    }
-
-    public CodeValidatorLevel getMutantValidatorLevel() {
-        return mutantValidatorLevel;
     }
 
     public boolean isCapturePlayersIntention() {

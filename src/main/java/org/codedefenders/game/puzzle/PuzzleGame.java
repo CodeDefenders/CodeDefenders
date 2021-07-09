@@ -55,15 +55,6 @@ public class PuzzleGame extends AbstractGame {
      * level; protected GameMode mode;
      */
 
-    /**
-     * Maximum number of allowed assertions per submitted test.
-     */
-    private int maxAssertionsPerTest;
-
-    /**
-     * Validation level used to check submitted mutants.
-     */
-    private CodeValidatorLevel mutantValidatorLevel;
 
     /**
      * The current round of the puzzle. Every mutant or test (valid or invalid) the
@@ -219,14 +210,6 @@ public class PuzzleGame extends AbstractGame {
      */
     public int getInvalidSubmissionCount() {
         return currentRound - getValidSubmissionCount() - 1;
-    }
-
-    public int getMaxAssertionsPerTest() {
-        return maxAssertionsPerTest;
-    }
-
-    public CodeValidatorLevel getMutantValidatorLevel() {
-        return mutantValidatorLevel;
     }
 
     public int getCurrentRound() {

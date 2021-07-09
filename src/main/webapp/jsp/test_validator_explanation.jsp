@@ -1,4 +1,6 @@
-<%--
+<%@ page import="org.codedefenders.game.AbstractGame" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="java.util.Objects" %><%--
 
     Copyright (C) 2016-2019 Code Defenders contributors
 
@@ -18,13 +20,24 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%
+    AbstractGame game = (AbstractGame) request.getAttribute("game");
+    game = Objects.nonNull(game) ? game : (AbstractGame) request.getAttribute(Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME);
+
+    String maxAssertionsPerTest;
+    if (Objects.nonNull(game)) {
+        maxAssertionsPerTest = Integer.toString(game.getMaxAssertionsPerTest());
+    } else {
+        maxAssertionsPerTest = "the configured amount of";
+    }
+%>
 <div class="panel-body" style="padding: 10px;">
     <h3>Test rules</h3>
     <ul>
         <li>No loops</li>
         <li>No calls to System.*</li>
         <li>No new methods or conditionals</li>
-        <li>Only two assertions per test</li>
+        <li>Only <%=maxAssertionsPerTest%> assertions per test
+        </li>
     </ul>
-
 </div>
