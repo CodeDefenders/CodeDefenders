@@ -25,6 +25,9 @@
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("KillMap Management"); %>
 
@@ -131,17 +134,11 @@
                 <div class="row mb-3">
                     <div class="col-12">
                         <label for="class-ids" class="form-label">
-                            <a data-bs-toggle="collapse" data-bs-target="#class-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
+                            <a data-bs-toggle="modal" data-bs-target="#class-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
                                 Class IDs
                                 <span class="fa fa-question-circle ms-1"></span>
                             </a>
                         </label>
-                        <div id="class-ids-explanation" class="collapse card mb-2">
-                            <div class="card-body">
-                                Comma separated list of class IDs to generate killmaps for.
-                                Newlines and whitespaces are allowed.
-                            </div>
-                        </div>
                         <textarea name="ids" id="class-ids" class="form-control" placeholder="Class IDs" rows="3"></textarea>
                     </div>
                 </div>
@@ -164,17 +161,11 @@
                 <div class="row mb-3">
                     <div class="col-12">
                         <label for="game-ids" class="form-label">
-                            <a data-bs-toggle="collapse" data-bs-target="#game-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
+                            <a data-bs-toggle="modal" data-bs-target="#game-ids-explanation" class="text-decoration-none text-reset cursor-pointer">
                                 Game IDs
                                 <span class="fa fa-question-circle ms-1"></span>
                             </a>
                         </label>
-                        <div id="game-ids-explanation" class="collapse card mb-2">
-                            <div class="card-body">
-                                Comma separated list of game IDs to generate killmaps for.
-                                Newlines and whitespaces are allowed.
-                            </div>
-                        </div>
                         <textarea name="ids" id="game-ids" class="form-control" placeholder="Game IDs" rows="3"></textarea>
                     </div>
                 </div>
@@ -188,6 +179,19 @@
                 </div>
             </div>
         </div>
+
+        <t:modal title="Class IDs Explanation" id="class-ids-explanation">
+            <jsp:attribute name="content">
+                Comma separated list of class IDs to generate killmaps for.
+                Newlines and whitespaces are allowed.
+            </jsp:attribute>
+        </t:modal>
+        <t:modal title="Game IDs Explanation" id="game-ids-explanation">
+            <jsp:attribute name="content">
+                Comma separated list of game IDs to generate killmaps for.
+                Newlines and whitespaces are allowed.
+            </jsp:attribute>
+        </t:modal>
 
     <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
 

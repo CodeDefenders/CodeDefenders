@@ -26,6 +26,9 @@
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -218,24 +221,11 @@
         <div class="row g-3">
             <div class="col-12">
                 <label for="user_name_list" class="form-label">
-                    <a data-bs-toggle="collapse" data-bs-target="#demo" class="text-decoration-none text-reset cursor-pointer">
+                    <a data-bs-toggle="modal" data-bs-target="#user-info-format" class="text-decoration-none text-reset cursor-pointer">
                         List of user credentials
                         <span class="fa fa-question-circle ms-1"></span>
                     </a>
                 </label>
-                <div id="demo" class="collapse card mb-2">
-                    <div class="card-body">
-                        <p>List of usernames, passwords and (optional) emails.</p>
-                        <p class="m-0">Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).</p>
-                        <p class="m-0">Users are separated by new lines.</p>
-                        <p>If an email is provided and sending emails is enabled, created users receive an email with their credentials.</p>
-                        <p class="mb-2">Valid input format examples:</p>
-                        <pre class="m-0"><code>username,password
-username2,password,example@mail.com
-username3;password
-username4;password;example@mail.com</code></pre>
-                    </div>
-                </div>
                 <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
                           oninput="document.getElementById('submit_users_btn').disabled = this.value.length === 0;"></textarea>
             </div>
@@ -248,6 +238,22 @@ username4;password;example@mail.com</code></pre>
         </div>
 
     </form>
+
+    <t:modal title="User Info Format Explanation" id="user-info-format">
+        <jsp:attribute name="content">
+            <p>List of usernames, passwords and (optional) emails.</p>
+            <ul>
+                <li>Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).</li>
+                <li>Users are separated by new lines.</li>
+                <li>If an email is provided and sending emails is enabled, created users receive an email with their credentials.</li>
+            </ul>
+            <p class="mb-2">Valid input format examples:</p>
+            <pre class="bg-light p-3 m-0"><code>username,password
+username2,password,example@mail.com
+username3;password
+username4;password;example@mail.com</code></pre>
+        </jsp:attribute>
+    </t:modal>
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>
