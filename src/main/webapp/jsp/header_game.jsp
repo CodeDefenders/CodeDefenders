@@ -50,9 +50,9 @@
 <jsp:include page="/jsp/header.jsp" />
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
-    <div class="d-flex flex-column flex-xl-row align-items-center justify-content-between">
-        <h2 class="text-center flex-shrink-0">${pageInfo.pageTitle}</h2>
-        <div class="d-flex flex-wrap justify-content-center justify-content-xl-end gap-2">
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+        <h2 class="m-0">${pageInfo.pageTitle}</h2>
+        <div class="d-flex flex-wrap align-items-center gap-2">
 
             <%
                 if (game.getCreatorId() == login.getUserId()) {
