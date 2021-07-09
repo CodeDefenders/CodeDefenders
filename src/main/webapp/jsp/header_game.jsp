@@ -50,72 +50,74 @@
 <jsp:include page="/jsp/header.jsp" />
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
-    <h2 class="text-center">${pageInfo.pageTitle}</h2>
-    <div class="d-flex flex-wrap justify-content-center gap-2">
+    <div class="d-flex flex-column flex-xl-row align-items-center justify-content-between">
+        <h2 class="text-center flex-shrink-0">${pageInfo.pageTitle}</h2>
+        <div class="d-flex flex-wrap justify-content-center justify-content-xl-end gap-2">
 
-        <%
-            if (game.getCreatorId() == login.getUserId()) {
-                if (game.getState() == GameState.ACTIVE) {
-        %>
-                <form id="adminEndBtn" action="<%=selectionManagerUrl%>" method="post">
-                    <input type="hidden" name="formType" value="endGame">
-                    <input type="hidden" name="gameId" value="<%=game.getId()%>">
-                    <button type="submit" class="btn btn-sm btn-danger" id="endGame" form="adminEndBtn">
-                        End Game
-                    </button>
-                </form>
-        <%
-                } else if (game.getState() == GameState.CREATED) {
-        %>
-                <form id="adminStartBtn" action="<%=selectionManagerUrl%>" method="post">
-                    <input type="hidden" name="formType" value="startGame">
-                    <input type="hidden" name="gameId" value="<%=game.getId()%>">
-                    <button type="submit" class="btn btn-sm btn-success" id="startGame" form="adminStartBtn">
-                        Start Game
-                    </button>
-                </form>
-        <%
+            <%
+                if (game.getCreatorId() == login.getUserId()) {
+                    if (game.getState() == GameState.ACTIVE) {
+            %>
+                    <form id="adminEndBtn" action="<%=selectionManagerUrl%>" method="post">
+                        <input type="hidden" name="formType" value="endGame">
+                        <input type="hidden" name="gameId" value="<%=game.getId()%>">
+                        <button type="submit" class="btn btn-sm btn-danger" id="endGame" form="adminEndBtn">
+                            End Game
+                        </button>
+                    </form>
+            <%
+                    } else if (game.getState() == GameState.CREATED) {
+            %>
+                    <form id="adminStartBtn" action="<%=selectionManagerUrl%>" method="post">
+                        <input type="hidden" name="formType" value="startGame">
+                        <input type="hidden" name="gameId" value="<%=game.getId()%>">
+                        <button type="submit" class="btn btn-sm btn-success" id="startGame" form="adminStartBtn">
+                            Start Game
+                        </button>
+                    </form>
+            <%
+                    }
                 }
-            }
-        %>
+            %>
 
-        <div class="btn-group">
-            <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
-                    data-bs-toggle="modal" data-bs-target="#scoreboard">
-                <i class="fa fa-book"></i>
-                Scoreboard
+            <div class="btn-group">
+                <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
+                        data-bs-toggle="modal" data-bs-target="#scoreboard">
+                    <i class="fa fa-book"></i>
+                    Scoreboard
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="btnScoringModal"
+                        data-bs-toggle="modal" data-bs-target="#scoringModal">
+                    <i class="fa fa-question-circle"></i>
+                </button>
+            </div>
+            <t:modal title="Scoring System" id="scoringModal" modalBodyClasses="bg-light">
+                <jsp:attribute name="content">
+                    <jsp:include page="/jsp/scoring_system.jsp"/>
+                </jsp:attribute>
+            </t:modal>
+
+            <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnHistory"
+                    data-bs-toggle="modal" data-bs-target="#history">
+                <i class="fa fa-history"></i>
+                Timeline
             </button>
-            <button class="btn btn-sm btn-outline-secondary" id="btnScoringModal"
-                    data-bs-toggle="modal" data-bs-target="#scoringModal">
-                <i class="fa fa-question-circle"></i>
+
+            <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
+               class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
+               title="Export as a Gradle project to import into an IDE.">
+                <i class="fa fa-download"></i>
+                Gradle Export
+            </a>
+
+            <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnFeedback"
+                    data-bs-toggle="modal" data-bs-target="#playerFeedback">
+                <i class="fa fa-comment"></i>
+                Feedback
             </button>
+
+            <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+
+            <t:game_chat/>
         </div>
-        <t:modal title="Scoring System" id="scoringModal" modalBodyClasses="bg-light">
-            <jsp:attribute name="content">
-                <jsp:include page="/jsp/scoring_system.jsp"/>
-            </jsp:attribute>
-        </t:modal>
-
-        <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnHistory"
-                data-bs-toggle="modal" data-bs-target="#history">
-            <i class="fa fa-history"></i>
-            Timeline
-        </button>
-
-        <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
-           class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
-           title="Export as a Gradle project to import into an IDE.">
-            <i class="fa fa-download"></i>
-            Gradle Export
-        </a>
-
-        <button type="button" class="btn btn-sm btn-outline-secondary text-nowrap" id="btnFeedback"
-                data-bs-toggle="modal" data-bs-target="#playerFeedback">
-            <i class="fa fa-comment"></i>
-            Feedback
-        </button>
-
-        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
-
-        <t:game_chat/>
     </div>
