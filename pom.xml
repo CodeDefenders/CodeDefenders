@@ -460,7 +460,7 @@
 		</profile>
 		<!-- System tests use Docker, Docker-Compose, Selenium and probably something
 			else. Before test we ensure the system is rebuild and repackage as war file
-			using config.properties@docker as config file. Not sure how this can be enforces
+			using docker.properties as config file. Not sure how this can be enforces
 			if not encoding the value of ${config.properties} Then we use surefire (not
 			failsafe) to execute the tests, but we bind this phase to integration-tests
 			instead of regular unit-tests: https://stackoverflow.com/questions/1399240/how-do-i-get-my-maven-integration-tests-to-run?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa -->
@@ -468,7 +468,7 @@
 			<id>ST</id>
 			<properties>
 				<!-- Read the properties from this specific file -->
-				<config.properties>config.properties@docker</config.properties>
+				<config.properties>docker.properties</config.properties>
 			</properties>
 			<build>
 				<!-- TODO Use the maven plugin to build codedefenders/frontend and tomcat:8.5 -->
