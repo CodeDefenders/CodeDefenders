@@ -392,7 +392,7 @@
 			</build>
 		</profile>
 
-		<!-- Solution inspired by: Taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
+		<!-- Solution inspired by and taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
 		<!-- Integration Tests are run locally without docker or anything else -->
 		<profile>
 			<id>IT</id>
