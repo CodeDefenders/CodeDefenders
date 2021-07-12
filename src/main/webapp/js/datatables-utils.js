@@ -1,34 +1,27 @@
 /*
  * Divide two numbers, or return a default value when dividing by zero.
  */
-function dtDiv(a, b, defaultValue, precision) {
-    if (typeof defaultValue === 'undefined') defaultValue = 0;
-    if (typeof precision === 'undefined') precision = 2;
-
+const dtDiv = function (a, b, defaultValue = '0', precision = 2) {
     return b === 0 ? defaultValue : (a / b).toFixed(precision);
 }
 
 /*
  * Divide two numbers and format the result as a percentage, or return a default value when dividing by zero.
  */
-function dtPerc(a, b, defaultValue, precision) {
-    if (typeof defaultValue === 'undefined') defaultValue = '0%';
-    if (typeof precision === 'undefined') precision = 1;
-
+const dtPercent = function (a, b, defaultValue = '0.0%', precision = 1) {
     return b === 0 ? defaultValue : ((a * 100 / b).toFixed(precision) + '%');
-}
+};
 
 /*
  * Return a string containing "a" and the percentage of "(a / b)" in parentheses.
  */
-function dtValAndPerc(a, b, defaultValue, precision) {
-    return a + ' (' + dtPerc(a, b, defaultValue, precision) + ')';
-}
+const dtValAndPercent = function(a, b, defaultValue, precision) {
+    return a + ' (' + dtPercent(a, b, defaultValue, precision) + ')';
+};
 
 /*
  * Set up clickable table cells to toggle child rows in a DataTable.
  *
- * tableSelector:   A selector with which the table can be selected, e.g. "#tableUsers"
  * table:           The DataTables object associated with the table
  * format:          The function to generate the child row from it's data
  *
@@ -37,7 +30,7 @@ function dtValAndPerc(a, b, defaultValue, precision) {
  * <table>
  *     <thead>
  *         <tr>
- *             <th id="toggle-all-details"><span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span></th>
+ *             <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right text-muted"></i></th>
  *             ...
  *         </tr>
  *     </thead>
@@ -50,7 +43,7 @@ function dtValAndPerc(a, b, defaultValue, precision) {
  *             "className":      'toggle-details',
  *             "orderable":      false,
  *             "data":           null,
- *             "defaultContent": '<span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span>'
+ *             "defaultContent": '<i class="toggle-details-icon fa fa-chevron-right"></i>'
  *         },
  *         ...
  *     ],
@@ -59,43 +52,64 @@ function dtValAndPerc(a, b, defaultValue, precision) {
  *
  * Tables in child rows should have the class "table-child-details".
  */
-function setupChildRows(tableSelector, table, format) {
-    $(tableSelector + ' tbody').on('click', '.toggle-details', function () {
-        var tr = $(this).closest('tr');
-        var row = table.row(tr);
+const setupChildRows = function (table, format) {
+    const setIcon = function(toggleDetailsEl, expand) {
+        if (expand) {
+            toggleDetailsEl.querySelector('.toggle-details-icon')
+                    .classList
+                    .replace('fa-chevron-right', 'fa-chevron-down');
+        } else {
+            toggleDetailsEl.querySelector('.toggle-details-icon')
+                    .classList
+                    .replace('fa-chevron-down', 'fa-chevron-right');
+        }
+    };
 
-        /* Toggle the child of the row. */
+    table.table().container()
+            .querySelector('tbody')
+            .addEventListener('click', function (event) {
+
+        const toggleDetailsEl = event.target.closest('.toggle-details');
+        if (toggleDetailsEl === null) {
+            return;
+        }
+
+        const tr = toggleDetailsEl.closest('tr');
+        const row = table.row(tr);
+
+        /* Toggle the child row. */
         if (row.child.isShown()) {
             row.child.hide();
-            tr.removeClass('shown');
-            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
+            setIcon(toggleDetailsEl, false);
         } else {
             row.child(format(row.data())).show();
-            tr.addClass('shown');
-            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
+            setIcon(toggleDetailsEl, true);
         }
     });
 
-    $('#toggle-all-details').on('click', function () {
-        $(this).toggleClass('shown');
-        var shown = $(this).hasClass('shown');
+    table.table().container()
+            .querySelector('.toggle-all-details')
+            .addEventListener('click', function (event) {
 
-        $(this).find(".toggle-details-icon").toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-down');
+        const expandedBefore = JSON.parse(this.dataset.expanded ?? false);
+        this.dataset.expanded = !expandedBefore;
+        setIcon(this, !expandedBefore);
 
-        /* Show or hide all children of rows on this page. */
-        $(tableSelector + ' tbody .toggle-details').each(function() {
-            var tr = $(this).closest('tr');
-            var row = table.row(tr);
+        /* Show or hide all children of rows in this table. */
+        for (const toggleDetailsEl of table.table().container()
+                .querySelectorAll('tbody .toggle-details')) {
 
-            if (row.child.isShown() && !shown) {
+            const tr = toggleDetailsEl.closest('tr');
+            const row = table.row(tr);
+
+            /* Toggle the child row. */
+            if (expandedBefore) {
                 row.child.hide();
-                tr.removeClass('shown');
-                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
-            } else if (!row.child.isShown() && shown){
+                setIcon(toggleDetailsEl, false);
+            } else {
                 row.child(format(row.data())).show();
-                tr.addClass('shown');
-                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
+                setIcon(toggleDetailsEl, true);
             }
-        });
+        }
     });
 };

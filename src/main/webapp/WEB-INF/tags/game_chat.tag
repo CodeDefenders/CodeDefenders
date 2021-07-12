@@ -14,43 +14,21 @@
         padding-top: 2px;
         padding-bottom: 2px;
     }
-
-    #chat .chat-message .chat-message-name::after {
-        content: ":";
-        padding-right: .25em;
-    }
-
-    /* Message prefixes. */
-    #chat .chat-message-all .chat-message-name::before {
-        content: "[All]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-attacker .chat-message-name::before {
-        content: "[Attacker]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-defender .chat-message-name::before {
-        content: "[Defender]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-player .chat-message-name::before {
-        content: "[Player]";
-        padding-right: .25em;
-    }
-    #chat .chat-message-team.chat-message-observer .chat-message-name::before {
-        content: "[Observer]";
-        padding-right: .25em;
+    #chat .chat-tab-button {
+        border-radius: 50rem;
+        padding-left: .5rem;
+        padding-right: .5rem;
     }
 
     /* Role colors. */
     #chat .chat-message-attacker .chat-message-name {
-        color: #bf0035;
+        color: var(--fg-attacker);
     }
     #chat .chat-message-defender .chat-message-name {
-        color: #0041db;
+        color: var(--fg-defender);
     }
     #chat .chat-message-player .chat-message-name {
-        color: #1e9f02;
+        color: var(--fg-player);
     }
     #chat .chat-message-observer .chat-message-name {
         color: #ff8300;
@@ -62,48 +40,68 @@
 </style>
 
 <div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;" hidden>
-    <div class="panel panel-default" style="margin: 0;">
-        <div id="chat-handle" class="panel-heading">
-            <c:if test="${gameChat.showTabs}">
-                <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-default active"
-                    title="Show all message.">All</button>
-                <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-danger"
-                    title="Show messages from the perspective of the attacker team.">Attackers</button>
-                <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-primary"
-                    title="Show messages from the perspective of the defender team.">Defenders</button>
-            </c:if>
-            <button id="chat-close" type="button" class="close" style="margin-top: -.5em; margin-right: -.5em;">×</button>
-        </div>
-        <div class="panel-body" style="padding: 0px;">
+    <div class="card m-0">
+        <c:choose>
+            <c:when test="${gameChat.showTabs}">
+                <div id="chat-handle" class="card-header p-1 ps-2 d-flex align-items-center gap-2">
+                    <button type="button" data-tab="ALL" class="chat-tab-button btn btn-xs btn-outline-success active"
+                            title="Show all messages.">All</button>
+                    <button type="button" data-tab="ATTACKERS" class="chat-tab-button btn btn-xs btn-outline-danger"
+                            title="Show messages from the perspective of the attacker team.">Attackers</button>
+                    <button type="button" data-tab="DEFENDERS" class="chat-tab-button btn btn-xs btn-outline-primary"
+                            title="Show messages from the perspective of the defender team.">Defenders</button>
+                    <button id="chat-close" type="button" class="btn-close m-1 ms-auto"></button>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div id="chat-handle" class="card-header p-0 d-flex align-items-center">
+                    <button id="chat-close" type="button" class="btn-close m-1 ms-auto"></button>
+                </div>
+            </c:otherwise>
+        </c:choose>
+        <div class="card-body p-0">
             <div id="chat-messages-container" style="height: 30em; width: 25em; overflow-y: scroll;">
                 <div id="chat-messages" style="word-wrap: break-word; padding: .5em .75em .5em .75em;"></div>
             </div>
         </div>
-        <div class="panel-footer">
-            <form class="form-inline" style="margin: 0;">
-                <div class="form-group" style="width: 100%; margin: 0;">
-                    <!-- Change this to type="text" once we get rid of common.css. -->
-                    <div class="input-group" style="width: 100%;">
-                        <div id="chat-channel-container" class="input-group-addon" style="cursor: pointer; width: 4.5em;">
-                            <span id="chat-channel" title="Switch between sending messages to your own team or all players.">
-                                Team
-                            </span>
+        <div class="card-footer p-2">
+            <c:choose>
+                <c:when test="${gameChat.showChannel}">
+                    <div class="input-group">
+                        <div id="chat-channel" class="input-group-text d-flex justify-content-center"
+                             style="min-width: 4.5rem; cursor: pointer;"
+                             title="Switch between sending messages to your own team or all players.">
+                            Team
                         </div>
-                        <textarea id="chat-input" class="form-control" maxlength="${gameChat.maxMessageLength}" placeholder="Message" style="width: 100%; resize: none;"></textarea>
+                        <label class="visually-hidden" for="chat-input">Message</label>
+                        <textarea type="text" id="chat-input" class="form-control"
+                                  maxlength="${gameChat.maxMessageLength}"
+                                  placeholder="Message"
+                                  style="resize: none;"></textarea>
                     </div>
-                </div>
-            </form>
+                </c:when>
+                <c:otherwise>
+                    <div>
+                        <div id="chat-channel" hidden>
+                            Team
+                        </div>
+                        <label class="visually-hidden" for="chat-input">Message</label>
+                        <textarea type="text" id="chat-input" class="form-control"
+                                  maxlength="${gameChat.maxMessageLength}"
+                                  placeholder="Message"
+                                  style="resize: none;"></textarea>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </div>
 </div>
 
-<div id="chat-indicator" style="position: fixed; left: 0; bottom: -1px; z-index: 10; cursor: pointer;">
-    <div class="panel panel-default" style="margin: 0; border-top-left-radius: 0; border-bottom: none;">
-        <div class="panel-heading" style="padding: .5em .7em .4em .5em; border-bottom: none;">
-            Chat&nbsp;&nbsp;<span id="chat-count" class="label label-default" style="padding-top: .5em;">0</span>
-        </div>
-    </div>
-</div>
+<button type="button" id="chat-indicator" class="btn btn-sm btn-outline-secondary">
+    <i class="fa fa-comments"></i>
+    Chat
+    <span id="chat-count" class="badge bg-secondary">0</span>
+</button>
 
 <script>
 (function () {
@@ -196,11 +194,23 @@
         /**
          * Creates a DOM element for a message and caches it. Returns the cached element if present.
          * @param {object} message The message.
-         * @return {HTMLSpanElement} The rendered message.
+         * @return {HTMLDivElement} The rendered message.
          */
         renderMessage (message) {
             if (message._cache) {
                 return message._cache;
+            }
+
+            const lowerCaseRole = message.system ? '' : message.role.toLowerCase();
+
+            let messageRole;
+            if (!message.system) {
+                if (message.isAllChat) {
+                    messageRole = 'All';
+                } else {
+                    // Capitalize role name.
+                    messageRole = lowerCaseRole.charAt(0).toUpperCase() + lowerCaseRole.slice(1);
+                }
             }
 
             const msgDiv = document.createElement('div');
@@ -208,14 +218,14 @@
             if (message.system) {
                 msgDiv.classList.add('chat-message-system');
             } else {
-                msgDiv.classList.add('chat-message-' + message.role.toLowerCase());
+                msgDiv.classList.add('chat-message-' + lowerCaseRole);
                 msgDiv.classList.add(message.isAllChat ? 'chat-message-all' : 'chat-message-team');
             }
 
             if (!message.system) {
                 const msgName = document.createElement('span');
                 msgName.classList.add('chat-message-name');
-                msgName.textContent = message.senderName;
+                msgName.textContent = `[\${messageRole}] \${message.senderName}: `;
                 msgDiv.appendChild(msgName);
             }
 
@@ -391,11 +401,11 @@
         setCount (count) {
             this.count = count;
             if (count > 0) {
-                this.countElement.classList.remove('label-default');
-                this.countElement.classList.add('label-warning');
+                this.countElement.classList.remove('bg-secondary');
+                this.countElement.classList.add('bg-warning');
             } else {
-                this.countElement.classList.remove('label-warning');
-                this.countElement.classList.add('label-default');
+                this.countElement.classList.remove('bg-warning');
+                this.countElement.classList.add('bg-secondary');
             }
             this.countElement.textContent = String(count);
         }
@@ -414,41 +424,35 @@
          */
         constructor(inputElement) {
             this.inputElement = inputElement;
-            this.$inputElement = $(inputElement);
         }
 
         /**
-         * Initializes the empty height and height offset of the text area.
+         * Initializes the height and margin of the text area.
          * In order for this method to work, the text area has to be ready and visible.
          */
         init () {
-            const textarea = this.inputElement;
-            const $textarea = this.$inputElement;
-
-            textarea.value = '';
-            this.offset = textarea.clientHeight - $textarea.height();
-
-            $textarea.height(1);
-            $textarea.height(textarea.scrollHeight - this.offset);
-            this.emptyHeight = $textarea.height();
+            this.inputElement.value = '';
+            this.resize();
         }
 
         /**
-         *  Resizes the text area to its text. (from stackoverflow.com/a/36958094/9360382).
+         *  Resizes the text area to its text. (adopted from https://stackoverflow.com/a/36958094/9360382).
          */
         resize () {
             const textarea = this.inputElement;
-            const $textarea = this.$inputElement;
 
-            /* Shrink the field and then re-set it to the scroll height in case it needs to shrink. */
-            if (textarea.clientHeight >= textarea.scrollHeight) {
-                $textarea.height(1);
-            }
+            /* Shrink the text area to one line. */
+            textarea.style['height'] = '0px';
 
-            /* Grow the field. */
-            const height = Math.max(textarea.scrollHeight - this.offset, this.emptyHeight);
-            $textarea.height(height);
-            $textarea.css('margin-top', this.emptyHeight - height);
+            /* Grow the text area. */
+            const style = window.getComputedStyle(this.inputElement);
+            const newHeight = textarea.scrollHeight         /* text height incl. padding */
+                    + parseFloat(style.borderTopWidth)
+                    + parseFloat(style.borderBottomWidth);
+            const newMargin = textarea.clientHeight         /* actual height (1 line) incl. padding */
+                    - textarea.scrollHeight                 /* text height incl. padding */;
+            textarea.style['height'] = newHeight + 'px';
+            textarea.style['margin-top'] = newMargin + 'px';
         }
 
         getText () {
@@ -501,7 +505,7 @@
                 chat.style.top = chatPos.top;
                 chat.style.left = chatPos.left;
             }
-            $(chat).show();
+            chat.removeAttribute('hidden');
         }
     }
 
@@ -514,7 +518,7 @@
         /* Initialize the textarea heights needed for the resizing once the textarea is shown. */
         new MutationObserver((mutations, observer) => {
             for (const mutation of mutations) {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'hidden') {
                     setTimeout(input.init.bind(input), 0);
                     observer.disconnect();
                 }
@@ -566,7 +570,7 @@
         });
 
         /* Toggle message channel (all / team). */
-        $('#chat-channel-container').on('click', function () {
+        $('#chat-channel').on('click', function () {
             channel.setAllChat(!channel.isAllChat());
         });
 
@@ -590,17 +594,16 @@
 
         /* Toggle the chat and reset it's position when the indicator is clicked. */
         $("#chat-indicator").on('click', function () {
-            const chat = document.getElementById('chat');
-            if ($(chat).is(':visible')) {
-                $(chat).hide();
+            if (!chatElement.hasAttribute('hidden')) {
+                chatElement.setAttribute('hidden', '');
                 localStorage.setItem('showChat', JSON.stringify(false))
             } else {
-                chat.style.top = null;
-                chat.style.right = null;
-                chat.style.bottom = '0px';
-                chat.style.left = '0px';
+                chatElement.style.top = null;
+                chatElement.style.right = null;
+                chatElement.style.bottom = '0px';
+                chatElement.style.left = '0px';
                 messageCount.setCount(0);
-                $(chat).show();
+                chatElement.removeAttribute('hidden');
                 messages.scrollToBottom();
                 localStorage.setItem('showChat', JSON.stringify(true))
             }
@@ -609,7 +612,7 @@
 
         /* Close chat when the X on the chat window is clicked. */
         $("#chat-close").on('click', function () {
-            $("#chat").hide();
+            document.getElementById('chat').setAttribute('hidden', '');
             localStorage.setItem('showChat', JSON.stringify(false))
         });
 

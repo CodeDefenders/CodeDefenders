@@ -18,16 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<div class="panel-body" style="padding: 10px;">
-	<p>
-        This value refers to the number of tests which cover, but do not
-		kill, mutants and controls if and when equivalence duels are
-		automatically triggered.
-    </p>
-    <ul>
-        <li><b>0</b> disables the automatic triggering of equivalence
-            mutants.
-        <li><b>N > 0</b> triggers an equivalence duels for every mutant
-            which survives N tests.
-    </ul>
-</div>
+<p>
+    This value refers to the number of tests which cover, but do not
+    kill, mutants and controls if and when equivalence duels are
+    automatically triggered.
+</p>
+<ul class="mb-0">
+    <li><b>0</b> disables the automatic triggering of equivalence
+        mutants.
+    <li><b>N > 0</b> triggers an equivalence duels for every mutant
+        which survives N tests.
+</ul>

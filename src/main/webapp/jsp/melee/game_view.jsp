@@ -62,22 +62,19 @@
     history.setPlayers(Collections.singletonList(player), otherPlayers);
 %>
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
-
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
-<jsp:include page="/jsp/melee/header_game.jsp"/>
+<jsp:include page="/jsp/header_game.jsp"/>
+
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
-<t:game_chat/>
 
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%
     if (role.equals(Role.OBSERVER)) {

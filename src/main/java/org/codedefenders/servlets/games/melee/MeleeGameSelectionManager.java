@@ -169,7 +169,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        GameLevel level = parameterThenOrOther(request, "level", GameLevel.EASY, GameLevel.HARD);
+        GameLevel level = GameLevel.valueOf(getStringParameter(request, "level").orElse(GameLevel.HARD.name()));
         float lineCoverage = getFloatParameter(request, "line_cov").orElse(1.1f);
         float mutantCoverage = getFloatParameter(request, "mutant_cov").orElse(1.1f);
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);

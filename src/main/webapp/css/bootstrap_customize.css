@@ -2,79 +2,112 @@
 bootstrap classes
 ============================================================================= */
 
-/* Buttons
+/* Form elements
 ----------------------------------------------------------------------------- */
 
-/* Small buttons between btn-sm and btn-xs. */
-.btn-ssm {
+/* Buttons smaller than btn-sm. */
+.btn-xs {
     padding: 1px 4px;
+    font-size: 12px;
+}
+
+/* Highlight important buttons. */
+.btn-highlight {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* Input styled to be a large as a .btn-xs */
+.input-xs {
+    width: 15em;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 12px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+/* Display icons (and other things) depending on if a btn-check is checked or not.
+   Use as:
+   <input type="checkbox" class="btn-check">
+   <label class="btn">
+       <span class="btn-check-active">
+           Active-only content here.
+       </span>
+       <span class="btn-check-inactive">
+           Inactive-only content here.
+       </span>
+   </div>
+*/
+.btn-check + .btn .btn-check-active,
+.btn-check:active + .btn .btn-check-inactive,
+.btn-check:checked + .btn .btn-check-inactive {
+    display: none;
+}
+.btn-check + .btn .btn-check-inactive,
+.btn-check:active + .btn .btn-check-active,
+.btn-check:checked + .btn .btn-check-active {
+    display: initial;
+}
+
+/* Modals
+----------------------------------------------------------------------------- */
+
+/* Modals that change the size based on the content width.
+   Use style="min-width: ...;" to customize the minimum width. */
+.modal-dialog-responsive {
+    min-width: 500px;
+    max-width: calc(100% - 4rem);
+    width: max-content;
 }
 
 /* Navbar
 ----------------------------------------------------------------------------- */
 
-/* General look of the navbar. */
+/* Background color. */
 .navbar-cd {
     background-color: var(--bg-codedefenders);
-    border-radius: 0;
-    border: none;
 }
 
-/* Background and color of the Logo + Name. */
+/* Brand style. */
 .navbar-cd .navbar-brand {
     color: white;
 }
-.navbar-cd .navbar-brand:hover,
-.navbar-cd .navbar-brand:focus {
-    background-color: var(--bg-codedefenders-bright);
-}
 
-/* Background and color of navbar entries. */
-.navbar-cd .navbar-nav > li > a {
+/* Text color of navbar items. */
+.navbar-cd .navbar-nav .nav-item > .nav-link {
+    color: #ffffffe0;
+}
+.navbar-cd .navbar-nav .nav-item > .nav-link:hover,
+.navbar-cd .navbar-nav .nav-item > .nav-link:focus {
     color: white;
 }
-.navbar-cd .navbar-nav > li > a:hover,
-.navbar-cd .navbar-nav > li > a:focus {
-    background-color: var(--bg-codedefenders-bright);
-}
-
-/* Background and color of open dropdowns. */
-.navbar-cd .navbar-nav > .dropdown.open > a {
-    background-color: var(--bg-codedefenders-bright);
+.navbar-cd .navbar-nav .dropdown > .nav-link.show {
     color: white;
 }
 
-/* Background and color dropdowns in collapsed mode.
-   (767px is the width at which the navbar collapses.) */
-@media (max-width: 767px) {
-    .navbar-cd .navbar-nav .open .dropdown-menu > li > a {
+/* Rules for non-collapsed mode only (767px is the width at which the navbar collapses for md.) */
+@media (min-width: 768px) {
+    /* Highlighted (important) nav items. */
+    .navbar-cd .nav-item-highlight > .nav-link {
+        padding: .25rem .75rem;
         color: white;
+        border: 1px solid white;
+        border-radius: .2rem;
     }
-    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:focus,
-    .navbar-cd .navbar-nav .open .dropdown-menu > li > a:hover {
-        background-color: var(--bg-codedefenders-bright);
-    }
-    .navbar-cd .navbar-nav .open .dropdown-menu .divider {
-        background-color: var(--bg-codedefenders-brighter);
+    .navbar-cd .nav-item-highlight:hover > .nav-link,
+    .navbar-cd .nav-item-highlight.dropdown > .nav-link.show {
+        background-color: var(--bg-codedefenders-light);
     }
 }
 
 /* "Toggle navbar" button color in collapsed mode. */
-.navbar-cd .navbar-toggle .icon-bar {
-    background-color: white;
+.navbar-cd .navbar-toggler-icon {
+    /* Copied from Bootstrap 5 and modified. */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e")
 }
-
-/* Center items in nav. (from https://gist.github.com/sadewowtito/2b5bcbd10e853919a960)
-   (767px is the width at which the navbar collapses.) */
-@media (min-width: 768px) {
-    .navbar-nav.navbar-nav-center {
-        width: 100%;
-        text-align: center;
-    }
-    .navbar-nav.navbar-nav-center > li {
-        float: none;
-        display: inline-block;
-    }
+.navbar-cd .navbar-toggler {
+    box-shadow: none;
 }
 
 /* Tables
@@ -82,9 +115,59 @@ bootstrap classes
 
 /* Color rows by .odd/.even instead of :nth-of-type(2n+1).
    Use :nth-of-type(n) to increase CSS specificity. */
-.table-striped > tbody > .odd:nth-of-type(n) {
-    background: transparent;
+/* Color odd rows. */
+.table-striped > tbody > tr.odd:nth-of-type(n) > td {
+    box-shadow: rgba(0, 0, 0, 0.05) 0 0 0 9999px inset;
 }
-.table-striped > tbody > .even:nth-of-type(n) {
-    background-color: #f4f4f4;
+/* Color even rows. */
+.table-striped > tbody > tr.even:nth-of-type(n) > td {
+    box-shadow: none;
+}
+/* Color odd child rows. */
+.table-striped > tbody > tr.odd:nth-of-type(n) + tr:not(.even):not(.odd) > td {
+    box-shadow: rgba(0, 0, 0, 0.05) 0 0 0 9999px inset;
+}
+/* Color even child rows. */
+.table-striped > tbody > tr.even:nth-of-type(n) + tr:not(.even):not(.odd) > td {
+    box-shadow: none;
+}
+
+
+/* Tables with no bottom border on the last row. */
+.table-no-last-border > tbody:last-of-type > tr:last-child > td {
+    border-bottom: none;
+}
+
+
+/* Remove space inside .table-responsive to make it easier to place elements under it without the spacing changing
+   depending on screen width. Use :nth-of-type(n) to increase CSS specificity. */
+.table-responsive:nth-of-type(n) {
+    margin-bottom: 1rem;
+}
+.table-responsive > table {
+    margin-bottom: 0;
+}
+
+/* Extra Bootstrap-Style Util Classes
+----------------------------------------------------------------------------- */
+
+.cursor-pointer {
+    cursor: pointer !important;
+}
+
+/* Popovers
+----------------------------------------------------------------------------- */
+
+.popover-fluid {
+    max-width: max-content;
+}
+
+/* Tooltips
+----------------------------------------------------------------------------- */
+
+/* Make tooltips with two lines look a bit less awkward.
+   Use :nth-of-type(n) to increase CSS specificity. */
+.tooltip-inner:nth-of-type(n) {
+    padding: .35rem .5rem;
+    line-height: 1.25;
 }

@@ -26,7 +26,11 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
-<pre><textarea id="test-code" name="test" title="test" cols="80" rows="30">${testEditor.testCode}</textarea></pre>
+<div class="card game-component-resize">
+    <div class="card-body p-0 codemirror-fill">
+        <pre class="m-0"><textarea id="test-code" name="test" title="test">${testEditor.testCode}</textarea></pre>
+    </div>
+</div>
 
 <script>
 (function () {
@@ -53,7 +57,7 @@
 
     let autocompleteList = [];
 
-    filterOutComments = function(text) {
+    const filterOutComments = function(text) {
         let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
         return text.replace(commentRegex, "");
     };
@@ -102,8 +106,12 @@
             "Tab": "insertSoftTab"
         },
         keyMap: "${login.user.keyMap.CMName}",
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
+        autoRefresh: true
     });
+    if (window.hasOwnProperty('ResizeObserver')) {
+        new ResizeObserver(() => editorTest.refresh()).observe(editorTest.getWrapperElement());
+    }
 
 
     CodeMirror.commands.autocompleteTest = function (cm) {
@@ -152,8 +160,6 @@
             updateAutocompleteList();
         }
     });
-
-    editorTest.setSize("100%", 500);
 
 })();
 </script>

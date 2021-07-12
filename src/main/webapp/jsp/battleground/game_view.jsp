@@ -51,19 +51,16 @@
     history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+<jsp:include page="/jsp/header_game.jsp"/>
 
-<jsp:include page="/jsp/battleground/header_game.jsp"/>
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
-<t:game_chat/>
 
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;

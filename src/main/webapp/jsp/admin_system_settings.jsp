@@ -20,114 +20,149 @@
 --%>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.stream.Collectors" %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("System Settings"); %>
+
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminSystemSettings"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <h3>System Settings</h3>
-    <form id="changeSettings" name="changeSettings" action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" onsubmit="return validateForm()" method="post">
-        <script>
-            function validateForm() {
-                var form = document.forms['changeSettings'];
-                var mailEnabled = form["<%=AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED.name()%>"].checked;
-                var address = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS.name()%>"];
-                var password = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD.name()%>"];
-                var smtpHost = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST.name()%>"];
-                var smtpPort = form["<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT.name()%>"];
-
-                if (mailEnabled) {
-                    if (address.value === "") {
-                        address.parentElement.style.border = "1px solid red";
-                    } else {
-                        address.parentElement.style.border = '0px';
-                    }
-
-                    if (smtpHost.value === "") {
-                        smtpHost.parentElement.style.border = "1px solid red";
-                    } else {
-                        smtpHost.parentElement.style.border ='0px';
-                    }
-
-                    if (smtpPort.value === "") {
-                        smtpPort.parentElement.style.border = "1px solid red";
-                    } else {
-                        smtpPort.parentElement.style.border ='0px';
-                    }
-
-                    return address.value !== "" && smtpHost.value !== "" && smtpPort.value !== 0;
-                } else {
-                    address.parentElement.style.border = '0px';
-                    password.parentElement.style.border ='0px';
-                    smtpHost.parentElement.style.border ='0px';
-                    smtpPort.parentElement.style.border ='0px';
-                    return true;
-                }
-            }
-        </script>
+    <form id="changeSettings" name="changeSettings"
+          class="needs-validation"
+          action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post"
+          autocomplete="off">
         <input type="hidden" name="formType" value="saveSettings">
 
-        <% for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
-            if( AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals( setting.getName())){
-                continue; // Do not show Killmap Setting here
-            }
-            String readableName = setting.getName().name().toLowerCase().replace("_", " ");
-            String explanation = setting.getName().toString();
-
-            switch (setting.getType()) {
-                case STRING_VALUE:
-                    if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
-                        setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {%>
-        <div class="form-group" id="<%="group_"+setting.getName().name()%>">
-            <label for="<%=setting.getName().name()%>" title="<%=explanation%>"><%=readableName%>
-            </label>
-            <textarea class="form-control" rows="3" name="<%=setting.getName().name()%>"
-                      id="<%=setting.getName().name()%>"><%=setting.getStringValue()%></textarea>
-        </div>
-
-        <% } else {%>
-        <div class="input-group" id="<%="group_"+setting.getName().name()%>">
-            <span class="input-group-addon" style=" width: 250px; text-align: left;"
-                  title="<%=explanation%>"><%=readableName%> </span>
-            <input class="form-control" name="<%=setting.getName().name()%>"
-                   <%if (!setting.getName().name().startsWith("EMAIL_")) {%>required <%}%>
-                   style = "padding-left:10px"
-                   type="<%=setting.getName().name().contains("PASSWORD") ? "password" : "text"%>"
-                   id="<%=setting.getName().name()%>" value="<%=setting.getStringValue()%>">
-        </div>
         <%
+            for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
+
+                // Do not show Killmap Setting here.
+                if (AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals(setting.getName())) {
+                    continue;
                 }
-                break;
-            case BOOL_VALUE:
-        %>
-        <div class="input-group" id="<%="group_"+setting.getName().name()%>">
-            <span class="input-group-addon" style=" width: 250px; text-align: left;"
-                  title="<%=explanation%>"><%=readableName%> </span>
-            <input type="checkbox" id="<%=setting.getName().name()%>" name="<%=setting.getName().name()%>"
-                   class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-                   data-onstyle="primary" data-offstyle=""
-                <%=setting.getBoolValue() ? "checked" : ""%>>
-        </div>
 
-        <% break;
-            case INT_VALUE: %>
-        <div class="input-group" id="<%="group_"+setting.getName().name()%>">
-            <span class="input-group-addon" style=" width: 250px; text-align: left;"
-                  title="<%=explanation%>"><%=readableName%> </span>
-            <input type="number" value="<%=setting.getIntValue()%>" id="<%=setting.getName().name()%>"
-                   name="<%=setting.getName().name()%>" min="0" required class="form-control" style="width: 80px"/>
-        </div>
+                String readableName = Arrays.stream(setting.getName().name().split("_"))
+                        .map(s -> s.charAt(0) + s.substring(1).toLowerCase())
+                        .collect(Collectors.joining(" "));
+
+                String explanation = setting.getName().toString();
+        %>
+            <div class="row mb-3">
+                <label class="col-4 col-form-label" id="class-label"
+                       for="<%=setting.getName().name()%>"
+                       title="<%=explanation%>">
+                    <%=readableName%>
+                </label>
         <%
-                    break;
+
+                switch (setting.getType()) {
+                    case STRING_VALUE:
+                        if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
+                            setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {
+        %>
+                <div class="col-8">
+                    <textarea class="form-control" rows="3"
+                              name="<%=setting.getName().name()%>"
+                              id="<%=setting.getName().name()%>"><%=setting.getStringValue()%></textarea>
+                </div>
+        <%
+                        } else {
+        %>
+                <div class="col-8">
+                    <input type="<%=setting.getName().name().contains("PASSWORD") ? "password" : "text"%>"
+                           class="form-control"
+                           name="<%=setting.getName().name()%>"
+                           id="<%=setting.getName().name()%>"
+                           value="<%=setting.getStringValue()%>">
+                    <% if (setting.getName().name().startsWith("EMAIL")) { %>
+                        <div class="invalid-feedback">
+                            This setting is required for sending emails.
+                            Please provide a valid value, or disable emails.
+                        </div>
+                    <% } %>
+                </div>
+        <%
+                        }
+                        break;
+                    case BOOL_VALUE:
+        %>
+                <div class="col-8 d-flex align-items-center">
+                    <div class="form-check form-switch">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               id="<%=setting.getName().name()%>"
+                               name="<%=setting.getName().name()%>"
+                               <%=setting.getBoolValue() ? "checked" : ""%>>
+                        <label class="form-check-label" for="<%=setting.getName().name()%>">
+                            <%=readableName%>
+                        </label>
+                    </div>
+                </div>
+        <%
+                        break;
+                    case INT_VALUE:
+        %>
+                <div class="col-8">
+                    <input type="number"
+                           class="form-control"
+                           name="<%=setting.getName().name()%>"
+                           id="<%=setting.getName().name()%>"
+                           value="<%=setting.getIntValue()%>">
+                    <% if (setting.getName().name().startsWith("EMAIL")) { %>
+                        <div class="invalid-feedback">
+                            This setting is required for sending emails.
+                            Please provide a valid value, or disable emails.
+                        </div>
+                    <% } %>
+                </div>
+        <%
+                        break;
+                }
+        %>
+            </div>
+        <%
             }
         %>
-        <br>
-        <%}%>
-        <button type="submit" class="btn btn-primary" name="saveSettingsBtn" id="saveSettingsBtn"> Save
-        </button>
-        <a class="btn btn-default" id="cancelBtn" onclick="window.location.reload();">Cancel</a>
+
+        <div class="row g-2">
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary" name="saveSettingsBtn" id="saveSettingsBtn">Save</button>
+            </div>
+            <div class="col-auto">
+                <button type="button" class="btn btn-secondary" id="cancelBtn" onclick="window.location.reload();">Cancel</button>
+            </div>
+        </div>
     </form>
+
+    <script>
+        $(document).ready(() => {
+            const emailSwitch = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED.name()%>');
+            const otherEmailInputs = [
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS.name()%>'),
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD.name()%>'),
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST.name()%>'),
+                document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT.name()%>')
+            ];
+
+            const validateEmailSettings = function () {
+                for (const emailInput of otherEmailInputs) {
+                    const valid = !emailSwitch.checked || emailInput.value.trim().length > 0;
+                    emailInput.setCustomValidity(valid ? '' : 'value-missing');
+                }
+            };
+
+            emailSwitch.addEventListener('change', validateEmailSettings);
+            for (const emailInput of otherEmailInputs) {
+                emailInput.addEventListener('input', validateEmailSettings);
+            }
+
+            validateEmailSettings();
+        });
+    </script>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

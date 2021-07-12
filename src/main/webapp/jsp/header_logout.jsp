@@ -25,32 +25,37 @@
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
-<nav class="navbar navbar-cd" id="header">
-    <div class="navbar-header">
+<nav class="navbar navbar-expand-md navbar-cd" id="header">
+    <div class="container-fluid">
 
-        <%-- The style attributes here are a workaround to make Logo + Text work in the navbar brand. --%>
-        <a class="navbar-brand" href="${pageContext.request.contextPath}" style="position: relative;">
-            <img src="images/logo.png" style="width: 2em; position: absolute; top: .1em; left: .4em;"/>
-            <span style="margin-left: 2em;">Code Defenders</span>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}">
+            <img src="${pageContext.request.contextPath}/images/logo.png" alt="" class="d-inline-block"
+            <%-- Negative margin to prevent the navbar from getting tall from the tall image. --%>
+                 style="height: 2.5rem; margin: -2rem .25rem -1.7rem .2rem;" />
+            Code Defenders
         </a>
 
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-navbar-controls" aria-expanded="true">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#header-navbar-controls"
+                aria-controls="header-navbar-controls" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
 
-    </div>
-    <div class="collapse navbar-collapse" id="header-navbar-controls">
+        <div class="collapse navbar-collapse" id="header-navbar-controls">
 
-        <ul class="nav navbar-nav">
-            <li><a href="#research" onclick="openResearchBox()">Research</a></li>
-        </ul>
-        <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="login">Login</a></li>
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#research">Research</a>
+                </li>
             </ul>
-        </c:if>
+            <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="login">Login</a>
+                    </li>
+                </ul>
+            </c:if>
+
+        </div>
 
     </div>
 </nav>
