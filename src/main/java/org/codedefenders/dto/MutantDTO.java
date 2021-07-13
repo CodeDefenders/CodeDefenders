@@ -68,12 +68,12 @@ public class MutantDTO {
         id = mutant.getId();
         points = mutant.getScore();
         state = mutant.getState();
-        description = StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream()
-                .filter(Objects::nonNull).collect(Collectors.joining("<br>")));
+        description = mutant.getHTMLReadout().stream()
+                .filter(Objects::nonNull).collect(Collectors.joining("<br>"));
         if (mutant.getKillingTest() != null) {
             killedByName = UserDAO.getUserForPlayer(mutant.getKillingTest().getPlayerId()).getUsername();
             killedByTestId = mutant.getKillingTest().getId();
-            killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
+            killMessage = mutant.getKillMessage();
         } else {
             killedByName = null;
             killedByTestId = -1;

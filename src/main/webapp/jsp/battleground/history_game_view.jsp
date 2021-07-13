@@ -69,8 +69,6 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
-
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 <%
     classViewer.setClassCode(game.getCUT());
@@ -130,32 +128,32 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<jsp:include page="/jsp/battleground/header_game.jsp"/>
+<jsp:include page="/jsp/header_game.jsp"/>
 
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-xl-6 col-12">
         <div id="mutants-div">
-            <h3>Existing Mutants</h3>
+            <div class="game-component-header"><h3>Existing Mutants</h3></div>
             <t:mutant_accordion/>
         </div>
 
         <div id="tests-div">
-            <h3>JUnit tests </h3>
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
         </div>
     </div>
 
-    <div class="col-md-6" id="cut-div">
-        <h3>Class Under Test</h3>
+    <div class="col-xl-6 col-12" id="cut-div">
+        <div class="game-component-header"><h3>Class Under Test</h3></div>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 </div>
 

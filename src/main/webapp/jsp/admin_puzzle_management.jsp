@@ -19,45 +19,41 @@
 
 --%>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Admin Puzzles"); %>
+<% pageInfo.setPageTitle("Puzzle Management"); %>
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminPuzzles"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <h2>Puzzle Management</h2>
-
-    <h3>Puzzle Chapters</h3>
-    <table id="tableChapters"
-           class="table table-striped table-hover table-responsive">
+    <h3 class="mb-3">Puzzle Chapters</h3>
+    <table id="tableChapters" class="table table-striped table-v-align-middle">
         <thead>
-        <tr>
-            <th>ID</th>
-            <th>Position</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Update</th>
-            <th>Delete</th>
-        </tr>
+            <tr>
+                <th>ID</th>
+                <th>Position</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
         </thead>
     </table>
 
-    <h3>Puzzle</h3>
-    <table id="tablePuzzles"
-           class="table table-striped table-hover table-responsive">
+    <h3 class="mt-4 mb-3">Puzzles</h3>
+    <table id="tablePuzzles" class="table table-striped table-v-align-middle">
         <thead>
-        <tr>
-            <th>ID</th>
-            <th>Chapter</th>
-            <th>Position</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Class</th>
-            <th>Update</th>
-            <th>Delete</th>
-        </tr>
+            <tr>
+                <th>ID</th>
+                <th>Chapter</th>
+                <th>Position</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Class</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
         </thead>
     </table>
 
@@ -86,46 +82,54 @@
                             "defaultContent": "",
                             "render": function(chapter, type, row, meta) {
                                 return `
-<button type="button" class="btn btn-sm btn-danger"
-        data-toggle="modal" data-target="#updatePuzzleChapter-` + chapter.id +`">
-    <span class="glyphicon glyphicon-pencil"></span>
+<button type="button" class="btn btn-sm btn-primary"
+        data-bs-toggle="modal" data-bs-target="#updatePuzzleChapter-\${chapter.id}">
+    <i class="fa fa-edit"></i>
 </button>
-<div class="modal fade" id="updatePuzzleChapter-` + chapter.id + `" role="dialog">
+<div class="modal fade" id="updatePuzzleChapter-\${chapter.id}" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h5 class="modal-title">Update Puzzle Chapter ` + chapter.id + `</h5>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label style="width:100px" for="positionForPuzzleChapter` + chapter.id + `">Position</label>
-                        <input style="width:250px" type="number" class="form-control"
-                            id="positionForPuzzleChapter` + chapter.id + `" value="` + chapter.position + `"
-                            placeholder="Number or empty.">
+            <form>
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Puzzle Chapter \${chapter.id}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="form-group">
+                            <label for="positionForPuzzleChapter\${chapter.id}" class="form-label">Position</label>
+                            <input type="number" class="form-control"
+                                id="positionForPuzzleChapter\${chapter.id}" value="\${chapter.position}"
+                                placeholder="Number or empty.">
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="titleForPuzzleChapter` + chapter.id + `">Title</label>
-                        <input style="width:250px" type="text" class="form-control"
-                            id="titleForPuzzleChapter` + chapter.id + `" value="` + chapter.title + `">
+
+                    <div class="row mb-3">
+                        <div class="form-group">
+                            <label for="titleForPuzzleChapter\${chapter.id}" class="form-label">Title</label>
+                            <input type="text" class="form-control"
+                                id="titleForPuzzleChapter\${chapter.id}" value="\${chapter.title}">
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="descriptionForPuzzleChapter` + chapter.id + `">Description</label>
-                        <input style="width:250px" type="text" class="form-control"
-                            id="descriptionForPuzzleChapter` + chapter.id + `" value="` + chapter.description + `">
+
+                    <div class="row mb-2">
+                        <div class="form-group">
+                            <label for="descriptionForPuzzleChapter\${chapter.id}" class="form-label">Description</label>
+                            <input type="text" class="form-control"
+                                id="descriptionForPuzzleChapter\${chapter.id}" value="\${chapter.description}">
+                        </div>
                     </div>
-                    <br>
-                    <button type="button" class="btn btn-primary"
-                            onclick="updatePuzzleChapter(` + chapter.id + `,` + meta.row + `)">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                            onclick="updatePuzzleChapter(\${chapter.id}, \${meta.row})">
                         Update
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -137,16 +141,18 @@
                             "data": null,
                             "defaultContent": "",
                             "render": function(data, type, row, meta) {
-                                return `<button class="btn btn-sm btn-danger" ` +
-                                    `onclick="` +
-                                    `removePuzzleChapter(` + data.id + `,` + meta.row + `,` + meta.col + `);">` +
-                                    `<span class="glyphicon glyphicon-trash"></span>` +
-                                    `</button>`;
+                                return `<button class="btn btn-sm btn-danger"
+                                           onclick="removePuzzleChapter(\${data.id}, \${meta.row}, \${meta.col});">
+                                           <i class="fa fa-trash"></i>
+                                       </button>`;
                             },
                             "orderable": false
                         }
                     ],
-                    "pageLength": 10,
+                    "scrollY": "600px",
+                    "scrollCollapse": true,
+                    "paging": false,
+                    "language": {"info": "Showing _TOTAL_ entries"},
                     "order": [[ 1, "asc" ]]
                 });
             }
@@ -173,71 +179,80 @@
                             "defaultContent": "",
                             "render": function(puzzle, type, row, meta) {
                                 return `
-<button type="button" class="btn btn-sm btn-danger"
-        data-toggle="modal" data-target="#updatePuzzle-` + puzzle.id +`">
-    <span class="glyphicon glyphicon-pencil"></span>
+<button type="button" class="btn btn-sm btn-primary"
+        data-bs-toggle="modal" data-bs-target="#updatePuzzle-\${puzzle.id}">
+    <i class="fa fa-edit"></i>
 </button>
-<div class="modal fade" id="updatePuzzle-` + puzzle.id + `" role="dialog">
+<div class="modal fade" id="updatePuzzle-\${puzzle.id}" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h5 class="modal-title">Update Puzzle ` + puzzle.id + `</h5>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label style="width:100px" for="positionForPuzzle` + puzzle.id + `">Position</label>
-                        <input style="width:250px" type="number" class="form-control"
-                            id="positionForPuzzle` + puzzle.id + `" value="` + puzzle.position + `"
-                            placeholder="Number or empty.">
+            <form>
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Puzzle \${puzzle.id}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label for="chapterIdForPuzzle\${puzzle.id}" class="form-label">Chapter ID</label>
+                            <input type="number" class="form-control"
+                                id="chapterIdForPuzzle\${puzzle.id}"
+                                value="\${puzzle.chapterId}" placeholder="Identifier of a chapter or empty.">
+                        </div>
+                        <div class="col-6">
+                            <label for="positionForPuzzle\${puzzle.id}" class="form-label">Position in Chapter</label>
+                            <input type="number" class="form-control"
+                                id="positionForPuzzle\${puzzle.id}" value="\${puzzle.position}"
+                                placeholder="Number or empty.">
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="chapterIdForPuzzle` + puzzle.id + `">Chapter Id</label>
-                        <input style="width:250px" type="number" class="form-control"
-                            id="chapterIdForPuzzle` + puzzle.id + `"
-                            value="` + puzzle.chapterId + `" placeholder="Identifier of a chapter or empty.">
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="titleForPuzzle\${puzzle.id}" class="form-label">Title</label>
+                            <input type="text" class="form-control"
+                                id="titleForPuzzle\${puzzle.id}" value="\${puzzle.title}">
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="titleForPuzzle` + puzzle.id + `">Title</label>
-                        <input style="width:250px" type="text" class="form-control"
-                            id="titleForPuzzle` + puzzle.id + `" value="` + puzzle.title + `">
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="descriptionForPuzzle\${puzzle.id}" class="form-label">Description</label>
+                            <input type="text" class="form-control"
+                                id="descriptionForPuzzle\${puzzle.id}" value="\${puzzle.description}">
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="descriptionForPuzzle` + puzzle.id + `">Description</label>
-                        <input style="width:250px" type="text" class="form-control"
-                            id="descriptionForPuzzle` + puzzle.id + `" value="` + puzzle.description + `">
+
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label for="maxAssertionsPerTestForPuzzle\${puzzle.id}" class="form-label">Max. Assertions</label>
+                            <input type="number" class="form-control"
+                                id="maxAssertionsPerTestForPuzzle\${puzzle.id}" value="\${puzzle.maxAssertionsPerTest}">
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="maxAssertionsPerTestForPuzzle` + puzzle.id + `">Max. Assertions</label>
-                        <input style="width:250px" type="number" class="form-control"
-                            id="maxAssertionsPerTestForPuzzle` + puzzle.id + `" value="` + puzzle.maxAssertionsPerTest + `">
+
+                    <div class="row g-3 mb-2">
+                        <div class="col-6">
+                            <label for="editableLinesStartForPuzzle\${puzzle.id}" class="form-label">First Editable Line</label>
+                            <input type="number" class="form-control"
+                                id="editableLinesStartForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesStart}">
+                        </div>
+                        <div class="col-6">
+                            <label for="editableLinesEndForPuzzle\${puzzle.id}" class="form-label">Last Editable Line</label>
+                            <input type="number" class="form-control"
+                                id="editableLinesEndForPuzzle\${puzzle.id}" value="\${puzzle.editableLinesEnd}">
+                        </div>
                     </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="editableLinesStartForPuzzle` + puzzle.id + `">First Edit Line</label>
-                        <input style="width:250px" type="number" class="form-control"
-                            id="editableLinesStartForPuzzle` + puzzle.id + `" value="` + puzzle.editableLinesStart + `">
-                    </div>
-                    <br>
-                    <div class="form-group">
-                        <label style="width:100px" for="editableLinesEndForPuzzle` + puzzle.id + `">Last Edit Line</label>
-                        <input style="width:250px" type="number" class="form-control"
-                            id="editableLinesEndForPuzzle` + puzzle.id + `" value="` + puzzle.editableLinesEnd + `">
-                    </div>
-                    <br>
-                    <button type="button" class="btn btn-primary"
-                            onclick="updatePuzzle(` + puzzle.id + `,` + meta.row + `)">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                            onclick="updatePuzzle(\${puzzle.id}, \${meta.row})">
                         Update
                     </button>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -249,16 +264,18 @@
                             "data": null,
                             "defaultContent": "",
                             "render": function(data, type, row, meta) {
-                                return `<button class="btn btn-sm btn-danger" ` +
-                                    `onclick="` +
-                                    `removePuzzle(` + data.id + `,` + meta.row + `,` + meta.col + `);">` +
-                                        `<span class="glyphicon glyphicon-trash"></span>` +
-                                    `</button>`;
+                                return `<button class="btn btn-sm btn-danger"
+                                           onclick="removePuzzle(\${data.id}, \${meta.row}, \${meta.col});">
+                                           <i class="fa fa-trash"></i>
+                                       </button>`;
                             },
                             "orderable": false
                         }
                     ],
-                    "pageLength": 10,
+                    "scrollY": "600px",
+                    "scrollCollapse": true,
+                    "paging": false,
+                    "language": {"info": "Showing _TOTAL_ entries"},
                     "order": [[ 1, "asc" ], [ 2, "asc" ]]
                 });
             }
@@ -283,8 +300,6 @@
             PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
                 .then(responseJSON => {
                     chapterTable.row(row).data(updateChapterData);
-                    $('.modal-backdrop').fadeOut();
-                    document.querySelector("#updatePuzzleChapter-" + puzzleChapterId +  " .close").click();
 
                     // Redraw, so ordering is restored, too.
                     chapterTable.rows().invalidate('data').draw();
@@ -329,8 +344,6 @@
             PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
                 .then(responseJSON => {
                     puzzleTable.row(row).data(updatedPuzzleData);
-                    $('.modal-backdrop').fadeOut();
-                    document.querySelector("#updatePuzzle-" + puzzleId +  " .close").click();
 
                     // Redraw, so ordering is restored, too.
                     puzzleTable.rows().invalidate('data').draw();
@@ -356,7 +369,6 @@
         }
     </script>
 
-
-
 </div>
+
 <%@ include file="/jsp/footer.jsp"%>

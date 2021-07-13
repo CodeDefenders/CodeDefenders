@@ -102,7 +102,6 @@ public class GameChatAPI extends HttpServlet {
         String json = gson.toJson(messages);
 
         response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         out.write(json.getBytes(StandardCharsets.UTF_8));
         out.flush();
     }

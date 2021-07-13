@@ -21,40 +21,43 @@
 --%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("Contact Us"); %>
+<% pageInfo.setPageTitle("Imprint & Privacy Policy"); %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <% if (login.isLoggedIn()) { %>
-<jsp:include page="/jsp/header.jsp"/>
+    <jsp:include page="/jsp/header.jsp"/>
 <% } else { %>
-<jsp:include page="/jsp/header_logout.jsp"/>
+    <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<div class="container" style=" max-width: 50%; min-width: 25%; ">
+<%
+    String siteNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue();
+    String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
+%>
 
-    <h2 style="text-align: left">Imprint</h2>
+<div class="container">
 
-    <%  String siteNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue();
-        if (siteNotice.isEmpty()) {
-    %>
-            <p>Please add an imprint in the system settings</p>
-    <%  } else { %>
-            <%=siteNotice%>
-    <%  } %>
+    <h3 class="mb-3">Imprint</h3>
 
-    <br/>
+    <div class="bg-light rounded-3 p-3 mb-3">
+        <% if (siteNotice.isEmpty()) { %>
+            <p class="mb-0">Please add an imprint in the system settings.</p>
+        <% } else { %>
+            <p style="white-space: pre-wrap" class="mb-0"><%=siteNotice%></p>
+        <% } %>
+    </div>
 
-    <h3 style="text-align: left">Privacy Policy</h3>
+    <h3 class="mt-4 mb-3">Privacy Policy</h3>
 
-    <%  String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
-        if (privacyNotice.isEmpty()) {
-    %>
-            <p>Please add a privacy policy in the system settings</p>
-    <%  } else { %>
-            <%=privacyNotice%>
-    <%  } %>
-    
+    <div class="bg-light rounded-3 p-3 mb-3">
+        <% if (privacyNotice.isEmpty()) { %>
+            <p class="mb-0">Please add a privacy policy in the system settings.</p>
+        <% } else { %>
+            <p style="white-space: pre-wrap" class="mb-0"><%=privacyNotice%></p>
+        <% } %>
+    </div>
+
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>
