@@ -41,16 +41,16 @@ public class Redirect {
         String contextPath = request.getContextPath();
 
         if (referer == null) {
-            logger.debug("Header does not specify a referer, redirecting back to " + contextPath);
-            response.sendRedirect(contextPath);
+            logger.debug("Header does not specify a referer, redirecting back to " + Paths.LANDING_PAGE);
+            redirectTo(request, response, Paths.LANDING_PAGE);
 
         } else if (referer.contains(contextPath)) {
             logger.debug("Redirecting back to absolute URL " + referer);
-            response.sendRedirect(referer);
+            redirectTo(request, response, referer);
 
         } else {
             logger.debug("Redirecting back to relative URL " + contextPath + "/" + referer);
-            response.sendRedirect(contextPath + "/" + referer);
+            redirectTo(request, response, contextPath + "/" + referer);
         }
     }
     
@@ -58,14 +58,14 @@ public class Redirect {
      * Redirect to the provided target page
      */
     public static void redirectTo(HttpServletRequest request, HttpServletResponse response, String target) throws IOException {
-        // TODO: Should we check this is indeed a valid URL from Paths?
+        // TODO: Should we check this is indeed a valid URL from Paths, we cannot allow to redirect to any web page out there, can't we?
         String contextPath = request.getContextPath();
 
         if (target == null) {
-            logger.debug("Header does not specify a referer, redirecting back to " + contextPath);
-            response.sendRedirect(contextPath);
+            logger.debug("Header does not specify a target, redirecting back to " + Paths.LANDING_PAGE);
+            response.sendRedirect(Paths.LANDING_PAGE);
 
-        } else if (target.contains(contextPath)) {
+        } else if (target.startsWith(contextPath)) {
             logger.debug("Redirecting back to absolute URL " + target);
             response.sendRedirect(target);
 
