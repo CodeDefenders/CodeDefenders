@@ -49,7 +49,7 @@
 <div id="creategame" class="container">
     <p class="text-center">
         Before you can start games, please
-        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>>?origin=<%=Paths.BATTLEGROUND_CREATE%>" class="text-center">upload a class under test</a>.
+        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.BATTLEGROUND_CREATE%>" class="text-center">upload a class under test</a>.
     </p>
 <%
         } else {

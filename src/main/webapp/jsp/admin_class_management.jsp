@@ -123,7 +123,7 @@
 
     <% if (!allClasses.isEmpty()) { %>
         <p>
-            <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Click here</a>
+            <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.ADMIN_CLASSES%>">Click here</a>
             to upload a new class.
         </p>
     <% } %>
