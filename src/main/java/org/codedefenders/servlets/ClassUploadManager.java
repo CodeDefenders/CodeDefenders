@@ -538,9 +538,12 @@ public class ClassUploadManager extends HttpServlet {
             logger.error("Could error while calculating killmap for successfully uploaded class.", e);
         }
 
-        // Handle the automatic redirection logic
-        if( disableAutomaticRedirect || origin == null) {
-            logger.info("Redirecting to class upload page " + origin);
+        // Handle the automatic redirection logic. At this point, origin is 
+        if( disableAutomaticRedirect) {
+            logger.info("Redirecting to class upload page disableAutomaticRedirect checked");
+            Redirect.redirectBack(request, response);
+        } else if (origin == null || origin.equalsIgnoreCase("null")) {
+            logger.info("Redirecting to class upload page. Null origin");
             Redirect.redirectBack(request, response);
         } else {
             logger.info("Automatically Redirecting to admin " + origin);
