@@ -84,7 +84,7 @@ public class ParallelMutationTester extends MutationTester //
         List<Mutant> killedMutants = new ArrayList<Mutant>();
 
         // Acquire and release the connection
-        Optional<UserEntity> u =userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
+        Optional<UserEntity> u = userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
         if (!u.isPresent()) {
             // TODO
             throw new RuntimeException();

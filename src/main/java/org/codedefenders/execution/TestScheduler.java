@@ -27,9 +27,6 @@ public interface TestScheduler {
 
     /**
      * Returns an ordered sequence of tests to be executed.
-     *
-     * @param tests
-     * @return
      */
     List<Test> scheduleTests(Collection<Test> tests);
 

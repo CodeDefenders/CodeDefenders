@@ -19,6 +19,7 @@
 package org.codedefenders;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -27,10 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminUserManagement;
 import org.codedefenders.util.EmailUtils;
@@ -46,13 +47,27 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-@Category(IntegrationTest.class)
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
+
+/*
+`@PowerMockIgnore` is required to fix some strange exception caused by PowerMock:
+java.security.NoSuchAlgorithmException: class configured for TrustManagerFactory: sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory not a TrustManagerFactory
+
+This should be removed if we no longer depend on PowerMockS
+
+See also:
+https://stackoverflow.com/questions/14654639/when-a-trustmanagerfactory-is-not-a-trustmanagerfactory-java
+ */
+@PowerMockIgnore("javax.net.ssl.*")
+@Category(DatabaseTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({AdminDAO.class, EmailUtils.class, DatabaseConnection.class})
-public class AdminUserManagementTest {
+public class AdminUserManagementIT {
 
     /**
      * I tried to mock away stuff but at the moment is not possible since basically
@@ -176,7 +191,19 @@ public class AdminUserManagementTest {
         Mockito.when(request.getParameter("user_name_list")).thenReturn(userNameList);
 
         try {
-            new AdminUserManagement().doPost(request, response);
+            AdminUserManagement adminUserManagement = new AdminUserManagement();
+
+            Field fieldUserRepo = AdminUserManagement.class.getDeclaredField("userRepo");
+            fieldUserRepo.setAccessible(true);
+            UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+            fieldUserRepo.set(adminUserManagement, userRepo);
+
+            Field fieldMessages = AdminUserManagement.class.getDeclaredField("messages");
+            fieldMessages.setAccessible(true);
+            MessagesBean messagesBean = mock(MessagesBean.class);
+            fieldMessages.set(adminUserManagement, messagesBean);
+
+            adminUserManagement.doPost(request, response);
         } catch (IOException | ServletException e) {
             e.printStackTrace();
             Assert.fail("Exception raised");
@@ -184,6 +211,7 @@ public class AdminUserManagementTest {
 
         //PowerMockito.verifyStatic();
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        PowerMockito.verifyStatic(EmailUtils.class);
         EmailUtils.sendEmail(Mockito.anyString(), Mockito.anyString(), captor.capture());
         String email = captor.getValue();
         Assert.assertFalse(email.contains(Paths.ADMIN_USERS));

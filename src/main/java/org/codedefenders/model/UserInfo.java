@@ -33,7 +33,7 @@ import org.codedefenders.game.Role;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class UserInfo implements Serializable {
-    private final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter
             .ofPattern("yyyy-MM-dd HH:mm")
             .withZone(ZoneId.systemDefault());
 

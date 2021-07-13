@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2019,2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -18,15 +18,18 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.rules.DatabaseRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
+
+import org.codedefenders.DatabaseRule;
+import org.codedefenders.DatabaseTest;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -36,8 +39,19 @@ import static org.junit.Assert.assertNotNull;
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
+/*
+`@PowerMockIgnore` is required to fix some strange exception caused by PowerMock:
+java.security.NoSuchAlgorithmException: class configured for TrustManagerFactory: sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory not a TrustManagerFactory
+
+This should be removed if we no longer depend on PowerMockS
+
+See also:
+https://stackoverflow.com/questions/14654639/when-a-trustmanagerfactory-is-not-a-trustmanagerfactory-java
+ */
+@PowerMockIgnore("javax.net.ssl.*")
+@Category(DatabaseTest.class)
 @RunWith(PowerMockRunner.class)
-public class CreatePreparedStatementTest {
+public class CreatePreparedStatementIT {
     @Rule
     public DatabaseRule db = new DatabaseRule();
 

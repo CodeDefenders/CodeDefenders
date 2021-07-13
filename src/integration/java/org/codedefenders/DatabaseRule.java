@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2019,2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.rules;
+package org.codedefenders;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -93,6 +93,7 @@ public class DatabaseRule extends ExternalResource {
     public void before() throws Exception {
         logger.debug("Started Embedded Database creation");
 
+        /*
         DBConfigurationBuilder databaseConfig = DBConfigurationBuilder.newBuilder();
         // This is necessary to allow the database to run as root, which can be the case if these tests are run inside
         // an (docker) container e.g. in the CI.
@@ -106,6 +107,8 @@ public class DatabaseRule extends ExternalResource {
         embeddedDatabase.createDB(dbName);
 
         dbConnectionUrl = databaseConfig.getURL(dbName) + connectionOptions;
+         */
+        dbConnectionUrl = "jdbc:mysql://database:3306/codedefenders";
         logger.debug("Finished Embedded Database creation");
 
         // Load the
@@ -125,11 +128,13 @@ public class DatabaseRule extends ExternalResource {
 
     @Override
     public void after() {
+        /*
         try {
             logger.debug("Stopping Embedded Database");
             embeddedDatabase.stop();
         } catch (ManagedProcessException e) {
             // quiet
         }
+         */
     }
 }

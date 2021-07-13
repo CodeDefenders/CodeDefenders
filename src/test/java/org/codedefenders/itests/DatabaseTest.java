@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.codedefenders.itests;
 
 import java.sql.Connection;
@@ -23,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
@@ -47,7 +49,6 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;

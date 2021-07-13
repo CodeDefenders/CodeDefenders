@@ -344,8 +344,7 @@ public class MultiplayerGame extends AbstractGame {
     /**
      * This method calculates the mutant score for every attacker in the game.
      *
-     * <p>
-     * The result is a mapping of playerId to player score.
+     * <p>The result is a mapping of playerId to player score.
      *
      * @return mapping from playerId to player score.
      */
@@ -431,8 +430,7 @@ public class MultiplayerGame extends AbstractGame {
     /**
      * This method calculates the test score for every defender in the game.
      *
-     * <p>
-     * The result is a mapping of playerId to player score.
+     * <p>The result is a mapping of playerId to player score.
      *
      * @return mapping from playerId to player score.
      */
