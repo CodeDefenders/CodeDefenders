@@ -63,7 +63,7 @@ public class TestAccordionBean {
         categories = new ArrayList<>();
 
         for (TestDTO test : testsList) {
-            tests.put(test.id, test);
+            tests.put(test.getId(), test);
         }
 
         TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
@@ -113,7 +113,7 @@ public class TestAccordionBean {
                     /* Line belongs to a method. */
                 } else {
                     lastRange = entry.getKey();
-                    entry.getValue().addTestId(test.id);
+                    entry.getValue().addTestId(test.getId());
                 }
             }
         }

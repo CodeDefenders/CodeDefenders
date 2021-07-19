@@ -29,30 +29,29 @@ import com.google.gson.annotations.Expose;
 
 public class MutantDTO {
     @Expose
-    public final int id;
+    private final int id;
     @Expose
-    public final SimpleUser creator;
+    private final SimpleUser creator;
     @Expose
-    public final Mutant.State state;
+    private final Mutant.State state;
     @Expose
-    public final int points;
+    private final int points;
     @Expose
-    public final String lineString;
+    private final String lineString;
     @Expose
-    public Boolean covered;
+    private final SimpleUser killedBy;
     @Expose
-    public final SimpleUser killedBy;
+    private final boolean canMarkEquivalent;
     @Expose
-    public final boolean canMarkEquivalent;
+    private final boolean canView;
     @Expose
-    public final boolean canView;
+    private final int killedByTestId;
     @Expose
-    public final int killedByTestId;
+    private final String killMessage;
     @Expose
-    public final String killMessage;
+    private final String description;
     @Expose
-    public final String description;
-
+    private final Boolean covered;
     private final List<Integer> lines;
     private final Integer gameId;
     private final Integer playerId;
@@ -113,6 +112,54 @@ public class MutantDTO {
 
     public Integer getGameId() {
         return gameId;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public SimpleUser getCreator() {
+        return creator;
+    }
+
+    public Mutant.State getState() {
+        return state;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public String getLineString() {
+        return lineString;
+    }
+
+    public Boolean getCovered() {
+        return covered;
+    }
+
+    public SimpleUser getKilledBy() {
+        return killedBy;
+    }
+
+    public boolean isCanMarkEquivalent() {
+        return canMarkEquivalent;
+    }
+
+    public boolean isCanView() {
+        return canView;
+    }
+
+    public int getKilledByTestId() {
+        return killedByTestId;
+    }
+
+    public String getKillMessage() {
+        return killMessage;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
 

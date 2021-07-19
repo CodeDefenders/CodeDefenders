@@ -3,11 +3,11 @@ package org.codedefenders.beans.game;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
@@ -56,7 +56,7 @@ public class MutantAccordionBean {
         categories = new ArrayList<>();
 
         MutantAccordionCategory allMutants = new MutantAccordionCategory("All Mutants", "all");
-        allMutants.addMutantIds(getMutants().stream().map(m -> m.id).collect(Collectors.toList()));
+        allMutants.addMutantIds(getMutants().stream().map(MutantDTO::getId).collect(Collectors.toList()));
         categories.add(allMutants);
 
         MutantAccordionCategory mutantsWithoutMethod =
@@ -109,12 +109,12 @@ public class MutantAccordionBean {
                 } else {
                     lastRange = entry.getKey();
                     belongsMethod = true;
-                    entry.getValue().addMutantId(mutant.id);
+                    entry.getValue().addMutantId(mutant.getId());
                 }
             }
 
             if (!belongsMethod) {
-                mutantsWithoutMethod.addMutantId(mutant.id);
+                mutantsWithoutMethod.addMutantId(mutant.getId());
             }
         }
     }
@@ -139,7 +139,8 @@ public class MutantAccordionBean {
     }
 
     public String jsonMutants() {
-        Map<Integer, MutantDTO> mutants = this.mutantList.stream().collect(Collectors.toMap(m -> m.id, m -> m));
+        Map<Integer, MutantDTO> mutants = this.mutantList.stream()
+                .collect(Collectors.toMap(MutantDTO::getId, Function.identity()));
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()

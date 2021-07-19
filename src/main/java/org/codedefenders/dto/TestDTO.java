@@ -19,25 +19,26 @@
 
 package org.codedefenders.dto;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.google.gson.annotations.Expose;
 
 public class TestDTO {
     @Expose
-    public final int id;
+    private final int id;
     @Expose
-    public final SimpleUser creator;
+    private final SimpleUser creator;
     @Expose
-    public final Integer points;
+    private final Integer points;
     @Expose
-    public boolean canView;
+    private final boolean canView;
     @Expose
-    public List<Integer> coveredMutantIds;
+    private final List<Integer> coveredMutantIds;
     @Expose
-    public List<Integer> killedMutantIds;
+    private final List<Integer> killedMutantIds;
     @Expose
-    public final List<String> smells;
+    private final List<String> smells;
 
     private final List<Integer> linesCovered;
     private final Integer gameId;
@@ -83,5 +84,33 @@ public class TestDTO {
 
     public String getSource() {
         return source;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public SimpleUser getCreator() {
+        return creator;
+    }
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public boolean isCanView() {
+        return canView;
+    }
+
+    public List<Integer> getCoveredMutantIds() {
+        return Collections.unmodifiableList(coveredMutantIds);
+    }
+
+    public List<Integer> getKilledMutantIds() {
+        return Collections.unmodifiableList(killedMutantIds);
+    }
+
+    public List<String> getSmells() {
+        return Collections.unmodifiableList(smells);
     }
 }

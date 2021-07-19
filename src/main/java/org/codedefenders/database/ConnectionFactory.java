@@ -46,11 +46,11 @@ import com.mysql.cj.jdbc.Driver;
 public class ConnectionFactory {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
-    private BasicDataSource dataSource;
+    private final BasicDataSource dataSource;
     private final QueryRunner queryRunner;
 
     @Inject
-    public ConnectionFactory(Configuration config) {
+    public ConnectionFactory(final Configuration config) {
         if (config.isValid()) {
             dataSource = new BasicDataSource();
             try {
@@ -68,8 +68,7 @@ public class ConnectionFactory {
 
             queryRunner = new QueryRunner(dataSource);
         } else {
-            // TODO: We should not reach this point
-            queryRunner = null;
+            throw new RuntimeException("Configuration invalid");
         }
     }
 
@@ -155,9 +154,7 @@ public class ConnectionFactory {
     }
 
     /**
-     *
      * @param maxTotalConnections
-     *
      * @deprecated Set this via the configuration
      */
     @Deprecated
@@ -165,9 +162,7 @@ public class ConnectionFactory {
     }
 
     /**
-     *
      * @param parseInt
-     *
      * @deprecated Set this via the configuration
      */
     @Deprecated
