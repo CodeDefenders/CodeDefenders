@@ -19,9 +19,19 @@
 package org.codedefenders.validation.code;
 
 public enum CodeValidatorLevel {
-    RELAXED,
-    MODERATE,
-    STRICT;
+    RELAXED("Relaxed"),
+    MODERATE("Moderate"),
+    STRICT("Strict");
+
+    private final String displayName;
+
+    CodeValidatorLevel(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
 
     /**
      * Similar to {@link #valueOf(String)} but returns {@code null} if

@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.beans.game.HistoryBean" %>
 
@@ -27,44 +29,45 @@
     final List<HistoryBean.HistoryBeanEventDTO> events = history.getEvents();
 %>
 
+<%--@elvariable id="history" type="org.codedefenders.beans.game.HistoryBean"--%>
+
 <link href="${pageContext.request.contextPath}/css/timeline.css" rel="stylesheet">
 
-<div id="history" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
-    <div class="modal-dialog" style="width: 900px">
-        <!-- Modal content-->
-        <div class="modal-content" style="z-index: 10000; position: absolute; width: 100%; left:0%;">
+<div id="history" class="modal fade" tabindex="-1">
+    <div class="modal-dialog" style="max-width: 900px">
+        <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">History</h4>
+                <h5 class="modal-title">History</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="background: #eee; overflow-y: auto; max-height: 55vh">
                 <div class="timeline-centered timeline-sm">
-                    <%
-                        for (HistoryBean.HistoryBeanEventDTO event : events) {
+                    <c:forEach items="${history.events}" var="event">
+                        <article class="timeline-entry ${event.alignment}-aligned">
+                            <div class="timeline-entry-inner">
+                                <time datetime="${event.format}" class="timeline-time">
+                                    <span>${event.time}</span>
+                                    <span>${event.date}</span>
+                                </time>
 
-                    %>
-                    <article class="timeline-entry <%= event.getAlignment()%>-aligned">
-                        <div class="timeline-entry-inner">
-                            <time datetime=<%=event.getFormat()%> class="timeline-time">
-                                <span><%= event.getTime() %></span>
-                                <span><%= event.getDate() %></span>
-                            </time>
-
-                            <div class="timeline-icon bg-<%= event.getColour() %>"><i class="fa fa-group"></i>
+                                <div class="timeline-icon bg-${event.colour}"><i class="fa fa-group"></i>
+                                </div>
+                                <div class="timeline-label bg-${event.colour}">
+                                    <span class="h5 timeline-title">${event.userMessage}</span>
+                                    <%--
+                                        If events ever have a body message:
+                                        <c:if test="${not empty event.message}">
+                                            <p class="mt-2"><!-- Body message here --></p>
+                                        </c:if>
+                                    --%>
+                                </div>
                             </div>
-                            <div class="timeline-label bg-<%= event.getColour() %>"><h4
-                                    class="timeline-title"><%= event.getUserMessage() %>
-                            </h4>
-                                <p><%-- Body message here--%></p></div>
-                        </div>
-                    </article>
-                    <%
-                        }
-                    %>
+                        </article>
+                    </c:forEach>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

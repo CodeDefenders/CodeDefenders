@@ -50,7 +50,7 @@ public class UserServlet extends HttpServlet {
                     messages.add("Could not create user. Invalid password.");
                 } else if (!validator.validEmailAddress(email)) {
                     // This check should be performed in the user interface too.
-                    messages.add("Could not create user. Invalid E-Mail address.");
+                    messages.add("Could not create user. Invalid Email address.");
                 } else if (!password.equals(confirm)) {
                     // This check should be performed in the user interface too.
                     messages.add("Could not create user. Password entries did not match.");
@@ -67,8 +67,7 @@ public class UserServlet extends HttpServlet {
                         messages.add("Could not create a user for you, sorry!");
                     }
                 }
-                RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-                dispatcher.forward(request, response);
+                response.sendRedirect(Constants.LOGIN_VIEW_JSP);
                 break;
 
             default:

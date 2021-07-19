@@ -44,7 +44,8 @@ public class MeleeGameService extends AbstractGameService {
     protected boolean canViewMutant(Mutant mutant, AbstractGame game, UserEntity user, Player player,
             Role playerRole) {
         return playerRole != Role.NONE
-                && (game.getLevel() == GameLevel.EASY
+                && (game.isFinished()
+                || game.getLevel() == GameLevel.EASY
                 || (game.getLevel() == GameLevel.HARD
                 && (mutant.getCreatorId() == user.getId()
                 || playerRole.equals(Role.OBSERVER)
@@ -64,7 +65,7 @@ public class MeleeGameService extends AbstractGameService {
 
     @Override
     protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
-        return game.getState() == GameState.FINISHED
+        return game.isFinished()
                 || playerRole == Role.OBSERVER
                 || game.getLevel() == GameLevel.EASY
                 || test.getPlayerId() == player.getId();

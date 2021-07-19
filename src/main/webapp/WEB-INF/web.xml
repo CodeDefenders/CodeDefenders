@@ -95,6 +95,34 @@
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
 
+	<!-- Set character encoding -->
+
+	<filter>
+		<filter-name>RequestCharacterEncoding</filter-name>
+		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>RequestCharacterEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>ResponseCharacterEncoding</filter-name>
+		<filter-class>org.codedefenders.configuration.SetResponseCharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>ResponseCharacterEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<!-- CodeDefenders filters -->
 
 	<filter-mapping>
@@ -106,7 +134,6 @@
 		<filter-name>BeanFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
 
 	<error-page>
 		<location>/jsp/error_page_404.jsp</location>

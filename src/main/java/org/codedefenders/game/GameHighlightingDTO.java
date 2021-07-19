@@ -140,6 +140,7 @@ public class GameHighlightingDTO {
             this.lines = mutant.getSummaryString();
             this.status = mutant.getState();
             this.canClaim = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                    && mutant.isAlive()
                     && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                     && (user == null || mutant.getCreatorId() != user.getId())
                     && mutant.getLines().size() >= 1;

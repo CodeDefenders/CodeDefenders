@@ -730,10 +730,9 @@ public class MeleeGameManager extends HttpServlet {
             return;
         }
 
-        boolean handleAcceptEquivalence = ServletUtils.parameterThenOrOther(request, "acceptEquivalent", true, false);
-        boolean handleRejectEquivalence = ServletUtils.parameterThenOrOther(request, "rejectEquivalent", true, false);
+        String resolveAction = request.getParameter("resolveAction");
 
-        if (handleAcceptEquivalence) {
+        if ("accept".equals(resolveAction)) {
             // Accepting equivalence
             final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
             if (!equivMutantId.isPresent()) {
@@ -774,7 +773,8 @@ public class MeleeGameManager extends HttpServlet {
             logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
                     login.getUserId(), mutantId);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
-        } else if (handleRejectEquivalence) {
+
+        } else if ("reject".equals(resolveAction)) {
             // Reject equivalence and submit killing test case
             final Optional<String> test = ServletUtils.getStringParameter(request, "test");
             if (!test.isPresent()) {
@@ -964,9 +964,9 @@ public class MeleeGameManager extends HttpServlet {
             game.update();
             logger.info("Resolving equivalence was handled successfully");
             response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+
         } else {
-            logger.info("Rejecting resolving equivalence request. "
-                    + "Missing parameters 'acceptEquivalent' or 'rejectEquivalent'.");
+            logger.info("Rejecting resolving equivalence request. Invalid value for 'resolveAction': " + resolveAction);
             Redirect.redirectBack(request, response);
         }
     }

@@ -34,12 +34,85 @@
 
 <jsp:include page="/jsp/header_logout.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/index.css" rel="stylesheet">
+<%-- Vertically align content if enough space is available. --%>
+<div class="container py-4 h-100 d-flex flex-column justify-content-center align-items-center">
 
-<div class="container">
-        <div id="splash" class="jumbotron masthead">
-            <h2><img class="logo" href="${pageContext.request.contextPath}/"
-                     src="images/logo.png" style="margin-right: 10px"/>Code Defenders: A Mutation Testing Game</h2>
+    <div class="d-flex align-items-center gap-3 mb-3">
+        <img href="${pageContext.request.contextPath}/"
+             src="images/logo.png" alt="Code Defenders Logo"
+             width="58">
+        <%-- Make the header break nicely on smaller screens. --%>
+        <h1 class="d-lg-block d-flex flex-column">
+            <span>Code Defenders: </span>
+            <span>A Mutation Testing Game</span>
+        </h1>
+    </div>
+
+    <a href="${pageContext.request.contextPath}<%=Paths.LOGIN%>"
+       class="btn btn-lg btn-primary btn-highlight"
+       style="margin-bottom: 5rem;">
+        Log in or Sign up
+    </a>
+
+    <div class="row g-4">
+        <div class="col-xxl-6 col-12">
+            <div class="p-5 bg-light rounded-3">
+                <h2 class="mb-3">Active Multiplayer Games</h2>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Creator</th>
+                                <th>Class</th>
+                                <th>Attackers</th>
+                                <th>Defenders</th>
+                                <th>Level</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                if (openGames.isEmpty()) {
+                            %>
+                                <tr>
+                                    <td colspan="100" class="text-center">
+                                        There are currently no open games.
+                                    </td>
+                                </tr>
+                            <%
+                                } else {
+                                    for (MultiplayerGame game : openGames) {
+                                    final GameClass cut = game.getCUT();
+                                    int attackers = game.getAttackerPlayers().size();
+                                    int defenders = game.getDefenderPlayers().size();
+                            %>
+                                <tr id="<%="game-"+game.getId()%>">
+                                    <td><%=gameCreatorNames.get(game.getId())%></td>
+                                    <td><span><%=cut.getAlias()%></span></td>
+                                    <td><%=attackers%></td>
+                                    <td><%=defenders%></td>
+                                    <td><%=game.getLevel().getFormattedString()%></td>
+                                </tr>
+                            <%
+                                    }
+                                }
+                            %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xxl-6 col-12">
+            <div class="p-5 bg-light rounded-3">
+                <h2 class="mb-3">Research</h2>
+                <%@ include file="/jsp/research.jsp" %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<%@ include file="/jsp/footer.jsp" %>
 
 <%--            <!-- Puzzle--> may be used in the future once puzzles are more sophisticated--%>
 <%--            <h3 class="text-primary"--%>
@@ -61,61 +134,3 @@
 <%--                </tr>--%>
 <%--                <%}%>--%>
 <%--            </table>--%>
-
-            <!-- Battleground -->
-            <!--
-            <h3 class="text-primary"
-                style="border-top: 1px solid; border-bottom: 1px solid; padding: 10px; /*background: #d9edf7">
-                Currently Active Battleground Games
-            </h3>
-            -->
-            <p style="font-size: medium">Currently active multiplayer games:</p>
-
-            <table class="table table-hover table-responsive table-center">
-                <tr>
-                    <th>Creator</th>
-                    <th>Class</th>
-                    <th>Attackers</th>
-                    <th>Defenders</th>
-                    <th>Level</th>
-                </tr>
-                <%
-                    if (openGames.isEmpty()) {
-                %>
-                <tr>
-                    <td colspan="100%"> Currently there are no open games.</td>
-                </tr>
-                <%
-                } else {
-                    for (MultiplayerGame game : openGames) {
-                    final GameClass cut = game.getCUT();
-                    int attackers = game.getAttackerPlayers().size();
-                    int defenders = game.getDefenderPlayers().size();
-                %>
-                <tr id="<%="game-"+game.getId()%>">
-                    <td class="col-sm-1"><%=gameCreatorNames.get(game.getId())%></td>
-                    <td class="col-sm-2">
-                        <span><%=cut.getAlias()%></span>
-                    </td>
-                    <td class="col-sm-1"><%=attackers%>
-                    </td>
-                    <td class="col-sm-1"><%=defenders%>
-                    </td>
-                    <td class="col-sm-1"><%= game.getLevel().getFormattedString()%>
-                    </td>
-                </tr>
-                <%
-                        }
-                    }
-                %>
-            </table>
-            <a id="enter" class="btn btn-primary btn-large" href="login">Log in or sign up</a>
-        </div>
-
-    <hr>
-    <div class="text-center">
-        <%@ include file="/jsp/research.jsp" %>
-    </div>
-</div>
-
-<%@ include file="/jsp/footer.jsp" %>

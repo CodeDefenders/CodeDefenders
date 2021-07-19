@@ -27,50 +27,74 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="mutantEditor" class="org.codedefenders.beans.game.MutantEditorBean" scope="request"/>
 
-<%-- no dependencies -> no tabs --%>
-<% if (!mutantEditor.hasDependencies()) { %>
+<div class="card game-component-resize">
 
-    <pre style="margin-top: 10px;"><textarea id="mutant-code" name="mutant" title="mutant" cols="80"
-                                             rows="50">${mutantEditor.mutantCode}</textarea></pre>
+    <%-- no dependencies -> no tabs --%>
+    <% if (!mutantEditor.hasDependencies()) { %>
 
-<%-- dependencies exist -> tab system --%>
-<% } else { %>
+        <div class="card-body p-0 codemirror-fill">
+            <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant" cols="80" rows="50">${mutantEditor.mutantCode}</textarea></pre>
+        </div>
 
-    <div>
-        <ul class="nav nav-tabs" style="margin-top: 15px">
-            <li role="presentation" class="active">
-                <a href="#${mutantEditor.className}" aria-controls="${mutantEditor.className}"
-                   role="tab" data-toggle="tab">${mutantEditor.className}</a>
-            </li>
-            <% for (String depName : mutantEditor.getDependencies().keySet()) {%>
-                <li role="presentation">
-                    <a href="#<%=depName%>" aria-controls="<%=depName%>" role="tab" data-toggle="tab"><%=depName%></a>
+    <%-- dependencies exist -> tab system --%>
+    <% } else { %>
+
+        <div class="card-header">
+            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-1 active" data-bs-toggle="tab"
+                            id="${mutantEditor.className}-tab"
+                            data-bs-target="#${mutantEditor.className}"
+                            aria-controls="${mutantEditor.className}"
+                            type="button" role="tab" aria-selected="true">
+                        ${mutantEditor.className}
+                    </button>
                 </li>
-            <% }%>
-        </ul>
+                <% for (String depName : mutantEditor.getDependencies().keySet()) { %>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-1" data-bs-toggle="tab"
+                            id="<%=depName%>-tab"
+                            data-bs-target="#<%=depName%>"
+                            aria-controls="<%=depName%>"
+                            type="button" role="tab" aria-selected="true">
+                        <%=depName%>
+                    </button>
+                </li>
+                <% } %>
+            </ul>
+        </div>
 
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="${mutantEditor.className}" data-toggle="tab">
-                    <pre><textarea id="mutant-code" name="mutant" title="mutant" cols="80"
-                                   rows="50">${mutantEditor.mutantCode}</textarea></pre>
-            </div>
-            <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
+        <div class="card-body p-0 codemirror-fill">
+            <div class="tab-content">
+                <div class="tab-pane active"
+                     id="${mutantEditor.className}"
+                     aria-labelledby="${mutantEditor.className}-tab"
+                     role="tabpanel">
+                    <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
+                </div>
+                <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
                     String depName = dependency.getKey();
                     String depCode = dependency.getValue(); %>
-
-                <div role="tabpanel" class="tab-pane active hideAfterRendering" id="<%=depName%>" data-toggle="tab">
-                            <pre class="readonly-pre"><textarea class="readonly-textarea" id="text-<%=depName%>"
-                                                                name="text-<%=depName%>"
-                                                                title="text-<%=depName%>" cols="80"
-                                                                rows="30"><%=depCode%></textarea></pre>
-                </div>
-            <% } %>
+                    <div class="tab-pane"
+                         id="<%=depName%>"
+                         aria-labelledby="<%=depName%>-tab"
+                         role="tabpanel">
+                             <pre class="m-0"><textarea id="text-<%=depName%>"
+                                                        name="text-<%=depName%>"
+                                                        title="text-<%=depName%>"
+                                                        readonly><%=depCode%></textarea></pre>
+                    </div>
+                <% } %>
+            </div>
         </div>
+
+    <% } %>
+
+    <div class="card-footer">
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 
-<% } %>
-
-
+</div>
 
 
 <script>
@@ -182,10 +206,12 @@
             "Tab": "insertSoftTab"
         },
         keyMap: "${login.user.keyMap.CMName}",
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
+        autoRefresh: true
     });
-
-    editorMutant.setSize("100%", 500);
+    if (window.hasOwnProperty('ResizeObserver')) {
+        new ResizeObserver(() => editorMutant.refresh()).observe(editorMutant.getWrapperElement());
+    }
 
     editorMutant.on('beforeChange', function (cm, change) {
         let text = cm.getValue();
@@ -232,34 +258,29 @@
     /* ==================== Initialize dependency viewers ==================== */
 
     <%-- dependencies exist -> tab system --%>
-    <% if (mutantEditor.hasDependencies()) { %>
-
-        <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
-            String depName = dependency.getKey(); %>
-
-                let editor<%=depName%> = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
+    <%
+        if (mutantEditor.hasDependencies()) {
+            for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
+                String depName = dependency.getKey();
+    %>
+            {
+                let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
                     lineNumbers: true,
                     matchBrackets: true,
                     mode: "text/x-java",
-                    readOnly: true
+                    readOnly: 'nocursor',
+                    autoRefresh: true
                 });
-                editor<%=depName%>.setSize("100%", 500); // next to the test editor the cm editor would be too big
-                editor<%=depName%>.refresh();
+                if (window.hasOwnProperty('ResizeObserver')) {
+                    new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());
+                }
 
-                autocompletedClasses['<%=depName%>'] =  editor<%=depName%>.getTextArea().value;
-        <% } %>
-
-    <% } %>
-
-
-    /* ==================== Finishing up ==================== */
-
-    // Please don't blame me.
-    // Without the hideAfterRendering class attribute the editor is only rendered
-    // when the editor is displayed and actively clicked on
-    $('.hideAfterRendering').each(function () {
-        $(this).removeClass('active')
-    });
+                autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
+            }
+    <%
+            }
+        }
+    %>
 
 })();
 </script>

@@ -66,7 +66,7 @@ public class MultiplayerGameService extends AbstractGameService {
 
     @Override
     protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
-        return game.getState() == GameState.FINISHED
+        return game.isFinished()
                 || playerRole == Role.OBSERVER
                 || playerRole == Role.DEFENDER
                 || game.getLevel() == GameLevel.EASY

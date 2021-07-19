@@ -18,7 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<jsp:include page="/jsp/header_main.jsp"/>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("KillMap Analytics"); %>
+
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminAnalytics"); %>
@@ -26,8 +32,7 @@
 
     <h3>Useful Actions</h3>
 
-    <table id="tableKillmaps"
-           class="table table-striped table-hover table-responsive">
+    <table id="tableKillmaps" class="table table-striped">
         <thead>
             <tr>
                 <th>User ID</th>
@@ -42,40 +47,56 @@
         </thead>
     </table>
 
-    <div class="btn-group">
-        <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
-            type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
-           type="button" class="btn btn-default" id="download-json">Download as JSON</a>
-    </div>
-    <div style="display: inline-block; margin-left: 10px;">
-        <a data-toggle="collapse" href="#explanation" style="color: black">
-            <span class="glyphicon glyphicon-question-sign"></span>
-        </a>
+    <div class="row g-3 mt-4">
+        <div class="col-12">
+            <a data-bs-toggle="modal" data-bs-target="#useful-actions-explanation" class="btn btn-outline-secondary btn-sm">
+                What are useful actions?
+            </a>
+        </div>
+        <div class="col-12">
+            <div class="btn-group">
+                <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download">
+                    <i class="fa fa-download me-1"></i>
+                    Download table
+                </a>
+                <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
+                    as CSV
+                </a>
+                <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
+                    as JSON
+                </a>
+            </div>
+        </div>
     </div>
 
-    <div id="explanation" class="collapse panel panel-default" style="margin-top: 10px;">
-        <div class="panel-body" style="padding: 10px;">
-            This table uses data from the class killmaps to determine the number of useful tests and mutants per
-            player, class and role.
-            <p></p>
-            <table>
+    <t:modal title="Useful Actions Explanation" id="useful-actions-explanation">
+        <jsp:attribute name="content">
+            <p>
+                This table uses data from the class killmaps to determine the number of useful tests and mutants per
+                player, class and role.
+            </p>
+            <table class="table table-no-last-border mb-0">
+                <tbody>
                 <tr>
-                    <td><b>Useful Tests:</b></td>
+                    <td class="text-nowrap"><b>Useful Tests:</b></td>
                     <td>Number of tests, which killed at least one mutant.</td>
                 </tr>
                 <tr>
-                    <td><b>Useful Mutants:</b></td>
+                    <td class="text-nowrap"><b>Useful Mutants:</b></td>
                     <td>Number of mutants, which were killed by at least one test,
                         but were covered and not killed by at least one other test.</td>
                 </tr>
                 <tr>
-                    <td><b>Useful Actions:</b></td>
+                    <td class="text-nowrap"><b>Useful Actions:</b></td>
                     <td>Sum of useful tests and useful mutants.</td>
                 </tr>
+                </tbody>
             </table>
-        </div>
-    </div>
+        </jsp:attribute>
+    </t:modal>
 </div>
 
 <script>
@@ -106,7 +127,11 @@
                 { className: "text-right", "targets": [0,2,5,6,7] },
             ], */
             "pageLength": 50,
-            "order": [[1, "asc"]]
+            "order": [[1, "asc"]],
+            "scrollY": '600px',
+            "scrollCollapse": true,
+            "paging": false,
+            "language": {"info": "Showing _TOTAL_ entries"}
         });
     });
 

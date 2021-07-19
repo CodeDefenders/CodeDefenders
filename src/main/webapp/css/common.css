@@ -4,28 +4,47 @@
 /* Tables
 ----------------------------------------------------------------------------- */
 
-.table-center td,
-.table-center th {
-    text-align: center;
+/* Vertically align table content in the middle.
+   Useful when some cells have taller content than others, e.g. buttons. */
+.table-v-align-middle > thead > tr > th,
+.table-v-align-middle > tbody > tr > td {
+    vertical-align: middle;
 }
 
 /* Attacker- and defender-colored elements
 ----------------------------------------------------------------------------- */
 
 .bg-attacker {
-    background-color: var(--bg-attacker);
+    background-color: var(--bg-attacker) !important;
+}
+.bg-attacker-light {
+    background-color: var(--bg-attacker-light) !important;
 }
 
 .bg-defender {
-    background-color: var(--bg-defender);
+    background-color: var(--bg-defender) !important;
+}
+.bg-defender-light {
+    background-color: var(--bg-defender-light) !important;
+}
+
+.bg-player {
+    background-color: var(--bg-player) !important;
+}
+.bg-player-light {
+    background-color: var(--bg-player-light) !important;
 }
 
 .fg-attacker {
-    color: var(--fg-attacker);
+    color: var(--fg-attacker) !important;
 }
 
 .fg-defender {
-    color: var(--fg-defender);
+    color: var(--fg-defender) !important;
+}
+
+.fg-player {
+    color: var(--fg-player) !important;
 }
 
 .btn-attacker {
@@ -48,6 +67,17 @@
     color: white;
     background-color: var(--bg-defender-dark);
     border-color: var(--bg-defender-contrast-dark);
+}
+
+.btn-player {
+    color: white;
+    background-color: var(--bg-player);
+    border-color: var(--bg-player-contrast);
+}
+.btn-player:hover {
+    color: white;
+    background-color: var(--bg-player-dark);
+    border-color: var(--bg-player-contrast-dark);
 }
 
 /* Mutant icons
@@ -88,4 +118,11 @@
     border-radius: 0;
     border: 0;
     padding: 8px;
+}
+
+/* Form width
+----------------------------------------------------------------------------- */
+
+.form-width {
+    max-width: 50rem;
 }

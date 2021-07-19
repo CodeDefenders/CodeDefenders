@@ -151,7 +151,7 @@ public class UserProfileManager extends HttpServlet {
                      * so)
                      */
                     // messages.add("You successfully deleted your account. Sad to see you go. :(");
-                    response.sendRedirect(Paths.LOGOUT);
+                    response.sendRedirect(request.getContextPath() +  Paths.LOGOUT);
                 } else {
                     logger.info("Failed to set user {} as inactive.", login.getUserId());
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");

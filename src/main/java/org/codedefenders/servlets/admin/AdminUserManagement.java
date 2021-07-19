@@ -116,7 +116,7 @@ public class AdminUserManagement extends HttpServlet {
                 }
                 final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
                 if (userToEdit.isPresent()) {
-                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
+                    responsePath = request.getContextPath() + Paths.ADMIN_USERS
                             + "?editUser=" + userToEdit.get();
                 }
                 break;
@@ -143,7 +143,7 @@ public class AdminUserManagement extends HttpServlet {
                     String msg = editUser(userId.get(), request, successMsg);
                     messages.add(msg);
                     if (!msg.equals(successMsg)) {
-                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP
+                        responsePath = request.getContextPath() + Paths.ADMIN_USERS
                                 + "?editUser=" + userId.get();
                     }
                 }

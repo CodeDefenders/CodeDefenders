@@ -45,6 +45,9 @@
     final String description = puzzle.getDescription();
 %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
+
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
@@ -108,35 +111,44 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
-<div id="game-container">
-    <div class="row">
-        <h4 class="col-md-2"><b><%=title%></b></h4>
-        <h4><%=description%></h4>
+<div id="game-container" class="container-fluid">
+
+    <h4><b><%=title%></b></h4>
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+        <h4 class="m-0"><%=description%></h4>
+        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
     </div>
-    <hr class="hr-primary" style="margin: 5px">
+    <hr>
+
     <div class="row">
-        <div class="col-md-6" id="cut-div">
-            <h3>Class Under Test</h3>
+        <div class="col-xl-6 col-12" id="cut-div">
+            <div class="game-component-header"><h3>Class Under Test</h3></div>
             <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-            <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         </div>
 
-        <div class="col-md-6" id="ut-div">
+        <div class="col-xl-6 col-12" id="ut-div">
             <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
-            <h3>Write a new JUnit test here
-                <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitTest" form="def"
-                        onClick="testProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
-                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Defend!
-                </button>
-            </h3>
+
+            <div class="game-component-header">
+                <h3>Write a new JUnit test here</h3>
+                <div>
+
+                    <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
+                            onclick="testProgressBar(); this.form.submit(); this.disabled=true;"
+                            <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                        Defend
+                    </button>
+
+                </div>
+            </div>
+
             <form id="def"
                   action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>"
                   method="post">
@@ -145,23 +157,20 @@
 
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             </form>
-            <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-6" id="mutants-div">
-            <h3>Existing Mutants</h3>
+        <div class="col-xl-6 col-12" id="mutants-div">
+            <div class="game-component-header"><h3>Existing Mutants</h3></div>
             <t:mutant_accordion/>
         </div>
 
-        <div class="col-md-6">
-            <h3>JUnit tests</h3>
+        <div class="col-xl-6 col-12">
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
         </div>
     </div>
 </div>
-
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%@ include file="/jsp/footer_game.jsp"%>
