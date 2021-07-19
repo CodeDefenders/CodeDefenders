@@ -120,8 +120,9 @@ public class UserService {
      * @see #getSimpleUserById(int)
      */
     // TODO: Relocate into sth like `PlayerService` or the `GameService`s
+    @Nonnull
     public Optional<SimpleUser> getSimpleUserByPlayerId(final int playerId) {
-        return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserByPlayerId);
+        return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserById);
     }
 
     @Nonnull

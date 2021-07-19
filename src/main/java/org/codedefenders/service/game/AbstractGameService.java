@@ -110,7 +110,7 @@ public abstract class AbstractGameService implements IGameService {
         if (killingTest != null) {
             killedBy = userService.getSimpleUserByPlayerId(killingTest.getPlayerId()).orElse(null);
             killedByTestId = killingTest.getId();
-            killMessage = StringEscapeUtils.escapeJavaScript(mutant.getKillMessage());
+            killMessage = mutant.getKillMessage();
         } else {
             killedBy = null;
             killedByTestId = -1;
@@ -125,8 +125,8 @@ public abstract class AbstractGameService implements IGameService {
                 new SimpleUser(mutant.getCreatorId(), mutant.getCreatorName()),
                 mutant.getState(),
                 mutant.getScore(),
-                StringEscapeUtils.escapeJavaScript(mutant.getHTMLReadout().stream()
-                        .filter(Objects::nonNull).collect(Collectors.joining("<br>"))),
+                mutant.getHTMLReadout().stream()
+                        .filter(Objects::nonNull).collect(Collectors.joining("<br>")),
                 mutant.getLines().stream().map(String::valueOf).collect(Collectors.joining(",")),
                 isCovered,
                 canView,
