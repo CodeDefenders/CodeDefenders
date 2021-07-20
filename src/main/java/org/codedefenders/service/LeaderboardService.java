@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,19 +16,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.game.leaderboard;
+package org.codedefenders.service;
 
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.persistence.database.LeaderboardRepository;
+import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
 
-/**
- * Created by jmr on 11/07/2017.
- */
-public class Leaderboard {
+@Named
+@ApplicationScoped
+public class LeaderboardService {
 
-    public static List<Entry> getAll() {
-        return DatabaseAccess.getLeaderboard();
+    private final LeaderboardRepository leaderboardRepo;
+
+    @Inject
+    public LeaderboardService(LeaderboardRepository leaderboardRepo) {
+        this.leaderboardRepo = leaderboardRepo;
+    }
+
+    public List<LeaderboardEntryEntity> getAll() {
+        return leaderboardRepo.getLeaderboard();
     }
 
 }
