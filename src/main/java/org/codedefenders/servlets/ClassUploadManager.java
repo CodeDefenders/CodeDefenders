@@ -135,7 +135,11 @@ public class ClassUploadManager extends HttpServlet {
         TestingFramework testingFramework = null;
         AssertionLibrary assertionLibrary = null;
         boolean shouldPrepareAI = false;
-
+        // Control whether after a successful upload we return to the same back or to the original page
+        boolean disableAutomaticRedirect = false;
+        // Data about page to automatically redirect to after a successful upload 
+        String origin = null;
+        
         // Alias of the CUT
         String classAlias = null;
         // Used to check whether multiple CUTs are uploaded.
@@ -192,6 +196,9 @@ public class ClassUploadManager extends HttpServlet {
                     // TODO Phil: legacy, will this be used in the future? (look TODO below)
                     shouldPrepareAI = true;
                     break;
+                case "disableAutomaticRedirect":
+                    disableAutomaticRedirect = true;
+                    break;
                 case "enableMocking":
                     isMockingEnabled = true;
                     break;
@@ -201,8 +208,11 @@ public class ClassUploadManager extends HttpServlet {
                 case "assertionLibrary":
                     assertionLibrary = AssertionLibrary.valueOf(fieldValue);
                     break;
+                case "origin":
+                    origin = fieldValue;
+                    break;
                 default:
-                    logger.warn("Unrecognized parameter: " + fieldName);
+                    logger.warn("Unrecognized parameter {" + fieldName + ":" + fieldValue + "}");
                     break;
             }
         }
@@ -528,7 +538,17 @@ public class ClassUploadManager extends HttpServlet {
             logger.error("Could error while calculating killmap for successfully uploaded class.", e);
         }
 
-        Redirect.redirectBack(request, response);
+        // Handle the automatic redirection logic. At this point, origin is 
+        if( disableAutomaticRedirect) {
+            logger.info("Redirecting to class upload page disableAutomaticRedirect checked");
+            Redirect.redirectBack(request, response);
+        } else if (origin == null || origin.equalsIgnoreCase("null")) {
+            logger.info("Redirecting to class upload page. Null origin");
+            Redirect.redirectBack(request, response);
+        } else {
+            logger.info("Automatically Redirecting to admin " + origin);
+            Redirect.redirectTo(request, response, origin);
+        }
     }
 
     /**

@@ -158,7 +158,7 @@
                                         <span class="input-group-text position-relative cursor-pointer"
                                               title="Upload a class.">
                                             <a class="stretched-link text-decoration-none"
-                                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">
+                                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.ADMIN_GAMES%>">
                                                 <i class="fa fa-upload"></i>
                                             </a>
                                         </span>

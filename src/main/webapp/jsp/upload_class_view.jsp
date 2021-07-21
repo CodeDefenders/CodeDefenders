@@ -167,6 +167,9 @@
                 </button>
             </div>
         </div>
+        
+        <input type="hidden" name="origin" value="<%=request.getParameter("origin")%>" />
+        <input type="checkbox" name="disableAutomaticRedirect" value="disabled" style="margin-right:5px;">I want to upload another class</input>
     </form>
 
     <h2 class="mt-4">Uploaded Classes</h2>
