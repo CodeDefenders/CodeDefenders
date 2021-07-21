@@ -89,6 +89,33 @@
     }
 </style>
 
+<div id="filter" class="d-flex flex-row-reverse">
+    <input type="radio" class="btn-check" name="filter" id="all" value="" checked>
+    <label class="btn btn-xs btn-outline-secondary" for="all">
+        <span class="align-middle me-1">All</span>
+    </label>
+    <input type="radio" class="btn-check" name="filter" id="alive" value="Alive">
+    <label class="btn btn-xs btn-outline-secondary" for="alive">
+        <span class="mutantCUTImage mutantImageAlive align-middle"></span>
+        <span class="align-middle me-1">Alive</span>
+    </label>
+    <input type="radio" class="btn-check" name="filter" id="killed" value="Killed">
+    <label class="btn btn-xs btn-outline-secondary" for="killed">
+        <span class="mutantCUTImage mutantImageKilled align-middle"></span>
+        <span class="align-middle me-1">Killed</span>
+    </label>
+    <input type="radio" class="btn-check" name="filter" id="marked" value="Flagged">
+    <label class="btn btn-xs btn-outline-secondary" for="marked">
+        <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
+        <span class="align-middle me-1">Claimed Equivalent</span>
+    </label>
+    <input type="radio" class="btn-check" name="filter" id="equivalent" value="Equiv">
+    <label class="btn btn-xs btn-outline-secondary" for="equivalent">
+        <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
+        <span class="align-middle me-1">Equivalent</span>
+    </label>
+</div>
+
 <div class="accordion" id="mutants-accordion">
     <c:forEach items="${mutantAccordion.categories}" var="category">
         <div class="accordion-item">
@@ -345,5 +372,27 @@
                 $("#cut-div, #newmut-div")[0].scrollIntoView();
             });
         }
+
+        const filter = $('#filter input:radio')
+        filter.change(function () {
+            let showOnly = this.value
+
+            let accordion = $("#mutants-accordion .accordion-item")
+
+            for (let i = 0; i < accordion.length; i++) {
+                $(accordion[i]).find('table tbody tr').each( function() {
+                    let el = $(this)
+                    if (showOnly === '' || el.find('.mutantImage' + showOnly).length === 1) {
+                        el.show()
+                    } else {
+                        el.hide()
+                    }
+                })
+                let shownItems = jQuery.makeArray($(accordion[i]).find('table tbody tr'))
+                        .filter(item => !($(item).css('display') === 'none'  || $(item).css("visibility") === "hidden"))
+                        .length
+                $(accordion[i]).find('.accordion-header .accordion-button .badge').text(shownItems)
+            }
+        })
     })();
 </script>
