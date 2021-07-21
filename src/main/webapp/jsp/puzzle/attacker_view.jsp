@@ -128,10 +128,7 @@
 
     <div class="row">
         <div class="col-xl-6 col-12">
-            <div id="mutants-div">
-                <div class="game-component-header"><h3>Mutants</h3></div>
-                <t:mutant_accordion/>
-            </div>
+            <t:mutant_accordion/>
 
             <% if (showTestAccordion) { %>
                 <div id="tests-div">

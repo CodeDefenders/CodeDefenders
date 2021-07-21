@@ -119,10 +119,7 @@
 <div class="row">
 
     <div class="col-xl-6 col-12">
-        <div id="mutants-div">
-            <div class="game-component-header"><h3>Existing Mutants</h3></div>
-            <t:mutant_accordion/>
-        </div>
+        <t:mutant_accordion/>
 
         <div id="tests-div">
             <div class="game-component-header"><h3>JUnit Tests</h3></div>
