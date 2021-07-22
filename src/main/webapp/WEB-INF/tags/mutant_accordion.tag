@@ -100,11 +100,10 @@
         }
     </style>
 
-    <div class="d-flex flex-wrap justify-content-between align-items-end">
 
-        <div class="game-component-header"><h3>Existing Mutants</h3></div>
-
-        <div id="ma-filter" class="d-flex justify-content-end gap-2 mb-2">
+    <div class="game-component-header">
+        <h3>Existing Mutants</h3>
+        <div id="ma-filter">
             <input type="radio" class="btn-check" name="filter" id="all" value="ALL" checked>
             <label class="btn btn-xs btn-outline-secondary" for="all">
                 <span class="align-middle me-1">All</span>
