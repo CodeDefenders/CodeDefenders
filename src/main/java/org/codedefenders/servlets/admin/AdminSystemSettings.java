@@ -170,6 +170,12 @@ public class AdminSystemSettings extends HttpServlet {
                 return "Let users view and edit their profile.";
             }
         },
+        ALLOW_PUZZLE_SECTION{
+            @Override
+            public String toString() {
+                return "Let users play the puzzles in the puzzle section.";
+            }
+        },
         FAILED_DUEL_VALIDATION_THRESHOLD {
             @Override
             public String toString() {
