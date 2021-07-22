@@ -104,27 +104,27 @@
 
         <div class="game-component-header"><h3>Existing Mutants</h3></div>
 
-        <div id="filter" class="d-flex justify-content-end gap-2 mb-2">
-            <input type="radio" class="btn-check" name="filter" id="all" value="" checked>
+        <div id="ma-filter" class="d-flex justify-content-end gap-2 mb-2">
+            <input type="radio" class="btn-check" name="filter" id="all" value="ALL" checked>
             <label class="btn btn-xs btn-outline-secondary" for="all">
                 <span class="align-middle me-1">All</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="alive" value="Alive">
+            <input type="radio" class="btn-check" name="filter" id="alive" value="ALIVE">
             <label class="btn btn-xs btn-outline-secondary" for="alive">
                 <span class="mutantCUTImage mutantImageAlive align-middle"></span>
                 <span class="align-middle me-1">Alive</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="killed" value="Killed">
+            <input type="radio" class="btn-check" name="filter" id="killed" value="KILLED">
             <label class="btn btn-xs btn-outline-secondary" for="killed">
                 <span class="mutantCUTImage mutantImageKilled align-middle"></span>
                 <span class="align-middle me-1">Killed</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="marked" value="Flagged">
+            <input type="radio" class="btn-check" name="filter" id="marked" value="FLAGGED">
             <label class="btn btn-xs btn-outline-secondary" for="marked">
                 <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
                 <span class="align-middle me-1">Claimed Equivalent</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="equivalent" value="Equiv">
+            <input type="radio" class="btn-check" name="filter" id="equivalent" value="EQUIVALENT">
             <label class="btn btn-xs btn-outline-secondary" for="equivalent">
                 <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
                 <span class="align-middle me-1">Equivalent</span>
@@ -142,10 +142,12 @@
                             data-bs-target="#ma-collapse-${category.id}"
                             aria-controls="ma-collapse-${category.id}">
                             <%-- ${empty …} doesn't work with Set --%>
-                        <c:if test="${!(category.mutantIds.size() == 0)}">
-                            <span class="badge bg-attacker me-2 ma-count">${category.mutantIds.size()}</span>
-                        </c:if>
-                            ${category.description}
+                        <span class="badge bg-attacker me-2 ma-count"
+                              id="ma-count-${category.id}"
+                              <c:if test="${category.mutantIds.size() == 0}">hidden</c:if>>
+                            ${category.mutantIds.size()}
+                        </span>
+                        ${category.description}
                     </button>
                 </h2>
                 <div class="accordion-collapse collapse"
@@ -173,6 +175,9 @@
             /** Maps mutant ids to modals that show the tests' code. */
             const mutantModals = new Map();
             const testModals = new Map();
+
+            /** Store DataTable instances for later use. */
+            const dataTablesByCategory = new Map();
 
             /* Functions to generate table columns. */
             const genId = row => `<span class="ma-mutant-link">Mutant \${row.id}</span>
@@ -360,9 +365,11 @@
                     language: {
                         emptyTable: category.id === 'all'
                                 ? 'No mutants.'
-                                : 'No mutants in this method.'
+                                : 'No mutants in this method.',
+                        zeroRecords: 'No mutants match the selected category.'
                     }
                 });
+                dataTablesByCategory.set(category.id, dataTable);
 
                 /* Assign function to the "View" buttons. */
                 tableElement.on('click', '.ma-view-button', function () {
@@ -389,26 +396,35 @@
                 });
             }
 
-            const filter = $('#filter input:radio')
-            filter.change(function () {
-                let showOnly = this.value
+            document.getElementById('ma-filter')
+                    .addEventListener('change', function(event) {
+                const selectedCategory = event.target.value;
 
-                let accordion = $("#mutants-accordion .accordion-item")
+                const searchFunction = (settings, renderedData, index, data, counter) => {
+                    /* Let this only affect mutant accordion tables. */
+                    if (!settings.nTable.id.startsWith('ma-table-')) {
+                        return true;
+                    }
 
-                for (let i = 0; i < accordion.length; i++) {
-                    $(accordion[i]).find('table tbody tr').each(function () {
-                        let el = $(this)
-                        if (showOnly === '' || el.find('.mutantImage' + showOnly).length === 1) {
-                            el.show()
-                        } else {
-                            el.hide()
-                        }
-                    })
-                    let shownItems = jQuery.makeArray($(accordion[i]).find('table tbody tr'))
-                            .filter(item => !($(item).css('display') === 'none' || $(item).css("visibility") === "hidden"))
-                            .length
-                    $(accordion[i]).find('.accordion-header .accordion-button .badge').text(shownItems)
+                    return selectedCategory === 'ALL'
+                            || data.state === selectedCategory;
                 }
+
+                $.fn.dataTable.ext.search.push(searchFunction);
+
+                for (const category of categories) {
+                    dataTablesByCategory.get(category.id).draw();
+
+                    const filteredMutants = category.mutantIds
+                            .map(mutants.get, mutants)
+                            .filter(mutant => selectedCategory === 'ALL'
+                                    || mutant.state === selectedCategory);
+
+                    document.getElementById('ma-count-' + category.id).innerText = filteredMutants.length;
+                }
+
+                /* Remove search function again after tables have been filtered. */
+                $.fn.dataTable.ext.search.splice($.fn.dataTable.ext.search.indexOf(searchFunction), 1);
             })
         })();
     </script>
