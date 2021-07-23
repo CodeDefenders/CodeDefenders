@@ -395,6 +395,7 @@
                 });
             }
 
+            /* Setup filter functionality for mutant-accordion */
             document.getElementById('ma-filter')
                     .addEventListener('change', function(event) {
                 const selectedCategory = event.target.value;
