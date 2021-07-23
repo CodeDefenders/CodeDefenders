@@ -36,7 +36,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
@@ -683,7 +682,7 @@ public class AdminCreateGamesBean implements Serializable {
                 .serializeNulls()
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .registerTypeAdapter(UserInfo.class, new UserInfoSerializer())
-                .registerTypeAdapter(UserEntity.class, new UserSerializer())
+                .registerTypeAdapter(UserEntity.class, new UserEntitySerializer())
                 .create();
         return gson.toJson(getUserInfos());
     }
@@ -737,7 +736,7 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     // TODO: Move this elsewhere?
-    public static class UserSerializer implements JsonSerializer<UserEntity> {
+    public static class UserEntitySerializer implements JsonSerializer<UserEntity> {
         @Override
         public JsonElement serialize(UserEntity user, Type type, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();

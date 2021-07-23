@@ -32,10 +32,6 @@ import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.vorburger.exec.ManagedProcessException;
-import ch.vorburger.mariadb4j.DB;
-import ch.vorburger.mariadb4j.DBConfigurationBuilder;
-
 import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.when;
 
@@ -45,33 +41,10 @@ import static org.powermock.api.mockito.PowerMockito.when;
 public class DatabaseRule extends ExternalResource {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseRule.class);
 
-    // These ensures we do not mess up with the timeZone problem during integration testing
-    private static final String[] DEFAULT_OPTIONS = new String[]{
-            "useUnicode=true",
-            "useJDBCCompliantTimezoneShift=true",
-            "useLegacyDatetimeCode=false",
-            "serverTimezone=UTC",
-            "generateSimpleParameterMetadata=true"
-    };
-
-    private DB embeddedDatabase;
     private String dbConnectionUrl;
 
-    private final String dbName = "codedefenders";
     private final String username = "root";
     private final String password = "";
-
-    private String connectionOptions = "";
-
-    public DatabaseRule() {
-        this(DEFAULT_OPTIONS);
-    }
-
-    public DatabaseRule(String[] options) {
-        if (options != null && options.length > 0) {
-            connectionOptions = "?" + String.join("&", options);
-        }
-    }
 
     public ConnectionFactory getConnectionFactory() throws SQLException {
         DataSource dataSourceMock = mock(DataSource.class);
@@ -93,25 +66,10 @@ public class DatabaseRule extends ExternalResource {
     public void before() throws Exception {
         logger.debug("Started Embedded Database creation");
 
-        /*
-        DBConfigurationBuilder databaseConfig = DBConfigurationBuilder.newBuilder();
-        // This is necessary to allow the database to run as root, which can be the case if these tests are run inside
-        // an (docker) container e.g. in the CI.
-        databaseConfig.addArg("--user=root");
-        // Setting this to 0 will let the DB to dynamically pick an open port
-        // For debugging the database, it can be helpful to change this to a static value
-        databaseConfig.setPort(0);
-
-        embeddedDatabase = DB.newEmbeddedDB(databaseConfig.build());
-        embeddedDatabase.start();
-        embeddedDatabase.createDB(dbName);
-
-        dbConnectionUrl = databaseConfig.getURL(dbName) + connectionOptions;
-         */
         dbConnectionUrl = "jdbc:mysql://database:3306/codedefenders";
         logger.debug("Finished Embedded Database creation");
 
-        // Load the
+        // Load the Database Driver
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         logger.debug("Started Database Migrations");
@@ -124,17 +82,5 @@ public class DatabaseRule extends ExternalResource {
         flyway.clean();
         flyway.migrate();
         logger.debug("Finished Database Migrations");
-    }
-
-    @Override
-    public void after() {
-        /*
-        try {
-            logger.debug("Stopping Embedded Database");
-            embeddedDatabase.stop();
-        } catch (ManagedProcessException e) {
-            // quiet
-        }
-         */
     }
 }
