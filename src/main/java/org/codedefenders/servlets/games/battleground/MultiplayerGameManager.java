@@ -54,6 +54,7 @@ import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
@@ -80,6 +81,7 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -162,6 +164,9 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private UserRepository userRepo;
 
+    @Inject
+    private UserService userService;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -189,10 +194,10 @@ public class MultiplayerGameManager extends HttpServlet {
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    Optional<UserEntity> defender = userRepo.getUserIdForPlayerId(defenderId).flatMap(userId -> userRepo.getUserById(userId));
+                    Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);;
 
                     // TODO
-                    request.setAttribute("equivDefender", defender.get());
+                    request.setAttribute("equivDefender", defender.orElse(null));
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });

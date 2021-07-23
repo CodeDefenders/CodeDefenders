@@ -51,7 +51,7 @@ public class MutantAccordionBean {
     public MutantAccordionBean(GameService gameService, LoginBean login, GameProducer gameProducer) {
         this.game = gameProducer.getGame();
 
-        mutantList = gameService.getMutants(login.getUser(), game);
+        mutantList = gameService.getMutants(login.getUserId(), game.getId());
 
         categories = new ArrayList<>();
 

@@ -28,6 +28,7 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
@@ -36,7 +37,6 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
-import org.codedefenders.model.UserEntity;
 
 @ApplicationScoped
 public class GameService implements IGameService {
@@ -85,7 +85,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public List<MutantDTO> getMutants(UserEntity user, AbstractGame game) {
+    public List<MutantDTO> getMutants(SimpleUser user, AbstractGame game) {
         IGameService gameService = getGameServiceForGame(game);
         if (gameService != null) {
             return gameService.getMutants(user, game);
@@ -126,7 +126,7 @@ public class GameService implements IGameService {
     }
 
     @Override
-    public List<TestDTO> getTests(UserEntity user, AbstractGame game) {
+    public List<TestDTO> getTests(SimpleUser user, AbstractGame game) {
         IGameService gameService = getGameServiceForGame(game);
         if (gameService != null) {
             return gameService.getTests(user, game);

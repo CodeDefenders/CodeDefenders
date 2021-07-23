@@ -21,6 +21,7 @@ package org.codedefenders.service.game;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -28,7 +29,6 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Constants;
 
 @ApplicationScoped
@@ -41,7 +41,7 @@ public class MultiplayerGameService extends AbstractGameService {
 
     // TODO: This could use some tests
     @Override
-    protected boolean canViewMutant(Mutant mutant, AbstractGame game, UserEntity user, Player player,
+    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
             Role playerRole) {
         return playerRole != Role.NONE // User must participate in the Game
                 // Defender can see Mutants if the game is over or its an easy Game
@@ -55,7 +55,7 @@ public class MultiplayerGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, UserEntity user) {
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user) {
         return game.getState().equals(GameState.ACTIVE)
                 && mutant.getState().equals(Mutant.State.ALIVE)
                 && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)

@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -41,7 +40,6 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 
@@ -70,7 +68,7 @@ public abstract class AbstractGameService implements IGameService {
     public MutantDTO getMutant(int userId, Mutant mutant) {
         AbstractGame game = GameDAO.getGame(mutant.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, mutant.getGameId());
-        Optional<UserEntity> user = userRepository.getUserById(userId);
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
         if (game != null && user.isPresent()) {
             return convertMutant(mutant, user.get(), player, game);
         } else {
@@ -80,7 +78,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<MutantDTO> getMutants(int userId, int gameId) {
-        Optional<UserEntity> user = userRepository.getUserById(userId);
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
         AbstractGame game = GameDAO.getGame(gameId);
         if (game != null && user.isPresent()) {
             return getMutants(user.get(), game);
@@ -90,7 +88,7 @@ public abstract class AbstractGameService implements IGameService {
     }
 
     @Override
-    public List<MutantDTO> getMutants(UserEntity user, AbstractGame game) {
+    public List<MutantDTO> getMutants(SimpleUser user, AbstractGame game) {
         Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
         return game.getMutants().stream()
                 .map(mutant -> convertMutant(mutant, user, player, game))
@@ -100,7 +98,7 @@ public abstract class AbstractGameService implements IGameService {
 
     // NOTE: This could be split into several methods. Like: canFlag(Mutant mutant, Player player, AbstractGame game);
     //  So the actual building of the MutantDTO could happen in this class.
-    protected MutantDTO convertMutant(Mutant mutant, UserEntity user, Player player, AbstractGame game) {
+    protected MutantDTO convertMutant(Mutant mutant, SimpleUser user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
         SimpleUser killedBy;
@@ -143,10 +141,10 @@ public abstract class AbstractGameService implements IGameService {
 
     protected abstract boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player);
 
-    protected abstract boolean canViewMutant(Mutant mutant, AbstractGame game, UserEntity user, Player player,
+    protected abstract boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
             Role playerRole);
 
-    protected abstract boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, UserEntity user);
+    protected abstract boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user);
 
 
     @Override
@@ -158,7 +156,7 @@ public abstract class AbstractGameService implements IGameService {
     public TestDTO getTest(int userId, Test test) {
         AbstractGame game = GameDAO.getGame(test.getGameId());
         Player player = PlayerDAO.getPlayerForUserAndGame(userId, test.getGameId());
-        Optional<UserEntity> user = userRepository.getUserById(userId);
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
         if (game != null && user.isPresent()) {
             return convertTest(test, user.get(), player, game);
         } else {
@@ -168,7 +166,7 @@ public abstract class AbstractGameService implements IGameService {
 
     @Override
     public List<TestDTO> getTests(int userId, int gameId) {
-        Optional<UserEntity> user = userRepository.getUserById(userId);
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
         AbstractGame game = GameDAO.getGame(gameId);
         if (game != null && user.isPresent()) {
             return getTests(user.get(), game);
@@ -178,7 +176,7 @@ public abstract class AbstractGameService implements IGameService {
     }
 
     @Override
-    public List<TestDTO> getTests(UserEntity user, AbstractGame game) {
+    public List<TestDTO> getTests(SimpleUser user, AbstractGame game) {
         Player player = PlayerDAO.getPlayerForUserAndGame(user.getId(), game.getId());
         return game.getTests().stream()
                 .map(test -> convertTest(test, user, player, game))
@@ -186,7 +184,7 @@ public abstract class AbstractGameService implements IGameService {
                 .collect(Collectors.toList());
     }
 
-    protected TestDTO convertTest(Test test, UserEntity user, Player player, AbstractGame game) {
+    protected TestDTO convertTest(Test test, SimpleUser user, Player player, AbstractGame game) {
         Role playerRole = determineRole(user, player, game);
 
         boolean viewable = canViewTest(test, game, player, playerRole);
@@ -207,7 +205,7 @@ public abstract class AbstractGameService implements IGameService {
     protected abstract boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole);
 
     // TODO:
-    protected Role determineRole(UserEntity user, Player player, AbstractGame game) {
+    protected Role determineRole(SimpleUser user, Player player, AbstractGame game) {
         Role result = null;
         if (game != null) {
             if (player != null) {

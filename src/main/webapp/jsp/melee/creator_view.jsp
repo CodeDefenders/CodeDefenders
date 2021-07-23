@@ -20,9 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.UserEntity"%>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
 
 <%--
     @param MutliplayerGame game
@@ -31,9 +29,6 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <%
 	MeleeGame game = (MeleeGame) request.getAttribute("game");
-	final GameClass cut = game.getCUT();
-
-    final UserEntity user = login.getUser();
 %>
 
 

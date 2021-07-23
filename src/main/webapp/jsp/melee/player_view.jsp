@@ -29,6 +29,7 @@
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.dto.SimpleUser" %>
 
 <%--
     @param MeleeGame game
@@ -45,13 +46,13 @@
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
-    UserEntity equivDefender = (UserEntity) request.getAttribute("equivDefender");
+    SimpleUser equivDefender = (SimpleUser) request.getAttribute("equivDefender");
 
     String mutantClaimedMessage = null;
     if (openEquivalenceDuel) {
         mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
                 ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
-                : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getUsername();
+                : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
     }
 
     final UserEntity user = login.getUser();

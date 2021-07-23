@@ -21,12 +21,12 @@ package org.codedefenders.service.game;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.UserEntity;
 
 @ApplicationScoped
 public class PuzzleGameService extends AbstractGameService {
@@ -38,7 +38,7 @@ public class PuzzleGameService extends AbstractGameService {
 
     // TODO: This doesn't use playerRole. Why not?! Doesn't {@link #determineRole} doesn't work for PuzzleGames?
     @Override
-    protected boolean canViewMutant(Mutant mutant, AbstractGame game, UserEntity user, Player player,
+    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
             Role playerRole) {
         if (player != null) {
             return player.getRole() != null && player.getRole() != Role.NONE;
@@ -48,7 +48,7 @@ public class PuzzleGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, UserEntity user) {
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user) {
         return false;
     }
 

@@ -37,8 +37,10 @@ import org.apache.commons.lang.math.IntRange;
 import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
@@ -66,6 +68,9 @@ public class AdminUserManagement extends HttpServlet {
     @Inject
     private UserRepository userRepo;
 
+    @Inject
+    private UserService userService;
+
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
 
@@ -81,10 +86,10 @@ public class AdminUserManagement extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        UserEntity user = null;
+        User user = null;
         String editUser = request.getParameter("editUser");
         if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
-            user = userRepo.getUserById(Integer.parseInt(editUser)).get();
+            user = userService.getUserById(Integer.parseInt(editUser)).orElse(null);
         }
 
         request.setAttribute("editedUser", user);

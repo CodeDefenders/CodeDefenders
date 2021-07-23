@@ -19,10 +19,10 @@
 
 --%>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.dto.User" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -39,7 +39,7 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <%
-        UserEntity u = (UserEntity) request.getAttribute("editedUser");
+        User u = (User) request.getAttribute("editedUser");
         if (u != null) {
             int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
     %>
@@ -54,7 +54,7 @@
             <div class="row g-3">
                 <div class="col-12">
                     <label for="name" class="form-label">Username</label>
-                    <input id="name" type="text" class="form-control" name="name" value="<%=user.getUsername()%>" placeholder="Username"
+                    <input id="name" type="text" class="form-control" name="name" value="<%=u.getName()%>" placeholder="Username"
                            required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
                     <div class="invalid-feedback">
                         Please enter a valid username.
@@ -66,7 +66,7 @@
 
                 <div class="col-12">
                     <label for="email" class="form-label">Email</label>
-                    <input id="email" type="email" class="form-control" name="email" value="<%=user.getEmail()%>" placeholder="Email"
+                    <input id="email" type="email" class="form-control" name="email" value="<%=u.getEmail()%>" placeholder="Email"
                            required>
                     <div class="invalid-feedback">
                         Please enter a valid email address.

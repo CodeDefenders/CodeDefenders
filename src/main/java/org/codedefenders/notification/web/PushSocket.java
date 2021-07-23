@@ -32,7 +32,7 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import org.codedefenders.model.UserEntity;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
 import org.codedefenders.notification.events.EventNames;
@@ -41,6 +41,7 @@ import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.handling.ServerEventHandlerContainer;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,9 +95,10 @@ public class PushSocket {
 
     // @Inject
     private final UserRepository userRepo;
+    private final UserService userService;
 
     // Authorization
-    private UserEntity user;
+    private SimpleUser user;
     private String ticket;
     private boolean open;
 
@@ -115,6 +117,8 @@ public class PushSocket {
 
         userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
 
+        userService = CDIUtil.getBeanFromCDI(UserService.class);
+
         open = false;
     }
 
@@ -129,7 +133,7 @@ public class PushSocket {
             return;
         }
 
-        Optional<UserEntity> user = userRepo.getUserById(userId);
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
 
         if (!user.isPresent()) {
             logger.info("Invalid user id for session " + session);
