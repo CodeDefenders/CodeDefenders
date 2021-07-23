@@ -57,7 +57,7 @@ public class TestAccordionBean {
         AbstractGame game = gameProducer.getGame();
 
         GameClass cut = game.getCUT();
-        List<TestDTO> testsList = gameService.getTests(login.getUser(), game);
+        List<TestDTO> testsList = gameService.getTests(login.getUserId(), game.getId());
 
         tests = new HashMap<>();
         categories = new ArrayList<>();

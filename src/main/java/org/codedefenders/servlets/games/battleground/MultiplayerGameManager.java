@@ -1019,9 +1019,9 @@ public class MultiplayerGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                Optional<UserEntity> mutantOwner = userRepo.getUserIdForPlayerId(m.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
+                                Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
 
-                                Event event = new Event(-1, gameId, mutantOwner.map(UserEntity::getId).orElse(0),
+                                Event event = new Event(-1, gameId, mutantOwner.map(SimpleUser::getId).orElse(0),
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));

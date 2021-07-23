@@ -70,7 +70,7 @@ public class GameHighlightingDTO {
      * @param mutants The mutants in the game.
      * @param tests The tests in the game.
      */
-    public GameHighlightingDTO(List<Mutant> mutants, List<Test> tests, UserEntity user) {
+    public GameHighlightingDTO(List<Mutant> mutants, List<Test> tests, Integer userId) {
         this.mutantIdsPerLine = new TreeMap<>();
         this.testIdsPerLine = new TreeMap<>();
         this.mutants = new TreeMap<>();
@@ -93,7 +93,7 @@ public class GameHighlightingDTO {
 
         /* Construct the mutant maps. */
         for (Mutant mutant : mutants) {
-            this.mutants.put(mutant.getId(), new GHMutantDTO(mutant, user));
+            this.mutants.put(mutant.getId(), new GHMutantDTO(mutant, userId));
             List<Integer> lines = mutant.getLines();
             for (Integer line : lines) {
                 List<Integer> list = mutantIdsPerLine.computeIfAbsent(line, key -> new LinkedList<>());
@@ -133,7 +133,7 @@ public class GameHighlightingDTO {
         @Expose public Mutant.State status;
         @Expose public boolean canClaim;
 
-        public GHMutantDTO(Mutant mutant, UserEntity user) {
+        public GHMutantDTO(Mutant mutant, Integer userId) {
             this.id = mutant.getId();
             this.score = mutant.getScore();
             this.creatorName = mutant.getCreatorName();
@@ -142,7 +142,7 @@ public class GameHighlightingDTO {
             this.canClaim = mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
                     && mutant.isAlive()
                     && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                    && (user == null || mutant.getCreatorId() != user.getId())
+                    && (userId == null || mutant.getCreatorId() != userId)
                     && mutant.getLines().size() >= 1;
         }
     }

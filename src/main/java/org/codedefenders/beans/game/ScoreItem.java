@@ -1,18 +1,18 @@
 package org.codedefenders.beans.game;
 
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.multiplayer.PlayerScore;
-import org.codedefenders.model.UserEntity;
 
 // DTO for the score board
 public class ScoreItem {
 
-    private final UserEntity user;
+    private final SimpleUser user;
     // PlayerScore contains the player id
     private final PlayerScore attackScore;
     private final PlayerScore defenseScore;
     private final PlayerScore duelScore;
 
-    public ScoreItem(UserEntity user, PlayerScore attackScore, PlayerScore defenseScore, PlayerScore duelScore) {
+    public ScoreItem(SimpleUser user, PlayerScore attackScore, PlayerScore defenseScore, PlayerScore duelScore) {
         this.user = user;
         this.attackScore = attackScore;
         this.defenseScore = defenseScore;
@@ -31,7 +31,7 @@ public class ScoreItem {
         return duelScore;
     }
 
-    public UserEntity getUser() {
+    public SimpleUser getUser() {
         return user;
     }
 

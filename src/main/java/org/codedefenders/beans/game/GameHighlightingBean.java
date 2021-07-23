@@ -9,7 +9,6 @@ import org.codedefenders.game.GameHighlightingDTO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.JSONUtils;
 
 import com.google.gson.Gson;
@@ -62,8 +61,8 @@ public class GameHighlightingBean {
         this.setGameData(mutants, tests, null);
     }
 
-    public void setGameData(List<Mutant> mutants, List<Test> tests, UserEntity user) {
-        gameHighlightingData = new GameHighlightingDTO(mutants, tests, user);
+    public void setGameData(List<Mutant> mutants, List<Test> tests, Integer userId) {
+        gameHighlightingData = new GameHighlightingDTO(mutants, tests, userId);
     }
 
     public void setAlternativeTests(List<Test> tests) {

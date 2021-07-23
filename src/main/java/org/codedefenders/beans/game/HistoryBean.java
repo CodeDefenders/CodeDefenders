@@ -183,7 +183,7 @@ public class HistoryBean {
         } else if (e.getEventType().toString().matches("GAME")) {
             alignment = "right";
         } else {
-            alignment = login.getUser().getId() == e.getUserId() ? "left" : "right";
+            alignment = login.getUserId() == e.getUserId() ? "left" : "right";
         }
         return new HistoryBeanEventDTO(
                 userName,

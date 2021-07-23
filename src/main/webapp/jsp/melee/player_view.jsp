@@ -25,7 +25,6 @@
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.List" %>
@@ -55,7 +54,6 @@
                 : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
     }
 
-    final UserEntity user = login.getUser();
     // These two are set in the MeleeGameManager, since we need to do a getUserIdForPlayerId lookup for test filtering.
     final List<Test> playerTests = (List<Test>) request.getAttribute("playerTests");
     final List<Test> enemyTests = (List<Test>) request.getAttribute("enemyTests");
@@ -85,7 +83,7 @@
              class="org.codedefenders.beans.game.GameHighlightingBean"
              scope="request"/>
 <%
-    gameHighlighting.setGameData(game.getMutants(), playerTests, user);
+    gameHighlighting.setGameData(game.getMutants(), playerTests, login.getUserId());
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
     gameHighlighting.setEnableFlagging(true);
     // We should show game highlighting only inside the mutant editor
