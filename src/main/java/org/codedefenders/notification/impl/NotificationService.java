@@ -18,10 +18,11 @@
  */
 package org.codedefenders.notification.impl;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.annotation.ManagedBean;
-import javax.enterprise.context.ApplicationScoped;
+import javax.annotation.PreDestroy;
 import javax.inject.Singleton;
 
 import org.codedefenders.notification.INotificationService;
@@ -30,13 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.google.gson.Gson;
 
 /**
  * Notification Service implementation.
  * This service behaves like a singleton in the app.
  * See https://docs.oracle.com/javaee/6/api/javax/enterprise/context/ApplicationScoped.html
+ *
  * @author gambi
  */
 @ManagedBean
@@ -51,26 +52,37 @@ public class NotificationService implements INotificationService {
         logger.warn("Event was: " + gson.toJson(context.getEvent()));
     };
 
-    @SuppressWarnings("UnstableApiUsage")
-    private EventBus eventBus = new AsyncEventBus(Executors.newFixedThreadPool(NUM_THREADS));
+    private final ExecutorService executor;
 
-    // TODO Ensures that event bus is defined in a Tomcat System Listener !
-    // public NotificationService(EventBus eventBus) {
-    //     this.eventBus = eventBus;
-    // }
+    @SuppressWarnings("UnstableApiUsage")
+    private final EventBus eventBus;
+
+    public NotificationService() {
+        executor = Executors.newFixedThreadPool(NUM_THREADS);
+        //noinspection UnstableApiUsage
+        eventBus = new AsyncEventBus(executor);
+    }
 
     @Override
     public void post(Object message) {
+        //noinspection UnstableApiUsage
         eventBus.post(message);
     }
 
     @Override
     public void register(Object eventHandler) {
+        //noinspection UnstableApiUsage
         eventBus.register(eventHandler);
     }
 
     @Override
     public void unregister(Object eventHandler) {
+        //noinspection UnstableApiUsage
         eventBus.unregister(eventHandler);
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        executor.shutdown();
     }
 }
