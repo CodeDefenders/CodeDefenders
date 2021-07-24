@@ -48,7 +48,7 @@
 %>
     <p class="text-center">
         Before you can start games, please
-        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center">upload a class under test</a>.
+        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>" class="text-center">upload a class under test</a>.
     </p>
 <%
         } else {
@@ -63,6 +63,7 @@
     <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
           class="needs-validation" autocomplete="off">
         <input type="hidden" name="formType" value="createGame">
+
         <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 
         <div class="row mb-3">
@@ -78,7 +79,7 @@
                         <span class="input-group-text position-relative cursor-pointer"
                               title="Upload a class.">
                             <a class="stretched-link text-decoration-none"
-                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">
+                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>">
                                 <i class="fa fa-upload"></i>
                             </a>
                         </span>

@@ -142,8 +142,7 @@
 </div>
 
 <div class="row">
-    <div class="col-xl-6 col-12" id="mutants-div">
-        <div class="game-component-header"><h3>Existing Mutants</h3></div>
+    <div class="col-xl-6 col-12">
         <t:mutant_accordion/>
     </div>
 
