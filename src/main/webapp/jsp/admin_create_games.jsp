@@ -406,7 +406,7 @@
         </div> <%-- row --%>
     </form>
 
-    <t:modal id="validatorExplanation" title="Mutant Validator Explanation">
+    <t:modal id="validatorExplanation" title="Validator Explanations">
         <jsp:attribute name="content">
             <%@ include file="/jsp/mutant_validator_explanation.jsp"%>
             <%@ include file="/jsp/test_validator_explanation.jsp"%>
