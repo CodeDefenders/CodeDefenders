@@ -46,12 +46,6 @@ public class NotificationService implements INotificationService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
     private static final int NUM_THREADS = 8;
 
-    private SubscriberExceptionHandler exceptionHandler = (exception, context) -> {
-        Gson gson = new Gson();
-        logger.warn("Got " + exception.getClass().getSimpleName() + " while calling notification handler.", exception);
-        logger.warn("Event was: " + gson.toJson(context.getEvent()));
-    };
-
     private final ExecutorService executor;
 
     @SuppressWarnings("UnstableApiUsage")
@@ -60,7 +54,10 @@ public class NotificationService implements INotificationService {
     public NotificationService() {
         executor = Executors.newFixedThreadPool(NUM_THREADS);
         //noinspection UnstableApiUsage
-        eventBus = new AsyncEventBus(executor);
+        eventBus = new AsyncEventBus(executor, ((exception, context) -> {
+            logger.warn("Got {} while calling notification handler.", exception.getClass().getSimpleName(), exception);
+            logger.warn("Event was: {}", new Gson().toJson(context.getEvent()));
+        }));
     }
 
     @Override
