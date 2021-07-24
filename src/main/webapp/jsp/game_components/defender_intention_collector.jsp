@@ -39,7 +39,8 @@
     theForm.appendChild(input);
 
     // Update Left Code Mirror to enable line selection on gutter
-    var editor = document.querySelector("#sut + .CodeMirror").CodeMirror;
+    var editor = (document.querySelector("#sut + .CodeMirror")
+            || document.querySelector("#mutant-code + .CodeMirror")).CodeMirror;
     var testEditor = document.querySelector("#test-code + .CodeMirror").CodeMirror;
 
     toggleIntentionClass();
