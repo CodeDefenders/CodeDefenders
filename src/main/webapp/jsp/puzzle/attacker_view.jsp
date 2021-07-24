@@ -109,17 +109,19 @@
 
 
 <jsp:include page="/jsp/header_main.jsp"/>
-</div></div></div></div></div>
-<div class="game-container">
+
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+
+<div id="game-container">
 
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
-    <div class="row" style="padding: 0px 15px;">
+    <div class="row">
         <h4 class="col-md-2"><b><%=title%></b></h4>
         <h4><%=description%></h4>
     </div>
     <hr class="hr-primary" style="margin: 5px">
-<div class="row" style="padding: 0px 15px;">
+<div class="row">
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
@@ -140,14 +142,14 @@
         <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
             <input type="hidden" name="formType" value="reset">
             <input type="hidden" name="gameId" value="<%= game.getId() %>">
-            <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
+            <button class="btn btn-primary btn-warning btn-bold pull-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
                 Reset
             </button>
         </form>
 
         <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
         <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
-            <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk"
+            <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitMutant" form="atk"
                     onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                 Attack!
@@ -162,6 +164,8 @@
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
+</div>
+
 </div>
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>

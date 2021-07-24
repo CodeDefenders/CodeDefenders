@@ -59,16 +59,6 @@ public class MessagesBean implements Serializable {
     }
 
     /**
-     * Returns if the messages should fade out or not.
-     * @return If the messages should fade out or not.
-     */
-    // TODO: make individual messages fade out instead of all of the messages
-    //      -> we need to check which messages are not marked as fadeOut(false) even though they shouldn't fade out
-    public synchronized boolean isFadeOut() {
-        return messages.stream().allMatch(Message::isFadeOut);
-    }
-
-    /**
      * Clears the messages.
      */
     public synchronized void clear() {

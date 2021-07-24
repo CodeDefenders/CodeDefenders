@@ -19,63 +19,42 @@
 
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <jsp:include page="/jsp/header_base.jsp"/>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
-<div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
-    <div class="full-width">
-        <div class="ws-12 container" style="text-align: right; clear:
-        both; width: 100%; padding: 0">
+<nav class="navbar navbar-cd" id="header">
+    <div class="navbar-header">
 
-            <!-- toggle menu button for small frames -->
-            <button type="button"
-                    class="navbar-toggle collapsed text-white button tab-link bg-minus-1"
-                    data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1"
-                    style="margin-top: 3px">
-                Menu <span class="glyphicon glyphicon-plus"></span>
-            </button>
+        <%-- The style attributes here are a workaround to make Logo + Text work in the navbar brand. --%>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}" style="position: relative;">
+            <img src="images/logo.png" style="width: 2em; position: absolute; top: .1em; left: .4em;"/>
+            <span style="margin-left: 2em;">Code Defenders</span>
+        </a>
 
-            <!-- logo and pagetitle -->
-            <a id="site-logo" class="navbar-brand site-logo main-title text-white tab-link"
-               href="${pageContext.request.contextPath}/" style="padding-left: 0">
-                <img class="logo" href="${pageContext.request.contextPath}/"
-                     src="images/logo.png" style="float:left; margin-left: 10px; margin-right: 10px"/>
-                <div id="headerhome"
-                     style="text-align: center; font-size: x-large; padding: 15px 20px 0 0; float: left">
-                    Code Defenders
-                </div>
-            </a>
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-navbar-controls" aria-expanded="true">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
 
-            <!-- navigation bar -->
-            <div id="bs-example-navbar-collapse-1" class="navbar-collapse collapse">
-                <ul class="crow no-gutter nav navbar-nav" style="display: flow-root; position: relative; z-index: 1000">
-                    <% if (!request.getRequestURI().contains("login")) { %>
-                    <li class="col-md-4"><a class="text-white button tab-link bg-minus-1"
-                                               href="login" style="width:100%; margin-right: 80px">Login</a></li>
-                    <% } %>
-
-                    <li class="col-md-4"><a
-                            class="text-white button tab-link bg-minus-1"
-                            href="#research" style="width:100%; margin-right: 60px"
-                            onclick="openResearchBox()">Research</a></li>
-                    <li class="col-md-4"><a class="text-white button tab-link bg-minus-1"
-                                               href="help" style="width:100%; margin-right: 90px">Help</a></li>
-                </ul>
-            </div>
-        </div>
     </div>
-</div>
+    <div class="collapse navbar-collapse" id="header-navbar-controls">
 
+        <ul class="nav navbar-nav">
+            <li><a href="#research" onclick="openResearchBox()">Research</a></li>
+        </ul>
+        <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="login">Login</a></li>
+            </ul>
+        </c:if>
 
-<script>
-    function openResearchBox() {
-        $('#researchBox').collapse('show')
-        var toggle = document.getElementById('researchBoxToggle');
-        var newClass = 'glyphicon glyphicon-chevron-up';
-        toggle.setAttribute('class', newClass);
-    }
-</script>
+    </div>
+</nav>
 
 <jsp:include page="/jsp/messages.jsp"/>
+
+<div id="content"> <%-- closed in footer --%>

@@ -51,14 +51,13 @@
     history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+
 <jsp:include page="/jsp/battleground/header_game.jsp"/>
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_notifications.jsp"/>
 <t:game_chat/>
-
-<%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
-<%--<%@ include file="/jsp/push_game_notifications.jsp"%>--%>
 
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
@@ -66,7 +65,6 @@
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<div class="crow fly no-gutter up">
 <%
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
 
@@ -90,7 +88,7 @@
             return;
     }
 %>
-    </div>
+
 <%
 if (game.isCapturePlayersIntention()) {
     if (role == Role.DEFENDER) {
@@ -106,4 +104,4 @@ if (game.isCapturePlayersIntention()) {
 %>
 <!-- This corresponds to dispatcher.Dispatch -->
 <jsp:include page="/jsp/game_notifications.jsp"/>
-<%@ include file="/jsp/battleground/footer_game.jsp" %>
+<%@ include file="/jsp/footer_game.jsp" %>

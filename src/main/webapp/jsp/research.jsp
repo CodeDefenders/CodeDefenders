@@ -19,16 +19,17 @@
 
 --%>
 
+<link href="${pageContext.request.contextPath}/css/research.css" rel="stylesheet">
+
 <div id="research" class="paper-list">
 
-	<h2 style="border-top: 1px solid lightgray; padding-top: 20px">
-		<a id="showResearch" data-toggle="collapse" href="#researchBox" style="color:black"
-		   onclick="changeChevron()">
+	<h3>
+		<a id="showResearch" data-toggle="collapse" href="#researchBox" onclick="changeChevron()">
 			Research
-			<span id = "researchBoxToggle" class="glyphicon glyphicon-chevron-down" style=" font-size: 20px; margin: 5px; "></span>
+			<span id="researchBoxToggle" class="glyphicon glyphicon-chevron-down"></span>
 		</a>
-	</h2>
-	<p></p>
+	</h3>
+
 	<div id="researchBox" class="collapse" style="font-size: 12px;">
 		<div class="row-fluid">
 			<ul class="papercite_bibliography">
@@ -171,20 +172,29 @@
 	</div>
 </div>
 
-<script>function changeChevron() {
-    var toggle = document.getElementById('researchBoxToggle');
-    var currentClass = toggle.getAttribute("class");
-    var newClass = currentClass === 'glyphicon glyphicon-chevron-down' ? 'glyphicon glyphicon-chevron-up' : 'glyphicon glyphicon-chevron-down';
-    toggle.setAttribute('class', newClass);
-}
+<script>
+    function openResearchBox() {
+        $('#researchBox').collapse('show')
+        const toggle = document.getElementById('researchBoxToggle');
+        toggle.setAttribute('class', 'glyphicon glyphicon-chevron-up');
+    }
 
-function toggleBibtex(div) {
-    var className = div.getAttribute("class");
-    if(className=="bibtex_hide") {
-        div.className = "bibtex_show";
+    function changeChevron() {
+        const toggle = document.getElementById('researchBoxToggle');
+        const currentClass = toggle.getAttribute("class");
+        const newClass = currentClass === 'glyphicon glyphicon-chevron-down'
+                ? 'glyphicon glyphicon-chevron-up'
+                : 'glyphicon glyphicon-chevron-down';
+        toggle.setAttribute('class', newClass);
     }
-    else{
-        div.className = "bibtex_hide";
+
+    function toggleBibtex(div) {
+        const className = div.getAttribute("class");
+        if (className === "bibtex_hide") {
+            div.className = "bibtex_show";
+        }
+        else{
+            div.className = "bibtex_hide";
+        }
     }
-}
 </script>

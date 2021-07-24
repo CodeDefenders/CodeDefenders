@@ -63,9 +63,12 @@ public class AntRunner implements //
 
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
-    @Inject
-    private Configuration config;
+    private final Configuration config;
 
+    @Inject
+    public AntRunner(Configuration config) {
+        this.config = config;
+    }
 
     /**
      * {@inheritDoc}

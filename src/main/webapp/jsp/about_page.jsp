@@ -35,7 +35,7 @@
     <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<div class="container" style=" max-width: 50%; min-width: 25%; ">
+<div class="container">
     <h2 style="text-align: center">About CodeDefenders</h2>
 
     <div class="panel panel-default" style="padding:25px;">
@@ -71,8 +71,8 @@
             </p>
             <p>
             Code Defenders is an open source project. See the <a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.
-            <p/>
-            <p>
+            </p>
+
             <h3>Contributors</h3>
             <ul>
                 <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Gordon Fraser (University of Passau)</a></li>
@@ -90,16 +90,15 @@
                 <li><a href="https://github.com/werli">Phil Werli</a> (University of Passau)</li>
                 <li>Thomas White (The University of Sheffield)</li>
             </ul>
-            </p>
 
             <h3>Supporters</h3>
-            <p>
             <ul>
                 <li><a href="https://impress-project.eu/">IMPRESS Project</a> (Improving Engagement of Students in Software Engineering Courses through Gamification)</li>
                 <li><a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a></li>
                 <li><a href="http://royalsociety.org/">Royal Society (Grant RG160969)</a></li>
             </ul>
-            </p>
+
+            <jsp:include page="research.jsp"/>
         </div>
 
     </div>

@@ -441,7 +441,7 @@ public class MultiplayerGameManager extends HttpServlet {
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-            messages.add(decorate).escape(false);
+            messages.add(decorate).escape(false).fadeOut(false);
             //
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -452,7 +452,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // testOriginalTarget.state.equals(TargetExecution.Status.FAIL)
             //     || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
-            messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
+            messages.add(testOriginalTarget.message).fadeOut(false);
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -659,7 +659,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode(escapedHtml, false, true);
-                messages.add(decorate).escape(false);
+                messages.add(decorate).escape(false).fadeOut(false);
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -857,7 +857,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
                     String decorate = decorateWithLinksToCode(escapedHtml, true, false);
-                    messages.add(decorate);
+                    messages.add(decorate).escape(false).fadeOut(false);
                 }
 
                 previousSubmission.setTestCode(testText);
@@ -870,7 +870,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 //   || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
                 logger.debug("testOriginalTarget: " + testOriginalTarget);
                 messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
-                messages.add(testOriginalTarget.message);
+                messages.add(testOriginalTarget.message).fadeOut(false);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;

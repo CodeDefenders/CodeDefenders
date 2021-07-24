@@ -41,14 +41,17 @@ import org.codedefenders.model.User;
 @ApplicationScoped
 public class GameService implements IGameService {
 
-    @Inject
-    MultiplayerGameService multiplayerGameService;
+    private final MultiplayerGameService multiplayerGameService;
+    private final MeleeGameService meleeGameService;
+    private final PuzzleGameService puzzleGameService;
 
     @Inject
-    MeleeGameService meleeGameService;
-
-    @Inject
-    PuzzleGameService puzzleGameService;
+    public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
+            PuzzleGameService puzzleGameService) {
+        this.multiplayerGameService = multiplayerGameService;
+        this.meleeGameService = meleeGameService;
+        this.puzzleGameService = puzzleGameService;
+    }
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {

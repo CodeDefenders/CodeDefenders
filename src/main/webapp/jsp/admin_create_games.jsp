@@ -47,10 +47,7 @@
     }
 </style>
 
-<%-- Workaround for the stupid <div class="nest"> in header_main. Remove this once that div is gone --%>
-</div></div></div></div></div><div class="container">
-
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
@@ -73,7 +70,7 @@
                     </label>
                 </div>
                 <input type="search" id="search-staged-games" class="form-control" placeholder="Search"
-                       style="height: .65em; width: 10em; display: inline;">
+                       style="height: 1.5em; width: 10em; display: inline;">
             </div>
         </div>
         <div class="panel-body">
@@ -114,12 +111,11 @@
                     </label>
                 </div>
                 <input type="search" id="search-users" class="form-control" placeholder="Search"
-                       style="height: .65em; width: 10em; display: inline;">
+                       style="height: 1.5em; width: 10em; display: inline;">
             </div>
         </div>
         <div class="panel-body">
             <table id="table-users" class="table table-responsive"></table>
-            </div>
         </div>
     </div>
 
@@ -1423,8 +1419,5 @@
         });
     </script>
 </div>
-
-<%-- Workaround for the stupid <div class="nest"> in header_main. Remove this once that div is gone --%>
-</div><div><div><div><div><div><div>
 
 <%@ include file="/jsp/footer.jsp" %>

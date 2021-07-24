@@ -38,29 +38,21 @@
     pageInfo.setPageTitle("Game " + game.getId() + " (" + role.getFormattedString() + ")");
 %>
 
-
 <jsp:include page="/jsp/header_main.jsp" />
-</div>
-</div>
-</div>
-</div>
-</div>
 
-<div class="game-container">
-	<nav class="nest"
-		style="width: 100%; margin-left: 0; margin-right: auto;">
-		<div class="crow fly">
+<div id="game-container" class="container"> <%-- closed in footer --%>
+    <div class="row">
 			<%
 			    if (game.getCreatorId() == login.getUserId()) {
 			%>
-			<div class="admin-panel col-md-12">
+			<div class="admin-panel col-md-6">
 				<%
 				    if (game.getState() == GameState.ACTIVE) {
 				%>
 				<form id="adminEndBtn"
 					action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>"
 					method="post" style="display: inline-block;">
-					<button type="submit" class="btn btn-primary btn-game btn-left"
+					<button type="submit" class="btn btn-primary btn-bold"
 						id="endGame" form="adminEndBtn">End Game</button>
 					<input type="hidden" name="formType" value="endGame"> <input
 						type="hidden" name="gameId" value="<%=game.getId()%>" />
@@ -71,7 +63,7 @@
 				<form id="adminStartBtn"
 					action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>"
 					method="post" style="display: inline-block;">
-					<button type="submit" class="btn btn-primary btn-game"
+					<button type="submit" class="btn btn-primary btn-bold"
 						id="startGame" form="adminStartBtn">Start Game</button>
 					<input type="hidden" name="formType" value="startGame"> <input
 						type="hidden" name="gameId" value="<%=game.getId()%>" />
@@ -86,33 +78,26 @@
 			%>
 
 			<%-- This bar shows the possible interactions at game level --%>
-			<div class="container">
+			<div class="col-md-6" style="float: right;">
 
-				<%-- Make those interactive later ! For the moment they are just place holders ! --%>
-				<%-- Probably use some DISABLE CSS or something  --%>
-				<%--<a id="notification-chat" class="notification-icon glyphicon glyphicon-envelope"></a>--%>
-				<%--<a id="notification-game" class="notification-icon glyphicon glyphicon-bell"></a>--%>
-
-				<a href="#" class="btn btn-diff" id="btnScoringTooltip"
+				<a href="#" class="btn pull-right" id="btnScoringTooltip"
 					data-toggle="modal" data-target="#scoringTooltip"
 					style="color: black; font-size: 18px; padding: 5px;"> <span
 					class="glyphicon glyphicon-question-sign"></span>
 				</a>
-                <a href="#" class="btn btn-default btn-diff" id="btnScoreboard"
+                <a href="#" class="btn btn-default pull-right" id="btnScoreboard"
                    data-toggle="modal" data-target="#scoreboard">Scoreboard
                 </a>
-                <a href="#" class="btn btn-default btn-diff" id="btnHistory" data-toggle="modal"
+                <a href="#" class="btn btn-default pull-right" id="btnHistory" data-toggle="modal"
                    data-target="#history">History
                 </a>
                 <a
 					href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
 					title="Export as a Gradle project to import into an IDE."
-					class="btn btn-default btn-diff" id="btnProjectExport"> Export
+					class="btn btn-default pull-right" id="btnProjectExport"> Export
                 </a>
-                
-                <a href="#" class="btn btn-default btn-diff" id="btnFeedback"
+
+                <a href="#" class="btn btn-default pull-right" id="btnFeedback"
 					data-toggle="modal" data-target="#playerFeedback"> Feedback </a>
-			</div>
-		</div>
-	</nav>
-	<div class="clear"></div>
+            </div>
+    </div>

@@ -32,9 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
-import org.codedefenders.SystemStartStop;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.configuration.ConfigurationValidationException;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.slf4j.Logger;
@@ -50,10 +48,7 @@ public class ConnectionFactory {
     BasicDataSource dataSource;
 
     @Inject
-    Configuration config;
-
-    @PostConstruct
-    void init() {
+    public ConnectionFactory(Configuration config) {
         if (config.isValid()) {
             dataSource = new BasicDataSource();
             try {
@@ -67,8 +62,12 @@ public class ConnectionFactory {
             dataSource.setMaxTotal(config.getMaximumTotalDatabaseConnections());
             dataSource.setMaxWaitMillis(config.getDatabaseConnectionTimeout());
 
-            migrate();
+            migrate(config.getDbName());
         }
+    }
+
+    @PostConstruct
+    void init() {
     }
 
     @PreDestroy
@@ -86,12 +85,12 @@ public class ConnectionFactory {
         return dataSource.getConnection();
     }
 
-    private void migrate() {
+    private void migrate(String dbName) {
         FluentConfiguration flywayConfig = Flyway.configure();
         flywayConfig.dataSource(dataSource);
         flywayConfig.locations("classpath:db/migrations");
 
-        Map<String, Boolean> check = checkDatabase();
+        Map<String, Boolean> check = checkDatabase(dbName);
 
         if (!check.get("databaseEmpty") && !check.get("flywayHistoryExists")) {
             if (check.get("databaseBaseline1.7")) {
@@ -114,10 +113,10 @@ public class ConnectionFactory {
         R check(T input) throws SQLException;
     }
 
-    private Map<String, Boolean> checkDatabase() {
+    private Map<String, Boolean> checkDatabase(String dbName) {
         Map<String, Boolean> result = new HashMap<>();
         result.put("databaseEmpty",
-                checkDatabase(metaData -> metaData.getTables(config.getDbName(), null, null, null), true));
+                checkDatabase(metaData -> metaData.getTables(dbName, null, null, null), true));
         result.put("flywayHistoryExists",
                 checkDatabase(metaData -> metaData.getTables(null, null, "flyway_schema_history", null)));
         result.put("databaseBaseline1.6",

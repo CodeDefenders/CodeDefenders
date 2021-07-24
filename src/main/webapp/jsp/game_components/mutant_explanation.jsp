@@ -27,6 +27,23 @@
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 
+<style>
+    .mutantCUTLegendDesc {
+        font-weight: bold;
+        margin-right: .5rem;
+    }
+    .mutantCUTLegend > * {
+        vertical-align: middle;
+    }
+    .validatorLevelTag {
+        display: inline-block;
+        padding: 0;
+        margin-top: -2px;
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+</style>
+
 <%
     String levelStyling;
     switch (mutantExplanation.getCodeValidatorLevel()) {
@@ -43,8 +60,8 @@
         levelStyling = "btn-primary";
     }
 %>
-<div style="height: 24px;">
-	<div>
+<div>
+	<div class="mutantCUTLegend">
 		<span class="mutantCUTImage mutantImageAlive"></span>
 		<span class="mutantCUTLegendDesc">Live</span>
 		<span class="mutantCUTImage mutantImageKilled"></span>
@@ -60,7 +77,7 @@
          <div
             data-toggle="modal" href="#validatorExplanation"
             title="Click the question sign for more information on the levels"
-            class="<%="validatorLevelTag btn " + levelStyling%>">
+            class="validatorLevelTag btn <%=levelStyling%>">
             <%=StringUtils.capitalize(mutantExplanation.getCodeValidatorLevel().toString().toLowerCase())%>
         </div>
          <div style="display: inline-block;">

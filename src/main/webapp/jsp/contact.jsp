@@ -32,17 +32,6 @@
 	<jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<%
-	String result = (String)request.getSession().getAttribute("emailSent");
-	request.getSession().removeAttribute("emailSent");
-	if (result != null) {
-%>
-<div class="alert alert-info" id="messages-div">
-	<p><%=result%></p>
-</div>
-<%
-	}
-%>
 <div class="container" style=" max-width: 50%; min-width: 25%; ">
 	<h2 style="text-align: center">Contact Us</h2>
 	<p style="text-align: center">
@@ -64,7 +53,8 @@
 		<label for="inputSubject" class="sr-only">Subject</label>
 		<input type="text" id="inputSubject" name="subject" class="form-control" placeholder="Subject" required autofocus>
 		<label for="inputMessage" class="sr-only">Message</label>
-		<textarea id="inputMessage" name="message" class="form-control" placeholder="Message" rows="8" required></textarea>
+		<textarea id="inputMessage" name="message" class="form-control" placeholder="Message" rows="8" required
+            style="resize: none;"></textarea>
 		<button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>
 	</form>
 <%

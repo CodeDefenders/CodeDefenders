@@ -18,10 +18,12 @@
  */
 package org.codedefenders.systemtests;
 
+/*
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.configuration.DockerComposeFiles;
 import com.palantir.docker.compose.connection.DockerPort;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+*/
 
 import org.junit.After;
 import org.junit.Assert;
@@ -58,6 +60,7 @@ import static org.junit.Assert.fail;
 @Category(SystemTest.class)
 public class UploadUncompilableClassTest {
 
+    /*
 	@ClassRule
 	public static DockerComposeRule docker = DockerComposeRule.builder()//
 			// This allows to alter docker-compose and mount
@@ -75,6 +78,7 @@ public class UploadUncompilableClassTest {
 				}
 			})) //
 			.build();
+     */
 
 	private WebDriver driver;
 	private StringBuffer verificationErrors = new StringBuffer();

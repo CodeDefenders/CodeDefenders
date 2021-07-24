@@ -23,15 +23,15 @@
 <script>
 
 //To fix #638 I made this function global so it can be invoked by onClick. I do not like it but cannot find a better way to
-// make this happen... 
+// make this happen...
 function updateAttackForm(value){
 	// Probably we should use const here?
     var attackButton = document.getElementById('submitMutant');
 	var theForm = document.getElementById('atk');
-	
+
     document.getElementById("attacker_intention").value = value;
- 	// Disabled for #638. This function might have been deleted/refactored in some other commit 
-    // progressBar();        
+ 	// Disabled for #638. This function might have been deleted/refactored in some other commit
+    // progressBar();
  	// Disabled for #490
     /* registerMutantProgressBar(); */
     theForm.submit();
@@ -42,7 +42,7 @@ function updateAttackForm(value){
     var attackButton = document.getElementById('submitMutant');
     var theForm = document.getElementById('atk');
 
-    
+
 
     // Add the attacker_intention hidden field to the atk form
     var input = document.createElement("input");
@@ -57,14 +57,14 @@ function updateAttackForm(value){
 
     // Create the attackDropDown
     var attackDropDown = document.createElement('div');
-    
+
     attackDropDown.setAttribute("id", "attackDropDown");
     attackDropDown.setAttribute("class", "dropdown");
     attackDropDown.setAttribute("style", "float: right; margin-right: 5px");
 
     var attackDropDownButton = document.createElement('button');
     attackDropDownButton.setAttribute("type", "button");
-    attackDropDownButton.setAttribute("class", "btn btn-primary btn-game btn-right dropdown-toggle");
+    attackDropDownButton.setAttribute("class", "btn btn-primary btn-bold pull-right dropdown-toggle");
     attackDropDownButton.setAttribute("data-toggle", "dropdown");
     // Note the ID !
     attackDropDownButton.setAttribute("id", "submitMutantTemp" );
@@ -72,8 +72,8 @@ function updateAttackForm(value){
     attackDropDownButton.setAttribute("aria-haspopup", "true");
     attackDropDownButton.setAttribute("aria-expanded", "false");
     attackDropDownButton.innerHTML="Attack <span class=\"glyphicon glyphicon-triangle-bottom\" style=\"font-size: small\"/></span>";
-    
-    
+
+
     // Attach the button to the drop down
     attackDropDown.appendChild(attackDropDownButton)
 
@@ -98,7 +98,7 @@ function updateAttackForm(value){
     var killableMutant = document.createElement('a');
     killableMutant.setAttribute("class", "dropdown-item");
     killableMutant.setAttribute("style", "cursor: pointer");
-    
+
     killableMutant.setAttribute("onclick", "updateAttackForm(\'KILLABLE\')");
     killableMutant.innerHTML = 'My mutant is killable';
     // connect <ul>, <li> and <a> elements

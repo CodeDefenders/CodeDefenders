@@ -62,6 +62,7 @@
     history.setPlayers(Collections.singletonList(player), otherPlayers);
 %>
 
+<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
@@ -71,11 +72,6 @@
 <jsp:include page="/jsp/push_notifications.jsp"/>
 <t:game_chat/>
 
-<%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
-<%--<%@ include file="/jsp/push_game_notifications.jsp"%>--%>
-<%-- Show the mail icon with counts of unread notifications: requires push_notifications.jsp --%>
-<%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
-
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
@@ -83,20 +79,18 @@
 <jsp:include page="/jsp/battleground/game_history.jsp"/>
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<div class="crow fly no-gutter up">
-	<%
-	    if (role.equals(Role.OBSERVER)) {
-	%>
-			<jsp:include page="/jsp/melee/creator_view.jsp" />
-	<%
-	    } else {
-	%>
-			<jsp:include page="/jsp/melee/player_view.jsp" />
-	<%
-	    }
-	%>
-</div>
+<%
+    if (role.equals(Role.OBSERVER)) {
+%>
+        <jsp:include page="/jsp/melee/creator_view.jsp" />
+<%
+    } else {
+%>
+        <jsp:include page="/jsp/melee/player_view.jsp" />
+<%
+    }
+%>
 
 <!-- This corresponds to dispatcher.Dispatch -->
 <jsp:include page="/jsp/game_notifications.jsp"/>
-<%@ include file="/jsp/melee/footer_game.jsp" %>
+<%@ include file="/jsp/footer_game.jsp" %>

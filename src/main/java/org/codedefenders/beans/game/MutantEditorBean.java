@@ -58,8 +58,14 @@ public class MutantEditorBean {
         editableLinesEnd = null;
     }
 
+    /**
+     * Sets the className. This method is called upon the information of a {@link GameClass}. Since the
+     * {@link GameClass#name} contains the fully qualified name, the package information must be removed.
+     * @param className The fully qualified name of the class
+     */
     public void setClassName(String className) {
-        this.className = className;
+        String[] split = className.split("\\.");
+        this.className = split[split.length - 1];
     }
 
     public void setMutantCodeForClass(GameClass clazz) {

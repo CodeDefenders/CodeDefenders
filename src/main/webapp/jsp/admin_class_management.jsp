@@ -27,7 +27,7 @@
     List<GameClassInfo> allClasses  = (List<GameClassInfo>) request.getAttribute("classInfos");
 %>
 
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminClasses"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
@@ -37,7 +37,7 @@
     </div>
 
     <table id="tableClasses"
-               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-center dataTable display">
         <thead>
             <tr>
                 <th>ID</th>

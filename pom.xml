@@ -514,7 +514,7 @@
 		<!-- Context and Dependency Injection (CDI) -->
 		<dependency>
 			<groupId>org.jboss.weld.servlet</groupId>
-			<artifactId>weld-servlet-shaded</artifactId>
+			<artifactId>weld-servlet-core</artifactId>
 			<version>3.0.5.Final</version>
 		</dependency>
 		<!-- Not sure if this creates a conflict -->
@@ -833,12 +833,14 @@
 			</exclusions>
 		</dependency>
 
+		<!--
 		<dependency>
 			<groupId>com.palantir.docker.compose</groupId>
 			<artifactId>docker-compose-rule-junit4</artifactId>
 			<version>0.33.0</version>
 			<scope>test</scope>
 		</dependency>
+		-->
 
 		<!-- Docker client to make assertions on docker containers. Ideally we
 			should use this in combination with Hamcrest -->
@@ -872,6 +874,7 @@
 	</dependencies>
 
 	<repositories>
+		<!--
 		<repository>
 			<id>Palantir</id>
 			<url>https://dl.bintray.com/palantir/releases/</url>
@@ -879,6 +882,7 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		-->
 		<repository>
 			<id>Local Repository</id>
 			<url>file://${basedir}/local-repo</url>

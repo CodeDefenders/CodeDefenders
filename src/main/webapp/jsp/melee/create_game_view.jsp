@@ -59,9 +59,10 @@
 %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
-          class="form-creategame-mp">
+          class="form-creategame"
+          style="padding: 15px; margin: 0 auto; max-width: 75rem;">
         <input type="hidden" name="formType" value="createGame">
-        <table class="tableform">
+        <table style="border-collapse: separate; border-spacing: 20px; font-size: 16px; text-align: center; line-height: 27px;">
             <tr>
                 <td width="25%">Java Class</td>
                 <td id="classTd">

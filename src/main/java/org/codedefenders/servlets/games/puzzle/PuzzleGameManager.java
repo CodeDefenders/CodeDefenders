@@ -426,7 +426,7 @@ public class PuzzleGameManager extends HttpServlet {
         final TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, COMPILE_TEST);
         if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
-            messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
+            messages.add(compileTestTarget.message).fadeOut(false);
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -435,7 +435,7 @@ public class PuzzleGameManager extends HttpServlet {
         final TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TEST_ORIGINAL);
         if (!testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
-            messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
+            messages.add(testOriginalTarget.message).fadeOut(false);
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -464,9 +464,8 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = false;
-            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame));
-            message.escape(false);
-            message.fadeOut(false);
+            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame))
+                    .escape(false).fadeOut(false);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -645,9 +644,8 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = true;
-            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame));
-            message.fadeOut(false);
-            message.escape(false);
+            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame))
+                    .escape(false).fadeOut(false);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);

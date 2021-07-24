@@ -20,7 +20,7 @@
 --%>
 <jsp:include page="/jsp/header_main.jsp"/>
 
-<div class="full-width">
+<div class="container">
     <% request.setAttribute("adminActivePage", "adminAnalytics"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
