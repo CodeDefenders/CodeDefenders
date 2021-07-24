@@ -81,9 +81,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Validator Explanation</h4>
-                <h5 class="modal-title" id="validator-explanation-modal-title">Mutant Validator Explanation</h5>
+                <h5 class="modal-title" id="validator-explanation-modal-title">Validator Explanation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 
