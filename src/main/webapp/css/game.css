@@ -1,5 +1,70 @@
+/* CSS for game pages
+============================================================================= */
+
+/* Game container
+----------------------------------------------------------------------------- */
+
+/* <div id="game-container" class="container-fluid"> */
+
 #game-container {
     padding-left: 30px;
     padding-right: 30px;
+    max-width: 2000px; /* Enough to display 120 characters in editors. */
+}
+
+/* Component header with controls
+----------------------------------------------------------------------------- */
+
+/*
+ * <div class="game-component-header">
+ *     <h3>Component Title</h3>
+ *     <div>
+ *         <!-- Controls for the component here (the whole div is optional) -->
+ *     </div>
+ * </div>
+ */
+
+.game-component-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: .25rem; /* Corresponds to .gap-1 in Bootstrap. */
+    margin-bottom: .5rem; /* Corresponds to .mb-2 in Bootstrap. */
+    margin-top: 1.5rem;
+    min-height: 2.5rem; /* To make headers with buttons the same height as headers without buttons. */
+    align-items: center;
+}
+
+.game-component-header > h3 {
+    display: inline;
+    margin: 0;
+}
+
+.game-component-header > div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5rem; /* Corresponds to .gap-2 in Bootstrap. */
+}
+
+/* Resizable game components.
+----------------------------------------------------------------------------- */
+
+.game-component-resize {
+    height: 700px;
+    min-height: 200px;
+    resize: vertical;
+    overflow: auto;
+}
+
+/* Container for highlighting the components for resolving an equivalence duel
+----------------------------------------------------------------------------- */
+
+.equivalence-container {
+    border: 5px dashed #f00;
+    border-radius: 5px;
     width: 100%;
+    padding: .5rem 1rem;
 }

@@ -86,8 +86,6 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
         switch (action) {
             case "claimEquivalent":
             case "resolveEquivalence":
-            case "acceptEquivalent":
-            case "rejectEquivalent":
                 forwardEquivalenceAction(request, response, gameId);
                 return;
             default:

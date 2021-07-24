@@ -112,41 +112,40 @@
 
 
 <div class="row">
-    <div class="col-md-6" style="margin-top: 10px;">
-        <div id="mutants-div">
-            <h3 style="margin-top: 0px;margin-bottom: 17px;">Existing Mutants</h3>
-            <t:mutant_accordion/>
-        </div>
+    <div class="col-xl-6 col-12">
+        <t:mutant_accordion/>
 
         <% if (showTestAccordion) { %>
             <div id="tests-div">
-                <h3>JUnit tests </h3>
+                <div class="game-component-header"><h3>JUnit Tests</h3></div>
                 <t:test_accordion/>
             </div>
         <% } %>
     </div>
 
-    <div class="col-md-6" id="newmut-div" style="margin-top: 10px;">
-        <div class="row" style="display: contents">
-            <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
+    <div class="col-xl-6 col-12" id="newmut-div">
+        <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
 
-            <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
-            <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
-            <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitMutant" form="atk"
-                onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
-                style="float: right; margin-right: 5px"
-                <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                Attack!
-            </button>
+        <div class="game-component-header">
+            <h3>Create a mutant here</h3>
+            <div>
 
-            <!-- Reset button -->
-            <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post" style="float: right; margin-right: 5px">
-                <button class="btn btn-primary btn-warning btn-bold pull-right" id="btnReset">
-                    Reset
+                <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
+                    <button class="btn btn-warning" id="btnReset">
+                        Reset
+                    </button>
+                    <input type="hidden" name="formType" value="reset">
+                    <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
+                </form>
+
+                <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
+                <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
+                        onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
+                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                    Attack
                 </button>
-                <input type="hidden" name="formType" value="reset">
-                <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
-            </form>
+
+            </div>
         </div>
 
         <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
@@ -157,7 +156,5 @@
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
             <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
         </form>
-        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
-        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
 </div>

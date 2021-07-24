@@ -45,6 +45,7 @@
 
                 const li = document.createElement('li');
                 const a = document.createElement('a');
+                a.classList.add('dropdown-item');
 
                 a.href = '<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>' + '?gameId=' + r[index].gameId;
                 a.innerHTML = r[index].parsedMessage;
@@ -58,12 +59,12 @@
             notificationCount.innerText = count;
 
             if (count > 0) {
-                notificationCount.classList.remove('label-default');
-                notificationCount.classList.add('label-warning');
+                notificationCount.classList.remove('bg-secondary');
+                notificationCount.classList.add('bg-warning');
                 notificationSeparator.style.display = null;
             } else {
-                notificationCount.classList.remove('label-warning');
-                notificationCount.classList.add('label-default');
+                notificationCount.classList.remove('bg-warning');
+                notificationCount.classList.add('bg-secondary');
                 notificationSeparator.style.display = 'none';
             }
         });
@@ -82,64 +83,65 @@
                 var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.USEREVENT%>&timestamp=0";
                 updateUserNotifications(url);
             }
-            $('[data-toggle="tooltip"]').tooltip();
         }
     );
 
 })();
 </script>
 
-<nav class="navbar navbar-cd" id="header">
-    <div class="navbar-header">
+<nav class="navbar navbar-expand-md navbar-cd" id="header">
+    <div class="container-fluid">
 
-        <%-- The style attributes here are a workaround to make Logo + Text work in the navbar brand. --%>
-        <a class="navbar-brand" href="${pageContext.request.contextPath}" style="position: relative;">
-            <img src="images/logo.png" style="width: 2em; position: absolute; top: .1em; left: .4em;"/>
-            <span style="margin-left: 2em;">Code Defenders</span>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}">
+            <img src="${pageContext.request.contextPath}/images/logo.png" alt="" class="d-inline-block"
+                 <%-- Negative margin to prevent the navbar from getting tall from the tall image. --%>
+                 style="height: 2.5rem; margin: -2rem .25rem -1.7rem .2rem;" />
+            Code Defenders
         </a>
 
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-navbar-controls" aria-expanded="true">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#header-navbar-controls"
+                aria-controls="header-navbar-controls" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
 
-    </div>
-    <div class="collapse navbar-collapse" id="header-navbar-controls">
+        <div class="collapse navbar-collapse" id="header-navbar-controls">
 
-        <ul class="nav navbar-nav">
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    Multiplayer
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a id="headerUserGames" href="<%=request.getContextPath()  + Paths.GAMES_OVERVIEW%>">Games</a></li>
-                    <li><a id="headerGamesHistory" href="<%=request.getContextPath() + Paths.GAMES_HISTORY %>">History</a></li>
-                    <li><a id="headerLeaderboardButton" href="<%= request.getContextPath() + Paths.LEADERBOARD_PAGE%>">Leaderboard</a></li>
-                </ul>
-            </li>
-            <li><a id="puzzleOverview" href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>">Puzzles</a></li>
-        </ul>
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item nav-item-highlight dropdown me-3">
+                    <a class="nav-link dropdown-toggle" id="header-multiplayer" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Multiplayer
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="header-multiplayer">
+                        <li><a class="dropdown-item" id="header-games" href="<%=request.getContextPath()  + Paths.GAMES_OVERVIEW%>">Games</a></li>
+                        <li><a class="dropdown-item" id="header-games-history" href="<%=request.getContextPath() + Paths.GAMES_HISTORY %>">History</a></li>
+                        <li><a class="dropdown-item" id="header-leaderboard" href="<%= request.getContextPath() + Paths.LEADERBOARD_PAGE%>">Leaderboard</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item nav-item-highlight">
+                    <a class="nav-link" id="header-puzzle" href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>">Puzzles</a>
+                </li>
+            </ul>
 
-        <ul class="nav navbar-nav navbar-right">
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                    ${login.user.username}
-                    <span id="notification-count" class="label label-default" style="margin-left: .25em;"></span>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" id="user-dropdown">
-                    <% if (profileEnabled) { %>
-                        <li><a id="headerProfileButton" href="<%=request.getContextPath() + Paths.USER_PROFILE%>">Profile</a></li>
-                    <% } %>
-                    <li><a id="headerHelpButton" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a></li>
-                    <li><a id="headerLogout" href="<%=request.getContextPath() + Paths.LOGOUT%>">Logout</a></li>
-                    <li id="notification-separator" role="separator" class="divider"></li>
-                </ul>
-            </li>
-        </ul>
+            <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="header-user" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        ${login.user.username}
+                        <span id="notification-count" class="badge bg-secondary ms-1"></span>
+                    </a>
+                    <ul class="dropdown-menu" id="user-dropdown" aria-labelledby="header-user"
+                        <%-- Align dropdown menu to the right, so it doesn't get cut off. --%>
+                        style="left: auto; right: 0;">
+                        <% if (profileEnabled) { %>
+                            <li><a class="dropdown-item" id="header-profile" href="<%=request.getContextPath() + Paths.USER_PROFILE%>">Profile</a></li>
+                        <% } %>
+                        <li><a class="dropdown-item" id="header-help" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a></li>
+                        <li><a class="dropdown-item" id="header-logout" href="<%=request.getContextPath() + Paths.LOGOUT%>">Logout</a></li>
+                        <li id="notification-separator"><hr class="dropdown-divider"></li>
+                    </ul>
+                </li>
+            </ul>
 
+        </div>
     </div>
 </nav>
 

@@ -1,64 +1,50 @@
 /* (Page-wide) CodeMirror customizations
 ============================================================================= */
 
+/* Add a bit more padding on the left side.
+----------------------------------------------------------------------------- */
+
+.CodeMirror-gutters {
+    padding-right: .2em;
+    padding-left: .2em;
+}
+pre.CodeMirror-line {
+    padding-left: .4em;
+}
+
 /* Mutant Icons
 ----------------------------------------------------------------------------- */
 
-.mutant-icons {
-    margin-left: 3px;
-    display: inline-block;
+.gh-mutant-icons {
+    display: flex;
+    width: max-content;
+    align-content: center;
+    gap: 1px;
+    margin-left: 1px;
 }
-.mutant-icon {
-    display: inline-block;
-}
-.mutant-icon-image {
-    width: 18px;
-    height: 18px;
-    max-width: 18px;
-    max-height: 18px;
-    display: inline-block;
-}
-.mutant-icon-count {
-    /* Font */
-    color: #FFFFFF;
-    font-weight: bold;
-    text-align: center;
-
-    /* Outline */
-    background-color: #FF0000;
-    padding-left: 1px;
-    padding-right: 1px;
-    border-radius: 7px;
-
-    /* Positioning */
-    vertical-align: top;
-    margin-left: -8px;
+.gh-mutant-icon {
     position: relative;
-    top: -5px;
-    left: 3px;
 }
+.gh-mutant-icon::after {
+    content: attr(data-count);
 
-/* Mutant Popovers
------------------------------------------------------------------------------ */
+    /* Position */
+    position: absolute;
+    top: 0;
+    left: 100%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
 
-.mutant-popover-body {
-    margin-right: -14px;
-    padding-right: 14px;
-    max-height: 400px;
-    overflow: auto;
-}
-.mutant-popover-body > table {
-    font-size: 14px;
-}
-.mutant-popover-body > table > thead {
+    /* Font */
+    color: white;
     font-weight: bold;
-}
-.mutant-popover-body > table td {
-    padding-left: 10px !important;
-    padding-right: 10px !important;
-}
-.popover {
-    max-width: 100%;
+    font-size: .75em;
+    line-height: 1;
+
+    /* Background */
+    background-color: #dc3545;
+    padding: .25rem;
+    border-radius: 50rem;
 }
 
 /* Highlighting colors / decorations
@@ -170,14 +156,71 @@
 /* Style for read-only CodeMirror instances
 ----------------------------------------------------------------------------- */
 
-.readonly-pre .CodeMirror-focused .CodeMirror-cursor {
-    visibility: hidden; /* hide cursor */
-}
-
-.readonly-pre .CodeMirror-lines {
-    cursor : default; /* default pointer */
-}
-
 .readonly-pre .CodeMirror {
     background: #F5F5F5;
+}
+
+/* Sizing
+----------------------------------------------------------------------------- */
+
+/*
+ * Different ways to set the size of a CodeMirror editor:
+ *
+ * - Full size:
+ *       Use [editor.setSize('100%', '100%');].
+
+ * - Other fixed size:
+ *       Use [editor.setSize(..., ...);].
+
+ * - Size depending on parent element:
+ *       Don't use [editor.setSize(..., ...);].
+ *       Add .codemirror-fill to the parent element.
+
+ * - Size depending on content but constrained to min/max height/width:
+ *       Don't use [editor.setSize(..., ...);].
+ *       Add .codemirror-expand and [style="--cm-min-height: ..."] etc. to the parent element.
+ *       (Or use a predefined class that sets the CSS variables instead of the style attribute.)
+ */
+
+/* https://stackoverflow.com/questions/4804581/css-expand-float-child-div-height-to-parents-height */
+.codemirror-fill {
+    position: relative;
+}
+.codemirror-fill .CodeMirror {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* https://discuss.codemirror.net/t/codemirror-6-setting-a-minimum-height-but-allow-the-editor-to-grow/2520/2 */
+.codemirror-expand .CodeMirror {
+    width: 100%;
+    height: 100%;
+}
+.codemirror-expand .CodeMirror-scroll {
+    min-height: var(--cm-min-height, unset);
+    max-height: var(--cm-max-height, unset);
+    min-width: var(--cm-min-width, unset);
+    max-width: var(--cm-max-width, unset);
+}
+/* Reasonable sizes for CodeMirror centered modals. */
+.codemirror-class-modal-size {
+    --cm-min-height: 100px;
+    --cm-max-height: 800px; /* Comfortable max-height for 1080p screens. */
+    --cm-min-width: 700px;  /* Fits about 80 chars of code. */
+    --cm-max-width: 1000px; /* Fits about 120 chars of code. */
+}
+.codemirror-test-modal-size {
+    --cm-min-height: 100px;
+    --cm-max-height: 800px;
+    --cm-min-width: 500px;
+    --cm-max-width: 1000px;
+}
+.codemirror-mutant-modal-size {
+    --cm-min-height: 100px;
+    --cm-max-height: 800px;
+    --cm-min-width: 400px;
+    --cm-max-width: 1000px;
 }

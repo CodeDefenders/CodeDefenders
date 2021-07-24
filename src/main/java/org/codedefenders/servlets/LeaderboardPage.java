@@ -40,7 +40,7 @@ public class LeaderboardPage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        pageInfo.setPageTitle("Leaderboard");
+        pageInfo.setPageTitle("Battlegrounds Leaderboard");
 
         req.setAttribute("leaderboardEntries", Leaderboard.getAll());
 

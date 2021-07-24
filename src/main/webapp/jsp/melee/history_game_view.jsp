@@ -109,33 +109,28 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<jsp:include page="/jsp/header_game.jsp"/>
+
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/melee/header_game.jsp"/>
-
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <div class="row">
 
-    <div class="col-md-6">
-        <div id="mutants-div">
-            <h3>Existing Mutants</h3>
-            <t:mutant_accordion/>
-        </div>
+    <div class="col-xl-6 col-12">
+        <t:mutant_accordion/>
 
         <div id="tests-div">
-            <h3>JUnit tests </h3>
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
         </div>
     </div>
 
-    <div class="col-md-6" id="cut-div">
-        <h3>Class Under Test</h3>
+    <div class="col-xl-6 col-12" id="cut-div">
+        <div class="game-component-header"><h3>Class Under Test</h3></div>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 </div>
 

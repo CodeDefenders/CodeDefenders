@@ -66,6 +66,20 @@ public class GameChatBean {
     }
 
     /**
+     * Checks whether the Team/All channels should be shown in the chat for the current game.
+     * @return Whether the channels should be shown.
+     */
+    public boolean isShowChannel() {
+        if (game instanceof MultiplayerGame) {
+            MultiplayerGame multiplayerGame = (MultiplayerGame) game;
+            Role role = multiplayerGame.getRole(login.getUserId());
+            return role != Role.OBSERVER;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Returns the URL for the chat API for the current game.
      * @return The URL for the chat API.
      */
