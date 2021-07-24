@@ -268,7 +268,7 @@ public class AdminUserManagement extends HttpServlet {
             logger.info("Failed to create user. Password invalid:" + password);
             messages.add("Password for user " + username + " invalid, user not created. Please notice that only >= "
                     + AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()
-                    + " alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed");
+                    + " alphanumeric characters (a-z, A-Z, 0-9) without whitespaces are allowed.");
             return;
         }
 
