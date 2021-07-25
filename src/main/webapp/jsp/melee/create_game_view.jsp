@@ -221,6 +221,7 @@
                 </div>
                 <div class="modal-body p-4">
                     <%@ include file="/jsp/mutant_validator_explanation.jsp"%>
+                    <div class="mt-3"></div> <%-- spacing --%>
                     <%@ include file="/jsp/test_validator_explanation.jsp"%>
                 </div>
                 <div class="modal-footer">

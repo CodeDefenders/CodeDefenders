@@ -409,6 +409,7 @@
     <t:modal id="validatorExplanation" title="Validator Explanations">
         <jsp:attribute name="content">
             <%@ include file="/jsp/mutant_validator_explanation.jsp"%>
+            <div class="mt-3"></div> <%-- spacing --%>
             <%@ include file="/jsp/test_validator_explanation.jsp"%>
         </jsp:attribute>
     </t:modal>

@@ -31,13 +31,10 @@
         maxAssertionsPerTest = "the configured amount of";
     }
 %>
-<div class="panel-body" style="padding: 10px;">
-    <h3>Test rules</h3>
-    <ul>
-        <li>No loops</li>
-        <li>No calls to System.*</li>
-        <li>No new methods or conditionals</li>
-        <li>Only <%=maxAssertionsPerTest%> assertions per test
-        </li>
-    </ul>
-</div>
+<h3>Test rules</h3>
+<ul class="mb-0">
+    <li>No loops</li>
+    <li>No calls to System.*</li>
+    <li>No new methods or conditionals</li>
+    <li>Only <%=maxAssertionsPerTest%> assertions per test</li>
+</ul>
