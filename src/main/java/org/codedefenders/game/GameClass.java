@@ -30,8 +30,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.Range;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Dependency;
@@ -101,6 +101,7 @@ public class GameClass {
      *     <li>parentClass = null</li>
      *     <li>isActive = true</li>
      * </ul>
+     *
      * @return A GameClass builder.
      */
     public static Builder build() {
@@ -127,7 +128,8 @@ public class GameClass {
 
     /**
      * Creates a new puzzle class from an existing class.
-     * @param other The other class.
+     *
+     * @param other    The other class.
      * @param newAlias A new alias for the puzzle class.
      * @return The new puzzle class.
      */
@@ -237,7 +239,6 @@ public class GameClass {
      * Only applies when class is a puzzle class:
      * The parent class is the original uploaded class. Parent and child class share the same source files.
      * If a class is no puzzle class, the parent class is {@code null}.
-     *
      */
     public Integer getParentClassId() {
         return parentClassId;
@@ -272,7 +273,7 @@ public class GameClass {
     }
 
     public String getAsHTMLEscapedString() {
-        return StringEscapeUtils.escapeHtml(getSourceCode());
+        return StringEscapeUtils.escapeHtml4(getSourceCode());
     }
 
     /**
@@ -322,7 +323,7 @@ public class GameClass {
      * @return a HTML escaped test template for a Junit Test as a {@link String}.
      */
     public String getHTMLEscapedTestTemplate() {
-        return StringEscapeUtils.escapeHtml(getTestTemplate());
+        return StringEscapeUtils.escapeHtml4(getTestTemplate());
     }
 
     /**
@@ -345,7 +346,7 @@ public class GameClass {
      * Gathers and returns all lines which non initialized fields.
      *
      * @return All lines of not initialized fields as a {@link List} of {@link Integer Integers}.
-     *     Can be empty, but never {@code null}.
+     * Can be empty, but never {@code null}.
      */
     public List<Integer> getNonInitializedFields() {
         visitCode();
@@ -357,7 +358,7 @@ public class GameClass {
      * Gathers and returns all lines which contain a method signature.
      *
      * @return All lines of method signatures as a {@link List} of {@link Integer Integers}.
-     *     Can be empty, but never {@code null}.
+     * Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignatures() {
         visitCode();
@@ -372,7 +373,7 @@ public class GameClass {
      * Gathers and returns all non coverable lines.
      *
      * @return All lines which are not coverable as a {@link List} of {@link Integer Integers}.
-     *     Can be empty, but never {@code null}.
+     * Can be empty, but never {@code null}.
      */
     public List<Integer> getNonCoverableCode() {
         visitCode();
@@ -384,7 +385,7 @@ public class GameClass {
      * to be recompiled against the mutant.
      *
      * @return All lines of compile time constants as a {@link List} of {@link Integer Integers}.
-     *     Can be empty, but never {@code null}.
+     * Can be empty, but never {@code null}.
      */
     public List<Integer> getCompileTimeConstants() {
         visitCode();
@@ -396,7 +397,7 @@ public class GameClass {
      *
      * @param line the line the method signature is returned for.
      * @return All lines of the method signature a given line resides as a {@link List} of {@link Integer Integers}.
-     *     Can be empty, but never {@code null}.
+     * Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignaturesForLine(Integer line) {
         visitCode();

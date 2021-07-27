@@ -3,7 +3,6 @@ package org.codedefenders.beans.game;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
@@ -148,7 +147,7 @@ public class MutantAccordionBean {
                 .create();
         // We need to do the JavaScript escaping in the end, since otherwise {@code '} character don't get escaped
         // properly
-        return StringEscapeUtils.escapeJavaScript(gson.toJson(mutants));
+        return StringEscapeUtils.escapeEcmaScript(gson.toJson(mutants));
     }
 
     public static class MutantAccordionCategory {

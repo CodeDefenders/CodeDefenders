@@ -32,9 +32,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
@@ -135,13 +135,14 @@ public class Mutant implements Serializable {
     /**
      * Creates a mutant.
      *
-     * @param gameId The ID of the game for which we generate the mutant.
-     * @param javaFile The path to the java file of the mutant.
+     * @param gameId    The ID of the game for which we generate the mutant.
+     * @param javaFile  The path to the java file of the mutant.
      * @param classFile The path to the class file with the compiled mutant.
-     * @param alive If the mutant is alive or not.
-     * @param playerId The ID of the player who submitted the mutant.
+     * @param alive     If the mutant is alive or not.
+     * @param playerId  The ID of the player who submitted the mutant.
      */
-    public Mutant(int gameId, int classId,  String javaFile, String classFile, boolean alive, int playerId, int roundCreated) {
+    public Mutant(int gameId, int classId, String javaFile, String classFile, boolean alive, int playerId,
+            int roundCreated) {
         this.gameId = gameId;
         this.classId = classId;
         this.roundCreated = roundCreated;
@@ -153,7 +154,7 @@ public class Mutant implements Serializable {
     }
 
     public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
-                  int roundCreated, int roundKilled, int playerId) {
+            int roundCreated, int roundKilled, int playerId) {
         this(gid, classId, javaFile, classFile, alive, playerId, roundCreated);
         this.id = mid;
         this.equivalent = equiv;
@@ -164,7 +165,7 @@ public class Mutant implements Serializable {
     }
 
     public Mutant(int mid, int classId, int gid, String javaFile, String classFile, boolean alive, Equivalence equiv,
-                  int roundCreated, int roundKilled, int playerId, String md5, String killMessage) {
+            int roundCreated, int roundKilled, int playerId, String md5, String killMessage) {
         this(mid, classId, gid, javaFile, classFile, alive, equiv, roundCreated, roundKilled, playerId);
         this.md5 = md5;
         this.killMessage = killMessage;
@@ -314,10 +315,10 @@ public class Mutant implements Serializable {
         }
 
         DatabaseValue[] values = new DatabaseValue[]{
-            DatabaseValue.of(equivalent.name()),
-            DatabaseValue.of(alive),
-            DatabaseValue.of(roundKilled),
-            DatabaseValue.of(id)
+                DatabaseValue.of(equivalent.name()),
+                DatabaseValue.of(alive),
+                DatabaseValue.of(roundKilled),
+                DatabaseValue.of(id)
         };
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
         return DB.executeUpdate(stmt, conn);
@@ -419,7 +420,7 @@ public class Mutant implements Serializable {
     }
 
     public String getHTMLEscapedPatchString() {
-        return StringEscapeUtils.escapeHtml(getPatchString());
+        return StringEscapeUtils.escapeHtml4(getPatchString());
     }
 
     public Test getKillingTest() {
@@ -435,7 +436,7 @@ public class Mutant implements Serializable {
     }
 
     public String getHTMLEscapedKillMessage() {
-        return StringEscapeUtils.escapeHtml(getKillMessage());
+        return StringEscapeUtils.escapeHtml4(getKillMessage());
     }
 
 
@@ -526,13 +527,13 @@ public class Mutant implements Serializable {
             }
         }
         if (modified != null) {
-            description.add(StringEscapeUtils.escapeHtml(modified + "\n"));
+            description.add(StringEscapeUtils.escapeHtml4(modified + "\n"));
         }
         if (deleted != null) {
-            description.add(StringEscapeUtils.escapeHtml(deleted + "\n"));
+            description.add(StringEscapeUtils.escapeHtml4(deleted + "\n"));
         }
         if (added != null) {
-            description.add(StringEscapeUtils.escapeHtml(added + "\n"));
+            description.add(StringEscapeUtils.escapeHtml4(added + "\n"));
         }
 
         setLines(mutatedLines);

@@ -23,7 +23,7 @@
     Displays explanations about the mutant icons and the mutant validator level as model dialog
 --%>
 
-<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.apache.commons.lang3.StringUtils"%>
 
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 

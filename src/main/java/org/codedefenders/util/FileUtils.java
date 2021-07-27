@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,7 +33,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +69,7 @@ public class FileUtils {
         File folder = directory.toFile();
         folder.mkdirs();
         String[] directories =
-            folder.list((current, name) -> new File(current, name).isDirectory() && (isParsable(name)));
+                folder.list((current, name) -> new File(current, name).isDirectory() && (isParsable(name)));
         Arrays.sort(directories);
         Path newPath;
         if (directories.length == 0) {
@@ -138,7 +137,7 @@ public class FileUtils {
      * Similar to {@link #readJavaFileWithDefault(Path)} but HTML escaped.
      */
     public static String readJavaFileWithDefaultHTMLEscaped(Path javaFilePath) {
-        return StringEscapeUtils.escapeHtml(readJavaFileWithDefault(javaFilePath));
+        return StringEscapeUtils.escapeHtml4(readJavaFileWithDefault(javaFilePath));
     }
 
     /**

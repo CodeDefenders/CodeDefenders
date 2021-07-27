@@ -35,7 +35,7 @@ import java.util.concurrent.Future;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;

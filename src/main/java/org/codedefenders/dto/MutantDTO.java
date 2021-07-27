@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.model.User;
