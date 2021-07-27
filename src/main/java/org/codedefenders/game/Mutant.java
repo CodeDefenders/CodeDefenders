@@ -581,16 +581,6 @@ public class Mutant implements Serializable {
                 .toHashCode();
     }
 
-    public void prepareForSerialise(boolean showDifferences) {
-        getHTMLReadout();
-        getLines();
-        if (showDifferences) {
-            getDifferences();
-        } else {
-            difference = new Patch();
-        }
-    }
-
     /**
      * This comparators place first mutants that modify lines at the top of the file.
      */
