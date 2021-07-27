@@ -136,8 +136,8 @@ public class HistoryBean {
                 break;
 
                  */
-            //    case PLAYER_MUTANT_EQUIVALENT:
             case DEFENDER_MUTANT_EQUIVALENT:
+            case PLAYER_MUTANT_EQUIVALENT:
                 if (e.getEventStatus() == EventStatus.NEW) {
                     return null;
                 }

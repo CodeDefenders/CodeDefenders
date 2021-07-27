@@ -115,6 +115,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         flaggedMutants.put(mutantId, playerClaimingEquivalenceId);
                         break;
                     case PLAYER_WON_EQUIVALENT_DUEL:
+                    case PLAYER_MUTANT_KILLED_EQUIVALENT:
                     case ATTACKER_MUTANT_KILLED_EQUIVALENT:
                         // Remove the mutant from the flagged mutants
                         flaggedMutants.remove(mutantId);
@@ -127,6 +128,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         break;
                     case PLAYER_LOST_EQUIVALENT_DUEL:
                     case DEFENDER_MUTANT_EQUIVALENT:
+                    case PLAYER_MUTANT_EQUIVALENT:
                         // Remove the mutant from the flagged mutants but keep the playerId that flagged
                         // it
                         Integer playerId = flaggedMutants.remove(mutantId);

@@ -331,8 +331,7 @@ public class MeleeGameManager extends HttpServlet {
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
                                 + "tests so it was automatically claimed as equivalent.",
-                        // TODO it might make sense to specify a new event type?
-                        EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
+                        EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(event);
                 /*
@@ -345,7 +344,7 @@ public class MeleeGameManager extends HttpServlet {
                 String flaggingChatMessage = "Code Defenders automatically flagged mutant " + aliveMutant.getId()
                         + " as equivalent.";
                 Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
-                        EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                        EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
             }
@@ -495,7 +494,7 @@ public class MeleeGameManager extends HttpServlet {
 
         final String message = user.getName() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        final Event notif = new Event(-1, game.getId(), user.getId(), message, EventType.DEFENDER_TEST_CREATED,
+        final Event notif = new Event(-1, game.getId(), user.getId(), message, EventType.PLAYER_TEST_CREATED,
                 EventStatus.GAME, timestamp);
         eventDAO.insert(notif);
 
@@ -689,7 +688,7 @@ public class MeleeGameManager extends HttpServlet {
         messages.add(MUTANT_COMPILED_MESSAGE);
         final String notificationMsg = user.getName() + " created a mutant.";
         // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
-        Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
+        Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.PLAYER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
@@ -1017,7 +1016,7 @@ public class MeleeGameManager extends HttpServlet {
 
                                 Event event = new Event(-1, gameId, mutantOwner.map(SimpleUser::getId).orElse(0),
                                         "One or more of your mutants is flagged equivalent.",
-                                        EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
+                                        EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(event);
 
@@ -1049,7 +1048,7 @@ public class MeleeGameManager extends HttpServlet {
             String flaggingChatMessage = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("") + " flagged " + nClaimed
                     + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
-                    EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                    EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                     new Timestamp(System.currentTimeMillis()));
             eventDAO.insert(event);
         }
