@@ -52,6 +52,7 @@ public class MutantDTO {
     @Expose
     private boolean canView = false;
     private String sourceCode;
+    @Expose
     private List<Integer> lines;
     @Expose
     private int killedByTestId;
@@ -140,7 +141,7 @@ public class MutantDTO {
     }
 
     public List<Integer> getLines() {
-        return lines;
+        return Collections.unmodifiableList(lines);
     }
 
     public Integer getPlayerId() {
