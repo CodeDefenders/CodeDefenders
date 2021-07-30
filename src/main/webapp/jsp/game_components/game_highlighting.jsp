@@ -261,7 +261,8 @@
         const createEquivalenceButton = function (line) {
             <% if (gameHighlighting.getGameMode() == GameMode.PARTY || gameHighlighting.getGameMode() == GameMode.MELEE ) { %>
                 return '' +
-                    `<form class="mt-3" id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line \${line} as equivalent. Are you sure?')">
+                    `<form class="mt-3" id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post"
+                        onsubmit="return window.confirm('This will mark all player-created mutants on line \${line} as equivalent. Are you sure?')">
                         <input type="hidden" name="formType" value="claimEquivalent">
                         <input type="hidden" name="equivLines" value="\${line}">
                         <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
