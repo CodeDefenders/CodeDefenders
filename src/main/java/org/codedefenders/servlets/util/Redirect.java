@@ -53,7 +53,7 @@ public class Redirect {
             redirectTo(request, response, contextPath + "/" + referer);
         }
     }
-    
+
     /**
      * Redirect to the provided target page
      */
@@ -70,8 +70,11 @@ public class Redirect {
             response.sendRedirect(target);
 
         } else {
-            logger.debug("Redirecting back to relative URL " + contextPath + "/" + target);
-            response.sendRedirect(contextPath + "/" + target);
+            String redirectUrl = target.startsWith("/")
+                    ? contextPath + target
+                    : contextPath + "/" + target;
+            logger.debug("Redirecting back to relative URL " + redirectUrl);
+            response.sendRedirect(redirectUrl);
         }
     }
 }
