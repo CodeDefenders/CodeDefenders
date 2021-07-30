@@ -63,7 +63,7 @@ public class Redirect {
 
         if (target == null) {
             logger.debug("Header does not specify a target, redirecting back to " + Paths.LANDING_PAGE);
-            response.sendRedirect(Paths.LANDING_PAGE);
+            response.sendRedirect(request.getContextPath() + Paths.LANDING_PAGE);
 
         } else if (target.startsWith(contextPath)) {
             logger.debug("Redirecting back to absolute URL " + target);
