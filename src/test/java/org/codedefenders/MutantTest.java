@@ -19,7 +19,7 @@
 package org.codedefenders;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -138,8 +138,8 @@ public class MutantTest {
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         // This call causes the connection lookup
         PowerMockito.when(MultiplayerGameDAO.getMultiplayerGame(mockedGameID)).thenReturn(mockedGame);
-        
-        
+
+
         when(mockedGame.getClassId()).thenReturn(1);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);

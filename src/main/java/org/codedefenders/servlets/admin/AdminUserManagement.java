@@ -19,12 +19,12 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.math.IntRange;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
@@ -326,7 +325,7 @@ public class AdminUserManagement extends HttpServlet {
         }
         char[] resultChars = sb.toString().toCharArray();
 
-        List<Integer> randomInts = Arrays.stream(new IntRange(0, length - 1).toArray()).boxed()
+        List<Integer> randomInts = IntStream.range(0, length).boxed()
                 .collect(Collectors.toList());
         Collections.shuffle(randomInts);
 

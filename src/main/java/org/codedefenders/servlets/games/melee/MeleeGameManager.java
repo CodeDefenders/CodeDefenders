@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
@@ -439,7 +439,7 @@ public class MeleeGameManager extends HttpServlet {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             // We escape the content of the message for new tests since user can embed there
             // anything
-            String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+            String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
@@ -645,7 +645,7 @@ public class MeleeGameManager extends HttpServlet {
                     && !compileMutantTarget.message.isEmpty()) {
                 // We escape the content of the message for new tests since user can embed there
                 // anything
-                String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message);
+                String escapedHtml = StringEscapeUtils.escapeHtml4(compileMutantTarget.message);
                 // Extract the line numbers of the errors
                 List<Integer> errorLines = extractErrorLines(compileMutantTarget.message);
                 // Store them in the session so they can be picked up later
@@ -819,7 +819,7 @@ public class MeleeGameManager extends HttpServlet {
                 messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
 
                 if (compileTestTarget != null) {
-                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
                     // Extract the line numbers of the errors
                     List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
                     // Store them in the session so they can be picked up later
@@ -1004,7 +1004,6 @@ public class MeleeGameManager extends HttpServlet {
                                         EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT,
                                         EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(scoreEvent);
-
 
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
