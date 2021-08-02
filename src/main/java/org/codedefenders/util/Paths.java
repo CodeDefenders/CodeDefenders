@@ -85,7 +85,6 @@ public class Paths {
     public static final String ADMIN_ANALYTICS_KILLMAPS = "/admin/analytics/killmaps";
 
     public static final String API_NOTIFICATION = "/api/notifications";
-    public static final String API_MUTANTS = "/api/game_mutants";
     public static final String API_FEEDBACK = "/api/feedback";
     public static final String API_SEND_EMAIL = "/api/sendmail";
     public static final String API_CLASS = "/api/class";

@@ -152,7 +152,6 @@ public class ShiroConfig {
         // they require a different type of authentication, e.g., if the are REST
         // org.codedefenders.util.Paths.API_NOTIFICATION = "/api/notifications";
         // org.codedefenders.util.Paths.API_MESSAGES = "/api/messages"; // path used in messaging.js
-        // org.codedefenders.util.Paths.API_MUTANTS = "/api/game_mutants";
         // org.codedefenders.util.Paths.API_FEEDBACK = "/api/feedback";
         // org.codedefenders.util.Paths.API_SEND_EMAIL = "/api/sendmail";
         // org.codedefenders.util.Paths.API_CLASS = "/api/class";

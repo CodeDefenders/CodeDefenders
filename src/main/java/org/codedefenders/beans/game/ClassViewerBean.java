@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.model.Dependency;
@@ -51,14 +51,14 @@ public class ClassViewerBean {
     public void setClassCode(GameClass clazz) {
         String[] split = clazz.getName().split("\\.");
         className = split[split.length - 1];
-        classCode = StringEscapeUtils.escapeHtml(clazz.getSourceCode());
+        classCode = StringEscapeUtils.escapeHtml4(clazz.getSourceCode());
     }
 
     public void setDependenciesForClass(GameClass clazz) {
         for (Dependency dependency : GameClassDAO.getMappedDependenciesForClassId(clazz.getId())) {
             Path path = Paths.get(dependency.getJavaFile());
             String className = FileUtils.extractFileNameNoExtension(path);
-            String classCode = StringEscapeUtils.escapeHtml(FileUtils.readJavaFileWithDefault(path));
+            String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));
             dependencies.put(className, classCode);
         }
     }

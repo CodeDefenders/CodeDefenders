@@ -52,6 +52,7 @@ public class MutantDTO {
     private final String description;
     @Expose
     private final Boolean covered;
+    @Expose
     private final List<Integer> lines;
     private final Integer gameId;
     private final Integer playerId;
@@ -103,7 +104,7 @@ public class MutantDTO {
     }
 
     public List<Integer> getLines() {
-        return lines;
+        return Collections.unmodifiableList(lines);
     }
 
     public Integer getPlayerId() {

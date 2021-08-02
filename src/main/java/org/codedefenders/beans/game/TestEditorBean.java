@@ -3,7 +3,7 @@ package org.codedefenders.beans.game;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
 
@@ -45,7 +45,7 @@ public class TestEditorBean {
     }
 
     public void setTestCodeForClass(GameClass clazz) {
-        testCode = StringEscapeUtils.escapeHtml(clazz.getTestTemplate());
+        testCode = StringEscapeUtils.escapeHtml4(clazz.getTestTemplate());
     }
 
     /**
@@ -53,7 +53,7 @@ public class TestEditorBean {
      * @param previousTestCode The code from the previous submission, not HTML-escaped.
      */
     public void setPreviousTestCode(String previousTestCode) {
-        testCode = StringEscapeUtils.escapeHtml(previousTestCode);
+        testCode = StringEscapeUtils.escapeHtml4(previousTestCode);
     }
 
     public void setEditableLinesForClass(GameClass clazz) {

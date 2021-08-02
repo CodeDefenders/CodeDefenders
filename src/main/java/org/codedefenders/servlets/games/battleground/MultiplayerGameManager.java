@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
@@ -443,7 +443,7 @@ public class MultiplayerGameManager extends HttpServlet {
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             // We escape the content of the message for new tests since user can embed there anything
-            String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+            String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
@@ -661,7 +661,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // There's a ton of defensive programming here...
             if (errorMessage != null) {
                 // We escape the content of the message for new tests since user can embed there anything
-                String escapedHtml = StringEscapeUtils.escapeHtml(errorMessage);
+                String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
                 // Extract the line numbers of the errors
                 List<Integer> errorLines = extractErrorLines(errorMessage);
                 // Store them in the session so they can be picked up later
@@ -859,7 +859,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
 
                 if (compileTestTarget != null) {
-                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
                     // Extract the line numbers of the errors
                     List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
                     // Store them in the session so they can be picked up later
