@@ -167,6 +167,7 @@
                         <button id="upload" type="submit" class="btn btn-primary">
                             Upload
                         </button>
+                        <%-- TODO Where do we cancel to in this case? --%>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -179,6 +180,7 @@
                             <button id="upload-and-stay" type="submit" class="btn btn-outline-primary" name="disableAutomaticRedirect" value="disabled">
                                 Upload and stay on the page
                             </button>
+                            <a href="${param.origin}" id="cancel" name="cancel" class="btn btn-outline-primary">Cancel</a>
                         </div>
                     </div>
                 </c:otherwise>
