@@ -181,7 +181,7 @@
                                 Upload and stay on this page
                             </button>
                         </div>
-                        <a href="${param.origin}" id="cancel" name="cancel" class="btn btn-outline-primary">Cancel</a>
+                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel" class="btn btn-outline-primary">Cancel</a>
                     </div>
                 </c:otherwise>
             </c:choose>

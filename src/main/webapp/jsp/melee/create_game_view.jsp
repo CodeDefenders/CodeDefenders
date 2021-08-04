@@ -218,10 +218,10 @@
                     </c:when>
                     <c:otherwise>
                         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
-                        <a href="${param.origin}" id="cancel" name="cancel" class="btn btn-outline-primary">Cancel</a>
+                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel" class="btn btn-outline-primary">Cancel</a>
                     </c:otherwise>
                 </c:choose>
-                        
+
             </form>
 
             <div class="modal fade" id="validatorExplanation" tabindex="-1">
