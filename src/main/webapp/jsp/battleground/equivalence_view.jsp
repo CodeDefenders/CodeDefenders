@@ -19,11 +19,11 @@
 
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.model.User" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.dto.SimpleUser" %>
 
 <%--
     @param MutliplayerGame game
@@ -36,14 +36,14 @@
 
 <%
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
-    User equivDefender = (User) request.getAttribute("equivDefender");
+    SimpleUser equivDefender = (SimpleUser) request.getAttribute("equivDefender");
 
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
 
     final String mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
             ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
-            : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getUsername();
+            : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
 %>
 
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
@@ -50,7 +51,7 @@ public class MutantAccordionBean {
     public MutantAccordionBean(GameService gameService, LoginBean login, GameProducer gameProducer) {
         this.game = gameProducer.getGame();
 
-        mutantList = gameService.getMutants(login.getUser(), game);
+        mutantList = gameService.getMutants(login.getUserId(), game.getId());
 
         categories = new ArrayList<>();
 
@@ -138,7 +139,8 @@ public class MutantAccordionBean {
     }
 
     public String jsonMutants() {
-        Map<Integer, MutantDTO> mutants = this.mutantList.stream().collect(Collectors.toMap(MutantDTO::getId, m -> m));
+        Map<Integer, MutantDTO> mutants = this.mutantList.stream()
+                .collect(Collectors.toMap(MutantDTO::getId, Function.identity()));
         // TODO If we try to sort the mutants according to the order they appear in the
         //  class we need to sort the Ids in the MutantAccordionCategory.
         Gson gson = new GsonBuilder()

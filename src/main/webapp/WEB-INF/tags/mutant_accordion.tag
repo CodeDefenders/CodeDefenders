@@ -181,7 +181,7 @@
             /* Functions to generate table columns. */
             const genId = row => `<span class="ma-mutant-link">Mutant \${row.id}</span>
                 <span class="ma-column-name mx-2">by</span>\${row.creator.name}
-                \${row.killedByName ? '<span class="ma-column-name mx-2">killed by</span>' + row.killedByName : ''}`;
+                \${row.killedBy ? '<span class="ma-column-name mx-2">killed by</span>' + row.killedBy.name : ''}`;
             const genPoints = row => `<span class="ma-column-name">Points:</span> \${row.points}`;
             const genLines = row => row.description;
             const genIcon = row => {
@@ -381,7 +381,7 @@
                     const mutant = rowData(this, dataTable);
                     viewTestModal({
                         "id": mutant.killedByTestId,
-                        "creatorName": mutant.killedByName,
+                    "creatorName": mutant.killedBy.name,
                         "killMessage": mutant.killMessage
                     });
                 });

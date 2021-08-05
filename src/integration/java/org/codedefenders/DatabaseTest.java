@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Code Defenders contributors
+ * Copyright (C) 2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -17,18 +17,12 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.dto;
+package org.codedefenders;
 
-import com.google.gson.annotations.Expose;
-
-public class UserDTO {
-    @Expose
-    private final int id;
-    @Expose
-    private final String name;
-
-    public UserDTO(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+/**
+ * JUnit 4 marker interface.
+ *
+ * <p>Should be added to all classes which use {@link DatabaseRule}
+ */
+public interface DatabaseTest {
 }

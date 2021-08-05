@@ -27,7 +27,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
 
 /**
- * This class contains information about a {@link MultiplayerGame} from the view of a single {@link User}.
+ * This class contains information about a {@link MultiplayerGame} from the view of a single {@link UserEntity}.
  *
  * <p>Additionally to the game itself, this class contains the user's identifier, his role in the game and
  * game creator's name. {@link Type} also specifies whether the user is already active in this game

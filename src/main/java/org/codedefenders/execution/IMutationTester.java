@@ -36,41 +36,24 @@ public interface IMutationTester {
     // AbstractGame !
     /**
      * Execute the test against all the other players' mutants
-     * 
-     * @param game
-     * @param newMutant
-     * @param messages
      */
     void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages);
 
     /**
      * Execute all the tests registered from all the other players against the
      * provided mutant, using a random scheduling of test execution.
-     * 
-     * @param game
-     * @param newMutant
-     * @param messages
      */
     void runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant, ArrayList<String> messages);
 
     /**
      * Execute all the tests registered for the defenders against the provided
      * mutant, using a random scheduling of test execution.
-     *
-     * @param game
-     * @param mutant
-     * @param messages
      */
     void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages);
 
     /**
      * Execute all the tests registered for the defenders against the provided
      * mutant, using a the given TestScheduler for ordering the execution of tests.
-     *
-     * @param game
-     * @param mutant
-     * @param messages
-     * @param scheduler
      */
     void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages, TestScheduler scheduler);
 

@@ -21,7 +21,7 @@ package org.codedefenders;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ import javax.inject.Inject;
  */
 public class MutationTesterUtilities {
 
-    public static Runnable attack(MultiplayerGame activeGame, String mutantFile, User attacker,
+    public static Runnable attack(MultiplayerGame activeGame, String mutantFile, UserEntity attacker,
                                   ArrayList<String> messages, Logger logger) throws IOException {
         return new Runnable() {
 
@@ -73,7 +73,7 @@ public class MutationTesterUtilities {
         };
     }
 
-    public static Runnable defend(MultiplayerGame activeGame, String testFile, User defender,
+    public static Runnable defend(MultiplayerGame activeGame, String testFile, UserEntity defender,
                                   ArrayList<String> messages, Logger logger) {
         return new Runnable() {
 

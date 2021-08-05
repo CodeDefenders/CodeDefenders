@@ -20,9 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
 
 <%--
     @param MutliplayerGame game
@@ -33,9 +31,6 @@
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-	final GameClass cut = game.getCUT();
-
-	final User user = login.getUser();
 %>
 
 

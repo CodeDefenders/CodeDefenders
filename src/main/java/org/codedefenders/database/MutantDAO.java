@@ -138,7 +138,7 @@ public class MutantDAO {
                 "WHERE m.Game_ID = ?",
                 "  AND m.User_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
-                DatabaseValue.of(gameId), DatabaseValue.of( userId));
+                DatabaseValue.of(gameId), DatabaseValue.of(userId));
     }
 
     /**

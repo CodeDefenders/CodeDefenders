@@ -18,13 +18,11 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.apache.commons.lang3.StringUtils" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.*" %>
-<%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.dto.User" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -41,24 +39,22 @@
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <%
-        String editUser = request.getParameter("editUser");
-        if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
-            User user = UserDAO.getUserById(Integer.parseInt(editUser));
+        User u = (User) request.getAttribute("editedUser");
+        if (u != null) {
             int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
-            if (user != null) {
     %>
-        <h3>Editing User <%=user.getId()%></h3>
+        <h3>Editing User <%=u.getId()%></h3>
 
         <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post"
               class="needs-validation form-width mb-4"
               autocomplete="off">
             <input type="hidden" name="formType" value="editUser">
-            <input type="hidden" name="uid" value="<%=user.getId()%>">
+            <input type="hidden" name="uid" value="<%=u.getId()%>">
 
             <div class="row g-3">
                 <div class="col-12">
                     <label for="name" class="form-label">Username</label>
-                    <input id="name" type="text" class="form-control" name="name" value="<%=user.getUsername()%>" placeholder="Username"
+                    <input id="name" type="text" class="form-control" name="name" value="<%=u.getName()%>" placeholder="Username"
                            required minlength="3" maxlength="20" pattern="[a-z][a-zA-Z0-9]*" autofocus>
                     <div class="invalid-feedback">
                         Please enter a valid username.
@@ -70,7 +66,7 @@
 
                 <div class="col-12">
                     <label for="email" class="form-label">Email</label>
-                    <input id="email" type="email" class="form-control" name="email" value="<%=user.getEmail()%>" placeholder="Email"
+                    <input id="email" type="email" class="form-control" name="email" value="<%=u.getEmail()%>" placeholder="Email"
                            required>
                     <div class="invalid-feedback">
                         Please enter a valid email address.
@@ -130,7 +126,6 @@
             </script>
         </form>
     <%
-            }
         }
     %>
 

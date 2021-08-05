@@ -58,7 +58,7 @@
                         <%
                                 }
                         %>
-                                <td><%=scoreItem.getUser().getUsername()%></td>
+                                <td><%=scoreItem.getUser().getName()%></td>
                                 <td><%=scoreItem.getAttackScore().getTotalScore()%></td>
                                 <td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
                                 <td><%=scoreItem.getDuelScore().getTotalScore()%></td>

@@ -35,7 +35,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
 import org.junit.After;
 import org.junit.Assert;
@@ -177,11 +177,11 @@ public class DoubleEquivalenceSubmissionTest {
 	}
 
 	class HelperUser {
-		private User user;
+		private UserEntity user;
 		private String password;
 		private WebClient browser;
 
-		public HelperUser(User user, String password) {
+		public HelperUser(UserEntity user, String password) {
 			this.user = user;
 			this.password = password;
 			this.browser = WebClientFactory.getNewWebClient();
@@ -378,7 +378,7 @@ public class DoubleEquivalenceSubmissionTest {
 	@Ignore
 	@Test
 	public void doubleSubmissionTest() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		User creatorUser = new User("creator");
+		UserEntity creatorUser = new UserEntity("creator");
 		HelperUser creator = new HelperUser(creatorUser, "test");
 		creator.doLogin();
 		System.out.println("Creator Login");
@@ -388,7 +388,7 @@ public class DoubleEquivalenceSubmissionTest {
 		//
 		creator.startGame(newGameId);
 		//
-		User attackerUser = new User("demoattacker");
+		UserEntity attackerUser = new UserEntity("demoattacker");
 		HelperUser attacker = new HelperUser(attackerUser, "test");
 		attacker.doLogin();
 		System.out.println("Attacker Login");
@@ -396,7 +396,7 @@ public class DoubleEquivalenceSubmissionTest {
 		attacker.joinOpenGame(newGameId, true);
 		System.out.println("Attacker Join game " + newGameId);
 		//
-		User defenderUser = new User("demodefender");
+		UserEntity defenderUser = new UserEntity("demodefender");
 		HelperUser defender = new HelperUser(defenderUser, "test");
 		defender.doLogin();
 		//
@@ -406,7 +406,7 @@ public class DoubleEquivalenceSubmissionTest {
 		//
 		System.out.println("Defender Join game " + newGameId);
 		//
-		User defender2User = new User("demodefender");
+		UserEntity defender2User = new UserEntity("demodefender");
 		HelperUser defender2 = new HelperUser(defender2User, "test");
 		defender2.doLogin();
 		//

@@ -1,6 +1,5 @@
 package org.codedefenders.beans.game;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +14,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.model.Feedback.Type;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
 /**
@@ -27,7 +26,7 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
 public class PlayerFeedbackBean {
     private Integer gameId;
     private Integer creatorId;
-    private User user;
+    private UserEntity user;
     private Role role;
 
     private Boolean showFeedbackEnabled;
@@ -53,7 +52,7 @@ public class PlayerFeedbackBean {
         this.creatorId = creatorId;
     }
 
-    public void setPlayerInfo(User user, Role role) {
+    public void setPlayerInfo(UserEntity user, Role role) {
         this.user = user;
         this.role = role;
     }

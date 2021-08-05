@@ -20,14 +20,12 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.Optional" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.Role" %>
 
 <%--
@@ -58,10 +56,7 @@
         request.setAttribute("game", game);
     }
 
-    final GameClass cut = game.getCUT();
     Role role = game.getRole(login.getUserId());
-
-    final User user = login.getUser();
 
 %>
 

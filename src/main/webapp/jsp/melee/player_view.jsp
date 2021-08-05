@@ -20,17 +20,15 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.model.User" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.stream.Collectors" %>
+<%@ page import="org.codedefenders.dto.SimpleUser" %>
 
 <%--
     @param MeleeGame game
@@ -47,26 +45,18 @@
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     // This is set by the GameManager but we could have it set by a different servlet common for all the games which require equivalence duels
-    User equivDefender = (User) request.getAttribute("equivDefender");
+    SimpleUser equivDefender = (SimpleUser) request.getAttribute("equivDefender");
 
     String mutantClaimedMessage = null;
     if (openEquivalenceDuel) {
         mutantClaimedMessage = equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID
                 ? "Mutant " + equivMutant.getId() + " automatically claimed equivalent"
-                : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getUsername();
+                : "Mutant " + equivMutant.getId() + " claimed equivalent by " + equivDefender.getName();
     }
 
-    final User user = login.getUser();
-    // Trying to add this lookup inside the filter statement will lead to some weird, not working behaviour.
-    final int userId = login.getUserId();
-    final List<Test> playerTests = game.getTests()
-            .stream()
-            .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() == userId)
-            .collect(Collectors.toList());
-    final List<Test> enemyTests = game.getTests()
-            .stream()
-            .filter(t -> UserDAO.getUserForPlayer(t.getPlayerId()).getId() != userId)
-            .collect(Collectors.toList());
+    // These two are set in the MeleeGameManager, since we need to do a getUserIdForPlayerId lookup for test filtering.
+    final List<Test> playerTests = (List<Test>) request.getAttribute("playerTests");
+    final List<Test> enemyTests = (List<Test>) request.getAttribute("enemyTests");
 %>
 
 <jsp:useBean id="previousSubmission"
@@ -93,7 +83,7 @@
              class="org.codedefenders.beans.game.GameHighlightingBean"
              scope="request"/>
 <%
-    gameHighlighting.setGameData(game.getMutants(), playerTests, user);
+    gameHighlighting.setGameData(game.getMutants(), playerTests, login.getUserId());
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
     gameHighlighting.setEnableFlagging(true);
     // We should show game highlighting only inside the mutant editor

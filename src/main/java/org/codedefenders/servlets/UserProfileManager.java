@@ -33,9 +33,9 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.KeyMap;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged
- * in {@link User}. This functionality may be disabled, e.g. in a class room
+ * in {@link UserEntity}. This functionality may be disabled, e.g. in a class room
  * setting. See {@link #checkEnabled()}.
  *
  * <p>Serves on path: {@code /profile}.
@@ -60,6 +60,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserRepository userRepo;
 
     @Inject
     private LoginBean login;
@@ -88,7 +91,7 @@ public class UserProfileManager extends HttpServlet {
             return;
         }
 
-        if (UserDAO.getUserById(login.getUserId()) == null) {
+        if (!userRepo.getUserById(login.getUserId()).isPresent()) {
             response.sendRedirect(request.getContextPath());
             return;
         }
@@ -162,7 +165,7 @@ public class UserProfileManager extends HttpServlet {
         }
     }
 
-    private boolean updateUserKeyMap(User user, KeyMap editorKeyMap) {
+    private boolean updateUserKeyMap(UserEntity user, KeyMap editorKeyMap) {
         if (user == null) {
             return false;
         }
@@ -170,7 +173,7 @@ public class UserProfileManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean updateUserInformation(User user, Optional<String> email, Optional<String> password,
+    private boolean updateUserInformation(UserEntity user, Optional<String> email, Optional<String> password,
             boolean allowContact) {
 
         CodeDefendersValidator validator = new CodeDefendersValidator();
@@ -182,7 +185,7 @@ public class UserProfileManager extends HttpServlet {
             if (!validator.validPassword(password.get())) {
                 return false;
             }
-            user.setEncodedPassword(User.encodePassword(password.get()));
+            user.setEncodedPassword(UserEntity.encodePassword(password.get()));
         }
         email.ifPresent(user::setEmail);
         user.setAllowContact(allowContact);
@@ -190,7 +193,7 @@ public class UserProfileManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean removeUserInformation(User user) {
+    private boolean removeUserInformation(UserEntity user) {
         if (user == null) {
             return false;
         }

@@ -30,7 +30,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
 import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
 import org.junit.Assert;
 
@@ -46,19 +46,19 @@ import java.util.Set;
 
 public class HelperUser {
 
-	private User user;
+	private UserEntity user;
 	private WebClient browser;
 	private String codedefendersHome;
 	private String password;
 
-	public HelperUser(User user, WebClient browser, String codedefendersHome, String password) {
+	public HelperUser(UserEntity user, WebClient browser, String codedefendersHome, String password) {
 		this.user = user;
 		this.browser = browser;
 		this.codedefendersHome = "http://" + codedefendersHome;
 		this.password = password;
 	}
 
-	public User getUser() {
+	public UserEntity getUser() {
 		return user;
 	}
 

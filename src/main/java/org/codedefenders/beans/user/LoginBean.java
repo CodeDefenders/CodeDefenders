@@ -5,7 +5,7 @@ import java.io.Serializable;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.SessionScoped;
 
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class LoginBean implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(LoginBean.class);
 
-    private User user;
+    private UserEntity user;
     private String redirectURL;
 
     public LoginBean() {
@@ -31,7 +31,7 @@ public class LoginBean implements Serializable {
      * Sets the given user as the logged in user for the session.
      * @param user The user to log in.
      */
-    public void loginUser(User user) {
+    public void loginUser(UserEntity user) {
         this.user = user;
     }
 
@@ -47,7 +47,7 @@ public class LoginBean implements Serializable {
      * Returns the logged in user for the session.
      * @return The logged in user for the session.
      */
-    public User getUser() {
+    public UserEntity getUser() {
         return user;
     }
 

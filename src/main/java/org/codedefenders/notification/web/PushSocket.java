@@ -19,11 +19,8 @@
 package org.codedefenders.notification.web;
 
 import java.io.IOException;
+import java.util.Optional;
 
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.EncodeException;
@@ -35,8 +32,7 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
 import org.codedefenders.notification.events.EventNames;
@@ -44,6 +40,8 @@ import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.handling.ServerEventHandlerContainer;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,13 +88,17 @@ public class PushSocket {
     private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
 
     // @Inject
-    private INotificationService notificationService;
+    private final INotificationService notificationService;
 
     // @Inject
-    private ITicketingService ticketingServices;
+    private final ITicketingService ticketingServices;
+
+    // @Inject
+    private final UserRepository userRepo;
+    private final UserService userService;
 
     // Authorization
-    private User user;
+    private SimpleUser user;
     private String ticket;
     private boolean open;
 
@@ -113,6 +115,10 @@ public class PushSocket {
 
         ticketingServices = CDIUtil.getBeanFromCDI(ITicketingService.class);
 
+        userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
+
+        userService = CDIUtil.getBeanFromCDI(UserService.class);
+
         open = false;
     }
 
@@ -127,18 +133,18 @@ public class PushSocket {
             return;
         }
 
-        User user = UserDAO.getUserById(userId);
+        Optional<SimpleUser> user = userService.getSimpleUserById(userId);
 
-        if (user == null) {
+        if (!user.isPresent()) {
             logger.info("Invalid user id for session " + session);
             session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid user id"));
             return;
         }
 
-        this.user = user;
+        this.user = user.get();
         this.ticket = ticket;
-        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user, ticket);
-        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user, ticket);
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user.get(), ticket);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user.get(), ticket);
         this.session = session;
 
         open = true;

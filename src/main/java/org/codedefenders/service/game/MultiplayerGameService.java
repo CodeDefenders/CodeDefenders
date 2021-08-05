@@ -21,8 +21,7 @@ package org.codedefenders.service.game;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.codedefenders.dto.MutantDTO;
-import org.codedefenders.dto.TestDTO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -30,46 +29,47 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
 import org.codedefenders.util.Constants;
 
 @ApplicationScoped
 public class MultiplayerGameService extends AbstractGameService {
 
     @Override
-    protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game) {
-        Role playerRole = determineRole(user, player, game);
+    protected boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player) {
+        return mutant.isCovered(game.getTests(true));
+    }
 
-        return new MutantDTO(mutant)
-                .setCovered(mutant.isCovered(game.getTests(true)))
-                // TODO: This could use some tests
-                .setViewable(playerRole != Role.NONE // User must participate in the Game
-                        // Defender can see Mutants if the game is over or its an easy Game
-                        && (game.isFinished() || game.getLevel() == GameLevel.EASY
-                        || (game.getLevel() == GameLevel.HARD
-                        // In Hard Games the User must either be an Attacker or Observer
-                        && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
-                        // Or the mutant must be killed or equivalent
-                        || mutant.getState().equals(Mutant.State.KILLED)
-                        || mutant.getState().equals(Mutant.State.EQUIVALENT)))))
-                .setCanMarkEquivalent(game.getState().equals(GameState.ACTIVE)
-                        && mutant.getState().equals(Mutant.State.ALIVE)
-                        && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                        && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
-                        && mutant.getCreatorId() != user.getId()
-                        && mutant.getLines().size() >= 1);
+    // TODO: This could use some tests
+    @Override
+    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
+            Role playerRole) {
+        return playerRole != Role.NONE // User must participate in the Game
+                // Defender can see Mutants if the game is over or its an easy Game
+                && (game.isFinished() || game.getLevel() == GameLevel.EASY
+                || (game.getLevel() == GameLevel.HARD
+                // In Hard Games the User must either be an Attacker or Observer
+                && (playerRole.equals(Role.ATTACKER) || playerRole.equals(Role.OBSERVER)
+                // Or the mutant must be killed or equivalent
+                || mutant.getState().equals(Mutant.State.KILLED)
+                || mutant.getState().equals(Mutant.State.EQUIVALENT))));
     }
 
     @Override
-    protected TestDTO convertTest(Test test, User user, Player player, AbstractGame game) {
-        Role playerRole = determineRole(user, player, game);
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user) {
+        return game.getState().equals(GameState.ACTIVE)
+                && mutant.getState().equals(Mutant.State.ALIVE)
+                && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                && mutant.getCreatorId() != user.getId()
+                && mutant.getLines().size() >= 1;
+    }
 
-        return new TestDTO(test)
-                .setMutantData(game.getMutants())
-                .setViewable(game.isFinished()
-                        || playerRole == Role.OBSERVER
-                        || playerRole == Role.DEFENDER
-                        || game.getLevel() == GameLevel.EASY
-                        || test.getPlayerId() == player.getId());
+    @Override
+    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
+        return game.isFinished()
+                || playerRole == Role.OBSERVER
+                || playerRole == Role.DEFENDER
+                || game.getLevel() == GameLevel.EASY
+                || test.getPlayerId() == player.getId();
     }
 }

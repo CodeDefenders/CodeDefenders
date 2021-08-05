@@ -26,7 +26,6 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="java.time.Instant" %>
 <%@ page import="java.time.Duration" %>
@@ -43,8 +42,10 @@
 <jsp:include page="/jsp/header.jsp"/>
 
 <%
-    List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
-    List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
+    List<MultiplayerGame> multiplayerGames = (List<MultiplayerGame>) request.getAttribute("multiplayerGames");
+    Map<Integer, String> multiplayerGameCreatorNames = (Map<Integer, String>) request.getAttribute("multiplayerGameCreatorNames");
+    Map<Integer, List<List<String>>> multiplayerPlayerInfoForGame = (Map<Integer, List<List<String>>>) request.getAttribute("multiplayerPlayersInfoForGame");
+    Map<Integer, Integer> multiplayerUserIdForPlayerIds = (Map<Integer, Integer>) request.getAttribute("multiplayerUserIdForPlayerIds");
 %>
 
 <%!
@@ -137,7 +138,7 @@
                             <% pageContext.setAttribute("gameId", gid); %>
                             <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
                         </td>
-                        <td><%=UserDAO.getUserById(g.getCreatorId()).getUsername()%></td>
+                        <td><%=multiplayerGameCreatorNames.get(gid)%></td>
                         <td><%=g.getAttackerPlayers().size()%></td>
                         <td><%=g.getDefenderPlayers().size()%></td>
                         <td><%=g.getLevel()%></td>
@@ -149,12 +150,8 @@
                         </td>
                     </tr>
                     <%
-                        List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
-                        Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
-                                info -> Integer.parseInt(info.get(0)),
-                                info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
-                        ));
-                        if (!userIdByPlayerId.values().stream().anyMatch(
+                        List<List<String>> playersInfo = multiplayerPlayerInfoForGame.get(gid);
+                        if (!multiplayerUserIdForPlayerIds.values().stream().anyMatch(
                                 userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
                     %>
                         <tr class="players-table" hidden>
@@ -188,7 +185,7 @@
                                                 int gameScoreAttack = 0;
                                                 int gameScoreDefense = 0;
 
-                                                for (List<String> playerInfo : playerInfos) {
+                                                for (List<String> playerInfo : playersInfo) {
                                                     if (Role.ATTACKER.equals(Role.valueOf(playerInfo.get(2)))) {
                                                         gameScoreAttack = gameScoreAttack + Integer.parseInt(playerInfo.get(4));
                                                     } else if (Role.DEFENDER.equals(Role.valueOf(playerInfo.get(2)))) {
@@ -196,9 +193,9 @@
                                                     }
                                                 }
 
-                                                for (List<String> playerInfo : playerInfos) {
+                                                for (List<String> playerInfo : playersInfo) {
                                                     int playerId = Integer.parseInt(playerInfo.get(0));
-                                                    int userID = userIdByPlayerId.get(playerId);
+                                                    int userID = multiplayerUserIdForPlayerIds.get(playerId);
 
                                                     // Do not visualize system users.
                                                     // Note this does not prevent someone to forge move player requests which remove system users from the game
@@ -288,6 +285,12 @@
         <%-- ------------------------------------------------------------------------------------------------------ --%>
 
         <h3 class="mb-3 mt-4">Your Melee Games</h3>
+        <%
+            List<MeleeGame> meleeGames = (List<MeleeGame>) request.getAttribute("meleeGames");
+            Map<Integer, String> meleeGameCreatorNames = (Map<Integer, String>) request.getAttribute("meleeGameCreatorNames");
+            Map<Integer, List<List<String>>> meleePlayersInfoForGame = (Map<Integer, List<List<String>>>) request.getAttribute("meleePlayersInfoForGame");
+            Map<Integer, Integer> meleeUserIdForPlayerIds = (Map<Integer, Integer>) request.getAttribute("meleeUserIdForPlayerIds");
+        %>
         <table id="table-melee" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
@@ -357,7 +360,7 @@
                             <% pageContext.setAttribute("gameId", gid); %>
                             <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
                         </td>
-                        <td><%=UserDAO.getUserById(g.getCreatorId()).getUsername()%></td>
+                        <td><%=meleeGameCreatorNames.get(gid)%></td>
                         <td><%=g.getPlayers().size()%></td>
                         <td><%=g.getLevel()%></td>
                         <td>
@@ -368,12 +371,8 @@
                         </td>
                     </tr>
                     <%
-                        List<List<String>> playerInfos = AdminDAO.getPlayersInfo(gid);
-                        Map<Integer, Integer> userIdByPlayerId = playerInfos.stream().collect(Collectors.toMap(
-                                info -> Integer.parseInt(info.get(0)),
-                                info -> UserDAO.getUserForPlayer(Integer.parseInt(info.get(0))).getId()
-                        ));
-                        if (!userIdByPlayerId.values().stream().anyMatch(
+                        List<List<String>> playerInfos = meleePlayersInfoForGame.get(gid);
+                        if (!meleeUserIdForPlayerIds.values().stream().anyMatch(
                                 userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
                     %>
                         <tr class="players-table" hidden>
@@ -412,7 +411,7 @@
 
                                                 for (List<String> playerInfo : playerInfos) {
                                                     int playerId = Integer.parseInt(playerInfo.get(0));
-                                                    int userID = userIdByPlayerId.get(playerId);
+                                                    int userID = meleeUserIdForPlayerIds.get(playerId);
 
                                                     // Do not visualize system users.
                                                     // Note this does not prevent someone to forge move player requests which remove system users from the game

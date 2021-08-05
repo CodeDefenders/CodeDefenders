@@ -33,10 +33,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.dto.User;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
@@ -48,7 +51,7 @@ import org.slf4j.LoggerFactory;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED;
 
 /**
- * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
+ * This {@link HttpServlet} handles admin requests for managing {@link UserEntity Users}.
  *
  * <p>Serves on path: {@code /admin/users}.
  */
@@ -60,6 +63,12 @@ public class AdminUserManagement extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserRepository userRepo;
+
+    @Inject
+    private UserService userService;
 
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
@@ -75,6 +84,15 @@ public class AdminUserManagement extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        User user = null;
+        String editUser = request.getParameter("editUser");
+        if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
+            user = userService.getUserById(Integer.parseInt(editUser)).orElse(null);
+        }
+
+        request.setAttribute("editedUser", user);
+
         request.getRequestDispatcher(Constants.ADMIN_USER_JSP).forward(request, response);
     }
 
@@ -144,12 +162,12 @@ public class AdminUserManagement extends HttpServlet {
     }
 
     private boolean setUserInactive(int userId) {
-        final User user = UserDAO.getUserById(userId);
-        if (user == null) {
+        final Optional<UserEntity> user = userRepo.getUserById(userId);
+        if (!user.isPresent()) {
             return false;
         }
-        user.setActive(false);
-        return user.update();
+        user.get().setActive(false);
+        return user.get().update();
 
     }
 
@@ -157,10 +175,11 @@ public class AdminUserManagement extends HttpServlet {
 
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
-        User u = UserDAO.getUserById(userId);
-        if (u == null) {
+        Optional<UserEntity> user = userRepo.getUserById(userId);
+        if (!user.isPresent()) {
             return "Error. User " + userId + " cannot be retrieved from database.";
         }
+        UserEntity u = user.get();
 
         String name = request.getParameter("name");
         String email = request.getParameter("email");
@@ -171,11 +190,11 @@ public class AdminUserManagement extends HttpServlet {
             return "Passwords don't match";
         }
 
-        if (!name.equals(u.getUsername()) && UserDAO.getUserByName(name) != null) {
+        if (!name.equals(u.getUsername()) && userRepo.getUserByName(name).isPresent()) {
             return "Username " + name + " is already taken";
         }
 
-        if (!email.equals(u.getEmail()) && UserDAO.getUserByEmail(email) != null) {
+        if (!email.equals(u.getEmail()) && userRepo.getUserByEmail(email).isPresent()) {
             return "Email " + email + " is already in use";
         }
 
@@ -188,7 +207,7 @@ public class AdminUserManagement extends HttpServlet {
             if (!validator.validPassword(password)) {
                 return "Password is not valid";
             }
-            u.setEncodedPassword(User.encodePassword(password));
+            u.setEncodedPassword(UserEntity.encodePassword(password));
         }
         u.setUsername(name);
         u.setEmail(email);
@@ -234,7 +253,7 @@ public class AdminUserManagement extends HttpServlet {
         }
 
         final String username = credentials[0].trim();
-        if (UserDAO.getUserByName(username) != null) {
+        if (userRepo.getUserByName(username).isPresent()) {
             logger.info("Failed to create user. Username already in use:" + username);
             messages.add("Username '" + username + "' already in use.");
             return;
@@ -257,7 +276,7 @@ public class AdminUserManagement extends HttpServlet {
         final boolean hasMail = credentials.length == 3;
         if (hasMail) {
             email = credentials[2].trim();
-            if (UserDAO.getUserByEmail(email) != null) {
+            if (userRepo.getUserByEmail(email).isPresent()) {
                 logger.info("Failed to create user. Email address already in use:" + email);
                 messages.add("Email '" + email + "' already in use.");
                 return;
@@ -266,8 +285,8 @@ public class AdminUserManagement extends HttpServlet {
             email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
         }
 
-        final User user = new User(username, User.encodePassword(password), email);
-        final boolean createSuccess = user.insert();
+        final UserEntity user = new UserEntity(username, UserEntity.encodePassword(password), email);
+        final boolean createSuccess = userRepo.insert(user).isPresent();
 
         if (!createSuccess) {
             final String errorMsg = "Failed to create account for user '" + username + "'";
@@ -302,11 +321,12 @@ public class AdminUserManagement extends HttpServlet {
 
         String newPassword = generatePW();
 
-        if (AdminDAO.setUserPassword(uid, User.encodePassword(newPassword))) {
+        if (AdminDAO.setUserPassword(uid, UserEntity.encodePassword(newPassword))) {
             if (AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue()) {
-                User u = UserDAO.getUserById(uid);
-                String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
-                EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
+                userRepo.getUserById(uid).ifPresent(user -> {
+                    String msg = String.format(PASSWORD_RESET_MSG, user.getUsername(), newPassword);
+                    EmailUtils.sendEmail(user.getEmail(), "Code Defenders Password reset", msg);
+                });
             }
             return "User " + uid + "'s password set to: " + newPassword;
         }

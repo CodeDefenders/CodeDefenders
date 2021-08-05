@@ -27,15 +27,15 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
@@ -70,13 +70,15 @@ public class AdminCreateGamesBean implements Serializable {
     private final MessagesBean messages;
     private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
+    private final UserRepository userRepo;
 
     @Inject
-    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils, EventDAO eventDAO) {
+    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils, EventDAO eventDAO, UserRepository userRepo) {
         this.login = login;
         this.messages = messages;
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
+        this.userRepo = userRepo;
     }
 
     /**
@@ -260,7 +262,7 @@ public class AdminCreateGamesBean implements Serializable {
      * @param user The user.
      * @return {@code true} if the user's role could be switched, {@code false} if not.
      */
-    public boolean switchRole(StagedGame stagedGame, User user) {
+    public boolean switchRole(StagedGame stagedGame, UserEntity user) {
         if (stagedGame.getAttackers().contains(user.getId())) {
             stagedGame.removePlayer(user.getId());
             stagedGame.addDefender(user.getId());
@@ -287,7 +289,7 @@ public class AdminCreateGamesBean implements Serializable {
      * @return {@code true} if the user could be added, {@code false} if not.
      */
     public boolean movePlayerBetweenStagedGames(StagedGame stagedGameFrom, StagedGame stagedGameTo,
-                                                User user, Role role) {
+                                                UserEntity user, Role role) {
         if (!stagedGameFrom.removePlayer(user.getId())) {
             messages.add(format(
                     "ERROR: Cannot move user {0} from staged game {1}. "
@@ -323,7 +325,7 @@ public class AdminCreateGamesBean implements Serializable {
      * @param role The role the user should be added to the game as.
      * @return {@code true} if the user could be added, {@code false} if not.
      */
-    public boolean addPlayerToStagedGame(StagedGame stagedGame, User user, Role role) {
+    public boolean addPlayerToStagedGame(StagedGame stagedGame, UserEntity user, Role role) {
         boolean success;
         switch (role) {
             case PLAYER:
@@ -357,8 +359,9 @@ public class AdminCreateGamesBean implements Serializable {
      * @param role The role the user should be added to the game as.
      * @return {@code true} if the user could be added, {@code false} if not.
      */
-    public boolean addPlayerToExistingGame(AbstractGame game, User user, Role role) {
+    public boolean addPlayerToExistingGame(AbstractGame game, UserEntity user, Role role) {
         game.setEventDAO(eventDAO);
+        game.setUserRepository(userRepo);
         if (!game.addPlayer(user.getId(), role)) {
             messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}.",
                     user.getId(), game.getId(), role));
@@ -599,6 +602,7 @@ public class AdminCreateGamesBean implements Serializable {
 
         /* Insert the game. */
         game.setEventDAO(eventDAO);
+        game.setUserRepository(userRepo);
         if (!game.insert()) {
             messages.add(format("ERROR: Could not create game for staged game {0}.",
                     stagedGame.getFormattedId()));
@@ -678,7 +682,7 @@ public class AdminCreateGamesBean implements Serializable {
                 .serializeNulls()
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
                 .registerTypeAdapter(UserInfo.class, new UserInfoSerializer())
-                .registerTypeAdapter(User.class, new UserSerializer())
+                .registerTypeAdapter(UserEntity.class, new UserEntitySerializer())
                 .create();
         return gson.toJson(getUserInfos());
     }
@@ -709,8 +713,8 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     public String getUnassignedUserIdsJSON() {
-        List<Integer> userIds = UserDAO.getUnassignedUsers().stream()
-                .map(User::getId)
+        List<Integer> userIds = userRepo.getUnassignedUsers().stream()
+                .map(UserEntity::getId)
                 .collect(Collectors.toList());
         Gson gson = new GsonBuilder().create();
         return gson.toJson(userIds);
@@ -732,9 +736,9 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     // TODO: Move this elsewhere?
-    public static class UserSerializer implements JsonSerializer<User> {
+    public static class UserEntitySerializer implements JsonSerializer<UserEntity> {
         @Override
-        public JsonElement serialize(User user, Type type, JsonSerializationContext context) {
+        public JsonElement serialize(UserEntity user, Type type, JsonSerializationContext context) {
             JsonObject obj = new JsonObject();
             obj.addProperty("id", user.getId());
             obj.addProperty("username", user.getUsername());

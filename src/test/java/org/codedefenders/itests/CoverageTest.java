@@ -45,8 +45,8 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.User;
-import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -79,7 +79,7 @@ public class CoverageTest {
     private IMutationTester mutationTester;
 
     @Rule // Look for the file on the classpath
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     // PROBLEM: @ClassRule cannot be used with PowerMock ...
     private static File codedefendersHome;
@@ -171,11 +171,11 @@ public class CoverageTest {
         // MOVE THIS CODE TO BEFORE OF FACTORY METHOD
         ArrayList<String> messages = new ArrayList<String>();
         // Create the users
-        User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
+        UserEntity observer = new UserEntity("observer", UserEntity.encodePassword("password"), "demo@observer.com");
         observer.insert();
-        User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
+        UserEntity attacker = new UserEntity("demoattacker", UserEntity.encodePassword("password"), "demo@attacker.com");
         attacker.insert();
-        User defender = new User("demodefender", User.encodePassword("password"), "demo@defender.com");
+        UserEntity defender = new UserEntity("demodefender", UserEntity.encodePassword("password"), "demo@defender.com");
         defender.insert();
         // CUT with Inner Static Class
         File cutFolder = new File(Constants.CUTS_DIR, "ClassWithPrivateInnerClass");

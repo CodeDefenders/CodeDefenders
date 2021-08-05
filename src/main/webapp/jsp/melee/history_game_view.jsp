@@ -18,15 +18,7 @@
   --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="java.util.Optional" %>
-<%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.database.MeleeGameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.database.PlayerDAO" %>
 <%@ page import="java.util.List" %>
