@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
@@ -211,7 +212,16 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
+                <c:choose>
+                    <c:when test="${empty param.origin}">
+                        <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
+                    </c:when>
+                    <c:otherwise>
+                        <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
+                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel" class="btn btn-outline-primary">Cancel</a>
+                    </c:otherwise>
+                </c:choose>
+
             </form>
 
             <div class="modal fade" id="validatorExplanation" tabindex="-1">
