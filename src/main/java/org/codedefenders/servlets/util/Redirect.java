@@ -49,6 +49,10 @@ public class Redirect {
         }
     }
 
+    /*
+     * TODO: Change this to only take context-relative paths.
+     * TODO: Change other redirects to use this method.
+     */
     /**
      * Redirect to the provided target page.
      * The target page can have three possible formats:
