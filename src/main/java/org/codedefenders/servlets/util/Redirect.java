@@ -38,19 +38,14 @@ public class Redirect {
      */
     public static void redirectBack(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String referer = request.getHeader("referer");
-        String contextPath = request.getContextPath();
 
         if (referer == null) {
             logger.debug("Header does not specify a referer, redirecting back to " + Paths.LANDING_PAGE);
             redirectTo(request, response, Paths.LANDING_PAGE);
 
-        } else if (referer.startsWith("http")) {
+        } else {
             logger.debug("Redirecting back to absolute URL " + referer);
             response.sendRedirect(referer);
-
-        } else {
-            logger.debug("Redirecting back to relative URL " + contextPath + "/" + referer);
-            redirectTo(request, response, referer);
         }
     }
 
