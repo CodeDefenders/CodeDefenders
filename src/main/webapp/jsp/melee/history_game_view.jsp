@@ -76,8 +76,6 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request"/>
-
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
     history.setLogin(login);
@@ -105,7 +103,6 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <div class="row">
