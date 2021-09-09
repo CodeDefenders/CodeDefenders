@@ -211,7 +211,12 @@
                                     <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">Claim Equivalent</button>
                                 </form>`;
                             } else {
-                                return '<button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>Claim Equivalent</button>';
+                                // We need the wrapper element (<span …), because tooltips do not work on disabled elements:
+                                // https://getbootstrap.com/docs/5.1/components/tooltips/#disabled-elements
+                                return `
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Cover this mutant with a test to be able to claim it as equivalent">
+                                    <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>Claim Equivalent</button>
+                                </span>`;
                             }
                         } else {
                             return '';
