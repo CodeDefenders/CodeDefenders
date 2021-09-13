@@ -1,0 +1,4 @@
+window.CodeDefenders = {
+    classes: {},
+    objects: {}
+};
