@@ -259,7 +259,7 @@
                                 <div class="modal-body">
                                     <div class="card">
                                         <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
-                                            <pre class="m-0"><textarea name="mutant-\${mutant.id}"></textarea></pre>
+                                            <pre class="m-0"><textarea></textarea></pre>
                                         </div>
                                     </div>
                                 </div>
@@ -281,7 +281,7 @@
                     autoRefresh: true
                 });
 
-                MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
+                CodeDefenders.classes.InfoApi.setMutantEditorValue(editor, mutant.id);
                 modal.modal('show');
             };
 
@@ -308,7 +308,7 @@
                                 <div class="modal-body">
                                     <div class="card mb-3">
                                         <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
-                                            <pre class="m-0"><textarea name="test-\${test.id}"></textarea></pre>
+                                            <pre class="m-0"><textarea></textarea></pre>
                                         </div>
                                     </div>
                                     <pre class="m-0 terminal-pre"></pre>
@@ -333,7 +333,7 @@
                     autoRefresh: true
                 });
 
-                TestAPI.getAndSetEditorValue(textarea, editor);
+                CodeDefenders.classes.InfoApi.setTestEditorValue(editor, test.id);
                 modal.modal('show');
             };
 

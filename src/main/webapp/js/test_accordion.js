@@ -67,7 +67,7 @@ class TestAccordion {
                             <div class="modal-body">
                                 <div class="card">
                                     <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
-                                        <pre class="m-0"><textarea name="test-${test.id}"></textarea></pre>
+                                        <pre class="m-0"><textarea></textarea></pre>
                                     </div>
                                 </div>
                             </div>
@@ -89,7 +89,7 @@ class TestAccordion {
             autoRefresh: true
         });
 
-        TestAPI.getAndSetEditorValue(textarea, editor);
+        CodeDefenders.classes.InfoApi.setTestEditorValue(editor, test.id);
         modal.modal('show');
     };
 
