@@ -51,7 +51,7 @@
         mockitoMethods = ["mock", "when", "then", "thenThrow", "doThrow", "doReturn", "doNothing"];
         // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
         // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)
-        // Behavior verification is currentlty not implemented (Mockito.verify)
+        // Behavior verification is currently not implemented (Mockito.verify)
         testMethods = testMethods.concat(mockitoMethods);
     <% } %>
 

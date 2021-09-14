@@ -18,6 +18,8 @@ class TestAccordion {
 
         /** Maps test ids to modals that show the tests' code. */
         this.testModals = new Map();
+
+        this._init();
     }
 
     /**
@@ -27,7 +29,7 @@ class TestAccordion {
      * @param {function} renderTitle A function to render the heading of the popover with.
      * @param {function} renderContent A function to render the body of the popover with.
      */
-    setupPopover (triggerElement, data, renderTitle, renderContent) {
+    _setupPopover (triggerElement, data, renderTitle, renderContent) {
         new bootstrap.Popover(triggerElement, {
             container: document.body,
             template:
@@ -49,7 +51,7 @@ class TestAccordion {
      * References to created models are cached in a map so they don't need to be generated again.
      * @param {object} test The test DTO to display.
      */
-    viewTestModal (test) {
+    _viewTestModal (test) {
         let modal = this.testModals.get(test.id);
         if (modal !== undefined) {
             modal.modal('show');
@@ -93,10 +95,10 @@ class TestAccordion {
         modal.modal('show');
     };
 
-    init () {
+    _init () {
         /* Bind functions that we need later, since we can't safely use "this" in a callback function. */
-        const setupPopover = this.setupPopover.bind(this);
-        const viewTestModal = this.viewTestModal.bind(this);
+        const setupPopover = this._setupPopover.bind(this);
+        const viewTestModal = this._viewTestModal.bind(this);
 
         /* Loop through the categories and create a test table for each one. */
         for (const category of this.categories) {

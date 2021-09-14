@@ -134,7 +134,6 @@
         const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
         const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
 
-        CodeDefenders.objects.test_accordion = new CodeDefenders.classes.TestAccordion (categories, tests);
-        CodeDefenders.objects.test_accordion.init();
+        CodeDefenders.objects.test_accordion = new CodeDefenders.classes.TestAccordion(categories, tests);
     })();
 </script>
