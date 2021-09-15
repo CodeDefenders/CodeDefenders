@@ -6,8 +6,10 @@ class TestEditor {
         this.editorElement = editorElement;
         this.editor = null;
 
-        this.editableLinesStart = editableLinesStart ?? 1;
-        this.editableLinesEnd = editableLinesEnd; // Does nothing as of now.
+        this.editableLinesStart = editableLinesStart;
+        this.editableLinesEnd = editableLinesEnd;
+        this.initialNumLines = null;
+
         this.mockingEnabled = mockingEnabled;
         this.keymap = keymap;
 
@@ -49,6 +51,10 @@ class TestEditor {
             autoRefresh: true
         });
 
+        this.initialNumLines = this.editor.lineCount();
+        this.editableLinesStart = this.editableLinesStart ?? 1;
+        this.editableLinesEnd = this.editableLinesStart ?? this.initialNumLines - 3;
+
         if (window.hasOwnProperty('ResizeObserver')) {
             new ResizeObserver(() => this.editor.refresh())
                     .observe(this.editor.getWrapperElement());
@@ -56,8 +62,8 @@ class TestEditor {
 
         this.editor.on('beforeChange', function (cm, change) {
             const numLines = cm.lineCount();
-            if (change.from.line < (self.editableLinesStart - 1)
-                    || change.to.line > (numLines - 3)) {
+            if (change.from.line < self.editableLinesStart - 1
+                    || change.to.line > self.editableLinesEnd - 1 + (numLines - self.initialNumLines)) {
                 change.cancel();
             }
         });
