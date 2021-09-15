@@ -96,9 +96,8 @@ class TestAccordion {
     };
 
     _init () {
-        /* Bind functions that we need later, since we can't safely use "this" in a callback function. */
-        const setupPopover = this._setupPopover.bind(this);
-        const viewTestModal = this._viewTestModal.bind(this);
+        /* Bind "this" to safely use it in callback functions. */
+        const self = this;
 
         /* Loop through the categories and create a test table for each one. */
         for (const category of this.categories) {
@@ -130,21 +129,21 @@ class TestAccordion {
                             : 'No tests cover this method.'
                 },
                 createdRow: function (row, data, index) {
-                    setupPopover(
+                    self._setupPopover(
                             row.querySelector('.ta-covered-link'),
                             data,
                             TestAccordion.RenderFunctions.renderCoveredMutantsPopoverTitle,
                             TestAccordion.RenderFunctions.renderCoveredMutantsPopoverBody
                     );
 
-                    setupPopover(
+                    self._setupPopover(
                             row.querySelector('.ta-killed-link'),
                             data,
                             TestAccordion.RenderFunctions.renderKilledMutantsPopoverTitle,
                             TestAccordion.RenderFunctions.renderKilledMutantsPopoverBody
                     );
 
-                    setupPopover(
+                    self._setupPopover(
                             row.querySelector('.ta-smells-link'),
                             data,
                             TestAccordion.RenderFunctions.renderSmellsPopoverTitle,
@@ -152,7 +151,7 @@ class TestAccordion {
                     );
 
                     row.querySelector('.ta-view-button').addEventListener('click', function (event) {
-                        viewTestModal(data);
+                        self._viewTestModal(data);
                     });
                 }
             });
