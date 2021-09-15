@@ -16,6 +16,12 @@ class TestEditor {
         this._init();
     }
 
+    static COMMENT_REGEX = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
+
+    /* from https://stackoverflow.com/a/35578805/9360382 */
+    static IDENTIFIER_REGEX = /(?:\b[_a-zA-Z]|\B\$)[_$a-zA-Z0-9]*/g;
+
+
     _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
@@ -68,22 +74,28 @@ class TestEditor {
         });
     }
 
-    _getWordAt (str, index) {
-        const regex = /[a-zA-Z][a-zA-Z0-9]*/;
-
-        let start = index;
-        let end = index;
-
-        while (end < str.length && regex.test(str.charAt(end))) {
-            end++;
+    /**
+     * Computes the word under cursor for a cursor index.
+     * A word is considered under cursor if the cursor index describes any of its character or the character after the
+     * word.
+     *
+     * @param {string} line The string to find the word it.
+     * @param {number} index The cursor index, 0 to (including) str.length.
+     *
+     * @returns {{word: string, index: number}}
+     *      <ul>
+     *          <li>start: start of the word (inclusive)</li>
+     *          <li>index: index of the first character</li>
+     *      </ul>
+     *      If there is no word under the cursor, {word: '', index: cursor index} will be returned.
+     */
+    _getIdentifierUnderCursor (line, index) {
+        for (const match of line.matchAll(TestEditor.IDENTIFIER_REGEX)) {
+            if (index >= match.index && index <= match.index + match[0].length) {
+                return {word: match[0], index: match.index}
+            }
         }
-
-        while (start > 0 && regex.test(str.charAt(start - 1))) {
-            start--;
-        }
-
-        const word = str.slice(start, end);
-        return {start, end, word};
+        return {word: '', index};
     }
 
     _registerCodeCompletion () {
@@ -96,20 +108,20 @@ class TestEditor {
                     const cursor = editor.getCursor();
                     const line = editor.getLine(cursor.line);
 
-                    const {start, end, word} = self._getWordAt(line, cursor.ch);
-                    const regex = new RegExp('^' + word, 'i');
+                    const {word, index} = self._getIdentifierUnderCursor(line, cursor.ch);
 
                     let list = self.codeCompletionList;
                     if (word !== '') {
+                        const lowerWord = word.toLowerCase();
                         list = list
-                                .filter(item => item.match(regex))
+                                .filter(item => item.toLowerCase().startsWith(lowerWord))
                                 .sort();
                     }
 
                     return {
                         list,
-                        from: CodeMirror.Pos(cursor.line, start),
-                        to: CodeMirror.Pos(cursor.line, end)
+                        from: CodeMirror.Pos(cursor.line, index),
+                        to: CodeMirror.Pos(cursor.line, index + word.length)
                     };
                 }
             });
@@ -146,14 +158,6 @@ class TestEditor {
             testMethods = testMethods.concat(mockitoMethods);
         }
 
-        const filterOutComments = function(text) {
-            let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
-            return text.replace(commentRegex, "");
-        };
-
-        let wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
-        let set = new Set(testMethods);
-
         let testClass = this.editor.getValue().split("\n");
         testClass.slice(this.editableLinesStart, testClass.length - 2);
         testClass = testClass.join("\n");
@@ -166,20 +170,15 @@ class TestEditor {
             });
         }
 
-        texts.forEach(function (text) {
-            text = filterOutComments(text);
-            let m;
-            while ((m = wordRegex.exec(text)) !== null) {
-                if (m.index === wordRegex.lastIndex) {
-                    wordRegex.lastIndex++;
-                }
-                m.forEach(function (match) {
-                    set.add(match)
-                });
+        let codeCompletionList = new Set(testMethods);
+        for (let text of texts) {
+            text = text.replace(TestEditor.COMMENT_REGEX, '');
+            for (const match of text.matchAll(TestEditor.IDENTIFIER_REGEX)) {
+                codeCompletionList.add(match[0]);
             }
-        });
+        }
 
-        this.codeCompletionList = Array.from(set);
+        this.codeCompletionList = Array.from(codeCompletionList);
     }
 
 }
