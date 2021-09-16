@@ -32,6 +32,7 @@
     </div>
 </div>
 
+<script type="text/javascript" src="js/code_completion.js"></script>
 <script type="text/javascript" src="js/test_editor.js"></script>
 
 <script>

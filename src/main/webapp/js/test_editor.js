@@ -13,22 +13,14 @@ class TestEditor {
         this.mockingEnabled = mockingEnabled;
         this.keymap = keymap;
 
-        this.codeCompletionList = [];
+        this.codeCompletion = null;
 
         this._init();
     }
 
-    static COMMENT_REGEX = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
-
-    /* from https://stackoverflow.com/a/35578805/9360382 */
-    static IDENTIFIER_REGEX = /(?:\b[_a-zA-Z]|\B\$)[_$a-zA-Z0-9]*/g;
-
-
     _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
-
-        this._registerCodeCompletion();
 
         /* Create the editor. */
         this.editor = CodeMirror.fromTextArea(this.editorElement, {
@@ -36,12 +28,12 @@ class TestEditor {
             indentUnit: 4,
             smartIndent: true,
             matchBrackets: true,
-            mode: "text/x-java",
+            mode: 'text/x-java',
             autoCloseBrackets: true,
             styleActiveLine: true,
             extraKeys: {
-                "Ctrl-Space": "autocompleteTest",
-                "Tab": "insertSoftTab"
+                'Ctrl-Space': 'completeTest',
+                'Tab': "insertSoftTab"
             },
             keyMap: this.keymap,
             gutters: [
@@ -51,142 +43,69 @@ class TestEditor {
             autoRefresh: true
         });
 
-        this.initialNumLines = this.editor.lineCount();
-        this.editableLinesStart = this.editableLinesStart ?? 1;
-        this.editableLinesEnd = this.editableLinesStart ?? this.initialNumLines - 3;
-
+        /* Refresh editor when resized. */
         if (window.hasOwnProperty('ResizeObserver')) {
             new ResizeObserver(() => this.editor.refresh())
                     .observe(this.editor.getWrapperElement());
         }
 
-        this.editor.on('beforeChange', function (cm, change) {
-            const numLines = cm.lineCount();
+        /* Prevent changes in readonly lines. */
+        this.initialNumLines = this.editor.lineCount();
+        this.editableLinesStart = this.editableLinesStart ?? 1;
+        this.editableLinesEnd = this.editableLinesEnd ?? this.initialNumLines - 2;
+        this.editor.on('beforeChange', function (editor, change) {
             if (change.from.line < self.editableLinesStart - 1
-                    || change.to.line > self.editableLinesEnd - 1 + (numLines - self.initialNumLines)) {
+                    || change.to.line > self.editableLinesEnd - 1 + (editor.lineCount() - self.initialNumLines)) {
                 change.cancel();
             }
         });
 
-        this.editor.on('focus', function () {
-            self._updateCodeCompletion();
-        });
-
-        this.editor.on('keyHandled', function (cm, name, event) {
-            // 9 == Tab, 13 == Enter
-            if ([9, 13].includes(event.keyCode)) {
-                self._updateCodeCompletion();
-            }
-        });
+        this._initCodeCompletion();
     }
 
-    /**
-     * Computes the word under cursor for a cursor index.
-     * A word is considered under cursor if the cursor index describes any of its character or the character after the
-     * word.
-     *
-     * @param {string} line The string to find the word it.
-     * @param {number} index The cursor index, 0 to (including) str.length.
-     *
-     * @returns {{word: string, index: number}}
-     *      <ul>
-     *          <li>start: start of the word (inclusive)</li>
-     *          <li>index: index of the first character</li>
-     *      </ul>
-     *      If there is no word under the cursor, {word: '', index: cursor index} will be returned.
-     */
-    _getIdentifierUnderCursor (line, index) {
-        for (const match of line.matchAll(TestEditor.IDENTIFIER_REGEX)) {
-            if (index >= match.index && index <= match.index + match[0].length) {
-                return {word: match[0], index: match.index}
-            }
-        }
-        return {word: '', index};
-    }
+    _initCodeCompletion() {
+        this.codeCompletion = new CodeDefenders.classes.CodeCompletion();
 
-    _registerCodeCompletion () {
-        /* Bind "this" to safely use it in callback functions. */
-        const self = this;
-
-        CodeMirror.commands.autocompleteTest = function (cm) {
-            cm.showHint({
-                hint: function (editor) {
-                    const cursor = editor.getCursor();
-                    const line = editor.getLine(cursor.line);
-
-                    const {word, index} = self._getIdentifierUnderCursor(line, cursor.ch);
-
-                    let list = self.codeCompletionList;
-                    if (word !== '') {
-                        const lowerWord = word.toLowerCase();
-                        list = list
-                                .filter(item => item.toLowerCase().startsWith(lowerWord))
-                                .sort();
-                    }
-
-                    return {
-                        list,
-                        from: CodeMirror.Pos(cursor.line, index),
-                        to: CodeMirror.Pos(cursor.line, index + word.length)
-                    };
-                }
-            });
-        };
-    }
-
-    _updateCodeCompletion () {
-        // If you make changes to the autocompletion, change it for an attacker too.
         let testMethods = [
-                "assertArrayEquals",
-                "assertEquals",
-                "assertTrue",
-                "assertFalse",
-                "assertNull",
-                "assertNotNull",
-                "assertSame",
-                "assertNotSame",
-                "fail"
+            "assertArrayEquals",
+            "assertEquals",
+            "assertTrue",
+            "assertFalse",
+            "assertNull",
+            "assertNotNull",
+            "assertSame",
+            "assertNotSame",
+            "fail"
         ];
 
         if (this.mockingEnabled) {
-            let mockitoMethods = [
-                    "mock",
-                    "when",
-                    "then",
-                    "thenThrow",
-                    "doThrow",
-                    "doReturn",
-                    "doNothing"
-            ];
             // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
             // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)
             // Behavior verification is currently not implemented (Mockito.verify)
+
+            let mockitoMethods = [
+                "mock",
+                "when",
+                "then",
+                "thenThrow",
+                "doThrow",
+                "doReturn",
+                "doNothing"
+            ];
+
             testMethods = testMethods.concat(mockitoMethods);
         }
 
-        let testClass = this.editor.getValue().split("\n");
-        testClass.slice(this.editableLinesStart, testClass.length - 2);
-        testClass = testClass.join("\n");
-        let texts = [testClass];
+        this.codeCompletion.setCompletionPool('testMethods', new Set(testMethods));
 
-        const autocompletedClasses = window.autocompletedClasses;
-        if (typeof autocompletedClasses !== 'undefined') {
-            Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
-                texts.push(autocompletedClasses[key]);
-            });
+        if (typeof window.autocompletedClasses !== 'undefined') {
+            const texts = Array.from(Object.values(window.autocompletedClasses));
+            const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
+            this.codeCompletion.setCompletionPool('classes', completions);
         }
 
-        let codeCompletionList = new Set(testMethods);
-        for (let text of texts) {
-            text = text.replace(TestEditor.COMMENT_REGEX, '');
-            for (const match of text.matchAll(TestEditor.IDENTIFIER_REGEX)) {
-                codeCompletionList.add(match[0]);
-            }
-        }
-
-        this.codeCompletionList = Array.from(codeCompletionList);
+        this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
     }
-
 }
 
 CodeDefenders.classes.TestEditor = TestEditor;
