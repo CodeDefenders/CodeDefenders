@@ -200,24 +200,27 @@
 
             const genAdditionalButton = row => {
                 switch (row.state) {
-                        <c:if test="mutantAccordion.flag">
                     case "ALIVE":
                         if (row.canMarkEquivalent) {
                             if (row.covered) {
-                                return '<form id="equiv" action="${pageContext.request.contextPath + Paths.EQUIVALENCE_DUELS_GAME}" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
-                                        '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
-                                        '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
-                                        '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
-                                        '      <button type="submit" class="btn btn-default btn-xs pull-right">Claim Equivalent</button>\n' +
-                                        '   </form>';
+                                return `
+                                <form id="equiv" action="${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) \${row.lineString} as equivalent. Are you sure?\');">
+                                    <input type="hidden" name="formType" value="claimEquivalent">
+                                    <input type="hidden" name="equivLines" value="\${row.lineString}">
+                                    <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">
+                                    <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">Claim Equivalent</button>
+                                </form>`;
                             } else {
-                                return '<button type="submit" class="btn btn-default btn-xs pull-right" disabled>Claim Equivalent</button>';
+                                // We need the wrapper element (<span …), because tooltips do not work on disabled elements:
+                                // https://getbootstrap.com/docs/5.1/components/tooltips/#disabled-elements
+                                return `
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Cover this mutant with a test to be able to claim it as equivalent">
+                                    <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>Claim Equivalent</button>
+                                </span>`;
                             }
                         } else {
                             return '';
                         }
-
-                        </c:if>
                     case "KILLED":
                         return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
                     default:
