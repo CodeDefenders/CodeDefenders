@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codedefenders.game.Role;
-import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
@@ -38,37 +37,6 @@ import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_TYPE;
 import static org.codedefenders.persistence.database.UserRepository.userFromRS;
 
 public class AdminDAO {
-
-    public static Entry getScore(int userId) throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT",
-                "  U.username                            AS username,",
-                "  IFNULL(NMutants, 0)                   AS NMutants,",
-                "  IFNULL(AScore, 0)                     AS AScore,",
-                "  IFNULL(NTests, 0)                     AS NTests,",
-                "  IFNULL(DScore, 0)                     AS DScore,",
-                "  IFNULL(NKilled, 0)                    AS NKilled,",
-                "  IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore",
-                "FROM users U LEFT JOIN",
-                "  (SELECT",
-                "     PA.user_id,",
-                "     count(M.Mutant_ID) AS NMutants,",
-                "     sum(M.Points)      AS AScore",
-                "   FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID",
-                "   GROUP BY PA.user_id)",
-                "    AS Attacker ON U.user_id = Attacker.user_id",
-                "  LEFT JOIN",
-                "  (SELECT",
-                "     PD.user_id,",
-                "     count(T.Test_ID)     AS NTests,",
-                "     sum(T.Points)        AS DScore,",
-                "     sum(T.MutantsKilled) AS NKilled",
-                "   FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID",
-                "   GROUP BY PD.user_id)",
-                "    AS Defender ON U.user_id = Defender.user_id",
-                "WHERE U.user_id = ?;");
-        return DB.executeQueryReturnValue(query, DatabaseAccess::entryFromRS, DatabaseValue.of(userId));
-    }
 
     public static boolean deletePlayerTest(int pid) {
         String query = "DELETE FROM tests WHERE Player_ID =?;";
@@ -330,10 +298,10 @@ public class AdminDAO {
         return DB.executeQueryReturnValue(query, AdminDAO::settingFromRS, DatabaseValue.of(name.name()));
     }
 
-    // TODO this is just used to initialize the connection pool, we should probably make more specific methods for that
     /**
      * This does not close the given {@link Connection}.
      */
+    // TODO this is just used to initialize the connection pool, we should probably make more specific methods for that
     static AdminSystemSettings.SettingsDTO getSystemSettingInt(SETTING_NAME name, Connection conn) throws SQLException {
         String query = "SELECT * FROM settings WHERE settings.name = ?;";
         PreparedStatement stmt = conn.prepareStatement(query);
