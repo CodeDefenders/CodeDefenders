@@ -2,6 +2,7 @@
 (function () {
 
 class TestEditor {
+
     constructor (editorElement, editableLinesStart, editableLinesEnd, mockingEnabled, keymap) {
         this.editorElement = editorElement;
         this.editor = null;
@@ -12,7 +13,6 @@ class TestEditor {
 
         this.mockingEnabled = mockingEnabled;
         this.keymap = keymap;
-
         this.codeCompletion = null;
 
         this._init();
@@ -49,10 +49,12 @@ class TestEditor {
                     .observe(this.editor.getWrapperElement());
         }
 
-        /* Prevent changes in readonly lines. */
+        /* Set editable lines to sensible values. */
         this.initialNumLines = this.editor.lineCount();
         this.editableLinesStart = this.editableLinesStart ?? 1;
         this.editableLinesEnd = this.editableLinesEnd ?? this.initialNumLines - 2;
+
+        /* Prevent changes in readonly lines. */
         this.editor.on('beforeChange', function (editor, change) {
             if (change.from.line < self.editableLinesStart - 1
                     || change.to.line > self.editableLinesEnd - 1 + (editor.lineCount() - self.initialNumLines)) {
@@ -65,6 +67,7 @@ class TestEditor {
 
     _initCodeCompletion() {
         this.codeCompletion = new CodeDefenders.classes.CodeCompletion();
+        this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
 
         let testMethods = [
             "assertArrayEquals",
@@ -98,13 +101,28 @@ class TestEditor {
 
         this.codeCompletion.setCompletionPool('testMethods', new Set(testMethods));
 
-        if (typeof window.autocompletedClasses !== 'undefined') {
-            const texts = Array.from(Object.values(window.autocompletedClasses));
-            const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
-            this.codeCompletion.setCompletionPool('classes', completions);
+        /* Gather classes to autocomplete. */
+        const texts = [];
+        /* Get classes from class viewer. */
+        if (CodeDefenders.objects.hasOwnProperty('classViewer')) {
+            const classViewer = CodeDefenders.objects.classViewer;
+            texts.push(classViewer.editor.getValue());
+            for (const dependencyEditor of classViewer.dependencyEditors) {
+                texts.push(dependencyEditor.getValue());
+            }
+        }
+        /* Get classes from mutant editor. */
+        if (CodeDefenders.objects.hasOwnProperty('mutantEditor')) {
+            const mutantEditor = CodeDefenders.objects.mutantEditor;
+            texts.push(mutantEditor.editor.getValue());
+            for (const dependencyEditor of mutantEditor.dependencyEditors) {
+                texts.push(dependencyEditor.getValue());
+            }
         }
 
-        this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
+        /* Add words from classes to completion. */
+        const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
+        this.codeCompletion.setCompletionPool('classes', completions);
     }
 }
 

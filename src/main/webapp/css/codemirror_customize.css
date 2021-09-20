@@ -224,3 +224,11 @@ pre.CodeMirror-line {
     --cm-min-width: 400px;
     --cm-max-width: 1000px;
 }
+
+/* Style for readonly lines.
+----------------------------------------------------------------------------- */
+
+.readonly-line {
+    opacity: .5;
+    filter: alpha(opacity = 50);
+}
