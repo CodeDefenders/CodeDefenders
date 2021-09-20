@@ -21,11 +21,19 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Attributes set in the servlet --%>
-<%--@elvariable id="leaderboardEntries" type="java.util.List<org.codedefenders.game.leaderboard.Entry>"--%>
 
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
+<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
+<%--@elvariable id="leaderboardService" type="org.codedefenders.service.LeaderboardService"--%>
 
-<jsp:include page="/jsp/header.jsp"/>
+<c:choose>
+    <c:when test="${login.loggedIn}">
+        <jsp:include page="/jsp/header.jsp"/>
+    </c:when>
+    <c:otherwise>
+        <jsp:include page="/jsp/header_logout.jsp"/>
+    </c:otherwise>
+</c:choose>
 
 <div class="container">
     <h2 class="mb-4">${pageInfo.pageTitle}</h2>
@@ -43,7 +51,7 @@
             </tr>
         </thead>
         <tbody>
-            <c:forEach var="entry" items="${leaderboardEntries}">
+            <c:forEach var="entry" items="${leaderboardService.all}">
                 <tr>
                     <td>${entry.username}</td>
                     <td>${entry.mutantsSubmitted}</td>

@@ -30,7 +30,6 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -60,7 +59,6 @@ public class DatabaseAccess {
     }
 
     /**
-     *
      * @param gameId The gameId for which to remove the events.
      * @param userId The userId of the events to remove.
      *
@@ -207,28 +205,6 @@ public class DatabaseAccess {
         return DB.executeUpdateQuery(query, values);
     }
 
-    static Entry entryFromRS(ResultSet rs) throws SQLException {
-        Entry p = new Entry();
-        p.setUsername(rs.getString("username"));
-        p.setMutantsSubmitted(rs.getInt("NMutants"));
-        p.setAttackerScore(rs.getInt("AScore"));
-        p.setTestsSubmitted(rs.getInt("NTests"));
-        p.setDefenderScore(rs.getInt("DScore"));
-        p.setMutantsKilled(rs.getInt("NKilled"));
-        p.setTotalPoints(rs.getInt("TotalScore"));
-        return p;
-    }
-
-    public static List<Entry> getLeaderboard() {
-        String query = String.join("\n",
-                "SELECT U.username AS username, IFNULL(NMutants,0) AS NMutants, IFNULL(AScore,0) AS AScore, IFNULL(NTests,0) AS NTests, IFNULL(DScore,0) AS DScore, IFNULL(NKilled,0) AS NKilled, IFNULL(AScore,0)+IFNULL(DScore,0)+IFNULL(EScore,0) AS TotalScore",
-                "FROM view_valid_users U",
-                "LEFT JOIN (SELECT PA.user_id, count(M.Mutant_ID) AS NMutants, sum(M.Points) AS AScore FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID GROUP BY PA.user_id) AS Attacker ON U.user_id = Attacker.user_id",
-                "LEFT JOIN (SELECT PD.user_id, count(T.Test_ID) AS NTests, sum(T.Points) AS DScore, sum(T.MutantsKilled) AS NKilled FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID GROUP BY PD.user_id) AS Defender ON U.user_id = Defender.user_id",
-                "LEFT JOIN (SELECT PE.user_id, sum(PE.Points) AS EScore FROM players PE GROUP BY PE.user_id) AS Player ON U.User_ID = Player.User_ID");
-        return DB.executeQueryReturnList(query, DatabaseAccess::entryFromRS);
-    }
-
     public static int getKillingTestIdForMutant(int mutantId) {
         String query = String.join("\n",
                 "SELECT *",
@@ -306,7 +282,7 @@ public class DatabaseAccess {
     }
 
     public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId,
-                                                                         int lastSubmissionId, boolean isDefender) {
+            int lastSubmissionId, boolean isDefender) {
         // Current test is the one right after lastTestId in the user/game context
         String query = isDefender
                 ? "SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in (SELECT Test_ID FROM tests" :
