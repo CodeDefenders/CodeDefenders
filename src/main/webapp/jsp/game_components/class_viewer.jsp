@@ -25,61 +25,79 @@
 <div class="card game-component-resize">
 
     <%-- no dependencies -> no tabs --%>
-    <% if (!classViewer.hasDependencies()) { %>
+    <%
+        if (!classViewer.hasDependencies()) {
+    %>
 
         <div class="card-body p-0 codemirror-fill">
             <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
         </div>
 
     <%-- dependencies exist -> tab system --%>
-    <% } else { %>
+    <%
+        } else {
+            int currentId = 0;
+    %>
 
         <div class="card-header">
             <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link py-1 active" data-bs-toggle="tab"
-                            id="${classViewer.className}-tab"
-                            data-bs-target="#${classViewer.className}"
-                            aria-controls="${classViewer.className}"
+                            id="class-viewer-tab-<%=currentId%>"
+                            data-bs-target="#class-viewer-pane-<%=currentId%>"
+                            aria-controls="class-viewer-pane-<%=currentId%>"
                             type="button" role="tab" aria-selected="true">
                         ${classViewer.className}
                     </button>
                 </li>
-                <% for (String depName : classViewer.getDependencies().keySet()) { %>
+                <%
+                    for (String depName : classViewer.getDependencies().keySet()) {
+                        currentId++;
+                %>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link py-1" data-bs-toggle="tab"
-                                id="<%=depName%>-tab"
-                                data-bs-target="#<%=depName%>"
-                                aria-controls="<%=depName%>"
+                                id="class-viewer-tab-<%=currentId%>"
+                                data-bs-target="#class-viewer-pane-<%=currentId%>"
+                                aria-controls="class-viewer-pane-<%=currentId%>"
                                 type="button" role="tab" aria-selected="true">
                             <%=depName%>
                         </button>
                     </li>
-                <% } %>
+                <%
+                    }
+                %>
             </ul>
         </div>
+
+        <%
+            currentId = 0;
+        %>
 
         <div class="card-body p-0 codemirror-fill">
             <div class="tab-content">
                 <div class="tab-pane active"
-                     id="${classViewer.className}"
-                     aria-labelledby="${classViewer.className}-tab"
+                     id="class-viewer-pane-<%=currentId%>"
+                     aria-labelledby="class-viewer-tab-<%=currentId%>"
                      role="tabpanel">
                     <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
                 </div>
-                <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
-                        String depName = dependency.getKey();
-                        String depCode = dependency.getValue(); %>
+
+                <%
+                    for (String depCode : classViewer.getDependencies().values()) {
+                        currentId++;
+                %>
                     <div class="tab-pane"
-                         id="<%=depName%>"
-                         aria-labelledby="<%=depName%>-tab"
+                         id="class-viewer-pane-<%=currentId%>"
+                         aria-labelledby="class-viewer-tab-<%=currentId%>"
                          role="tabpanel">
-                         <pre class="m-0"><textarea id="text-<%=depName%>"
-                                                    name="text-<%=depName%>"
-                                                    title="text-<%=depName%>"
-                                                    readonly><%=depCode%></textarea></pre>
+                             <pre class="m-0"><textarea id="class-viewer-code-<%=currentId%>"
+                                                        name="class-viewer-code-<%=currentId%>"
+                                                        title="class-viewer-code-<%=currentId%>"
+                                                        readonly><%=depCode%></textarea></pre>
                     </div>
-                <% } %>
+                <%
+                    }
+                %>
             </div>
         </div>
 
@@ -91,50 +109,21 @@
 
 </div>
 
+<script type="text/javascript" src="js/class_viewer.js"></script>
 
 <script>
-(function () {
+    /* Wrap in a function to avoid polluting the global scope. */
+    (function () {
+        const numDependencies = ${classViewer.hasDependencies() ? classViewer.dependencies.size() : 0};
 
-    let editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
-        lineNumbers: true,
-        matchBrackets: true,
-        mode: "text/x-java",
-        readOnly: 'nocursor',
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
-        autoRefresh: true
-    });
-    if (window.hasOwnProperty('ResizeObserver')) {
-        new ResizeObserver(() => editorSUT.refresh()).observe(editorSUT.getWrapperElement());
-    }
-
-    /* If global autocompletedClasses exists, get it, otherwise, create it. */
-    const autocompletedClasses = window.autocompletedClasses = window.autocompletedClasses || {};
-    autocompletedClasses['${classViewer.className}'] = editorSUT.getTextArea().value;
-
-    <%-- dependencies exist -> tab system --%>
-    <%
-        if (classViewer.hasDependencies()) {
-            for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
-                String depName = dependency.getKey();
-    %>
-            {
-                let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
-                    lineNumbers: true,
-                    matchBrackets: true,
-                    mode: "text/x-java",
-                    readOnly: 'nocursor',
-                    autoRefresh: true
-                });
-                if (window.hasOwnProperty('ResizeObserver')) {
-                    new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());
-                }
-
-                autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
-            }
-    <%
-            }
+        const editorElement = document.getElementById('sut');
+        const dependencyEditorElements = [];
+        for (let i = 1; i <= numDependencies; i++) {
+            dependencyEditorElements.push(document.getElementById(`class-viewer-code-\${i}`));
         }
-    %>
 
-})();
+        CodeDefenders.objects.classViewer = new CodeDefenders.classes.ClassViewer(
+                editorElement,
+                dependencyEditorElements);
+    })();
 </script>
