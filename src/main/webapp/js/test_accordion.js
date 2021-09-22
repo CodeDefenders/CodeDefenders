@@ -150,9 +150,12 @@ class TestAccordion {
                             TestAccordion.RenderFunctions.renderSmellsPopoverBody
                     );
 
-                    row.querySelector('.ta-view-button').addEventListener('click', function (event) {
-                        self._viewTestModal(data);
-                    });
+                    const element = row.querySelector('.ta-view-button');
+                    if (element !== null) {
+                        element.addEventListener('click', function (event) {
+                            self._viewTestModal(data);
+                        });
+                    }
                 }
             });
         }
