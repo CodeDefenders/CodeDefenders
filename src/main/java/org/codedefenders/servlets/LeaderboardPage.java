@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.page.PageInfoBean;
-import org.codedefenders.game.leaderboard.Leaderboard;
 
 @WebServlet("/leaderboard")
 public class LeaderboardPage extends HttpServlet {
@@ -40,9 +39,7 @@ public class LeaderboardPage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        pageInfo.setPageTitle("Leaderboard");
-
-        req.setAttribute("leaderboardEntries", Leaderboard.getAll());
+        pageInfo.setPageTitle("Battlegrounds Leaderboard");
 
         req.getRequestDispatcher("/jsp/leaderboards.jsp").forward(req, resp);
     }

@@ -18,15 +18,7 @@
   --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="java.util.Optional" %>
-<%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.database.MeleeGameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.database.PlayerDAO" %>
 <%@ page import="java.util.List" %>
@@ -84,8 +76,6 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request"/>
-
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
     history.setLogin(login);
@@ -109,33 +99,27 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
+<jsp:include page="/jsp/header_game.jsp"/>
+
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/melee/header_game.jsp"/>
-
-<jsp:include page="/jsp/scoring_tooltip.jsp"/>
-<jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <div class="row">
 
-    <div class="col-md-6">
-        <div id="mutants-div">
-            <h3>Existing Mutants</h3>
-            <t:mutant_accordion/>
-        </div>
+    <div class="col-xl-6 col-12">
+        <t:mutant_accordion/>
 
         <div id="tests-div">
-            <h3>JUnit tests </h3>
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
         </div>
     </div>
 
-    <div class="col-md-6" id="cut-div">
-        <h3>Class Under Test</h3>
+    <div class="col-xl-6 col-12" id="cut-div">
+        <div class="game-component-header"><h3>Class Under Test</h3></div>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 </div>
 

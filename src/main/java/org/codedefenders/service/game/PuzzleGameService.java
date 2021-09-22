@@ -21,37 +21,39 @@ package org.codedefenders.service.game;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.codedefenders.dto.MutantDTO;
-import org.codedefenders.dto.TestDTO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
 
 @ApplicationScoped
 public class PuzzleGameService extends AbstractGameService {
 
     @Override
-    protected MutantDTO convertMutant(Mutant mutant, User user, Player player, AbstractGame game) {
-        if (player == null) {
-            return new MutantDTO(mutant);
+    protected boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player) {
+        return mutant.isCovered(game.getTests(true));
+    }
+
+    // TODO: This doesn't use playerRole. Why not?! Doesn't {@link #determineRole} doesn't work for PuzzleGames?
+    @Override
+    protected boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
+            Role playerRole) {
+        if (player != null) {
+            return player.getRole() != null && player.getRole() != Role.NONE;
         } else {
-            return new MutantDTO(mutant)
-                    .setCovered(mutant.isCovered(game.getTests(true)))
-                    .setViewable(player.getRole() != null && player.getRole() != Role.NONE);
+            return false;
         }
     }
 
     @Override
-    protected TestDTO convertTest(Test test, User user, Player player, AbstractGame game) {
-        if (player == null) {
-            return new TestDTO(test);
-        } else {
-            return new TestDTO(test)
-                    .setMutantData(game.getMutants())
-                    .setViewable(true);
-        }
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user) {
+        return false;
+    }
+
+    @Override
+    protected boolean canViewTest(Test test, AbstractGame game, Player player, Role playerRole) {
+        return true;
     }
 }

@@ -1,61 +1,71 @@
 /* (Page-wide) DataTables customizations
 ============================================================================= */
 
-/* Background color of child tables
+/* Consistent padding for child rows.
 ----------------------------------------------------------------------------- */
 
-/* Inherit row color to all child tables. */
-.table table > tbody > tr:nth-of-type(n) {
-    background-color: inherit;
+.child-row-wrapper {
+    padding-left: 5em;
+    padding-top: .25em;
+    padding-bottom: .25em;
 }
 
-/* Color child table rows the same color as their leading row.
-   Use :nth-of-type(n) to increase CSS specificity. */
-.table-striped > tbody > .odd:nth-of-type(n) + tr:not(.odd):not(.even) {
-    background: transparent;
-}
-.table-striped > tbody > .even:nth-of-type(n) + tr:not(.odd):not(.even) {
-    background-color: #f4f4f4;
-}
-
-/* Child table styles (for child tables of like in admin analytics)
+/* Child row details (for child rows like in admin analytics or game overview).
 ----------------------------------------------------------------------------- */
 
-/* Indent for row details */
-table .indented {
-    margin-left: 50px;
-}
+/* Padding and layout. */
 
-/* Child table margins and padding */
-.table-child-details {
-    padding-top: 1em;
-    padding-bottom: 1.5em;
+/* Regular cells. */
+.child-row-details > tbody > tr > td,
+.child-row-details > thead > tr > th {
+    white-space: nowrap;
+    padding: .15em 1.5em;
 }
-.table-child-details > tbody > tr > td {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 4px;
-}
-.table-child-details > thead > tr > th {
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 12px;
-}
-.table-child-details > thead:first-child > tr:first-child > th {
-    padding-left: 20px;
-    padding-right: 20px;
+/* No top padding for the very first row. */
+.child-row-details > thead:first-child > tr:first-child > th,
+.child-row-details > tbody:first-child > tr:first-child > td {
     padding-top: 0;
 }
+/* Space between table sections (multiple thead elements). */
+.child-row-details > thead:not(:first-child) > tr:first-child > th {
+    padding-top: 1em;
+}
+/* Smaller padding for the first and last cell of each row, so the border doesn't extend too much. */
+.child-row-details > thead > tr > th:first-child,
+.child-row-details > tbody > tr > td:first-child {
+    padding-left: .75em;
+}
+.child-row-details > thead > tr > th:last-child,
+.child-row-details > tbody > tr > td:last-child {
+    padding-right: .75em;
+}
 
-/* Borders between child table rows */
-.table-child-details > tbody > tr {
-    border-top: solid #dddddd;
-    border-bottom: solid #dddddd;
-    border-width: 1px;
+/* Borders. */
+
+/* Borders for regular rows. */
+.child-row-details > tbody > tr {
+    border-top: solid 1px #dddddd;
+    border-bottom: solid 1px #dddddd;
 }
-.table-child-details > tbody > tr:first-child {
-    border-top: none;
-}
-.table-child-details > tbody > tr:last-child {
+/* No border after the last row. */
+.child-row-details > tbody > tr:last-child {
     border-bottom: none;
+}
+
+/* Style for the toggle button of child tables.
+----------------------------------------------------------------------------- */
+
+.toggle-details,
+.toggle-all-details {
+    cursor: pointer;
+    color: #6c757d; /* Color of .text-muted in Bootstrap 5. */
+    transition: color .15s ease-in-out;
+}
+.toggle-details:hover,
+.toggle-all-details:hover {
+    color: black;
+}
+.toggle-details-icon {
+    width: 1rem;
+    text-align: center;
 }

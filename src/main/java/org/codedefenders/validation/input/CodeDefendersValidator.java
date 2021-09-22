@@ -14,7 +14,6 @@ public class CodeDefendersValidator {
      * Username must contain 3 to 20 alphanumeric characters, start with an
      * alphabetic character, and have no whitespace or special character.
      *
-     * @param username
      * @return true iff valid username
      */
     // TODO extract that method to a util class

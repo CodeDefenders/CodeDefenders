@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.persistence.database.UserRepository;
 
 public class MutationTesterProducer {
 
@@ -42,13 +43,16 @@ public class MutationTesterProducer {
         this.eventDAO = eventDAO;
     }
 
+    @Inject
+    private UserRepository userRepo;
+
     @Produces
     @RequestScoped
     public IMutationTester getMutationTester() {
         if (config.isParallelize()) {
-            return new ParallelMutationTester(backend, eventDAO, config.isMutantCoverage(), testExecutorThreadPool);
+            return new ParallelMutationTester(backend, userRepo, eventDAO, config.isMutantCoverage(), testExecutorThreadPool);
         } else {
-            return new MutationTester(backend, eventDAO, config.isMutantCoverage());
+            return new MutationTester(backend, userRepo, eventDAO, config.isMutantCoverage());
         }
     }
 

@@ -32,34 +32,49 @@
 	<jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<div class="container" style=" max-width: 50%; min-width: 25%; ">
-	<h2 style="text-align: center">Contact Us</h2>
-	<p style="text-align: center">
+<div class="container form-width">
+
+	<h2>${pageInfo.pageTitle}</h2>
+	<p>
 		Code Defenders is an open source project; you can find details on the
 		<a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.
 	</p>
-</div>
-	<%
-	final boolean emailEnabled = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
-	if(emailEnabled) {
+<%
+	if (AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue()) {
 %>
-<div class="container">
-	<form action="<%=request.getContextPath() + Paths.API_SEND_EMAIL%>" method="post" class="form-signin">
+	<form action="<%=request.getContextPath() + Paths.API_SEND_EMAIL%>" method="post" class="needs-validation">
 		<input type="hidden" name="formType" value="login">
-		<label for="inputName" class="sr-only">Name</label>
-		<input type="text" id="inputName" name="name" class="form-control" placeholder="Name" required autofocus>
-		<label for="inputEmail" class="sr-only">Email</label>
-		<input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required>
-		<label for="inputSubject" class="sr-only">Subject</label>
-		<input type="text" id="inputSubject" name="subject" class="form-control" placeholder="Subject" required autofocus>
-		<label for="inputMessage" class="sr-only">Message</label>
-		<textarea id="inputMessage" name="message" class="form-control" placeholder="Message" rows="8" required
-            style="resize: none;"></textarea>
-		<button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>
+
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label" for="name-input">Name</label>
+                <input type="text" id="name-input" name="name" class="form-control" placeholder="Name" required autofocus>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" for="email-input">Email</label>
+                <input type="email" id="email-input" name="email" class="form-control" placeholder="Email" required>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" for="subject-input">Subject</label>
+                <input type="text" id="subject-input" name="subject" class="form-control" placeholder="Subject" required>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" for="message-input">Message</label>
+                <textarea id="message-input" name="message" class="form-control" placeholder="Message" rows="8" required></textarea>
+            </div>
+
+            <div class="col-12">
+                <button class="btn btn-primary" type="submit">Send</button>
+            </div>
+        </div>
 	</form>
 <%
 	}
 %>
+
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>

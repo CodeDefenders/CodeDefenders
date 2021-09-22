@@ -47,7 +47,7 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
@@ -417,7 +417,7 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     /**
-     * Extract and validate POST parameters for {@link AdminCreateGamesBean#switchRole(StagedGame, User)
+     * Extract and validate POST parameters for {@link AdminCreateGamesBean#switchRole(StagedGame, UserEntity)
      * AdminCreateGamesBean#switchRole()}.
      * @param request The HTTP request.
      */
@@ -453,7 +453,7 @@ public class AdminCreateGames extends HttpServlet {
 
     /**
      * Extract and validate POST parameters for {@link AdminCreateGamesBean#movePlayerBetweenStagedGames(StagedGame,
-     * StagedGame, User, Role) AdminCreateGamesBean#movePlayerBetweenStagedGames()}.
+     * StagedGame, UserEntity, Role) AdminCreateGamesBean#movePlayerBetweenStagedGames()}.
      * @param request The HTTP request.
      */
     private void movePlayerBetweenStagedGames(HttpServletRequest request) {
@@ -499,9 +499,9 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     /**
-     * Extract and validate POST parameters for {@link AdminCreateGamesBean#addPlayerToStagedGame(StagedGame, User,
+     * Extract and validate POST parameters for {@link AdminCreateGamesBean#addPlayerToStagedGame(StagedGame, UserEntity,
      * Role) AdminCreateGamesBean#addPlayerToStagedGame()} or {@link AdminCreateGamesBean#addPlayerToExistingGame(
-     * AbstractGame, User, Role) AdminCreateGamesBean#addPlayerToExistingGame()}.
+     * AbstractGame, UserEntity, Role) AdminCreateGamesBean#addPlayerToExistingGame()}.
      * @param request The HTTP request.
      */
     private void addPlayerToGame(HttpServletRequest request) {

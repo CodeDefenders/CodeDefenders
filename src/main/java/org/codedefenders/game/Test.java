@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
@@ -235,7 +235,7 @@ public class Test {
 
     @SuppressWarnings("Duplicates")
     public String getAsHTMLEscapedString() {
-        return StringEscapeUtils.escapeHtml(getAsString());
+        return StringEscapeUtils.escapeHtml4(getAsString());
     }
 
     public boolean insert() {

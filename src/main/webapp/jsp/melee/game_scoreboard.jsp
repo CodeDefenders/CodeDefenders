@@ -20,53 +20,61 @@
 --%>
 <%@page import="org.codedefenders.beans.game.ScoreItem"%>
 
-<jsp:useBean id="meleeScoreboardBean" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
+<!-- Instance is created manually in MeleeGame(History)Manager so we use 'type=' instead of 'class=' so nothing
+complains about the missing no-args constructor (this is simply a type hint for an existing attribute and will not try
+to create it if it is missing -->
+<jsp:useBean id="meleeScoreboardBean" type="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
 
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
 
-<div id="scoreboard" class="modal fade" role="dialog"
-	style="z-index: 10000; position: absolute;">
+<div id="scoreboard" class="modal fade" role="dialog">
 	<div class="modal-dialog">
-		<!-- Modal content-->
-		<div class="modal-content"
-			style="z-index: 10000; position: absolute; width: 100%; left: 0%;">
+		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Scoreboard</h4>
+				<h5 class="modal-title">Scoreboard</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
 				<table class="table">
-					<thead >
-						<th>User</th>
-						<th>Attack</th>
-						<th>Defense</th>
-						<th>Duels</th>
-						<th>Total Points</th>
+					<thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Attack</th>
+                            <th>Defense</th>
+                            <th>Duels</th>
+                            <th>Total Points</th>
+                        </tr>
 					</thead>
-					<!--  Use the tag library to go over the players instead of using java snippets -->
-					<%
-					    for (ScoreItem scoreItem : meleeScoreboardBean.getSortedScoreItems()) {
-					        // Highlight the row of the current player. Apparently, embedding the rendering in the class tag breaks it ?
-					        if (login.getUserId() == scoreItem.getUser().getId()) {
-					            %><tr class="bg-info"><%
-					        } else {
-					            %><tr><%
-					        }
-					%>
-					<td><%=scoreItem.getUser().getUsername()%></td>
-					<td><%=scoreItem.getAttackScore().getTotalScore()%></td>
-					<td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
-					<td><%=scoreItem.getDuelScore().getTotalScore()%></td>
-					<td><%=scoreItem.getAttackScore().getTotalScore() + scoreItem.getDefenseScore().getTotalScore() + scoreItem.getDuelScore().getTotalScore()%></td>
-					</tr>
-					<%
-					    }
-					%>
+                    <tbody>
+                        <!--  Use the tag library to go over the players instead of using java snippets -->
+                        <%
+                            for (ScoreItem scoreItem : meleeScoreboardBean.getSortedScoreItems()) {
+                                // Highlight the row of the current player. Apparently, embedding the rendering in the class tag breaks it ?
+                                if (login.getUserId() == scoreItem.getUser().getId()) {
+                        %>
+                            <tr class="bg-warning bg-gradient">
+                        <%
+                                } else {
+                        %>
+                            <tr>
+                        <%
+                                }
+                        %>
+                                <td><%=scoreItem.getUser().getName()%></td>
+                                <td><%=scoreItem.getAttackScore().getTotalScore()%></td>
+                                <td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
+                                <td><%=scoreItem.getDuelScore().getTotalScore()%></td>
+                                <td><%=scoreItem.getAttackScore().getTotalScore() + scoreItem.getDefenseScore().getTotalScore() + scoreItem.getDuelScore().getTotalScore()%></td>
+                            </tr>
+                        <%
+                            }
+                        %>
+                    </tbody>
 				</table>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 			</div>
 		</div>
 	</div>

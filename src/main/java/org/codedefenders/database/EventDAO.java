@@ -35,7 +35,7 @@ public class EventDAO {
                     "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
                     "VALUES (?, ?, ?, ?, ?);");
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
-                    DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
+                    DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
         } else if (eventType.equals(EventType.PLAYER_LOST_EQUIVALENT_DUEL) // Melee Game
                 || eventType.equals(EventType.PLAYER_WON_EQUIVALENT_DUEL)
@@ -46,13 +46,13 @@ public class EventDAO {
                     "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",
                     "VALUES (?, ?, ?, ?, ?);");
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
-                    DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
+                    DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of(event.getMessage())};
         } else {
             query = String.join("\n", "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status)",
                     "VALUES (?, ?, ?, ?);");
             valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
-                    DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
+                    DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                     DatabaseValue.of(event.getEventStatus().toString())};
         }
 
@@ -71,7 +71,7 @@ public class EventDAO {
                 "SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?)",
                 "WHERE Event_ID=?");
         DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
-                DatabaseValue.of(event.getUser().getId()), DatabaseValue.of(eventType.toString()),
+                DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                 DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of((Long) event.getTimestamp()),
                 DatabaseValue.of(event.getId())};
 

@@ -46,7 +46,13 @@ body {
 }
 #content {
     grid-area: content;
+    padding: 2rem 0;
 }
 #footer {
     grid-area: footer;
+}
+
+/* Avoid margin when all messages are cleared. */
+#messages .alert:first-of-type {
+    margin-top: 1rem; /* Corresponds to .mt-3 in Bootstrap. */
 }

@@ -20,9 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User"%>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
 
 <%--
     @param MutliplayerGame game
@@ -31,9 +29,6 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <%
 	MeleeGame game = (MeleeGame) request.getAttribute("game");
-	final GameClass cut = game.getCUT();
-
-    final User user = login.getUser();
 %>
 
 
@@ -77,22 +72,18 @@
 
 
 <div class="row">
-	<div class="col-md-6">
-		<div id="mutants-div">
-			<h3>Existing Mutants</h3>
-            <t:mutant_accordion/>
-		</div>
+	<div class="col-xl-6 col-12">
+		<t:mutant_accordion/>
 
 		<div id="tests-div">
-			<h3>JUnit tests </h3>
+            <div class="game-component-header"><h3>JUnit Tests</h3></div>
             <t:test_accordion/>
 		</div>
 	</div>
 
-	<div class="col-md-6" id="cut-div">
-		<h3>Class Under Test</h3>
-		<jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+	<div class="col-xl-6 col-12" id="cut-div">
+        <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
 		<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-		<jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
 	</div>
 </div>

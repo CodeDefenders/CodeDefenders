@@ -50,6 +50,7 @@ import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -99,6 +100,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Inject
     private GameProducer gameProducer;
+
+    @Inject
+    private UserRepository userRepo;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -162,7 +166,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        GameLevel level = parameterThenOrOther(request, "level", GameLevel.EASY, GameLevel.HARD);
+        GameLevel level = GameLevel.valueOf(getStringParameter(request, "level").orElse(GameLevel.HARD.name()));
         float lineCoverage = getFloatParameter(request, "line_cov").orElse(1.1f);
         float mutantCoverage = getFloatParameter(request, "mutant_cov").orElse(1.1f);
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
@@ -179,6 +183,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .build();
 
         newGame.setEventDAO(eventDAO);
+        newGame.setUserRepository(userRepo);
 
         if (newGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());

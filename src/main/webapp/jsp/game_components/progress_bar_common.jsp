@@ -1,4 +1,4 @@
-<div class="progress" id="progress" style="height: 40px; font-size: 30px; display: none; margin: 0 2rem 1rem 2rem;">
+<div class="progress mx-3 mt-3" id="progress" style="height: 40px; font-size: 30px; display: none;">
     <div class="progress-bar" role="progressbar"
          style="font-size: 15px; line-height: 40px; width: 0;
                 <%-- Disable animations because animations don't have time to finish before the page reloads. --%>

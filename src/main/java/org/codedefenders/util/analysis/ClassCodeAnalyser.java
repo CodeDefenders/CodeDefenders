@@ -111,12 +111,7 @@ public class ClassCodeAnalyser {
             nonEmptyLines.add(blockStart);
             nonEmptyLines.add(blockEnd);
 
-            // Lines which contain comments are not empty
-            for (Comment c : n.getAllContainedComments()) {
-                for (int line = c.getBegin().get().line; line <= c.getEnd().get().line; line++) {
-                    nonEmptyLines.add(line);
-                }
-            }
+            // Since #872, we consider lines with comments as EMPTY so we can cover them as well. 
 
             // Processing the block
             NodeList<Statement> statements = n.getStatements();

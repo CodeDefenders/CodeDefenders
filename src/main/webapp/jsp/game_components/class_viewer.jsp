@@ -22,43 +22,74 @@
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
-<%-- no dependencies -> no tabs --%>
-<% if (!classViewer.hasDependencies()) { %>
+<div class="card game-component-resize">
 
-    <pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80"
-                                        rows="30">${classViewer.classCode}</textarea></pre>
+    <%-- no dependencies -> no tabs --%>
+    <% if (!classViewer.hasDependencies()) { %>
 
-<%-- dependencies exist -> tab system --%>
-<% } else { %>
-
-    <div>
-        <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a href="#${classViewer.className}" aria-controls="${classViewer.className}" role="tab" data-toggle="tab">${classViewer.className}</a></li>
-            <% for (String depName : classViewer.getDependencies().keySet()) { %>
-                <li role="presentation"><a href="#<%=depName%>" aria-controls="<%=depName%>" role="tab" data-toggle="tab"><%=depName%></a></li>
-            <% } %>
-        </ul>
-
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="${classViewer.className}" data-toggle="tab">
-                <pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80"
-                                                    rows="30">${classViewer.classCode}</textarea></pre>
-            </div>
-            <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
-                    String depName = dependency.getKey();
-                    String depCode = dependency.getValue(); %>
-                <div role="tabpanel" class="tab-pane active hideAfterRendering" id="<%=depName%>" data-toggle="tab">
-                    <pre class="readonly-pre"><textarea class="readonly-textarea" id="text-<%=depName%>"
-                                                        name="text-<%=depName%>"
-                                                        title="text-<%=depName%>" cols="80"
-                                                        rows="30"><%=depCode%></textarea></pre>
-                </div>
-            <% } %>
+        <div class="card-body p-0 codemirror-fill">
+            <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
         </div>
+
+    <%-- dependencies exist -> tab system --%>
+    <% } else { %>
+
+        <div class="card-header">
+            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link py-1 active" data-bs-toggle="tab"
+                            id="${classViewer.className}-tab"
+                            data-bs-target="#${classViewer.className}"
+                            aria-controls="${classViewer.className}"
+                            type="button" role="tab" aria-selected="true">
+                        ${classViewer.className}
+                    </button>
+                </li>
+                <% for (String depName : classViewer.getDependencies().keySet()) { %>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link py-1" data-bs-toggle="tab"
+                                id="<%=depName%>-tab"
+                                data-bs-target="#<%=depName%>"
+                                aria-controls="<%=depName%>"
+                                type="button" role="tab" aria-selected="true">
+                            <%=depName%>
+                        </button>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+
+        <div class="card-body p-0 codemirror-fill">
+            <div class="tab-content">
+                <div class="tab-pane active"
+                     id="${classViewer.className}"
+                     aria-labelledby="${classViewer.className}-tab"
+                     role="tabpanel">
+                    <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
+                </div>
+                <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
+                        String depName = dependency.getKey();
+                        String depCode = dependency.getValue(); %>
+                    <div class="tab-pane"
+                         id="<%=depName%>"
+                         aria-labelledby="<%=depName%>-tab"
+                         role="tabpanel">
+                         <pre class="m-0"><textarea id="text-<%=depName%>"
+                                                    name="text-<%=depName%>"
+                                                    title="text-<%=depName%>"
+                                                    readonly><%=depCode%></textarea></pre>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+    <% } %>
+
+    <div class="card-footer">
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 
-<% } %>
-
+</div>
 
 
 <script>
@@ -68,40 +99,42 @@
         lineNumbers: true,
         matchBrackets: true,
         mode: "text/x-java",
-        readOnly: true,
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+        readOnly: 'nocursor',
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
+        autoRefresh: true
     });
-    editorSUT.setSize("100%", 500);
+    if (window.hasOwnProperty('ResizeObserver')) {
+        new ResizeObserver(() => editorSUT.refresh()).observe(editorSUT.getWrapperElement());
+    }
 
     /* If global autocompletedClasses exists, get it, otherwise, create it. */
     const autocompletedClasses = window.autocompletedClasses = window.autocompletedClasses || {};
     autocompletedClasses['${classViewer.className}'] = editorSUT.getTextArea().value;
 
     <%-- dependencies exist -> tab system --%>
-    <% if (classViewer.hasDependencies()) { %>
+    <%
+        if (classViewer.hasDependencies()) {
+            for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
+                String depName = dependency.getKey();
+    %>
+            {
+                let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    mode: "text/x-java",
+                    readOnly: 'nocursor',
+                    autoRefresh: true
+                });
+                if (window.hasOwnProperty('ResizeObserver')) {
+                    new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());
+                }
 
-        <% for (Map.Entry<String, String> dependency : classViewer.getDependencies().entrySet()) {
-                String depName = dependency.getKey(); %>
-            let editor<%=depName%> = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
-                lineNumbers: true,
-                matchBrackets: true,
-                mode: "text/x-java",
-                readOnly: true
-            });
-            editor<%=depName%>.setSize("100%", 457); // next to the test editor the cm editor would be too big
-            editor<%=depName%>.refresh();
-
-            autocompletedClasses['<%=depName%>'] =  editor<%=depName%>.getTextArea().value;
-        <% } %>
-
-    <% } %>
-
-    <%-- Without the hideAfterRendering class attribute the editor is only rendered
-         when the editor is displayed and actively clicked on.--%>
-    $('.hideAfterRendering').each(function () {
-        $(this).removeClass('active')
-    });
+                autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
+            }
+    <%
+            }
+        }
+    %>
 
 })();
 </script>
-

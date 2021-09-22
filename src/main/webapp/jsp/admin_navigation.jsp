@@ -39,38 +39,38 @@
     }
 %>
 
-<ul class="nav nav-tabs">
-    <li class="<%=active(activePage,"adminCreateGames")%>">
-        <a id="adminCreateGames" href="<%=request.getContextPath() + Paths.ADMIN_GAMES%>">Create Games</a>
+<ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"adminCreateGames")%>" id="adminCreateGames" href="<%=request.getContextPath() + Paths.ADMIN_GAMES%>">Create Games</a>
     </li>
-    <li class="<%=active(activePage,"adminMonitorGames")%>">
-        <a id="adminMonitorGames" href="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>">Monitor Games</a>
+    <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"adminMonitorGames")%>" id="adminMonitorGames" href="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>">Monitor Games</a>
     </li>
-    <li class="<%=active(activePage,"adminUserMgmt")%>">
-        <a id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Users</a>
+    <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"adminUserMgmt")%>" id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Users</a>
     </li>
-    <li class="<%=active(activePage,"adminClasses")%>">
-        <a id="adminClasses" href="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>">Classes</a>
+    <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"adminClasses")%>" id="adminClasses" href="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>">Classes</a>
     </li>
-    <li class="<%=active(activePage,"adminPuzzles")%> dropdown">
-        <a id="adminPuzzles" class="dropdown-toggle" data-toggle="dropdown" href="#">Puzzles&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>
+    <li class="nav-item dropdown">
+        <a class="nav-link <%=active(activePage,"adminPuzzles")%> dropdown-toggle" id="adminPuzzles" data-bs-toggle="dropdown" href="#">Puzzles</a>
         <ul class="dropdown-menu">
-            <li><a id="adminPuzzleManagement" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_MANAGEMENT%>">Manage</a></li>
-            <li><a id="adminPuzzleUpload" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_UPLOAD%>">Upload</a></li>
+            <li><a class="dropdown-item" id="adminPuzzleManagement" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_MANAGEMENT%>">Manage</a></li>
+            <li><a class="dropdown-item" id="adminPuzzleUpload" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_UPLOAD%>">Upload</a></li>
         </ul>
     </li>
-    <li class="<%=active(activePage,"adminKillMaps")%>">
-        <a id="adminKillMaps" href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">Analysis</a>
+    <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"adminKillMaps")%>" id="adminKillMaps" href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">Analysis</a>
     </li>
-    <li class="<%=active(activePage,"adminAnalytics")%> dropdown">
-        <a id="adminAnalytics" class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>
+    <li class="nav-item dropdown">
+        <a class="nav-link <%=active(activePage,"adminAnalytics")%> dropdown-toggle" id="adminAnalytics" data-bs-toggle="dropdown" href="#">Analytics</a>
         <ul class="dropdown-menu">
-            <li><a id="adminAnalyticsUsers" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_USERS%>">Users</a></li>
-            <li><a id="adminAnalyticsClasses" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
-            <li><a id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
+            <li><a class="dropdown-item" id="adminAnalyticsUsers" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_USERS%>">Users</a></li>
+            <li><a class="dropdown-item" id="adminAnalyticsClasses" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
+            <li><a class="dropdown-item" id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
         </ul>
     </li>
-    <li class="<%=active(activePage,"adminSystemSettings")%>">
-        <a id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
+    <li class="nav-item">
+        <a class="nav-link <%=active(activePage,"adminSystemSettings")%>" id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
     </li>
 </ul>

@@ -19,6 +19,8 @@
 
 package org.codedefenders.auth;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -32,7 +34,7 @@ import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.realm.AuthenticatingRealm;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.SettingsRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
@@ -49,12 +51,12 @@ import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
 
     private final SettingsRepository settingsRepository;
-    private final UserRepository userRepository;
+    private final UserRepository userRepo;
 
     @Inject
-    public CodeDefendersAuthenticatingRealm(SettingsRepository settingsRepository, UserRepository userRepository) {
+    public CodeDefendersAuthenticatingRealm(SettingsRepository settingsRepository, UserRepository userRepo) {
         this.settingsRepository = settingsRepository;
-        this.userRepository = userRepository;
+        this.userRepo = userRepo;
     }
 
     @Override
@@ -64,25 +66,25 @@ public class CodeDefendersAuthenticatingRealm extends AuthenticatingRealm {
         if (token instanceof UsernamePasswordToken) {
             UsernamePasswordToken usernamePasswordToken = (UsernamePasswordToken) token;
 
-            User activeUser = userRepository.getUserByName(usernamePasswordToken.getUsername());
+            Optional<UserEntity> activeUser = userRepo.getUserByName(usernamePasswordToken.getUsername());
 
-            if (activeUser == null) {
+            if (!activeUser.isPresent()) {
                 throw new UnknownAccountException("Username not found or password incorrect.");
             }
 
-            if (settingsRepository.isMailValidationRequired() && !activeUser.isValidated()) {
+            if (settingsRepository.isMailValidationRequired() && !activeUser.get().isValidated()) {
                 throw new LockedAccountException("Account email is not validated.");
             }
 
-            if (!activeUser.isActive()) {
+            if (!activeUser.get().isActive()) {
                 throw new LockedAccountException(
                         "Your account is inactive, login is only possible with an active account.");
             }
 
-            String dbPassword = activeUser.getEncodedPassword();
+            String dbPassword = activeUser.get().getEncodedPassword();
 
-            if (User.passwordMatches(new String(usernamePasswordToken.getPassword()), dbPassword)) {
-                return new SimpleAuthenticationInfo(activeUser, usernamePasswordToken.getPassword(), getName());
+            if (UserEntity.passwordMatches(new String(usernamePasswordToken.getPassword()), dbPassword)) {
+                return new SimpleAuthenticationInfo(activeUser.get(), usernamePasswordToken.getPassword(), getName());
             } else {
                 throw new IncorrectCredentialsException("Username not found or password incorrect.");
             }

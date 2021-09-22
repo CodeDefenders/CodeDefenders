@@ -11,11 +11,13 @@ import java.util.Set;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
 
 import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.service.UserService;
 
 /**
  * <p>
@@ -38,6 +40,14 @@ public class MeleeScoreboardBean {
      * - Meele game has N teams
      *
      */
+
+    private final UserService userService;
+
+    @Inject
+    public MeleeScoreboardBean(UserService userService) {
+        this.userService = userService;
+    }
+
 
     private Integer gameId;
 
@@ -105,7 +115,7 @@ public class MeleeScoreboardBean {
                         - (o1.getAttackScore().getTotalScore() + o1.getDefenseScore().getTotalScore() + o1.getDuelScore().getTotalScore());
 
                 if (diff == 0) {
-                    return o1.getUser().getUsername().compareTo(o2.getUser().getUsername());
+                    return o1.getUser().getName().compareTo(o2.getUser().getName());
                 } else {
                     return diff;
                 }
@@ -121,7 +131,7 @@ public class MeleeScoreboardBean {
         for (Player player : this.players) {
             // We need user id because User is not Hashable (maybe it does not redefine
             // proper hash/equals?)
-            User user = player.getUser();
+            SimpleUser user = userService.getSimpleUserByPlayerId(player.getId()).get();
             int playerId = player.getId();
             PlayerScore attackScore = mutantsScores.get(user.getId());
             if (attackScore == null) {

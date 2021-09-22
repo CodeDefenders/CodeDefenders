@@ -26,14 +26,11 @@
 
     The game highlighting uses these HTML elements:
         - Mutant Icons:
-            <div class="mutant-icons">
-                <div class="mutant-icon"
-                    <img class="mutant-icon-image">
-                    <span class="mutant-icon-count">
+            <div class="gh-mutant-icons">
+                <div class="gh-mutant-icon">
+                    ::after
                 </div>
             </div>
-        - Mutant Pop-overs:
-            <div class="mutant-popover-body"/>
 
     The CSS is located in codemirror_customize.css.
 --%>
@@ -68,12 +65,12 @@
             EQUIVALENT: 'Equivalent Mutants'
         };
 
-        const Icons = {
-            ALIVE: '<%=request.getContextPath()%>/images/ingameicons/mutant.png',
-            KILLED: '<%=request.getContextPath()%>/images/ingameicons/mutantKilled.png',
-            FLAGGED: '<%=request.getContextPath()%>/images/ingameicons/mutantFlagged.png',
-            EQUIVALENT: '<%=request.getContextPath()%>/images/ingameicons/mutantEquiv.png',
-            FLAG: '<%=request.getContextPath()%>/images/ingameicons/flag.png'
+        const IconClasses = {
+            ALIVE: ['mutantCUTImage', 'mutantImageAlive'],
+            KILLED: ['mutantCUTImage', 'mutantImageKilled'],
+            FLAGGED: ['mutantCUTImage', 'mutantImageFlagged'],
+            EQUIVALENT: ['mutantCUTImage', 'mutantImageEquiv'],
+            FLAG: ['mutantCUTImage', 'mutantImageFlagAction']
         };
 
         /*
@@ -107,18 +104,21 @@
             }
 
             /* Create the icons for each mutant type on the line. */
-            let icons = [];
-            for (const mutantStatus in sortedMutants) {
-                /* Must be in one line, because it's in a pre.
-                   Can't use template strings because JSP's EL syntax overrides it. */
-                icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '"  can-claim="' + mutantsOnLine.some((element) => element.canClaim) + '">' +
-                               '<img class="mutant-icon-image" src="' + Icons[mutantStatus] + '">' +
-                               '<span class="mutant-icon-count">' + sortedMutants[mutantStatus].length + '</span>' +
-                           '</div>');
-            }
             const mutantIcons = document.createElement('div');
-            mutantIcons.classList.add('mutant-icons');
-            mutantIcons.innerHTML = icons.join("");
+            mutantIcons.classList.add('gh-mutant-icons');
+            for (const mutantStatus in sortedMutants) {
+                const mutantIcon = document.createElement('div');
+                mutantIcon.classList.add('gh-mutant-icon');
+                mutantIcon.classList.add(...IconClasses[mutantStatus]);
+
+                /* Dataset entries are "converted" to kebap-case DOM attributes. */
+                mutantIcon.dataset.mutantStatus = mutantStatus;
+                mutantIcon.dataset.line = line;
+                mutantIcon.dataset.count = sortedMutants[mutantStatus].length;
+                mutantIcon.dataset.canClaim = mutantsOnLine.some((element) => element.canClaim);
+
+                mutantIcons.appendChild(mutantIcon);
+            }
 
             return mutantIcons;
         };
@@ -129,60 +129,77 @@
          * @param {HTMLElement} mutantIcons The mutant icons.
          */
         const addPopoverTriggerToMutantIcons = function (mutantIcons) {
-            $(mutantIcons).find('.mutant-icon').popover({
-                /* Append to body instead of the element itself, so that the icons don't overlap modals. */
-                container: document.body,
-                placement: 'right',
-                trigger: 'manual',
-                html: true,
-                title: createPopoverTitle,
-                content: createPopoverContent
-            }).on('mouseenter', function () {
-                clearTimeouts();
+            for (const mutantIcon of mutantIcons.querySelectorAll('.gh-mutant-icon')) {
 
-                /* Hide all other pop-overs. */
-                $('.mutant-icon').not(this).popover('hide');
+                mutantIcon.popover = new bootstrap.Popover(mutantIcon, {
+                    /* Append to body instead of the element itself, so that the icons don't overlap modals. */
+                    container: document.body,
+                    placement: 'right',
+                    trigger: 'manual',
+                    html: true,
+                    customClass: 'popover-fluid',
+                    title: createPopoverTitle,
+                    content: createPopoverContent
+                });
 
-                /* Show this pop-over. */
-                $(this).popover('show');
-
-                /* Clear timeouts when pop-over is hovered so it won't be hidden by the timeout. */
-                $('.popover').on('mouseenter', () => {
+                /* Activate popovers manually so we can make them stay as long as they are hovered. */
+                mutantIcon.addEventListener('mouseenter', function (event) {
                     clearTimeouts();
-                }).on('mouseleave', () => {
+
+                    /* Hide all other pop-overs. */
+                    for (const otherMutantIcon of document.querySelectorAll('.gh-mutant-icon')) {
+                        if (mutantIcon !== otherMutantIcon) {
+                            otherMutantIcon.popover.hide();
+                        }
+                    }
+
+                    mutantIcon.popover.show();
+
+                    /* Clear timeouts when pop-over is hovered so it won't be hidden by the timeout. */
+                    for (const popoverElement of document.getElementsByClassName('popover')) {
+                        popoverElement.addEventListener('mouseenter', function (event) {
+                            clearTimeouts();
+                        });
+                        popoverElement.addEventListener('mouseleave', function (event) {
+                            addTimeout(() => {
+                                mutantIcon.popover.hide();
+                            }, 500);
+                        });
+                    }
+                });
+                mutantIcon.addEventListener('mouseleave', function (event) {
                     addTimeout(() => {
-                        $(this).popover('hide');
+                        mutantIcon.popover.hide();
                     }, 500);
                 });
-            }).on('mouseleave', function () {
-                addTimeout(() => {
-                    $(this).popover('hide');
-                }, 500);
-            });
+            }
         };
 
         /**
          * Creates the title for a popover.
-         * "this" will point to the ".mutant-icon" div.
+         * "this" will point to the ".gh-mutant-icon" div.
          * @returns {string} The popover title.
          */
         const createPopoverTitle = function () {
-            const status = $(this).attr('mutant-status');
-            const line = Number($(this).attr('mutant-line'));
+            const status = this.dataset.mutantStatus;
+            const line = Number(this.dataset.line);
 
-            return '<img src="' + Icons[status] + '" class="mutant-icon-image"> '
-                + MutantNames[status] + ' (Line ' + line + ')';
+            return '' +
+                `<div class="d-flex align-items-center gap-2">
+                    <div class="\${IconClasses[status].join(' ')}"></div>
+                    \${MutantNames[status]} (Line \${line})
+                </div>`;
         };
 
         /**
          * Creates the body for a popover.
-         * "this" will point to the ".mutant-icon" div.
+         * "this" will point to the ".gh-mutant-icon" div.
          * @returns {HTMLElement} The popover body.
          */
         const createPopoverContent = function () {
-            const status = $(this).attr('mutant-status');
-            const canClaim = $(this).attr('can-claim');
-            const line = Number($(this).attr('mutant-line'));
+            const status = this.dataset.mutantStatus;
+            const canClaim = this.dataset.canClaim;
+            const line = Number(this.dataset.line);
 
             const mutantsOnLine = mutantIdsPerLine.get(line)
                 .map(id => mutants.get(id))
@@ -190,33 +207,33 @@
 
             const head =
                 `<thead>
-                     <tr>
-                         <td>Creator</td>
-                         <td align="right">ID</td>
-                         <td align="right">Score</td>
-                         <td align="right">Changed Lines</td>
-                     </tr>
-                 </thead>`;
+                    <tr>
+                        <td>Creator</td>
+                        <td class="text-end">ID</td>
+                        <td class="text-end">Score</td>
+                        <td class="text-end">Changed Lines</td>
+                    </tr>
+                </thead>`;
 
             const rows = [];
             for (const mutant of mutantsOnLine) {
                 rows.push(
                     `<tr>
-                         <td>` + mutant.creatorName + `</td>
-                         <td align="right">` + mutant.id + `</td>
-                         <td align="right">` + mutant.score + `</td>
-                         <td align="right">` + mutant.lines + `</td>
-                     </tr>`
+                        <td>\${mutant.creatorName}</td>
+                        <td class="text-end">\${mutant.id}</td>
+                        <td class="text-end">\${mutant.score}</td>
+                        <td class="text-end">\${mutant.lines}</td>
+                    </tr>`
                 );
             }
 
             const table =
                 `<div>
-                    <table class="table table-condensed">`
-                         + head +
-                        `<tbody>`
-                             + rows.join('\n') +
-                        `</tbody>
+                    <table class="table table-sm table-no-last-border m-0">
+                        \${head}
+                        <tbody>
+                             \${rows.join('\n')}
+                        </tbody>
                      </table>
                 </div>`;
 
@@ -243,14 +260,17 @@
          */
         const createEquivalenceButton = function (line) {
             <% if (gameHighlighting.getGameMode() == GameMode.PARTY || gameHighlighting.getGameMode() == GameMode.MELEE ) { %>
-                return `<form id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
-                            <input type="hidden" name="formType" value="claimEquivalent">
-                            <input type="hidden" name="equivLines" value="` + line + `">
-                            <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
-                            <button class="btn btn-danger btn-sm" style="width: 100%;">
-                                <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
-                            </button>
-                        </form>`;
+                return '' +
+                    `<form class="mt-3" id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post"
+                        onsubmit="return window.confirm('This will mark all player-created mutants on line \${line} as equivalent. Are you sure?')">
+                        <input type="hidden" name="formType" value="claimEquivalent">
+                        <input type="hidden" name="equivLines" value="\${line}">
+                        <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
+                        <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
+                            <div class="\${IconClasses.FLAG.join(' ')}"></div>
+                            <span>Claim Equivalent</span>
+                        </button>
+                    </form>`;
             <% } else { %>
                 return '';
             <% } %>
@@ -326,7 +346,7 @@
          * @param {object} codeMirror The CodeMirror instance.
          */
         const hideMutants = function (codeMirror) {
-            $(codeMirror.getWrapperElement()).find('.mutant-icons').hide();
+            $(codeMirror.getWrapperElement()).find('.gh-mutant-icons').hide();
         };
 
         /**
@@ -334,7 +354,7 @@
          * @param {object} codeMirror The CodeMirror instance.
          */
         const showMutants = function (codeMirror) {
-            $(codeMirror.getWrapperElement()).find('.mutant-icons').show();
+            $(codeMirror.getWrapperElement()).find('.gh-mutant-icons').show();
         };
 
         const codeMirror = $('${gameHighlighting.codeDivSelector}').find('.CodeMirror')[0].CodeMirror;

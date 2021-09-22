@@ -12,6 +12,9 @@
 
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+
+		<skipUnitTests>false</skipUnitTests>
+		<skipIntegrationTests>false</skipIntegrationTests>
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
@@ -44,6 +47,89 @@
 			</plugin>
 
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.2.0</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.basedir}/src/integration/java/</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.22.2</version>
+				<!-- This forces to use the proper junit runner. Old versions do not
+					support categories -->
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.surefire</groupId>
+						<artifactId>surefire-junit47</artifactId>
+						<version>2.22.2</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<skipTests>${skipUnitTests}</skipTests>
+					<!-- Sets the VM argument line used when unit tests are run. -->
+					<argLine>${surefireArgLine}</argLine>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.6</version>
+				<configuration>
+					<excludes>
+						<exclude>target/classes/data/generated_mutants_2016.zip@**/*</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<!-- Prepare the property pointing to the JaCoCo runtime agent which
+					is passed as VM argument when Maven Surefire plugin is executed. -->
+					<execution>
+						<id>pre-unit-test</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
+							<!-- Sets the name of the property containing the settings for JaCoCo
+								runtime agent. -->
+							<propertyName>surefireArgLine</propertyName>
+						</configuration>
+					</execution>
+					<!-- Ensures that the code coverage report for unit tests is created
+						after unit tests have been run. -->
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+							<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
+							<!-- Sets the output directory for the coverage report. -->
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.6</version>
@@ -55,6 +141,36 @@
 						</manifest>
 					</archive>
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>3.0.0-M5</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.surefire</groupId>
+						<artifactId>surefire-junit47</artifactId>
+						<version>3.0.0-M5</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<goals>
+							<goal>integration-test</goal>
+							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<skipTests>${skipIntegrationTests}</skipTests>
+					<additionalClasspathElements>
+						<additionalClasspathElement>${project.basedir}/src/integration/resources
+						</additionalClasspathElement>
+					</additionalClasspathElements>
+					<!-- DatabaseTests need to be enabled manually via the it-database-only profile -->
+					<excludedGroups>org.codedefenders.DatabaseTest</excludedGroups>
 				</configuration>
 			</plugin>
 
@@ -254,89 +370,29 @@
 	</build>
 
 	<profiles>
-		<!-- Solution inspired by: Taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
 		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+			<id>it-database-only</id>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.22.2</version>
-						<!-- This forces to use the proper junit runner. Old versions do not
-							support categories -->
-						<dependencies>
-							<dependency>
-								<groupId>org.apache.maven.surefire</groupId>
-								<artifactId>surefire-junit47</artifactId>
-								<version>2.22.2</version>
-							</dependency>
-						</dependencies>
+						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
-							<!-- Sets the VM argument line used when unit tests are run. -->
-							<argLine>${surefireArgLine}</argLine>
-							<includes>
-								<include>**/*.class</include>
-							</includes>
-							<excludedGroups>
-								org.codedefenders.itests.IntegrationTest,org.codedefenders.systemtests.SystemTest
-							</excludedGroups>
-							<!-- Exclude resources for integration tests. Note that those are
-								actual java and class files for mutants and tests -->
-							<excludes>
-								<exclude>**/itests/**/*.*</exclude>
-								<exclude>**/systemtests/**/*.*</exclude>
-							</excludes>
+							<skipTests>${skipIntegrationTests}</skipTests>
+							<additionalClasspathElements>
+								<additionalClasspathElement>${project.basedir}/src/integration/resources
+								</additionalClasspathElement>
+							</additionalClasspathElements>
+							<groups>org.codedefenders.DatabaseTest</groups>
+							<!-- Need to overwrite the excluded groups of the default invocation -->
+							<excludedGroups>org.codedefenders</excludedGroups>
 						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>0.8.6</version>
-						<configuration>
-							<excludes>
-								<exclude>target/classes/data/generated_mutants_2016.zip@**/*</exclude>
-							</excludes>
-						</configuration>
-						<executions>
-							<!-- Prepare the property pointing to the JaCoCo runtime agent which
-							is passed as VM argument when Maven Surefire plugin is executed. -->
-							<execution>
-								<id>pre-unit-test</id>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-								<configuration>
-									<!-- Sets the path to the file which contains the execution data. -->
-									<destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
-									<!-- Sets the name of the property containing the settings for JaCoCo
-										runtime agent. -->
-									<propertyName>surefireArgLine</propertyName>
-								</configuration>
-							</execution>
-							<!-- Ensures that the code coverage report for unit tests is created
-								after unit tests have been run. -->
-							<execution>
-								<id>post-unit-test</id>
-								<phase>test</phase>
-								<goals>
-									<goal>report</goal>
-								</goals>
-								<configuration>
-									<!-- Sets the path to the file which contains the execution data. -->
-									<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
-									<!-- Sets the output directory for the coverage report. -->
-									<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
+
+		<!-- Solution inspired by and taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
 		<!-- Integration Tests are run locally without docker or anything else -->
 		<profile>
 			<id>IT</id>
@@ -404,7 +460,7 @@
 		</profile>
 		<!-- System tests use Docker, Docker-Compose, Selenium and probably something
 			else. Before test we ensure the system is rebuild and repackage as war file
-			using config.properties@docker as config file. Not sure how this can be enforces
+			using docker.properties as config file. Not sure how this can be enforces
 			if not encoding the value of ${config.properties} Then we use surefire (not
 			failsafe) to execute the tests, but we bind this phase to integration-tests
 			instead of regular unit-tests: https://stackoverflow.com/questions/1399240/how-do-i-get-my-maven-integration-tests-to-run?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa -->
@@ -412,7 +468,7 @@
 			<id>ST</id>
 			<properties>
 				<!-- Read the properties from this specific file -->
-				<config.properties>config.properties@docker</config.properties>
+				<config.properties>docker.properties</config.properties>
 			</properties>
 			<build>
 				<!-- TODO Use the maven plugin to build codedefenders/frontend and tomcat:8.5 -->
@@ -581,7 +637,7 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>24.1.1-jre</version>
+			<version>30.1.1-jre</version>
 		</dependency>
 
 		<!-- JSON serialization -->
@@ -638,24 +694,29 @@
 			<version>1.9.4</version>
 		</dependency>
 		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-dbutils</groupId>
 			<artifactId>commons-dbutils</artifactId>
 			<version>1.7</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.6</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
-			<version>1.3.3</version>
+			<version>1.4</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -664,13 +725,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-csv</artifactId>
-			<version>1.6</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.14</version>
+			<artifactId>commons-text</artifactId>
+			<version>1.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -683,32 +739,13 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-			<version>3.3.5</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap-select</artifactId>
-			<version>1.9.4</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars.bower</groupId>
-			<artifactId>bootstrap-toggle</artifactId>
-			<version>2.2.1</version>
-			<scope>runtime</scope>
-		</dependency>
-		<!-- Do we still need this? -->
-		<dependency>
-			<groupId>org.webjars.bower</groupId>
-			<artifactId>slick-carousel</artifactId>
-			<version>1.5.8</version>
+			<version>5.0.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>jquery</artifactId>
-			<version>3.3.1-2</version>
+			<version>3.6.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -720,7 +757,7 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>font-awesome</artifactId>
-			<version>4.3.0</version>
+			<version>4.7.0</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -738,20 +775,20 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>datatables</artifactId>
-			<version>1.10.16</version>
+			<version>1.10.24</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>datatables-select</artifactId>
-			<version>1.3.1</version>
+			<version>1.3.3</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!-- Provides datetime-moment.js -->
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>datatables-plugins</artifactId>
-			<version>1.10.16</version>
+			<version>1.10.24</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!-- End Client Side Dependencies -->
@@ -780,6 +817,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- More/Better Assertions -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.7.1</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- Mocking frameworks -->
 		<dependency>
 			<groupId>org.powermock</groupId>
@@ -799,14 +844,6 @@
 					<artifactId>objenesis</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<!-- Used for database tests. TODO: Shall we keep this around now that we use docker ? -->
-		<dependency>
-			<groupId>ch.vorburger.mariaDB4j</groupId>
-			<artifactId>mariaDB4j</artifactId>
-			<version>2.2.3</version>
-			<scope>test</scope>
 		</dependency>
 		<!-- End Test Dependencies -->
 

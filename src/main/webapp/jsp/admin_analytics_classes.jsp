@@ -18,19 +18,21 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Class Analytics"); %>
+
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminAnalytics"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <h3>Classes</h3>
+    <h3>Class Analytics</h3>
 
-    <table id="tableClasses"
-           class="table table-striped table-hover table-responsive">
+    <table id="tableClasses" class="table table-striped">
         <thead>
             <tr>
-                <th id="toggle-all-details"><span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span></th>
+                <th class="toggle-all-details"><i class="toggle-details-icon fa fa-chevron-right"></i></th>
                 <th>ID</th>
                 <th>Name (Alias)</th>
                 <th>Games Played</th>
@@ -42,11 +44,24 @@
         </thead>
     </table>
 
-    <div class="btn-group">
-        <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
-            type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=json"
-           type="button" class="btn btn-default" id="download-json">Download as JSON</a>
+    <div class="row mt-4">
+        <div class="col-auto">
+            <div class="btn-group">
+                <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download">
+                    <i class="fa fa-download me-1"></i>
+                    Download table
+                </a>
+                <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
+                    as CSV
+                </a>
+                <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=json"
+                   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
+                    as JSON
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -61,67 +76,69 @@
         var rating3 = data.ratings.gameEngaging;
 
         return '' +
-            '<table class="table-child-details indented">'+
-                '<thead>'+
-                    '<tr>'+
-                        '<th>Win Rates</td>'+
-                    '</tr>'+
-                '</thead>'+
-                '<tbody>'+
-                    '<tr>'+
-                        '<td>Attacker Wins:</td>'+
-                        '<td>'+dtValAndPerc(data.attackerWins, data.nrGames)+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Defender Wins:</td>'+
-                        '<td>'+dtValAndPerc(data.defenderWins, data.nrGames)+'</td>'+
-                    '</tr>'+
-                '</tbody>'+
-                '<thead>'+
-                    '<tr>'+
-                        '<th>Feedback</td>'+
-                    '</tr>'+
-                '</thead>'+
-                '<tbody>'+
-                    '<tr>'+
-                        '<td>Mutation Difficulty:</td>'+
-                        '<td>'+dtDiv(rating1.sum, rating1.count, 'NA')+'</td>'+
-                        '<td>Number of votes:</td>'+
-                        '<td>'+rating1.count+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Test Difficulty:</td>'+
-                        '<td>'+dtDiv(rating2.sum, rating2.count, 'NA')+'</td>'+
-                        '<td>Number of votes:</td>'+
-                        '<td>'+rating2.count+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Game is engaging:</td>'+
-                        '<td>'+dtDiv(rating3.sum, rating3.count, 'NA')+'</td>'+
-                        '<td>Number of votes:</td>'+
-                        '<td>'+rating3.count+'</td>'+
-                    '</tr>'+
-                '</tbody>'+
-                '<thead>'+
-                    '<tr>'+
-                        '<th>Mutants</td>'+
-                    '</tr>'+
-                '</thead>'+
-                '<tbody>'+
-                    '<tr>'+
-                        '<td>Mutants Alive:</td>'+
-                        '<td>'+dtValAndPerc(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
-                        '<td>Per Game:</td>'+
-                        '<td>'+dtDiv(data.mutantsAlive, data.nrGames)+'</td>'+
-                    '</tr>'+
-                    '<tr>'+
-                        '<td>Mutants Equivalent:</td>'+
-                        '<td>'+dtValAndPerc(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
-                        '<td>Per Game:</td>'+
-                        '<td>'+dtDiv(data.mutantsEquivalent, data.nrGames)+'</td>'+
-                    '</tr>'+
-                '</tbody>'+
-            '</table>';
+            `<div class="child-row-wrapper">
+                <table class="child-row-details">
+                    <thead>
+                        <tr>
+                            <th>Win Rates</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Attacker Wins:</td>
+                            <td>\${dtValAndPercent(data.attackerWins, data.nrGames)}</td>
+                        </tr>
+                        <tr>
+                            <td>Defender Wins:</td>
+                            <td>\${dtValAndPercent(data.defenderWins, data.nrGames)}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th>Feedback</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mutation Difficulty:</td>
+                            <td>\${dtDiv(rating1.sum, rating1.count, 'NA')}</td>
+                            <td>Number of votes:</td>
+                            <td>\${rating1.count}</td>
+                        </tr>
+                        <tr>
+                            <td>Test Difficulty:</td>
+                            <td>\${dtDiv(rating2.sum, rating2.count, 'NA')}</td>
+                            <td>Number of votes:</td>
+                            <td>\${rating2.count}</td>
+                        </tr>
+                        <tr>
+                            <td>Game is engaging:</td>
+                            <td>\${dtDiv(rating3.sum, rating3.count, 'NA')}</td>
+                            <td>Number of votes:</td>
+                            <td>\${rating3.count}</td>
+                        </tr>
+                    </tbody>
+                    <thead>
+                        <tr>
+                            <th>Mutants</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mutants Alive:</td>
+                            <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
+                            <td>Per Game:</td>
+                            <td>\${dtDiv(data.mutantsAlive, data.nrGames)}</td>
+                        </tr>
+                        <tr>
+                            <td>Mutants Equivalent:</td>
+                            <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
+                            <td>Per Game:</td>
+                            <td>\${dtDiv(data.mutantsEquivalent, data.nrGames)}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>`;
     }
 
     $(document).ready(function() {
@@ -135,33 +152,37 @@
                     "className":      'toggle-details',
                     "orderable":      false,
                     "data":           null,
-                    "defaultContent": '<span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span>'
+                    "defaultContent": '<i class="toggle-details-icon fa fa-chevron-right"></i>'
                 },
                 { "data": "id" },
                 { "data":
-                        function(row, type, val, meta) {
+                        function (row, type, val, meta) {
                             return row.classname + ' (' + row.classalias + ')';
                         }
                 },
                 { "data": "nrGames" },
                 { "data": "testsSubmitted" },
                 { "data":
-                        function(row, type, val, meta) {
+                        function (row, type, val, meta) {
                             return dtDiv(row.testsSubmitted, row.nrGames);
                         }
                 },
                 { "data": "mutantsSubmitted" },
                 { "data":
-                        function(row, type, val, meta) {
+                        function (row, type, val, meta) {
                             return dtDiv(row.mutantsSubmitted, row.nrGames);
                         }
                 }
             ],
             "pageLength": 50,
-            "order": [[ 1, "asc" ]]
+            "order": [[ 1, "asc" ]],
+            "scrollY": '600px',
+            "scrollCollapse": true,
+            "paging": false,
+            "language": {"info": "Showing _TOTAL_ entries"}
         });
 
-        setupChildRows("#tableClasses", table, format);
+        setupChildRows(table, format);
     });
 
 })();

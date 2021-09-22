@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
@@ -59,6 +58,7 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -133,6 +133,9 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private GameProducer gameProducer;
 
+    @Inject
+    private UserRepository userRepo;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
@@ -153,6 +156,7 @@ public class PuzzleGameManager extends HttpServlet {
             } else {
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 game.setEventDAO(eventDAO);
+                game.setUserRepository(userRepo);
             }
             if (game.getCreatorId() != login.getUserId()) {
                 logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.",
@@ -178,6 +182,7 @@ public class PuzzleGameManager extends HttpServlet {
                 gameProducer.setGameId(game.getId());
                 // TODO Should he make PuzzleDAO inject dependencies instead
                 game.setEventDAO(eventDAO);
+                game.setUserRepository(userRepo);
             }
         }
 
@@ -235,6 +240,7 @@ public class PuzzleGameManager extends HttpServlet {
         } else {
             // TODO How we should handle dependency injection here?
             game.setEventDAO(eventDAO);
+            game.setUserRepository(userRepo);
         }
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
@@ -350,6 +356,7 @@ public class PuzzleGameManager extends HttpServlet {
         } else {
             // TODO Should he make PuzzleDAO inject dependencies instead
             game.setEventDAO(eventDAO);
+            game.setUserRepository(userRepo);
         }
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit test to non-puzzle game {}.", gameId);
@@ -508,6 +515,7 @@ public class PuzzleGameManager extends HttpServlet {
         } else {
             // TODO Should he make PuzzleDAO inject dependencies instead
             game.setEventDAO(eventDAO);
+            game.setUserRepository(userRepo);
         }
         if (game.getMode() != GameMode.PUZZLE) {
             logger.error("Trying to submit mutant to non-puzzle game {}. Aborting.", gameId);
@@ -706,6 +714,7 @@ public class PuzzleGameManager extends HttpServlet {
                         return message.toString();
                     }
                     playedGame.setEventDAO(eventDAO);
+                    playedGame.setUserRepository(userRepo);
                 }
             }
         }

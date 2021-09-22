@@ -22,349 +22,413 @@
 
 <%--@elvariable id="mutantAccordion" type="org.codedefenders.beans.game.MutantAccordionBean"--%>
 
-<style type="text/css">
-    <%-- Prefix all classes with "ta-" to avoid conflicts.
-    We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
 
-    #mutants-accordion {
-        margin-bottom: 0;
-    }
+<div id="mutants-div">
 
-    #mutants-accordion .panel-body {
-        padding: 0;
-    }
+    <style>
+        <%-- Prefix all classes with "ta-" to avoid conflicts.
+        We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
 
-    #mutants-accordion thead {
-        display: none;
-    }
+        /* Customization of Bootstrap 5 accordion style.
+        ----------------------------------------------------------------------------- */
 
-    #mutants-accordion .dataTables_scrollHead {
-        display: none;
-    }
+        #mutants-accordion .accordion-button {
+            padding: .6rem .8rem;
+            background-color: rgba(0, 0, 0, .03);
+        }
 
-    #mutants-accordion .panel-heading {
-        padding-top: .375em;
-        padding-bottom: .375em;
-    }
+        /* Clear the box shadow from .accordion-button. This removes the blue outline when selecting a button, and the
+           border between the header and content of accordion items when expanded. */
+        #mutants-accordion .accordion-button {
+            box-shadow: none;
+        }
 
-    #mutants-accordion td {
-        vertical-align: middle;
-    }
+        /* Add back the border between header and content of accordion items. */
+        #mutants-accordion .accordion-body {
+            border-top: 1px solid rgba(0, 0, 0, .125);
+        }
 
-    #mutants-accordion .panel-title.ma-covered {
-        color: black;
-    }
+        /* Always display the chevron icon in black. */
+        #mutants-accordion .accordion-button:not(.collapsed)::after {
+            /* Copied from Bootstrap 5. */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+        }
 
-    #mutants-accordion .panel-title:not(.ma-covered) {
-        color: #B0B0B0;
-    }
+        /* Categories.
+        ----------------------------------------------------------------------------- */
 
-    #mutants-accordion .ma-column-name {
-        color: #B0B0B0;
-    }
+        #mutants-accordion .accordion-button:not(.ma-covered) {
+            color: #B0B0B0;
+        }
 
-    #mutants-accordion .ma-count {
-        margin-right: .5em;
-        padding-bottom: .2em;
-    }
+        #mutants-accordion .accordion-button.ma-covered {
+            color: black;
+        }
 
-    #mutants-accordion .ma-covered-link,
-    #mutants-accordion .ma-killed-link {
-        color: inherit;
-    }
+        /* Tables.
+        ----------------------------------------------------------------------------- */
 
-    #mutants-accordion .panel-heading a {
-        text-decoration: none;
-    }
+        #mutants-accordion thead {
+            display: none;
+        }
 
-    #mutants-accordion .ma-mutant-link {
-        padding: 0
-    }
+        #mutants-accordion .dataTables_scrollHead {
+            display: none;
+        }
 
-    .modal.mutant-modal .modal-dialog {
-        width: max-content;
-        max-width: 90%;
-        min-width: 500px;
-    }
-</style>
+        #mutants-accordion td {
+            vertical-align: middle;
+        }
 
-<div class="panel panel-default">
-    <div class="panel-body" id="mutants">
-        <div class="panel-group" id="mutants-accordion">
-            <c:forEach items="${mutantAccordion.categories}" var="category">
-                <div class="panel panel-default">
-                    <div class="panel-heading" id="ma-heading-${category.id}">
-                        <a role="button" data-toggle="collapse" aria-expanded="false"
-                           href="#ma-collapse-${category.id}"
-                           aria-controls="ma-collapse-${category.id}"
-                            <%-- ${empty …} doesn't work with Set --%>
-                           class="panel-title ${category.mutantIds.size() == 0 ? "" : 'ma-covered'}"
-                           style="text-decoration: none;">
-                                <%-- ${empty …} doesn't work with Set --%>
-                            <c:if test="${!(category.mutantIds.size() == 0)}">
-                                <span class="label bg-attacker ma-count">${category.mutantIds.size()}</span>
-                            </c:if>
-                                ${category.description}
-                        </a>
-                    </div>
-                    <div class="panel-collapse collapse" data-parent="#mutants-accordion"
-                         id="ma-collapse-${category.id}"
-                         aria-labelledby="ma-heading-${category.id}">
-                        <div class="panel-body">
-                            <table id="ma-table-${category.id}" class="table table-sm"></table>
-                        </div>
-                    </div>
-                </div>
-            </c:forEach>
+        #mutants-accordion table {
+            font-size: inherit;
+        }
+
+        #mutants-accordion tr:last-child > td {
+            border-bottom: none;
+        }
+
+        /* Inline elements.
+        ----------------------------------------------------------------------------- */
+
+        #mutants-accordion .ma-column-name {
+            color: #B0B0B0;
+        }
+
+        #mutants-accordion .ma-mutant-link {
+            cursor: default;
+        }
+    </style>
+
+
+    <div class="game-component-header">
+        <h3>Existing Mutants</h3>
+        <div id="ma-filter">
+            <input type="radio" class="btn-check" name="filter" id="all" value="ALL" checked>
+            <label class="btn btn-xs btn-outline-secondary" for="all">
+                <span class="align-middle">All</span>
+            </label>
+            <input type="radio" class="btn-check" name="filter" id="alive" value="ALIVE">
+            <label class="btn btn-xs btn-outline-secondary" for="alive">
+                <span class="mutantCUTImage mutantImageAlive align-middle"></span>
+                <span class="align-middle">Alive</span>
+            </label>
+            <input type="radio" class="btn-check" name="filter" id="killed" value="KILLED">
+            <label class="btn btn-xs btn-outline-secondary" for="killed">
+                <span class="mutantCUTImage mutantImageKilled align-middle"></span>
+                <span class="align-middle">Killed</span>
+            </label>
+            <input type="radio" class="btn-check" name="filter" id="marked" value="FLAGGED">
+            <label class="btn btn-xs btn-outline-secondary" for="marked">
+                <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
+                <span class="align-middle">Claimed Equivalent</span>
+            </label>
+            <input type="radio" class="btn-check" name="filter" id="equivalent" value="EQUIVALENT">
+            <label class="btn btn-xs btn-outline-secondary" for="equivalent">
+                <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
+                <span class="align-middle">Equivalent</span>
+            </label>
         </div>
     </div>
-</div>
 
-<script>
-    /* Wrap in a function so it has it's own scope. */
-    (function () {
+    <div class="accordion" id="mutants-accordion">
+        <c:forEach items="${mutantAccordion.categories}" var="category">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="ma-heading-${category.id}">
+                        <%-- ${empty …} doesn't work with Set --%>
+                    <button class="${category.mutantIds.size() == 0 ? "" : 'ma-covered'} accordion-button collapsed"
+                            type="button" data-bs-toggle="collapse"
+                            data-bs-target="#ma-collapse-${category.id}"
+                            aria-controls="ma-collapse-${category.id}">
+                            <%-- ${empty …} doesn't work with Set --%>
+                        <span class="badge bg-attacker me-2 ma-count"
+                              id="ma-count-${category.id}"
+                              <c:if test="${category.mutantIds.size() == 0}">hidden</c:if>>
+                            ${category.mutantIds.size()}
+                        </span>
+                        ${category.description}
+                    </button>
+                </h2>
+                <div class="accordion-collapse collapse"
+                     id="ma-collapse-${category.id}"
+                     data-bs-parent="#mutants-accordion"
+                     aria-expanded="false" aria-labelledby="ma-heading-${category.id}">
+                    <div class="accordion-body p-0">
+                        <table id="ma-table-${category.id}" class="table table-sm"></table>
+                    </div>
+                </div>
+            </div>
+        </c:forEach>
+    </div>
 
-        /** A description and list of mutant ids for each category (method). */
-        const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
+    <script>
+        /* Wrap in a function so it has it's own scope. */
+        (function () {
 
-        /** Maps mutant ids to their DTO representation. */
-        const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
+            /** A description and list of mutant ids for each category (method). */
+            const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
 
-        /** Maps mutant ids to modals that show the tests' code. */
-        const mutantModals = new Map();
-        const testModals = new Map();
+            /** Maps mutant ids to their DTO representation. */
+            const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
 
-        /* Functions to generate table columns. */
-        const genId = row => `<span class="ma-mutant-link btn-link">Mutant \${row.id}</span>
-                <span class="ma-column-name">  by  </span> \${row.creator.name}
-                \${row.killedByName ? ' <span class="ma-column-name">  killed by  </span> ' + row.killedByName : ''}`;
-        const genPoints = row => `<span class="ma-column-name">Points:</span> \${row.points}`;
-        const genLines = row => row.description;
-        const genIcon = row => {
-            switch (row.state) {
-                case "ALIVE":
-                    return '<span class="mutantCUTImage mutantImageAlive"></span>';
-                case "KILLED":
-                    return '<span class="mutantCUTImage mutantImageKilled"></span>';
-                case "EQUIVALENT":
-                    return '<span class="mutantCUTImage mutantImageEquiv"></span>';
-                case "FLAGGED":
-                    return '<span class="mutantCUTImage mutantImageFlagged"></span>';
-            }
-        };
-        const genViewButton = row => row.canView ? '<button class="ma-view-button btn btn-primary btn-ssm pull-right">View</button>' : '';
+            /** Maps mutant ids to modals that show the tests' code. */
+            const mutantModals = new Map();
+            const testModals = new Map();
 
-        const genAdditionalButton = row => {
-            switch (row.state) {
-                    <c:if test="mutantAccordion.flag">
-                case "ALIVE":
-                    if (row.canMarkEquivalent) {
-                        if (row.covered) {
-                            return '<form id="equiv" action="${pageContext.request.contextPath + Paths.EQUIVALENCE_DUELS_GAME}" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) ' + row.lineString + ' as equivalent. Are you sure?\');">\n' +
-                                    '      <input type="hidden" name="formType" value="claimEquivalent">\n' +
-                                    '      <input type="hidden" name="equivLines" value="' + row.lineString + '">\n' +
-                                    '      <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">\n' +
-                                    '      <button type="submit" class="btn btn-default btn-ssm pull-right">Claim Equivalent</button>\n' +
-                                    '   </form>';
+            /** Store DataTable instances for later use. */
+            const dataTablesByCategory = new Map();
+
+            /* Functions to generate table columns. */
+            const genId = row => `<span class="ma-mutant-link">Mutant \${row.id}</span>
+                <span class="ma-column-name mx-2">by</span>\${row.creator.name}
+                \${row.killedBy ? '<span class="ma-column-name mx-2">killed by</span>' + row.killedBy.name : ''}`;
+            const genPoints = row => `<span class="ma-column-name">Points:</span> \${row.points}`;
+            const genLines = row => row.description;
+            const genIcon = row => {
+                switch (row.state) {
+                    case "ALIVE":
+                        return '<span class="mutantCUTImage mutantImageAlive"></span>';
+                    case "KILLED":
+                        return '<span class="mutantCUTImage mutantImageKilled"></span>';
+                    case "EQUIVALENT":
+                        return '<span class="mutantCUTImage mutantImageEquiv"></span>';
+                    case "FLAGGED":
+                        return '<span class="mutantCUTImage mutantImageFlagged"></span>';
+                }
+            };
+            const genViewButton = row => row.canView ? '<button class="ma-view-button btn btn-primary btn-xs pull-right">View</button>' : '';
+
+            const genAdditionalButton = row => {
+                switch (row.state) {
+                    case "ALIVE":
+                        if (row.canMarkEquivalent) {
+                            if (row.covered) {
+                                return `
+                                <form id="equiv" action="${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}" method="post" onsubmit="return confirm(\'This will mark all player-created mutants on line(s) \${row.lineString} as equivalent. Are you sure?\');">
+                                    <input type="hidden" name="formType" value="claimEquivalent">
+                                    <input type="hidden" name="equivLines" value="\${row.lineString}">
+                                    <input type="hidden" name="gameId" value="${mutantAccordion.gameId}">
+                                    <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">Claim Equivalent</button>
+                                </form>`;
+                            } else {
+                                // We need the wrapper element (<span …), because tooltips do not work on disabled elements:
+                                // https://getbootstrap.com/docs/5.1/components/tooltips/#disabled-elements
+                                return `
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Cover this mutant with a test to be able to claim it as equivalent">
+                                    <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>Claim Equivalent</button>
+                                </span>`;
+                            }
                         } else {
-                            return '<button type="submit" class="btn btn-default btn-ssm pull-right" disabled>Claim Equivalent</button>';
+                            return '';
                         }
-                    } else {
+                    case "KILLED":
+                        return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
+                    default:
                         return '';
-                    }
+                }
+            };
 
-                    </c:if>
-                case "KILLED":
-                    return '<button class="ma-view-test-button btn btn-default btn-ssm pull-right">View Killing Test</button>';
-                default:
-                    return '';
-            }
-        };
+            /**
+             * Returns the mutant DTO that describes the row of an element in a DataTables row.
+             * @param {HTMLElement} element An HTML element contained in a table row.
+             * @param {object} dataTable The DataTable the row belongs to.
+             * @return {object} The mutant DTO the row describes.
+             */
+            const rowData = function (element, dataTable) {
+                const row = $(element).closest('tr');
+                return dataTable.row(row).data();
+            };
 
-        /**
-         * Returns the mutant DTO that describes the row of an element in a DataTables row.
-         * @param {HTMLElement} element An HTML element contained in a table row.
-         * @param {object} dataTable The DataTable the row belongs to.
-         * @return {object} The mutant DTO the row describes.
-         */
-        const rowData = function (element, dataTable) {
-            const row = $(element).closest('tr');
-            return dataTable.row(row).data();
-        };
+            /**
+             * Creates a modal to display the given mutant and shows it.
+             * References to created models are cached in a map so they don't need to be generated again.
+             * @param {object} mutant The mutant DTO to display.
+             */
+            const viewMutantModal = function (mutant) {
+                let modal = mutantModals.get(mutant.id);
+                if (modal !== undefined) {
+                    modal.modal('show');
+                    return;
+                }
 
-        /**
-         * Creates a modal to display the given mutant and shows it.
-         * References to created models are cached in a map so they don't need to be generated again.
-         * @param {object} mutant The mutant DTO to display.
-         */
-        const viewMutantModal = function (mutant) {
-            let modal = mutantModals.get(mutant.id);
-            if (modal !== undefined) {
-                modal.modal('show');
-                return;
-            }
-
-            modal = $(
-                    `<div class="modal mutant-modal fade" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Mutant ` + mutant.id + ` (by ` + mutant.creatorName + `)</h4>
-                            </div>
-                            <div class="modal-body">
-                                <pre class="readonly-pre"><textarea class="mutdiff" name="mutant-` + mutant.id + `"></textarea></pre>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                modal = $(
+                    `<div class="modal fade" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-responsive">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Mutant \${mutant.id} (by \${mutant.creator.name})</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="card">
+                                        <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
+                                            <pre class="m-0"><textarea name="mutant-\${mutant.id}"></textarea></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>`);
-            modal.appendTo(document.body);
-            mutantModals.set(mutant.id, modal);
+                    </div>`);
+                modal.appendTo(document.body);
+                mutantModals.set(mutant.id, modal);
 
-            const textarea = modal.find('textarea').get(0);
-            const editor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: true,
-                matchBrackets: true,
-                mode: "text/x-diff",
-                readOnly: true,
-
-            });
-            editor.setSize('max-content', 'max-content');
-
-            <%-- TODO: Is there a better solution for this? --%>
-            /* Refresh the CodeMirror instance once the modal is displayed.
-             * If this is not done, it will display an empty textarea until it is clicked. */
-            new MutationObserver((mutations, observer) => {
-                for (const mutation of mutations) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        editor.refresh();
-                        observer.disconnect();
-                    }
-                }
-            }).observe(modal.get(0), {attributes: true});
-
-            MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
-            modal.modal('show');
-        };
-
-        /**
-         * Creates a modal to display the given test and shows it.
-         * References to created models are cached in a map so they don't need to be generated again.
-         * @param {object} test The test DTO to display.
-         */
-        const viewTestModal = function (test) {
-            let modal = testModals.get(test.id);
-            if (modal !== undefined) {
-                modal.modal('show');
-                return;
-            }
-
-            modal = $(
-                    `<div class="modal mutant-modal fade" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Test \${test.id} (by \${test.creatorName})</h4>
-                            </div>
-                            <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="test-\${test.id}"></textarea></pre>
-                                <pre class="readonly-pre terminal-pre"></pre>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`);
-            modal.appendTo(document.body);
-            testModals.set(test.id, modal);
-
-            const killMessage = modal.find('.modal-body .readonly-pre.terminal-pre').get(0);
-            killMessage.innerText = test.killMessage;
-            const textarea = modal.find('textarea').get(0);
-            const editor = CodeMirror.fromTextArea(textarea, {
-                lineNumbers: true,
-                matchBrackets: true,
-                mode: "text/x-java",
-                readOnly: true,
-
-            });
-            editor.setSize('max-content', 'max-content');
-
-            <%-- TODO: Is there a better solution for this? --%>
-            /* Refresh the CodeMirror instance once the modal is displayed.
-             * If this is not done, it will display an empty textarea until it is clicked. */
-            new MutationObserver((mutations, observer) => {
-                for (const mutation of mutations) {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        editor.refresh();
-                        observer.disconnect();
-                    }
-                }
-            }).observe(modal.get(0), {attributes: true});
-
-            TestAPI.getAndSetEditorValue(textarea, editor);
-            modal.modal('show');
-        };
-
-
-        /* Loop through the categories and create a mutant table for each one. */
-        for (const category of categories) {
-            const rows = category.mutantIds
-                    .sort()
-                    .map(mutants.get, mutants);
-
-            /* Create the DataTable. */
-            const tableElement = $('#ma-table-' + category.id);
-            const dataTable = tableElement.DataTable({
-                data: rows,
-                columns: [
-                    {data: null, title: '', defaultContent: ''},
-                    {data: genIcon, title: ''},
-                    {data: genId, title: ''},
-                    {data: genLines, title: ''},
-                    {data: genPoints, title: ''},
-                    {data: genViewButton, title: ''},
-                    {data: genAdditionalButton, title: ''}
-                ],
-                scrollY: '400px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {
-                    emptyTable: category.id === 'all'
-                            ? 'No mutants.'
-                            : 'No mutants in this method.'
-                }
-            });
-
-            /* Assign function to the "View" buttons. */
-            tableElement.on('click', '.ma-view-button', function () {
-                const test = rowData(this, dataTable);
-                viewMutantModal(test);
-            });
-
-            /* Assign function to the "View killing test" buttons. */
-            tableElement.on('click', '.ma-view-test-button', function () {
-                const mutant = rowData(this, dataTable);
-                viewTestModal({
-                    "id": mutant.killedByTestId,
-                    "creatorName": mutant.killedByName,
-                    "killMessage": mutant.killMessage
+                const textarea = modal.find('textarea').get(0);
+                const editor = CodeMirror.fromTextArea(textarea, {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    mode: "text/x-diff",
+                    readOnly: true,
+                    autoRefresh: true
                 });
-            });
 
-            /* Assign function to the "Mutant <id>" link. */
-            tableElement.on('click', '.ma-mutant-link', function () {
-                const mutant = rowData(this, dataTable);
-                const cm = $('#cut-div, #newmut-div').find('.CodeMirror').get(0).CodeMirror;
-                cm.scrollIntoView({line: mutant.lines[0] - 1, char: 0}, cm.getScrollInfo().clientHeight / 2 - 10);
-                $("#cut-div, #newmut-div")[0].scrollIntoView();
-            });
-        }
-    })();
-</script>
+                MutantAPI.getAndSetEditorValueWithDiff(textarea, editor);
+                modal.modal('show');
+            };
+
+            /**
+             * Creates a modal to display the given test and shows it.
+             * References to created models are cached in a map so they don't need to be generated again.
+             * @param {object} test The test DTO to display.
+             */
+            const viewTestModal = function (test) {
+                let modal = testModals.get(test.id);
+                if (modal !== undefined) {
+                    modal.modal('show');
+                    return;
+                }
+
+                modal = $(
+                    `<div class="modal fade" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-responsive">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Test \${test.id} (by \${test.creatorName})</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="card mb-3">
+                                        <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
+                                            <pre class="m-0"><textarea name="test-\${test.id}"></textarea></pre>
+                                        </div>
+                                    </div>
+                                    <pre class="m-0 terminal-pre"></pre>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`);
+                modal.appendTo(document.body);
+                testModals.set(test.id, modal);
+
+                const killMessage = modal.find('.modal-body .terminal-pre').get(0);
+                killMessage.innerText = test.killMessage;
+                const textarea = modal.find('textarea').get(0);
+                const editor = CodeMirror.fromTextArea(textarea, {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    mode: "text/x-java",
+                    readOnly: true,
+                    autoRefresh: true
+                });
+
+                TestAPI.getAndSetEditorValue(textarea, editor);
+                modal.modal('show');
+            };
+
+
+            /* Loop through the categories and create a mutant table for each one. */
+            for (const category of categories) {
+                const rows = category.mutantIds
+                        .sort()
+                        .map(mutants.get, mutants);
+
+                /* Create the DataTable. */
+                const tableElement = $('#ma-table-' + category.id);
+                const dataTable = tableElement.DataTable({
+                    data: rows,
+                    columns: [
+                        {data: null, title: '', defaultContent: ''},
+                        {data: genIcon, title: ''},
+                        {data: genId, title: ''},
+                        {data: genLines, title: ''},
+                        {data: genPoints, title: ''},
+                        {data: genViewButton, title: ''},
+                        {data: genAdditionalButton, title: ''}
+                    ],
+                    scrollY: '400px',
+                    scrollCollapse: true,
+                    paging: false,
+                    dom: 't',
+                    language: {
+                        emptyTable: category.id === 'all'
+                                ? 'No mutants.'
+                                : 'No mutants in this method.',
+                        zeroRecords: 'No mutants match the selected category.'
+                    }
+                });
+                dataTablesByCategory.set(category.id, dataTable);
+
+                /* Assign function to the "View" buttons. */
+                tableElement.on('click', '.ma-view-button', function () {
+                    const test = rowData(this, dataTable);
+                    viewMutantModal(test);
+                });
+
+                /* Assign function to the "View killing test" buttons. */
+                tableElement.on('click', '.ma-view-test-button', function () {
+                    const mutant = rowData(this, dataTable);
+                    viewTestModal({
+                        "id": mutant.killedByTestId,
+                    "creatorName": mutant.killedBy.name,
+                        "killMessage": mutant.killMessage
+                    });
+                });
+
+                /* Assign function to the "Mutant <id>" link. */
+                tableElement.on('click', '.ma-mutant-link', function () {
+                    const mutant = rowData(this, dataTable);
+                    const cm = $('#cut-div, #newmut-div').find('.CodeMirror').get(0).CodeMirror;
+                    cm.scrollIntoView({line: mutant.lines[0] - 1, char: 0}, cm.getScrollInfo().clientHeight / 2 - 10);
+                    $("#cut-div, #newmut-div")[0].scrollIntoView();
+                });
+            }
+
+            /* Setup filter functionality for mutant-accordion */
+            document.getElementById('ma-filter')
+                    .addEventListener('change', function(event) {
+                const selectedCategory = event.target.value;
+
+                const searchFunction = (settings, renderedData, index, data, counter) => {
+                    /* Let this only affect mutant accordion tables. */
+                    if (!settings.nTable.id.startsWith('ma-table-')) {
+                        return true;
+                    }
+
+                    return selectedCategory === 'ALL'
+                            || data.state === selectedCategory;
+                }
+
+                $.fn.dataTable.ext.search.push(searchFunction);
+
+                for (const category of categories) {
+                    dataTablesByCategory.get(category.id).draw();
+
+                    const filteredMutants = category.mutantIds
+                            .map(mutants.get, mutants)
+                            .filter(mutant => selectedCategory === 'ALL'
+                                    || mutant.state === selectedCategory);
+
+                    document.getElementById('ma-count-' + category.id).innerText = filteredMutants.length;
+                }
+
+                /* Remove search function again after tables have been filtered. */
+                $.fn.dataTable.ext.search.splice($.fn.dataTable.ext.search.indexOf(searchFunction), 1);
+            })
+        })();
+    </script>
+</div>

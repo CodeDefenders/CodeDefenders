@@ -23,16 +23,19 @@ WHERE e.Event_ID IN (
                  WHERE (Event_Type = 'GAME_PLAYER_LEFT')
                    AND Event_Status = 'NEW'
                  GROUP BY Game_ID, Player_ID
-             ) as FIRSTJOINEDEVENT
+             ) AS FIRSTJOINEDEVENT
         GROUP BY Game_ID, Player_ID
     )
-    SELECT e.Event_ID
-    FROM events e,
-         firstEvent
-    WHERE e.Event_Status != 'DELETED'
-      AND e.Event_Type NOT IN
-          ('GAME_CREATED', 'GAME_STARTED', 'GAME_FINISHED', 'GAME_GRACE_ONE', 'GAME_GRACE_TWO')
-      AND e.Game_ID = firstEvent.Game_ID
-      AND e.Player_ID = firstEvent.User_ID
-      AND e.Event_ID < firstEvent.Event_ID
+    SELECT *
+    FROM (
+             SELECT e.Event_ID
+             FROM events e,
+                  firstEvent
+             WHERE e.Event_Status != 'DELETED'
+               AND e.Event_Type NOT IN
+                   ('GAME_CREATED', 'GAME_STARTED', 'GAME_FINISHED', 'GAME_GRACE_ONE', 'GAME_GRACE_TWO')
+               AND e.Game_ID = firstEvent.Game_ID
+               AND e.Player_ID = firstEvent.User_ID
+               AND e.Event_ID < firstEvent.Event_ID
+         ) AS tmpTbl
 )

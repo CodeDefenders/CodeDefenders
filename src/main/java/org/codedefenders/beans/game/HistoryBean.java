@@ -12,10 +12,12 @@ import javax.enterprise.context.RequestScoped;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 
 /**
@@ -28,6 +30,7 @@ public class HistoryBean {
 
     // TODO: Replace this with proper @Inject if this is completly managed by CDI (not jsp:useBean pseudo CDI …)
     EventDAO eventDAO = CDIUtil.getBeanFromCDI(EventDAO.class);
+    UserService userService = CDIUtil.getBeanFromCDI(UserService.class);
 
     private Integer gameId;
     private LoginBean login;
@@ -55,10 +58,13 @@ public class HistoryBean {
     }
 
     private HistoryBeanEventDTO createHistoryBeanEvent(Event e) {
-        if (e.getUser().getId() < 100) {
+        if (e.getUserId() < 100) {
             return null;
         }
-        String userMessage = e.getUser().getUsername() + " ";
+        String userName = userService.getSimpleUserById(e.getUserId())
+                .map(SimpleUser::getName)
+                .orElse("Unknown user");
+        String userMessage = userName + " ";
         String colour = "gray";
         switch (e.getEventType()) {
             case GAME_CREATED:
@@ -177,10 +183,10 @@ public class HistoryBean {
         } else if (e.getEventType().toString().matches("GAME")) {
             alignment = "right";
         } else {
-            alignment = login.getUser().getId() == e.getUser().getId() ? "left" : "right";
+            alignment = login.getUserId() == e.getUserId() ? "left" : "right";
         }
         return new HistoryBeanEventDTO(
-                e.getUser().getUsername(),
+                userName,
                 new Timestamp(e.getTimestamp()),
                 userMessage,
                 e.getEventType(),
@@ -222,7 +228,7 @@ public class HistoryBean {
         private final String colour;
 
         public HistoryBeanEventDTO(String userName, Timestamp time, String message, EventType type, String alignment,
-                                   String colour) {
+                String colour) {
             this.userName = userName;
             this.time = time.toLocalDateTime();
             LocalDateTime now = LocalDateTime.now();
@@ -262,10 +268,10 @@ public class HistoryBean {
 
         public String getFormat() {
             // For the game_history.jsp in the format "2014-01-10T03:45"
-            return "\"" + time.getYear()
+            return time.getYear()
                     + "-" + String.format("%02d", time.getMonth().ordinal())
                     + "-" + String.format("%02d", time.getDayOfMonth()) + "T"
-                    + getTime() + "\"";
+                    + getTime();
         }
 
         public String getUserMessage() {

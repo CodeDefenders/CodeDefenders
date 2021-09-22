@@ -22,7 +22,7 @@ This guide assumes:
 
 #### Modify the configuration
 
-Copy the `codedefenders-example.properties` file to `/var/lib/tomcat9/conf/codedefenders.properties` and set the values to match your environment.  
+Copy the `example.codedefenders.properties` file to `/var/lib/tomcat9/conf/codedefenders.properties` and set the values to match your environment.  
 The only required value is `data.dir`, all other properties have sensible default values.
 
 #### Adapt the systemd service
@@ -98,7 +98,7 @@ You can either download the `codedefenders.war` file from the latest [release](h
 
 Alternatively you can automatically deploy with maven. For this, Tomcat requires a user with `manager-script` role, which can be configured in `$CATALINA_BASE/conf/tomcat-users.xml` (`CATALINA_BASE` is the Tomcat installation directory).
 
-The maven deployment is configured via a `config.properties` file. Simply copy the `config.properties.example` file over and adjust the values to your needs.
+The maven deployment is configured via a `config.properties` file. Simply copy the `example.config.properties` file over and adjust the values to your needs.
 
 ```xml
 <role rolename="manager-script"/>

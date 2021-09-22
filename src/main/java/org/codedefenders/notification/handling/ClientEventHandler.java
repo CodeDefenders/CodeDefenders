@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 import org.codedefenders.beans.game.GameChatBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.client.chat.ClientGameChatEvent;
 import org.codedefenders.notification.events.client.registration.GameChatRegistrationEvent;
@@ -33,13 +33,13 @@ public class ClientEventHandler {
 
     private INotificationService notificationService;
     private ServerEventHandlerContainer serverEventHandlerContainer;
-    private User user;
+    private SimpleUser user;
     private String ticket;
 
     public ClientEventHandler(
             INotificationService notificationService,
             ServerEventHandlerContainer serverEventHandlerContainer,
-            User user,
+            SimpleUser user,
             String ticket) {
         this.notificationService = notificationService;
         this.serverEventHandlerContainer = serverEventHandlerContainer;
@@ -106,7 +106,7 @@ public class ClientEventHandler {
         ServerGameChatEvent serverEvent = new ServerGameChatEvent();
         serverEvent.setMessage(message);
         serverEvent.setSenderId(user.getId());
-        serverEvent.setSenderName(user.getUsername());
+        serverEvent.setSenderName(user.getName());
         serverEvent.setAllChat(isAllChat);
         serverEvent.setGameId(event.getGameId());
         serverEvent.setRole(role);

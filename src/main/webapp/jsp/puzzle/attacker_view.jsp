@@ -48,6 +48,9 @@
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
 %>
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
+
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
@@ -108,66 +111,67 @@
 <%-- -------------------------------------------------------------------------------- --%>
 
 
-<jsp:include page="/jsp/header_main.jsp"/>
+<jsp:include page="/jsp/header.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<div id="game-container">
-
 <jsp:include page="/jsp/push_notifications.jsp"/>
 
+<div id="game-container" class="container-fluid">
+
+    <h4><b><%=title%></b></h4>
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+        <h4 class="m-0"><%=description%></h4>
+        <jsp:include page="/jsp/game_components/keymap_config.jsp"/>
+    </div>
+    <hr>
+
     <div class="row">
-        <h4 class="col-md-2"><b><%=title%></b></h4>
-        <h4><%=description%></h4>
-    </div>
-    <hr class="hr-primary" style="margin: 5px">
-<div class="row">
-    <div class="col-md-6">
-        <div id="mutants-div">
-            <h3>Mutants</h3>
+        <div class="col-xl-6 col-12">
             <t:mutant_accordion/>
+
+            <% if (showTestAccordion) { %>
+                <div id="tests-div">
+                    <div class="game-component-header"><h3>JUnit Tests</h3></div>
+                    <t:test_accordion/>
+                </div>
+            <% } %>
         </div>
 
-        <% if (showTestAccordion) { %>
-        <div id="tests-div">
-            <h3>JUnit tests</h3>
-            <t:test_accordion/>
+        <div class="col-xl-6 col-12" id="cut-div">
+            <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
+
+            <div class="game-component-header">
+                <h3>Create a mutant here</h3>
+                <div>
+
+                    <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
+                        <input type="hidden" name="formType" value="reset">
+                        <input type="hidden" name="gameId" value="<%= game.getId() %>">
+                        <button class="btn btn-warning" id="btnReset">
+                            Reset
+                        </button>
+                    </form>
+
+                    <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
+                            onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
+                            <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                        Attack
+                    </button>
+
+                </div>
+            </div>
+
+            <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
+                <input type="hidden" name="formType" value="createMutant">
+                <input type="hidden" name="gameId" value="<%= game.getId() %>">
+
+                <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
+                <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+            </form>
         </div>
-        <% } %>
     </div>
 
-    <div class="col-md-6" id="cut-div">
-        <h3 style="margin-bottom: 0;">Create a mutant here</h3>
-
-        <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
-            <input type="hidden" name="formType" value="reset">
-            <input type="hidden" name="gameId" value="<%= game.getId() %>">
-            <button class="btn btn-primary btn-warning btn-bold pull-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
-                Reset
-            </button>
-        </form>
-
-        <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
-        <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
-            <button type="submit" class="btn btn-primary btn-bold pull-right" id="submitMutant" form="atk"
-                    onClick="mutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
-                <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                Attack!
-            </button>
-
-            <input type="hidden" name="formType" value="createMutant">
-            <input type="hidden" name="gameId" value="<%= game.getId() %>">
-
-            <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
-            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
-        </form>
-        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
-        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
-    </div>
 </div>
-
-</div>
-
-<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%@ include file="/jsp/footer_game.jsp" %>

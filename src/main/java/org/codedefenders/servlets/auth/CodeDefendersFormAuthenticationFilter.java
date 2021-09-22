@@ -15,7 +15,7 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +63,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         // From LoginManager:login
         HttpSession session = httpRequest.getSession();
         // Log user activity including the timestamp
-        DatabaseAccess.logSession(((User) subject.getPrincipal()).getId(), getClientIpAddress(httpRequest));
-        login.loginUser((User) subject.getPrincipal());
+        DatabaseAccess.logSession(((UserEntity) subject.getPrincipal()).getId(), getClientIpAddress(httpRequest));
+        login.loginUser((UserEntity) subject.getPrincipal());
 
         // Call the super method, as this is the one doing the redirect after a successful login.
         return super.onLoginSuccess(token, subject, request, response);

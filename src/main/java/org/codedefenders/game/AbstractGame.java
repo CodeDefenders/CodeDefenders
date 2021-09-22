@@ -29,6 +29,7 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
+import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +65,16 @@ public abstract class AbstractGame {
 
     // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
     // Consider to move this into a setEvents method instead !
+    // This tells us that AbstractGame is not the right place for any logic!!!
     protected EventDAO eventDAO;
+    protected UserRepository userRepository;
 
     public void setEventDAO(EventDAO eventDAO) {
         this.eventDAO = eventDAO;
+    }
+
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public int getId() {
@@ -116,7 +123,7 @@ public abstract class AbstractGame {
         return this.mode;
     }
 
-    abstract public boolean isChatEnabled();
+    public abstract boolean isChatEnabled();
 
     protected void setMode(GameMode newMode) {
         this.mode = newMode;
