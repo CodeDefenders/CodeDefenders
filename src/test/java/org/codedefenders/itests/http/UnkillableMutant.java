@@ -34,7 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.codedefenders.itests.http.utils.HelperUser;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class UnkillableMutant {
 
 	private static int TIMEOUT = 10000;
 
-	static class WebClientFactory{ 
+	static class WebClientFactory{
 		private static Collection<WebClient> clients = new ArrayList<WebClient>();
 
 		public static WebClient getNewWebClient() {
@@ -153,7 +153,7 @@ public class UnkillableMutant {
 	@Test
 	public void testUnkillableMutant() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		// // This test assumes an empty db !
-		User creatorUser = new User("creator");
+		UserEntity creatorUser = new UserEntity("creator");
 		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 		creator.doLogin();
 		System.out.println("Creator Login");
@@ -169,7 +169,7 @@ public class UnkillableMutant {
 		//
 		creator.startGame(newGameId);
 		//
-		User attackerUser = new User("demoattacker");
+		UserEntity attackerUser = new UserEntity("demoattacker");
 		HelperUser attacker = new HelperUser(attackerUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 		attacker.doLogin();
 		System.out.println("Attacker Login");
@@ -184,7 +184,7 @@ public class UnkillableMutant {
 						Charset.defaultCharset()));
 		System.out.println("Attacker attack in game " + newGameId);
 		//
-		User defenderUser = new User("demodefender");
+		UserEntity defenderUser = new UserEntity("demodefender");
 		HelperUser defender = new HelperUser(defenderUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 		defender.doLogin();
 		//
@@ -193,22 +193,22 @@ public class UnkillableMutant {
 		defender.joinOpenGame(newGameId, false);
 		//
 		System.out.println("Defender Join game " + newGameId);
-		
+
 
 		// Submit all the compilable tests from the original game (182)
 		Collection<File> testFiles = FileUtils.listFiles(
-				  new File("src/test/resources/itests/tests/XmlElement/182"), 
-				  new RegexFileFilter("^.*.java"), 
+				  new File("src/test/resources/itests/tests/XmlElement/182"),
+				  new RegexFileFilter("^.*.java"),
 				  DirectoryFileFilter.DIRECTORY
 				);
-		
+
 		for( File testFile : testFiles ){
 			System.out.println("UnkillableMutant.testUnkillableMutant() Defending with " + testFile);
 			defender.defend(newGameId, new String(
 					Files.readAllBytes(
 							testFile.toPath()),
 					Charset.defaultCharset()));
-		}		
+		}
 	}
 
 	@After

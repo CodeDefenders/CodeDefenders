@@ -2,7 +2,7 @@ package org.codedefenders.beans.message;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * Represents a message shown on to a user on page load.
@@ -39,7 +39,7 @@ public class Message implements Serializable {
      */
     public String getText() {
         if (isEscape()) {
-            return StringEscapeUtils.escapeHtml(text);
+            return StringEscapeUtils.escapeHtml4(text);
         } else {
             return text;
         }

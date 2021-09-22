@@ -24,7 +24,7 @@
 <%@ page import="org.codedefenders.database.TestDAO" %>
 <%@ page import="org.codedefenders.database.MutantDAO" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
-<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="java.util.Map" %>
 
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
@@ -73,10 +73,12 @@
                     <%
                         for (Player attacker : attackers) {
                             int playerId = attacker.getId();
-                            User attackerUser = attacker.getUser();
-
-                            if (attackerUser.getId() == Constants.DUMMY_ATTACKER_USER_ID
-                                    && MutantDAO.getMutantsByGameAndUser(scoreboard.getGameId(), attackerUser.getId()).isEmpty()) {
+                        UserEntity attackerUser = attacker.getUser();
+                        // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
+                        // Does system attacker submitted any mutant?
+                        // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
+                        // For system generated mutants,  mutant.playerID == userID, which is wrong...
+                        if(attackerUser.getId() == Constants.DUMMY_ATTACKER_USER_ID && MutantDAO.getMutantsByGameAndUser(scoreboard.getGameId(), attackerUser.getId()).isEmpty() ){
                                continue;
                             }
 
@@ -118,7 +120,7 @@
                     <%
                         for (Player defender : defenders) {
                             int playerId = defender.getId();
-                            User defenderUser = defender.getUser();
+                            UserEntity defenderUser = defender.getUser();
 
                             if (defenderUser.getId() == Constants.DUMMY_DEFENDER_USER_ID
                                     && TestDAO.getTestsForGameAndUser(scoreboard.getGameId(), defenderUser.getId()).isEmpty()) {

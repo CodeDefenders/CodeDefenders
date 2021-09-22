@@ -23,7 +23,7 @@
     Displays explanations about the mutant icons and the mutant validator level as model dialog
 --%>
 
-<%@ page import="org.apache.commons.lang.StringUtils"%>
+<%@ page import="org.apache.commons.lang3.StringUtils"%>
 
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 

@@ -18,7 +18,6 @@
  */
 package org.codedefenders.model;
 
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 
 /**
@@ -30,24 +29,15 @@ import org.codedefenders.game.Role;
  */
 public class Player {
     private int id;
-    private User user;
+    private UserEntity user;
     private int gameId;
     private int points;
     private Role role;
     private boolean active;
 
-    public Player(int id, User user, int gameId, int points, Role role, boolean active) {
+    public Player(int id, UserEntity user, int gameId, int points, Role role, boolean active) {
         this.id = id;
         this.user = user;
-        this.gameId = gameId;
-        this.points = points;
-        this.role = role;
-        this.active = active;
-    }
-
-    public Player(int id, int userId, int gameId, int points, Role role, boolean active) {
-        this.id = id;
-        this.user = UserDAO.getUserById(userId);
         this.gameId = gameId;
         this.points = points;
         this.role = role;
@@ -58,7 +48,7 @@ public class Player {
         return id;
     }
 
-    public User getUser() {
+    public UserEntity getUser() {
         return user;
     }
 

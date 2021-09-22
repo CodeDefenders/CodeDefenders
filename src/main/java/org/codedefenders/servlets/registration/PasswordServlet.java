@@ -19,6 +19,7 @@ package org.codedefenders.servlets.registration;
  */
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Random;
 
 import javax.inject.Inject;
@@ -28,12 +29,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
@@ -49,6 +50,9 @@ public class PasswordServlet extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserRepository userRepo;
 
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
@@ -74,19 +78,19 @@ public class PasswordServlet extends HttpServlet {
             case "resetPassword":
                 email = request.getParameter("accountEmail");
                 username = request.getParameter("accountUsername");
-                User u = UserDAO.getUserByEmail(email);
-                if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
+                Optional<UserEntity> u = userRepo.getUserByEmail(email);
+                if (!u.isPresent() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
                     messages.add("No user was found for this username and email. Please check if the username and email match.");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
-                    DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
+                    DatabaseAccess.setPasswordResetSecret(u.get().getId(), resetPwSecret);
                     String hostAddr = request.getScheme() + "://" + request.getServerName() + ":"
                             + request.getServerPort() + request.getContextPath();
                     String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-                    String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
+                    String msg = String.format(CHANGE_PASSWORD_MSG, u.get().getUsername(), url,
                             AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
                                     .getIntValue());
-                    if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
+                    if (EmailUtils.sendEmail(u.get().getEmail(), "Code Defenders Password reset", msg)) {
                         messages.add("A password reset link has been sent to " + email);
                     } else {
                         messages.add("Something went wrong. No email could be sent.");
@@ -106,12 +110,14 @@ public class PasswordServlet extends HttpServlet {
                     if (!(validator.validPassword(password))) {
                         messages.add("Password not changed. Make sure it is valid.");
                     } else if (password.equals(confirm)) {
-                        User user = UserDAO.getUserById(userId);
-                        user.setEncodedPassword(User.encodePassword(password));
-                        if (user.update()) {
-                            DatabaseAccess.setPasswordResetSecret(user.getId(), null);
-                            responseURL = request.getContextPath() + Paths.LOGIN;
-                            messages.add("Successfully changed your password.");
+                        Optional<UserEntity> user = userRepo.getUserById(userId);
+                        if (user.isPresent()) {
+                            user.get().setEncodedPassword(UserEntity.encodePassword(password));
+                            if (user.get().update()) {
+                                DatabaseAccess.setPasswordResetSecret(user.get().getId(), null);
+                                responseURL = request.getContextPath() + Paths.LOGIN;
+                                messages.add("Successfully changed your password.");
+                            }
                         }
                     } else {
                         messages.add("Your two password entries did not match");

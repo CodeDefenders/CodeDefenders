@@ -22,13 +22,8 @@ package org.codedefenders.dto;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.model.User;
 
 import com.google.gson.annotations.Expose;
 
@@ -36,85 +31,68 @@ public class MutantDTO {
     @Expose
     private final int id;
     @Expose
-    private UserDTO creator;
+    private final SimpleUser creator;
     @Expose
-    private Mutant.State state;
+    private final Mutant.State state;
     @Expose
-    private int points;
+    private final int points;
     @Expose
-    private String lineString;
+    private final String lineString;
     @Expose
-    private Boolean covered;
+    private final SimpleUser killedBy;
     @Expose
-    private String killedByName;
+    private final boolean canMarkEquivalent;
     @Expose
-    private boolean canMarkEquivalent;
+    private final boolean canView;
     @Expose
-    private boolean canView = false;
-    private String sourceCode;
-    private List<Integer> lines;
+    private final int killedByTestId;
     @Expose
-    private int killedByTestId;
+    private final String killMessage;
     @Expose
-    private String killMessage;
+    private final String description;
     @Expose
-    private String description;
-    private Integer playerId;
-    private Integer gameId;
-    private String patchString;
+    private final Boolean covered;
+    @Expose
+    private final List<Integer> lines;
+    private final Integer gameId;
+    private final Integer playerId;
+    private final String patchString;
 
-    public MutantDTO(Mutant mutant) {
-        creator = new UserDTO(mutant.getCreatorId(), mutant.getCreatorName());
-        id = mutant.getId();
-        points = mutant.getScore();
-        state = mutant.getState();
-        description = mutant.getHTMLReadout().stream()
-                .filter(Objects::nonNull).collect(Collectors.joining("<br>"));
-        if (mutant.getKillingTest() != null) {
-            killedByName = UserDAO.getUserForPlayer(mutant.getKillingTest().getPlayerId()).getUsername();
-            killedByTestId = mutant.getKillingTest().getId();
-            killMessage = mutant.getKillMessage();
-        } else {
-            killedByName = null;
-            killedByTestId = -1;
-            killMessage = null;
-        }
-        lines = mutant.getLines();
-        lineString = lines.stream().map(String::valueOf).collect(Collectors.joining(","));
-        playerId = mutant.getPlayerId();
-        gameId = mutant.getGameId();
-        patchString = mutant.getPatchString();
-    }
-
-    @Deprecated
-    public MutantDTO(Mutant mutant, User user, boolean playerCoverToClaim) {
-        this(mutant);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public MutantDTO setCovered(boolean covered) {
+    public MutantDTO(
+            int id,
+            SimpleUser creator,
+            Mutant.State state,
+            int points,
+            String description,
+            String lineString,
+            boolean covered,
+            boolean canView,
+            boolean canMarkEquivalent,
+            SimpleUser killedBy,
+            int killedByTestId,
+            String killMessage,
+            int gameId,
+            int playerId,
+            List<Integer> lines,
+            String patchString
+    ) {
+        this.id = id;
+        this.creator = creator;
+        this.state = state;
+        this.points = points;
+        this.description = description;
+        this.lineString = lineString;
         this.covered = covered;
-        return this;
-    }
-
-    public boolean isViewable() {
-        return canView;
-    }
-
-    public MutantDTO setViewable(boolean canView) {
         this.canView = canView;
-        return this;
-    }
+        this.canMarkEquivalent = canMarkEquivalent;
+        this.killedBy = killedBy;
+        this.killedByTestId = killedByTestId;
+        this.killMessage = killMessage;
 
-    public String getSourceCode() {
-        if (canView) {
-            return sourceCode;
-        } else {
-            return null;
-        }
+        this.gameId = gameId;
+        this.playerId = playerId;
+        this.lines = lines;
+        this.patchString = patchString;
     }
 
     public String getPatchString() {
@@ -125,22 +103,8 @@ public class MutantDTO {
         }
     }
 
-    public MutantDTO setSourceCode(String sourceCode) {
-        this.sourceCode = sourceCode;
-        return this;
-    }
-
-    public boolean isCanMarkEquivalent() {
-        return canMarkEquivalent;
-    }
-
-    public MutantDTO setCanMarkEquivalent(boolean canMarkEquivalent) {
-        this.canMarkEquivalent = canMarkEquivalent;
-        return this;
-    }
-
     public List<Integer> getLines() {
-        return lines;
+        return Collections.unmodifiableList(lines);
     }
 
     public Integer getPlayerId() {
@@ -150,6 +114,55 @@ public class MutantDTO {
     public Integer getGameId() {
         return gameId;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public SimpleUser getCreator() {
+        return creator;
+    }
+
+    public Mutant.State getState() {
+        return state;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public String getLineString() {
+        return lineString;
+    }
+
+    public Boolean getCovered() {
+        return covered;
+    }
+
+    public SimpleUser getKilledBy() {
+        return killedBy;
+    }
+
+    public boolean isCanMarkEquivalent() {
+        return canMarkEquivalent;
+    }
+
+    public boolean isCanView() {
+        return canView;
+    }
+
+    public int getKilledByTestId() {
+        return killedByTestId;
+    }
+
+    public String getKillMessage() {
+        return killMessage;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
 
     public static class LineNumberComparator implements Comparator<MutantDTO> {
 

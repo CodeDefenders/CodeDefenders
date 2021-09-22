@@ -115,9 +115,6 @@ public class AntProcessResult {
     /**
      * Sanitize the compiler output by identifying the output folder and
      * removing it from the compiler output before sending it over the clients.
-     *
-     * @param fullCompilerOutput
-     * @return
      */
     private String sanitize(String fullCompilerOutput) {
         String outputFolder = null; // This is what we shall remove from the log

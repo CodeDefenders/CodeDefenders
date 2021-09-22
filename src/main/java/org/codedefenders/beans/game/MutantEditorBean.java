@@ -8,7 +8,7 @@ import java.util.Map;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.puzzle.Puzzle;
@@ -69,7 +69,7 @@ public class MutantEditorBean {
     }
 
     public void setMutantCodeForClass(GameClass clazz) {
-        mutantCode = StringEscapeUtils.escapeHtml(clazz.getSourceCode());
+        mutantCode = StringEscapeUtils.escapeHtml4(clazz.getSourceCode());
     }
 
     /**
@@ -77,14 +77,14 @@ public class MutantEditorBean {
      * @param previousMutantCode The code from the previous submission, not HTML-escaped.
      */
     public void setPreviousMutantCode(String previousMutantCode) {
-        mutantCode = StringEscapeUtils.escapeHtml(previousMutantCode);
+        mutantCode = StringEscapeUtils.escapeHtml4(previousMutantCode);
     }
 
     public void setDependenciesForClass(GameClass clazz) {
         for (Dependency dependency : GameClassDAO.getMappedDependenciesForClassId(clazz.getId())) {
             Path path = Paths.get(dependency.getJavaFile());
             String className = FileUtils.extractFileNameNoExtension(path);
-            String classCode = StringEscapeUtils.escapeHtml(FileUtils.readJavaFileWithDefault(path));
+            String classCode = StringEscapeUtils.escapeHtml4(FileUtils.readJavaFileWithDefault(path));
             dependencies.put(className, classCode);
         }
     }

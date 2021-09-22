@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2020 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,19 +16,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.game.leaderboard;
 
-import java.util.List;
+package org.codedefenders.dto;
 
-import org.codedefenders.database.DatabaseAccess;
+import java.util.Objects;
+
+import com.google.gson.annotations.Expose;
 
 /**
- * Created by jmr on 11/07/2017.
+ * For usage in the 90% of the places where we need a User and the userId and the username are enough.
  */
-public class Leaderboard {
+public class SimpleUser {
+    @Expose
+    private final int id;
+    @Expose
+    private final String name;
 
-    public static List<Entry> getAll() {
-        return DatabaseAccess.getLeaderboard();
+    public SimpleUser(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

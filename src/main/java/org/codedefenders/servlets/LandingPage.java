@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -35,8 +36,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.UserDAO;
+import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 
@@ -58,9 +61,12 @@ public class LandingPage extends HttpServlet {
     @Inject
     private LoginBean login;
 
+    @Inject
+    private UserService userService;
+
     @Override
     protected void doGet(HttpServletRequest request,
-                         HttpServletResponse response) throws ServletException, IOException {
+            HttpServletResponse response) throws ServletException, IOException {
 
         if (login.isLoggedIn()) {
             // User logged in? Send him to the games overview.
@@ -78,7 +84,13 @@ public class LandingPage extends HttpServlet {
 
             request.setAttribute("openMultiplayerGames", availableMultiplayerGames);
 
-            request.setAttribute("gameCreatorNames", UserDAO.getGamesCreatorNames(availableMultiplayerGames));
+            Map<Integer, String> gameCreatorNames = availableMultiplayerGames.stream()
+                    .collect(Collectors.toMap(AbstractGame::getId,
+                            game -> userService.getSimpleUserById(game.getCreatorId())
+                                    .map(SimpleUser::getName)
+                                    .orElse("Unknown user")));
+
+            request.setAttribute("gameCreatorNames", gameCreatorNames);
 
             request.getRequestDispatcher(Constants.INDEX_JSP).forward(request, response);
         }

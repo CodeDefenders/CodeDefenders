@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2021 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,20 +16,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.codedefenders.itests;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
 
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -37,7 +35,6 @@ import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -50,9 +47,8 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Feedback;
-import org.codedefenders.model.User;
-import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
@@ -68,11 +64,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -81,17 +74,17 @@ import static org.junit.Assume.assumeTrue;
  */
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class, CodeValidator.class })
+@PrepareForTest({DatabaseConnection.class, CodeValidator.class})
 public class DatabaseTest {
     private static long START_TIME = (int) 1e15;
     private static long END_TIME = (int) 1e30;
 
     @Before // BeforeClass has to be static...
     public void createEntities() {
-        user1 = new User("FREE_USERNAME", User.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
-        user2 = new User("FREE_USERNAME2", User.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
+        user1 = new UserEntity("FREE_USERNAME", UserEntity.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
+        user2 = new UserEntity("FREE_USERNAME2", UserEntity.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
 
-        creator = new User(20000, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
+        creator = new UserEntity(20000, "FREE_USERNAME3", UserEntity.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
 
         cut1 = GameClass.build()
                 .id(22345678)
@@ -122,7 +115,7 @@ public class DatabaseTest {
     // This will re-create the same DB from scratch every time... is this really
     // necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    public DatabaseRule db = new DatabaseRule();
 
     @Before
     public void mockDBConnections() throws Exception {
@@ -136,9 +129,9 @@ public class DatabaseTest {
         });
     }
 
-    private User creator;
-    private User user1;
-    private User user2;
+    private UserEntity creator;
+    private UserEntity user1;
+    private UserEntity user2;
 
     private MultiplayerGame multiplayerGame;
 
@@ -146,38 +139,6 @@ public class DatabaseTest {
     private GameClass cut2;
     private Mutant mutant1;
     private org.codedefenders.game.Test test;
-
-
-    @Test
-    public void testInsertUser() throws Exception {
-        assertTrue(user1.insert());
-        User userFromDB = UserDAO.getUserById(user1.getId());
-        assertEquals(user1.getId(), userFromDB.getId());
-        assertEquals(user1.getUsername(), userFromDB.getUsername());
-        assertEquals(user1.getEmail(), userFromDB.getEmail());
-        // FIXME this is never written to the DB
-        // assertEquals(user1.isValidated(), userFromDB.isValidated());
-        assertTrue(User.passwordMatches("TEST_PASSWORD", userFromDB.getEncodedPassword()));
-        assertNotEquals("Password should not be stored in plain text", "TEST_PASSWORD", userFromDB.getEncodedPassword());
-        // FIXME Split this in two tests
-        // assertFalse("Inserting a user twice should fail", user1.insert());
-    }
-
-    @Test
-    public void testUpdateUser() {
-        assumeTrue(user1.insert());
-
-        user1.setEncodedPassword(User.encodePassword("TEST_PASSWORD" + "_new"));
-        user1.setUsername(user1.getUsername() + "_new");
-        user1.setEmail(user1.getEmail() + "_new");
-
-        assertTrue(user1.update());
-        User userFromDB = UserDAO.getUserById(user1.getId());
-        assertEquals(user1.getId(), userFromDB.getId());
-        assertEquals(user1.getUsername(), userFromDB.getUsername());
-        assertEquals(user1.getEmail(), userFromDB.getEmail());
-        assertEquals(user1.getEncodedPassword(), userFromDB.getEncodedPassword());
-    }
 
     //FIXME
     @Ignore
@@ -208,9 +169,9 @@ public class DatabaseTest {
 
         MultiplayerGame multiplayerGameFromDB = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
         assertEquals(multiplayerGameFromDB.getPrize(), multiplayerGame.getPrize(), 1e-10);
-        assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest() , multiplayerGame.getMaxAssertionsPerTest());
+        assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest(), multiplayerGame.getMaxAssertionsPerTest());
         assertEquals(multiplayerGameFromDB.isChatEnabled(), multiplayerGame.isChatEnabled());
-        assertEquals(multiplayerGameFromDB.getMutantValidatorLevel() , multiplayerGame.getMutantValidatorLevel());
+        assertEquals(multiplayerGameFromDB.getMutantValidatorLevel(), multiplayerGame.getMutantValidatorLevel());
     }
 
     //FIXME
@@ -275,6 +236,8 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testInsertPlayer() throws Exception {
+        UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+
         assumeTrue(creator.insert());
         assumeTrue(user1.insert());
         assumeTrue(cut1.insert());
@@ -286,7 +249,7 @@ public class DatabaseTest {
         assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
         int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
         assertTrue(playerID > 0);
-        assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
+        assertEquals(userRepo.getUserIdForPlayerId(playerID).get().intValue(), user1.getId());
         assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
         assertEquals(PlayerDAO.getPlayerPoints(playerID), 0);
         PlayerDAO.increasePlayerPoints(13, playerID);
@@ -320,7 +283,7 @@ public class DatabaseTest {
                 Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
         assertTrue(mutant1.insert());
         assertTrue(mutant2.insert());
-        Mutant[] ml = { mutant1, mutant2 };
+        Mutant[] ml = {mutant1, mutant2};
         assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
         assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml));
     }
@@ -395,11 +358,11 @@ public class DatabaseTest {
         assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
         int score = mutant1.getScore();
         // Prevent score update
-        mutant1.setScore( 10 );
+        mutant1.setScore(10);
         assertFalse(mutant1.update());
         //
 
-        Mutant storedMutant = MutantDAO.getMutantById( mutant1.getId() );
+        Mutant storedMutant = MutantDAO.getMutantById(mutant1.getId());
         assertEquals("Score does not match", score, storedMutant.getScore());
         //
         assertEquals(mutant1, storedMutant);
@@ -487,7 +450,7 @@ public class DatabaseTest {
         int pidAttacker = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
         int cutID = cut1.getId();
 
-        Mutant mutant1 = new Mutant(999,  cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+        Mutant mutant1 = new Mutant(999, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
                 Mutant.Equivalence.ASSUMED_NO, 1, 99, pidAttacker);
         assertTrue(mutant1.insert());
 

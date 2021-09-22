@@ -417,10 +417,10 @@
 
     <% if (gamesCreatable) { %>
         <div>
-            <a id="createBattleground" class="btn btn-outline-primary me-2" href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>">
+            <a id="createBattleground" class="btn btn-outline-primary me-2" href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE %>?origin=<%=Paths.GAMES_OVERVIEW%>">
                 Create battleground game
             </a>
-            <a id="createMelee" class="btn btn-outline-primary" href="<%=request.getContextPath() + Paths.MELEE_CREATE%>">
+            <a id="createMelee" class="btn btn-outline-primary" href="<%=request.getContextPath() + Paths.MELEE_CREATE%>?origin=<%=Paths.GAMES_OVERVIEW%>">
                 Create melee game
             </a>
         </div>

@@ -22,15 +22,26 @@ import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.Objects;
+import java.util.Optional;
+
+import javax.enterprise.inject.spi.CDI;
 
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-public class User implements Serializable {
-    private static final Logger logger = LoggerFactory.getLogger(User.class);
+/**
+ * Represents a user object in the database.
+ *
+ * @apiNote Should not be used directly in the frontend, instead it should only be used in the database layer
+ * (repositories) and in the business layer (services), but shouldn't be exposed in the API from the later ones.
+ */
+public class UserEntity implements Serializable {
+    private static final Logger logger = LoggerFactory.getLogger(UserEntity.class);
 
     private int id;
     private String username;
@@ -41,24 +52,24 @@ public class User implements Serializable {
     private boolean allowContact;
     private KeyMap keyMap;
 
-    public User(String username) {
-        this(username, User.encodePassword(""));
+    public UserEntity(String username) {
+        this(username, UserEntity.encodePassword(""));
     }
 
-    public User(String username, String encodedPassword) {
+    public UserEntity(String username, String encodedPassword) {
         this(username, encodedPassword, "");
     }
 
-    public User(String username, String encodedPassword, String email) {
+    public UserEntity(String username, String encodedPassword, String email) {
         this(0, username, encodedPassword, email);
     }
 
-    public User(int id, String username, String encodedPassword, String email) {
+    public UserEntity(int id, String username, String encodedPassword, String email) {
         this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT);
     }
 
-    public User(int id, String username, String encodedPassword, String email, boolean validated,
-                boolean active, boolean allowContact, KeyMap keyMap) {
+    public UserEntity(int id, String username, String encodedPassword, String email, boolean validated,
+            boolean active, boolean allowContact, KeyMap keyMap) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -69,60 +80,28 @@ public class User implements Serializable {
         this.keyMap = keyMap;
     }
 
+    /**
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#insert(UserEntity)} instead.
+     */
+    @Deprecated
     public boolean insert() {
-        // TODO Phil 12/12/18: Update this like Test#insert() to use DAO insert method but update identifier
-        DatabaseValue[] valueList;
-        String query;
-        Connection conn = DB.getConnection();
-
-        if (id <= 0) {
-            query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
-            valueList = new DatabaseValue[]{DatabaseValue.of(username),
-                    DatabaseValue.of(encodedPassword),
-                    DatabaseValue.of(email)};
-        } else {
-            query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
-            valueList = new DatabaseValue[]{DatabaseValue.of(id),
-                    DatabaseValue.of(username),
-                    DatabaseValue.of(encodedPassword),
-                    DatabaseValue.of(email)};
-        }
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        int key = DB.executeUpdateGetKeys(stmt, conn);
-        if (key != -1) {
-            this.id = key;
-            return true;
-        } else {
+        // TODO: Remove workaround
+        Optional<Integer> result = CDI.current().select(UserRepository.class).get().insert(this);
+        if (!result.isPresent()) {
             return false;
+        } else {
+            id = result.get();
+            return true;
         }
     }
 
+    /**
+     * @deprecated Use {@link org.codedefenders.persistence.database.UserRepository#update(UserEntity)} instead.
+     */
+    @Deprecated
     public boolean update() {
-        DatabaseValue[] valueList;
-        Connection conn = DB.getConnection();
-
-        String query = String.join("\n",
-                "UPDATE users",
-                "SET Username = ?,",
-                "  Email = ?,",
-                "  Password = ?,",
-                "  Validated = ?,",
-                "  Active = ?,",
-                "  AllowContact = ?,",
-                "  KeyMap = ?",
-                "WHERE User_ID = ?;");
-        valueList = new DatabaseValue[]{
-                DatabaseValue.of(username),
-                DatabaseValue.of(email),
-                DatabaseValue.of(encodedPassword),
-                DatabaseValue.of(validated),
-                DatabaseValue.of(active),
-                DatabaseValue.of(allowContact),
-                DatabaseValue.of(keyMap.name()),
-                DatabaseValue.of(id)
-        };
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        return DB.executeUpdate(stmt, conn);
+        // TODO: Remove workaround
+        return CDI.current().select(UserRepository.class).get().update(this);
     }
 
     public boolean isValidated() {
@@ -202,7 +181,7 @@ public class User implements Serializable {
         if (other == null || getClass() != other.getClass()) {
             return false;
         }
-        User user = (User) other;
+        UserEntity user = (UserEntity) other;
         return getId() == user.getId();
     }
 

@@ -20,7 +20,10 @@
 --%>
 <%@page import="org.codedefenders.beans.game.ScoreItem"%>
 
-<jsp:useBean id="meleeScoreboardBean" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
+<!-- Instance is created manually in MeleeGame(History)Manager so we use 'type=' instead of 'class=' so nothing
+complains about the missing no-args constructor (this is simply a type hint for an existing attribute and will not try
+to create it if it is missing -->
+<jsp:useBean id="meleeScoreboardBean" type="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
 
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
@@ -58,7 +61,7 @@
                         <%
                                 }
                         %>
-                                <td><%=scoreItem.getUser().getUsername()%></td>
+                                <td><%=scoreItem.getUser().getName()%></td>
                                 <td><%=scoreItem.getAttackScore().getTotalScore()%></td>
                                 <td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
                                 <td><%=scoreItem.getDuelScore().getTotalScore()%></td>

@@ -137,9 +137,9 @@ public class ClassUploadManager extends HttpServlet {
         boolean shouldPrepareAI = false;
         // Control whether after a successful upload we return to the same back or to the original page
         boolean disableAutomaticRedirect = false;
-        // Data about page to automatically redirect to after a successful upload 
+        // Data about page to automatically redirect to after a successful upload
         String origin = null;
-        
+
         // Alias of the CUT
         String classAlias = null;
         // Used to check whether multiple CUTs are uploaded.
@@ -538,15 +538,15 @@ public class ClassUploadManager extends HttpServlet {
             logger.error("Could error while calculating killmap for successfully uploaded class.", e);
         }
 
-        // Handle the automatic redirection logic. At this point, origin is 
-        if( disableAutomaticRedirect) {
+        // Handle the automatic redirection logic.
+        if (disableAutomaticRedirect) {
             logger.info("Redirecting to class upload page disableAutomaticRedirect checked");
             Redirect.redirectBack(request, response);
         } else if (origin == null || origin.equalsIgnoreCase("null")) {
             logger.info("Redirecting to class upload page. Null origin");
             Redirect.redirectBack(request, response);
         } else {
-            logger.info("Automatically Redirecting to admin " + origin);
+            logger.info("Automatically redirecting to origin " + origin);
             Redirect.redirectTo(request, response, origin);
         }
     }

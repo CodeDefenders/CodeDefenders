@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.validation.input.CodeDefendersValidator;
@@ -22,6 +22,9 @@ public class UserServlet extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserRepository userRepo;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -51,12 +54,12 @@ public class UserServlet extends HttpServlet {
                 } else if (!password.equals(confirm)) {
                     // This check should be performed in the user interface too.
                     messages.add("Could not create user. Password entries did not match.");
-                } else if (UserDAO.getUserByName(username) != null) {
+                } else if (userRepo.getUserByName(username).isPresent()) {
                     messages.add("Could not create user. Username is already taken.");
-                } else if (UserDAO.getUserByEmail(email) != null) {
+                } else if (userRepo.getUserByEmail(email).isPresent()) {
                     messages.add("Could not create user. Email has already been used. You can reset your password.");
                 } else {
-                    User newUser = new User(username, User.encodePassword(password), email);
+                    UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);
                     if (newUser.insert()) {
                         messages.add("Your user has been created. You can login now.");
                     } else {
@@ -64,7 +67,7 @@ public class UserServlet extends HttpServlet {
                         messages.add("Could not create a user for you, sorry!");
                     }
                 }
-                response.sendRedirect(Constants.LOGIN_VIEW_JSP);
+                response.sendRedirect(Paths.LOGIN);
                 break;
 
             default:

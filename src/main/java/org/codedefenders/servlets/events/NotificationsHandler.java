@@ -40,6 +40,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.NotificationType;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,9 @@ public class NotificationsHandler extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private UserService userService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -144,7 +148,7 @@ public class NotificationsHandler extends HttpServlet {
 
         for (Event e : events) {
             e.setCurrentUserName(login.getUser().getUsername());
-            e.parse(e.getEventStatus() == EventStatus.GAME);
+            e.parse(e.getEventStatus() == EventStatus.GAME, userService);
         }
 
         PrintWriter out = response.getWriter();
@@ -200,13 +204,13 @@ public class NotificationsHandler extends HttpServlet {
 
         for (Event e : events) {
 
-            if (e.getUser().getId() == Constants.DUMMY_CREATOR_USER_ID) {
+            if (e.getUserId() == Constants.DUMMY_CREATOR_USER_ID) {
                 continue;
             }
 
             // Make sure we do not trigger NPE
             if (e.getMessage() != null) {
-                e.parse(e.getEventStatus() == EventStatus.GAME);
+                e.parse(e.getEventStatus() == EventStatus.GAME, userService);
             }
             e.setCurrentUserName(login.getUser().getUsername());
         }
@@ -246,7 +250,7 @@ public class NotificationsHandler extends HttpServlet {
             // for extra check
             final List<Event> events = DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp).stream()
                     .peek(event -> event.setCurrentUserName(login.getUser().getUsername()))
-                    .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
+                    .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME, userService))
                     .collect(Collectors.toList());
 
             PrintWriter out = response.getWriter();

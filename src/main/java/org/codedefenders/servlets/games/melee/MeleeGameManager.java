@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -40,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
@@ -52,7 +53,7 @@ import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
@@ -67,7 +68,6 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
@@ -76,6 +76,8 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -161,6 +163,12 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private GameProducer gameProducer;
 
+    @Inject
+    private UserRepository userRepo;
+
+    @Inject
+    private UserService userService;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -195,9 +203,9 @@ public class MeleeGameManager extends HttpServlet {
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    User defender = UserDAO.getUserForPlayer(defenderId);
+                    Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
                     // TODO This should be a better name
-                    request.setAttribute("equivDefender", defender);
+                    request.setAttribute("equivDefender", defender.orElse(null));
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
@@ -206,7 +214,7 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("playerId", playerId);
 
         // Compute the score and pass along the ScoreBoard bean?
-        MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean();
+        MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean(userService);
         // Why ID is necessary here?
         meleeScoreboardBean.setGameId(game.getId());
         meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(game.getId()),
@@ -214,6 +222,24 @@ public class MeleeGameManager extends HttpServlet {
         meleeScoreboardBean.setPlayers(game.getPlayers());
         // Set the preconditions for the score board
         request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
+
+        // We need to compute/set this here for the `player_view.jsp`.
+        List<Test> playerTests = game.getTests()
+                .stream()
+                .filter(t -> {
+                    Optional<Integer> optUserId = userRepo.getUserIdForPlayerId(t.getPlayerId());
+                    return optUserId.isPresent() && optUserId.get() == userId;
+                })
+                .collect(Collectors.toList());
+        List<Test> enemyTests = game.getTests()
+                .stream()
+                .filter(t -> {
+                    Optional<Integer> optUserId = userRepo.getUserIdForPlayerId(t.getPlayerId());
+                    return optUserId.isPresent() && optUserId.get() != userId;
+                })
+                .collect(Collectors.toList());
+        request.setAttribute("playerTests", playerTests);
+        request.setAttribute("enemyTests", enemyTests);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_VIEW_JSP);
         dispatcher.forward(request, response);
@@ -238,11 +264,11 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         final String action = ServletUtils.formType(request);
-        final User user = UserDAO.getUserById(login.getUserId());
+        final Optional<SimpleUser> user = userService.getSimpleUserById(login.getUserId());
 
         final int playerId = PlayerDAO.getPlayerIdForUserAndGame(login.getUserId(), gameId);
 
-        if (playerId == -1) {
+        if (playerId == -1 || !user.isPresent()) {
             // Something odd with the registration - TODO
             logger.warn("Wrong registration with the User {} in Melee Game {}", login.getUserId(), gameId);
             Redirect.redirectBack(request, response);
@@ -251,12 +277,12 @@ public class MeleeGameManager extends HttpServlet {
 
         switch (action) {
             case "createMutant": {
-                createMutant(request, response, user, game, playerId);
+                createMutant(request, response, user.get(), game, playerId);
                 triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
-                createTest(request, response, user, game);
+                createTest(request, response, user.get(), game);
                 // After a test is submitted, there's the chance that one or more mutants
                 // already survived enough tests
                 triggerAutomaticMutantEquivalenceForGame(game);
@@ -300,7 +326,7 @@ public class MeleeGameManager extends HttpServlet {
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
                 // Send the notification about the flagged mutant to attacker
-                int mutantOwnerId = UserDAO.getUserForPlayer(aliveMutant.getPlayerId()).getId();
+                int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
                 Event event = new Event(-1, game.getId(), mutantOwnerId,
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
@@ -327,7 +353,7 @@ public class MeleeGameManager extends HttpServlet {
     }
 
     @SuppressWarnings("Duplicates")
-    private void createTest(HttpServletRequest request, HttpServletResponse response, User user, MeleeGame game)
+    private void createTest(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game)
             throws IOException {
 
         final String contextPath = ctx(request);
@@ -439,7 +465,7 @@ public class MeleeGameManager extends HttpServlet {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             // We escape the content of the message for new tests since user can embed there
             // anything
-            String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+            String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
@@ -467,7 +493,7 @@ public class MeleeGameManager extends HttpServlet {
         // Include Test Smells in the messages back to user
         includeDetectTestSmellsInMessages(newTest, messages.getBridge());
 
-        final String message = user.getUsername() + " created a test";
+        final String message = user.getName() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         final Event notif = new Event(-1, game.getId(), user.getId(), message, EventType.DEFENDER_TEST_CREATED,
                 EventStatus.GAME, timestamp);
@@ -537,7 +563,7 @@ public class MeleeGameManager extends HttpServlet {
         return decorated.toString();
     }
 
-    private void createMutant(HttpServletRequest request, HttpServletResponse response, User user, MeleeGame game,
+    private void createMutant(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game,
             int playerId) throws IOException {
 
         final String contextPath = ctx(request);
@@ -645,7 +671,7 @@ public class MeleeGameManager extends HttpServlet {
                     && !compileMutantTarget.message.isEmpty()) {
                 // We escape the content of the message for new tests since user can embed there
                 // anything
-                String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message);
+                String escapedHtml = StringEscapeUtils.escapeHtml4(compileMutantTarget.message);
                 // Extract the line numbers of the errors
                 List<Integer> errorLines = extractErrorLines(compileMutantTarget.message);
                 // Store them in the session so they can be picked up later
@@ -661,7 +687,7 @@ public class MeleeGameManager extends HttpServlet {
         }
 
         messages.add(MUTANT_COMPILED_MESSAGE);
-        final String notificationMsg = UserDAO.getUserById(user.getId()).getUsername() + " created a mutant.";
+        final String notificationMsg = user.getName() + " created a mutant.";
         // TODO Do we need to create a special message: PLAYER_MUTANT_CREATED?
         Event notif = new Event(-1, game.getId(), user.getId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
@@ -727,10 +753,10 @@ public class MeleeGameManager extends HttpServlet {
                     m.kill(Mutant.Equivalence.DECLARED_YES);
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
-                    User eventUser = UserDAO.getUserById(login.getUserId());
+                    Optional<SimpleUser> eventUser = userService.getSimpleUserById(login.getUserId());
 
                     Event notifEquiv = new Event(-1, game.getId(), login.getUserId(),
-                            eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.",
+                            eventUser.map(SimpleUser::getName).orElse("") + " accepts that their mutant " + m.getId() + " is equivalent.",
                             EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(notifEquiv);
@@ -819,7 +845,7 @@ public class MeleeGameManager extends HttpServlet {
                 messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
 
                 if (compileTestTarget != null) {
-                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
                     // Extract the line numbers of the errors
                     List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
                     // Store them in the session so they can be picked up later
@@ -874,7 +900,7 @@ public class MeleeGameManager extends HttpServlet {
                     // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points
                     // added.
                     newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
-                    final String message = UserDAO.getUserById(login.getUserId()).getUsername() + " killed mutant "
+                    final String message = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("") + " killed mutant "
                             + mPending.getId() + " in an equivalence duel.";
                     Event notif = new Event(-1, gameId, login.getUserId(), message,
                             EventType.PLAYER_WON_EQUIVALENT_DUEL, EventStatus.GAME,
@@ -898,7 +924,7 @@ public class MeleeGameManager extends HttpServlet {
                         logger.debug("Test {} did not kill mutant {} and so did not prov it non-equivalent",
                                 newTest.getId(), mPending.getId());
                         mPending.kill(ASSUMED_YES);
-                        final String message = UserDAO.getUserById(login.getUserId()).getUsername()
+                        final String message = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("")
                                 + " lost an equivalence duel. Mutant " + mPending.getId() + " is assumed equivalent.";
                         Event notif = new Event(-1, gameId, login.getUserId(), message,
                                 EventType.PLAYER_LOST_EQUIVALENT_DUEL, EventStatus.GAME,
@@ -987,9 +1013,9 @@ public class MeleeGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                User mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
+                                Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
 
-                                Event event = new Event(-1, gameId, mutantOwner.getId(),
+                                Event event = new Event(-1, gameId, mutantOwner.map(SimpleUser::getId).orElse(0),
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));
@@ -1006,7 +1032,6 @@ public class MeleeGameManager extends HttpServlet {
                                 eventDAO.insert(scoreEvent);
 
 
-
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
                                 DatabaseAccess.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
@@ -1021,7 +1046,7 @@ public class MeleeGameManager extends HttpServlet {
 
         int nClaimed = claimedMutants.get();
         if (nClaimed > 0) {
-            String flaggingChatMessage = UserDAO.getUserById(login.getUserId()).getUsername() + " flagged " + nClaimed
+            String flaggingChatMessage = userService.getSimpleUserById(login.getUserId()).map(SimpleUser::getName).orElse("") + " flagged " + nClaimed
                     + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
                     EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,

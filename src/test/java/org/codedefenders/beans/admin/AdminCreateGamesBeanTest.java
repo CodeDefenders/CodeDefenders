@@ -1,6 +1,5 @@
 package org.codedefenders.beans.admin;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,13 +20,13 @@ import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,14 +50,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
         AdminDAO.class,
         GameDAO.class,
         MultiplayerGameDAO.class,
-        MeleeGameDAO.class,
-        UserDAO.class
+        MeleeGameDAO.class
 })
 public class AdminCreateGamesBeanTest {
     private AdminCreateGamesBean adminCreateGamesBean;
     private StagedGameList stagedGameList;
 
     private HashMap<Integer, UserInfo> userInfos;
+
+    private UserRepository userRepo;
 
     @Before
     public void mockDatabase() {
@@ -68,7 +68,6 @@ public class AdminCreateGamesBeanTest {
         PowerMockito.mockStatic(GameDAO.class);
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(MeleeGameDAO.class);
-        PowerMockito.mockStatic(UserDAO.class);
         PowerMockito.mockStatic(AdminCreateGamesBean.class);
     }
 
@@ -81,27 +80,28 @@ public class AdminCreateGamesBeanTest {
         /* Mock bean dependencies of AdminCreateGamesBean. */
         LoginBean loginBean = PowerMockito.mock(LoginBean.class);
         PowerMockito.when(loginBean.getUserId()).thenReturn(0);
-        PowerMockito.when(loginBean.getUser()).thenReturn(new User(0, "creator", "", ""));
+        PowerMockito.when(loginBean.getUser()).thenReturn(new UserEntity(0, "creator", "", ""));
 
         MessagesBean messagesBean = PowerMockito.mock(MessagesBean.class);
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);
         EventDAO eventDAO = PowerMockito.mock(EventDAO.class);
+        userRepo = PowerMockito.mock(UserRepository.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO);
+        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
     @Before
     public void initializeData() {
         userInfos = new HashMap<>();
-        userInfos.put(1, new UserInfo(new User(1, "userA", "", "userA@email.com"), null, Role.ATTACKER, 1));
-        userInfos.put(2, new UserInfo(new User(2, "userB", "", "userB@email.com"), null, Role.ATTACKER, 2));
-        userInfos.put(3, new UserInfo(new User(3, "userC", "", "userC@email.com"), null, Role.ATTACKER, 3));
-        userInfos.put(4, new UserInfo(new User(4, "userD", "", "userD@email.com"), null, Role.ATTACKER, 4));
-        userInfos.put(5, new UserInfo(new User(5, "userE", "", "userE@email.com"), null, Role.PLAYER, 5));
-        userInfos.put(6, new UserInfo(new User(6, "userF", "", "userF@email.com"), null, Role.PLAYER, 6));
-        userInfos.put(7, new UserInfo(new User(7, "userG", "", "userG@email.com"), null, Role.DEFENDER, 7));
-        userInfos.put(8, new UserInfo(new User(8, "userH", "", "userH@email.com"), null, Role.DEFENDER, 8));
+        userInfos.put(1, new UserInfo(new UserEntity(1, "userA", "", "userA@email.com"), null, Role.ATTACKER, 1));
+        userInfos.put(2, new UserInfo(new UserEntity(2, "userB", "", "userB@email.com"), null, Role.ATTACKER, 2));
+        userInfos.put(3, new UserInfo(new UserEntity(3, "userC", "", "userC@email.com"), null, Role.ATTACKER, 3));
+        userInfos.put(4, new UserInfo(new UserEntity(4, "userD", "", "userD@email.com"), null, Role.ATTACKER, 4));
+        userInfos.put(5, new UserInfo(new UserEntity(5, "userE", "", "userE@email.com"), null, Role.PLAYER, 5));
+        userInfos.put(6, new UserInfo(new UserEntity(6, "userF", "", "userF@email.com"), null, Role.PLAYER, 6));
+        userInfos.put(7, new UserInfo(new UserEntity(7, "userG", "", "userG@email.com"), null, Role.DEFENDER, 7));
+        userInfos.put(8, new UserInfo(new UserEntity(8, "userH", "", "userH@email.com"), null, Role.DEFENDER, 8));
     }
 
     private Set<UserInfo> userSet(int... ids) {
@@ -224,7 +224,7 @@ public class AdminCreateGamesBeanTest {
 
         PowerMockito.when(MultiplayerGameDAO.storeMultiplayerGame(Matchers.any(MultiplayerGame.class))).thenReturn(0);
         PowerMockito.when(GameDAO.addPlayerToGame(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(Role.class))).thenReturn(true);
-        PowerMockito.when(UserDAO.getUserById(Matchers.anyInt())).thenReturn(new User(""));
+        PowerMockito.when(userRepo.getUserById(Matchers.anyInt())).thenReturn(Optional.of(new UserEntity("")));
         adminCreateGamesBean = PowerMockito.spy(adminCreateGamesBean);
 
         adminCreateGamesBean.createStagedGames(stagedGames);
@@ -327,10 +327,10 @@ public class AdminCreateGamesBeanTest {
     }
 
     private void testAssignRoles(RoleAssignmentMethod roleAssignmentMethod,
-                                 Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
-                                 int attackersPerGame, int defendersPerGame,
-                                 int expectedNumAttackers, int expectedNumDefenders,
-                                 Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
+            Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
+            int attackersPerGame, int defendersPerGame,
+            int expectedNumAttackers, int expectedNumDefenders,
+            Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
         int numUsers = users.size() + attackers.size() + defenders.size();
         Set<UserInfo> usersBefore = new HashSet<>(users);
         Set<UserInfo> attackersBefore = new HashSet<>(attackers);
@@ -352,18 +352,18 @@ public class AdminCreateGamesBeanTest {
     }
 
     private void testAssignRoles_Random(Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
-                                        int attackersPerGame, int defendersPerGame,
-                                        int expectedNumAttackers, int expectedNumDefenders) {
+            int attackersPerGame, int defendersPerGame,
+            int expectedNumAttackers, int expectedNumDefenders) {
         testAssignRoles(RoleAssignmentMethod.RANDOM, users, attackers, defenders, attackersPerGame, defendersPerGame,
                 expectedNumAttackers, expectedNumDefenders, new HashSet<>(), new HashSet<>());
     }
 
     private void testAssignRoles_Opposite(Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
-                                        int attackersPerGame, int defendersPerGame,
-                                        int expectedNumAttackers, int expectedNumDefenders,
-                                        Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
-        testAssignRoles(RoleAssignmentMethod.OPPOSITE, users, attackers, defenders, attackersPerGame,defendersPerGame,
-            expectedNumAttackers, expectedNumDefenders, expectedAttackers, expectedDefenders);
+            int attackersPerGame, int defendersPerGame,
+            int expectedNumAttackers, int expectedNumDefenders,
+            Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
+        testAssignRoles(RoleAssignmentMethod.OPPOSITE, users, attackers, defenders, attackersPerGame, defendersPerGame,
+                expectedNumAttackers, expectedNumDefenders, expectedAttackers, expectedDefenders);
     }
 
     @Test

@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
@@ -54,7 +54,7 @@ import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
+import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
@@ -70,7 +70,7 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
@@ -80,6 +80,8 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -159,6 +161,12 @@ public class MultiplayerGameManager extends HttpServlet {
     @Inject
     private GameProducer gameProducer;
 
+    @Inject
+    private UserRepository userRepo;
+
+    @Inject
+    private UserService userService;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -186,9 +194,10 @@ public class MultiplayerGameManager extends HttpServlet {
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    User defender = UserDAO.getUserForPlayer(defenderId);
+                    Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);;
 
-                    request.setAttribute("equivDefender", defender);
+                    // TODO
+                    request.setAttribute("equivDefender", defender.orElse(null));
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
@@ -277,8 +286,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
                 // Send the notification about the flagged mutant to attacker
-                int mutantOwnerId = UserDAO.getUserForPlayer(aliveMutant.getPlayerId()).getId();
-                Event event = new Event(-1, game.getId(), mutantOwnerId,
+                Optional<Integer> mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId());
+                Event event = new Event(-1, game.getId(), mutantOwnerId.orElse(0),
                         "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
                                 + "tests so it was automatically claimed as equivalent.",
@@ -434,7 +443,7 @@ public class MultiplayerGameManager extends HttpServlet {
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             // We escape the content of the message for new tests since user can embed there anything
-            String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+            String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
             // Extract the line numbers of the errors
             List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
@@ -652,7 +661,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // There's a ton of defensive programming here...
             if (errorMessage != null) {
                 // We escape the content of the message for new tests since user can embed there anything
-                String escapedHtml = StringEscapeUtils.escapeHtml(errorMessage);
+                String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
                 // Extract the line numbers of the errors
                 List<Integer> errorLines = extractErrorLines(errorMessage);
                 // Store them in the session so they can be picked up later
@@ -762,10 +771,10 @@ public class MultiplayerGameManager extends HttpServlet {
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
                         int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
-                        int userId = UserDAO.getUserForPlayer(defenderId).getId();
+                        Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
                         notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
-                        Event notifDefenderEquiv = new Event(-1, game.getId(), userId, notification,
+                        Event notifDefenderEquiv = new Event(-1, game.getId(), userId.orElse(0), notification,
                                 EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
                         eventDAO.insert(notifDefenderEquiv);
@@ -850,7 +859,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
 
                 if (compileTestTarget != null) {
-                    String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+                    String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
                     // Extract the line numbers of the errors
                     List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
                     // Store them in the session so they can be picked up later
@@ -1010,9 +1019,9 @@ public class MultiplayerGameManager extends HttpServlet {
                                 m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                                 m.update();
 
-                                User mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
+                                Optional<SimpleUser> mutantOwner = userService.getSimpleUserByPlayerId(m.getPlayerId());
 
-                                Event event = new Event(-1, gameId, mutantOwner.getId(),
+                                Event event = new Event(-1, gameId, mutantOwner.map(SimpleUser::getId).orElse(0),
                                         "One or more of your mutants is flagged equivalent.",
                                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                                         new Timestamp(System.currentTimeMillis()));

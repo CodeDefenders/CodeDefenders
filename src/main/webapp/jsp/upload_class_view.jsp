@@ -161,15 +161,31 @@
         </details>
 
         <div class="row mt-3">
-            <div class="col-auto">
-                <button id="upload" type="submit" class="btn btn-primary">
-                    Upload
-                </button>
-            </div>
+            <c:choose>
+                <c:when test="${empty param.origin}">
+                    <div class="col-auto">
+                        <button id="upload" type="submit" class="btn btn-primary">
+                            Upload
+                        </button>
+                        <%-- TODO Where do we cancel to in this case? --%>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <input type="hidden" name="origin" value="${param.origin}"/>
+                    <div class="col-auto">
+                        <div class="btn-group">
+                            <button id="upload" type="submit" class="btn btn-primary">
+                                Upload
+                            </button>
+                            <button id="upload-and-stay" type="submit" class="btn btn-outline-primary" name="disableAutomaticRedirect" value="disabled">
+                                Upload and stay on this page
+                            </button>
+                        </div>
+                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel" class="btn btn-outline-primary">Cancel</a>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
-        
-        <input type="hidden" name="origin" value="<%=request.getParameter("origin")%>" />
-        <input type="checkbox" name="disableAutomaticRedirect" value="disabled" style="margin-right:5px;">I want to upload another class</input>
     </form>
 
     <h2 class="mt-4">Uploaded Classes</h2>

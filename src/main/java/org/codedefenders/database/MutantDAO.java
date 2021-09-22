@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
@@ -138,7 +138,7 @@ public class MutantDAO {
                 "WHERE m.Game_ID = ?",
                 "  AND m.User_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS,
-                DatabaseValue.of(gameId), DatabaseValue.of( userId));
+                DatabaseValue.of(gameId), DatabaseValue.of(userId));
     }
 
     /**

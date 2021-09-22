@@ -18,15 +18,7 @@
   --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="java.util.Optional" %>
-<%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
-<%@ page import="org.codedefenders.database.MeleeGameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.database.PlayerDAO" %>
 <%@ page import="java.util.List" %>
@@ -84,8 +76,6 @@
 <jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
-<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request"/>
-
 <jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
 <%
     history.setLogin(login);
@@ -113,7 +103,6 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <div class="row">

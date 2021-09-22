@@ -7,7 +7,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 
 /**
- * This class contains information about a {@link MeleeGame} from the view of a single {@link User}.
+ * This class contains information about a {@link MeleeGame} from the view of a single {@link UserEntity}.
  *
  * <p>Additionally to the game itself, this class contains the user's identifier, his role in the game and
  * game creator's name. {@link Type} also specifies whether the user is already active in this game

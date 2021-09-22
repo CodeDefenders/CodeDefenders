@@ -21,13 +21,13 @@ package org.codedefenders.game.multiplayer;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -40,7 +40,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
@@ -290,11 +290,11 @@ public class MultiplayerGame extends AbstractGame {
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
-        User u = UserDAO.getUserById(userId);
+        Optional<UserEntity> u = userRepository.getUserById(userId);
         EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role, et, EventStatus.GAME,
+        Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined the game as " + role, et, EventStatus.GAME,
                 timestamp);
         eventDAO.insert(e);
 
@@ -312,7 +312,7 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     private boolean canJoinGame(int userId) {
-        return !requiresValidation || UserDAO.getUserById(userId).isValidated();
+        return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
     @Override
@@ -334,8 +334,7 @@ public class MultiplayerGame extends AbstractGame {
     /**
      * This method calculates the mutant score for every attacker in the game.
      *
-     * <p>
-     * The result is a mapping of playerId to player score.
+     * <p>The result is a mapping of playerId to player score.
      *
      * @return mapping from playerId to player score.
      */
@@ -421,8 +420,7 @@ public class MultiplayerGame extends AbstractGame {
     /**
      * This method calculates the test score for every defender in the game.
      *
-     * <p>
-     * The result is a mapping of playerId to player score.
+     * <p>The result is a mapping of playerId to player score.
      *
      * @return mapping from playerId to player score.
      */
@@ -540,44 +538,44 @@ public class MultiplayerGame extends AbstractGame {
         List<Event> events = getEvents();
 
         switch (state) {
-        case ACTIVE:
-            if (!listContainsEvent(events, EventType.GAME_STARTED)) {
-                EventType et = EventType.GAME_STARTED;
-                notifyAttackers("Game has started. Attack now!", et);
-                notifyDefenders("Game has started. Defend now!", et);
-                notifyCreator("Your game as started!", et);
-                notifyGame("The game has started!", et);
-            }
-            break;
-        case GRACE_ONE:
-            if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)) {
-                EventType et = EventType.GAME_GRACE_ONE;
-                notifyAttackers("A game has entered Grace One.", et);
-                notifyDefenders("A game has entered Grace One.", et);
-                notifyCreator("Your game has entered Grace One", et);
-                notifyGame("The game as entered Grace Period One", et);
-            }
-            break;
-        case GRACE_TWO:
-            if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)) {
-                EventType et = EventType.GAME_GRACE_TWO;
-                notifyAttackers("A game has entered Grace Two.", et);
-                notifyDefenders("A game has entered Grace Two.", et);
-                notifyCreator("Your game has entered Grace Two", et);
-                notifyGame("The game as entered Grace Period Two", et);
-            }
-            break;
-        case FINISHED:
-            if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
-                EventType et = EventType.GAME_FINISHED;
-                notifyAttackers("A game has finished.", et);
-                notifyDefenders("A game has finished.", et);
-                notifyCreator("Your game has finished.", et);
-                notifyGame("The game has ended.", et);
-            }
-            break;
-        default:
-            // ignored
+            case ACTIVE:
+                if (!listContainsEvent(events, EventType.GAME_STARTED)) {
+                    EventType et = EventType.GAME_STARTED;
+                    notifyAttackers("Game has started. Attack now!", et);
+                    notifyDefenders("Game has started. Defend now!", et);
+                    notifyCreator("Your game as started!", et);
+                    notifyGame("The game has started!", et);
+                }
+                break;
+            case GRACE_ONE:
+                if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)) {
+                    EventType et = EventType.GAME_GRACE_ONE;
+                    notifyAttackers("A game has entered Grace One.", et);
+                    notifyDefenders("A game has entered Grace One.", et);
+                    notifyCreator("Your game has entered Grace One", et);
+                    notifyGame("The game as entered Grace Period One", et);
+                }
+                break;
+            case GRACE_TWO:
+                if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)) {
+                    EventType et = EventType.GAME_GRACE_TWO;
+                    notifyAttackers("A game has entered Grace Two.", et);
+                    notifyDefenders("A game has entered Grace Two.", et);
+                    notifyCreator("Your game has entered Grace Two", et);
+                    notifyGame("The game as entered Grace Period Two", et);
+                }
+                break;
+            case FINISHED:
+                if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
+                    EventType et = EventType.GAME_FINISHED;
+                    notifyAttackers("A game has finished.", et);
+                    notifyDefenders("A game has finished.", et);
+                    notifyCreator("Your game has finished.", et);
+                    notifyGame("The game has ended.", et);
+                }
+                break;
+            default:
+                // ignored
         }
     }
 

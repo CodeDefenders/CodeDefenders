@@ -20,7 +20,7 @@ package org.codedefenders.game;
 
 import java.util.Set;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 public class TestTemplate {
     private String code;
@@ -50,7 +50,7 @@ public class TestTemplate {
     }
 
     public String getHTMLEscapedCode() {
-        return StringEscapeUtils.escapeHtml(getCode());
+        return StringEscapeUtils.escapeHtml4(getCode());
     }
 
     public int getEditableLinesStart() {

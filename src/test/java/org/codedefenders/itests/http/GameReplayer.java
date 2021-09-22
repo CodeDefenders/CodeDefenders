@@ -26,7 +26,7 @@ import org.codedefenders.itests.http.utils.AttackAction;
 import org.codedefenders.itests.http.utils.CodeDefenderAction;
 import org.codedefenders.itests.http.utils.DefendAction;
 import org.codedefenders.itests.http.utils.HelperUser;
-import org.codedefenders.model.User;
+import org.codedefenders.model.UserEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,9 +45,9 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Given a trace file this class replay the game as close as possible...
- * 
+ *
  * This is an utility class for running tests
- * 
+ *
  * @author gambi
  *
  */
@@ -82,8 +82,8 @@ public class GameReplayer {
 		mutants = new HashMap<>();
 	}
 
-	public List<User> getUsers() {
-		List<User> users = new ArrayList<>();
+	public List<UserEntity> getUsers() {
+		List<UserEntity> users = new ArrayList<>();
 		for (HelperUser hu : actors.values()) {
 			users.add(hu.getUser());
 		}
@@ -113,7 +113,7 @@ public class GameReplayer {
 				System.out.println("GameReplayer.parse() FOUND ATTACKER " + userID);
 				actors.put(userID,
 						new HelperUser(
-								new User("Attacker" + userID, User.encodePassword("test"), "Attacker" + userID + "@test.com"),
+								new UserEntity("Attacker" + userID, UserEntity.encodePassword("test"), "Attacker" + userID + "@test.com"),
 								org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
 			}
 			System.out.println("GameReplayer.parse() Attack " + userID);
@@ -141,7 +141,7 @@ public class GameReplayer {
 				if (!actors.containsKey(userID)) {
 					System.out.println("GameReplayer.parse() FOUND DEFENDER " + userID);
 					actors.put(userID,
-							new HelperUser(new User("Defender" + userID, User.encodePassword("test"), "Defender" + userID + "@test.com"),
+							new HelperUser(new UserEntity("Defender" + userID, UserEntity.encodePassword("test"), "Defender" + userID + "@test.com"),
 									org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
 				}
 			}
@@ -226,7 +226,7 @@ public class GameReplayer {
 	// Raise assertions ?
 	public void replay(int speedUp) throws FailingHttpStatusCodeException, IOException, InterruptedException {
 		// Create a game -> we need the game ID
-		User creatorUser = new User("creator", User.encodePassword("test"), "creator@test.com");
+		UserEntity creatorUser = new UserEntity("creator", UserEntity.encodePassword("test"), "creator@test.com");
 		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 
 		// This fails if the user exists ?
