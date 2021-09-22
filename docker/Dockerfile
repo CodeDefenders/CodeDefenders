@@ -1,4 +1,4 @@
-FROM maven:3.6-jdk-8 AS build
+FROM maven:3.8-openjdk-11 AS build
 RUN mkdir /Codedefenders/
 WORKDIR /Codedefenders/
 COPY ./local-repo ./local-repo/
@@ -9,7 +9,7 @@ COPY ./src ./src/
 RUN mvn package -DskipTests -Dcheckstyle.skip
 
 
-FROM tomcat:9.0-jdk8-openjdk AS tomcat
+FROM tomcat:9.0-jdk11-openjdk AS tomcat
 
 RUN mkdir /srv/codedefenders
 
