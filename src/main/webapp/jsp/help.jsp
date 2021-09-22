@@ -43,7 +43,9 @@
     <p>Below these panels are two more panels, which show existing mutants and tests. In the mutants panel, mutants can be claimed as being equivalent (which is covered at the end of this page). Existing mutants can also be seen by the icon present in the margin of the CUT panel.</p>
     <p><img style="margin-top:16px" src="images/help/defend_02.png" class="img-responsive"/></p>
     <p>We&#39;re going to submit a test to kill an alive mutant. Tests don&#39;t necessarily have to target alive mutants, and can simply be made to kill possible future mutants.</p>
-    <t:validator_explanation_test/>
+    <div class = "panel" style="margin: 30px">
+        <t:validator_explanation_test/>
+    </div>
     <p><img style="margin-top:16px" src="images/help/defend_03.png" class="img-responsive"/></p>
     <p>If an error is made in your test and it does not compile, a full compiler error is shown at the top of the screen. In this case, I did not add the brackets at the end of a function call.</p>
     <p><img style="margin-top:16px" src="images/help/defend_04.png" class="img-responsive"/></p>
