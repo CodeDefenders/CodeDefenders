@@ -241,9 +241,12 @@
             let button = '';
             if (enableFlagging
                 && status === MutantStatuses.ALIVE
-                && (canClaim === "true")
-                && testIdsPerLine.get(line)) {
-                button = createEquivalenceButton(line);
+                && canClaim === "true") {
+                if (testIdsPerLine.get(line)) {
+                    button = createEquivalenceButton(line);
+                } else {
+                    button = createUncoveredEquivalenceButton(line);
+                }
             }
 
             const content = document.createElement('div');
@@ -259,21 +262,32 @@
          * @return {string} The equivalence button.
          */
         const createEquivalenceButton = function (line) {
-            <% if (gameHighlighting.getGameMode() == GameMode.PARTY || gameHighlighting.getGameMode() == GameMode.MELEE ) { %>
-                return '' +
-                    `<form class="mt-3" id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post"
-                        onsubmit="return window.confirm('This will mark all player-created mutants on line \${line} as equivalent. Are you sure?')">
-                        <input type="hidden" name="formType" value="claimEquivalent">
-                        <input type="hidden" name="equivLines" value="\${line}">
-                        <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
-                        <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
-                            <div class="\${IconClasses.FLAG.join(' ')}"></div>
-                            <span>Claim Equivalent</span>
-                        </button>
-                    </form>`;
-            <% } else { %>
-                return '';
-            <% } %>
+            return '' +
+                `<form class="mt-3" id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post"
+                    onsubmit="return window.confirm('This will mark all player-created mutants on line \${line} as equivalent. Are you sure?')">
+                    <input type="hidden" name="formType" value="claimEquivalent">
+                    <input type="hidden" name="equivLines" value="\${line}">
+                    <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
+                    <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
+                        <div class="\${IconClasses.FLAG.join(' ')}"></div>
+                        <span>Claim Equivalent</span>
+                    </button>
+                </form>`;
+        };
+
+        /**
+         * Creates a disabled equivalence button with a tooltip explaining that the line needs to be covered first.
+         * @param line The line number.
+         * @return {string} The equivalence button.
+         */
+        const createUncoveredEquivalenceButton = function (line) {
+            return '' +
+                `<span class="d-inline-block w-100 mt-3" tabindex="0" title="Cover this mutant with a test to be able to claim it as equivalent.">
+                    <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2" disabled>
+                        <div class="\${IconClasses.FLAG.join(' ')}"></div>
+                        <span>Claim Equivalent</span>
+                    </button>
+                </span>`;
         };
 
         /**
