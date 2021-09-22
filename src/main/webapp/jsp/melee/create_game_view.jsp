@@ -28,6 +28,8 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Melee Game"); %>
 
@@ -212,24 +214,14 @@
         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
     </form>
 
-    <div class="modal fade" id="validatorExplanation" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Validator Explanation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <%@ include file="/jsp/mutant_validator_explanation.jsp"%>
-                    <div class="mt-3"></div> <%-- spacing --%>
-                    <%@ include file="/jsp/test_validator_explanation.jsp"%>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="validatorExplanation" title="Validator Explanations">
+        <jsp:attribute name="content">
+            <t:validator_explanation_mutant/>
+            <div class="mt-3"></div> <%-- spacing --%>
+            <t:validator_explanation_test/>
+        </jsp:attribute>
+    </t:modal>
+
 	<div class="modal fade" id="automaticEquivalenceTriggerExplanation" tabindex="-1">
 		<div class="modal-dialog">
 			<div class="modal-content">

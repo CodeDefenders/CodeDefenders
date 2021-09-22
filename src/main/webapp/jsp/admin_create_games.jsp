@@ -406,26 +406,13 @@
         </div> <%-- row --%>
     </form>
 
-    <div id="validatorExplanation" class="modal fade" tabindex="-1" aria-labelledby="validator-explanation-modal-title" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="validator-explanation-modal-title">Validator Explanation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body p-4">
-                    <%@ include file="/jsp/mutant_validator_explanation.jsp"%>
-                    <div class="mt-3"></div> <%-- spacing --%>
-                    <%@ include file="/jsp/test_validator_explanation.jsp"%>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <t:modal id="validatorExplanation" title="Validator Explanations">
+        <jsp:attribute name="content">
+            <t:validator_explanation_mutant/>
+            <div class="mt-3"></div> <%-- spacing --%>
+            <t:validator_explanation_test/>
+        </jsp:attribute>
+    </t:modal>
 
     <t:modal id="automaticEquivalenceTriggerExplanation" title="Equivalence Duel Threshold Explanation">
         <jsp:attribute name="content">
