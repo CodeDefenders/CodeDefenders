@@ -23,7 +23,7 @@ class TestAccordion {
     }
 
     /**
-     * Sets up a popover.
+     * Sets up a popover trigger on the given element.
      * @param {HTMLElement} triggerElement A DOM element to be used as the popover trigger.
      * @param {object} data The data of the row, as given by datatables.
      * @param {function} renderTitle A function to render the heading of the popover with.
