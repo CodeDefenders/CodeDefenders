@@ -8,12 +8,12 @@ class MutantAccordion {
      *      Given by [JSON.parse('${mutantAccordion.jsonFromCategories()}']
      * @param {Map<number, object>} mutants
      *      Given by [new Map(JSON.parse('${mutantAccordion.jsonMutants()}'))]
-     * @param {string} equivalenceDuelUrl
+     * @param {string} flaggingUrl
      *      Given by ['${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}']
      * @param {number} gameId
      *      Given by [${mutantAccordion.gameId}]
      */
-    constructor (categories, mutants, equivalenceDuelUrl, gameId) {
+    constructor (categories, mutants, flaggingUrl, gameId) {
         /** The categories of mutants to display. */
         this.categories = categories;
 
