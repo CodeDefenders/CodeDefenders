@@ -281,12 +281,11 @@
                 </div>
                 <script>
                     $('#highlighting-switch').change(function () {
-                        const codeMirror = $('#newmut-div .CodeMirror')[0].CodeMirror;
-                        codeMirror.clearCoverage();
+                        CodeDefenders.objects.gameHighlighting.clearCoverage();
                         if (this.checked) {
-                            codeMirror.highlightAlternativeCoverage();
+                            CodeDefenders.objects.gameHighlighting.highlightAlternativeCoverage();
                         } else {
-                            codeMirror.highlightCoverage();
+                            CodeDefenders.objects.gameHighlighting.highlightCoverage();
                         }
                     })
                 </script>
