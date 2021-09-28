@@ -259,21 +259,17 @@
          * @return {string} The equivalence button.
          */
         const createEquivalenceButton = function (line) {
-            <% if (gameHighlighting.getGameMode() == GameMode.PARTY || gameHighlighting.getGameMode() == GameMode.MELEE ) { %>
-                return '' +
-                    `<form class="mt-3" id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post"
-                        onsubmit="return window.confirm('This will mark all player-created mutants on line \${line} as equivalent. Are you sure?')">
-                        <input type="hidden" name="formType" value="claimEquivalent">
-                        <input type="hidden" name="equivLines" value="\${line}">
-                        <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
-                        <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
-                            <div class="\${IconClasses.FLAG.join(' ')}"></div>
-                            <span>Claim Equivalent</span>
-                        </button>
-                    </form>`;
-            <% } else { %>
-                return '';
-            <% } %>
+            return '' +
+                `<form class="mt-3" id="equiv" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post"
+                    onsubmit="return window.confirm('This will mark all player-created mutants on line \${line} as equivalent. Are you sure?')">
+                    <input type="hidden" name="formType" value="claimEquivalent">
+                    <input type="hidden" name="equivLines" value="\${line}">
+                    <input type="hidden" name="gameId" value="${gameHighlighting.gameId}">
+                    <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
+                        <div class="\${IconClasses.FLAG.join(' ')}"></div>
+                        <span>Claim Equivalent</span>
+                    </button>
+                </form>`;
         };
 
         /**
