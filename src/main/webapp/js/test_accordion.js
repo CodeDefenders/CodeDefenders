@@ -111,13 +111,13 @@ class TestAccordion {
                 data: rows,
                 columns: [
                     { data: null, title: '', defaultContent: '' },
-                    { data: TestAccordion.RenderFunctions.renderId, title: '' },
-                    { data: TestAccordion.RenderFunctions.renderCreator, title: '' },
-                    { data: TestAccordion.RenderFunctions.renderCoveredMutants, title: '' },
-                    { data: TestAccordion.RenderFunctions.renderKilledMutants, title: '' },
-                    { data: TestAccordion.RenderFunctions.renderPoints, title: '' },
-                    { data: TestAccordion.RenderFunctions.renderSmells, title: '' },
-                    { data: TestAccordion.RenderFunctions.renderViewButton, title: '' }
+                    { data: this._renderId.bind(this), title: '' },
+                    { data: this._renderCreator.bind(this), title: '' },
+                    { data: this._renderCoveredMutants.bind(this), title: '' },
+                    { data: this._renderKilledMutants.bind(this), title: '' },
+                    { data: this._renderPoints.bind(this), title: '' },
+                    { data: this._renderSmells.bind(this), title: '' },
+                    { data: this._renderViewButton.bind(this), title: '' }
                 ],
                 scrollY: '400px',
                 scrollCollapse: true,
@@ -132,22 +132,22 @@ class TestAccordion {
                     self._setupPopover(
                             row.querySelector('.ta-covered-link'),
                             data,
-                            TestAccordion.RenderFunctions.renderCoveredMutantsPopoverTitle,
-                            TestAccordion.RenderFunctions.renderCoveredMutantsPopoverBody
+                            self._renderCoveredMutantsPopoverTitle.bind(self),
+                            self._renderCoveredMutantsPopoverBody.bind(self)
                     );
 
                     self._setupPopover(
                             row.querySelector('.ta-killed-link'),
                             data,
-                            TestAccordion.RenderFunctions.renderKilledMutantsPopoverTitle,
-                            TestAccordion.RenderFunctions.renderKilledMutantsPopoverBody
+                            self._renderKilledMutantsPopoverTitle.bind(self),
+                            self._renderKilledMutantsPopoverBody.bind(self)
                     );
 
                     self._setupPopover(
                             row.querySelector('.ta-smells-link'),
                             data,
-                            TestAccordion.RenderFunctions.renderSmellsPopoverTitle,
-                            TestAccordion.RenderFunctions.renderSmellsPopoverBody
+                            self._renderSmellsPopoverTitle.bind(self),
+                            self._renderSmellsPopoverBody.bind(self)
                     );
 
                     const element = row.querySelector('.ta-view-button');
@@ -161,89 +161,84 @@ class TestAccordion {
         }
     }
 
-    /**
-     * Functions to render the table content from data.
-     */
-    static RenderFunctions = class RenderFunctions {
-        static renderId (data) {
-            return `Test ${data.id}`;
-        }
+    _renderId (data) {
+        return `Test ${data.id}`;
+    }
 
-        static renderCreator (data) {
-            return data.creator.name;
-        }
+    _renderCreator (data) {
+        return data.creator.name;
+    }
 
-        static renderPoints (data) {
-            return `<span class="ta-column-name">Points:</span> ${data.points}`;
-        }
+    _renderPoints (data) {
+        return `<span class="ta-column-name">Points:</span> ${data.points}`;
+    }
 
-        static renderCoveredMutants (data) {
-            return `<span class="ta-covered-link"><span class="ta-column-name">Covered:</span> ${data.coveredMutantIds.length}</span>`;
-        }
+    _renderCoveredMutants (data) {
+        return `<span class="ta-covered-link"><span class="ta-column-name">Covered:</span> ${data.coveredMutantIds.length}</span>`;
+    }
 
-        static renderKilledMutants (data) {
-            return `<span class="ta-killed-link"><span class="ta-column-name">Killed:</span> ${data.killedMutantIds.length}</span>`;
-        }
+    _renderKilledMutants (data) {
+        return `<span class="ta-killed-link"><span class="ta-column-name">Killed:</span> ${data.killedMutantIds.length}</span>`;
+    }
 
-        static renderViewButton (data) {
-            return data.canView
-                    ? '<button class="ta-view-button btn btn-xs btn-primary">View</button>'
-                    : '';
-        }
+    _renderViewButton (data) {
+        return data.canView
+                ? '<button class="ta-view-button btn btn-xs btn-primary">View</button>'
+                : '';
+    }
 
-        static renderSmells (data) {
-            const numSmells = data.smells.length;
-            let smellLevel;
-            let smellColor;
-            if (numSmells >= 3) {
-                smellLevel = 'Bad';
-                smellColor = 'btn-danger';
-            } else if (numSmells >= 1) {
-                smellLevel = 'Fishy';
-                smellColor = 'btn-warning';
-            } else {
-                smellLevel = 'Good';
-                smellColor = 'btn-success';
-            }
-            return `<a class="ta-smells-link btn btn-xs ${smellColor}">${smellLevel}</a>`;
+    _renderSmells (data) {
+        const numSmells = data.smells.length;
+        let smellLevel;
+        let smellColor;
+        if (numSmells >= 3) {
+            smellLevel = 'Bad';
+            smellColor = 'btn-danger';
+        } else if (numSmells >= 1) {
+            smellLevel = 'Fishy';
+            smellColor = 'btn-warning';
+        } else {
+            smellLevel = 'Good';
+            smellColor = 'btn-success';
         }
+        return `<a class="ta-smells-link btn btn-xs ${smellColor}">${smellLevel}</a>`;
+    }
 
-        static renderCoveredMutantsPopoverTitle (data) {
-            return data.coveredMutantIds.length > 0
-                    ? 'Covered Mutants'
-                    : '';
-        }
+    _renderCoveredMutantsPopoverTitle (data) {
+        return data.coveredMutantIds.length > 0
+                ? 'Covered Mutants'
+                : '';
+    }
 
-        static renderCoveredMutantsPopoverBody (data) {
-            return data.coveredMutantIds.length > 0
-                    ? data.coveredMutantIds.join(', ')
-                    : 'No mutants are covered by this test.';
-        }
+    _renderCoveredMutantsPopoverBody (data) {
+        return data.coveredMutantIds.length > 0
+                ? data.coveredMutantIds.join(', ')
+                : 'No mutants are covered by this test.';
+    }
 
-        static renderKilledMutantsPopoverTitle (data) {
-            return data.killedMutantIds.length > 0
-                    ? 'Killed Mutants'
-                    : '';
-        }
+    _renderKilledMutantsPopoverTitle (data) {
+        return data.killedMutantIds.length > 0
+                ? 'Killed Mutants'
+                : '';
+    }
 
-        static renderKilledMutantsPopoverBody (data) {
-            return data.killedMutantIds.length > 0
-                    ? data.killedMutantIds.join(', ')
-                    : 'No mutants were killed by this test.';
-        }
+    _renderKilledMutantsPopoverBody (data) {
+        return data.killedMutantIds.length > 0
+                ? data.killedMutantIds.join(', ')
+                : 'No mutants were killed by this test.';
+    }
 
-        static renderSmellsPopoverTitle (data) {
-            return data.smells.length > 0
-                    ? 'Test Smells'
-                    : '';
-        }
+    _renderSmellsPopoverTitle (data) {
+        return data.smells.length > 0
+                ? 'Test Smells'
+                : '';
+    }
 
-        static renderSmellsPopoverBody (data) {
-            return data.smells.length > 0
-                    ? data.smells.join('<br>')
-                    : 'This test does not have any smells.'
-        }
-    };
+    _renderSmellsPopoverBody (data) {
+        return data.smells.length > 0
+                ? data.smells.join('<br>')
+                : 'This test does not have any smells.'
+    }
 }
 
 CodeDefenders.classes.TestAccordion = TestAccordion;

@@ -153,12 +153,12 @@ class MutantAccordion {
                 data: rows,
                 columns: [
                     {data: null, title: '', defaultContent: ''},
-                    {data: MutantAccordion.RenderFunctions.renderIcon, title: ''},
-                    {data: MutantAccordion.RenderFunctions.renderId, title: ''},
-                    {data: MutantAccordion.RenderFunctions.renderLines, title: ''},
-                    {data: MutantAccordion.RenderFunctions.renderPoints, title: ''},
-                    {data: MutantAccordion.RenderFunctions.renderViewButton, title: ''},
-                    {data: MutantAccordion.RenderFunctions.renderAdditionalButton.bind(this), title: ''}
+                    {data: this._renderIcon.bind(this), title: ''},
+                    {data: this._renderId.bind(this), title: ''},
+                    {data: this._renderLines.bind(this), title: ''},
+                    {data: this._renderPoints.bind(this), title: ''},
+                    {data: this._renderViewButton.bind(this), title: ''},
+                    {data: this._renderAdditionalButton.bind(this), title: ''}
                 ],
                 scrollY: '400px',
                 scrollCollapse: true,
@@ -251,75 +251,70 @@ class MutantAccordion {
                 })
     }
 
-    /**
-     * Functions to render the table content from data.
-     */
-    static RenderFunctions = class RenderFunctions {
-        static renderId (data) {
-            const killedByText =  data.killedBy
-                    ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
-                    : '';
-            return `<span class="ma-mutant-link">Mutant ${data.id}</span>
-                <span class="ma-column-name mx-2">by</span>${data.creator.name}
-                ${killedByText}`;
-        }
+    _renderId (data) {
+        const killedByText =  data.killedBy
+                ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
+                : '';
+        return `<span class="ma-mutant-link">Mutant ${data.id}</span>
+            <span class="ma-column-name mx-2">by</span>${data.creator.name}
+            ${killedByText}`;
+    }
 
-        static renderPoints (data) {
-            return `<span class="ma-column-name">Points:</span> ${data.points}`;
-        }
+    _renderPoints (data) {
+        return `<span class="ma-column-name">Points:</span> ${data.points}`;
+    }
 
-        static renderLines (data) {
-           return data.description;
-        }
+    _renderLines (data) {
+       return data.description;
+    }
 
-        static renderIcon (data) {
-            switch (data.state) {
-                case "ALIVE":
-                    return '<span class="mutantCUTImage mutantImageAlive"></span>';
-                case "KILLED":
-                    return '<span class="mutantCUTImage mutantImageKilled"></span>';
-                case "EQUIVALENT":
-                    return '<span class="mutantCUTImage mutantImageEquiv"></span>';
-                case "FLAGGED":
-                    return '<span class="mutantCUTImage mutantImageFlagged"></span>';
-            }
+    _renderIcon (data) {
+        switch (data.state) {
+            case "ALIVE":
+                return '<span class="mutantCUTImage mutantImageAlive"></span>';
+            case "KILLED":
+                return '<span class="mutantCUTImage mutantImageKilled"></span>';
+            case "EQUIVALENT":
+                return '<span class="mutantCUTImage mutantImageEquiv"></span>';
+            case "FLAGGED":
+                return '<span class="mutantCUTImage mutantImageFlagged"></span>';
         }
+    }
 
-        static renderViewButton (data) {
-            return data.canView
-                    ? '<button class="ma-view-button btn btn-primary btn-xs pull-right">View</button>'
-                    : '';
-        }
+    _renderViewButton (data) {
+        return data.canView
+                ? '<button class="ma-view-button btn btn-primary btn-xs pull-right">View</button>'
+                : '';
+    }
 
-        static renderAdditionalButton (data) {
-            switch (data.state) {
-                case "ALIVE":
-                    if (data.canMarkEquivalent) {
-                        if (data.covered) {
-                            return `
-                                <form id="equiv" action="${this.flaggingUrl}" method="post"
-                                onsubmit="return confirm('This will mark all player-created mutants on line(s) ${data.lineString} as equivalent. Are you sure?');">
-                                    <input type="hidden" name="formType" value="claimEquivalent">
-                                    <input type="hidden" name="equivLines" value="${data.lineString}">
-                                    <input type="hidden" name="gameId" value="${this.gameId}">
-                                    <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">Claim Equivalent</button>
-                                </form>`;
-                        } else {
-                            // We need the wrapper element (<span …), because tooltips do not work on disabled elements:
-                            // https://getbootstrap.com/docs/5.1/components/tooltips/#disabled-elements
-                            return `
-                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Cover this mutant with a test to be able to claim it as equivalent">
-                                    <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>Claim Equivalent</button>
-                                </span>`;
-                        }
+    _renderAdditionalButton (data) {
+        switch (data.state) {
+            case "ALIVE":
+                if (data.canMarkEquivalent) {
+                    if (data.covered) {
+                        return `
+                            <form id="equiv" action="${this.flaggingUrl}" method="post"
+                            onsubmit="return confirm('This will mark all player-created mutants on line(s) ${data.lineString} as equivalent. Are you sure?');">
+                                <input type="hidden" name="formType" value="claimEquivalent">
+                                <input type="hidden" name="equivLines" value="${data.lineString}">
+                                <input type="hidden" name="gameId" value="${this.gameId}">
+                                <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">Claim Equivalent</button>
+                            </form>`;
                     } else {
-                        return '';
+                        // We need the wrapper element (<span …), because tooltips do not work on disabled elements:
+                        // https://getbootstrap.com/docs/5.1/components/tooltips/#disabled-elements
+                        return `
+                            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="Cover this mutant with a test to be able to claim it as equivalent">
+                                <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap" disabled>Claim Equivalent</button>
+                            </span>`;
                     }
-                case "KILLED":
-                    return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
-                default:
+                } else {
                     return '';
-            }
+                }
+            case "KILLED":
+                return '<button class="ma-view-test-button btn btn-secondary btn-xs text-nowrap">View Killing Test</button>';
+            default:
+                return '';
         }
     }
 }
