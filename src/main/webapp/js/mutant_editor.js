@@ -3,23 +3,76 @@
 
 class MutantEditor {
 
+    /**
+     * @param {HTMLTextAreaElement} editorElement The text area to use as editor.
+     * @param {HTMLTextAreaElement[]} dependencyEditorElements Text areas to use as dependency editors.
+     * @param {?number} editableLinesStart
+     *      Given by [${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"}]
+     *      Null if the text should be editable from the start.
+     * @param {?number} editableLinesEnd
+     *      Given by [${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"}]
+     *      Null if the text should be editable to the end.
+     * @param {string} keymap
+     *      Given by [${login.user.keyMap.CMName}]
+     */
     constructor (editorElement, dependencyEditorElements, editableLinesStart, editableLinesEnd, keymap) {
+        /**
+         * The text area element of the editor.
+         * @type {HTMLTextAreaElement}
+         */
         this.editorElement = editorElement;
+        /**
+         * The CodeMirror instance used for the mutant editor.
+         * @type {CodeMirror}
+         */
         this.editor = null;
 
+
+        /**
+         * Text area elements for displaying dependencies.
+         * @type {HTMLTextAreaElement[]}
+         */
         this.dependencyEditorElements = dependencyEditorElements;
+        /**
+         * CodeMirror editors displaying dependencies.
+         * @type {CodeMirror[]}
+         */
         this.dependencyEditors = [];
 
+
+        /**
+         * The first editable line (1-indexed).
+         * @type {?number}
+         */
         this.editableLinesStart = editableLinesStart;
+        /**
+         * The last editable line (1-indexed).
+         * @type {?number}
+         */
         this.editableLinesEnd = editableLinesEnd;
+        /**
+         * Initial number of lines. Used to calculate the editable lines after the text has been edited.
+         * @type {null}
+         */
         this.initialNumLines = null;
 
+
+        /**
+         * Name of the keymap to be used in the editor.
+         * @type {string}
+         */
         this.keymap = keymap;
+        /**
+         * Code completion instance to handle the completion command.
+         * @type {CodeCompletion}
+         */
         this.codeCompletion = null;
+
 
         this._init();
     }
 
+    /** @private */
     _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
@@ -69,6 +122,7 @@ class MutantEditor {
         this._greyOutReadOnlyLines();
     }
 
+    /** @private */
     _initCodeCompletion () {
         this.codeCompletion = new CodeDefenders.classes.CodeCompletion();
         this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeMutant');
@@ -85,6 +139,7 @@ class MutantEditor {
         this.codeCompletion.setCompletionPool('classes', completions);
     }
 
+    /** @private */
     _initDependencies () {
         for (const element of this.dependencyEditorElements) {
             const editor = CodeMirror.fromTextArea(element, {
@@ -103,6 +158,7 @@ class MutantEditor {
         }
     }
 
+    /** @private */
     _greyOutReadOnlyLines () {
         const lineCount = this.editor.lineCount();
 

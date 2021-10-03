@@ -3,12 +3,10 @@
 
 class InfoApi {
 
-    // TODO: Move this somewhere else, preferably into some CodeMirror class.
     /**
      * Sets the given editor to the given value.
      * If the value is a failing promise, a placeholder text is displayed instead.
-     *
-     * @param {object} editor The CodeMirror editor which value is set.
+     * @param {CodeMirror} editor The CodeMirror editor which value is set.
      * @param {string|Promise<string>} value The value to set, can be a promise.
      */
     static setEditorValue(editor, value) {
@@ -25,7 +23,6 @@ class InfoApi {
 
     /**
      * Fetches an object from a given JSON API.
-     *
      * @async
      * @param url The URL to fetch from.
      * @returns {Promise<object>} A promise containing the response.

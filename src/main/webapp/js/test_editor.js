@@ -3,21 +3,69 @@
 
 class TestEditor {
 
+    /**
+     * @param {HTMLTextAreaElement} editorElement The text area to use as editor.
+     * @param {?number} editableLinesStart
+     *      Given by [${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"}]
+     *      Null if the text should be editable from the start.
+     * @param {?number} editableLinesEnd
+     *      Given by [${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"}]
+     *      Null if the text should be editable to the end.
+     * @param {boolean} mockingEnabled
+     *      Given by [${testEditor.mockingEnabled}]
+     * @param {string} keymap
+     *      Given by [${login.user.keyMap.CMName}]
+     */
     constructor (editorElement, editableLinesStart, editableLinesEnd, mockingEnabled, keymap) {
+        /**
+         * The text area element of the editor.
+         * @type {HTMLTextAreaElement}
+         */
         this.editorElement = editorElement;
+        /**
+         * The CodeMirror instance used for the test editor.
+         * @type {CodeMirror}
+         */
         this.editor = null;
 
+        /**
+         * The first editable line (1-indexed).
+         * @type {?number}
+         */
         this.editableLinesStart = editableLinesStart;
+        /**
+         * The last editable line (1-indexed).
+         * @type {?number}
+         */
         this.editableLinesEnd = editableLinesEnd;
+        /**
+         * Initial number of lines. Used to calculate the editable lines after the text has been edited.
+         * @type {null}
+         */
         this.initialNumLines = null;
 
+
+        /**
+         * Whether to include mocking keywords in the code completion.
+         * @type {boolean}
+         */
         this.mockingEnabled = mockingEnabled;
+        /**
+         * Name of the keymap to be used in the editor.
+         * @type {string}
+         */
         this.keymap = keymap;
+        /**
+         * Code completion instance to handle the completion command.
+         * @type {CodeCompletion}
+         */
         this.codeCompletion = null;
+
 
         this._init();
     }
 
+    /** @private */
     _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
@@ -65,6 +113,7 @@ class TestEditor {
         this._initCodeCompletion();
     }
 
+    /** @private */
     _initCodeCompletion() {
         this.codeCompletion = new CodeDefenders.classes.CodeCompletion();
         this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');

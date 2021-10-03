@@ -15,23 +15,81 @@ class GameHighlighting {
      *      Given by [${gameHighlighting.gameId}]
      */
     constructor(data, enableFlagging, flaggingUrl, gameId) {
-        this.mutantIdsPerLine = new Map(data.mutantIdsPerLine);
-        this.testIdsPerLine = new Map(data.testIdsPerLine);
+        /**
+         * Maps line numbers (1-indexed) to ids of mutants with changes on the line.
+         * @type {Map<number, number[]>}
+         * @private
+         */
+        this._mutantIdsPerLine = new Map(data.mutantIdsPerLine);
+        /**
+         * Maps line numbers (1-indexed) to ids of tests covering on the line.
+         * @type {Map<number, number[]>}
+         * @private
+         */
+        this._testIdsPerLine = new Map(data.testIdsPerLine);
 
-        this.mutants = new Map(data.mutants);
-        this.tests = new Map(data.tests);
 
-        this.alternativeTests = new Map(data.alternativeTests);
-        this.alternativeTestIdsPerLine = new Map(data.alternativeTestIdsPerLine);
+        /**
+         * Maps mutant ids to their mutant DTO.
+         * @type {Map<number, object>}
+         * @private
+         */
+        this._mutants = new Map(data.mutants);
+        /**
+         * Maps tests ids to their test DTO.
+         * @type {Map<number, object>}
+         * @private
+         */
+        this._tests = new Map(data.tests);
 
-        this.enableFlagging = enableFlagging;
-        this.flaggingUrl = flaggingUrl;
-        this.gameId = gameId;
 
-        /** We use timeouts to hide the pop-over after the icon or pop-over is not hovered for a certain time.
-         * These timeouts are saved, so they can be cleared when pop-overs are forced to hide. */
-        this.popoverTimeouts = [];
+        /**
+         * Maps line numbers (1-indexed) to ids of alternative (probably enemy-written) tests covering the line.
+         * @type {Map<number, object>}
+         * @private
+         */
+        this._alternativeTestIdsPerLine = new Map(data.alternativeTestIdsPerLine);
+        /**
+         * Maps tests ids their test DTO for the alternative (probably enemy-written) test.
+         * @type {Map<number, object>}
+         * @private
+         */
+        this._alternativeTests = new Map(data.alternativeTests);
 
+
+        /**
+         * Whether to enable flagging equivalent mutants in the popovers.
+         * @type {boolean}
+         * @private
+         */
+        this._enableFlagging = enableFlagging;
+        /**
+         * URL to POST to for flagging mutants.
+         * @type {string}
+         * @private
+         */
+        this._flaggingUrl = flaggingUrl;
+        /**
+         * Game id of the current game.
+         * @type {number}
+         * @private
+         */
+        this._gameId = gameId;
+
+
+        /**
+         * We use timeouts to hide the pop-over after the icon or pop-over is not hovered for a certain time.
+         * These timeouts are saved, so they can be cleared when pop-overs are forced to hide.
+         * @type {number[]}
+         * @private
+         */
+        this._popoverTimeouts = [];
+
+
+        /**
+         * The CodeMirror editor to provide highlighting on.
+         * @type {CodeMirror}
+         */
         this.editor = null;
         if (CodeDefenders.objects.hasOwnProperty('classViewer')) {
             this.editor = CodeDefenders.objects.classViewer.editor;
@@ -62,24 +120,15 @@ class GameHighlighting {
         FLAG: ['mutantCUTImage', 'mutantImageFlagAction']
     }
 
-    addTimeout (callback, time) {
-        this.popoverTimeouts.push(setTimeout(callback, time));
-    }
-
-    clearTimeouts () {
-        this.popoverTimeouts = this.popoverTimeouts.filter(clearTimeout);
-    }
-
     /**
      * Creates the HTML element that displays the mutant icons for one line.
      * @param {number} line The line number (starting at 1).
      * @param {object[]} mutantsOnLine The mutants that modify the line.
      * @return {HTMLElement} The mutant icons.
+     * @private
      */
-    createMutantIcons (line, mutantsOnLine) {
-
-        /* Split the mutants list by the mutant status.
-         * {ALIVE: [...], KILLED: [...], ...} */
+    _createMutantIcons (line, mutantsOnLine) {
+        /* Split the mutants list by the mutant status: {ALIVE: [...], KILLED: [...], ...} */
         const sortedMutants = {};
         for (const mutantStatus in GameHighlighting.MutantStatuses) {
             const mutantsInCategory = mutantsOnLine.filter(m => m.status === mutantStatus);
@@ -96,7 +145,7 @@ class GameHighlighting {
             mutantIcon.classList.add('gh-mutant-icon');
             mutantIcon.classList.add(...GameHighlighting.IconClasses[mutantStatus]);
 
-            /* Dataset entries are "converted" to kebap-case DOM attributes. */
+            /* Dataset entries are "converted" to kebab-case DOM attributes. */
             mutantIcon.dataset.mutantStatus = mutantStatus;
             mutantIcon.dataset.line = String(line);
             mutantIcon.dataset.count = sortedMutants[mutantStatus].length;
@@ -111,10 +160,19 @@ class GameHighlighting {
     /**
      * Adds a trigger to the mutant icons, which opens the popover and closes all other open popovers.
      * @param {HTMLElement} mutantIcons The element containing the mutant icons.
+     * @private
      */
-    addPopoverTriggerToMutantIcons (mutantIcons) {
+    _addPopoverTriggerToMutantIcons (mutantIcons) {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
+
+        const addPopoverTimeout = function (callback, time) {
+            self._popoverTimeouts.push(setTimeout(callback, time));
+        }
+
+        const clearPopoverTimeouts = function () {
+            self._popoverTimeouts = self._popoverTimeouts.filter(clearTimeout);
+        }
 
         for (const mutantIcon of mutantIcons.querySelectorAll('.gh-mutant-icon')) {
 
@@ -125,13 +183,13 @@ class GameHighlighting {
                 trigger: 'manual',
                 html: true,
                 customClass: 'popover-fluid',
-                title: this.createPopoverTitle.bind(this, mutantIcon),
-                content: this.createPopoverContent.bind(this, mutantIcon)
+                title: this._createPopoverTitle.bind(this, mutantIcon),
+                content: this._createPopoverContent.bind(this, mutantIcon)
             });
 
             /* Activate popovers manually so we can make them stay as long as they are hovered. */
             mutantIcon.addEventListener('mouseenter', function (event) {
-                self.clearTimeouts();
+                clearPopoverTimeouts();
 
                 /* Hide all other pop-overs. */
                 for (const otherMutantIcon of document.querySelectorAll('.gh-mutant-icon')) {
@@ -145,17 +203,17 @@ class GameHighlighting {
                 /* Clear timeouts when pop-over is hovered so it won't be hidden by the timeout. */
                 for (const popoverElement of document.getElementsByClassName('popover')) {
                     popoverElement.addEventListener('mouseenter', function (event) {
-                        self.clearTimeouts();
+                        clearPopoverTimeouts();
                     });
                     popoverElement.addEventListener('mouseleave', function (event) {
-                        self.addTimeout(() => {
+                        addPopoverTimeout(() => {
                             mutantIcon.popover.hide();
                         }, 500);
                     });
                 }
             });
             mutantIcon.addEventListener('mouseleave', function (event) {
-                self.addTimeout(() => {
+                addPopoverTimeout(() => {
                     mutantIcon.popover.hide();
                 }, 500);
             });
@@ -166,30 +224,32 @@ class GameHighlighting {
      * Creates the title for a popover.
      * @param {HTMLElement} mutantIcon The icon element.
      * @returns {string} The popover title.
+     * @private
      */
-    createPopoverTitle (mutantIcon) {
+    _createPopoverTitle (mutantIcon) {
         const status = mutantIcon.dataset.mutantStatus;
         const line = Number(mutantIcon.dataset.line);
 
         return '' +
-            `<div class="d-flex align-items-center gap-2">
-                <div class="${GameHighlighting.IconClasses[status].join(' ')}"></div>
-                ${GameHighlighting.MutantNames[status]} (Line ${line})
-            </div>`;
+                `<div class="d-flex align-items-center gap-2">
+                    <div class="${GameHighlighting.IconClasses[status].join(' ')}"></div>
+                    ${GameHighlighting.MutantNames[status]} (Line ${line})
+                </div>`;
     }
 
     /**
      * Creates the body for a popover.
      * @param {HTMLElement} mutantIcon The icon element.
      * @returns {HTMLElement} The popover body.
+     * @private
      */
-    createPopoverContent (mutantIcon) {
+    _createPopoverContent (mutantIcon) {
         const status = mutantIcon.dataset.mutantStatus;
         const canClaim = Boolean(JSON.parse(mutantIcon.dataset.canClaim));
         const line = Number(mutantIcon.dataset.line);
 
-        const mutantsOnLine = this.mutantIdsPerLine.get(line)
-                .map(id => this.mutants.get(id))
+        const mutantsOnLine = this._mutantIdsPerLine.get(line)
+                .map(id => this._mutants.get(id))
                 .filter(mutant => mutant.status === status);
 
         const head =
@@ -226,13 +286,13 @@ class GameHighlighting {
 
         /* Create the button if it is supposed to be shown. */
         let button = '';
-        if (this.enableFlagging
+        if (this._enableFlagging
                 && status === GameHighlighting.MutantStatuses.ALIVE
                 && canClaim) {
-            if (this.testIdsPerLine.get(line)) {
-                button = this.createEquivalenceButton(line);
+            if (this._testIdsPerLine.get(line)) {
+                button = this._createEquivalenceButton(line);
             } else {
-                button = this.createUncoveredEquivalenceButton(line);
+                button = this._createUncoveredEquivalenceButton(line);
             }
         }
 
@@ -247,14 +307,15 @@ class GameHighlighting {
      * Creates the button with which to flag mutants as equivalent.
      * @param line The line number.
      * @return {string} The equivalence button.
+     * @private
      */
-    createEquivalenceButton (line) {
+    _createEquivalenceButton (line) {
         return '' +
-                `<form class="mt-3" id="equiv" action="${this.flaggingUrl}" method="post"
+                `<form class="mt-3" id="equiv" action="${this._flaggingUrl}" method="post"
                     onsubmit="return window.confirm('This will mark all player-created mutants on line ${line} as equivalent. Are you sure?')">
                     <input type="hidden" name="formType" value="claimEquivalent">
                     <input type="hidden" name="equivLines" value="${line}">
-                    <input type="hidden" name="gameId" value="${this.gameId}">
+                    <input type="hidden" name="gameId" value="${this._gameId}">
                     <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2">
                         <div class="${GameHighlighting.IconClasses.FLAG.join(' ')}"></div>
                         <span>Claim Equivalent</span>
@@ -266,8 +327,9 @@ class GameHighlighting {
      * Creates a disabled equivalence button with a tooltip explaining that the line needs to be covered first.
      * @param line The line number.
      * @return {string} The equivalence button.
+     * @private
      */
-    createUncoveredEquivalenceButton (line) {
+    _createUncoveredEquivalenceButton (line) {
         return '' +
                 `<span class="d-inline-block w-100 mt-3" tabindex="0" title="Cover this mutant with a test to be able to claim it as equivalent.">
                     <button class="btn btn-danger btn-sm w-100 d-flex justify-content-center align-items-center gap-2" disabled>
@@ -281,15 +343,18 @@ class GameHighlighting {
      * Highlights coverage on the given CodeMirror instance.
      */
     highlightCoverage () {
-        for (const [line, testIds] of this.testIdsPerLine) {
-            const coveragePercent = (testIds.length * 100 / this.tests.size).toFixed(0);
+        for (const [line, testIds] of this._testIdsPerLine) {
+            const coveragePercent = (testIds.length * 100 / this._tests.size).toFixed(0);
             this.editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
         }
     }
 
+    /**
+     * Highlights coverage for alternative (probably enemy-written) tests on the given CodeMirror instance.
+     */
     highlightAlternativeCoverage () {
-        for (const [line, testIds] of this.alternativeTestIdsPerLine) {
-            const coveragePercent = (testIds.length * 100 / this.alternativeTests.size).toFixed(0);
+        for (const [line, testIds] of this._alternativeTestIdsPerLine) {
+            const coveragePercent = (testIds.length * 100 / this._alternativeTests.size).toFixed(0);
             this.editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
         }
     }
@@ -298,10 +363,10 @@ class GameHighlighting {
      * Displays mutant icons on the given CodeMirror instance.
      */
     highlightMutants () {
-        for (const [line, mutantIds] of this.mutantIdsPerLine) {
-            const mutantsOnLine = mutantIds.map(id => this.mutants.get(id));
-            const marker = this.createMutantIcons(line, mutantsOnLine);
-            this.addPopoverTriggerToMutantIcons(marker);
+        for (const [line, mutantIds] of this._mutantIdsPerLine) {
+            const mutantsOnLine = mutantIds.map(id => this._mutants.get(id));
+            const marker = this._createMutantIcons(line, mutantsOnLine);
+            this._addPopoverTriggerToMutantIcons(marker);
             this.editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
         }
     }
@@ -329,22 +394,6 @@ class GameHighlighting {
      */
     clearMutants () {
         this.editor.clearGutter('CodeMirror-mutantIcons');
-    }
-
-    /**
-     * Hides the mutant icons on the given CodeMirror instance.
-     * The mutant icons are only hidden, and not cleared. They can be shown hidden and shown again correctly even if
-     * lines were added or deleted in the editor.
-     */
-    hideMutants () {
-        $(this.editor.getWrapperElement()).find('.gh-mutant-icons').hide();
-    }
-
-    /**
-     * Shows the mutant icons on the given CodeMirror instance.
-     */
-    showMutants () {
-        $(this.editor.getWrapperElement()).find('.gh-mutant-icons').show();
     }
 }
 

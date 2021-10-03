@@ -3,16 +3,39 @@
 
 class ClassViewer {
 
+    /**
+     * @param {HTMLTextAreaElement} editorElement The text area to use as editor.
+     * @param {HTMLTextAreaElement[]} dependencyEditorElements Text areas to use as dependency editors.
+     */
     constructor (editorElement, dependencyEditorElements) {
+        /**
+         * The text area element of the editor.
+         * @type {HTMLTextAreaElement}
+         */
         this.editorElement = editorElement;
+        /**
+         * The CodeMirror instance used for the mutant editor.
+         * @type {CodeMirror}
+         */
         this.editor = null;
 
+
+        /**
+         * Text area elements for displaying dependencies.
+         * @type {HTMLTextAreaElement[]}
+         */
         this.dependencyEditorElements = dependencyEditorElements;
+        /**
+         * CodeMirror editors displaying dependencies.
+         * @type {CodeMirror[]}
+         */
         this.dependencyEditors = [];
+
 
         this._init();
     }
 
+    /** @private */
     _init () {
         /* Create the editor. */
         this.editor = CodeMirror.fromTextArea(this.editorElement, {
@@ -36,6 +59,7 @@ class ClassViewer {
         this._initDependencies();
     }
 
+    /** @private */
     _initDependencies () {
         for (const element of this.dependencyEditorElements) {
             const editor = CodeMirror.fromTextArea(element, {

@@ -46,7 +46,8 @@
         const flaggingUrl = '${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}';
         const gameId = ${gameHighlighting.gameId};
 
-        CodeDefenders.objects.gameHighlighting = new CodeDefenders.classes.GameHighlighting(data,
+        CodeDefenders.objects.gameHighlighting = new CodeDefenders.classes.GameHighlighting(
+                data,
                 enableFlagging,
                 flaggingUrl,
                 gameId);

@@ -14,24 +14,48 @@ class MutantAccordion {
      *      Given by [${mutantAccordion.gameId}]
      */
     constructor (categories, mutants, flaggingUrl, gameId) {
-        /** The categories of mutants to display. */
+        /**
+         * The categories of mutants to display, i.e. one category per method + all + outside methods.
+         * @type {object[]}
+         */
         this.categories = categories;
-
-        /** Maps mutant ids to the corresponding mutants. */
+        /**
+         * Maps mutant ids to their mutant DTO.
+         * @type {Map<number, object>}
+         */
         this.mutants = mutants
 
-        /** URL to POST to for flagging mutants. */
+
+        /**
+         * URL to POST to for flagging mutants.
+         * @type {string}
+         */
         this.flaggingUrl = flaggingUrl;
-        /** The id of the current game. */
+        /**
+         * The id of the current game.
+         * @type {number}
+         */
         this.gameId = gameId;
 
-        /** Maps mutant ids to modals that show the mutants' code. */
+
+        /**
+         * Maps mutant ids to the modal that show the mutant's code.
+         * @type {Map<number, object>}
+         */
         this.mutantModals = new Map();
-        /** Maps mutant ids to modals that show their killing test's code. */
+        /**
+         * Maps mutant ids to the modal that shows the code of the mutant's killing test.
+         * @type {Map<number, object>}
+         */
         this.testModals = new Map();
 
-        /** Stores datatables by the id of the category they display. */
+
+        /**
+         * Maps category ids to the datatable that displays the category.
+         * @type {Map<number, object>}
+         */
         this.dataTablesByCategory = new Map();
+
 
         this._init();
     }
@@ -40,6 +64,7 @@ class MutantAccordion {
      * Creates a modal to display the given mutant and shows it.
      * References to created models are cached in a map so they don't need to be generated again.
      * @param {object} mutant The mutant DTO to display.
+     * @private
      */
     _viewMutantModal (mutant) {
         let modal = this.mutantModals.get(mutant.id);
@@ -89,6 +114,7 @@ class MutantAccordion {
      * Creates a modal to display the given mutant's killing tests and kill message.
      * References to created models are cached in a map so they don't need to be generated again.
      * @param {object} mutant The mutant DTO for which to display the test.
+     * @private
      */
     _viewTestModal (mutant) {
         let modal = this.testModals.get(mutant.id);
@@ -128,7 +154,7 @@ class MutantAccordion {
         const editor = CodeMirror.fromTextArea(textarea, {
             lineNumbers: true,
             matchBrackets: true,
-            mode: "text/x-java",
+            mode: 'text/x-java',
             readOnly: true,
             autoRefresh: true
         });
@@ -137,6 +163,7 @@ class MutantAccordion {
         modal.modal('show');
     };
 
+    /** @private */
     _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
@@ -216,6 +243,7 @@ class MutantAccordion {
 
     /**
      * Initializes the filter radio to filter mutants by equivalence status.
+     * @private
      */
     _initFilters () {
         /* Setup filter functionality for mutant-accordion */
@@ -251,6 +279,7 @@ class MutantAccordion {
                 })
     }
 
+    /** @private */
     _renderId (data) {
         const killedByText =  data.killedBy
                 ? `<span class="ma-column-name mx-2">killed by</span>${data.killedBy.name}`
@@ -260,14 +289,17 @@ class MutantAccordion {
             ${killedByText}`;
     }
 
+    /** @private */
     _renderPoints (data) {
         return `<span class="ma-column-name">Points:</span> ${data.points}`;
     }
 
+    /** @private */
     _renderLines (data) {
        return data.description;
     }
 
+    /** @private */
     _renderIcon (data) {
         switch (data.state) {
             case "ALIVE":
@@ -281,12 +313,14 @@ class MutantAccordion {
         }
     }
 
+    /** @private */
     _renderViewButton (data) {
         return data.canView
                 ? '<button class="ma-view-button btn btn-primary btn-xs pull-right">View</button>'
                 : '';
     }
 
+    /** @private */
     _renderAdditionalButton (data) {
         switch (data.state) {
             case "ALIVE":

@@ -10,14 +10,24 @@ class TestAccordion {
      *      Given by [new Map(JSON.parse('${testAccordion.testsAsJSON}'))].
      */
     constructor (categories, tests) {
-        /** The categories of tests to display. */
+        /**
+         * The categories of tests to display, i.e. one category per method + all.
+         * @type {object[]}
+         */
         this.categories = categories;
-
-        /** Maps test ids to the corresponding tests. */
+        /**
+         * Maps test ids to their test DTO.
+         * @type {Map<number, object>}
+         */
         this.tests = tests
 
-        /** Maps test ids to modals that show the tests' code. */
+
+        /**
+         * Maps test ids to the modal that show the test's code.
+         * @type {Map<number, object>}
+         */
         this.testModals = new Map();
+
 
         this._init();
     }
@@ -28,6 +38,7 @@ class TestAccordion {
      * @param {object} data The data of the row, as given by datatables.
      * @param {function} renderTitle A function to render the heading of the popover with.
      * @param {function} renderContent A function to render the body of the popover with.
+     * @private
      */
     _setupPopover (triggerElement, data, renderTitle, renderContent) {
         new bootstrap.Popover(triggerElement, {
@@ -48,8 +59,9 @@ class TestAccordion {
 
     /**
      * Creates a modal to display the given test and shows it.
-     * References to created models are cached in a map so they don't need to be generated again.
+     * References to created models are cached so they don't need to be generated again.
      * @param {object} test The test DTO to display.
+     * @private
      */
     _viewTestModal (test) {
         let modal = this.testModals.get(test.id);
@@ -86,7 +98,7 @@ class TestAccordion {
         const editor = CodeMirror.fromTextArea(textarea, {
             lineNumbers: true,
             matchBrackets: true,
-            mode: "text/x-java",
+            mode: 'text/x-java',
             readOnly: true,
             autoRefresh: true
         });
@@ -95,6 +107,7 @@ class TestAccordion {
         modal.modal('show');
     };
 
+    /** @private */
     _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
@@ -161,32 +174,39 @@ class TestAccordion {
         }
     }
 
+    /** @private */
     _renderId (data) {
         return `Test ${data.id}`;
     }
 
+    /** @private */
     _renderCreator (data) {
         return data.creator.name;
     }
 
+    /** @private */
     _renderPoints (data) {
         return `<span class="ta-column-name">Points:</span> ${data.points}`;
     }
 
+    /** @private */
     _renderCoveredMutants (data) {
         return `<span class="ta-covered-link"><span class="ta-column-name">Covered:</span> ${data.coveredMutantIds.length}</span>`;
     }
 
+    /** @private */
     _renderKilledMutants (data) {
         return `<span class="ta-killed-link"><span class="ta-column-name">Killed:</span> ${data.killedMutantIds.length}</span>`;
     }
 
+    /** @private */
     _renderViewButton (data) {
         return data.canView
                 ? '<button class="ta-view-button btn btn-xs btn-primary">View</button>'
                 : '';
     }
 
+    /** @private */
     _renderSmells (data) {
         const numSmells = data.smells.length;
         let smellLevel;
@@ -204,36 +224,42 @@ class TestAccordion {
         return `<a class="ta-smells-link btn btn-xs ${smellColor}">${smellLevel}</a>`;
     }
 
+    /** @private */
     _renderCoveredMutantsPopoverTitle (data) {
         return data.coveredMutantIds.length > 0
                 ? 'Covered Mutants'
                 : '';
     }
 
+    /** @private */
     _renderCoveredMutantsPopoverBody (data) {
         return data.coveredMutantIds.length > 0
                 ? data.coveredMutantIds.join(', ')
                 : 'No mutants are covered by this test.';
     }
 
+    /** @private */
     _renderKilledMutantsPopoverTitle (data) {
         return data.killedMutantIds.length > 0
                 ? 'Killed Mutants'
                 : '';
     }
 
+    /** @private */
     _renderKilledMutantsPopoverBody (data) {
         return data.killedMutantIds.length > 0
                 ? data.killedMutantIds.join(', ')
                 : 'No mutants were killed by this test.';
     }
 
+    /** @private */
     _renderSmellsPopoverTitle (data) {
         return data.smells.length > 0
                 ? 'Test Smells'
                 : '';
     }
 
+    /** @private */
     _renderSmellsPopoverBody (data) {
         return data.smells.length > 0
                 ? data.smells.join('<br>')

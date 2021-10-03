@@ -66,6 +66,7 @@ class CodeCompletion {
      * The code completion function.
      * Adds the current editor text to the completions, then displays possible completions in the editor.
      * @param editor The editor to code complete on.
+     * @private
      */
     _complete (editor) {
         /* Bind "this" to safely use it in callback functions. */
@@ -98,16 +99,15 @@ class CodeCompletion {
      * Computes the word under cursor for a cursor index.
      * A word is considered under cursor if the cursor index describes any of its characters or the character after the
      * word.
-     *
      * @param {string} line The string to find the word it.
      * @param {number} index The cursor index, 0 to (including) str.length.
-     *
      * @returns {{word: string, index: number}}
      *      <ul>
      *          <li>word: the word under cursor</li>
      *          <li>index: index of the first character</li>
      *      </ul>
      *      If there is no word under the cursor, {word: '', index: cursor index} will be returned.
+     * @private
      */
     _getIdentifierUnderCursor (line, index) {
         for (const match of line.matchAll(CodeCompletion._IDENTIFIER_REGEX)) {
@@ -120,9 +120,9 @@ class CodeCompletion {
 
     /**
      * Goes through all pools of completions and searches for possible completions of the given word.
-     *
      * @param {string} word The word to complete.
      * @return {string[]} Possible completions.
+     * @private
      */
     _getCompletionsForWord (word) {
         const foundCompletions = new Set();
