@@ -217,9 +217,9 @@ class MutantAccordion {
                     /* Assign function to the "Mutant <id>" link. */
                     row.querySelector('.ma-mutant-link').addEventListener('click', function (event) {
                         let editor = null;
-                        if (CodeDefenders.objects.hasOwnProperty('classViewer')) {
+                        if (CodeDefenders.objects.classViewer != null) {
                             editor = CodeDefenders.objects.classViewer.editor;
-                        } else if (CodeDefenders.objects.hasOwnProperty('mutantEditor')) {
+                        } else if (CodeDefenders.objects.mutantEditor != null) {
                             editor = CodeDefenders.objects.mutantEditor.editor;
                         }
 
@@ -353,6 +353,6 @@ class MutantAccordion {
     }
 }
 
-CodeDefenders.classes.MutantAccordion = MutantAccordion;
+CodeDefenders.classes.MutantAccordion ??= MutantAccordion;
 
 })();

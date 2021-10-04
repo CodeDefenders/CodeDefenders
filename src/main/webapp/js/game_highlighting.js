@@ -91,9 +91,9 @@ class GameHighlighting {
          * @type {CodeMirror}
          */
         this.editor = null;
-        if (CodeDefenders.objects.hasOwnProperty('classViewer')) {
+        if (CodeDefenders.objects.classViewer != null) {
             this.editor = CodeDefenders.objects.classViewer.editor;
-        } else if (CodeDefenders.objects.hasOwnProperty('mutantEditor')) {
+        } else if (CodeDefenders.objects.mutantEditor != null) {
             this.editor = CodeDefenders.objects.mutantEditor.editor;
         }
     }

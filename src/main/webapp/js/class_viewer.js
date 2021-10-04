@@ -79,6 +79,6 @@ class ClassViewer {
     }
 }
 
-CodeDefenders.classes.ClassViewer = ClassViewer;
+CodeDefenders.classes.ClassViewer ??= ClassViewer;
 
 })();

@@ -176,6 +176,6 @@ class MutantEditor {
     }
 }
 
-CodeDefenders.classes.MutantEditor = MutantEditor;
+CodeDefenders.classes.MutantEditor ??= MutantEditor;
 
 })();

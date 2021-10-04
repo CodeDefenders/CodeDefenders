@@ -153,7 +153,7 @@ class TestEditor {
         /* Gather classes to autocomplete. */
         const texts = [];
         /* Get classes from class viewer. */
-        if (CodeDefenders.objects.hasOwnProperty('classViewer')) {
+        if (CodeDefenders.objects.classViewer != null) {
             const classViewer = CodeDefenders.objects.classViewer;
             texts.push(classViewer.editor.getValue());
             for (const dependencyEditor of classViewer.dependencyEditors) {
@@ -161,7 +161,7 @@ class TestEditor {
             }
         }
         /* Get classes from mutant editor. */
-        if (CodeDefenders.objects.hasOwnProperty('mutantEditor')) {
+        if (CodeDefenders.objects.mutantEditor != null) {
             const mutantEditor = CodeDefenders.objects.mutantEditor;
             texts.push(mutantEditor.editor.getValue());
             for (const dependencyEditor of mutantEditor.dependencyEditors) {
@@ -175,6 +175,6 @@ class TestEditor {
     }
 }
 
-CodeDefenders.classes.TestEditor = TestEditor;
+CodeDefenders.classes.TestEditor ??= TestEditor;
 
 })();

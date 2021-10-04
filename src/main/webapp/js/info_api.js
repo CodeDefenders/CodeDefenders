@@ -69,6 +69,6 @@ class InfoApi {
     }
 }
 
-CodeDefenders.classes.InfoApi = InfoApi;
+CodeDefenders.classes.InfoApi ??= InfoApi;
 
 })();

@@ -267,6 +267,6 @@ class TestAccordion {
     }
 }
 
-CodeDefenders.classes.TestAccordion = TestAccordion;
+CodeDefenders.classes.TestAccordion ??= TestAccordion;
 
 })();

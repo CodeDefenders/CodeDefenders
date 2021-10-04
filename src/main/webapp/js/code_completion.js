@@ -141,6 +141,6 @@ class CodeCompletion {
 
 }
 
-CodeDefenders.classes.CodeCompletion = CodeDefenders.classes.CodeCompletion ?? CodeCompletion;
+CodeDefenders.classes.CodeCompletion ??= CodeCompletion;
 
 })();
