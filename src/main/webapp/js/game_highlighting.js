@@ -78,12 +78,19 @@ class GameHighlighting {
 
 
         /**
-         * We use timeouts to hide the pop-over after the icon or pop-over is not hovered for a certain time.
-         * These timeouts are saved, so they can be cleared when pop-overs are forced to hide.
-         * @type {number[]}
+         * We use a timeout to hide the popover after the icon or popover is not hovered for a certain time.
+         * The timeout id is saved so it can be cleared if necessary.
+         * @type {?number}
          * @private
          */
-        this._popoverTimeouts = [];
+        this._activePopoverTimeout = null;
+        /**
+         * The currently active popover.
+         * This is saved to enable hiding the currently active popover and to avoid showing the same popover twice.
+         * @type {?Popover}
+         * @private
+         */
+        this._activePopover = null;
 
 
         /**
@@ -166,17 +173,23 @@ class GameHighlighting {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
-        const addPopoverTimeout = function (callback, time) {
-            self._popoverTimeouts.push(setTimeout(callback, time));
-        }
+        /* Sets a timeout to hide the given popover. */
+        const setPopoverTimeout = function (popover) {
+            self._popoverTimeout = setTimeout(function () {
+                popover.hide();
+                self._activePopover = null;
+                self._activePopoverTimeout = null;
+            }, 500);
+        };
 
-        const clearPopoverTimeouts = function () {
-            self._popoverTimeouts = self._popoverTimeouts.filter(clearTimeout);
-        }
+        /* Clears (cancels) the current popover timeout, if any is set. */
+        const clearPopoverTimeout = function () {
+            clearTimeout(self._popoverTimeout);
+            self._popoverTimeout = null;
+        };
 
         for (const mutantIcon of mutantIcons.querySelectorAll('.gh-mutant-icon')) {
-
-            mutantIcon.popover = new bootstrap.Popover(mutantIcon, {
+            const popover = new bootstrap.Popover(mutantIcon, {
                 /* Append to body instead of the element itself, so that the icons don't overlap modals. */
                 container: document.body,
                 placement: 'right',
@@ -187,36 +200,29 @@ class GameHighlighting {
                 content: this._createPopoverContent.bind(this, mutantIcon)
             });
 
-            /* Activate popovers manually so we can make them stay as long as they are hovered. */
+            /* Activate popovers manually when an icon is hovered. This way, we can make the popover stay open as long
+             * as either the icon or the popover itself is hovered. */
             mutantIcon.addEventListener('mouseenter', function (event) {
-                clearPopoverTimeouts();
+                clearPopoverTimeout();
 
-                /* Hide all other pop-overs. */
-                for (const otherMutantIcon of document.querySelectorAll('.gh-mutant-icon')) {
-                    if (mutantIcon !== otherMutantIcon) {
-                        otherMutantIcon.popover.hide();
+                /* Do nothing if the popover is already active. */
+                if (self._activePopover !== popover) {
+
+                    /* Hide active popover */
+                    if (self._activePopover != null) {
+                        self._activePopover.hide();
+                        self._activePopover = null;
                     }
-                }
 
-                mutantIcon.popover.show();
-
-                /* Clear timeouts when pop-over is hovered so it won't be hidden by the timeout. */
-                for (const popoverElement of document.getElementsByClassName('popover')) {
-                    popoverElement.addEventListener('mouseenter', function (event) {
-                        clearPopoverTimeouts();
-                    });
-                    popoverElement.addEventListener('mouseleave', function (event) {
-                        addPopoverTimeout(() => {
-                            mutantIcon.popover.hide();
-                        }, 500);
-                    });
+                    /* Show new popover. */
+                    popover.show();
+                    self._activePopover = popover;
                 }
             });
-            mutantIcon.addEventListener('mouseleave', function (event) {
-                addPopoverTimeout(() => {
-                    mutantIcon.popover.hide();
-                }, 500);
-            });
+
+            mutantIcon.addEventListener('mouseleave', setPopoverTimeout.bind(null, popover));
+            popover.getTipElement().addEventListener('mouseenter', clearPopoverTimeout);
+            popover.getTipElement().addEventListener('mouseleave', setPopoverTimeout.bind(null, popover));
         }
     }
 
