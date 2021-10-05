@@ -24,7 +24,7 @@ class TestAccordion {
 
         /**
          * Maps test ids to the modal that show the test's code.
-         * @type {Map<number, object>}
+         * @type {Map<number, Modal>}
          */
         this.testModals = new Map();
 
@@ -66,35 +66,24 @@ class TestAccordion {
     _viewTestModal (test) {
         let modal = this.testModals.get(test.id);
         if (modal !== undefined) {
-            modal.modal('show');
+            modal.controls.show();
             return;
         }
 
-        modal = $(
-                `<div class="modal fade" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-responsive">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Test ${test.id} (by ${test.creator.name})</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="card">
-                                    <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
-                                        <pre class="m-0"><textarea></textarea></pre>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
+        /* Create a new modal. */
+        modal = new CodeDefenders.classes.Modal();
+        modal.title.innerText = `Test ${test.id} (by ${test.creator.name})`;
+        modal.body.innerHTML =
+                `<div class="card">
+                    <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
+                        <pre class="m-0"><textarea></textarea></pre>
                     </div>
-                </div>`);
-        modal.appendTo(document.body);
+                </div>`;
+        modal.dialog.classList.add('modal-dialog-responsive');
         this.testModals.set(test.id, modal);
 
-        const textarea = modal.find('textarea').get(0);
+        /* Initialize the editor. */
+        const textarea = modal.body.querySelector('textarea');
         const editor = CodeMirror.fromTextArea(textarea, {
             lineNumbers: true,
             matchBrackets: true,
@@ -102,9 +91,9 @@ class TestAccordion {
             readOnly: true,
             autoRefresh: true
         });
-
         CodeDefenders.classes.InfoApi.setTestEditorValue(editor, test.id);
-        modal.modal('show');
+
+        modal.controls.show();
     };
 
     /** @private */
@@ -119,8 +108,8 @@ class TestAccordion {
                     .map(this.tests.get, this.tests);
 
             /* Create the DataTable. */
-            const tableElement = $('#ta-table-' + category.id);
-            const dataTable = tableElement.DataTable({
+            const tableElement = document.getElementById(`ta-table-${category.id}`);
+            const dataTable = $(tableElement).DataTable({
                 data: rows,
                 columns: [
                     { data: null, title: '', defaultContent: '' },

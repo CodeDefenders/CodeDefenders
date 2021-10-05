@@ -4,6 +4,7 @@ window.CodeDefenders = {
         CodeCompletion: null,
         GameHighlighting: null,
         InfoApi: null,
+        Modal: null,
         MutantAccordion: null,
         MutantEditor: null,
         TestAccordion: null,

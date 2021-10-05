@@ -40,12 +40,12 @@ class MutantAccordion {
 
         /**
          * Maps mutant ids to the modal that show the mutant's code.
-         * @type {Map<number, object>}
+         * @type {Map<number, Modal>}
          */
         this.mutantModals = new Map();
         /**
          * Maps mutant ids to the modal that shows the code of the mutant's killing test.
-         * @type {Map<number, object>}
+         * @type {Map<number, Modal>}
          */
         this.testModals = new Map();
 
@@ -69,35 +69,24 @@ class MutantAccordion {
     _viewMutantModal (mutant) {
         let modal = this.mutantModals.get(mutant.id);
         if (modal !== undefined) {
-            modal.modal('show');
+            modal.controls.show();
             return;
         }
 
-        modal = $(
-                `<div class="modal fade" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-responsive">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Mutant ${mutant.id} (by ${mutant.creator.name})</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="card">
-                                        <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
-                                            <pre class="m-0"><textarea></textarea></pre>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`);
-        modal.appendTo(document.body);
+        /* Create a new modal. */
+        modal = new CodeDefenders.classes.Modal();
+        modal.title.innerText = `Mutant ${mutant.id} (by ${mutant.creator.name})`;
+        modal.body.innerHTML =
+                `<div class="card">
+                    <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
+                        <pre class="m-0"><textarea></textarea></pre>
+                    </div>
+                </div>`;
+        modal.dialog.classList.add('modal-dialog-responsive');
         this.mutantModals.set(mutant.id, modal);
 
-        const textarea = modal.find('textarea').get(0);
+        /* Initialize the editor. */
+        const textarea = modal.body.querySelector('textarea');
         const editor = CodeMirror.fromTextArea(textarea, {
             lineNumbers: true,
             matchBrackets: true,
@@ -105,9 +94,9 @@ class MutantAccordion {
             readOnly: true,
             autoRefresh: true
         });
-
         CodeDefenders.classes.InfoApi.setMutantEditorValue(editor, mutant.id);
-        modal.modal('show');
+
+        modal.controls.show();
     };
 
     /**
@@ -119,38 +108,29 @@ class MutantAccordion {
     _viewTestModal (mutant) {
         let modal = this.testModals.get(mutant.id);
         if (modal !== undefined) {
-            modal.modal('show');
+            modal.controls.show();
             return;
         }
 
-        modal = $(
-                `<div class="modal fade" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-responsive">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Test ${mutant.killedByTestId} (by ${mutant.killedBy.name})</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="card mb-3">
-                                        <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
-                                            <pre class="m-0"><textarea></textarea></pre>
-                                        </div>
-                                    </div>
-                                    <pre class="m-0 terminal-pre"></pre>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`);
-        modal.appendTo(document.body);
+        /* Create a new modal. */
+        modal = new CodeDefenders.classes.Modal();
+        modal.title.innerText =`Test ${mutant.killedByTestId} (by ${mutant.killedBy.name})`;
+        modal.body.innerHTML =
+                `<div class="card mb-3">
+                    <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
+                        <pre class="m-0"><textarea></textarea></pre>
+                    </div>
+                </div>
+                <pre class="m-0 terminal-pre"></pre>`;
+        modal.dialog.classList.add('modal-dialog-responsive');
         this.testModals.set(mutant.killedByTestId, modal);
 
-        const killMessageElement = modal.find('.modal-body .terminal-pre').get(0);
+        /* Set the kill message. */
+        const killMessageElement = modal.body.querySelector('.terminal-pre');
         killMessageElement.innerText = mutant.killMessage;
-        const textarea = modal.find('textarea').get(0);
+
+        /* Initialize the editor. */
+        const textarea = modal.body.querySelector('textarea');
         const editor = CodeMirror.fromTextArea(textarea, {
             lineNumbers: true,
             matchBrackets: true,
@@ -158,9 +138,9 @@ class MutantAccordion {
             readOnly: true,
             autoRefresh: true
         });
-
         CodeDefenders.classes.InfoApi.setTestEditorValue(editor, mutant.killedByTestId);
-        modal.modal('show');
+
+        modal.controls.show();
     };
 
     /** @private */
@@ -175,8 +155,8 @@ class MutantAccordion {
                     .map(this.mutants.get, this.mutants);
 
             /* Create the DataTable. */
-            const tableElement = $('#ma-table-' + category.id);
-            const dataTable = tableElement.DataTable({
+            const tableElement = document.getElementById(`ma-table-${category.id}`);
+            const dataTable = $(tableElement).DataTable({
                 data: rows,
                 columns: [
                     {data: null, title: '', defaultContent: ''},

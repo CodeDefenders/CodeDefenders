@@ -17,7 +17,7 @@ class InfoApi {
                     editor.setValue(response);
                 })
                 .catch(() => {
-                    editor.setValue("Could not fetch test content.\nPlease reload the page at a later point.");
+                    editor.setValue("Could not fetch content.\nPlease reload the page at a later point.");
                 });
     }
 
