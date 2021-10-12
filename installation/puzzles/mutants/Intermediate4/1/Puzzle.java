@@ -3,12 +3,12 @@ public class Puzzle {
         int z = 0;
 
         if (x%2 == 0) {
-            if (y%2 == 0) {
+            if (y%4 == 0) {
                 z = z + 1;
             }
             z = z + 1;
         }
-        if (z >= 0 || x == y) {
+        if (z > 0 || x == y) {
             z = -1;
         }
 

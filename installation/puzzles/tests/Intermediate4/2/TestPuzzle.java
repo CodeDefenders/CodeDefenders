@@ -6,7 +6,7 @@ public class TestPuzzle {
   @Test
   public void test2() {
     Puzzle b = new Puzzle();
-    assertEquals(2, b.run(1, 1));
+    assertEquals(1, b.run(8, 14));
   }
 
 }
