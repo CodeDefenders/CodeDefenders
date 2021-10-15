@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.beans.message.MessagesBean;
@@ -27,14 +29,12 @@ import com.google.common.net.InetAddresses;
  * <p>The whole authentication logic is handled silently by the parent class {@link FormAuthenticationFilter} which
  * performs a login against the {@link org.codedefenders.auth.CodeDefendersAuthenticatingRealm} with the credentials
  * found in the {@code username} and {@code password} HTML parameters of the POST request.
- *
  */
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
-
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
 
-    LoginBean login;
-    MessagesBean messages;
+    private final LoginBean login;
+    private final MessagesBean messages;
     private final UserService userService;
 
     public CodeDefendersFormAuthenticationFilter(LoginBean login, MessagesBean messages,
@@ -67,6 +67,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         // Log user activity including the timestamp
         userService.recordSession(userId, ipAddress);
+        logger.info("Successful login for username '{}' from ip {}", token.getPrincipal(), ipAddress);
+
         login.loginUser((UserEntity) subject.getPrincipal());
 
         // Call the super method, as this is the one doing the redirect after a successful login.
@@ -83,6 +85,17 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
                 && response instanceof HttpServletResponse) {
             HttpServletRequest httpRequest = (HttpServletRequest) request;
             HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+            final String ipAddress = getClientIpAddress(httpRequest);
+
+            if (e instanceof IncorrectCredentialsException) {
+                logger.warn("Failed login with wrong password for username '{}' from ip {}", token.getPrincipal(), ipAddress);
+            } else if (e instanceof UnknownAccountException) {
+                logger.warn("Failed login for non-existing username '{}' from ip {}", token.getPrincipal(), ipAddress);
+            } else {
+                logger.warn("Failed login for username '{}' from ip {}", token.getPrincipal(), ipAddress);
+            }
+
             try {
                 httpResponse.sendRedirect(httpRequest.getContextPath() + Paths.LOGIN);
             } catch (IOException ioException) {
@@ -110,7 +123,6 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         if (invalidIP(ip)) {
             ip = request.getRemoteAddr();
         }
-        logger.debug("Client IP: " + ip);
         return ip;
     }
 
