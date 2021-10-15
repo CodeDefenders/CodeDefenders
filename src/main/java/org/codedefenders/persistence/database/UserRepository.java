@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -302,6 +303,40 @@ public class UserRepository {
         } catch (SQLException e) {
             logger.warn("SQLException while executing query", e);
             return false;
+        }
+    }
+
+    public boolean setPasswordResetSecret(int userId, @Nullable String passwordResetSecret) {
+        String query = "UPDATE users \n"
+                + "SET pw_reset_secret = ?, \n"
+                + "    pw_reset_timestamp = CURRENT_TIMESTAMP \n"
+                + "WHERE User_ID = ?;";
+
+        try {
+            connectionFactory.getQueryRunner().update(query, passwordResetSecret, userId);
+            return true;
+        } catch (SQLException e) {
+            logger.warn("SQLException while executing query", e);
+            return false;
+        }
+    }
+
+    @Nonnull
+    public Optional<Integer> getUserIdForPasswordResetSecret(@Nullable String passwordResetSecret) {
+        String query = "SELECT User_ID \n"
+                + "FROM users \n"
+                + "WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < ("
+                + "         SELECT INT_VALUE \n"
+                + "         FROM settings \n"
+                + "         WHERE name = 'PASSWORD_RESET_SECRET_LIFESPAN'"
+                + ") AND pw_reset_secret = ?;";
+
+        try {
+            return Optional.ofNullable(connectionFactory.getQueryRunner()
+                    .query(query, new ScalarHandler<>(), passwordResetSecret));
+        } catch (SQLException e) {
+            logger.warn("SQLException while executing query", e);
+            return Optional.empty();
         }
     }
 }

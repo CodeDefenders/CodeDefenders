@@ -281,35 +281,4 @@ public class DatabaseAccess {
         TargetExecution t = DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, valueList);
         return Optional.ofNullable(t).map(te -> te.target).orElse(null);
     }
-
-    public static boolean setPasswordResetSecret(int userId, String pwResetSecret) {
-        String query = String.join("\n",
-                "UPDATE users",
-                "SET pw_reset_secret = ?,",
-                "    pw_reset_timestamp = CURRENT_TIMESTAMP",
-                "WHERE User_ID = ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(pwResetSecret),
-                DatabaseValue.of(userId)
-        };
-        return DB.executeUpdateQuery(query, values);
-    }
-
-    public static int getUserIDForPWResetSecret(String pwResetSecret) {
-        String query = String.join("\n",
-                "",
-                "SELECT User_ID",
-                "FROM users",
-                "WHERE",
-                "  TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) <",
-                "             (SELECT INT_VALUE",
-                "              FROM settings",
-                "              WHERE name = 'PASSWORD_RESET_SECRET_LIFESPAN')",
-                "AND",
-                "  pw_reset_secret = ?;");
-
-        final Integer userId = DB.executeQueryReturnValue(query,
-                rs -> rs.getInt("User_ID"), DatabaseValue.of(pwResetSecret));
-        return Optional.ofNullable(userId).orElse(-1);
-    }
 }
