@@ -101,7 +101,7 @@ public class UserRepository {
      *
      * @param userEntity The new {@code UserEntity} to store in the database.
      * @return The id of the inserted {@code UserEntity} wrapped in an {@code Optional} or an empty optional if
-     * inserting the {@code userEntity} failed.
+     *         inserting the {@code userEntity} failed.
      * @throws IllegalArgumentException if {@code userEntity.id} is greater then 0.
      */
     // TODO: This gives no information why we couldn't insert the UserEntity into the database
@@ -171,7 +171,8 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE User_ID = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -187,7 +188,8 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE Username = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), username);
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), username);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -203,7 +205,8 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE Email = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -230,7 +233,8 @@ public class UserRepository {
                 + "WHERE players.User_ID = users.User_ID "
                 + "AND players.ID = ?";
         try {
-            return Optional.ofNullable(connectionFactory.getQueryRunner().query(query, new ScalarHandler<>(), playerId));
+            return Optional.ofNullable(connectionFactory.getQueryRunner()
+                    .query(query, new ScalarHandler<>(), playerId));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -247,7 +251,8 @@ public class UserRepository {
         String query = "SELECT * "
                 + "FROM  users;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -275,7 +280,8 @@ public class UserRepository {
                 + "    )"
                 + "ORDER BY Username, User_ID;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

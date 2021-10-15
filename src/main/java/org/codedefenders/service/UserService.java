@@ -55,7 +55,7 @@ public class UserService {
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
                 // Entries expire after a relative short time, since User(name) updates are not handled through this
-                // class so we can't invalidate the entries on updates. This could lead to some stale data presented in
+                // class, so we can't invalidate the entries on updates. This could lead to some stale data presented in
                 // places where SimpleUser objects are used.
                 .expireAfterWrite(30, TimeUnit.SECONDS)
                 .maximumSize(200)
