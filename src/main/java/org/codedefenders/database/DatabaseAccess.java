@@ -44,21 +44,6 @@ import org.codedefenders.model.EventType;
 public class DatabaseAccess {
 
     /**
-     * Sanitises user input. If a whole SQL query is entered, syntax
-     * errors may occur.
-     *
-     * @param s user input String
-     * @return sanitised String s
-     */
-    public static String sanitise(String s) {
-        s = s.replaceAll("\\<", "&lt;");
-        s = s.replaceAll("\\>", "&gt;");
-        s = s.replaceAll("\\\"", "&quot;");
-        s = s.replaceAll("\\'", "&apos;");
-        return s;
-    }
-
-    /**
      * @param gameId The gameId for which to remove the events.
      * @param userId The userId of the events to remove.
      *
@@ -248,37 +233,5 @@ public class DatabaseAccess {
         };
         final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
         return new HashSet<>(mutants);
-    }
-
-    public static int getLastCompletedSubmissionForUserInGame(int userId, int gameId, boolean isDefender) {
-        String query = isDefender ? "SELECT MAX(test_id) FROM tests" : "SELECT MAX(mutant_id) FROM mutants";
-        query += " WHERE game_id=? AND player_id = (SELECT id FROM players WHERE game_id=? AND user_id=?);";
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId)
-        };
-
-        final Integer result = DB.executeQueryReturnValue(query, rs -> rs.getInt(1), valueList);
-        return Optional.ofNullable(result).orElse(-1);
-    }
-
-    public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId,
-            int lastSubmissionId, boolean isDefender) {
-        // Current test is the one right after lastTestId in the user/game context
-        String query = isDefender
-                ? "SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in (SELECT Test_ID FROM tests" :
-                "SELECT * FROM targetexecutions WHERE Mutant_ID > ? AND Mutant_ID in (SELECT Mutant_ID FROM mutants";
-        query += " WHERE game_id=? AND player_id = (SELECT id from players where game_id=? and user_id=?))"
-                + "AND TargetExecution_ID >= (SELECT MAX(TargetExecution_ID) from targetexecutions);";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DatabaseValue.of(lastSubmissionId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId)
-        };
-        TargetExecution t = DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, valueList);
-        return Optional.ofNullable(t).map(te -> te.target).orElse(null);
     }
 }
