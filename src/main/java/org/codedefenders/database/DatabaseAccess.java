@@ -250,24 +250,6 @@ public class DatabaseAccess {
         return new HashSet<>(mutants);
     }
 
-    /**
-     * This also automatically update the Timestamp field using CURRENT_TIMESTAMP().
-     */
-    public static void logSession(int uid, String ipAddress) {
-        deleteSessions(uid);
-        String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(uid),
-                DatabaseValue.of(ipAddress)
-        };
-        DB.executeUpdateQuery(query, values);
-    }
-
-    public static boolean deleteSessions(int userId) {
-        String query = "DELETE FROM sessions WHERE User_ID = ?;";
-        return DB.executeUpdateQuery(query, DatabaseValue.of(userId));
-    }
-
     public static int getLastCompletedSubmissionForUserInGame(int userId, int gameId, boolean isDefender) {
         String query = isDefender ? "SELECT MAX(test_id) FROM tests" : "SELECT MAX(mutant_id) FROM mutants";
         query += " WHERE game_id=? AND player_id = (SELECT id FROM players WHERE game_id=? AND user_id=?);";

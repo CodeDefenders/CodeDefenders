@@ -280,4 +280,28 @@ public class UserRepository {
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
+
+    public boolean insertSession(int userId, String ipAddress) {
+        String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
+
+        try {
+            connectionFactory.getQueryRunner().update(query, userId, ipAddress);
+            return true;
+        } catch (SQLException e) {
+            logger.warn("SQLException while logging session", e);
+            return false;
+        }
+    }
+
+    public boolean deleteSessions(int userId) {
+        String query = "DELETE FROM sessions WHERE User_ID = ?;";
+
+        try {
+            connectionFactory.getQueryRunner().update(query, userId);
+            return true;
+        } catch (SQLException e) {
+            logger.warn("SQLException while executing query", e);
+            return false;
+        }
+    }
 }

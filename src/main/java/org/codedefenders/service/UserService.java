@@ -135,4 +135,12 @@ public class UserService {
     private SimpleUser simpleUserFromUserEntity(@Nonnull UserEntity user) {
         return new SimpleUser(user.getId(), user.getUsername());
     }
+
+    public boolean recordSession(int userId, String ipAddress) {
+        return deleteRecordedSessions(userId) && userRepo.insertSession(userId, ipAddress);
+    }
+
+    public boolean deleteRecordedSessions(int userId) {
+        return userRepo.deleteSessions(userId);
+    }
 }

@@ -32,10 +32,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -60,6 +60,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private UserService userService;
 
     @Inject
     private UserRepository userRepo;
@@ -201,6 +204,6 @@ public class UserProfileManager extends HttpServlet {
         user.setUsername(DELETED_USER_NAME);
         user.setEmail(String.format(DELETED_USER_EMAIL, UUID.randomUUID()));
         user.setEncodedPassword(DELETED_USER_PASSWORD);
-        return user.update() && DatabaseAccess.deleteSessions(user.getId());
+        return user.update() && userService.deleteRecordedSessions(user.getId());
     }
 }

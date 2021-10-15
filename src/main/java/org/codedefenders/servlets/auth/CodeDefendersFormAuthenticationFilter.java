@@ -6,7 +6,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -14,8 +13,8 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +35,13 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
     LoginBean login;
     MessagesBean messages;
+    private final UserService userService;
 
-    public CodeDefendersFormAuthenticationFilter(LoginBean login, MessagesBean messages) {
+    public CodeDefendersFormAuthenticationFilter(LoginBean login, MessagesBean messages,
+            UserService userService) {
         this.login = login;
         this.messages = messages;
+        this.userService = userService;
     }
 
     @Override
@@ -60,10 +62,11 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         httpResponse.setDateHeader("Expires", -1);
 
-        // From LoginManager:login
-        HttpSession session = httpRequest.getSession();
+        final int userId = ((UserEntity) subject.getPrincipal()).getId();
+        final String ipAddress = getClientIpAddress(httpRequest);
+
         // Log user activity including the timestamp
-        DatabaseAccess.logSession(((UserEntity) subject.getPrincipal()).getId(), getClientIpAddress(httpRequest));
+        userService.recordSession(userId, ipAddress);
         login.loginUser((UserEntity) subject.getPrincipal());
 
         // Call the super method, as this is the one doing the redirect after a successful login.
