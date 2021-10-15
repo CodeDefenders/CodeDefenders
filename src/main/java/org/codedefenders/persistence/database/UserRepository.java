@@ -104,7 +104,8 @@ public class UserRepository {
      * @throws IllegalArgumentException if {@code userEntity.id} is greater then 0.
      */
     // TODO: This gives no information why we couldn't insert the UserEntity into the database
-    public Optional<Integer> insert(UserEntity userEntity) {
+    @Nonnull
+    public Optional<Integer> insert(@Nonnull UserEntity userEntity) {
         if (userEntity.getId() > 0) {
             // TODO: Should we allow this?
             throw new IllegalArgumentException("Can't insert user with id > 0");
@@ -134,7 +135,7 @@ public class UserRepository {
      * @param userEntity The {@code UserEntity} to update
      * @return Whether updating the provided {@code UserEntity} was successful or not.
      */
-    public boolean update(UserEntity userEntity) {
+    public boolean update(@Nonnull UserEntity userEntity) {
         String query = "UPDATE users "
                 + "SET Username = ?, "
                 + "  Email = ?, "
@@ -163,6 +164,7 @@ public class UserRepository {
     /**
      * Retrieve an {@code UserEntity} for a given {@code userId} from the database.
      */
+    @Nonnull
     public Optional<UserEntity> getUserById(int userId) {
         String query = "SELECT * "
                 + "FROM  users "
@@ -178,7 +180,8 @@ public class UserRepository {
     /**
      * Retrieve an {@code UserEntity} identified by the given {@code username} from the database.
      */
-    public Optional<UserEntity> getUserByName(String username) {
+    @Nonnull
+    public Optional<UserEntity> getUserByName(@Nonnull String username) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE Username = ?;";
@@ -193,7 +196,8 @@ public class UserRepository {
     /**
      * Retrieve an {@code UserEntity} identified by the given {@code email} from the database.
      */
-    public Optional<UserEntity> getUserByEmail(String email) {
+    @Nonnull
+    public Optional<UserEntity> getUserByEmail(@Nonnull String email) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE Email = ?;";
@@ -209,6 +213,7 @@ public class UserRepository {
     /**
      * Retrieve the id of the user which corresponds to the player identified by the given {@code playerId}.
      */
+    @Nonnull
     public Optional<Integer> getUserIdForPlayerId(int playerId) {
         try {
             return Optional.of(userIdForPlayerIdCache.get(playerId));
@@ -236,6 +241,7 @@ public class UserRepository {
      *
      * <p>This list includes system users.
      */
+    @Nonnull
     public List<UserEntity> getUsers() {
         String query = "SELECT * "
                 + "FROM  users;";
@@ -252,6 +258,7 @@ public class UserRepository {
      *
      * <p>This list includes neither system nor inactive users
      */
+    @Nonnull
     public List<UserEntity> getUnassignedUsers() {
         String query = "SELECT DISTINCT u.* "
                 + "FROM view_valid_users u "
