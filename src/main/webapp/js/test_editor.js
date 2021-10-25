@@ -173,6 +173,15 @@ class TestEditor {
         const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
         this.codeCompletion.setCompletionPool('classes', completions);
     }
+
+    /**
+     * Scrolls the given line into view.
+     * @param {number} line The given line (1-indexed).
+     */
+    jumpToLine (line) {
+        line -= 1; // Subtract 1 because CodeMirror's lines are 0-indexed.
+        this.editor.scrollIntoView({line}, 200);
+    }
 }
 
 CodeDefenders.classes.TestEditor ??= TestEditor;

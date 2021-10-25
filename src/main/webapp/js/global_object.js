@@ -8,7 +8,8 @@ window.CodeDefenders = {
         MutantAccordion: null,
         MutantEditor: null,
         TestAccordion: null,
-        TestEditor: null
+        TestEditor: null,
+        ErrorHighlighting: null
     },
     objects: {
         classViewer: null,
@@ -16,6 +17,8 @@ window.CodeDefenders = {
         mutantAccordion: null,
         mutantEditor: null,
         testAccordion: null,
-        testEditor: null
+        testEditor: null,
+        mutantErrorHighlighting: null,
+        testErrorHighlighting: null
     }
 };
