@@ -69,7 +69,7 @@
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <%-- Push notifications using WebSocket --%>
-<jsp:include page="/jsp/push_notifications.jsp"/>
+<jsp:include page="/jsp/push_socket.jsp"/>
 
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>

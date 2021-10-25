@@ -669,7 +669,7 @@
          * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
          */
         const sendMessage = function (message, isAllChat) {
-            pushSocket.send('${eventNames.clientChatEventName}', {
+            CodeDefenders.objects.pushSocket.send('${eventNames.clientChatEventName}', {
                 gameId: ${gameChat.gameId},
                 allChat: isAllChat,
                 message
@@ -679,6 +679,8 @@
         loadSettings();
 
         /* Register for WebSocket events. */
+        const PushSocket = CodeDefenders.classes.PushSocket;
+        const pushSocket = CodeDefenders.objects.pushSocket;
         pushSocket.subscribe('${eventNames.gameChatRegistrationEventName}', {
             gameId: ${gameChat.gameId}
         });

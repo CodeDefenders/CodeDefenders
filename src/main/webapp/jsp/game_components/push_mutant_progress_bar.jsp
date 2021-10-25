@@ -77,6 +77,8 @@
         };
 
         const registerMutantProgressBar = function () {
+            const pushSocket = CodeDefenders.objects.pushSocket;
+
             pushSocket.subscribe('<%=EventNames.toClientEventName(MutantProgressBarRegistrationEvent.class)%>', {
                 gameId: ${mutantProgressBar.gameId}
             });
@@ -90,6 +92,8 @@
 
         <%--
         const unregisterMutantProgressBar = function () {
+            const pushSocket = CodeDefenders.objects.pushSocket;
+
             pushSocket.unsubscribe('<%=EventNames.toClientEventName(MutantProgressBarRegistrationEvent.class)%>', {
                 playerId: ${requestScope.playerId}
             });
@@ -103,6 +107,9 @@
         --%>
 
         window.mutantProgressBar = function () {
+            const PushSocket = CodeDefenders.classes.PushSocket;
+            const pushSocket = CodeDefenders.objects.pushSocket;
+
             setProgress(16, 'Submitting Mutant');
             registerMutantProgressBar();
 

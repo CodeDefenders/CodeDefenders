@@ -70,6 +70,8 @@
         };
 
         const registerTestProgressBar = function () {
+            const pushSocket = CodeDefenders.objects.pushSocket;
+
             pushSocket.subscribe('<%=EventNames.toClientEventName(TestProgressBarRegistrationEvent.class)%>', {
                 gameId: ${testProgressBar.gameId}
             });
@@ -83,6 +85,8 @@
 
         <%--
         const unregisterTestProgressBar = function () {
+            const pushSocket = CodeDefenders.objects.pushSocket;
+
             pushSocket.unsubscribe('<%=EventNames.toClientEventName(TestProgressBarRegistrationEvent.class)%>', {
                 gameId: ${requestScope.gameId}
             });
@@ -96,6 +100,9 @@
         --%>
 
         window.testProgressBar = function () {
+            const PushSocket = CodeDefenders.classes.PushSocket;
+            const pushSocket = CodeDefenders.objects.pushSocket;
+
             setProgress(16, 'Submitting Test');
             registerTestProgressBar();
 

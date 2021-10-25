@@ -115,7 +115,7 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/push_notifications.jsp"/>
+<jsp:include page="/jsp/push_socket.jsp"/>
 
 <div id="game-container" class="container-fluid">
 
