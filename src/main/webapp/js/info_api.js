@@ -28,7 +28,7 @@ class InfoApi {
      * @returns {Promise<object>} A promise containing the response.
      */
     static async fetchJSON (url) {
-        let response = await fetch(url, {
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -37,7 +37,7 @@ class InfoApi {
         if (!response.ok) {
             return Promise.reject();
         }
-        let json = await response.json();
+        const json = await response.json();
         return Promise.resolve(json);
     }
 

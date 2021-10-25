@@ -3,6 +3,7 @@ window.CodeDefenders = {
         ClassViewer: null,
         CodeCompletion: null,
         ErrorHighlighting: null,
+        GameChat: null,
         GameHighlighting: null,
         InfoApi: null,
         Modal: null,
@@ -14,6 +15,7 @@ window.CodeDefenders = {
     },
     objects: {
         classViewer: null,
+        gameChat: null,
         gameHighlighting: null,
         mutantAccordion: null,
         mutantEditor: null,
