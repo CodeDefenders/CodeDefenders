@@ -45,19 +45,21 @@ class GameChat {
     static Messages = class Messages {
         /**
          * @param {GameChat} gameChat The instance of the outer class.
-         * @param {HTMLDivElement} messagesElement The div containing the message elements.
-         * @param {HTMLDivElement} containerElement The scrollable container containing the messagesEl element.
          */
-        constructor (gameChat, messagesElement, containerElement) {
+        constructor (gameChat) {
             this.gameChat = gameChat;
 
-            this.messages = [];
             /**
+             * Stored messages. Past messages are fetched on initialization; new messages are received via WebSocket.
+             * @type {GameChatMessage[]}
+             */
+            this.messages = [];
+
+            /**
+             * Filter function that decides which messages are displayed.
              * @type {function(GameChatMessage): boolean}
              */
             this.filter = Messages.FILTER_ALL;
-            this.messagesElement = messagesElement;
-            this.containerElement = containerElement;
         }
 
         /**
@@ -88,7 +90,7 @@ class GameChat {
             for (const message of messages) {
                 this.messages.push(message);
                 if (this.filter.call(this, message)) {
-                    this.messagesElement.appendChild(this.renderMessage(message));
+                    this.gameChat.messagesElement.appendChild(this.renderMessage(message));
                 }
             }
 
@@ -105,7 +107,7 @@ class GameChat {
             this.messages.push(message);
             if (this.filter.call(this, message)) {
                 const wasScrolledToBottom = this.isScrolledToBottom();
-                this.messagesElement.appendChild(this.renderMessage(message));
+                this.gameChat.messagesElement.appendChild(this.renderMessage(message));
                 if (wasScrolledToBottom) {
                     this.scrollToBottom();
                 }
@@ -116,11 +118,11 @@ class GameChat {
          * Clears the displayed messages and redraws them, filtering them according to the set filter.
          */
         redraw () {
-            this.messagesElement.innerHTML = '';
+            this.gameChat.messagesElement.innerHTML = '';
 
             const messages = this.messages.filter(this.filter);
             for (const message of messages) {
-                this.messagesElement.appendChild(this.renderMessage(message));
+                this.gameChat.messagesElement.appendChild(this.renderMessage(message));
             }
 
             this.scrollToBottom();
@@ -130,14 +132,16 @@ class GameChat {
          * Checks whether the container element is scrolled all the way to the bottom.
          */
         isScrolledToBottom () {
-            return this.containerElement.scrollTop === this.containerElement.scrollHeight - this.containerElement.clientHeight;
+            const container = this.gameChat.messagesContainerElement;
+            return container.scrollTop === (container.scrollHeight - container.clientHeight);
         }
 
         /**
          * Scrolls the container element all the way to the bottom.
          */
         scrollToBottom () {
-            this.containerElement.scrollTop = this.containerElement.scrollHeight;
+            const container = this.gameChat.messagesContainerElement;
+            container.scrollTop = container.scrollHeight;
         }
 
         /**
@@ -269,9 +273,22 @@ class GameChat {
         constructor (gameChat, channelElement) {
             this.gameChat = gameChat;
 
-            this.channelElement = channelElement;
+            /**
+             * Whether the channel is set to all-chat or team-chat.
+             * @type {boolean}
+             */
             this.allChat = false;
+
+            /**
+             * Whether the channel is currently overridden.
+             * @type {boolean}
+             */
             this.override = false;
+
+            /**
+             * Whether the channel is overridden with all-chat or team-chat.
+             * @type {boolean}
+             */
             this.overrideValue = false;
         }
 
@@ -339,9 +356,9 @@ class GameChat {
          */
         updateButton () {
             if (this.isAllChat()) {
-                this.channelElement.textContent = Channel.CHANNEL_ALL;
+                this.gameChat.channelElement.textContent = Channel.CHANNEL_ALL;
             } else {
-                this.channelElement.textContent = Channel.CHANNEL_TEAM;
+                this.gameChat.channelElement.textContent = Channel.CHANNEL_TEAM;
             }
         }
 
@@ -375,7 +392,10 @@ class GameChat {
         constructor(gameChat, countElement) {
             this.gameChat = gameChat;
 
-            this.countElement = countElement;
+            /**
+             * The count of unread messages.
+             * @type {number}
+             */
             this.count = 0;
         }
 
@@ -384,15 +404,17 @@ class GameChat {
          * @param {number} count The count to set.
          */
         setCount (count) {
+            const countElement = this.gameChat.countElement;
+
             this.count = count;
             if (count > 0) {
-                this.countElement.classList.remove('bg-secondary');
-                this.countElement.classList.add('bg-warning');
+                countElement.classList.remove('bg-secondary');
+                countElement.classList.add('bg-warning');
             } else {
-                this.countElement.classList.remove('bg-warning');
-                this.countElement.classList.add('bg-secondary');
+                countElement.classList.remove('bg-warning');
+                countElement.classList.add('bg-secondary');
             }
-            this.countElement.textContent = String(count);
+            countElement.textContent = String(count);
         }
 
         getCount () {
@@ -410,8 +432,6 @@ class GameChat {
          */
         constructor(gameChat, inputElement) {
             this.gameChat = gameChat;
-
-            this.inputElement = inputElement;
         }
 
         /**
@@ -419,7 +439,7 @@ class GameChat {
          * In order for this method to work, the text area has to be ready and visible.
          */
         init () {
-            this.inputElement.value = '';
+            this.gameChat.inputElement.value = '';
             this.resize();
         }
 
@@ -427,13 +447,13 @@ class GameChat {
          *  Resizes the text area to its text. (adopted from https://stackoverflow.com/a/36958094/9360382).
          */
         resize () {
-            const textarea = this.inputElement;
+            const textarea = this.gameChat.inputElement;
 
             /* Shrink the text area to one line. */
             textarea.style['height'] = '0px';
 
             /* Grow the text area. */
-            const style = window.getComputedStyle(this.inputElement);
+            const style = window.getComputedStyle(textarea);
             const newHeight = textarea.scrollHeight         /* text height incl. padding */
                     + parseFloat(style.borderTopWidth)
                     + parseFloat(style.borderBottomWidth);
@@ -443,12 +463,20 @@ class GameChat {
             textarea.style['margin-top'] = newMargin + 'px';
         }
 
+        /**
+         * Returns the input's text.
+         * @return {string}
+         */
         getText () {
-            return this.inputElement.value;
+            return this.gameChat.inputElement.value;
         }
 
+        /**
+         * Sets the input's text.
+         * @param {string} text
+         */
         setText (text) {
-            this.inputElement.value = text;
+            this.gameChat.inputElement.value = text;
             this.resize();
         }
 
@@ -468,11 +496,17 @@ class GameChat {
         }
 
         // TODO: Get the command string from the enum.
+        /**
+         * @type {string}
+         */
         static get COMMAND_ALL () {
             return 'all';
         }
 
         // TODO: Get the command string from the enum.
+        /**
+         * @type {string}
+         */
         static get COMMAND_TEAM () {
             return 'team';
         }
