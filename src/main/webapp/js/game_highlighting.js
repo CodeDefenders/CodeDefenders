@@ -31,13 +31,13 @@ class GameHighlighting {
 
         /**
          * Maps mutant ids to their mutant DTO.
-         * @type {Map<number, object>}
+         * @type {Map<number, GHMutantDTO>}
          * @private
          */
         this._mutants = new Map(data.mutants);
         /**
          * Maps tests ids to their test DTO.
-         * @type {Map<number, object>}
+         * @type {Map<number, GHTestDTO>}
          * @private
          */
         this._tests = new Map(data.tests);
@@ -130,7 +130,7 @@ class GameHighlighting {
     /**
      * Creates the HTML element that displays the mutant icons for one line.
      * @param {number} line The line number (starting at 1).
-     * @param {object[]} mutantsOnLine The mutants that modify the line.
+     * @param {GHMutantDTO[]} mutantsOnLine The mutants that modify the line.
      * @return {HTMLElement} The mutant icons.
      * @private
      */
@@ -311,7 +311,7 @@ class GameHighlighting {
 
     /**
      * Creates the button with which to flag mutants as equivalent.
-     * @param line The line number.
+     * @param {number} line The line number.
      * @return {string} The equivalence button.
      * @private
      */
@@ -331,7 +331,7 @@ class GameHighlighting {
 
     /**
      * Creates a disabled equivalence button with a tooltip explaining that the line needs to be covered first.
-     * @param line The line number.
+     * @param {number} line The line number.
      * @return {string} The equivalence button.
      * @private
      */

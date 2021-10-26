@@ -52,7 +52,7 @@ class MutantEditor {
         this.editableLinesEnd = editableLinesEnd;
         /**
          * Initial number of lines. Used to calculate the editable lines after the text has been edited.
-         * @type {null}
+         * @type {?number}
          */
         this.initialNumLines = null;
 

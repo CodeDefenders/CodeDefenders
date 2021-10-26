@@ -52,6 +52,9 @@ class GameChat {
             this.gameChat = gameChat;
 
             this.messages = [];
+            /**
+             * @type {function(GameChatMessage): boolean}
+             */
             this.filter = Messages.FILTER_ALL;
             this.messagesElement = messagesElement;
             this.containerElement = containerElement;
@@ -68,7 +71,7 @@ class GameChat {
 
         /**
          * Replaces the messages with the given messages and displays the messages passing the currently set filter.
-         * @param {object[]} messages The new messages.
+         * @param {GameChatMessage[]} messages The new messages.
          */
         setMessages (messages) {
             this.messages = [...messages];
@@ -77,7 +80,7 @@ class GameChat {
 
         /**
          * Adds new messages and displays the messages passing the currently set filter.
-         * @param {object[]} messages The new messages.
+         * @param {GameChatMessage[]} messages The new messages.
          */
         addMessages (messages) {
             const wasScrolledToBottom = this.isScrolledToBottom();
@@ -96,7 +99,7 @@ class GameChat {
 
         /**
          * Adds a new message and displays it if it passes the currently set filter.
-         * @param {object} message The new messages.
+         * @param {GameChatMessage} message The new messages.
          */
         addMessage (message) {
             this.messages.push(message);
@@ -139,7 +142,7 @@ class GameChat {
 
         /**
          * Creates a DOM element for a message and caches it. Returns the cached element if present.
-         * @param {object} message The message.
+         * @param {GameChatMessage} message The message.
          * @return {HTMLDivElement} The rendered message.
          */
         renderMessage (message) {
@@ -182,10 +185,10 @@ class GameChat {
 
             message._cache = msgDiv;
             return msgDiv;
-        };
+        }
 
         /**
-         * Fetches the messages for the game from the API and replaces any stored messages with them.
+         * Fetches the messages for the game from the API and adds them.
          */
         async fetch () {
             const response = await fetch(this.gameChat.apiUrl, {
@@ -203,6 +206,7 @@ class GameChat {
 
         /**
          * Filter to show all message.
+         * @type {function(GameChatMessage): boolean}
          */
         static get FILTER_ALL () {
             return _ => true;
@@ -210,6 +214,7 @@ class GameChat {
 
         /**
          * Filter to show messages from the perspective of the attacker team.
+         * @type {function(GameChatMessage): boolean}
          */
         static get FILTER_ATTACKERS () {
             return message => message.system
@@ -219,6 +224,7 @@ class GameChat {
 
         /**
          * Filter to show messages from the perspective of the defender team.
+         * @type {function(GameChatMessage): boolean}
          */
         static get FILTER_DEFENDERS () {
             return message => message.system
@@ -228,6 +234,7 @@ class GameChat {
 
         /**
          * Message to show on WebSocket connect.
+         * @type {GameChatMessage}
          */
         static get SYSTEM_MESSAGE_CONNECT () {
             return {system: true, message: 'Connected to chat.'};
@@ -235,6 +242,7 @@ class GameChat {
 
         /**
          * Message to show on WebSocket disconnect.
+         * @type {GameChatMessage}
          */
         static get SYSTEM_MESSAGE_DISCONNECT () {
             return {system: true, message: 'Disconnected from chat.'};
@@ -242,6 +250,7 @@ class GameChat {
 
         /**
          * Message to show on failing to fetch the existing messages from the API.
+         * @type {GameChatMessage}
          */
         static get SYSTEM_MESSAGE_FAILED_LOAD () {
             return {system: true, message: 'Could not load chat messages.'};
@@ -311,7 +320,7 @@ class GameChat {
 
         /**
          * Sets the override by the command that is currently typed in the chat.
-         * @param command The typed command.
+         * @param {?string} command The typed command.
          */
         setOverrideByCommand (command) {
             if (command === GameChat.ChatInput.COMMAND_ALL) {
@@ -446,6 +455,7 @@ class GameChat {
         /**
          * If the text area's text starts with a command (a word prefixed with a '/'),
          * returns the word making up the command.
+         * @return {?string}
          */
         getCommand () {
             const text = this.getText().trimStart();
@@ -469,8 +479,8 @@ class GameChat {
     }
 
     /**
-     * Sends a message.
-     * @param {object} message The message to be sent.
+     * Sends a message to the server.
+     * @param {GameChatMessage} message The message to be sent.
      * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
      */
     sendMessage (message, isAllChat) {
@@ -490,6 +500,7 @@ class GameChat {
             this.messageCount.setCount(this.messageCount.getCount() + 1);
         }
         this.messages.addMessage({
+            system: false,
             isAllChat: serverChatEvent.isAllChat,
             role: serverChatEvent.role,
             senderId: serverChatEvent.senderId,

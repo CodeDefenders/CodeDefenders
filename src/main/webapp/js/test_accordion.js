@@ -12,12 +12,12 @@ class TestAccordion {
     constructor (categories, tests) {
         /**
          * The categories of tests to display, i.e. one category per method + all.
-         * @type {object[]}
+         * @type {TestAccordionCategory[]}
          */
         this.categories = categories;
         /**
          * Maps test ids to their test DTO.
-         * @type {Map<number, object>}
+         * @type {Map<number, TestDTO>}
          */
         this.tests = tests
 
@@ -60,7 +60,7 @@ class TestAccordion {
     /**
      * Creates a modal to display the given test and shows it.
      * References to created models are cached so they don't need to be generated again.
-     * @param {object} test The test DTO to display.
+     * @param {TestDTO} test The test DTO to display.
      * @private
      */
     _viewTestModal (test) {

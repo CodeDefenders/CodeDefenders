@@ -16,12 +16,12 @@ class MutantAccordion {
     constructor (categories, mutants, flaggingUrl, gameId) {
         /**
          * The categories of mutants to display, i.e. one category per method + all + outside methods.
-         * @type {object[]}
+         * @type {MutantAccordionCategory[]}
          */
         this.categories = categories;
         /**
          * Maps mutant ids to their mutant DTO.
-         * @type {Map<number, object>}
+         * @type {Map<number, MutantDTO>}
          */
         this.mutants = mutants
 
@@ -52,7 +52,7 @@ class MutantAccordion {
 
         /**
          * Maps category ids to the datatable that displays the category.
-         * @type {Map<number, object>}
+         * @type {Map<number, DataTable>}
          */
         this.dataTablesByCategory = new Map();
 
@@ -63,7 +63,7 @@ class MutantAccordion {
     /**
      * Creates a modal to display the given mutant and shows it.
      * References to created models are cached in a map so they don't need to be generated again.
-     * @param {object} mutant The mutant DTO to display.
+     * @param {MutantDTO} mutant The mutant DTO to display.
      * @private
      */
     _viewMutantModal (mutant) {
@@ -102,7 +102,7 @@ class MutantAccordion {
     /**
      * Creates a modal to display the given mutant's killing tests and kill message.
      * References to created models are cached in a map so they don't need to be generated again.
-     * @param {object} mutant The mutant DTO for which to display the test.
+     * @param {MutantDTO} mutant The mutant DTO for which to display the test.
      * @private
      */
     _viewTestModal (mutant) {

@@ -41,7 +41,7 @@ class PushSocket {
 
         /**
          * A queue to buffer messages and send them once the connection has been established.
-         * @type {{type: string, data: object}[]}
+         * @type {PushSocketMessage[]}
          */
         this.queue = [];
 

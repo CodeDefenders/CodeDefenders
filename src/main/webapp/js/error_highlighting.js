@@ -3,7 +3,7 @@
 
 class ErrorHighlighting {
     /**
-     * @param errorLines
+     * @param {number[]} errorLines
      *      Given by [JSON.parse('${mutantErrorHighlighting.errorLinesJSON}')]
      */
     constructor (errorLines) {
