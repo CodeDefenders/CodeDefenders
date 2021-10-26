@@ -268,9 +268,8 @@ class GameChat {
     static Channel = class Channel {
         /**
          * @param {GameChat} gameChat The instance of the outer class.
-         * @param {HTMLSpanElement} channelElement The element displaying the channel
          */
-        constructor (gameChat, channelElement) {
+        constructor (gameChat) {
             this.gameChat = gameChat;
 
             /**
@@ -387,9 +386,8 @@ class GameChat {
     static MessageCount = class MessageCount {
         /**
          * @param {GameChat} gameChat The instance of the outer class.
-         * @param {HTMLSpanElement} countElement The element containing the message count.
          */
-        constructor(gameChat, countElement) {
+        constructor(gameChat) {
             this.gameChat = gameChat;
 
             /**
@@ -514,7 +512,7 @@ class GameChat {
 
     /**
      * Sends a message to the server.
-     * @param {GameChatMessage} message The message to be sent.
+     * @param {string} message The message to be sent.
      * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
      */
     sendMessage (message, isAllChat) {
@@ -594,13 +592,13 @@ class GameChat {
             }
         }).observe(this.chatElement, {attributes: true});
 
-        this.messages = new GameChat.Messages(this, this.messagesElement, this.messagesContainerElement);
+        this.messages = new GameChat.Messages(this);
         this.messages.fetch();
 
-        this.messageCount = new GameChat.MessageCount(this, this.countElement);
+        this.messageCount = new GameChat.MessageCount(this);
         this.messageCount.setCount(0);
 
-        this.channel = new GameChat.Channel(this, this.channelElement);
+        this.channel = new GameChat.Channel(this);
         this.channel.setAllChat(false);
     }
 
@@ -613,17 +611,17 @@ class GameChat {
         const self = this;
 
         /* Resize after typing. Override message channel when "/all " or "/team " is entered. */
-        this.input.inputElement.addEventListener('input', function (event) {
+        this.inputElement.addEventListener('input', function (event) {
             self.input.resize();
             self.channel.setOverrideByCommand(self.input.getCommand());
         });
-        this.input.inputElement.addEventListener('paste', function (event) {
+        this.inputElement.addEventListener('paste', function (event) {
             self.input.resize();
             self.channel.setOverrideByCommand(self.input.getCommand());
         });
 
         /* Submit message on enter. */
-        this.input.inputElement.addEventListener('keypress', function (event) {
+        this.inputElement.addEventListener('keypress', function (event) {
             if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) {
                 event.preventDefault();
                 const message = self.input.getText().trim();

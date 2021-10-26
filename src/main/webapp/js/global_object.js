@@ -9,9 +9,12 @@ window.CodeDefenders = {
         Modal: null,
         MutantAccordion: null,
         MutantEditor: null,
+        MutantProgressBar: null,
         PushSocket: null,
+        ProgressBar: null,
         TestAccordion: null,
-        TestEditor: null
+        TestEditor: null,
+        TestProgressBar: null
     },
     objects: {
         classViewer: null,
@@ -20,9 +23,11 @@ window.CodeDefenders = {
         mutantAccordion: null,
         mutantEditor: null,
         mutantErrorHighlighting: null,
+        mutantProgressBar: null,
         testAccordion: null,
         testEditor: null,
         testErrorHighlighting: null,
+        testProgressBar: null,
         pushSocket: null
     }
 };

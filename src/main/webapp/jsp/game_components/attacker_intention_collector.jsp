@@ -33,7 +33,7 @@ function updateAttackForm(value){
  	// Disabled for #638. This function might have been deleted/refactored in some other commit
     // progressBar();
  	// Disabled for #490
-    /* registerMutantProgressBar(); */
+    /* CodeDefenders.objects.mutantProgressBar.activate(); */
     theForm.submit();
     attackButton.disabled = true;
 }
