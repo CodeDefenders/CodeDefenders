@@ -24,7 +24,7 @@ class InfoApi {
     /**
      * Fetches an object from a given JSON API.
      * @async
-     * @param url The URL to fetch from.
+     * @param {string} url The URL to fetch from.
      * @returns {Promise<object>} A promise containing the response.
      */
     static async fetchJSON (url) {
@@ -37,8 +37,7 @@ class InfoApi {
         if (!response.ok) {
             return Promise.reject();
         }
-        const json = await response.json();
-        return Promise.resolve(json);
+        return await response.json();
     }
 
     static async getClassInfo (classId) {

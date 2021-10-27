@@ -10,8 +10,9 @@ window.CodeDefenders = {
         MutantAccordion: null,
         MutantEditor: null,
         MutantProgressBar: null,
-        PushSocket: null,
         ProgressBar: null,
+        PushSocket: null,
+        PuzzleAPI: null,
         TestAccordion: null,
         TestEditor: null,
         TestProgressBar: null
@@ -24,10 +25,10 @@ window.CodeDefenders = {
         mutantEditor: null,
         mutantErrorHighlighting: null,
         mutantProgressBar: null,
+        pushSocket: null,
         testAccordion: null,
         testEditor: null,
         testErrorHighlighting: null,
-        testProgressBar: null,
-        pushSocket: null
+        testProgressBar: null
     }
 };

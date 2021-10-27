@@ -57,13 +57,14 @@
         </thead>
     </table>
 
-    <jsp:include page="/jsp/api/puzzle-api.jsp"/>
+    <script type="text/javascript" src="js/puzzle_api.js"></script>
+
     <script type="text/javascript">
         let puzzleTable;
         let chapterTable;
 
         $(document).ready(async function() {
-            const puzzleData = await PuzzleAPI.fetchPuzzleData();
+            const puzzleData = await CodeDefenders.classes.PuzzleAPI.fetchPuzzleData();
 
             const chapters = puzzleData.puzzleChapters;
             if (chapters) {
@@ -292,19 +293,19 @@
         function updatePuzzleChapter(puzzleChapterId, row) {
             let updateChapterData = {
                 id: puzzleChapterId,
-                title: String(document.getElementById(`titleForPuzzleChapter` + puzzleChapterId).value),
-                description: String(document.getElementById(`descriptionForPuzzleChapter` + puzzleChapterId).value),
-                position: parseIntOrNull(document.getElementById(`positionForPuzzleChapter` + puzzleChapterId).value)
+                title: String(document.getElementById(`titleForPuzzleChapter\${puzzleChapterId}`).value),
+                description: String(document.getElementById(`descriptionForPuzzleChapter\${puzzleChapterId}`).value),
+                position: parseIntOrNull(document.getElementById(`positionForPuzzleChapter\${puzzleChapterId}`).value)
             };
 
-            PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
+            CodeDefenders.classes.PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
                 .then(responseJSON => {
                     chapterTable.row(row).data(updateChapterData);
 
                     // Redraw, so ordering is restored, too.
                     chapterTable.rows().invalidate('data').draw();
                 }).catch(error => {
-                    alert('Puzzle chapter' + puzzleChapterId + ' could not be updated.');
+                    alert(`Puzzle chapter \${puzzleChapterId} could not be updated.`);
             });
         }
 
@@ -312,7 +313,7 @@
             let confirmResult = confirm('Are you sure you want to delete puzzle chapter ' + puzzleChapterId + '?'
                 + ' This will not remove the puzzles of the chapter.');
             if (confirmResult) {
-                PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
+                CodeDefenders.classes.PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
                     .then(responseJSON => {
                         chapterTable.row(row).remove();
 
@@ -320,7 +321,7 @@
                         chapterTable.rows().invalidate('data').draw();
                     }).catch(error => {
                         chapterTable.cell(row, column).node().firstChild.disabled = true;
-                        alert('Puzzle chapter ' + puzzleChapterId + ' could not be removed.');
+                        alert(`Puzzle chapter \${puzzleChapterId} could not be removed.`);
                     });
             }
         }
@@ -341,21 +342,21 @@
                 editableLinesEnd: parseIntOrNull(document.getElementById(`editableLinesEndForPuzzle` + puzzleId).value)
             };
 
-            PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
+            CodeDefenders.classes.PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
                 .then(responseJSON => {
                     puzzleTable.row(row).data(updatedPuzzleData);
 
                     // Redraw, so ordering is restored, too.
                     puzzleTable.rows().invalidate('data').draw();
                 }).catch(error => {
-                    alert('Puzzle ' + puzzleId + ' could not be updated.');
+                    alert(`Puzzle \${puzzleId} could not be updated.`);
                 });
         }
 
         function removePuzzle(puzzleId, row, column) {
-            let confirmResult = confirm('Are you sure you want to delete puzzle ' + puzzleId + '?');
+            let confirmResult = confirm(`Are you sure you want to delete puzzle \${puzzleId}?`);
             if (confirmResult) {
-                PuzzleAPI.deletePuzzle(puzzleId)
+                CodeDefenders.classes.PuzzleAPI.deletePuzzle(puzzleId)
                     .then(responseJSON => {
                         puzzleTable.row(row).remove();
 
@@ -363,7 +364,7 @@
                         puzzleTable.rows().invalidate('data').draw();
                     }).catch(error => {
                         puzzleTable.cell(row, column).node().firstChild.disabled = true;
-                        alert('Puzzle ' + puzzleId + ' could not be removed.');
+                        alert(`Puzzle \${puzzleId} could not be removed.`);
                 });
             }
         }
