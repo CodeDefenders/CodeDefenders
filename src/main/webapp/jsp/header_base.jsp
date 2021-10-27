@@ -50,7 +50,7 @@
     <script src="webjars/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
     <link href="webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap_customize.css" rel="stylesheet">
-    <script type="text/javascript" src="js/bootstrap-init.js"></script>
+    <script type="text/javascript" src="js/bootstrap_init.js"></script>
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
