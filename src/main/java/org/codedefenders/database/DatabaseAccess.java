@@ -91,47 +91,6 @@ public class DatabaseAccess {
         return DB.executeQueryReturnList(query, DatabaseAccess::getEventsWithMessage, values);
     }
 
-    public static List<Event> getEventsForUser(int userId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM events ",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ",
-                "WHERE Event_Status!='DELETED' ",
-                "  AND Player_ID=?;");
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, DatabaseValue.of(userId));
-    }
-
-    public static List<Event> getNewEventsForUser(int userId, long time) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM events ",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ",
-                "WHERE Player_ID=?",
-                "  AND Event_Status<>?",
-                "  AND Event_Status<>? ",
-                "  AND Timestamp >= FROM_UNIXTIME(?)");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(EventStatus.DELETED.toString()),
-                DatabaseValue.of(EventStatus.GAME.toString()),
-                DatabaseValue.of(time)};
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
-    }
-
-    private static Event getEvents(ResultSet rs) throws SQLException {
-        Event event = new Event(
-                rs.getInt("events.Event_ID"),
-                rs.getInt("Game_ID"),
-                rs.getInt("Player_ID"),
-                rs.getString("em.Message"),
-                rs.getString("events.Event_Type"),
-                rs.getString("Event_Status"),
-                rs.getTimestamp("Timestamp"));
-        return event;
-    }
-
     private static Event getEventsWithMessage(ResultSet rs) throws SQLException {
         Event event = new Event(
                 rs.getInt("events.Event_ID"),

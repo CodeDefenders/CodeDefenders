@@ -24,5 +24,4 @@ package org.codedefenders.model;
 public enum NotificationType {
     PUSHEVENT,
     GAMEEVENT,
-    USEREVENT
 }

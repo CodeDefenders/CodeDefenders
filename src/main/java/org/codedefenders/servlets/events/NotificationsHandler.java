@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -87,9 +85,6 @@ public class NotificationsHandler extends HttpServlet {
                 break;
             case GAMEEVENT:
                 handleGameEventRequest(request, response);
-                break;
-            case USEREVENT:
-                handleUserEventRequest(request, response);
                 break;
             default:
                 logger.error("Received request with wrong request type: " + type.name());
@@ -200,8 +195,6 @@ public class NotificationsHandler extends HttpServlet {
         final ArrayList<Event> events = new ArrayList<>(eventDAO.getNewEventsForGame(gameId, timestamp, role));
 
 
-
-
         for (Event e : events) {
 
             if (e.getUserId() == Constants.DUMMY_CREATOR_USER_ID) {
@@ -218,49 +211,5 @@ public class NotificationsHandler extends HttpServlet {
         PrintWriter out = response.getWriter();
         out.print(gson.toJson(events));
         out.flush();
-    }
-
-    /**
-     * Handles a user event request, which requires the following URL parameters:
-     * <ul>
-     * <li><code>timestamp</code></li>
-     * </ul>
-     * If parameters are valid, responds with a JSON list of most recent user
-     * {@link Event Events}.
-     */
-    @SuppressWarnings("Duplicates")
-    private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final String timestampString = request.getParameter("timestamp");
-        if (timestampString == null) {
-            response.setStatus(400);
-            logger.error("User Event: Missing parameter timestamp.");
-            return;
-        }
-        long timestamp;
-        try {
-            timestamp = Long.parseLong(timestampString);
-        } catch (NumberFormatException e) {
-            response.setStatus(400);
-            logger.error("User Event: Error trying to format timestamp.", e);
-            return;
-        }
-
-        try {
-            // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need
-            // for extra check
-            final List<Event> events = DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp).stream()
-                    .peek(event -> event.setCurrentUserName(login.getUser().getUsername()))
-                    .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME, userService))
-                    .collect(Collectors.toList());
-
-            PrintWriter out = response.getWriter();
-            out.print(gson.toJson(events));
-            out.flush();
-        } catch (NullPointerException e) {
-            logger.info("" + DatabaseAccess.getNewEventsForUser(login.getUserId(), timestamp));
-            logger.error("NPE: " + e);
-
-        }
-
     }
 }
