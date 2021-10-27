@@ -7,7 +7,7 @@ class PuzzleAPI {
      * @async
      * @param {string} url The URL to fetch from.
      * @param {string} method The method to use for the request.
-     * @param {object=null} body An optional body to be included in the request.
+     * @param {object=} body An optional body to be included in the request.
      * @returns {Promise<object>} A promise containing the response.
      */
     static async requestJSON (url, method, body = null) {

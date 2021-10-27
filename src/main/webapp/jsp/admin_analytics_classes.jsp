@@ -65,15 +65,18 @@
     </div>
 </div>
 
-<script src="js/datatables-utils.js" type="text/javascript" ></script>
+<script src="js/datatables_utils.js" type="text/javascript" ></script>
 
 <script>
 (function () {
+    const DataTablesUtils = CodeDefenders.classes.DataTablesUtils;
+    const div = DataTablesUtils.formatDivision;
+    const valPercent = DataTablesUtils.formatValueAndPercent;
 
     function format(data) {
-        var rating1 = data.ratings.cutMutationDifficulty;
-        var rating2 = data.ratings.cutTestDifficulty;
-        var rating3 = data.ratings.gameEngaging;
+        const rating1 = data.ratings.cutMutationDifficulty;
+        const rating2 = data.ratings.cutTestDifficulty;
+        const rating3 = data.ratings.gameEngaging;
 
         return '' +
             `<div class="child-row-wrapper">
@@ -86,11 +89,11 @@
                     <tbody>
                         <tr>
                             <td>Attacker Wins:</td>
-                            <td>\${dtValAndPercent(data.attackerWins, data.nrGames)}</td>
+                            <td>\${valPercent(data.attackerWins, data.nrGames)}</td>
                         </tr>
                         <tr>
                             <td>Defender Wins:</td>
-                            <td>\${dtValAndPercent(data.defenderWins, data.nrGames)}</td>
+                            <td>\${valPercent(data.defenderWins, data.nrGames)}</td>
                         </tr>
                     </tbody>
                     <thead>
@@ -101,19 +104,19 @@
                     <tbody>
                         <tr>
                             <td>Mutation Difficulty:</td>
-                            <td>\${dtDiv(rating1.sum, rating1.count, 'NA')}</td>
+                            <td>\${div(rating1.sum, rating1.count, 'NA')}</td>
                             <td>Number of votes:</td>
                             <td>\${rating1.count}</td>
                         </tr>
                         <tr>
                             <td>Test Difficulty:</td>
-                            <td>\${dtDiv(rating2.sum, rating2.count, 'NA')}</td>
+                            <td>\${div(rating2.sum, rating2.count, 'NA')}</td>
                             <td>Number of votes:</td>
                             <td>\${rating2.count}</td>
                         </tr>
                         <tr>
                             <td>Game is engaging:</td>
-                            <td>\${dtDiv(rating3.sum, rating3.count, 'NA')}</td>
+                            <td>\${div(rating3.sum, rating3.count, 'NA')}</td>
                             <td>Number of votes:</td>
                             <td>\${rating3.count}</td>
                         </tr>
@@ -126,15 +129,15 @@
                     <tbody>
                         <tr>
                             <td>Mutants Alive:</td>
-                            <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
+                            <td>\${valPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
                             <td>Per Game:</td>
-                            <td>\${dtDiv(data.mutantsAlive, data.nrGames)}</td>
+                            <td>\${div(data.mutantsAlive, data.nrGames)}</td>
                         </tr>
                         <tr>
                             <td>Mutants Equivalent:</td>
-                            <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
+                            <td>\${valPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
                             <td>Per Game:</td>
-                            <td>\${dtDiv(data.mutantsEquivalent, data.nrGames)}</td>
+                            <td>\${div(data.mutantsEquivalent, data.nrGames)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -164,13 +167,13 @@
                 { "data": "testsSubmitted" },
                 { "data":
                         function (row, type, val, meta) {
-                            return dtDiv(row.testsSubmitted, row.nrGames);
+                            return DataTablesUtils.formatDivision(row.testsSubmitted, row.nrGames);
                         }
                 },
                 { "data": "mutantsSubmitted" },
                 { "data":
                         function (row, type, val, meta) {
-                            return dtDiv(row.mutantsSubmitted, row.nrGames);
+                            return DataTablesUtils.formatDivision(row.mutantsSubmitted, row.nrGames);
                         }
                 }
             ],
@@ -182,7 +185,7 @@
             "language": {"info": "Showing _TOTAL_ entries"}
         });
 
-        setupChildRows(table, format);
+        DataTablesUtils.setupChildRows(table, format);
     });
 
 })();

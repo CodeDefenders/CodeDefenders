@@ -2,6 +2,7 @@ window.CodeDefenders = {
     classes: {
         ClassViewer: null,
         CodeCompletion: null,
+        DataTablesUtils: null,
         ErrorHighlighting: null,
         GameChat: null,
         GameHighlighting: null,
