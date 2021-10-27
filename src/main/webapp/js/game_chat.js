@@ -2,7 +2,6 @@
 (function () {
 
 class GameChat {
-
     /**
      * @param gameId
      *      Given by [${gameChat.gameId}]
@@ -10,14 +9,11 @@ class GameChat {
      *      Given by ['${gameChat.chatApiUrl}']
      * @param messageLimit
      *      Given by [${gameChat.messageLimit}]
-     * @param eventNames
-     *      Given by [${eventNames....}]
      */
-    constructor (gameId, apiUrl, messageLimit, eventNames) {
+    constructor (gameId, apiUrl, messageLimit) {
         this.gameId = gameId;
         this.apiUrl = apiUrl;
         this.messageLimit = messageLimit;
-        this.eventNames = eventNames;
 
         /* Used DOM elements. */
         this.chatElement = null;
@@ -516,7 +512,7 @@ class GameChat {
      * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
      */
     sendMessage (message, isAllChat) {
-        CodeDefenders.objects.pushSocket.send(this.eventNames.CLIENT_CHAT_EVENT, {
+        CodeDefenders.objects.pushSocket.send('chat.ClientGameChatEvent', {
             gameId: this.gameId,
             allChat: isAllChat,
             message
@@ -738,9 +734,9 @@ class GameChat {
 
         const PushSocket = CodeDefenders.classes.PushSocket;
         const pushSocket = CodeDefenders.objects.pushSocket;
-        pushSocket.subscribe(this.eventNames.GAME_CHAT_REGISTRATION_EVENT, {gameId: this.gameId});
-        pushSocket.register(this.eventNames.SERVER_CHAT_EVENT, this._onChatMessage.bind(this));
-        pushSocket.register(this.eventNames.SERVER_SYSTEM_CHAT_EVENT, this._onSystemMessage.bind(this));
+        pushSocket.subscribe('registration.GameChatRegistrationEvent', {gameId: this.gameId});
+        pushSocket.register('chat.ServerGameChatEvent', this._onChatMessage.bind(this));
+        pushSocket.register('chat.ServerSystemChatEvent', this._onSystemMessage.bind(this));
         pushSocket.register(PushSocket.WSEventType.CLOSE,
                 () => self.messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_DISCONNECT));
         pushSocket.register(PushSocket.WSEventType.OPEN, () =>

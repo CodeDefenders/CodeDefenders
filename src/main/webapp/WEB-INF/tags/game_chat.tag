@@ -1,11 +1,7 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%@ tag import="org.codedefenders.game.Role" %>
-<%@ tag import="org.codedefenders.game.ChatCommand" %>
-
 <%--@elvariable id="gameChat" type="org.codedefenders.beans.game.GameChatBean"--%>
-<%--@elvariable id="eventNames" type="org.codedefenders.beans.notification.EventNamesBean"--%>
 
 <c:if test="${gameChat.chatEnabled}">
 
@@ -110,18 +106,11 @@
         const gameId = ${gameChat.gameId};
         const apiUrl = '${gameChat.chatApiUrl}';
         const messageLimit = ${gameChat.messageLimit};
-        const eventNames = {
-            GAME_CHAT_REGISTRATION_EVENT: '${eventNames.gameChatRegistrationEventName}',
-            SERVER_CHAT_EVENT: '${eventNames.serverChatEventName}',
-            SERVER_SYSTEM_CHAT_EVENT: '${eventNames.serverSystemChatEventName}',
-            CLIENT_CHAT_EVENT: '${eventNames.clientChatEventName}'
-        };
 
         CodeDefenders.objects.gameChat = new CodeDefenders.classes.GameChat(
                 gameId,
                 apiUrl,
-                messageLimit,
-                eventNames
+                messageLimit
         );
     });
 </script>
