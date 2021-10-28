@@ -161,6 +161,7 @@
         </c:forEach>
     </div>
 
+    <script type="text/javascript" src="js/modal.js"></script>
     <script type="text/javascript" src="js/mutant_accordion.js"></script>
 
     <script>

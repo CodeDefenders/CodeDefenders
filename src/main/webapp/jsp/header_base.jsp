@@ -95,7 +95,6 @@
 
     <script type="text/javascript" src="js/global_object.js"></script>
     <script type="text/javascript" src="js/info_api.js"></script>
-    <script type="text/javascript" src="js/modal.js"></script>
 </head>
 
 <body>
