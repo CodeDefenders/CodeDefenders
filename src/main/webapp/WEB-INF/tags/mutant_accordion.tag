@@ -169,13 +169,11 @@
         (function () {
             const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
             const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
-            const flaggingUrl = '${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}';
             const gameId = ${mutantAccordion.gameId};
 
             CodeDefenders.objects.mutantAccordion = new CodeDefenders.classes.MutantAccordion(
                     categories,
                     mutants,
-                    flaggingUrl,
                     gameId);
         })();
     </script>

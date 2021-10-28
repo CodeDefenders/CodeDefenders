@@ -43,13 +43,11 @@
     (function () {
         const data = JSON.parse('${gameHighlighting.JSON}');
         const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
-        const flaggingUrl = '${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}';
         const gameId = ${gameHighlighting.gameId};
 
         CodeDefenders.objects.gameHighlighting = new CodeDefenders.classes.GameHighlighting(
                 data,
                 enableFlagging,
-                flaggingUrl,
                 gameId);
 
         CodeDefenders.objects.gameHighlighting.highlightCoverage();

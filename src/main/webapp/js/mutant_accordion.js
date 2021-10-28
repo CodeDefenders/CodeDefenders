@@ -8,12 +8,10 @@ class MutantAccordion {
      *      Given by [JSON.parse('${mutantAccordion.jsonFromCategories()}']
      * @param {Map<number, object>} mutants
      *      Given by [new Map(JSON.parse('${mutantAccordion.jsonMutants()}'))]
-     * @param {string} flaggingUrl
-     *      Given by ['${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}']
      * @param {number} gameId
      *      Given by [${mutantAccordion.gameId}]
      */
-    constructor (categories, mutants, flaggingUrl, gameId) {
+    constructor (categories, mutants, gameId) {
         /**
          * The categories of mutants to display, i.e. one category per method + all + outside methods.
          * @type {MutantAccordionCategory[]}
@@ -26,11 +24,6 @@ class MutantAccordion {
         this.mutants = mutants
 
 
-        /**
-         * URL to POST to for flagging mutants.
-         * @type {string}
-         */
-        this.flaggingUrl = flaggingUrl;
         /**
          * The id of the current game.
          * @type {number}
@@ -307,7 +300,7 @@ class MutantAccordion {
                 if (data.canMarkEquivalent) {
                     if (data.covered) {
                         return `
-                            <form id="equiv" action="${this.flaggingUrl}" method="post"
+                            <form id="equiv" action="equivalence-duels" method="post"
                             onsubmit="return confirm('This will mark all player-created mutants on line(s) ${data.lineString} as equivalent. Are you sure?');">
                                 <input type="hidden" name="formType" value="claimEquivalent">
                                 <input type="hidden" name="equivLines" value="${data.lineString}">

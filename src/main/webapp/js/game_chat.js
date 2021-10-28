@@ -5,14 +5,11 @@ class GameChat {
     /**
      * @param gameId
      *      Given by [${gameChat.gameId}]
-     * @param apiUrl
-     *      Given by ['${gameChat.chatApiUrl}']
      * @param messageLimit
      *      Given by [${gameChat.messageLimit}]
      */
-    constructor (gameId, apiUrl, messageLimit) {
+    constructor (gameId, messageLimit) {
         this.gameId = gameId;
-        this.apiUrl = apiUrl;
         this.messageLimit = messageLimit;
 
         /* Used DOM elements. */
@@ -191,7 +188,7 @@ class GameChat {
          * Fetches the messages for the game from the API and adds them.
          */
         async fetch () {
-            const response = await fetch(this.gameChat.apiUrl, {
+            const response = await fetch(`api/game-chat?gameId=${this.gameChat.gameId}&limit=1000`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

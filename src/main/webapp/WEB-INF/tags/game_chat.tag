@@ -104,14 +104,11 @@
 <script>
     $(document).ready(function() {
         const gameId = ${gameChat.gameId};
-        const apiUrl = '${gameChat.chatApiUrl}';
         const messageLimit = ${gameChat.messageLimit};
 
         CodeDefenders.objects.gameChat = new CodeDefenders.classes.GameChat(
                 gameId,
-                apiUrl,
-                messageLimit
-        );
+                messageLimit);
     });
 </script>
 

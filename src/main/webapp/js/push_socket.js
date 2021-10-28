@@ -26,7 +26,7 @@
  */
 class PushSocket {
     constructor (url) {
-        console.log('Setting up WebSocket at ' + url + '.');
+        console.log(`Setting up WebSocket at ${url}`);
 
         /**
          * The URL to connect the WebSocket to.

@@ -9,12 +9,10 @@ class GameHighlighting {
      *      Given by [JSON.parse('${gameHighlighting.JSON}')]
      * @param {boolean} enableFlagging
      *      Given by [Boolean(${gameHighlighting.enableFlagging})]
-     * @param {string} flaggingUrl
-     *      Given by ['${pageContext.request.contextPath}${Paths.EQUIVALENCE_DUELS_GAME}']
      * @param {number} gameId
      *      Given by [${gameHighlighting.gameId}]
      */
-    constructor(data, enableFlagging, flaggingUrl, gameId) {
+    constructor(data, enableFlagging, gameId) {
         /**
          * Maps line numbers (1-indexed) to ids of mutants with changes on the line.
          * @type {Map<number, number[]>}
@@ -63,12 +61,6 @@ class GameHighlighting {
          * @private
          */
         this._enableFlagging = enableFlagging;
-        /**
-         * URL to POST to for flagging mutants.
-         * @type {string}
-         * @private
-         */
-        this._flaggingUrl = flaggingUrl;
         /**
          * Game id of the current game.
          * @type {number}
@@ -317,7 +309,7 @@ class GameHighlighting {
      */
     _createEquivalenceButton (line) {
         return '' +
-                `<form class="mt-3" id="equiv" action="${this._flaggingUrl}" method="post"
+                `<form class="mt-3" id="equiv" action="equivalence-duels" method="post"
                     onsubmit="return window.confirm('This will mark all player-created mutants on line ${line} as equivalent. Are you sure?')">
                     <input type="hidden" name="formType" value="claimEquivalent">
                     <input type="hidden" name="equivLines" value="${line}">
