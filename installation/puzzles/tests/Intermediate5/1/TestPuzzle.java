@@ -7,6 +7,6 @@ public class TestPuzzle {
   public void test() {
     Puzzle foo = new Puzzle();
     int result = foo.testMe(42, 1);
-    assertEquals(1, result);
+    assertEquals(2, result);
   }
 }
