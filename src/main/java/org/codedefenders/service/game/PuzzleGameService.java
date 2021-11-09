@@ -48,7 +48,8 @@ public class PuzzleGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user) {
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user,
+            Role playerRole) {
         return false;
     }
 
