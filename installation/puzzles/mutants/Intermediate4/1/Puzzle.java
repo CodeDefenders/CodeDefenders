@@ -3,14 +3,13 @@ public class Puzzle {
     public int run(int x, int y) {
         int z = 0;
 
-        if (x % 2 == 0) {
-            if (y % 4 == 0) {
-                z = z + 1;
+        if (x == 5) {
+            z = x;
+            if (y == 7) {
+                z = 0;
             }
-            z = z + 1;
-        }
-        if (z > 0 || x == y) {
-            z = -1;
+        } else {
+            z = x + y;
         }
 
         return z;

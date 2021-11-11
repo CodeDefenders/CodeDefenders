@@ -1,19 +1,19 @@
 public class Puzzle {
 
-    public int testMe(int x, int y) {
-        int a = 1;
-        int b = 1;
+    public int run(int x, int y) {
+        int z = 0;
 
-        if (x == 42) {
-            a = a + 2;
-            y = y * 2;
+        if (x % 2 == 0) {
+            if (y % 4 == 0) {
+                z = z - 1;
+            }
+            z = z + 1;
+        }
+        if (z == 0 || x == y) {
+            z = -1;
         }
 
-        if (y == 100) {
-            b = 2 * a;
-        }
-
-        return a * b;
+        return z;
     }
 
 }

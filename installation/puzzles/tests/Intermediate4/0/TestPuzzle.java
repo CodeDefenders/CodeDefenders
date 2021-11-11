@@ -5,10 +5,9 @@ import static org.junit.Assert.*;
 public class TestPuzzle {
 
     @Test
-    public void test0() {
+    public void test() {
         Puzzle b = new Puzzle();
-        assertEquals(-1, b.run(0, 0));
+        assertEquals(7, b.run(5, 7));
     }
 
 }
-
