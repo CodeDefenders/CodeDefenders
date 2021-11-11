@@ -28,7 +28,6 @@ import com.google.common.net.InetAddresses;
  * <p>The whole authentication logic is handled silently by the parent class {@link FormAuthenticationFilter} which
  * performs a login against the {@link org.codedefenders.auth.CodeDefendersAuthenticatingRealm} with the credentials
  * found in the {@code username} and {@code password} HTML parameters of the POST request.
- *
  */
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
 
@@ -88,6 +87,18 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         }
 
         return false;
+    }
+
+    @Override
+    protected void saveRequest(ServletRequest request) {
+        if (request instanceof HttpServletRequest) {
+            HttpServletRequest httpRequest = (HttpServletRequest) request;
+            // Don't save request in this case because otherwise user is redirected to an API url on successful login
+            if (httpRequest.getRequestURI().startsWith("/api/")) {
+                return;
+            }
+        }
+        super.saveRequest(request);
     }
 
     private String getClientIpAddress(HttpServletRequest request) {
