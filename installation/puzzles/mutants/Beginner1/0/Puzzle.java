@@ -1,4 +1,5 @@
 public class Puzzle {
+
     public int foo(int x) {
         return x - 1;
     }
@@ -6,4 +7,5 @@ public class Puzzle {
     public int bar(int x) {
         return x - 1;
     }
+
 }

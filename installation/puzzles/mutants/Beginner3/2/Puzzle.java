@@ -1,12 +1,14 @@
 public class Puzzle {
-    public int foo(int x) {
-        return bar(-x, -x);
+
+    public int makeNegative(int x) {
+        return min(-x, -x);
     }
 
-    private int bar(int x, int y) {
+    private int min(int x, int y) {
         if (x > y) {
             return y;
         }
         return x;
     }
+
 }

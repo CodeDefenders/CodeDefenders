@@ -1,4 +1,5 @@
 import org.junit.*;
+
 import static org.junit.Assert.*;
 
 public class TestPuzzle {
@@ -8,5 +9,6 @@ public class TestPuzzle {
         Puzzle b = new Puzzle();
         assertEquals(-1, b.run(0, 0));
     }
+
 }
 
