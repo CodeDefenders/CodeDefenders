@@ -239,6 +239,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         if (game.hasUserJoined(login.getUserId())) {
             logger.info("User {} already in the requested game.", login.getUserId());
+            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
             return;
         }
         if (game.addPlayer(login.getUserId())) {
