@@ -273,7 +273,7 @@
             </div>
         </div>
 
-        <div class="form-width">
+        <div class="form-width w-100">
             <t:cut_preview/>
         </div>
     </div>
