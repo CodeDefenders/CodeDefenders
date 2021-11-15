@@ -65,7 +65,6 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="header-user" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         ${login.user.username}
-                        <span id="notification-count" class="badge bg-secondary ms-1"></span>
                     </a>
                     <ul class="dropdown-menu" id="user-dropdown" aria-labelledby="header-user"
                         <%-- Align dropdown menu to the right, so it doesn't get cut off. --%>

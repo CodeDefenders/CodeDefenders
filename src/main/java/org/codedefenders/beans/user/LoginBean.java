@@ -67,9 +67,7 @@ public class LoginBean implements Serializable {
     public void redirectAfterLogin(String redirectURL) {
         if (!redirectURL.endsWith(".ico")
                 && !redirectURL.endsWith(".css")
-                && !redirectURL.endsWith(".js")
-                // #140: after a POST to login we get a 302 to notifications
-                && !redirectURL.contains(Paths.API_NOTIFICATION)) {
+                && !redirectURL.endsWith(".js")) {
             this.redirectURL = redirectURL;
         }
     }

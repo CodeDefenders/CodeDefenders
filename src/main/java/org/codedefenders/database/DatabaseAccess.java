@@ -30,9 +30,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
 
 /**
  * This class handles database logic for functionality which has not
@@ -57,50 +55,6 @@ public class DatabaseAccess {
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId)};
         DB.executeUpdateQuery(query, values);
-    }
-
-    /**
-     * Retrieve the latest (in the past 5 minutes and not yet seen)
-     * events that belong to a game and relate to equivalence duels.
-     */
-    public static List<Event> getNewEquivalenceDuelEventsForGame(int gameId, int lastMessageId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM events",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ",
-                "WHERE Game_ID=?",
-                "  AND Event_Status=?",
-                "  AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?"
-                        + " OR events.Event_Type=? OR events.Event_Type=?) ",
-                "  AND Timestamp >= FROM_UNIXTIME(UNIX_TIMESTAMP()-300) ",
-                "  AND events.Event_ID > ?");
-        // DEFENDER_MUTANT_CLAIMED_EQUIVALENT
-        // EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
-        // ATTACKER_MUTANT_KILLED_EQUIVALENT
-        DatabaseValue[] values = new DatabaseValue[]{
-                // DatabaseValue.of(userId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(EventStatus.GAME.toString()),
-                DatabaseValue.of(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()),
-                DatabaseValue.of(EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT.toString()),
-                DatabaseValue.of(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()),
-                DatabaseValue.of(EventType.PLAYER_MUTANT_EQUIVALENT.toString()),
-                DatabaseValue.of(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
-                DatabaseValue.of(lastMessageId)};
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEventsWithMessage, values);
-    }
-
-    private static Event getEventsWithMessage(ResultSet rs) throws SQLException {
-        Event event = new Event(
-                rs.getInt("events.Event_ID"),
-                rs.getInt("Game_ID"),
-                rs.getInt("Player_ID"),
-                rs.getString("events.Event_Message"),
-                rs.getString("events.Event_Type"),
-                rs.getString("Event_Status"),
-                rs.getTimestamp("Timestamp"));
-        return event;
     }
 
     public static Role getRole(int userId, int gameId) {

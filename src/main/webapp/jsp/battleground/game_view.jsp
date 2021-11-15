@@ -100,5 +100,4 @@ if (game.isCapturePlayersIntention()) {
 }
 %>
 <!-- This corresponds to dispatcher.Dispatch -->
-<jsp:include page="/jsp/game_notifications.jsp"/>
 <%@ include file="/jsp/footer_game.jsp" %>
