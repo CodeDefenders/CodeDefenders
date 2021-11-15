@@ -30,10 +30,7 @@ function updateAttackForm(value){
 	var theForm = document.getElementById('atk');
 
     document.getElementById("attacker_intention").value = value;
- 	// Disabled for #638. This function might have been deleted/refactored in some other commit
-    // progressBar();
- 	// Disabled for #490
-    /* CodeDefenders.objects.mutantProgressBar.activate(); */
+    CodeDefenders.objects.mutantProgressBar.activate();
     theForm.submit();
     attackButton.disabled = true;
 }
