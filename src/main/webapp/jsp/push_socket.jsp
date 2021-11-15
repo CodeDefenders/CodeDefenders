@@ -30,10 +30,6 @@
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
-<%
-    String ticket = (String) request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME);
-%>
-
 <script type="text/javascript" src="js/push_socket.js"></script>
 
 <script>
@@ -42,7 +38,9 @@
         const baseWsUri = document.baseURI
                 .replace(/^http/, 'ws')
                 .replace(/\/$/, '');
-        const wsUri = `\${baseWsUri}/notifications/<%=ticket%>/<%=login.getUserId()%>`;
+        const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
+        const userId = '${login.userId}';
+        const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
         CodeDefenders.objects.pushSocket = new CodeDefenders.classes.PushSocket(wsUri);
     })();
 </script>
