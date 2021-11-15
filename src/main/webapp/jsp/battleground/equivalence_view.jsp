@@ -127,7 +127,7 @@
                 })();
             </script>
 
-            <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
+            <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
             <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
             <form id="equivalenceForm" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
@@ -150,7 +150,7 @@
                             }
                         });
                         document.getElementById("reject-equivalent-button").addEventListener('click', function (event) {
-                            testProgressBar();
+                            CodeDefenders.objects.testProgressBar.activate();
                             this.form['resolveAction'].value = 'reject';
                             this.form.submit();
                             this.disabled = true;

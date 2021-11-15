@@ -20,12 +20,14 @@ package org.codedefenders.servlets.games.melee;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -521,7 +523,7 @@ public class MeleeGameManager extends HttpServlet {
      * @return A list of (1-indexed) line numbers.
      */
     List<Integer> extractErrorLines(String compilerOutput) {
-        List<Integer> errorLines = new ArrayList<>();
+        Set<Integer> errorLines = new TreeSet<>(); // Use TreeSet for the ordering
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
@@ -530,7 +532,7 @@ public class MeleeGameManager extends HttpServlet {
                 errorLines.add(Integer.parseInt(m.group(1)));
             }
         }
-        return errorLines;
+        return new ArrayList<>(errorLines);
     }
 
     /**
@@ -540,21 +542,22 @@ public class MeleeGameManager extends HttpServlet {
      * components.
      */
     String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
-        String jumpFunction = "";
+        String editor = "";
         if (forTest) {
-            jumpFunction = "jumpToTestLine";
+            editor = "CodeDefenders.objects.testEditor";
         } else if (forMutant) {
-            jumpFunction = "jumpToMutantLine";
+            editor = "CodeDefenders.objects.mutantEditor";
         }
 
-        StringBuffer decorated = new StringBuffer();
+        StringBuilder decorated = new StringBuilder();
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // Replace the entire line with a link to the source code
-                String replacedLine = "<a onclick=\"" + jumpFunction + "(" + m.group(1)
-                        + ")\" href=\"javascript:void(0);\">" + line + "</a>";
+                String replacedLine = MessageFormat.format(
+                        "<a onclick=\"{0}.jumpToLine({1});\" href=\"javascript:void(0);\">{2}</a>",
+                        editor, m.group(1), line);
                 decorated.append(replacedLine).append("\n");
             } else {
                 decorated.append(line).append("\n");

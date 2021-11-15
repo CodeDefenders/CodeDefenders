@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="java.util.Map" %>
 
 <%--
     Displays the mutant code in a CodeMirror textarea.
@@ -30,61 +29,78 @@
 <div class="card game-component-resize">
 
     <%-- no dependencies -> no tabs --%>
-    <% if (!mutantEditor.hasDependencies()) { %>
+    <%
+        if (!mutantEditor.hasDependencies()) {
+    %>
 
         <div class="card-body p-0 codemirror-fill">
-            <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant" cols="80" rows="50">${mutantEditor.mutantCode}</textarea></pre>
+            <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
         </div>
 
     <%-- dependencies exist -> tab system --%>
-    <% } else { %>
+    <%
+        } else {
+            int currentId = 0;
+    %>
 
         <div class="card-header">
             <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link py-1 active" data-bs-toggle="tab"
-                            id="${mutantEditor.className}-tab"
-                            data-bs-target="#${mutantEditor.className}"
-                            aria-controls="${mutantEditor.className}"
+                            id="mutant-editor-tab-<%=currentId%>"
+                            data-bs-target="#mutant-editor-pane-<%=currentId%>"
+                            aria-controls="mutant-editor-pane-<%=currentId%>"
                             type="button" role="tab" aria-selected="true">
                         ${mutantEditor.className}
                     </button>
                 </li>
-                <% for (String depName : mutantEditor.getDependencies().keySet()) { %>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link py-1" data-bs-toggle="tab"
-                            id="<%=depName%>-tab"
-                            data-bs-target="#<%=depName%>"
-                            aria-controls="<%=depName%>"
-                            type="button" role="tab" aria-selected="true">
-                        <%=depName%>
-                    </button>
-                </li>
-                <% } %>
+                <%
+                    for (String depName : mutantEditor.getDependencies().keySet()) {
+                        currentId++;
+                %>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link py-1" data-bs-toggle="tab"
+                                id="mutant-editor-tab-<%=currentId%>"
+                                data-bs-target="#mutant-editor-pane-<%=currentId%>"
+                                aria-controls="mutant-editor-pane-<%=currentId%>"
+                                type="button" role="tab" aria-selected="true">
+                            <%=depName%>
+                        </button>
+                    </li>
+                <%
+                    }
+                %>
             </ul>
         </div>
+
+        <%
+            currentId = 0;
+        %>
 
         <div class="card-body p-0 codemirror-fill">
             <div class="tab-content">
                 <div class="tab-pane active"
-                     id="${mutantEditor.className}"
-                     aria-labelledby="${mutantEditor.className}-tab"
+                     id="mutant-editor-pane-<%=currentId%>"
+                     aria-labelledby="mutant-editor-tab-<%=currentId%>"
                      role="tabpanel">
                     <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
                 </div>
-                <% for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
-                    String depName = dependency.getKey();
-                    String depCode = dependency.getValue(); %>
+                <%
+                    for (String depCode : mutantEditor.getDependencies().values()) {
+                        currentId++;
+                %>
                     <div class="tab-pane"
-                         id="<%=depName%>"
-                         aria-labelledby="<%=depName%>-tab"
+                         id="mutant-editor-pane-<%=currentId%>"
+                         aria-labelledby="mutant-editor-tab-<%=currentId%>"
                          role="tabpanel">
-                             <pre class="m-0"><textarea id="text-<%=depName%>"
-                                                        name="text-<%=depName%>"
-                                                        title="text-<%=depName%>"
+                             <pre class="m-0"><textarea id="mutant-editor-code-<%=currentId%>"
+                                                        name="mutant-editor-code-<%=currentId%>"
+                                                        title="mutant-editor-code-<%=currentId%>"
                                                         readonly><%=depCode%></textarea></pre>
                     </div>
-                <% } %>
+                <%
+                    }
+                %>
             </div>
         </div>
 
@@ -96,191 +112,28 @@
 
 </div>
 
+<script type="text/javascript" src="js/code_completion.js"></script>
+<script type="text/javascript" src="js/mutant_editor.js"></script>
 
 <script>
-(function () {
+    /* Wrap in a function to avoid polluting the global scope. */
+    (function () {
+        const editableLinesStart = ${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"};
+        const editableLinesEnd = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
+        const keymap = '${login.user.keyMap.CMName}';
+        const numDependencies = ${mutantEditor.hasDependencies() ? mutantEditor.dependencies.size() : 0};
 
-    /* ==================== Scaffolding ==================== */
-
-    let mutantStartEditLine = ${mutantEditor.editableLinesStart};
-    let mutantReadOnlyLinesStart = Array.from(new Array(mutantStartEditLine - 1).keys());
-
-    let mutantEndEditLine = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
-
-    let mutantGetMutantReadOnlyLinesEnd = function (lines) {
-        if (mutantEndEditLine == null) {
-            return [];
-        }
-        let mutantReadOnlyLines = [];
-
-        // You don't want the end line to be editable even when a user removes above lines.
-        // So the mutantEndEditLine isn't a static hard limit, but an indicator that
-        // totalLines - mutantEndEditLine many lines from the bottom are read only.
-        for (let i = 1; i <= mutantGetReadOnlyBottomNumber(lines); i++) {
-            mutantReadOnlyLines.push(lines.length - i)
-        }
-        return mutantReadOnlyLines;
-    };
-
-    let numberOfMutantReadOnlyLinesFromBottom = null;
-    let mutantGetReadOnlyBottomNumber = function(lines) {
-        if (mutantEndEditLine != null && numberOfMutantReadOnlyLinesFromBottom == null) {
-            numberOfMutantReadOnlyLinesFromBottom = lines.length - mutantEndEditLine;
-        }
-        return numberOfMutantReadOnlyLinesFromBottom;
-    };
-
-    const mutantFilterOutComments = function (text) {
-        let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
-        return text.replace(commentRegex, "");
-    };
-
-    let mutantUpdateAutocompleteList = function () {
-        let wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
-        let set = new Set();
-
-        let texts = [editorMutant.getValue()];
-
-        const autocompletedClasses = window.autocompletedClasses;
-        if (typeof autocompletedClasses !== 'undefined') {
-            Object.getOwnPropertyNames(autocompletedClasses).forEach(function (key) {
-                texts.push(autocompletedClasses[key]);
-            });
+        const editorElement = document.getElementById('mutant-code');
+        const dependencyEditorElements = [];
+        for (let i = 1; i <= numDependencies; i++) {
+            dependencyEditorElements.push(document.getElementById(`mutant-editor-code-\${i}`));
         }
 
-        texts.forEach(function (text) {
-            text = mutantFilterOutComments(text);
-            let m;
-            while ((m = wordRegex.exec(text)) !== null) {
-                if (m.index === wordRegex.lastIndex) {
-                    wordRegex.lastIndex++;
-                }
-                m.forEach(function (match) {
-                    set.add(match)
-                });
-            }
-        });
-
-        autocompleteList = Array.from(set);
-    };
-
-    CodeMirror.commands.autocompleteMutant = function (cm) {
-        cm.showHint({
-            hint: function (editor) {
-                let reg = /[a-zA-Z][a-zA-Z0-9]*/;
-
-                let list = !autocompleteList ? [] : autocompleteList;
-                let cursor = editor.getCursor();
-                let currentLine = editor.getLine(cursor.line);
-                let start = cursor.ch;
-                let end = start;
-                while (end < currentLine.length && reg.test(currentLine.charAt(end))) ++end;
-                while (start && reg.test(currentLine.charAt(start - 1))) --start;
-                let curWord = start !== end && currentLine.slice(start, end);
-                let regex = new RegExp('^' + curWord, 'i');
-
-                return {
-                    list: (!curWord ? list : list.filter(function (item) {
-                        return item.match(regex);
-                    })).sort(),
-                    from: CodeMirror.Pos(cursor.line, start),
-                    to: CodeMirror.Pos(cursor.line, end)
-                };
-            }
-        });
-    };
-
-
-    /* ==================== Initialize main mutant editor ==================== */
-
-    let editorMutant = CodeMirror.fromTextArea(document.getElementById("mutant-code"), {
-        lineNumbers: true,
-        indentUnit: 4,
-        smartIndent: true,
-        matchBrackets: true,
-        mode: "text/x-java",
-        autoCloseBrackets: true,
-        styleActiveLine: true,
-        extraKeys: {
-            "Ctrl-Space": "autocompleteMutant",
-            "Tab": "insertSoftTab"
-        },
-        keyMap: "${login.user.keyMap.CMName}",
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
-        autoRefresh: true
-    });
-    if (window.hasOwnProperty('ResizeObserver')) {
-        new ResizeObserver(() => editorMutant.refresh()).observe(editorMutant.getWrapperElement());
-    }
-
-    editorMutant.on('beforeChange', function (cm, change) {
-        let text = cm.getValue();
-        let lines = text.split(/\r|\r\n|\n/);
-
-        let mutantReadOnlyLinesEnd = mutantGetMutantReadOnlyLinesEnd(lines);
-        if (~mutantReadOnlyLinesStart.indexOf(change.from.line) || ~mutantReadOnlyLinesEnd.indexOf(change.to.line)) {
-            change.cancel();
-        }
-    });
-
-    // All the lines which are not between mutantStartEditLine and mutantEndEditLine() must be greyed out
-    // https://stackoverflow.com/questions/1720320/how-to-dynamically-create-css-class-in-javascript-and-apply
-    // https://stackoverflow.com/questions/5081690/how-to-gray-out-a-html-element
-    // Define the Grayout style
-    if (mutantEndEditLine != null) {
-        var style = document.createElement('style');
-        style.innerHTML = '.grayout { opacity: 0.5; filter: alpha(opacity = 50);}';
-        document.getElementsByTagName('head')[0].appendChild(style);
-        // Apply the gray out style to the non-editable lines
-        var count = editorMutant.lineCount();
-        for (i = 0; i < count; i++) {
-            if ((i + 1) < mutantStartEditLine || (i + 1) > mutantEndEditLine) {
-                editorMutant.addLineClass(i, "text", "grayout");
-            }
-        }
-    }
-
-    editorMutant.on('focus', function () {
-        mutantUpdateAutocompleteList();
-    });
-    editorMutant.on('keyHandled', function (cm, name, event) {
-        // 9 == Tab, 13 == Enter
-        if ([9, 13].includes(event.keyCode)) {
-            mutantUpdateAutocompleteList();
-        }
-    });
-
-    /* If global autocompletedClasses exists, get it, otherwise, create it. */
-    const autocompletedClasses = window.autocompletedClasses = window.autocompletedClasses || {};
-    autocompletedClasses['${mutantEditor.className}'] = editorMutant.getTextArea().value;
-
-
-    /* ==================== Initialize dependency viewers ==================== */
-
-    <%-- dependencies exist -> tab system --%>
-    <%
-        if (mutantEditor.hasDependencies()) {
-            for (Map.Entry<String, String> dependency : mutantEditor.getDependencies().entrySet()) {
-                String depName = dependency.getKey();
-    %>
-            {
-                let editor = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
-                    lineNumbers: true,
-                    matchBrackets: true,
-                    mode: "text/x-java",
-                    readOnly: 'nocursor',
-                    autoRefresh: true
-                });
-                if (window.hasOwnProperty('ResizeObserver')) {
-                    new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());
-                }
-
-                autocompletedClasses['<%=depName%>'] = editor.getTextArea().value;
-            }
-    <%
-            }
-        }
-    %>
-
-})();
+        CodeDefenders.objects.mutantEditor = new CodeDefenders.classes.MutantEditor(
+                editorElement,
+                dependencyEditorElements,
+                editableLinesStart,
+                editableLinesEnd,
+                keymap);
+    })();
 </script>

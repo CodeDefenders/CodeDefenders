@@ -18,24 +18,18 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 
-<%--
-    Adds highlighting of error (red) lines to a CodeMirror editor.
-
-    The CSS is located in error_highlighting.css.
---%>
-
-<jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
-
-<script type="text/javascript" src="js/error_highlighting.js"></script>
+<script type="text/javascript" src="js/test_progress_bar.js"></script>
 
 <script>
-    /* Wrap in a function to avoid polluting the global scope. */
+    /* Wrap in a function so it has it's own scope. */
     (function () {
-        const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
+        const progressElement = document.getElementById('progress');
+        const gameId = ${testProgressBar.gameId};
 
-        CodeDefenders.objects.testErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(errorLines);
-
-        CodeDefenders.objects.testErrorHighlighting.highlightErrors();
+        CodeDefenders.objects.testProgressBar = new CodeDefenders.classes.TestProgressBar(progressElement, gameId);
     })();
 </script>
+
+

@@ -50,7 +50,7 @@
     <script src="webjars/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
     <link href="webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap_customize.css" rel="stylesheet">
-    <script type="text/javascript" src="js/bootstrap-init.js"></script>
+    <script type="text/javascript" src="js/bootstrap_init.js"></script>
 
     <!-- Codemirror -->
     <script src="webjars/codemirror/5.22.0/lib/codemirror.js" type="text/javascript" ></script>
@@ -93,9 +93,8 @@
     <link href="css/page.css" rel="stylesheet">
     <link href="css/common.css" rel="stylesheet">
 
-    <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
-    <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>
-    <script type="text/javascript" src="js/codedefenders/mutant-info-api.js"></script>
+    <script type="text/javascript" src="js/global_object.js"></script>
+    <script type="text/javascript" src="js/info_api.js"></script>
 </head>
 
 <body>

@@ -64,10 +64,13 @@
     </div>
 </div>
 
-<script src="js/datatables-utils.js" type="text/javascript" ></script>
+<script src="js/datatables_utils.js" type="text/javascript" ></script>
 
 <script>
 (function () {
+    const DataTablesUtils = CodeDefenders.classes.DataTablesUtils;
+    const div = DataTablesUtils.formatDivision;
+    const valPercent = DataTablesUtils.formatValueAndPercent;
 
     function format(data) {
         return '' +
@@ -81,9 +84,9 @@
                     <tbody>
                         <tr>
                             <td>Games as Attacker:</td>
-                            <td>\${dtValAndPercent(data.attackerGamesPlayed, data.gamesPlayed)}</td>
+                            <td>\${valPercent(data.attackerGamesPlayed, data.gamesPlayed)}</td>
                             <td>Games as Defender:</td>
-                            <td>\${dtValAndPercent(data.defenderGamesPlayed, data.gamesPlayed)}</td>
+                            <td>\${valPercent(data.defenderGamesPlayed, data.gamesPlayed)}</td>
                         </tr>
                     </tbody>
                     <thead>
@@ -96,19 +99,19 @@
                             <td>Mutants Submitted:</td>
                             <td>\${data.mutantsSubmitted}</td>
                             <td>Per Game (as Attacker):</td>
-                            <td>\${dtDiv(data.mutantsSubmitted, data.attackerGamesPlayed)}</td>
+                            <td>\${div(data.mutantsSubmitted, data.attackerGamesPlayed)}</td>
                         </tr>
                         <tr>
                             <td>Alive Mutants:</td>
-                            <td>\${dtValAndPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
+                            <td>\${valPercent(data.mutantsAlive, data.mutantsSubmitted)}</td>
                             <td>Per Game (as Attacker):</td>
-                            <td>\${dtDiv(data.mutantsAlive, data.attackerGamesPlayed)}</td>
+                            <td>\${div(data.mutantsAlive, data.attackerGamesPlayed)}</td>
                         </tr>
                         <tr>
                             <td>Equivalent Mutants:</td>
-                            <td>\${dtValAndPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
+                            <td>\${valPercent(data.mutantsEquivalent, data.mutantsSubmitted)}</td>
                             <td>Per Game (as Attacker):</td>
-                            <td>\${dtDiv(data.mutantsEquivalent, data.attackerGamesPlayed)}</td>
+                            <td>\${div(data.mutantsEquivalent, data.attackerGamesPlayed)}</td>
                         </tr>
                     </tbody>
                     <thead>
@@ -121,15 +124,15 @@
                             <td>Tests Submitted:</td>
                             <td>\${data.testsSubmitted}</td>
                             <td>Per Game (as Defender):</td>
-                            <td>\${dtDiv(data.testsSubmitted, data.defenderGamesPlayed)}</td>
+                            <td>\${div(data.testsSubmitted, data.defenderGamesPlayed)}</td>
                         </tr>
                         <tr>
                             <td>Mutants Killed:</td>
                             <td>\${data.mutantsKilled}</td>
                             <td>Per Game (as Defender):</td>
-                            <td>\${dtDiv(data.mutantsKilled, data.defenderGamesPlayed)}</td>
+                            <td>\${div(data.mutantsKilled, data.defenderGamesPlayed)}</td>
                             <td>Per Test:</td>
-                            <td>\${dtDiv(data.mutantsKilled, data.testsSubmitted)}</td>
+                            <td>\${div(data.mutantsKilled, data.testsSubmitted)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -168,7 +171,7 @@
             "language": {"info": "Showing _TOTAL_ entries"}
         });
 
-        setupChildRows(table, format);
+        DataTablesUtils.setupChildRows(table, format);
     });
 
 })();

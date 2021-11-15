@@ -20,22 +20,27 @@
 --%>
 
 <%--
-    Adds highlighting of error (red) lines to a CodeMirror editor.
+    @param String notification-ticket (TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME)
+        The ticket used for the WebSocket connection.
 
-    The CSS is located in error_highlighting.css.
+    See (server-side) PushSocket's JavaDoc or (client-side) PushSocket's JSDoc for more information.
 --%>
 
-<jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 
-<script type="text/javascript" src="js/error_highlighting.js"></script>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
+<script type="text/javascript" src="js/push_socket.js"></script>
 
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
-        const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
-
-        CodeDefenders.objects.testErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(errorLines);
-
-        CodeDefenders.objects.testErrorHighlighting.highlightErrors();
+        const baseWsUri = document.baseURI
+                .replace(/^http/, 'ws')
+                .replace(/\/$/, '');
+        const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
+        const userId = '${login.userId}';
+        const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
+        CodeDefenders.objects.pushSocket = new CodeDefenders.classes.PushSocket(wsUri);
     })();
 </script>

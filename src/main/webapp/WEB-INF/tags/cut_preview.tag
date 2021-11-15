@@ -33,11 +33,11 @@
         const textarea = cutPreview.querySelector('textarea');
 
         const updatePreview = function () {
-            textarea.setAttribute('name', `class-\${classSelector.value}`)
+            const classId = Number(classSelector.value);
             const codeMirrorContainer = cutPreview.querySelector('.CodeMirror');
 
             if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                ClassAPI.getAndSetEditorValue(textarea, codeMirrorContainer.CodeMirror);
+                CodeDefenders.classes.InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
             } else {
                 const editor = CodeMirror.fromTextArea(textarea, {
                     lineNumbers: true,
@@ -45,11 +45,11 @@
                     mode: 'text/x-java',
                     autoRefresh: true
                 });
-                ClassAPI.getAndSetEditorValue(textarea, editor);
+                CodeDefenders.classes.InfoApi.setClassEditorValue(editor, classId);
             }
         };
 
-        // Load initial selecte class
+        // Load initial selected class
         document.addEventListener("DOMContentLoaded", updatePreview);
 
         classSelector.addEventListener('change', updatePreview);

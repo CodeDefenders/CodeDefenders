@@ -214,7 +214,7 @@
                 })();
             </script>
 
-            <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
+            <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
             <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
             <form id="equivalenceForm" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post">
@@ -237,7 +237,7 @@
                             }
                         });
                         document.getElementById("reject-equivalent-button").addEventListener('click', function (event) {
-                            testProgressBar();
+                            CodeDefenders.objects.testProgressBar.activate();
                             this.form['resolveAction'].value = 'reject';
                             this.form.submit();
                             this.disabled = true;
@@ -265,7 +265,7 @@
 
     <div class="col-xl-6 col-12" id="newmut-div">
 
-        <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
+        <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
 
         <div class="game-component-header">
             <h3>Create a mutant here</h3>
@@ -281,12 +281,11 @@
                 </div>
                 <script>
                     $('#highlighting-switch').change(function () {
-                        const codeMirror = $('#newmut-div .CodeMirror')[0].CodeMirror;
-                        codeMirror.clearCoverage();
+                        CodeDefenders.objects.gameHighlighting.clearCoverage();
                         if (this.checked) {
-                            codeMirror.highlightAlternativeCoverage();
+                            CodeDefenders.objects.gameHighlighting.highlightAlternativeCoverage();
                         } else {
-                            codeMirror.highlightCoverage();
+                            CodeDefenders.objects.gameHighlighting.highlightCoverage();
                         }
                     })
                 </script>
@@ -298,7 +297,7 @@
                 </form>
 
                 <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
-                        onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
+                        onclick="CodeDefenders.objects.mutantProgressBar.activate(); this.form.submit(); this.disabled=true;"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
                     Attack
                 </button>
@@ -324,14 +323,14 @@
 
     <div class="col-xl-6 col-12" id="utest-div">
 
-        <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
+        <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
         <div class="game-component-header">
             <h3>Write a new JUnit test here</h3>
             <div>
                 <button type="submit" class="btn btn-defender btn-highlight"
                         id="submitTest" form="def"
-                        onclick="window.testProgressBar(); this.form.submit(); this.disabled = true;"
+                        onclick="CodeDefenders.objects.testProgressBar.activate(); this.form.submit(); this.disabled = true;"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
                     Defend
                 </button>

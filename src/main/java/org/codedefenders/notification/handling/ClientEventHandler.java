@@ -6,7 +6,9 @@ import java.util.regex.Pattern;
 import org.codedefenders.beans.game.GameChatBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.client.chat.ClientGameChatEvent;
@@ -62,6 +64,17 @@ public class ClientEventHandler {
         GameChatDAO gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
         Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
 
+        AbstractGame game = GameDAO.getGame(event.getGameId());
+        if (game == null) {
+            logger.warn("User {} tried to send chat message to game {}, which does not exist.",
+                    user.getId(), event.getGameId());
+            return;
+        }
+        if (!game.isChatEnabled()) {
+            logger.warn("User {} tried to send chat message to game {}, which does not have chat enabled.",
+                    user.getId(), event.getGameId());
+            return;
+        }
         if (role == null) {
             logger.warn("User {} tried to send chat message to game {}, which the user is not playing in.",
                     user.getId(), event.getGameId());

@@ -115,7 +115,7 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/push_notifications.jsp"/>
+<jsp:include page="/jsp/push_socket.jsp"/>
 
 <div id="game-container" class="container-fluid">
 
@@ -139,7 +139,7 @@
         </div>
 
         <div class="col-xl-6 col-12" id="cut-div">
-            <jsp:include page="/jsp/game_components/push_mutant_progress_bar.jsp"/>
+            <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
 
             <div class="game-component-header">
                 <h3>Create a mutant here</h3>
@@ -154,7 +154,7 @@
                     </form>
 
                     <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
-                            onclick="mutantProgressBar(); this.form.submit(); this.disabled=true;"
+                            onclick="CodeDefenders.objects.mutantProgressBar.activate(); this.form.submit(); this.disabled=true;"
                             <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                         Attack
                     </button>
