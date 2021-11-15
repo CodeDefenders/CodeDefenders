@@ -55,17 +55,17 @@
             a class under test</a>.
     </p>
     <%
-    } else {
+            } else {
     %>
     <p class="text-center">
         Games can only be started once at least one class under test has been uploaded.
     </p>
     <%
-        }
-    } else {
+            }
+        } else {
     %>
-    <div class="d-flex flex-wrap justify-content-around">
-        <div id="create-game-settings" class="form-width">.
+    <div class="d-flex flex-wrap justify-content-center gap-5">
+        <div id="create-game-settings" class="form-width">
             <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
                   class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="createGame">
@@ -258,7 +258,7 @@
             </div>
         </div>
 
-        <div class="form-width">
+        <div class="form-width w-100">
             <t:cut_preview/>
         </div>
     </div>
