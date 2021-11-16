@@ -115,7 +115,7 @@ public abstract class AbstractGameService implements IGameService {
             killMessage = null;
         }
         boolean canView = canViewMutant(mutant, game, user, player, playerRole);
-        boolean canMarkEquivalent = canMarkMutantEquivalent(mutant, game, user);
+        boolean canMarkEquivalent = canMarkMutantEquivalent(mutant, game, user, playerRole);
         boolean isCovered = isMutantCovered(mutant, game, player);
 
         return new MutantDTO(
@@ -144,7 +144,8 @@ public abstract class AbstractGameService implements IGameService {
     protected abstract boolean canViewMutant(Mutant mutant, AbstractGame game, SimpleUser user, Player player,
             Role playerRole);
 
-    protected abstract boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user);
+    protected abstract boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user,
+            Role playerRole);
 
 
     @Override

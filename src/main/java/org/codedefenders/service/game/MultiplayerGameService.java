@@ -55,10 +55,12 @@ public class MultiplayerGameService extends AbstractGameService {
     }
 
     @Override
-    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user) {
+    protected boolean canMarkMutantEquivalent(Mutant mutant, AbstractGame game, SimpleUser user,
+            Role playerRole) {
         return game.getState().equals(GameState.ACTIVE)
                 && mutant.getState().equals(Mutant.State.ALIVE)
                 && mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+                && playerRole.equals(Role.DEFENDER)
                 && mutant.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
                 && mutant.getCreatorId() != user.getId()
                 && mutant.getLines().size() >= 1;
