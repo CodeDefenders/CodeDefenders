@@ -55,7 +55,7 @@ public class UserService {
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
                 // Entries expire after a relative short time, since User(name) updates are not handled through this
-                // class so we can't invalidate the entries on updates. This could lead to some stale data presented in
+                // class, so we can't invalidate the entries on updates. This could lead to some stale data presented in
                 // places where SimpleUser objects are used.
                 .expireAfterWrite(30, TimeUnit.SECONDS)
                 .maximumSize(200)
@@ -95,7 +95,7 @@ public class UserService {
      * method multiple times is no big deal.
      */
     @Nonnull
-    public Optional<SimpleUser> getSimpleUserById(final int userId) {
+    public Optional<SimpleUser> getSimpleUserById(int userId) {
         try {
             return Optional.of(simpleUserForUserIdCache.get(userId));
         } catch (ExecutionException e) {
@@ -104,7 +104,7 @@ public class UserService {
     }
 
     @Nonnull
-    Optional<SimpleUser> getSimpleUserByIdInternal(final int userId) {
+    Optional<SimpleUser> getSimpleUserByIdInternal(int userId) {
         return userRepo.getUserById(userId).map(this::simpleUserFromUserEntity);
     }
 
@@ -121,7 +121,7 @@ public class UserService {
      */
     // TODO: Relocate into sth like `PlayerService` or the `GameService`s
     @Nonnull
-    public Optional<SimpleUser> getSimpleUserByPlayerId(final int playerId) {
+    public Optional<SimpleUser> getSimpleUserByPlayerId(int playerId) {
         return userRepo.getUserIdForPlayerId(playerId).flatMap(this::getSimpleUserById);
     }
 
@@ -134,5 +134,13 @@ public class UserService {
     @Nonnull
     private SimpleUser simpleUserFromUserEntity(@Nonnull UserEntity user) {
         return new SimpleUser(user.getId(), user.getUsername());
+    }
+
+    public boolean recordSession(int userId, String ipAddress) {
+        return deleteRecordedSessions(userId) && userRepo.insertSession(userId, ipAddress);
+    }
+
+    public boolean deleteRecordedSessions(int userId) {
+        return userRepo.deleteSessions(userId);
     }
 }

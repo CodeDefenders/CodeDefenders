@@ -19,7 +19,6 @@
 
 --%>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
@@ -238,7 +237,7 @@
 
 <%
     String resetPw = request.getParameter("resetPW");
-    if (resetPw != null && DatabaseAccess.getUserIDForPWResetSecret(resetPw) > 0) {
+    if (resetPw != null) {
 %>
 
 <div id="changepw-modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="changepw-modal-title" aria-hidden="true">

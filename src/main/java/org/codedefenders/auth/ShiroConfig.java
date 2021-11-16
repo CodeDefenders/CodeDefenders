@@ -33,13 +33,13 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 
 /**
  * This class configures Shiro.
  *
  * @author gambi
- *
  */
 @ApplicationScoped
 public class ShiroConfig {
@@ -54,8 +54,9 @@ public class ShiroConfig {
 
     @Produces
     @Singleton
-    public CodeDefendersFormAuthenticationFilter getAuthenticationFilter(LoginBean login, MessagesBean messages) {
-        CodeDefendersFormAuthenticationFilter authFilter = new CodeDefendersFormAuthenticationFilter(login, messages);
+    public CodeDefendersFormAuthenticationFilter getAuthenticationFilter(LoginBean login, MessagesBean messages,
+            UserService userService) {
+        CodeDefendersFormAuthenticationFilter authFilter = new CodeDefendersFormAuthenticationFilter(login, messages, userService);
         // org.codedefenders.util.Paths.LOGIN = "/login";
         authFilter.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
         // Go to game overview page after successful login
