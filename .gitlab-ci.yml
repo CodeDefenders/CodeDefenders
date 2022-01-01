@@ -71,13 +71,9 @@ unit-tests:
     - build
   script:
     - mvn --no-transfer-progress test -Dcheckstyle.skip
-  after_script:
-    # Print summary line, so GitLab can extract Code Coverage
-    - cat target/site/jacoco-ut/index.html | grep -o '<tfoot>.*</tfoot>'
   artifacts:
     paths:
-      - target/surefire-reports/
-      - target/site/jacoco-ut/
+      - target/jacoco.exec
     reports:
       junit:
         - target/surefire-reports/TEST-*.xml
@@ -93,6 +89,8 @@ unit-tests:
   script:
     - mvn --no-transfer-progress verify -P it-database-only -Dcheckstyle.skip -DskipUnitTests
   artifacts:
+    paths:
+      - target/jacoco-it.exec
     reports:
       junit:
         - target/failsafe-reports/TEST-*.xml
@@ -204,16 +202,31 @@ deploy-production:
     - if: $CI_COMMIT_TAG
       when: manual
 
+merge-jacoco:
+  stage: visualize
+  needs:
+    - build
+    - unit-tests
+    - integration-tests_database_mariadb-10-5-10
+  script:
+    - mvn --no-transfer-progress -Djacoco.destFile='${project.build.directory}/jacoco-merged.exec' -Djacoco.dataFile='${project.build.directory}/jacoco-merged.exec' jacoco:merge jacoco:report -Dmaven.repo.local=./.m2/repository
+  after_script:
+    # Print summary line, so GitLab can extract Code Coverage
+    - cat target/site/jacoco-merged/index.html | grep -o '<tfoot>.*</tfoot>'
+  artifacts:
+    paths:
+      - target/site/jacoco-merged/jacoco.xml
+
 
 # See: https://docs.gitlab.com/ee/user/project/merge_requests/test_coverage_visualization.html#java-and-kotlin-examples
 coverage:
   stage: visualize
   needs:
-    - unit-tests
+    - merge-jacoco
   image: registry.gitlab.com/haynes/jacoco2cobertura:1.0.7
   script:
     # convert report from jacoco to cobertura, using relative project path
-    - python /opt/cover2cover.py target/site/jacoco-ut/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > target/site/cobertura.xml
+    - python /opt/cover2cover.py target/site/jacoco-merged/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > target/site/cobertura.xml
   artifacts:
     reports:
       cobertura: target/site/cobertura.xml

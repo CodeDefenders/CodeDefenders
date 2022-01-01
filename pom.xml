@@ -155,9 +155,18 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<configuration>
-					<excludes>
-						<exclude>target/classes/data/generated_mutants_2016.zip@**/*</exclude>
-					</excludes>
+					<!-- Configuration for the jacoco:merge goal -->
+					<fileSets>
+						<fileSet>
+							<directory>${project.build.directory}</directory>
+							<includes>
+								<include>jacoco.exec</include>
+								<include>jacoco-it.exec</include>
+							</includes>
+						</fileSet>
+					</fileSets>
+					<!-- Configuration for the jacoco:report goal on standalone execution (not part of site gen) -->
+					<outputDirectory>${project.reporting.outputDirectory}/jacoco-merged</outputDirectory>
 				</configuration>
 				<executions>
 					<!-- Prepare the property pointing to the JaCoCo runtime agent which
@@ -168,26 +177,23 @@
 							<goal>prepare-agent</goal>
 						</goals>
 						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
 							<!-- Sets the name of the property containing the settings for JaCoCo
 								runtime agent. -->
 							<propertyName>surefireArgLine</propertyName>
 						</configuration>
 					</execution>
-					<!-- Ensures that the code coverage report for unit tests is created
-						after unit tests have been run. -->
+
+					<!-- Prepare the property pointing to the JaCoCo runtime agent which
+					is passed as VM argument when Maven Failsafe plugin is executed. -->
 					<execution>
-						<id>post-unit-test</id>
-						<phase>test</phase>
+						<id>pre-integration-test</id>
+						<phase>pre-integration-test</phase>
 						<goals>
-							<goal>report</goal>
+							<goal>prepare-agent-integration</goal>
 						</goals>
 						<configuration>
-							<!-- Sets the path to the file which contains the execution data. -->
-							<dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
-							<!-- Sets the output directory for the coverage report. -->
-							<outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
+							<!-- Sets the name of the property containing the settings for JaCoCo runtime agent. -->
+							<propertyName>failsafeArgLine</propertyName>
 						</configuration>
 					</execution>
 				</executions>
@@ -220,6 +226,8 @@
 				</executions>
 				<configuration>
 					<skipTests>${skipIntegrationTests}</skipTests>
+					<!--suppress UnresolvedMavenProperty -->
+					<argLine>${failsafeArgLine}</argLine>
 					<additionalClasspathElements>
 						<additionalClasspathElement>${project.basedir}/src/integration/resources
 						</additionalClasspathElement>
@@ -1062,6 +1070,19 @@
 					<reportSet>
 						<reports>
 							<report>checkstyle</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>report</report>
+							<report>report-integration</report>
 						</reports>
 					</reportSet>
 				</reportSets>
