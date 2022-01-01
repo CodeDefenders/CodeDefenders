@@ -365,6 +365,11 @@
 					<configuration>
 						<configLocation>checkstyle-codedefenders.xml</configLocation>
 						<consoleOutput>false</consoleOutput>
+						<includeTestSourceDirectory>true</includeTestSourceDirectory>
+						<testSourceDirectories>
+							<testSourceDirectory>src/test/java</testSourceDirectory>
+							<testSourceDirectory>src/test/integration</testSourceDirectory>
+						</testSourceDirectories>
 					</configuration>
 				</plugin>
 
