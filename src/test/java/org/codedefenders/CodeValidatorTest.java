@@ -34,8 +34,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 import static org.codedefenders.validation.code.CodeValidator.getMD5FromText;
@@ -52,8 +50,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({DatabaseAccess.class})
 public class CodeValidatorTest {
 
 	private static final CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
