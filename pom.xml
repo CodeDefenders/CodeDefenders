@@ -36,7 +36,78 @@
 	</licenses>
 
 	<build>
+		<finalName>${project.artifactId}</finalName>
+
 		<plugins>
+			<!-- Reads all the properties from ${config.properties} for deploying -->
+			<!-- Needs to be listed before maven-enforcer-plugin -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>read-deploy-properties</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${config.properties}</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.6</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+					<!-- For automatic deployment to tomcat server -->
+					<execution>
+						<id>enforce-deploy-properties-exist</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireProperty>
+									<property>tomcat.username</property>
+									<message>Tomcat username is missing</message>
+								</requireProperty>
+								<requireProperty>
+									<property>tomcat.password</property>
+									<message>Tomcat password is missing</message>
+								</requireProperty>
+								<requireProperty>
+									<property>tomcat.url</property>
+									<message>Tomcat manager api url is missing</message>
+								</requireProperty>
+								<requireProperty>
+									<property>tomcat.path</property>
+									<message>Tomcat deploy path is missing</message>
+								</requireProperty>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
@@ -53,7 +124,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>add-test-source</id>
@@ -73,19 +143,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.2</version>
-				<!-- This forces to use the proper junit runner. Old versions do not
-					support categories -->
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.surefire</groupId>
-						<artifactId>surefire-junit47</artifactId>
-						<version>2.22.2</version>
-					</dependency>
-				</dependencies>
 				<configuration>
 					<skipTests>${skipUnitTests}</skipTests>
 					<!-- Sets the VM argument line used when unit tests are run. -->
+					<!--suppress UnresolvedMavenProperty -->
 					<argLine>${surefireArgLine}</argLine>
 				</configuration>
 			</plugin>
@@ -93,7 +154,6 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.6</version>
 				<configuration>
 					<excludes>
 						<exclude>target/classes/data/generated_mutants_2016.zip@**/*</exclude>
@@ -136,7 +196,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -151,14 +210,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>3.0.0-M5</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.maven.surefire</groupId>
-						<artifactId>surefire-junit47</artifactId>
-						<version>3.0.0-M5</version>
-					</dependency>
-				</dependencies>
 				<executions>
 					<execution>
 						<goals>
@@ -182,68 +233,10 @@
 				Beginn configuration for automatic deployment
 			-->
 
-			<!-- Reads all the properties from ${config.properties} -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<id>read-deploy-properties</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>read-project-properties</goal>
-						</goals>
-						<configuration>
-							<files>
-								<file>${config.properties}</file>
-							</files>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Fails if the ${config.properties} file does not exists -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
-				<version>3.0.0-M1</version>
-				<executions>
-					<execution>
-						<id>enforce-deploy-properties-exist</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>enforce</goal>
-						</goals>
-						<configuration>
-							<rules>
-								<requireProperty>
-									<property>tomcat.username</property>
-									<message>Tomcat username is missing</message>
-								</requireProperty>
-								<requireProperty>
-									<property>tomcat.password</property>
-									<message>Tomcat password is missing</message>
-								</requireProperty>
-								<requireProperty>
-									<property>tomcat.url</property>
-									<message>Tomcat manager api url is missing</message>
-								</requireProperty>
-								<requireProperty>
-									<property>tomcat.path</property>
-									<message>Tomcat deploy path is missing</message>
-								</requireProperty>
-							</rules>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!-- Disables default deploy plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
 				<executions>
 					<execution>
 						<id>default-deploy</id>
@@ -256,12 +249,15 @@
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
 				<configuration>
 					<server>TomcatServer</server>
+					<!--suppress UnresolvedMavenProperty -->
 					<url>${tomcat.url}</url>
+					<!--suppress UnresolvedMavenProperty -->
 					<username>${tomcat.username}</username>
+					<!--suppress UnresolvedMavenProperty -->
 					<password>${tomcat.password}</password>
+					<!--suppress UnresolvedMavenProperty -->
 					<path>${tomcat.path}</path>
 					<update>true</update>
 					<ignorePackaging>true</ignorePackaging>
@@ -276,22 +272,35 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!--
+			Plugins without any configured <executions>
+			-->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+			</plugin>
+
+			<!-- Execute the installer within maven without the need of packaging a jar for it -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 
 		<pluginManagement>
 			<plugins>
-				<!--
-				Execute the installer within maven without the need of packaging a jar for it
-				-->
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>exec-maven-plugin</artifactId>
-					<version>1.6.0</version>
-					<configuration>
-						<mainClass>org.codedefenders.installer.Installer</mainClass>
-					</configuration>
-				</plugin>
-
+				<!-- TODO: Investigate switching to artifact by org.codehaus.mojo-->
 				<plugin>
 					<groupId>com.mycila</groupId>
 					<artifactId>license-maven-plugin</artifactId>
@@ -335,42 +344,155 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.1.2</version>
 					<dependencies>
 						<dependency>
 							<groupId>com.puppycrawl.tools</groupId>
 							<artifactId>checkstyle</artifactId>
-							<version>8.25</version>
+							<version>8.45</version>
 						</dependency>
 					</dependencies>
 					<configuration>
-						<configLocation>
-							checkstyle-codedefenders.xml
-						</configLocation>
+						<configLocation>checkstyle-codedefenders.xml</configLocation>
+						<consoleOutput>false</consoleOutput>
 					</configuration>
 				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>3.1.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.8.1</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+					<version>3.0.0-M1</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>3.0.0-M5</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.surefire</groupId>
+							<artifactId>surefire-junit47</artifactId>
+							<version>3.0.0-M5</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+					<version>3.0.0-M1</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-project-info-reports-plugin</artifactId>
+					<version>3.0.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.8.2</version>
+					<version>3.10.0</version>
 					<dependencies>
 						<dependency>
 							<groupId>org.apache.maven.doxia</groupId>
 							<artifactId>doxia-site-renderer</artifactId>
-							<version>1.9.1</version>
-						</dependency>
-						<dependency>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-project-info-reports-plugin</artifactId>
-							<version>3.0.0</version>
+							<version>1.11.1</version>
 						</dependency>
 					</dependencies>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>3.0.0-M5</version>
+					<!-- This forces to use the proper junit runner. Old versions do not
+						support categories -->
+					<dependencies>
+						<dependency>
+							<groupId>org.apache.maven.surefire</groupId>
+							<artifactId>surefire-junit47</artifactId>
+							<version>3.0.0-M5</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+					<version>3.3.2</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.tomcat.maven</groupId>
+					<artifactId>tomcat7-maven-plugin</artifactId>
+					<version>2.2</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.2.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>3.0.0</version>
+					<configuration>
+						<mainClass>org.codedefenders.installer.Installer</mainClass>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>properties-maven-plugin</artifactId>
+					<version>1.0.0</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>versions-maven-plugin</artifactId>
+					<version>2.8.1</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.7</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
-
-		<finalName>${project.artifactId}</finalName>
 	</build>
 
 	<profiles>
@@ -439,16 +561,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
-						<version>2.22.2</version>
-						<!-- This forces to use the proper junit runner. Old versions do not
-							support categories -->
-						<dependencies>
-							<dependency>
-								<groupId>org.apache.maven.surefire</groupId>
-								<artifactId>surefire-junit47</artifactId>
-								<version>2.22.2</version>
-							</dependency>
-						</dependencies>
 						<configuration>
 							<!-- Do not parallelize, but just fork a new JVM each time -->
 							<forkCount>1</forkCount>
@@ -480,7 +592,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-war-plugin</artifactId>
-						<version>3.2.0</version>
 						<configuration>
 							<outputDirectory>src/test/resources/systemtests/frontend</outputDirectory>
 						</configuration>
@@ -934,8 +1045,19 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.1.0</version>
 				<reportSets>
 					<reportSet>
 						<reports>
@@ -943,9 +1065,6 @@
 						</reports>
 					</reportSet>
 				</reportSets>
-				<configuration>
-					<consoleOutput>false</consoleOutput>
-				</configuration>
 			</plugin>
 		</plugins>
 	</reporting>

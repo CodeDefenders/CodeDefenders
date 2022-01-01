@@ -65,7 +65,6 @@ import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
-
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
