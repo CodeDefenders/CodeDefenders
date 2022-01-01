@@ -1,0 +1,11 @@
+public class Outer {
+    private int a = 0;
+
+    public void test() {
+        int b = 0;
+    }
+
+    public class Inner {
+        private int d = 0;
+    }
+}

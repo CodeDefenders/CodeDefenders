@@ -1,0 +1,6 @@
+public class CUT {
+    public test() {
+        int a = 0; // Comment changed
+        int b = 0 / 1;
+    }
+}

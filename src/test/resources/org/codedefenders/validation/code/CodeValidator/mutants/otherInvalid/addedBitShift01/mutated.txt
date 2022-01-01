@@ -1,0 +1,1 @@
+public class Rational { public void test() { r.num = r.num | ((r.num & (1 << 29)) << 1); }}

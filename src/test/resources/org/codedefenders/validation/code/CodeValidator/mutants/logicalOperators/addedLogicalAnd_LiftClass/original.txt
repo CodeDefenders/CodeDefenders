@@ -19,7 +19,6 @@ public class Lift {
     }
 
     public int getCurrentFloor() {
-        --topFloor;
         return currentFloor;
     }
 
@@ -64,4 +63,3 @@ public class Lift {
         }
     }
 }
-

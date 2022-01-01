@@ -1,0 +1,7 @@
+public class CUT {
+    private int a = 0;
+
+    public void test() {
+        int b = 0;
+    }
+}

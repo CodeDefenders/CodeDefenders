@@ -1,0 +1,3 @@
+public class CUT {
+    protected void setA(int a) {}
+}

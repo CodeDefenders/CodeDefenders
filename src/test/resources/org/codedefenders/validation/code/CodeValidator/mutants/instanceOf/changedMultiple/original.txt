@@ -1,0 +1,14 @@
+public class CUT {
+    public void test() {
+        Integer a = new Integer(0);
+        if (a instanceof Number) {
+            String b = a.toString();
+        }
+        if (a instanceof Number) {
+            String c = a.toString();
+        }
+        if (a instanceof Number) {
+            String d = a.toString();
+        }
+    }
+}
