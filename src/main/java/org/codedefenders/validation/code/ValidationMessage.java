@@ -42,7 +42,9 @@ public enum ValidationMessage {
     MUTANT_VALIDATION_CALLS("Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!"),
     MUTANT_VALIDATION_IDENTICAL("Invalid mutant, sorry! Your mutant is identical to the CUT"),
 
-    MUTANT_VALIDATION_METHOD_SIGNATURE("Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements"),
+    MUTANT_VALIDATION_METHOD_SIGNATURE("Invalid mutant, sorry! Your mutant changes one or more method signatures"),
+    MUTANT_VALIDATION_FIELD_NAME("Invalid mutant, sorry! Your mutant changes one or more field names"),
+    MUTANT_VALIDATION_IMPORT_STATEMENT("Invalid mutant, sorry! Your mutant changes one or more import statements"),
     MUTANT_VALIDATION_PACKAGE_SIGNATURE("Invalid mutant, sorry! Your mutant changes the package signature"),
     MUTANT_VALIDATION_CLASS_SIGNATURE("Invalid mutant, sorry! Your mutant changes a class signature"),
 
