@@ -98,8 +98,9 @@
 
 <%-- -------------------------------------------------------------------------------- --%>
 
-
 <jsp:include page="/jsp/header_game.jsp"/>
+
+<jsp:include page="/jsp/push_socket.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
