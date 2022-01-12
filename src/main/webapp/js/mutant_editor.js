@@ -146,7 +146,7 @@ class MutantEditor {
                 lineNumbers: true,
                 matchBrackets: true,
                 mode: 'text/x-java',
-                readOnly: 'nocursor',
+                readOnly: true,
                 autoRefresh: true
             });
 

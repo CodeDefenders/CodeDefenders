@@ -41,7 +41,7 @@
             } else {
                 const editor = CodeMirror.fromTextArea(textarea, {
                     lineNumbers: true,
-                    readOnly: 'nocursor',
+                    readOnly: true,
                     mode: 'text/x-java',
                     autoRefresh: true
                 });

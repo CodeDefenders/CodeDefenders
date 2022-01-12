@@ -42,7 +42,7 @@ class ClassViewer {
             lineNumbers: true,
             matchBrackets: true,
             mode: 'text/x-java',
-            readOnly: 'nocursor',
+            readOnly: true,
             gutters: [
                 'CodeMirror-linenumbers',
                 'CodeMirror-mutantIcons'
@@ -66,7 +66,7 @@ class ClassViewer {
                 lineNumbers: true,
                 matchBrackets: true,
                 mode: 'text/x-java',
-                readOnly: 'nocursor',
+                readOnly: true,
                 autoRefresh: true
             });
 

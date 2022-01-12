@@ -207,7 +207,7 @@
                     const codemirror = CodeMirror.fromTextArea(document.getElementById('diff'), {
                         lineNumbers: true,
                         mode: "text/x-diff",
-                        readOnly: 'nocursor',
+                        readOnly: true,
                         autoRefresh: true
                     });
                     codemirror.setSize('100%', '100%');
