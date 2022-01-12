@@ -156,8 +156,29 @@ pre.CodeMirror-line {
 /* Style for read-only CodeMirror instances
 ----------------------------------------------------------------------------- */
 
-.readonly-pre .CodeMirror {
-    background: #F5F5F5;
+/* Hide the cursor. Codemirror also has the option [readOnly: 'nocursor'], but it has some problems (e.g. copy & paste
+   does not work). */
+.CodeMirror.codemirror-readonly .CodeMirror-cursor {
+    display: none !important
+}
+
+/* Style for CodeMirror instances that toggle between readonly and editable
+----------------------------------------------------------------------------- */
+
+/* Add .codemirror-readonly to the .CodeMirror container to display a lock in the corner. */
+.CodeMirror.codemirror-readonly-toggle.codemirror-readonly::after {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    content: "\f023"; /* fontawesome lock icon */
+    font: normal normal normal 24px/1 FontAwesome;
+    color: var(--bs-gray);
+    z-index: 10; /* CodeMirror search dialog has z-index 15 */
+}
+/* When .codemirror-readonly-toggle is present in the container as well, the lines are grayed out to make it more
+   noticeable when the editor is toggled between readonly and editable. */
+.CodeMirror.codemirror-readonly-toggle.codemirror-readonly {
+    background: #f7f7f7;
 }
 
 /* Sizing
@@ -225,7 +246,7 @@ pre.CodeMirror-line {
     --cm-max-width: 1000px;
 }
 
-/* Style for readonly lines.
+/* Style for individual readonly lines.
 ----------------------------------------------------------------------------- */
 
 .readonly-line {
