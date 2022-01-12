@@ -149,6 +149,7 @@ class MutantEditor {
                 readOnly: true,
                 autoRefresh: true
             });
+            editor.getWrapperElement().classList.add('codemirror-readonly');
 
             if (window.hasOwnProperty('ResizeObserver')) {
                 new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());

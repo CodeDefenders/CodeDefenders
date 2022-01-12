@@ -210,6 +210,7 @@
                         readOnly: true,
                         autoRefresh: true
                     });
+                    codemirror.getWrapperElement().classList.add('codemirror-readonly');
                     codemirror.setSize('100%', '100%');
                 })();
             </script>

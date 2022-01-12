@@ -91,6 +91,7 @@ class TestAccordion {
             readOnly: true,
             autoRefresh: true
         });
+        editor.getWrapperElement().classList.add('codemirror-readonly');
         CodeDefenders.classes.InfoApi.setTestEditorValue(editor, test.id);
 
         modal.controls.show();
