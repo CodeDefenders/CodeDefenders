@@ -237,29 +237,36 @@
 
             </form>
 
-    <t:modal id="validatorExplanation" title="Validator Explanations">
-        <jsp:attribute name="content">
-            <t:validator_explanation_mutant/>
-            <div class="mt-3"></div> <%-- spacing --%>
-            <t:validator_explanation_test/>
-        </jsp:attribute>
-    </t:modal>
+            <t:modal id="validatorExplanation" title="Validator Explanations">
+                <jsp:attribute name="content">
+                    <t:validator_explanation_mutant/>
+                    <div class="mt-3"></div> <%-- spacing --%>
+                    <t:validator_explanation_test/>
+                </jsp:attribute>
+            </t:modal>
 
-	<div class="modal fade" id="automaticEquivalenceTriggerExplanation" tabindex="-1">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title">Auto Equivalence Duel Threshold Explanation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body p-4">
-					<%@ include file="/jsp/automatic_duels_explanation.jsp"%>
-				</div>
-				<div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
+            <div class="modal fade" id="automaticEquivalenceTriggerExplanation" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Auto Equivalence Duel Threshold Explanation</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="form-width">
+            <t:cut_preview/>
+        </div>
     </div>
     <%
         }

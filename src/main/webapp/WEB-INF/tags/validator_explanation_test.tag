@@ -20,16 +20,21 @@
 
 <%@ tag import="org.codedefenders.game.AbstractGame" %>
 <%@ tag import="org.codedefenders.util.Constants" %>
+<%@ tag import="org.codedefenders.util.MessageUtils" %>
+<%@ tag import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <%@ tag import="java.util.Objects" %>
 <%
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     game = Objects.nonNull(game) ? game : (AbstractGame) request.getAttribute(Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
-    String maxAssertionsPerTest;
+    String maxAssertionsText;
     if (Objects.nonNull(game)) {
-        maxAssertionsPerTest = Integer.toString(game.getMaxAssertionsPerTest());
+        maxAssertionsText = String.format("Only %d %s per test",
+                game.getMaxAssertionsPerTest(),
+                MessageUtils.pluralize(game.getMaxAssertionsPerTest(), "assertion", "assertions"));
     } else {
-        maxAssertionsPerTest = "the configured amount of";
+        maxAssertionsText = String.format("Only the configured number of assertions per test (default: %d)",
+                DEFAULT_NB_ASSERTIONS);
     }
 %>
 <h3>Test rules</h3>
@@ -37,5 +42,5 @@
     <li>No loops</li>
     <li>No calls to System.*</li>
     <li>No new methods or conditionals</li>
-    <li>Only <%=maxAssertionsPerTest%> assertion(s) per test</li>
+    <li><%=maxAssertionsText%></li>
 </ul>
