@@ -27,6 +27,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="settingsRepository" type="org.codedefenders.persistence.database.SettingsRepository"--%>
+
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -241,11 +243,10 @@
                 <li>Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).</li>
                 <li>Users are separated by new lines.</li>
                 <li>If an email is provided and sending emails is enabled, created users receive an email with their credentials.</li>
-                <li>The password rules are: At least
-                <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>
+                <li>The password rules are: At least ${settingsRepository.minPasswordLength}
                 alphanumeric characters (a-z, A-Z, 0-9) without whitespaces.
                 </li>
-                <li> Please consider that you can't reuse an username from an inactive user. <li
+                <li> Please consider that you can't reuse an username from an inactive user. </li>
             </ul>
             <p class="mb-2">Valid input format examples:</p>
             <pre class="bg-light p-3 m-0"><code>username,password
