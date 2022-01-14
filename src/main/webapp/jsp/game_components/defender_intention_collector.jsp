@@ -29,6 +29,7 @@
     var lineChooseNote = '<div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c"><i class="fa fa-arrow-down me-1"></i> Indicate which line you are defending to enable test editor. Click on a line number.</div>';
 
     $(lineChooseNote).insertAfter('#cut-div .game-component-header');
+    $(lineChooseNote).insertAfter('#newmut-div .game-component-header');
 
     var input = document.createElement("input");
     input.setAttribute("type", "hidden");
@@ -39,7 +40,8 @@
     theForm.appendChild(input);
 
     // Update Left Code Mirror to enable line selection on gutter
-    var editor = document.querySelector("#sut + .CodeMirror").CodeMirror;
+    var editor = (document.querySelector("#sut + .CodeMirror")
+            || document.querySelector("#mutant-code + .CodeMirror")).CodeMirror;
     var testEditor = document.querySelector("#test-code + .CodeMirror").CodeMirror;
 
     toggleIntentionClass();

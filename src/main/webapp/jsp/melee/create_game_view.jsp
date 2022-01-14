@@ -186,6 +186,20 @@
                     </div>
                 </div>
 
+                <div class="row mb-1"
+                     title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
+                    <label class="col-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture
+                        Intentions</label>
+                    <div class="col-8 d-flex align-items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="capture-intentions-switch"
+                                   name="capturePlayersIntention">
+                            <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players'
+                                Intentions</label>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row mb-3"
                      title="Allows players to chat within their team and with the enemy team.">
                     <label class="col-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
@@ -218,7 +232,8 @@
                     </c:when>
                     <c:otherwise>
                         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
-                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel" class="btn btn-outline-primary">Cancel</a>
+                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel"
+                           class="btn btn-outline-primary">Cancel</a>
                     </c:otherwise>
                 </c:choose>
 

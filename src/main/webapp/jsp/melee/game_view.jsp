@@ -87,6 +87,14 @@
 <%
     }
 %>
+<%
+    if (game.isCapturePlayersIntention()) {
+%>
+<%@include file="/jsp/game_components/defender_intention_collector.jsp"%>
+<%@include file="/jsp/game_components/attacker_intention_collector.jsp"%>
+<%
+    }
+%>
 
 <!-- This corresponds to dispatcher.Dispatch -->
 <jsp:include page="/jsp/game_notifications.jsp"/>
