@@ -71,7 +71,8 @@ public class DatabaseAccess {
                 "  ON events.Event_Type = em.Event_Type ",
                 "WHERE Game_ID=?",
                 "  AND Event_Status=?",
-                "  AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?) ",
+                "  AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?"
+                        + " OR events.Event_Type=? OR events.Event_Type=?) ",
                 "  AND Timestamp >= FROM_UNIXTIME(UNIX_TIMESTAMP()-300) ",
                 "  AND events.Event_ID > ?");
         // DEFENDER_MUTANT_CLAIMED_EQUIVALENT
@@ -82,7 +83,9 @@ public class DatabaseAccess {
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(EventStatus.GAME.toString()),
                 DatabaseValue.of(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()),
+                DatabaseValue.of(EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT.toString()),
                 DatabaseValue.of(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()),
+                DatabaseValue.of(EventType.PLAYER_MUTANT_EQUIVALENT.toString()),
                 DatabaseValue.of(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
                 DatabaseValue.of(lastMessageId)};
         return DB.executeQueryReturnList(query, DatabaseAccess::getEventsWithMessage, values);

@@ -30,6 +30,7 @@ public class EventDAO {
 
         if (eventType.equals(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT)
                 || eventType.equals(EventType.DEFENDER_MUTANT_EQUIVALENT)
+                || eventType.equals(EventType.PLAYER_MUTANT_EQUIVALENT)
                 || eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT)) {
             query = String.join("\n",
                     "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message)",

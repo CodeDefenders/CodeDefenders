@@ -32,7 +32,10 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Event;
+import org.codedefenders.model.EventType;
 import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This implementation of a {@link IScoringPolicy} calculates the score based on
@@ -42,6 +45,7 @@ import org.codedefenders.util.Constants;
  * <p>TODO Some caching would be great at this point ?
  */
 public class DefaultScoringPolicy implements IScoringPolicy {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultScoringPolicy.class);
 
     private EventDAO eventDAO;
 
@@ -81,6 +85,20 @@ public class DefaultScoringPolicy implements IScoringPolicy {
         // Process the event log to compute the score of each entity
         for (Event event : eventLog) {
             if (event.getUserId() == Constants.DUMMY_CREATOR_USER_ID) {
+                // Special case: Automatic Equivalence Duels events also have event.getUser().getId() == 1 but they
+                // have a 'normal' Message Payload so we need to short circuit otherwise the Message Payload extraction
+                // in the following lines will fail exceptionally ^^.
+                if (!event.getMessage().matches("[-0-9]*:[-0-9]*")) {
+                    if (event.getEventType().equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT)
+                            || event.getEventType().equals(EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT)) {
+                        // For this event types it can happen that the payload is not in the expected format.
+                        logger.debug("Ignored automatic triggered equivalence duel event");
+                    } else {
+                        throw new IllegalStateException("Encountered non-parseable event while computing score. Type: "
+                                + event.getEventType() + " and Message: " + event.getMessage());
+                    }
+                    break;
+                }
                 // Extract Message Payload
                 Integer testId = Integer.parseInt(event.getMessage().split(":")[0]);
                 // The first field of the message is overloaded for lost equivalence duels
@@ -97,6 +115,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         flaggedMutants.put(mutantId, playerClaimingEquivalenceId);
                         break;
                     case PLAYER_WON_EQUIVALENT_DUEL:
+                    case PLAYER_MUTANT_KILLED_EQUIVALENT:
                     case ATTACKER_MUTANT_KILLED_EQUIVALENT:
                         // Remove the mutant from the flagged mutants
                         flaggedMutants.remove(mutantId);
@@ -109,6 +128,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         break;
                     case PLAYER_LOST_EQUIVALENT_DUEL:
                     case DEFENDER_MUTANT_EQUIVALENT:
+                    case PLAYER_MUTANT_EQUIVALENT:
                         // Remove the mutant from the flagged mutants but keep the playerId that flagged
                         // it
                         Integer playerId = flaggedMutants.remove(mutantId);
