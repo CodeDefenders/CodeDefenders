@@ -98,7 +98,7 @@ public class PuzzleOverview extends HttpServlet {
      * @return {@code true} when users can play puzzles, {@code false} otherwise.
      */
     public static boolean checkEnabled() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue();
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() && !PuzzleDAO.getPuzzles().isEmpty();
     }
 
     /**
