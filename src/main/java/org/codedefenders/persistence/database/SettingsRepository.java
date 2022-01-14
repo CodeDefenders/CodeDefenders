@@ -20,14 +20,20 @@
 package org.codedefenders.persistence.database;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Named;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
+@Named
 @ApplicationScoped
 public class SettingsRepository {
 
     public boolean isMailValidationRequired() {
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REQUIRE_MAIL_VALIDATION).getBoolValue();
+    }
+
+    public int getMinPasswordLength() {
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
     }
 }
