@@ -34,7 +34,9 @@
     (function () {
         const errorLines = JSON.parse('${mutantErrorHighlighting.errorLinesJSON}');
 
-        CodeDefenders.objects.mutantErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(errorLines);
+        CodeDefenders.objects.mutantErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(
+                errorLines,
+                CodeDefenders.objects.mutantEditor.editor);
 
         CodeDefenders.objects.mutantErrorHighlighting.highlightErrors();
     })();

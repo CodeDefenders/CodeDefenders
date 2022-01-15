@@ -5,8 +5,10 @@ class ErrorHighlighting {
     /**
      * @param {number[]} errorLines
      *      Given by [JSON.parse('${mutantErrorHighlighting.errorLinesJSON}')]
+     * @param {CodeMirror} editor
+     *      The CodeMirror editor to apply the error highlighting on.
      */
-    constructor (errorLines) {
+    constructor (errorLines, editor) {
         /**
          * The line numbers of lines containing errors.
          * @type {number[]}
@@ -17,12 +19,7 @@ class ErrorHighlighting {
          * The CodeMirror editor to highlight errors on.
          * @type {CodeMirror}
          */
-        this.editor = null;
-        if (CodeDefenders.objects.classViewer != null) {
-            this.editor = CodeDefenders.objects.classViewer.editor;
-        } else if (CodeDefenders.objects.mutantEditor != null) {
-            this.editor = CodeDefenders.objects.mutantEditor.editor;
-        }
+        this.editor = editor;
     }
 
     /**

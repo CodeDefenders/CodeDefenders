@@ -34,7 +34,9 @@
     (function () {
         const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
 
-        CodeDefenders.objects.testErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(errorLines);
+        CodeDefenders.objects.testErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(
+                errorLines,
+                CodeDefenders.objects.testEditor.editor);
 
         CodeDefenders.objects.testErrorHighlighting.highlightErrors();
     })();
