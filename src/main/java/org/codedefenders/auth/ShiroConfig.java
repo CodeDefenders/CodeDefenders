@@ -129,19 +129,19 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME = "/equivalence-duels";
         fcMan.createChain(org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME, AUTHENTICATION);
 
-        // TODO Refactor URL as games/multiplayer/** or at least "/multiplayer/**"
         // org.codedefenders.util.Paths.BATTLEGROUND_GAME = "/multiplayergame";
         // org.codedefenders.util.Paths.BATTLEGROUND_HISTORY = "/multiplayer/history";
         // org.codedefenders.util.Paths.BATTLEGROUND_SELECTION = "/multiplayer/games";
         // org.codedefenders.util.Paths.BATTLEGROUND_CREATE = "/multiplayer/create";
-        fcMan.createChain("/multiplayer**", AUTHENTICATION);
+        fcMan.createChain("/multiplayergame/**", AUTHENTICATION);
+        fcMan.createChain("/multiplayer/**", AUTHENTICATION);
 
-        // TODO Refactor URL as games/melee/** or at least "/melee/**"
         // org.codedefenders.util.Paths.MELEE_GAME = "/meleegame";
         // org.codedefenders.util.Paths.MELEE_HISTORY = "/meleegame/history";
         // org.codedefenders.util.Paths.MELEE_SELECTION = "/melee/games";
         // org.codedefenders.util.Paths.MELEE_CREATE = "/melee/create";
-        fcMan.createChain("/melee**", AUTHENTICATION);
+        fcMan.createChain("/meleegame/**", AUTHENTICATION);
+        fcMan.createChain("/melee/**", AUTHENTICATION);
 
         // TODO Refactor URL as games/puzzle/** or at least "/puzzle/**"
         // org.codedefenders.util.Paths.PUZZLE_OVERVIEW = "/puzzles";
