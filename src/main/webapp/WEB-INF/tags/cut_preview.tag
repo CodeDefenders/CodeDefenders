@@ -41,10 +41,11 @@
             } else {
                 const editor = CodeMirror.fromTextArea(textarea, {
                     lineNumbers: true,
-                    readOnly: 'nocursor',
+                    readOnly: true,
                     mode: 'text/x-java',
                     autoRefresh: true
                 });
+                editor.getWrapperElement().classList.add('codemirror-readonly');
                 CodeDefenders.classes.InfoApi.setClassEditorValue(editor, classId);
             }
         };

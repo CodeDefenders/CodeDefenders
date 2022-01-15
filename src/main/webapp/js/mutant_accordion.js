@@ -87,6 +87,7 @@ class MutantAccordion {
             readOnly: true,
             autoRefresh: true
         });
+        editor.getWrapperElement().classList.add('codemirror-readonly');
         CodeDefenders.classes.InfoApi.setMutantEditorValue(editor, mutant.id);
 
         modal.controls.show();
@@ -131,6 +132,7 @@ class MutantAccordion {
             readOnly: true,
             autoRefresh: true
         });
+        editor.getWrapperElement().classList.add('codemirror-readonly');
         CodeDefenders.classes.InfoApi.setTestEditorValue(editor, mutant.killedByTestId);
 
         modal.controls.show();

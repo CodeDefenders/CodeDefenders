@@ -42,13 +42,14 @@ class ClassViewer {
             lineNumbers: true,
             matchBrackets: true,
             mode: 'text/x-java',
-            readOnly: 'nocursor',
+            readOnly: true,
             gutters: [
                 'CodeMirror-linenumbers',
                 'CodeMirror-mutantIcons'
             ],
             autoRefresh: true
         });
+        this.editor.getWrapperElement().classList.add('codemirror-readonly');
 
         /* Refresh editor when resized. */
         if (window.hasOwnProperty('ResizeObserver')) {
@@ -66,9 +67,10 @@ class ClassViewer {
                 lineNumbers: true,
                 matchBrackets: true,
                 mode: 'text/x-java',
-                readOnly: 'nocursor',
+                readOnly: true,
                 autoRefresh: true
             });
+            editor.getWrapperElement().classList.add('codemirror-readonly');
 
             if (window.hasOwnProperty('ResizeObserver')) {
                 new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());

@@ -43,6 +43,7 @@
     var editor = (document.querySelector("#sut + .CodeMirror")
             || document.querySelector("#mutant-code + .CodeMirror")).CodeMirror;
     var testEditor = document.querySelector("#test-code + .CodeMirror").CodeMirror;
+    testEditor.getWrapperElement().classList.add('codemirror-readonly-toggle');
 
     toggleIntentionClass();
     // Trigger the logic that updates the UI at last
@@ -112,8 +113,8 @@
             // Standard text
             submitTestButton.innerText = "Defend";
 
-            testEditor.setOption('readOnly', 'nocursor');
-            document.querySelector('#def pre').classList.add('readonly-pre');
+            testEditor.setOption('readOnly', true);
+            testEditor.getWrapperElement().classList.add('codemirror-readonly');
 
             // Update the value of the hidden field
             input.setAttribute("value", "");
@@ -124,7 +125,7 @@
             submitTestButton.innerText = "Defend Line " + sLine;
 
             testEditor.setOption('readOnly', false);
-            document.querySelector('#def pre').classList.remove('readonly-pre');
+            testEditor.getWrapperElement().classList.remove('codemirror-readonly');
 
             // Update the value of the hidden field
             input.setAttribute("value", sLine);
