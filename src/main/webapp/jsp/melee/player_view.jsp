@@ -254,6 +254,7 @@
 
     <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
     </div>
@@ -306,6 +307,8 @@
             </div>
         </div>
 
+        <t:defender_intention_collection_note/>
+
         <form id="atk"
               action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
               method="post">
@@ -342,8 +345,9 @@
               action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
               method="post">
             <jsp:include page="/jsp/game_components/test_editor.jsp"/>
-            <input type="hidden" name="formType" value="createTest"> <input
-                type="hidden" name="gameId" value="<%=game.getId()%>"/>
+            <input type="hidden" name="formType" value="createTest">
+            <input type="hidden" name="gameId" value="<%=game.getId()%>">
+            <input type="hidden" id="selected_lines" name="selected_lines" value="">
         </form>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
 

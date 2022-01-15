@@ -3,6 +3,7 @@ window.CodeDefenders = {
         ClassViewer: null,
         CodeCompletion: null,
         DataTablesUtils: null,
+        DefenderIntentionCollection: null,
         ErrorHighlighting: null,
         GameChat: null,
         GameHighlighting: null,
@@ -20,6 +21,7 @@ window.CodeDefenders = {
     },
     objects: {
         classViewer: null,
+        defenderIntentionCollection: null,
         gameChat: null,
         gameHighlighting: null,
         mutantAccordion: null,

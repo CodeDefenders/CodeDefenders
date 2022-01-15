@@ -145,6 +145,7 @@
 
     <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
     </div>

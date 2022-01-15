@@ -110,6 +110,7 @@
 <div class="row">
     <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <t:defender_intention_collection_note/>
         <jsp:include page="../game_components/class_viewer.jsp"/>
         <jsp:include page="../game_components/game_highlighting.jsp"/>
     </div>
@@ -134,7 +135,8 @@
         <form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
             <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             <input type="hidden" name="formType" value="createTest">
-            <input type="hidden" name="gameId" value="<%= game.getId() %>" />
+            <input type="hidden" name="gameId" value="<%= game.getId() %>">
+            <input type="hidden" id="selected_lines" name="selected_lines" value="">
         </form>
 
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
