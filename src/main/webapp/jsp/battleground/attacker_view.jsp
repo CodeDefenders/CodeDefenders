@@ -135,19 +135,19 @@
                     <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
                 </form>
 
-                <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
-                <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
-                        onclick="CodeDefenders.objects.mutantProgressBar.activate(); this.form.submit(); this.disabled=true;"
-                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Attack
-                </button>
-
+                <%
+                    request.setAttribute("gameActive", game.getState() == GameState.ACTIVE);
+                    request.setAttribute("intentionCollectionEnabled", game.isCapturePlayersIntention());
+                %>
+                <t:submit_mutant_button gameActive="${gameActive}"
+                                        intentionCollectionEnabled="${intentionCollectionEnabled}"/>
             </div>
         </div>
 
         <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
+            <input type="hidden" id="attacker_intention" name="attacker_intention" value="">
 
             <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
