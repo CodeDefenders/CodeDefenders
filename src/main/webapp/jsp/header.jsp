@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.NotificationType" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 <%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
@@ -30,66 +29,6 @@
     boolean profileEnabled = UserProfileManager.checkEnabled();
     boolean puzzleEnabled = PuzzleGameManager.checkEnabled();
 %>
-
-<script>
-(function () {
-
-    let count = 0;
-
-    var updateUserNotifications = function (url) {
-        $.getJSON(url, function (r) {
-            $(r).each(function (index) {
-                if (r[index].eventStatus === 'NEW') {
-                    count++;
-                }
-
-                const userDropdown = document.getElementById('user-dropdown');
-
-                const li = document.createElement('li');
-                const a = document.createElement('a');
-                a.classList.add('dropdown-item');
-
-                a.href = '<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>' + '?gameId=' + r[index].gameId;
-                a.innerHTML = r[index].parsedMessage;
-
-                li.appendChild(a);
-                userDropdown.appendChild(li);
-            });
-
-            const notificationCount = document.getElementById('notification-count');
-            const notificationSeparator = document.getElementById('notification-separator')
-            notificationCount.innerText = count;
-
-            if (count > 0) {
-                notificationCount.classList.remove('bg-secondary');
-                notificationCount.classList.add('bg-warning');
-                notificationSeparator.style.display = null;
-            } else {
-                notificationCount.classList.remove('bg-warning');
-                notificationCount.classList.add('bg-secondary');
-                notificationSeparator.style.display = 'none';
-            }
-        });
-    };
-
-    $(document).ready(function () {
-            if (document.getElementById('user-dropdown') !== null) {
-                //notifications written here:
-                // refreshed every 5 seconds
-                var interval = 5000;
-                setInterval(function () {
-                    var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.USEREVENT%>&timestamp=" + (new Date().getTime() - interval);
-                    updateUserNotifications(url);
-                }, interval);
-
-                var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.USEREVENT%>&timestamp=0";
-                updateUserNotifications(url);
-            }
-        }
-    );
-
-})();
-</script>
 
 <nav class="navbar navbar-expand-md navbar-cd" id="header">
     <div class="container-fluid">
@@ -130,7 +69,6 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="header-user" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         ${login.user.username}
-                        <span id="notification-count" class="badge bg-secondary ms-1"></span>
                     </a>
                     <ul class="dropdown-menu" id="user-dropdown" aria-labelledby="header-user"
                         <%-- Align dropdown menu to the right, so it doesn't get cut off. --%>
@@ -140,7 +78,6 @@
                         <% } %>
                         <li><a class="dropdown-item" id="header-help" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a></li>
                         <li><a class="dropdown-item" id="header-logout" href="<%=request.getContextPath() + Paths.LOGOUT%>">Logout</a></li>
-                        <li id="notification-separator"><hr class="dropdown-divider"></li>
                     </ul>
                 </li>
             </ul>
