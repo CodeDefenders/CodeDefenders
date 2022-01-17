@@ -21,12 +21,14 @@
 <%@ page import="org.codedefenders.model.NotificationType" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
+<%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <%
     boolean profileEnabled = UserProfileManager.checkEnabled();
+    boolean puzzleEnabled = PuzzleGameManager.checkEnabled();
 %>
 
 <script>
@@ -117,9 +119,11 @@
                         <li><a class="dropdown-item" id="header-leaderboard" href="<%= request.getContextPath() + Paths.LEADERBOARD_PAGE%>">Leaderboard</a></li>
                     </ul>
                 </li>
+                <% if (puzzleEnabled) { %>
                 <li class="nav-item nav-item-highlight">
                     <a class="nav-link" id="header-puzzle" href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>">Puzzles</a>
                 </li>
+                <% } %>
             </ul>
 
             <ul class="navbar-nav">
