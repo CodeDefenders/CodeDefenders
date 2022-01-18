@@ -1,5 +1,6 @@
 window.CodeDefenders = {
     classes: {
+        AttackerIntentionCollection: null,
         ClassViewer: null,
         CodeCompletion: null,
         DataTablesUtils: null,
@@ -20,6 +21,7 @@ window.CodeDefenders = {
         TestProgressBar: null
     },
     objects: {
+        attackerIntentionCollection: null,
         classViewer: null,
         defenderIntentionCollection: null,
         gameChat: null,
