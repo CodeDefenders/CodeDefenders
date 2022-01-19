@@ -18,12 +18,15 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
+
 <script type="text/javascript" src="js/defender_intention_collection.js"></script>
 
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
-        const lineToSelect = ${sessionScope.selected_lines == null ? "null" : sessionScope.selected_lines};
+        const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};
+        console.log(lineToSelect);
 
         CodeDefenders.objects.defenderIntentionCollection = new CodeDefenders.classes.DefenderIntentionCollection(
                 lineToSelect);

@@ -459,7 +459,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (game.isCapturePlayersIntention()) {
             collectDefenderIntentions(newTest, selectedLines, selectedMutants);
-            session.setAttribute("selected_lines", selectedLines.iterator().next());
+            previousSubmission.setSelectedLine(selectedLines.iterator().next());
         }
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
@@ -511,7 +511,6 @@ public class MeleeGameManager extends HttpServlet {
 
         // Clean up the session
         previousSubmission.clear();
-        session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
     }
 

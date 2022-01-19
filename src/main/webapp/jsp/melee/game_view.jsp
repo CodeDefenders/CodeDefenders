@@ -62,6 +62,8 @@
     history.setPlayers(Collections.singletonList(player), otherPlayers);
 %>
 
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
+
 <!-- We set the  meeleScoreboardBean from the servlet not the jsp -->
 
 <jsp:include page="/jsp/header_game.jsp"/>
@@ -87,11 +89,12 @@
 <%
     }
 %>
+
 <%
     if (game.isCapturePlayersIntention()) {
 %>
-<%@include file="/jsp/game_components/defender_intention_collector.jsp"%>
-<%@include file="/jsp/game_components/attacker_intention_collector.jsp"%>
+    <jsp:include page="/jsp/game_components/defender_intention_collector.jsp"/>
+    <jsp:include page="/jsp/game_components/attacker_intention_collector.jsp"/>
 <%
     }
 %>
@@ -99,3 +102,6 @@
 <!-- This corresponds to dispatcher.Dispatch -->
 <jsp:include page="/jsp/game_notifications.jsp"/>
 <%@ include file="/jsp/footer_game.jsp" %>
+
+
+<% previousSubmission.clear(); %>

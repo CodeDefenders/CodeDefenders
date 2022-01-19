@@ -438,8 +438,8 @@ public class MultiplayerGameManager extends HttpServlet {
         if (game.isCapturePlayersIntention()) {
             collectDefenderIntentions(newTest, selectedLines, selectedMutants);
             // Store intentions in the session in case tests is broken we automatically re-select the same line
-            // TODO At the moment, there is only and only one line
-            session.setAttribute("selected_lines", selectedLines.iterator().next());
+            // TODO At the moment, there is one and only one line
+            previousSubmission.setSelectedLine(selectedLines.iterator().next());
         }
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
@@ -491,7 +491,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
         // Clean up the session
         previousSubmission.clear();
-        session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
 

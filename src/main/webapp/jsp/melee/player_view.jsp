@@ -179,8 +179,6 @@
     classViewer.setDependenciesForClass(game.getCUT());
 %>
 
-<% previousSubmission.clear(); %>
-
 
 <div class="row">
 

@@ -106,8 +106,6 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
-<% previousSubmission.clear(); %>
-
 <%-- -------------------------------------------------------------------------------- --%>
 
 
@@ -176,3 +174,6 @@
 </div>
 
 <%@ include file="/jsp/footer_game.jsp" %>
+
+
+<% previousSubmission.clear(); %>
