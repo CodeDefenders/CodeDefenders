@@ -55,17 +55,17 @@
             a class under test</a>.
     </p>
     <%
-    } else {
+            } else {
     %>
     <p class="text-center">
         Games can only be started once at least one class under test has been uploaded.
     </p>
     <%
-        }
-    } else {
+            }
+        } else {
     %>
-    <div class="d-flex flex-wrap justify-content-around">
-        <div id="create-game-settings" class="form-width">.
+    <div class="d-flex flex-wrap justify-content-center gap-5">
+        <div id="create-game-settings" class="form-width">
             <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
                   class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="createGame">
@@ -186,16 +186,17 @@
                     </div>
                 </div>
 
-        <div class="row mb-1"
-             title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
-            <label class="col-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture Intentions</label>
-            <div class="col-8 d-flex align-items-center">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
-                    <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players' Intentions</label>
+                <div class="row mb-1"
+                     title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
+                    <label class="col-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture Intentions</label>
+                    <div class="col-8 d-flex align-items-center">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="capture-intentions-switch"
+                                   name="capturePlayersIntention">
+                            <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players' Intentions</label>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
 
                 <div class="row mb-3"
                      title="Allows players to chat within their team and with the enemy team.">
@@ -229,7 +230,8 @@
                     </c:when>
                     <c:otherwise>
                         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
-                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel" class="btn btn-outline-primary">Cancel</a>
+                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel"
+                           class="btn btn-outline-primary">Cancel</a>
                     </c:otherwise>
                 </c:choose>
 
@@ -262,7 +264,7 @@
 
         </div>
 
-        <div class="form-width">
+        <div class="form-width w-100">
             <t:cut_preview/>
         </div>
     </div>

@@ -32,134 +32,24 @@
     </div>
 </div>
 
+<script type="text/javascript" src="js/code_completion.js"></script>
+<script type="text/javascript" src="js/test_editor.js"></script>
+
 <script>
-(function () {
+    /* Wrap in a function to avoid polluting the global scope. */
+    (function () {
+        const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};
+        const editableLinesEnd = ${testEditor.hasEditableLinesEnd() ? testEditor.editableLinesEnd : "null"};
+        const mockingEnabled = ${testEditor.mockingEnabled};
+        const keymap = '${login.user.keyMap.CMName}';
 
-    let startEditLine = ${testEditor.editableLinesStart};
-    let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
+        const editorElement = document.getElementById('test-code');
 
-    let getReadOnlyLinesEnd = function(lines) {
-        // Test editor permits only last two lines
-        return [lines.length - 2, lines.length - 1];
-    };
-
-    // If you make changes to the autocompletion, change it for an attacker too.
-    testMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
-        "assertNotNull", "assertSame", "assertNotSame", "fail"];
-
-    <% if(testEditor.isMockingEnbaled()) { %>
-        mockitoMethods = ["mock", "when", "then", "thenThrow", "doThrow", "doReturn", "doNothing"];
-        // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
-        // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)
-        // Behavior verification is currentlty not implemented (Mockito.verify)
-        testMethods = testMethods.concat(mockitoMethods);
-    <% } %>
-
-    let autocompleteList = [];
-
-    const filterOutComments = function(text) {
-        let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
-        return text.replace(commentRegex, "");
-    };
-
-    let updateAutocompleteList = function () {
-        let wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
-        let set = new Set(testMethods);
-
-        let testClass = editorTest.getValue().split("\n");
-        testClass.slice(startEditLine, testClass.length - 2);
-        testClass = testClass.join("\n");
-        let texts = [testClass];
-
-        const autocompletedClasses = window.autocompletedClasses;
-        if (typeof autocompletedClasses !== 'undefined') {
-            Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
-                texts.push(autocompletedClasses[key]);
-            });
-        }
-
-        texts.forEach(function (text) {
-            text = filterOutComments(text);
-            let m;
-            while ((m = wordRegex.exec(text)) !== null) {
-                if (m.index === wordRegex.lastIndex) {
-                    wordRegex.lastIndex++;
-                }
-                m.forEach(function (match) {
-                    set.add(match)
-                });
-            }
-        });
-        autocompleteList =  Array.from(set);
-    };
-
-    let editorTest = CodeMirror.fromTextArea(document.getElementById("test-code"), {
-        lineNumbers: true,
-        indentUnit: 4,
-        smartIndent: true,
-        matchBrackets: true,
-        mode: "text/x-java",
-        autoCloseBrackets: true,
-        styleActiveLine: true,
-        extraKeys: {
-            "Ctrl-Space": "autocompleteTest",
-            "Tab": "insertSoftTab"
-        },
-        keyMap: "${login.user.keyMap.CMName}",
-        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons'],
-        autoRefresh: true
-    });
-    if (window.hasOwnProperty('ResizeObserver')) {
-        new ResizeObserver(() => editorTest.refresh()).observe(editorTest.getWrapperElement());
-    }
-
-
-    CodeMirror.commands.autocompleteTest = function (cm) {
-        cm.showHint({
-            hint: function (editor) {
-                let reg = /[a-zA-Z][a-zA-Z0-9]*/;
-
-                let list = autocompleteList;
-                let cursor = editor.getCursor();
-                let currentLine = editor.getLine(cursor.line);
-                let start = cursor.ch;
-                let end = start;
-                while (end < currentLine.length && reg.test(currentLine.charAt(end))) ++end;
-                while (start && reg.test(currentLine.charAt(start - 1))) --start;
-                let curWord = start !== end && currentLine.slice(start, end);
-                let regex = new RegExp('^' + curWord, 'i');
-
-                return {
-                    list: (!curWord ? list : list.filter(function (item) {
-                        return item.match(regex);
-                    })).sort(),
-                    from: CodeMirror.Pos(cursor.line, start),
-                    to: CodeMirror.Pos(cursor.line, end)
-                };
-            }
-        });
-    };
-
-    editorTest.on('beforeChange', function (cm, change) {
-        let text = cm.getValue();
-        let lines = text.split(/\r|\r\n|\n/);
-
-        let readOnlyLinesEnd = getReadOnlyLinesEnd(lines);
-        if (~readOnlyLinesStart.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
-            change.cancel();
-        }
-    });
-
-    editorTest.on('focus', function () {
-        updateAutocompleteList();
-    });
-
-    editorTest.on('keyHandled', function (cm, name, event) {
-        // 9 == Tab, 13 == Enter
-        if ([9, 13].includes(event.keyCode)) {
-            updateAutocompleteList();
-        }
-    });
-
-})();
+        CodeDefenders.objects.testEditor = new CodeDefenders.classes.TestEditor(
+                editorElement,
+                editableLinesStart,
+                editableLinesEnd,
+                mockingEnabled,
+                keymap);
+    })();
 </script>

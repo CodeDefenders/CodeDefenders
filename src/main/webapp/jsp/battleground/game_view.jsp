@@ -56,7 +56,7 @@
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
 <%-- Push notifications using WebSocket --%>
-<jsp:include page="/jsp/push_notifications.jsp"/>
+<jsp:include page="/jsp/push_socket.jsp"/>
 
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
@@ -100,5 +100,4 @@ if (game.isCapturePlayersIntention()) {
 }
 %>
 <!-- This corresponds to dispatcher.Dispatch -->
-<jsp:include page="/jsp/game_notifications.jsp"/>
 <%@ include file="/jsp/footer_game.jsp" %>

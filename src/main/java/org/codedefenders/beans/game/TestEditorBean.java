@@ -80,7 +80,7 @@ public class TestEditorBean {
     }
 
     public int getEditableLinesStart() {
-        return editableLinesStart == null ? 1 : editableLinesStart;
+        return editableLinesStart;
     }
 
     public int getEditableLinesEnd() {
@@ -95,7 +95,7 @@ public class TestEditorBean {
         return editableLinesEnd != null;
     }
 
-    public boolean isMockingEnbaled() {
+    public boolean isMockingEnabled() {
         return mockingEnabled;
     }
 }

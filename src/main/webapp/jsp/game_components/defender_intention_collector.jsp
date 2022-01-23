@@ -29,6 +29,7 @@
     var lineChooseNote = '<div id="line-choose-note" class="mb-1 ps-3" style="color: #00289c"><i class="fa fa-arrow-down me-1"></i> Indicate which line you are defending to enable test editor. Click on a line number.</div>';
 
     $(lineChooseNote).insertAfter('#cut-div .game-component-header');
+    $(lineChooseNote).insertAfter('#newmut-div .game-component-header');
 
     var input = document.createElement("input");
     input.setAttribute("type", "hidden");
@@ -42,6 +43,7 @@
     var editor = (document.querySelector("#sut + .CodeMirror")
             || document.querySelector("#mutant-code + .CodeMirror")).CodeMirror;
     var testEditor = document.querySelector("#test-code + .CodeMirror").CodeMirror;
+    testEditor.getWrapperElement().classList.add('codemirror-readonly-toggle');
 
     toggleIntentionClass();
     // Trigger the logic that updates the UI at last
@@ -111,8 +113,8 @@
             // Standard text
             submitTestButton.innerText = "Defend";
 
-            testEditor.setOption('readOnly', 'nocursor');
-            document.querySelector('#def pre').classList.add('readonly-pre');
+            testEditor.setOption('readOnly', true);
+            testEditor.getWrapperElement().classList.add('codemirror-readonly');
 
             // Update the value of the hidden field
             input.setAttribute("value", "");
@@ -123,7 +125,7 @@
             submitTestButton.innerText = "Defend Line " + sLine;
 
             testEditor.setOption('readOnly', false);
-            document.querySelector('#def pre').classList.remove('readonly-pre');
+            testEditor.getWrapperElement().classList.remove('codemirror-readonly');
 
             // Update the value of the hidden field
             input.setAttribute("value", sLine);

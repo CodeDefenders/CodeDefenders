@@ -248,6 +248,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         if (role != Role.NONE) {
             logger.info("User {} already in the requested game. Has role {}", login.getUserId(), role);
+            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
         boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);

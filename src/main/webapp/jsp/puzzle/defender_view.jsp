@@ -78,7 +78,7 @@
 <%
     gameHighlighting.setGameData(game.getMutants(), game.getTests());
     gameHighlighting.setFlaggingData(game.getMode(), game.getId());
-    gameHighlighting.setEnableFlagging(true);
+    gameHighlighting.setEnableFlagging(false);
     gameHighlighting.setCodeDivSelector("#cut-div");
 %>
 
@@ -115,7 +115,7 @@
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
 
-<jsp:include page="/jsp/push_notifications.jsp"/>
+<jsp:include page="/jsp/push_socket.jsp"/>
 
 <div id="game-container" class="container-fluid">
 
@@ -134,14 +134,14 @@
         </div>
 
         <div class="col-xl-6 col-12" id="ut-div">
-            <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
+            <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
             <div class="game-component-header">
                 <h3>Write a new JUnit test here</h3>
                 <div>
 
                     <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                            onclick="testProgressBar(); this.form.submit(); this.disabled=true;"
+                            onclick="CodeDefenders.objects.testProgressBar.activate(); this.form.submit(); this.disabled=true;"
                             <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                         Defend
                     </button>

@@ -11,7 +11,7 @@
         <jsp:attribute name="content">
             <div class="card">
                 <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
-                    <pre class="m-0"><textarea name="class-${classId}"></textarea></pre>
+                    <pre class="m-0"><textarea></textarea></pre>
                 </div>
             </div>
         </jsp:attribute>
@@ -28,11 +28,12 @@
                 } else {
                     const editor = CodeMirror.fromTextArea(textarea, {
                         lineNumbers: true,
-                        readOnly: 'nocursor',
+                        readOnly: true,
                         mode: 'text/x-java',
                         autoRefresh: true
                     });
-                    ClassAPI.getAndSetEditorValue(textarea, editor);
+                    editor.getWrapperElement().classList.add('codemirror-readonly');
+                    CodeDefenders.classes.InfoApi.setClassEditorValue(editor, ${classId});
                 }
             })
         })();

@@ -30,9 +30,7 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
 
 /**
  * This class handles database logic for functionality which has not
@@ -42,21 +40,6 @@ import org.codedefenders.model.EventType;
  * be moved to DAOs.
  */
 public class DatabaseAccess {
-
-    /**
-     * Sanitises user input. If a whole SQL query is entered, syntax
-     * errors may occur.
-     *
-     * @param s user input String
-     * @return sanitised String s
-     */
-    public static String sanitise(String s) {
-        s = s.replaceAll("\\<", "&lt;");
-        s = s.replaceAll("\\>", "&gt;");
-        s = s.replaceAll("\\\"", "&quot;");
-        s = s.replaceAll("\\'", "&apos;");
-        return s;
-    }
 
     /**
      * @param gameId The gameId for which to remove the events.
@@ -72,88 +55,6 @@ public class DatabaseAccess {
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId)};
         DB.executeUpdateQuery(query, values);
-    }
-
-    /**
-     * Retrieve the latest (in the past 5 minutes and not yet seen)
-     * events that belong to a game and relate to equivalence duels.
-     */
-    public static List<Event> getNewEquivalenceDuelEventsForGame(int gameId, int lastMessageId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM events",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ",
-                "WHERE Game_ID=?",
-                "  AND Event_Status=?",
-                "  AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?) ",
-                "  AND Timestamp >= FROM_UNIXTIME(UNIX_TIMESTAMP()-300) ",
-                "  AND events.Event_ID > ?");
-        // DEFENDER_MUTANT_CLAIMED_EQUIVALENT
-        // EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
-        // ATTACKER_MUTANT_KILLED_EQUIVALENT
-        DatabaseValue[] values = new DatabaseValue[]{
-                // DatabaseValue.of(userId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(EventStatus.GAME.toString()),
-                DatabaseValue.of(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()),
-                DatabaseValue.of(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()),
-                DatabaseValue.of(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
-                DatabaseValue.of(lastMessageId)};
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEventsWithMessage, values);
-    }
-
-    public static List<Event> getEventsForUser(int userId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM events ",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ",
-                "WHERE Event_Status!='DELETED' ",
-                "  AND Player_ID=?;");
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, DatabaseValue.of(userId));
-    }
-
-    public static List<Event> getNewEventsForUser(int userId, long time) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM events ",
-                "LEFT JOIN event_messages AS em",
-                "  ON events.Event_Type = em.Event_Type ",
-                "WHERE Player_ID=?",
-                "  AND Event_Status<>?",
-                "  AND Event_Status<>? ",
-                "  AND Timestamp >= FROM_UNIXTIME(?)");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(EventStatus.DELETED.toString()),
-                DatabaseValue.of(EventStatus.GAME.toString()),
-                DatabaseValue.of(time)};
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
-    }
-
-    private static Event getEvents(ResultSet rs) throws SQLException {
-        Event event = new Event(
-                rs.getInt("events.Event_ID"),
-                rs.getInt("Game_ID"),
-                rs.getInt("Player_ID"),
-                rs.getString("em.Message"),
-                rs.getString("events.Event_Type"),
-                rs.getString("Event_Status"),
-                rs.getTimestamp("Timestamp"));
-        return event;
-    }
-
-    private static Event getEventsWithMessage(ResultSet rs) throws SQLException {
-        Event event = new Event(
-                rs.getInt("events.Event_ID"),
-                rs.getInt("Game_ID"),
-                rs.getInt("Player_ID"),
-                rs.getString("events.Event_Message"),
-                rs.getString("events.Event_Type"),
-                rs.getString("Event_Status"),
-                rs.getTimestamp("Timestamp"));
-        return event;
     }
 
     public static Role getRole(int userId, int gameId) {
@@ -248,86 +149,5 @@ public class DatabaseAccess {
         };
         final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
         return new HashSet<>(mutants);
-    }
-
-    /**
-     * This also automatically update the Timestamp field using CURRENT_TIMESTAMP().
-     */
-    public static void logSession(int uid, String ipAddress) {
-        deleteSessions(uid);
-        String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(uid),
-                DatabaseValue.of(ipAddress)
-        };
-        DB.executeUpdateQuery(query, values);
-    }
-
-    public static boolean deleteSessions(int userId) {
-        String query = "DELETE FROM sessions WHERE User_ID = ?;";
-        return DB.executeUpdateQuery(query, DatabaseValue.of(userId));
-    }
-
-    public static int getLastCompletedSubmissionForUserInGame(int userId, int gameId, boolean isDefender) {
-        String query = isDefender ? "SELECT MAX(test_id) FROM tests" : "SELECT MAX(mutant_id) FROM mutants";
-        query += " WHERE game_id=? AND player_id = (SELECT id FROM players WHERE game_id=? AND user_id=?);";
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId)
-        };
-
-        final Integer result = DB.executeQueryReturnValue(query, rs -> rs.getInt(1), valueList);
-        return Optional.ofNullable(result).orElse(-1);
-    }
-
-    public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId,
-            int lastSubmissionId, boolean isDefender) {
-        // Current test is the one right after lastTestId in the user/game context
-        String query = isDefender
-                ? "SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in (SELECT Test_ID FROM tests" :
-                "SELECT * FROM targetexecutions WHERE Mutant_ID > ? AND Mutant_ID in (SELECT Mutant_ID FROM mutants";
-        query += " WHERE game_id=? AND player_id = (SELECT id from players where game_id=? and user_id=?))"
-                + "AND TargetExecution_ID >= (SELECT MAX(TargetExecution_ID) from targetexecutions);";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DatabaseValue.of(lastSubmissionId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(userId)
-        };
-        TargetExecution t = DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, valueList);
-        return Optional.ofNullable(t).map(te -> te.target).orElse(null);
-    }
-
-    public static boolean setPasswordResetSecret(int userId, String pwResetSecret) {
-        String query = String.join("\n",
-                "UPDATE users",
-                "SET pw_reset_secret = ?,",
-                "    pw_reset_timestamp = CURRENT_TIMESTAMP",
-                "WHERE User_ID = ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(pwResetSecret),
-                DatabaseValue.of(userId)
-        };
-        return DB.executeUpdateQuery(query, values);
-    }
-
-    public static int getUserIDForPWResetSecret(String pwResetSecret) {
-        String query = String.join("\n",
-                "",
-                "SELECT User_ID",
-                "FROM users",
-                "WHERE",
-                "  TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) <",
-                "             (SELECT INT_VALUE",
-                "              FROM settings",
-                "              WHERE name = 'PASSWORD_RESET_SECRET_LIFESPAN')",
-                "AND",
-                "  pw_reset_secret = ?;");
-
-        final Integer userId = DB.executeQueryReturnValue(query,
-                rs -> rs.getInt("User_ID"), DatabaseValue.of(pwResetSecret));
-        return Optional.ofNullable(userId).orElse(-1);
     }
 }

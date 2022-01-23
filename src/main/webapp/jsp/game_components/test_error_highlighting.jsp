@@ -27,40 +27,17 @@
 
 <jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
-<% if(testErrorHighlighting.hasErrorLines()) { %>
+<script type="text/javascript" src="js/error_highlighting.js"></script>
+
 <script>
-(function () {
+    /* Wrap in a function to avoid polluting the global scope. */
+    (function () {
+        const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
 
-    /* Game highlighting data. */
-    const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
+        CodeDefenders.objects.testErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(
+                errorLines,
+                CodeDefenders.objects.testEditor.editor);
 
-    const codeMirror = $('${testErrorHighlighting.codeDivSelector}').find('.CodeMirror')[0].CodeMirror;
-
-    /**
-     * Highlights errors on the given CodeMirror instance.
-     * @param {object} codeMirror The CodeMirror instance.
-     * See: https://creativewebspecialist.co.uk/2013/07/15/highlight-errors-in-codemirror/
-     */
-    const highlightErrors = function (codeMirror) {
-        for (const errorLine of errorLines) {
-            // Maybe we need to remove the
-            codeMirror.addLineClass(errorLine - 1, 'background', 'line-error');
-        }
-    };
-
-    /**
-     * Scrolls the given line into view.
-     * @param {Number} line The given line.
-     */
-    const jumpToLine = function (line) {
-        line -= 1; // Subtract 1 because CodeMirror's lines are 0-indexed.
-        codeMirror.scrollIntoView({line}, 200);
-    };
-
-    codeMirror.highlightErrors = function () { highlightErrors(this) };
-    codeMirror.highlightErrors();
-    window.jumpToTestLine = jumpToLine;
-
-})();
+        CodeDefenders.objects.testErrorHighlighting.highlightErrors();
+    })();
 </script>
-<% } %>

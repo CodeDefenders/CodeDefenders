@@ -80,14 +80,6 @@ public class GameChatBean {
     }
 
     /**
-     * Returns the URL for the chat API for the current game.
-     * @return The URL for the chat API.
-     */
-    public String getChatApiUrl() {
-        return Paths.API_GAME_CHAT.substring(1) + "?gameId=" + game.getId() + "&limit=" + getMessageLimit();
-    }
-
-    /**
      * Returns the maximum length for chat messages.
      * @return The maximum length for chat messages.
      */

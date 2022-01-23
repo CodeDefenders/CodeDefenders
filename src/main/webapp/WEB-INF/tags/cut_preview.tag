@@ -18,9 +18,9 @@
   --%>
 <%@ tag pageEncoding="UTF-8" %>
 
-<div id="create-game-cut-preview">
-<div class="card">
-    <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
+<div id="create-game-cut-preview" class="w-100 h-100">
+<div class="card" style="height: 100%; min-height: 200px; resize: vertical; overflow: auto;">
+    <div class="card-body p-0 codemirror-fill w-100 h-100">
         <pre class="m-0"><textarea name=""></textarea></pre>
     </div>
 </div>
@@ -33,23 +33,24 @@
         const textarea = cutPreview.querySelector('textarea');
 
         const updatePreview = function () {
-            textarea.setAttribute('name', `class-\${classSelector.value}`)
+            const classId = Number(classSelector.value);
             const codeMirrorContainer = cutPreview.querySelector('.CodeMirror');
 
             if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                ClassAPI.getAndSetEditorValue(textarea, codeMirrorContainer.CodeMirror);
+                CodeDefenders.classes.InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
             } else {
                 const editor = CodeMirror.fromTextArea(textarea, {
                     lineNumbers: true,
-                    readOnly: 'nocursor',
+                    readOnly: true,
                     mode: 'text/x-java',
                     autoRefresh: true
                 });
-                ClassAPI.getAndSetEditorValue(textarea, editor);
+                editor.getWrapperElement().classList.add('codemirror-readonly');
+                CodeDefenders.classes.InfoApi.setClassEditorValue(editor, classId);
             }
         };
 
-        // Load initial selecte class
+        // Load initial selected class
         document.addEventListener("DOMContentLoaded", updatePreview);
 
         classSelector.addEventListener('change', updatePreview);

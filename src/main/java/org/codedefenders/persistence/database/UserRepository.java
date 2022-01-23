@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -100,11 +101,12 @@ public class UserRepository {
      *
      * @param userEntity The new {@code UserEntity} to store in the database.
      * @return The id of the inserted {@code UserEntity} wrapped in an {@code Optional} or an empty optional if
-     * inserting the {@code userEntity} failed.
+     *         inserting the {@code userEntity} failed.
      * @throws IllegalArgumentException if {@code userEntity.id} is greater then 0.
      */
     // TODO: This gives no information why we couldn't insert the UserEntity into the database
-    public Optional<Integer> insert(UserEntity userEntity) {
+    @Nonnull
+    public Optional<Integer> insert(@Nonnull UserEntity userEntity) {
         if (userEntity.getId() > 0) {
             // TODO: Should we allow this?
             throw new IllegalArgumentException("Can't insert user with id > 0");
@@ -134,7 +136,7 @@ public class UserRepository {
      * @param userEntity The {@code UserEntity} to update
      * @return Whether updating the provided {@code UserEntity} was successful or not.
      */
-    public boolean update(UserEntity userEntity) {
+    public boolean update(@Nonnull UserEntity userEntity) {
         String query = "UPDATE users "
                 + "SET Username = ?, "
                 + "  Email = ?, "
@@ -163,12 +165,14 @@ public class UserRepository {
     /**
      * Retrieve an {@code UserEntity} for a given {@code userId} from the database.
      */
+    @Nonnull
     public Optional<UserEntity> getUserById(int userId) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE User_ID = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -178,12 +182,14 @@ public class UserRepository {
     /**
      * Retrieve an {@code UserEntity} identified by the given {@code username} from the database.
      */
-    public Optional<UserEntity> getUserByName(String username) {
+    @Nonnull
+    public Optional<UserEntity> getUserByName(@Nonnull String username) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE Username = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), username);
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), username);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -193,12 +199,14 @@ public class UserRepository {
     /**
      * Retrieve an {@code UserEntity} identified by the given {@code email} from the database.
      */
-    public Optional<UserEntity> getUserByEmail(String email) {
+    @Nonnull
+    public Optional<UserEntity> getUserByEmail(@Nonnull String email) {
         String query = "SELECT * "
                 + "FROM  users "
                 + "WHERE Email = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -209,6 +217,7 @@ public class UserRepository {
     /**
      * Retrieve the id of the user which corresponds to the player identified by the given {@code playerId}.
      */
+    @Nonnull
     public Optional<Integer> getUserIdForPlayerId(int playerId) {
         try {
             return Optional.of(userIdForPlayerIdCache.get(playerId));
@@ -224,7 +233,8 @@ public class UserRepository {
                 + "WHERE players.User_ID = users.User_ID "
                 + "AND players.ID = ?";
         try {
-            return Optional.ofNullable(connectionFactory.getQueryRunner().query(query, new ScalarHandler<>(), playerId));
+            return Optional.ofNullable(connectionFactory.getQueryRunner()
+                    .query(query, new ScalarHandler<>(), playerId));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -236,11 +246,13 @@ public class UserRepository {
      *
      * <p>This list includes system users.
      */
+    @Nonnull
     public List<UserEntity> getUsers() {
         String query = "SELECT * "
                 + "FROM  users;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -252,6 +264,7 @@ public class UserRepository {
      *
      * <p>This list includes neither system nor inactive users
      */
+    @Nonnull
     public List<UserEntity> getUnassignedUsers() {
         String query = "SELECT DISTINCT u.* "
                 + "FROM view_valid_users u "
@@ -267,10 +280,69 @@ public class UserRepository {
                 + "    )"
                 + "ORDER BY Username, User_ID;";
         try {
-            return connectionFactory.getQueryRunner().query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
+            return connectionFactory.getQueryRunner()
+                    .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public boolean insertSession(int userId, String ipAddress) {
+        String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
+
+        try {
+            connectionFactory.getQueryRunner().update(query, userId, ipAddress);
+            return true;
+        } catch (SQLException e) {
+            logger.warn("SQLException while logging session", e);
+            return false;
+        }
+    }
+
+    public boolean deleteSessions(int userId) {
+        String query = "DELETE FROM sessions WHERE User_ID = ?;";
+
+        try {
+            connectionFactory.getQueryRunner().update(query, userId);
+            return true;
+        } catch (SQLException e) {
+            logger.warn("SQLException while executing query", e);
+            return false;
+        }
+    }
+
+    public boolean setPasswordResetSecret(int userId, @Nullable String passwordResetSecret) {
+        String query = "UPDATE users \n"
+                + "SET pw_reset_secret = ?, \n"
+                + "    pw_reset_timestamp = CURRENT_TIMESTAMP \n"
+                + "WHERE User_ID = ?;";
+
+        try {
+            connectionFactory.getQueryRunner().update(query, passwordResetSecret, userId);
+            return true;
+        } catch (SQLException e) {
+            logger.warn("SQLException while executing query", e);
+            return false;
+        }
+    }
+
+    @Nonnull
+    public Optional<Integer> getUserIdForPasswordResetSecret(@Nullable String passwordResetSecret) {
+        String query = "SELECT User_ID \n"
+                + "FROM users \n"
+                + "WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < ("
+                + "         SELECT INT_VALUE \n"
+                + "         FROM settings \n"
+                + "         WHERE name = 'PASSWORD_RESET_SECRET_LIFESPAN'"
+                + ") AND pw_reset_secret = ?;";
+
+        try {
+            return Optional.ofNullable(connectionFactory.getQueryRunner()
+                    .query(query, new ScalarHandler<>(), passwordResetSecret));
+        } catch (SQLException e) {
+            logger.warn("SQLException while executing query", e);
+            return Optional.empty();
         }
     }
 }

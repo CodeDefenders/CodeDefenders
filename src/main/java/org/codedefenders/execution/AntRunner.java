@@ -444,7 +444,11 @@ public class AntRunner implements //
         command.add("-DtestClassname=" + testClassName);
         command.add("-Dcuts.deps=" + Paths.get(cutDir, CUTS_DEPENDENCY_DIR));
 
-        if (mutantDir != null && testDir != null) {
+        if (mutantDir != null && testDir != null
+                // Limit this code path to targets that depend on the `mutant.test.file` variable.
+                // Otherwise, this will create esp. for KillMaps a lot of empty directories
+                // See: https://gitlab.infosun.fim.uni-passau.de/se2/codedefenders/CodeDefenders/-/issues/904
+                && ("recompiled-test-mutant".equals(target) || "recompile-test-with-mutant".equals(target))) {
             String separator = File.separator;
             if (separator.equals("\\")) {
                 separator = "\\\\";

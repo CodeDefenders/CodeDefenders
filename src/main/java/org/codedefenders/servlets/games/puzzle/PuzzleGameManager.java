@@ -34,6 +34,7 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -59,6 +60,7 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -139,6 +141,11 @@ public class PuzzleGameManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
+        if (!checkEnabled()) {
+            // Send users to the home page
+            response.sendRedirect(ServletUtils.getBaseURL(request));
+            return;
+        }
         final PuzzleGame game;
 
         final Optional<Integer> gameIdOpt = gameId(request);
@@ -200,6 +207,15 @@ public class PuzzleGameManager extends HttpServlet {
                 logger.error("Trying to enter puzzle game with illegal role {}", role);
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
         }
+    }
+
+    /**
+     * Checks whether users can play puzzles.
+     *
+     * @return {@code true} when users can play puzzles, {@code false} otherwise.
+     */
+    public static boolean checkEnabled() {
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() && !PuzzleDAO.getPuzzles().isEmpty();
     }
 
     /**

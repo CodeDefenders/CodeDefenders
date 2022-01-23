@@ -83,7 +83,7 @@ public class PasswordServlet extends HttpServlet {
                     messages.add("No user was found for this username and email. Please check if the username and email match.");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
-                    DatabaseAccess.setPasswordResetSecret(u.get().getId(), resetPwSecret);
+                    userRepo.setPasswordResetSecret(u.get().getId(), resetPwSecret);
                     String hostAddr = request.getScheme() + "://" + request.getServerName() + ":"
                             + request.getServerPort() + request.getContextPath();
                     String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
@@ -105,16 +105,16 @@ public class PasswordServlet extends HttpServlet {
                 password = request.getParameter("inputPasswordChange");
 
                 String responseURL = request.getContextPath() + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-                int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
-                if (resetPwSecret != null && userId > -1) {
+                Optional<Integer> userId = userRepo.getUserIdForPasswordResetSecret(resetPwSecret);
+                if (resetPwSecret != null && userId.isPresent()) {
                     if (!(validator.validPassword(password))) {
                         messages.add("Password not changed. Make sure it is valid.");
                     } else if (password.equals(confirm)) {
-                        Optional<UserEntity> user = userRepo.getUserById(userId);
+                        Optional<UserEntity> user = userRepo.getUserById(userId.get());
                         if (user.isPresent()) {
                             user.get().setEncodedPassword(UserEntity.encodePassword(password));
                             if (user.get().update()) {
-                                DatabaseAccess.setPasswordResetSecret(user.get().getId(), null);
+                                userRepo.setPasswordResetSecret(user.get().getId(), null);
                                 responseURL = request.getContextPath() + Paths.LOGIN;
                                 messages.add("Successfully changed your password.");
                             }

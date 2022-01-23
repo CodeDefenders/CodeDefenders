@@ -33,13 +33,13 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 
 /**
  * This class configures Shiro.
  *
  * @author gambi
- *
  */
 @ApplicationScoped
 public class ShiroConfig {
@@ -54,8 +54,9 @@ public class ShiroConfig {
 
     @Produces
     @Singleton
-    public CodeDefendersFormAuthenticationFilter getAuthenticationFilter(LoginBean login, MessagesBean messages) {
-        CodeDefendersFormAuthenticationFilter authFilter = new CodeDefendersFormAuthenticationFilter(login, messages);
+    public CodeDefendersFormAuthenticationFilter getAuthenticationFilter(LoginBean login, MessagesBean messages,
+            UserService userService) {
+        CodeDefendersFormAuthenticationFilter authFilter = new CodeDefendersFormAuthenticationFilter(login, messages, userService);
         // org.codedefenders.util.Paths.LOGIN = "/login";
         authFilter.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
         // Go to game overview page after successful login
@@ -128,19 +129,19 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME = "/equivalence-duels";
         fcMan.createChain(org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME, AUTHENTICATION);
 
-        // TODO Refactor URL as games/multiplayer/** or at least "/multiplayer/**"
         // org.codedefenders.util.Paths.BATTLEGROUND_GAME = "/multiplayergame";
         // org.codedefenders.util.Paths.BATTLEGROUND_HISTORY = "/multiplayer/history";
         // org.codedefenders.util.Paths.BATTLEGROUND_SELECTION = "/multiplayer/games";
         // org.codedefenders.util.Paths.BATTLEGROUND_CREATE = "/multiplayer/create";
-        fcMan.createChain("/multiplayer**", AUTHENTICATION);
+        fcMan.createChain("/multiplayergame/**", AUTHENTICATION);
+        fcMan.createChain("/multiplayer/**", AUTHENTICATION);
 
-        // TODO Refactor URL as games/melee/** or at least "/melee/**"
         // org.codedefenders.util.Paths.MELEE_GAME = "/meleegame";
         // org.codedefenders.util.Paths.MELEE_HISTORY = "/meleegame/history";
         // org.codedefenders.util.Paths.MELEE_SELECTION = "/melee/games";
         // org.codedefenders.util.Paths.MELEE_CREATE = "/melee/create";
-        fcMan.createChain("/melee**", AUTHENTICATION);
+        fcMan.createChain("/meleegame/**", AUTHENTICATION);
+        fcMan.createChain("/melee/**", AUTHENTICATION);
 
         // TODO Refactor URL as games/puzzle/** or at least "/puzzle/**"
         // org.codedefenders.util.Paths.PUZZLE_OVERVIEW = "/puzzles";
@@ -150,7 +151,6 @@ public class ShiroConfig {
 
         // API URLs. I assume they require authentication, but I might be wrong. Maybe
         // they require a different type of authentication, e.g., if the are REST
-        // org.codedefenders.util.Paths.API_NOTIFICATION = "/api/notifications";
         // org.codedefenders.util.Paths.API_MESSAGES = "/api/messages"; // path used in messaging.js
         // org.codedefenders.util.Paths.API_FEEDBACK = "/api/feedback";
         // org.codedefenders.util.Paths.API_SEND_EMAIL = "/api/sendmail";
