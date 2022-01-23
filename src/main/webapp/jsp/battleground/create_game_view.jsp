@@ -31,8 +31,6 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 
-<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Battleground Game"); %>
 
