@@ -29,11 +29,15 @@
 </head>
 
 <body>
-	<a href="<%=request.getContextPath()%>">
-        <img src="<%=request.getContextPath()%>/images/logo.png">
-	</a>
-    <h1>404</h1>
-    <div class="container">
+    <div class="content">
+        <div class="branding">
+            <img href="${pageContext.request.contextPath}/"
+                 src="${pageContext.request.contextPath}/images/logo.png"
+                 alt="Code Defenders Logo"
+                 width="58">
+            <h1>Code Defenders</h1>
+        </div>
+        <h2>404</h2>
         <h3>The page could not be found or you don't have permission to view it.</h3>
         <hr/>
         <p>
@@ -42,16 +46,15 @@
         </p>
         <p>Make sure the address is correct and that the page hasn't moved.</p>
         <p>Please contact your administrator if you think this is a mistake.</p>
-        <a href="javascript:history.back()" class="go-back" hidden>Go back</a>
-    </div>
-    <script>
-        (function () {
+        <div class="go-back" hidden>
+            <a href="javascript:history.back()">Go back</a>
+        </div>
+        <script>
             if (history.length > 1) {
                 document.querySelector('.go-back').removeAttribute('hidden');
             }
-        })();
-    </script>
+        </script>
+    </div>
 </body>
 
 </html>
-

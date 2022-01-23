@@ -36,25 +36,28 @@
 </head>
 
 <body>
-	<a href="<%=request.getContextPath()%>">
-        <img src="<%=request.getContextPath()%>/images/logo.png">
-	</a>
-	<h1>500</h1>
-    <div class="container">
+    <div class="content">
+        <div class="branding">
+            <img href="${pageContext.request.contextPath}/"
+                 src="${pageContext.request.contextPath}/images/logo.png"
+                 alt="Code Defenders Logo"
+                 width="58">
+            <h1>Code Defenders</h1>
+        </div>
+        <h2>500</h2>
         <h3>Internal Server Error</h3>
-        <p>There has been a problem on our side.</p>
-        <p>Sorry!</p>
+        <hr/>
+        <p>There has been a problem on our side. Sorry about that.</p>
         <p>Please try again and contact your administrator if this keeps happening.</p>
-        <a href="javascript:history.back()" class="go-back">Go back</a>
-    </div>
-    <script>
-        (function () {
+        <div class="go-back" hidden>
+            <a href="javascript:history.back()">Go back</a>
+        </div>
+        <script>
             if (history.length > 1) {
                 document.querySelector('.go-back').removeAttribute('hidden');
             }
-        })();
-    </script>
+        </script>
+    </div>
 </body>
 
 </html>
-
