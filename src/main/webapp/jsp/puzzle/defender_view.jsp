@@ -113,7 +113,7 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/push_socket.jsp"/>
 

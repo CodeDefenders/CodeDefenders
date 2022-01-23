@@ -91,19 +91,19 @@
 }
 
 .mutantImageAlive {
-    background-image: url('../images/ingameicons/mutant.png');
+    background-image: url('../../images/ingameicons/mutant.png');
 }
 .mutantImageEquiv {
-    background-image: url('../images/ingameicons/mutantEquiv.png');
+    background-image: url('../../images/ingameicons/mutantEquiv.png');
 }
 .mutantImageFlagged {
-    background-image: url('../images/ingameicons/mutantFlagged.png');
+    background-image: url('../../images/ingameicons/mutantFlagged.png');
 }
 .mutantImageKilled {
-    background-image: url('../images/ingameicons/mutantKilled.png');
+    background-image: url('../../images/ingameicons/mutantKilled.png');
 }
 .mutantImageFlagAction {
-    background-image: url('../images/ingameicons/flag.png');
+    background-image: url('../../images/ingameicons/flag.png');
 }
 
 /* Terminal-like text style for command-line output <pre>s

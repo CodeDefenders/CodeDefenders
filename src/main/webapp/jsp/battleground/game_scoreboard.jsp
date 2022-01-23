@@ -41,7 +41,7 @@
     zeroDummyScore.setDuelInformation("0 / 0 / 0");
 %>
 
-<link href="${pageContext.request.contextPath}/css/game_scoreboard.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/specific/game_scoreboard.css" rel="stylesheet">
 
 <div id="scoreboard" class="modal fade" tabindex="-1">
     <div class="modal-dialog" style="max-width: 60rem;">

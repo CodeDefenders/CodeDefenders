@@ -32,8 +32,6 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/uploadcut.css" rel="stylesheet">
-
 <div class="container">
 
     <h2 class="mb-3">${pageInfo.pageTitle}</h2>

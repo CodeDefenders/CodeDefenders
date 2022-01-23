@@ -69,3 +69,13 @@
     width: 1rem;
     text-align: center;
 }
+
+/* Style for the datatables-select plugin.
+----------------------------------------------------------------------------- */
+
+/* Change colors of selected table rows. */
+table.dataTable tbody > tr.selected,
+table.dataTable tbody > tr > .selected {
+    background-color: #D8E0EA;
+    color: inherit;
+}

@@ -66,7 +66,7 @@
 
 <jsp:include page="/jsp/header_game.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
 
 <%-- Push notifications using WebSocket --%>
 <jsp:include page="/jsp/push_socket.jsp"/>

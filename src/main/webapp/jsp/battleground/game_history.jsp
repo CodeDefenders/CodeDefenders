@@ -31,7 +31,7 @@
 
 <%--@elvariable id="history" type="org.codedefenders.beans.game.HistoryBean"--%>
 
-<link href="${pageContext.request.contextPath}/css/timeline.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath}/css/specific/timeline.css" rel="stylesheet">
 
 <div id="history" class="modal fade" tabindex="-1">
     <div class="modal-dialog" style="max-width: 900px">
