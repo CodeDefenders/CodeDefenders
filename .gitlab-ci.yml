@@ -21,7 +21,7 @@ draft-job:
   script:
     - 'if [[ $PREVIOUS = Draft:* ]]; then echo "Pass. Previous title is draft"; else echo "Fail. Previous was not in Draft."; exit 0; fi'
     - 'if [[ $CURRENT = Draft:* ]];  then echo "Fail. Current is in draft."; exit 0; else echo "Pass. Current title is not in draft."; fi'
-    - 'curl --request POST --header "PRIVATE-TOKEN: ${PROJECT_TOKEN}" --no-progress-meter "https://gitlab.infosun.fim.uni-passau.de/api/v4/projects/${PROJECT_ID}/merge_requests/{$IID}/pipelines" | jq -r .web_url;'
+    - 'curl --request POST --header "PRIVATE-TOKEN: ${PROJECT_TOKEN}" "https://gitlab.infosun.fim.uni-passau.de/api/v4/projects/${PROJECT_ID}/merge_requests/{$IID}/pipelines" | jq -r .web_url;'
   rules:
     - if: '$CI_PIPELINE_SOURCE == "trigger"'
   tags:
