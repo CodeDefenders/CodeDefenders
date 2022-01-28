@@ -6,6 +6,9 @@ draft-job:
   stage: trigger
   # TODO: Replace with something else (e.g. sth more up to date)
   image: everpeace/curl-jq
+  variables:
+    # We do not need the repository
+    GIT_STRATEGY: none
   before_script:
     - 'export SOURCE=$(cat $TRIGGER_PAYLOAD | jq -r .object_attributes.source_branch)'
     - 'export PREVIOUS=$(cat $TRIGGER_PAYLOAD | jq -r .changes.title.previous)'
