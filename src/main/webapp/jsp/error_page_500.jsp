@@ -37,9 +37,8 @@
 
 <body>
     <div class="content">
-        <div class="branding">
-            <img href="${pageContext.request.contextPath}/"
-                 src="${pageContext.request.contextPath}/images/logo.png"
+        <a href="${pageContext.request.contextPath}/" class="branding">
+            <img src="${pageContext.request.contextPath}/images/logo.png"
                  alt="Code Defenders Logo"
                  width="58">
             <h1>Code Defenders</h1>

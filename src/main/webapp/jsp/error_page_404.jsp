@@ -30,13 +30,12 @@
 
 <body>
     <div class="content">
-        <div class="branding">
-            <img href="${pageContext.request.contextPath}/"
-                 src="${pageContext.request.contextPath}/images/logo.png"
+        <a href="${pageContext.request.contextPath}/" class="branding">
+            <img src="${pageContext.request.contextPath}/images/logo.png"
                  alt="Code Defenders Logo"
                  width="58">
             <h1>Code Defenders</h1>
-        </div>
+        </a>
         <h2>404</h2>
         <h3>The page could not be found or you don't have permission to view it.</h3>
         <hr/>
