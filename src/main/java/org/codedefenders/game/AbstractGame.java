@@ -30,6 +30,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,18 +57,25 @@ public abstract class AbstractGame {
     protected List<Mutant> mutants;
     protected List<Test> tests;
     protected List<Test> testsDefendersOnly;
+    /**
+     * Validation level used to check submitted mutants.
+     */
+    protected CodeValidatorLevel mutantValidatorLevel;
+    /**
+     * Maximum number of allowed assertions per submitted test.
+     */
+    protected int maxAssertionsPerTest;
+    // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
+    // Consider to move this into a setEvents method instead !
+    // This tells us that AbstractGame is not the right place for any logic!!!
+    protected EventDAO eventDAO;
+    protected UserRepository userRepository;
 
     public abstract boolean addPlayer(int userId, Role role);
 
     public abstract boolean insert();
 
     public abstract boolean update();
-
-    // TODO Dependency Injection. This suggests that AbstractGame might not be the right place to query for events
-    // Consider to move this into a setEvents method instead !
-    // This tells us that AbstractGame is not the right place for any logic!!!
-    protected EventDAO eventDAO;
-    protected UserRepository userRepository;
 
     public void setEventDAO(EventDAO eventDAO) {
         this.eventDAO = eventDAO;
@@ -99,6 +107,10 @@ public abstract class AbstractGame {
         return cut;
     }
 
+    public CodeValidatorLevel getMutantValidatorLevel() {
+        return mutantValidatorLevel;
+    }
+
     public int getCreatorId() {
         return creatorId;
     }
@@ -123,11 +135,11 @@ public abstract class AbstractGame {
         return this.mode;
     }
 
-    public abstract boolean isChatEnabled();
-
     protected void setMode(GameMode newMode) {
         this.mode = newMode;
     }
+
+    public abstract boolean isChatEnabled();
 
     public List<Test> getTests() {
         return getTests(false);
@@ -203,5 +215,9 @@ public abstract class AbstractGame {
 
     public boolean isFinished() {
         return this.state == GameState.FINISHED || this.state == GameState.SOLVED || this.state == GameState.FAILED;
+    }
+
+    public int getMaxAssertionsPerTest() {
+        return maxAssertionsPerTest;
     }
 }
