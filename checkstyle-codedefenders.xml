@@ -30,7 +30,9 @@
 	<!-- See http://checkstyle.sf.net/config_whitespace.html -->
 	<module name="FileTabCharacter">
 		<property name="eachLine" value="true"/>
+		<!--
 		<property name="severity" value="error"/>
+		-->
 	</module>
 
 	<module name="LineLength">
@@ -202,11 +204,14 @@
 		<module name="VariableDeclarationUsageDistance"/>
 		<module name="CustomImportOrder">
 			<property name="customImportOrderRules"
-					  value="STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS###THIRD_PARTY_PACKAGE###STATIC"/>
-			<property name="specialImportsRegExp" value="^org\."/>
+					  value="STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS###SAME_PACKAGE(1)###THIRD_PARTY_PACKAGE###STATIC"/>
+			<property name="standardPackageRegExp" value="^java\."/>
+			<property name="specialImportsRegExp" value="^javax\."/>
 			<property name="sortImportsInGroupAlphabetically" value="true"/>
 			<property name="separateLineBetweenGroups" value="true"/>
+			<!--
 			<property name="severity" value="error"/>
+			-->
 		</module>
 		<module name="MethodParamPad"/>
 		<module name="NoWhitespaceBefore">
@@ -245,12 +250,10 @@
 					  value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF, METHOD_DEF, CTOR_DEF, VARIABLE_DEF"/>
 		</module>
 		<module name="JavadocMethod">
-			<property name="scope" value="public"/>
+			<property name="accessModifiers" value="public"/>
 			<property name="allowMissingParamTags" value="true"/>
-			<property name="allowMissingThrowsTags" value="true"/>
 			<property name="allowMissingReturnTag" value="true"/>
 			<property name="allowedAnnotations" value="Override, Test"/>
-			<property name="allowThrowsTagsForSubclasses" value="true"/>
 		</module>
 		<module name="MissingJavadocMethod">
 			<property name="scope" value="public"/>

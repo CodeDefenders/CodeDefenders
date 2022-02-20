@@ -49,10 +49,11 @@ import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import difflib.Chunk;
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Chunk;
+import com.github.difflib.patch.Patch;
 
 /**
  * This class represents a mutation in a game class. These mutations are created
@@ -107,7 +108,7 @@ public class Mutant implements Serializable {
     // Computed on the fly if not read in the db
     private List<Integer> lines = null;
     private transient List<String> description = null;
-    private transient Patch difference = null;
+    private transient Patch<String> difference = null;
 
     private String killMessage;
 
@@ -358,7 +359,7 @@ public class Mutant implements Serializable {
         return CollectionUtils.containsAny(cut.getCompileTimeConstants(), getLines());
     }
 
-    public Patch getDifferences() {
+    public Patch<String> getDifferences() {
         if (difference == null) {
             computeDifferences();
         }
@@ -407,8 +408,8 @@ public class Mutant implements Serializable {
         List<String> sutLines = FileUtils.readLines(sourceFile);
         List<String> mutantLines = FileUtils.readLines(mutantFile);
 
-        Patch patch = DiffUtils.diff(sutLines, mutantLines);
-        List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
+        Patch<String> patch = DiffUtils.diff(sutLines, mutantLines);
+        List<String> unifiedPatches = UnifiedDiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
         StringBuilder unifiedPatch = new StringBuilder();
         for (String s : unifiedPatches) {
             if ("--- null".equals(s) || "+++ null".equals(s)) {
@@ -487,12 +488,12 @@ public class Mutant implements Serializable {
 
         List<String> fragementSummary = new ArrayList<>();
 
-        Patch p = getDifferences();
+        Patch<String> p = getDifferences();
         String modified = null;
         String deleted = null;
         String added = null;
-        for (Delta d : p.getDeltas()) {
-            Chunk chunk = d.getOriginal();
+        for (AbstractDelta<String> d : p.getDeltas()) {
+            Chunk<String> chunk = d.getSource();
             // position starts at 0 but code readout starts at 1
             int firstLine = chunk.getPosition() + 1;
             String desc = "line " + firstLine;

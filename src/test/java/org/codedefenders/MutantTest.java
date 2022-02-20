@@ -40,10 +40,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
-import difflib.PatchFailedException;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Patch;
+import com.github.difflib.patch.PatchFailedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -71,18 +72,18 @@ public class MutantTest {
                 "topFloor = highestFloor;", "}", "}");
 
         // generating diff information.
-        Patch thePatch = DiffUtils.diff(originalCode, mutantCode);
-        List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, originalCode, thePatch, 3);
+        Patch<String> thePatch = DiffUtils.diff(originalCode, mutantCode);
+        List<String> unifiedPatches = UnifiedDiffUtils.generateUnifiedDiff(null, null, originalCode, thePatch, 3);
         System.out.println("MutantTest.testApplyPatch() " + unifiedPatches);
         List<String> diff = Arrays.asList("--- null", "+++ null", "@@ -3,7 +3,7 @@",
                 " private int currentFloor = 0; // default", " private int capacity = 10;    // default",
                 " private int numRiders = 0;    // default", "-public Lift(int highestFloor) { ",
                 "+public Lift(int highestFloor) { topFloor = highestFloor;", " topFloor = highestFloor;", " }", " }");
 
-        Patch patch = DiffUtils.parseUnifiedDiff(diff);
+        Patch<String> patch = UnifiedDiffUtils.parseUnifiedDiff(diff);
 
         // Reapply the patch
-        List<String> patchedCode = (List<String>) DiffUtils.patch(originalCode, patch);
+        List<String> patchedCode = DiffUtils.patch(originalCode, patch);
         assertEquals(mutantCode, patchedCode);
     }
 
@@ -150,13 +151,13 @@ public class MutantTest {
         //
         Mutant m = new Mutant(mockedGameID, mockedClassID, mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(1, p.getDeltas().size());
         assertEquals(Arrays.asList(7), m.getLines());
 
-        for (Delta d : p.getDeltas()) {
-            System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
+        for (AbstractDelta<String> d : p.getDeltas()) {
+            System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d.toString());
         }
     }
 
@@ -217,7 +218,7 @@ public class MutantTest {
         //
         Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(1, p.getDeltas().size());
         assertEquals(Arrays.asList(7), m.getLines());
@@ -277,7 +278,7 @@ public class MutantTest {
         //
         Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(1, p.getDeltas().size());
         assertEquals(Arrays.asList(9), m.getLines());
@@ -338,7 +339,7 @@ public class MutantTest {
         //
         Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(1, p.getDeltas().size());
         assertEquals(Arrays.asList(8), m.getLines());
@@ -400,7 +401,7 @@ public class MutantTest {
         //
         Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(2, p.getDeltas().size()); // Change and insertion
         assertEquals(2, m.getLines().size());  // Change line, and line of insertion
@@ -481,12 +482,12 @@ public class MutantTest {
         System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getLines());
         System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(2, p.getDeltas().size()); // Change and insertion
         assertEquals(Arrays.asList(9, 13), m.getLines());
 
-        for (Delta d : p.getDeltas()) {
+        for (AbstractDelta<String> d : p.getDeltas()) {
             System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
         }
     }
@@ -546,12 +547,12 @@ public class MutantTest {
         //
         Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(1, p.getDeltas().size());
 //		assertEquals(Arrays.asList(7), m.getLines());
 
-        for (Delta d : p.getDeltas()) {
+        for (AbstractDelta<String> d : p.getDeltas()) {
             System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
         }
     }
@@ -611,7 +612,7 @@ public class MutantTest {
         //
         Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
 
-        Patch p = m.getDifferences();
+        Patch<String> p = m.getDifferences();
 
         assertEquals(0, p.getDeltas().size());
     }

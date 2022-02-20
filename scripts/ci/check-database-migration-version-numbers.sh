@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 output="$(find src/main/resources/db -name "V*" | sed -e 's/.*\(V[0-9._]*\)__.*/\1/' | sort | uniq -d)"
 if [ -z "$output" ]; then

@@ -75,8 +75,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import difflib.DiffUtils;
-import difflib.Patch;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.Patch;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
@@ -369,12 +370,12 @@ public class ParallelizeTest {
                     "     public int getTopFloor() {"
             );
 
-            Patch patch = DiffUtils.parseUnifiedDiff(diff);
+            Patch<String> patch = UnifiedDiffUtils.parseUnifiedDiff(diff);
             // Read the CUT code
             List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getSourceCode().split("\n") );
             // Apply the patch
 
-            List<String> mutantCode = (List<String>) DiffUtils.patch( origincalCode, patch);
+            List<String> mutantCode = DiffUtils.patch( origincalCode, patch);
             String mutantText = String.join("\n", mutantCode);
 
             Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),

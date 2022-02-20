@@ -48,6 +48,9 @@ import org.codedefenders.game.Mutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Chunk;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ParseProblemException;
@@ -65,10 +68,6 @@ import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
-
-import difflib.Chunk;
-import difflib.Delta;
-import difflib.DiffUtils;
 
 import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
 
@@ -193,8 +192,8 @@ public class CodeValidator {
         }
 
         // line-level diff
-        List<List<?>> originalLines = getOriginalLines(originalCode, mutatedCode);
-        List<List<?>> changedLines = getChangedLines(originalCode, mutatedCode);
+        List<List<String>> originalLines = getOriginalLines(originalCode, mutatedCode);
+        List<List<String>> changedLines = getChangedLines(originalCode, mutatedCode);
         assert (originalLines.size() == changedLines.size());
 
         if (level != CodeValidatorLevel.RELAXED && containsModifiedComments(originalCU, mutatedCU)) {
@@ -549,11 +548,11 @@ public class CodeValidator {
         return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
     }
 
-    private static boolean ternaryAdded(List<List<?>> orig, List<List<?>> muta) {
+    private static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
         final Pattern pattern = Pattern.compile(TERNARY_OP_REGEX);
 
-        Iterator<List<?>> it1 = orig.iterator();
-        Iterator<List<?>> it2 = muta.iterator();
+        Iterator<List<String>> it1 = orig.iterator();
+        Iterator<List<String>> it2 = muta.iterator();
         while (it1.hasNext() && it2.hasNext()) {
             final boolean foundInOriginal = pattern.matcher(it1.next().toString()).find();
             final boolean foundInMutant = pattern.matcher(it2.next().toString()).find();
@@ -565,9 +564,9 @@ public class CodeValidator {
         return false;
     }
 
-    private static boolean logicalOpAdded(List<List<?>> orig, List<List<?>> muta) {
-        Iterator<List<?>> it1 = orig.iterator();
-        Iterator<List<?>> it2 = muta.iterator();
+    private static boolean logicalOpAdded(List<List<String>> orig, List<List<String>> muta) {
+        Iterator<List<String>> it1 = orig.iterator();
+        Iterator<List<String>> it2 = muta.iterator();
         while (it1.hasNext() && it2.hasNext()) {
             final boolean foundInOriginal = containsAny(it1.next().toString(), PROHIBITED_LOGICAL_OPS);
             final boolean foundInMutant = containsAny(it2.next().toString(), PROHIBITED_LOGICAL_OPS);
@@ -593,7 +592,7 @@ public class CodeValidator {
         }
     }
 
-    private static List<Delta> getDeltas(String original, String changed) {
+    private static List<AbstractDelta<String>> getDeltas(String original, String changed) {
         List<String> originalLines = Arrays
                 .stream(original.split("\n"))
                 .map(String::trim)
@@ -606,18 +605,18 @@ public class CodeValidator {
         return DiffUtils.diff(originalLines, changedLines).getDeltas();
     }
 
-    private static List<List<?>> getChangedLines(String original, String changed) {
+    private static List<List<String>> getChangedLines(String original, String changed) {
         return getDeltas(original, changed)
                 .stream()
-                .map(Delta::getRevised)
+                .map(AbstractDelta::getTarget)
                 .map(Chunk::getLines)
                 .collect(Collectors.toList());
     }
 
-    private static List<List<?>> getOriginalLines(String original, String changed) {
+    private static List<List<String>> getOriginalLines(String original, String changed) {
         return getDeltas(original, changed)
                 .stream()
-                .map(Delta::getOriginal)
+                .map(AbstractDelta::getSource)
                 .map(Chunk::getLines)
                 .collect(Collectors.toList());
     }
