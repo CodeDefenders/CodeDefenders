@@ -338,6 +338,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         gle.setGameId(game.getId());
         gle.setUserId(login.getUserId());
         gle.setUserName(login.getUser().getUsername());
+        notificationService.post(gle);
 
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
     }
