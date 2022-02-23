@@ -45,7 +45,7 @@ class TieredConfiguration extends BaseConfiguration {
     private final List<BaseConfiguration> configurations;
 
     @Inject
-    TieredConfiguration(List<BaseConfiguration> configurations) {
+    TieredConfiguration(@SuppressWarnings("CdiInjectionPointsInspection") List<BaseConfiguration> configurations) {
         super();
         this.configurations = configurations;
     }

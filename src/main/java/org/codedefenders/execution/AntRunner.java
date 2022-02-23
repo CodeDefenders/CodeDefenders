@@ -66,7 +66,7 @@ public class AntRunner implements //
     private final Configuration config;
 
     @Inject
-    public AntRunner(Configuration config) {
+    public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
         this.config = config;
     }
 
