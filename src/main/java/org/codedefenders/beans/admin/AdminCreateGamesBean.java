@@ -66,6 +66,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 @SessionScoped
 public class AdminCreateGamesBean implements Serializable {
 
+    private final Object synchronizer = new Object();
     private final LoginBean login;
     private final MessagesBean messages;
     private final GameManagingUtils gameManagingUtils;
@@ -79,6 +80,10 @@ public class AdminCreateGamesBean implements Serializable {
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
+    }
+
+    public Object getSynchronizer() {
+        return synchronizer;
     }
 
     /**
