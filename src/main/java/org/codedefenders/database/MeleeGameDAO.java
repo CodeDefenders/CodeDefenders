@@ -424,7 +424,6 @@ public class MeleeGameDAO {
      * Retrieves the game in which the player plays.
      *
      * @param playerId The id of the player we get the game for.
-     * @return
      */
     public static AbstractGame getGameWherePlayerPlays(int playerId) {
         String query = String.join("\n",

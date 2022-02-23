@@ -77,8 +77,6 @@ public class ShiroConfig {
      * Configure the filtering mechanism. This might be replaced by annotations only
      * if we find a way to let the tomcat process them. Otherwise, we can use some
      * other configuration means
-     *
-     * @return
      */
     @Produces
     @Singleton
