@@ -151,7 +151,7 @@
                     </tr>
                     <%
                         List<List<String>> playersInfo = multiplayerPlayerInfoForGame.get(gid);
-                        if (!multiplayerUserIdForPlayerIds.values().stream().anyMatch(
+                        if (multiplayerUserIdForPlayerIds.values().stream().noneMatch(
                                 userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
                     %>
                         <tr class="players-table" hidden>
@@ -372,7 +372,7 @@
                     </tr>
                     <%
                         List<List<String>> playerInfos = meleePlayersInfoForGame.get(gid);
-                        if (!meleeUserIdForPlayerIds.values().stream().anyMatch(
+                        if (meleeUserIdForPlayerIds.values().stream().noneMatch(
                                 userId -> userId != Constants.DUMMY_ATTACKER_USER_ID && userId != Constants.DUMMY_DEFENDER_USER_ID)) {
                     %>
                         <tr class="players-table" hidden>
