@@ -38,7 +38,6 @@
     booktitle = {Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)},
     series = {SIGCSE'19},
     publisher = {ACM},
-    note = {To appear},
     year = {2019}
 }</code></pre>
                 <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
