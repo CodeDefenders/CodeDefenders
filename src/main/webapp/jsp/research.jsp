@@ -32,7 +32,7 @@
             In <span class="paper_venue">Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)</span>, ACM, 2019.
             <a href="#" data-bs-toggle="collapse" data-bs-target="#sigcse19_bibtex">[Bibtex]</a>
             <div id="sigcse19_bibtex" class="bibtex collapse" >
-<pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
+<pre class="tex"><code>@inproceedings{SIGSCE_2019_CodeDefenders,
     author = {Gordon Fraser and Alessio Gambi and Marvin Kreis and Jos{\'e} Miguel Rojas},
     title = {Gamifying a Software Testing Course with Code Defenders},
     booktitle = {Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)},
