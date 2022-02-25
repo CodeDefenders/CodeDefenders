@@ -18,6 +18,12 @@
  */
 package org.codedefenders;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.database.GameClassDAO;
@@ -34,12 +40,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.github.difflib.DiffUtils;
 import com.github.difflib.UnifiedDiffUtils;
 import com.github.difflib.patch.AbstractDelta;
@@ -49,7 +49,6 @@ import com.github.difflib.patch.PatchFailedException;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doReturn;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({GameDAO.class, GameClassDAO.class, MultiplayerGame.class, MultiplayerGameDAO.class})
@@ -412,8 +411,8 @@ public class MutantTest {
 
     @Test
     public void testGetLinesForInsertionMutantOnDisjointLines() throws IOException {
-//		int classId = MultiplayerGameDAO.getMultiplayerGame(gameId).getClassId();
-//		GameClass sut = MultiplayerGameDAO.getClassForId(classId);
+//        int classId = MultiplayerGameDAO.getMultiplayerGame(gameId).getClassId();
+//        GameClass sut = MultiplayerGameDAO.getClassForId(classId);
 
         // Mock the class provide a temmp sourceFile with original content in it
         String originalCode = "public class Lift {" + "\n"
@@ -550,7 +549,7 @@ public class MutantTest {
         Patch<String> p = m.getDifferences();
 
         assertEquals(1, p.getDeltas().size());
-//		assertEquals(Arrays.asList(7), m.getLines());
+//        assertEquals(Arrays.asList(7), m.getLines());
 
         for (AbstractDelta<String> d : p.getDeltas()) {
             System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);

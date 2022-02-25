@@ -28,51 +28,51 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({DatabaseAccess.class, GameManager.class})
 public class MultiplayerGameTest {
 
-	private MultiplayerGameManager multiplayerGameServlet;
-	
-	
-	@Test
-	public void testStrangeChars() throws IOException, ServletException{
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		PowerMockito.mockStatic(GameManager.class);
+    private MultiplayerGameManager multiplayerGameServlet;
 
-		multiplayerGameServlet = new MultiplayerGameManager();
-		
-		HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-		HttpServletResponse response = Mockito.mock( HttpServletResponse.class);
-		HttpSession session =Mockito.mock(HttpSession.class);
 
-		// This most likely requires power Mock
-		DatabaseAccess db = Mockito.mock(DatabaseAccess.class);
-		
-		Mockito.when(session.getAttribute("uid")).thenReturn(1);
-		Mockito.when(request.getSession()).thenReturn( session );
-		// int uid = (Integer) session.getAttribute("uid");
-		
-		Mockito.when(request.getContextPath()).thenReturn("");
-		Mockito.when(request.getParameter("formType")).thenReturn("createMutant");
-		Mockito.when(request.getParameter("gameId")).thenReturn("243");
+    @Test
+    public void testStrangeChars() throws IOException, ServletException{
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        PowerMockito.mockStatic(GameManager.class);
 
-//		MultiplayerGame mp = 
-		//
-		MultiplayerGame activeGame = Mockito.spy(new MultiplayerGame(1, 1, GameLevel.HARD, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0L, 0L, "ACTIVE"));
+        multiplayerGameServlet = new MultiplayerGameManager();
 
-		Mockito.when(activeGame.getRole(1)).thenReturn(Role.ATTACKER);
-		Mockito.when(activeGame.getState()).thenReturn(GameState.ACTIVE);
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock( HttpServletResponse.class);
+        HttpSession session =Mockito.mock(HttpSession.class);
+
+        // This most likely requires power Mock
+        DatabaseAccess db = Mockito.mock(DatabaseAccess.class);
+
+        Mockito.when(session.getAttribute("uid")).thenReturn(1);
+        Mockito.when(request.getSession()).thenReturn( session );
+        // int uid = (Integer) session.getAttribute("uid");
+
+        Mockito.when(request.getContextPath()).thenReturn("");
+        Mockito.when(request.getParameter("formType")).thenReturn("createMutant");
+        Mockito.when(request.getParameter("gameId")).thenReturn("243");
+
+//        MultiplayerGame mp =
+        //
+        MultiplayerGame activeGame = Mockito.spy(new MultiplayerGame(1, 1, GameLevel.HARD, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0L, 0L, "ACTIVE"));
+
+        Mockito.when(activeGame.getRole(1)).thenReturn(Role.ATTACKER);
+        Mockito.when(activeGame.getState()).thenReturn(GameState.ACTIVE);
 //
-//		
-		Mockito.when(DatabaseAccess.getPlayerIdForMultiplayerGame(Mockito.anyInt(), Mockito.anyInt())).thenReturn(1);
-		
-		Mockito.when(DatabaseAccess.getMultiplayerGame(243)).thenReturn(activeGame);
-		
-		// Is Charset.defaultCharset() ok ? Maybe this is not working at all on defenderVM !!
-		final String badMutantCode = new String(Files.readAllBytes(new File("src/test/resources/BadMutantCharRange.java").toPath()), Charset.defaultCharset());
-		Mockito.when(request.getParameter("mutant")).thenReturn( badMutantCode);
-		
-//		Mockito.when(GameManager.hasAttackerPendingMutantsInGame(Mockito.anyInt(), Mockito.anyInt())).thenReturn(false);
-		//
-		Mockito.when(GameManager.getMutantValidityMessage(Mockito.anyInt(), Mockito.anyString())).thenCallRealMethod();
-		
-		multiplayerGameServlet.doPost(request, response);
-	}
+//
+        Mockito.when(DatabaseAccess.getPlayerIdForMultiplayerGame(Mockito.anyInt(), Mockito.anyInt())).thenReturn(1);
+
+        Mockito.when(DatabaseAccess.getMultiplayerGame(243)).thenReturn(activeGame);
+
+        // Is Charset.defaultCharset() ok ? Maybe this is not working at all on defenderVM !!
+        final String badMutantCode = new String(Files.readAllBytes(new File("src/test/resources/BadMutantCharRange.java").toPath()), Charset.defaultCharset());
+        Mockito.when(request.getParameter("mutant")).thenReturn( badMutantCode);
+
+//        Mockito.when(GameManager.hasAttackerPendingMutantsInGame(Mockito.anyInt(), Mockito.anyInt())).thenReturn(false);
+        //
+        Mockito.when(GameManager.getMutantValidityMessage(Mockito.anyInt(), Mockito.anyString())).thenCallRealMethod();
+
+        multiplayerGameServlet.doPost(request, response);
+    }
 }

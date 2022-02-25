@@ -18,15 +18,15 @@
  */
 package org.codedefenders;
 
+import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.TestingFramework;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
-
-import org.codedefenders.game.AssertionLibrary;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.TestingFramework;
 
 public class AutomaticImportTest {
 

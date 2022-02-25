@@ -23,15 +23,15 @@ import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.configuration.DockerComposeFiles;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
 */
-import org.junit.ClassRule;
+
+import java.util.List;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
