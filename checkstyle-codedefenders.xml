@@ -292,4 +292,10 @@
 					 value="'ID' should be written as 'Id'."/>
 		</module>
 	</module>
+
+	<!-- Tone down LineLength checking for test files -->
+	<module name="SuppressionSingleFilter">
+		<property name="checks" value="LineLength"/>
+		<property name="files" value=".*[\\/]src[\\/](test|integration)[\\/]"/>
+	</module>
 </module>
