@@ -40,7 +40,9 @@
     <p>Your current email: <%=login.getUser().getEmail()%></p>
 
     <p>Change your account information, password or delete your account:</p>
-    <a href="<%=request.getContextPath() + Paths.USER_SETTINGS%>" class="btn btn-outline-primary">Account Settings</a>
+    <a href="<%=request.getContextPath() + Paths.USER_SETTINGS%>"
+       title="Edit or delete your CodeDefenders account."
+       class="btn btn-outline-primary">Account Settings</a>
 
 </div>
 
