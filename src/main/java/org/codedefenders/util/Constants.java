@@ -18,12 +18,10 @@
  */
 package org.codedefenders.util;
 
+import org.codedefenders.configuration.Configuration;
+
 import java.io.File;
 import java.nio.file.Paths;
-
-import javax.enterprise.inject.spi.CDI;
-
-import org.codedefenders.configuration.Configuration;
 
 /**
  * This class contains most constants used in Code Defenders.
@@ -118,6 +116,7 @@ public class Constants {
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
 
     public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();
+    public static final String USER_SETTINGS_JSP = Paths.get("jsp", "user_settings.jsp").toString();
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
     public static final String MELEE_GAME_VIEW_JSP = "/jsp/melee/game_view.jsp";

@@ -42,6 +42,7 @@ public class Paths {
     // TODO This might be duplicated. But then, why there's a profile
     public static final String USER = "/user";
     public static final String USER_PROFILE = "/profile";
+    public static final String USER_SETTINGS = "/account-settings";
 
     public static final String PASSWORD = "/password";
 
