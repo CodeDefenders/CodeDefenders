@@ -58,7 +58,7 @@
         </div>
 
         <div class="col-12">
-            <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Profile</button>
+            <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Email Preferences</button>
         </div>
     </form>
 
@@ -70,7 +70,7 @@
 
         <div class="col-12">
             <div class="mb-2">
-                <label for="updatedPassword" class="form-label">Password</label>
+                <label for="updatedPassword" class="form-label">New password</label>
                 <input type="password" class="form-control" id="updatedPassword" required
                        name="updatedPassword" placeholder="Password"
                        minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
@@ -120,6 +120,7 @@
 
     <h2 class="mt-4 mb-3">Account Deletion</h2>
 
+    <p>Delete all personalized information related to your account.</p>
     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#account-deletion-modal">
         Delete Account
     </button>
@@ -131,7 +132,7 @@
                     <input type="hidden" class="form-control" name="formType" value="deleteAccount">
 
                     <div class="modal-header">
-                        <h5 class="modal-title">Account Deletion</h5>
+                        <h3 class="modal-title">Confirm Account Deletion</h3>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
