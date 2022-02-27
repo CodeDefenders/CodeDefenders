@@ -80,9 +80,8 @@
             </div>
 
             <div>
-                <label for="repeatedPassword" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="repeatedPassword"
-                       name="repeatedPassword" placeholder="Confirm Password">
+                <input type="password" class="form-control" id="repeatedPassword" name="repeatedPassword"
+                       placeholder="Confirm Password" aria-label="Confirm Password">
                 <div class="invalid-feedback" id="confirm-password-feedback">
                     Please confirm your password.
                 </div>
