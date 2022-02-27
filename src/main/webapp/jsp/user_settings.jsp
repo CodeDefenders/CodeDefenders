@@ -35,9 +35,10 @@
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
 
-    <h2 class="mt-4 mb-3">Account Information</h2>
+    <h2 class="mt-4 mb-3">Email Settings</h2>
 
-    <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post" class="row g-3 needs-validation" autocomplete="off">
+    <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post" class="row g-3 needs-validation"
+          autocomplete="off">
         <input type="hidden" class="form-control" name="formType" value="updateProfile">
 
         <div class="col-12">
@@ -57,10 +58,21 @@
         </div>
 
         <div class="col-12">
+            <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Profile</button>
+        </div>
+    </form>
+
+    <h2 class="mt-4 mb-3">Update Password</h2>
+
+    <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post" class="row g-3 needs-validation"
+          autocomplete="off">
+        <input type="hidden" class="form-control" name="formType" value="changePassword">
+
+        <div class="col-12">
             <div class="mb-2">
                 <label for="updatedPassword" class="form-label">Password</label>
-                <input type="password" class="form-control" id="updatedPassword"
-                       name="updatedPassword" placeholder="Password (leave empty for unchanged)"
+                <input type="password" class="form-control" id="updatedPassword" required
+                       name="updatedPassword" placeholder="Password"
                        minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
                 <div class="invalid-feedback">
                     Please enter a valid password.
@@ -68,21 +80,21 @@
             </div>
 
             <div>
+                <label for="repeatedPassword" class="form-label">Confirm Password</label>
                 <input type="password" class="form-control" id="repeatedPassword"
                        name="repeatedPassword" placeholder="Confirm Password">
                 <div class="invalid-feedback" id="confirm-password-feedback">
                     Please confirm your password.
                 </div>
                 <div class="form-text">
-                    <%=pwMinLength%>-20 alphanumeric characters, no whitespace or special characters.
-                    <br>
-                    Leave empty to keep unchanged.
+                    Password requirements: <%=pwMinLength%>-20 alphanumeric characters,
+                    no whitespace or special characters.
                 </div>
             </div>
         </div>
 
         <div class="col-12">
-            <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Profile</button>
+            <button id="submitChangePassword" type="submit" class="btn btn-primary">Change Password</button>
         </div>
 
         <script>
@@ -92,7 +104,7 @@
                 const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
 
                 const validateConfirmPassword = function () {
-                    if (passwordInput.value === confirmPasswordInput.value)  {
+                    if (passwordInput.value === confirmPasswordInput.value) {
                         confirmPasswordInput.setCustomValidity('');
                         confirmPasswordFeedback.innerText = '';
                     } else {

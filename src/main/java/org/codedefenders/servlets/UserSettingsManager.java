@@ -128,11 +128,11 @@ public class UserSettingsManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
                 return;
             }
+
             case "updateProfile": {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
-                final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
-                final boolean success = updateUserInformation(login.getUser(), email, password, allowContact);
+                final boolean success = updateUserInformation(login.getUser(), email, allowContact);
                 if (success) {
                     messages.add("Successfully updated profile information.");
                 } else {
@@ -142,6 +142,26 @@ public class UserSettingsManager extends HttpServlet {
                 response.sendRedirect(responsePath);
                 return;
             }
+
+            case "changePassword": {
+                final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
+
+                if (isPasswordValid(password)) {
+                    final boolean success = changeUserPassword(login.getUser(), password.get());
+                    if (success) {
+                        messages.add("Successfully changed password.");
+                    } else {
+                        logger.info("Failed to change password for user {}.", login.getUserId());
+                        messages.add("Failed to change password. Please contact the page administrator.");
+                    }
+                } else {
+                    // Additional validation if frontend check is bypassed
+                    messages.add("No or invalid password provided.");
+                }
+                response.sendRedirect(responsePath);
+                return;
+            }
+
             case "deleteAccount": {
                 // Does not actually delete the account but pseudomizes it
                 final boolean success = removeUserInformation(login.getUser());
@@ -162,6 +182,7 @@ public class UserSettingsManager extends HttpServlet {
                 }
                 return;
             }
+
             default:
                 logger.error("Action {" + formType + "} not recognised.");
                 response.sendRedirect(responsePath);
@@ -176,23 +197,28 @@ public class UserSettingsManager extends HttpServlet {
         return user.update();
     }
 
-    private boolean updateUserInformation(UserEntity user, Optional<String> email, Optional<String> password,
-                                          boolean allowContact) {
-
-        CodeDefendersValidator validator = new CodeDefendersValidator();
-
+    private boolean updateUserInformation(UserEntity user, Optional<String> email, boolean allowContact) {
         if (user == null) {
             return false;
         }
-        if (password.isPresent()) {
-            if (!validator.validPassword(password.get())) {
-                return false;
-            }
-            user.setEncodedPassword(UserEntity.encodePassword(password.get()));
-        }
+
         email.ifPresent(user::setEmail);
         user.setAllowContact(allowContact);
 
+        return user.update();
+    }
+
+    private boolean isPasswordValid(Optional<String> password) {
+        final CodeDefendersValidator validator = new CodeDefendersValidator();
+        return password.isPresent() && validator.validPassword(password.get());
+    }
+
+    private boolean changeUserPassword(UserEntity user, String password) {
+        if (user == null) {
+            return false;
+        }
+
+        user.setEncodedPassword(UserEntity.encodePassword(password));
         return user.update();
     }
 
