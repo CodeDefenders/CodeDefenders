@@ -18,13 +18,7 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.model.UserEntity;
-import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -32,7 +26,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
 
 /**
  * This {@link HttpServlet} handles requests for viewing the currently logged

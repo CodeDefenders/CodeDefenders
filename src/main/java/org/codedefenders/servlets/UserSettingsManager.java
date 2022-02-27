@@ -18,6 +18,17 @@
  */
 package org.codedefenders.servlets;
 
+import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
@@ -33,16 +44,6 @@ import org.codedefenders.util.Paths;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged
@@ -153,7 +154,7 @@ public class UserSettingsManager extends HttpServlet {
                      * so)
                      */
                     // messages.add("You successfully deleted your account. Sad to see you go. :(");
-                    response.sendRedirect(request.getContextPath() +  Paths.LOGOUT);
+                    response.sendRedirect(request.getContextPath() + Paths.LOGOUT);
                 } else {
                     logger.info("Failed to set user {} as inactive.", login.getUserId());
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");

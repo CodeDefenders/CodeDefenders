@@ -18,10 +18,10 @@
  */
 package org.codedefenders.util;
 
-import org.codedefenders.configuration.Configuration;
-
 import java.io.File;
 import java.nio.file.Paths;
+
+import org.codedefenders.configuration.Configuration;
 
 /**
  * This class contains most constants used in Code Defenders.
@@ -92,7 +92,8 @@ public class Constants {
     public static final String LIB_HAMCREST = Paths.get(DATA_DIR, "lib", "hamcrest-all-1.3.jar").toString();
     public static final String LIB_MOCKITO = Paths.get(DATA_DIR, "lib", "mockito-all-1.10.19.jar").toString();
     public static final String LIB_GOOGLE_TRUTH = Paths.get(DATA_DIR, "lib", "truth-1.1.2.jar").toString();
-    public static final String LIB_GOOGLE_TRUTH_EXTENSION = Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.1.2.jar").toString();
+    public static final String LIB_GOOGLE_TRUTH_EXTENSION =
+            Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.1.2.jar").toString();
     public static final String LIB_GUAVA_ANDROID = Paths.get(DATA_DIR, "lib", "guava-29.0-android.jar").toString();
 
     // TODO Is this really necessary since we set the CP using build.xml?
