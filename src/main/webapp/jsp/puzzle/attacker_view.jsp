@@ -172,6 +172,4 @@
         </div>
     </div>
 
-</div>
-
 <%@ include file="/jsp/footer_game.jsp" %>
