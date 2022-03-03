@@ -42,7 +42,7 @@
                  alt="Code Defenders Logo"
                  width="58">
             <h1>Code Defenders</h1>
-        </div>
+        </a>
         <h2>500</h2>
         <h3>Internal Server Error</h3>
         <hr/>
