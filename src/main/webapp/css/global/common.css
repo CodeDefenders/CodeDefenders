@@ -126,3 +126,11 @@
 .form-width {
     max-width: 50rem;
 }
+
+/* Remove margin and padding from forms by default.
+----------------------------------------------------------------------------- */
+
+form {
+    padding: 0;
+    margin: 0;
+}
