@@ -47,6 +47,8 @@
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request" />
 <% pageInfo.setPageTitle("Game " + game.getId() + " (" + role.getFormattedString() + ")"); %>
 
+<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
+
 <jsp:include page="/jsp/header.jsp" />
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>

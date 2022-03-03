@@ -102,8 +102,6 @@
 
 <jsp:include page="/jsp/push_socket.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
-
 <jsp:include page="/jsp/melee/game_scoreboard.jsp"/>
 
 <div class="row">
