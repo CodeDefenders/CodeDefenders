@@ -20,11 +20,6 @@
 --%>
 <%@ page isErrorPage="true" import="java.io.*" contentType="text/html;" pageEncoding="UTF-8" %>
 
-<%
-    System.err.println(exception.getMessage());
-    exception.printStackTrace();
-%>
-
 <!DOCTYPE html>
 <html>
 
