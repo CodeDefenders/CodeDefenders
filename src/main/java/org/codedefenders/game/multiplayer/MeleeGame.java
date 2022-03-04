@@ -91,8 +91,6 @@ public class MeleeGame extends AbstractGame {
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
 
-    private boolean capturePlayersIntention;
-
     // We need a temporary location where to store information about system tests
     // and mutants
     private boolean withTests;
@@ -288,10 +286,6 @@ public class MeleeGame extends AbstractGame {
 
     public CodeValidatorLevel getMutantValidatorLevel() {
         return mutantValidatorLevel;
-    }
-
-    public boolean isCapturePlayersIntention() {
-        return capturePlayersIntention;
     }
 
     public int getAutomaticMutantEquivalenceThreshold() {

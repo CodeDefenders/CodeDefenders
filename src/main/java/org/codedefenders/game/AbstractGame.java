@@ -52,6 +52,8 @@ public abstract class AbstractGame {
     protected GameLevel level;
     protected GameMode mode;
 
+    protected boolean capturePlayersIntention = false;
+
     protected List<Event> events;
     protected List<Mutant> mutants;
     protected List<Test> tests;
@@ -121,6 +123,10 @@ public abstract class AbstractGame {
 
     public GameMode getMode() {
         return this.mode;
+    }
+
+    public boolean isCapturePlayersIntention() {
+        return capturePlayersIntention;
     }
 
     public abstract boolean isChatEnabled();

@@ -48,6 +48,8 @@
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
 %>
 
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
 
@@ -151,12 +153,8 @@
                         </button>
                     </form>
 
-                    <%
-                        request.setAttribute("gameActive", game.getState() == GameState.ACTIVE);
-                    %>
-                    <t:submit_mutant_button gameActive="${gameActive}"
+                    <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
                                             intentionCollectionEnabled="false"/>
-
                 </div>
             </div>
 

@@ -34,8 +34,10 @@
     @param MeleeGame game
         The game to be displayed.
 --%>
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean"
-             scope="request"/>
+
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
@@ -296,13 +298,8 @@
                     <button class="btn btn-warning" id="btnReset">Reset</button>
                 </form>
 
-                <%
-                    request.setAttribute("gameActive", game.getState() == GameState.ACTIVE);
-                    request.setAttribute("intentionCollectionEnabled", game.isCapturePlayersIntention());
-                %>
-                <t:submit_mutant_button gameActive="${gameActive}"
-                                        intentionCollectionEnabled="${intentionCollectionEnabled}"/>
-
+                <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
+                                        intentionCollectionEnabled="${gameProducer.game.capturePlayersIntention}"/>
             </div>
         </div>
 

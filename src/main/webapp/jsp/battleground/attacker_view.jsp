@@ -31,6 +31,7 @@
         The game to be displayed.
 --%>
 
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
@@ -133,12 +134,8 @@
                     <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
                 </form>
 
-                <%
-                    request.setAttribute("gameActive", game.getState() == GameState.ACTIVE);
-                    request.setAttribute("intentionCollectionEnabled", game.isCapturePlayersIntention());
-                %>
-                <t:submit_mutant_button gameActive="${gameActive}"
-                                        intentionCollectionEnabled="${intentionCollectionEnabled}"/>
+                <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
+                                        intentionCollectionEnabled="${gameProducer.game.capturePlayersIntention}"/>
             </div>
         </div>
 

@@ -72,8 +72,6 @@ public class MultiplayerGame extends AbstractGame {
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
 
-    private boolean capturePlayersIntention;
-
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
@@ -252,10 +250,6 @@ public class MultiplayerGame extends AbstractGame {
 
     public CodeValidatorLevel getMutantValidatorLevel() {
         return mutantValidatorLevel;
-    }
-
-    public boolean isCapturePlayersIntention() {
-        return capturePlayersIntention;
     }
 
     public int getAutomaticMutantEquivalenceThreshold() {
