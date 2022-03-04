@@ -126,7 +126,8 @@
     <div class="row">
         <div class="col-xl-6 col-12" id="cut-div">
             <div class="game-component-header"><h3>Class Under Test</h3></div>
-            <t:defender_intention_collection_note/>
+            <%-- <t:defender_intention_collection_note/>
+                 for defender intetion collection, not needed here --%>
             <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         </div>
@@ -152,7 +153,8 @@
                   method="post">
                 <input type="hidden" name="formType" value="createTest">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
-                <input type="hidden" id="selected_lines" name="selected_lines" value="">
+                <%-- <input type="hidden" id="selected_lines" name="selected_lines" value="">
+                     for defender intention collection, not needed here --%>
 
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             </form>
