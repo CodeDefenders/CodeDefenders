@@ -221,6 +221,9 @@ class MutantAccordion {
      * @private
      */
     _initFilters () {
+        /* Bind "this" to safely use it in callback functions. */
+        const self = this;
+
         /* Setup filter functionality for mutant-accordion */
         document.getElementById('ma-filter')
                 .addEventListener('change', function(event) {
@@ -238,11 +241,11 @@ class MutantAccordion {
 
                     $.fn.dataTable.ext.search.push(searchFunction);
 
-                    for (const category of this.categories) {
-                        this.dataTablesByCategory.get(category.id).draw();
+                    for (const category of self.categories) {
+                        self.dataTablesByCategory.get(category.id).draw();
 
                         const filteredMutants = category.mutantIds
-                                .map(this.mutants.get, this.mutants)
+                                .map(self.mutants.get, self.mutants)
                                 .filter(mutant => selectedCategory === 'ALL'
                                         || mutant.state === selectedCategory);
 
