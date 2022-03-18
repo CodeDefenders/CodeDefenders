@@ -28,7 +28,7 @@ public enum AssertionLibrary {
     JUNIT4_GOOGLE_TRUTH("JUnit 4 + Google Truth"),
     JUNIT5_GOOGLE_TRUTH("JUnit 5 + Google Truth"),;
 
-    private String description;
+    private final String description;
 
     AssertionLibrary(String description) {
         this.description = description;

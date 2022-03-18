@@ -18,13 +18,15 @@
  */
 package org.codedefenders.coverage;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
 import org.junit.Test;
+
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertThat;
 
 public class TestTemplateTest {
 

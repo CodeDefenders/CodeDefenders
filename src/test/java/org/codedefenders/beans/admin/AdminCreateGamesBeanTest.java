@@ -41,8 +41,15 @@ import com.google.common.collect.Sets;
 
 import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MELEE;
 import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({

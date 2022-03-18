@@ -30,9 +30,7 @@
 	<!-- See http://checkstyle.sf.net/config_whitespace.html -->
 	<module name="FileTabCharacter">
 		<property name="eachLine" value="true"/>
-		<!--
 		<property name="severity" value="error"/>
-		-->
 	</module>
 
 	<module name="LineLength">
@@ -209,9 +207,7 @@
 			<property name="specialImportsRegExp" value="^javax\."/>
 			<property name="sortImportsInGroupAlphabetically" value="true"/>
 			<property name="separateLineBetweenGroups" value="true"/>
-			<!--
 			<property name="severity" value="error"/>
-			-->
 		</module>
 		<module name="MethodParamPad"/>
 		<module name="NoWhitespaceBefore">
@@ -295,5 +291,11 @@
 			<message key="name.invalidPattern"
 					 value="'ID' should be written as 'Id'."/>
 		</module>
+	</module>
+
+	<!-- Tone down LineLength checking for test files -->
+	<module name="SuppressionSingleFilter">
+		<property name="checks" value="LineLength"/>
+		<property name="files" value=".*[\\/]src[\\/](test|integration)[\\/]"/>
 	</module>
 </module>

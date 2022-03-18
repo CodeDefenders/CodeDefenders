@@ -1,0 +1,9 @@
+public class XmlElementTest {
+
+    @Test(timeout = 4000)
+    public void test() throws Throwable {
+        // This one is problematic
+        XmlElement x = new XmlElement('Test');
+        assertNotNull(x.getData());
+    }
+}

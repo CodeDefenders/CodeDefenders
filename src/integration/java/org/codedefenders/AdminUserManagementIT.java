@@ -52,7 +52,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 /*
 `@PowerMockIgnore` is required to fix some strange exception caused by PowerMock:

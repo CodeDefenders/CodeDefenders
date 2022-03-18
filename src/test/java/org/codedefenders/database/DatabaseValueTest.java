@@ -18,12 +18,12 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.model.Dependency;
-import org.junit.Test;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
+
+import org.codedefenders.model.Dependency;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

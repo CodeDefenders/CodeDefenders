@@ -18,6 +18,11 @@
  */
 package org.codedefenders.util.analysis;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Iterator;
+
 import org.apache.commons.lang3.Range;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
@@ -25,18 +30,10 @@ import org.codedefenders.game.TestingFramework;
 import org.junit.Assume;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Iterator;
-
 import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.core.AllOf.allOf;
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 
 /**
  * Tests {@link GameClass} test template generation and {@link ClassCodeAnalyser} implementation.
@@ -88,7 +85,7 @@ public class StaticAnalysisTest {
                 "}");
         final CodeAnalysisResult result = ClassCodeAnalyser.visitCode(name, sourceCode);
 
-        Integer[] expected = {2,3};
+        Integer[] expected = {2, 3};
         assertArrayEquals(expected, result.getCompileTimeConstants().toArray());
     }
 
@@ -148,7 +145,7 @@ public class StaticAnalysisTest {
         assertEquals(3, then.getMinimum().intValue());
         assertEquals(5, then.getMaximum().intValue());
 
-        Integer[] expected = {2,5,6,8,9,10};
+        Integer[] expected = {2, 5, 6, 8, 9, 10};
         assertArrayEquals(expected, result.getNonCoverableCode().toArray());
     }
 

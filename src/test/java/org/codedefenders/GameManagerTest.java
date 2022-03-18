@@ -18,15 +18,15 @@
  */
 package org.codedefenders;
 
-import static org.junit.Assert.assertEquals;
-
-import org.codedefenders.util.FileUtils;
-import org.junit.Test;
-
 import java.io.File;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+
+import org.codedefenders.util.FileUtils;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Jose Rojas

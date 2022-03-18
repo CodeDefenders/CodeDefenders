@@ -1,0 +1,6 @@
+public class CUT {
+    public void test() {
+        String name = "test";
+        boolean result = "something".equals("test");
+    }
+}

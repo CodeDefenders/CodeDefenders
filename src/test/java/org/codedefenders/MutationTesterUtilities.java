@@ -18,14 +18,6 @@
  */
 package org.codedefenders;
 
-import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.UserEntity;
-import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -35,6 +27,14 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.UserEntity;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+
 /**
  * This class supports the testing of mutationTester
  *
@@ -43,7 +43,7 @@ import javax.inject.Inject;
 public class MutationTesterUtilities {
 
     public static Runnable attack(MultiplayerGame activeGame, String mutantFile, UserEntity attacker,
-                                  ArrayList<String> messages, Logger logger) throws IOException {
+            ArrayList<String> messages, Logger logger) throws IOException {
         return new Runnable() {
 
             @Inject
@@ -74,7 +74,7 @@ public class MutationTesterUtilities {
     }
 
     public static Runnable defend(MultiplayerGame activeGame, String testFile, UserEntity defender,
-                                  ArrayList<String> messages, Logger logger) {
+            ArrayList<String> messages, Logger logger) {
         return new Runnable() {
 
             @Inject

@@ -37,6 +37,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.game.GameClass;
@@ -46,7 +47,6 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -68,7 +68,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @Ignore
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class })
+@PrepareForTest({DatabaseConnection.class})
 public class ExecutionTest {
 
     @Inject
