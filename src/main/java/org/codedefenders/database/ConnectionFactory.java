@@ -50,7 +50,7 @@ public class ConnectionFactory {
     private final QueryRunner queryRunner;
 
     @Inject
-    public ConnectionFactory(final Configuration config) {
+    public ConnectionFactory(@SuppressWarnings("CdiInjectionPointsInspection") final Configuration config) {
         if (config.isValid()) {
             dataSource = new BasicDataSource();
             try {

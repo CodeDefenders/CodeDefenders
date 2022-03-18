@@ -130,6 +130,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
 

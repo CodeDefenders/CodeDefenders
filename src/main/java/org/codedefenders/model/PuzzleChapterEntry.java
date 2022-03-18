@@ -56,7 +56,6 @@ public class PuzzleChapterEntry implements Comparable {
         return puzzleEntries;
     }
 
-    @SuppressWarnings("Duplicates")
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof PuzzleChapterEntry)) {

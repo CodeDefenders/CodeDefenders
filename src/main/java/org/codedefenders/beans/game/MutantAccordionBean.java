@@ -78,9 +78,11 @@ public class MutantAccordionBean {
         @SuppressWarnings("UnstableApiUsage")
         RangeMap<Integer, MutantAccordionCategory> methodRanges = TreeRangeMap.create();
         for (MutantAccordionCategory method : methodCategories) {
+            //noinspection UnstableApiUsage
             methodRanges.put(Range.closed(method.startLine, method.endLine), method);
         }
 
+        //noinspection UnstableApiUsage
         Range<Integer> beforeFirst = Range.closedOpen(0, methodRanges.span().lowerEndpoint());
 
 

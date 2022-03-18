@@ -125,7 +125,6 @@ public class PuzzleEntry implements Comparable {
         return game.getState();
     }
 
-    @SuppressWarnings("Duplicates")
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof PuzzleEntry)) {
