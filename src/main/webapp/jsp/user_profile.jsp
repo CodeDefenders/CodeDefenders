@@ -29,20 +29,26 @@
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
 
-    <h2 class="mt-4 mb-3">Played games</h2>
-    <p>
-        You can find a list of your past games in the
-        <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
-    </p>
+    <section class="mt-5" aria-labelledby="played-games">
+        <h2 class="mb-3" id="played-games">Played games</h2>
+        <p>
+            You can find a list of your past games in the
+            <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
+        </p>
+    </section>
 
-    <h2 class="mt-4 mb-3">Account Information</h2>
-
-    <p>Your current email: <%=login.getUser().getEmail()%></p>
-
-    <p>Change your account information, password or delete your account:</p>
-    <a href="<%=request.getContextPath() + Paths.USER_SETTINGS%>"
-       title="Edit or delete your CodeDefenders account."
-       class="btn btn-outline-primary">Account Settings</a>
+    <section class="mt-5" aria-labelledby="account-information">
+        <h2 class="mb-3" id="account-information">Account Information</h2>
+        <p>
+            Your current email:
+            <span class="d-inline-block px-2 ms-2 border"><%=login.getUser().getEmail()%></span>
+        </p>
+        <p>
+            Change your account information, password or delete your account in the
+            <a href="<%=request.getContextPath() + Paths.USER_SETTINGS%>"
+               title="Edit or delete your CodeDefenders account.">account settings</a>.
+        </p>
+    </section>
 
 </div>
 

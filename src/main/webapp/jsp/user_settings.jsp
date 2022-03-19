@@ -35,122 +35,130 @@
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
 
-    <h2 class="mt-4 mb-3">Email Settings</h2>
+    <section class="mt-5" aria-labelledby="email-settings">
+        <h2 class="mb-3" id="email-settings">Email Settings</h2>
 
-    <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post" class="row g-3 needs-validation"
-          autocomplete="off">
-        <input type="hidden" class="form-control" name="formType" value="updateProfile">
+        <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post"
+              class="row g-3 needs-validation"
+              autocomplete="off">
+            <input type="hidden" class="form-control" name="formType" value="updateProfile">
 
-        <div class="col-12">
-            <div class="mb-2">
-                <label for="updatedEmail" class="form-label">Email</label>
-                <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
-                       value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
-            </div>
+            <div class="col-12">
+                <div class="mb-2">
+                    <label for="updatedEmail" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
+                           value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
+                </div>
 
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
-                    <%=login.getUser().getAllowContact() ? "checked" : ""%>>
-                <label class="form-check-label" for="allowContact">
-                    Allow us to contact your email address.
-                </label>
-            </div>
-        </div>
-
-        <div class="col-12">
-            <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Email Preferences</button>
-        </div>
-    </form>
-
-    <h2 class="mt-4 mb-3">Update Password</h2>
-
-    <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post" class="row g-3 needs-validation"
-          autocomplete="off">
-        <input type="hidden" class="form-control" name="formType" value="changePassword">
-
-        <div class="col-12">
-            <div class="mb-2">
-                <label for="updatedPassword" class="form-label">New password</label>
-                <input type="password" class="form-control" id="updatedPassword" required
-                       name="updatedPassword" placeholder="Password"
-                       minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
-                <div class="invalid-feedback">
-                    Please enter a valid password.
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
+                        <%=login.getUser().getAllowContact() ? "checked" : ""%>>
+                    <label class="form-check-label" for="allowContact">
+                        Allow us to contact your email address.
+                    </label>
                 </div>
             </div>
 
-            <div>
-                <input type="password" class="form-control" id="repeatedPassword" name="repeatedPassword"
-                       placeholder="Confirm Password" aria-label="Confirm Password">
-                <div class="invalid-feedback" id="confirm-password-feedback">
-                    Please confirm your password.
+            <div class="col-12">
+                <button id="submitUpdateProfile" type="submit" class="btn btn-primary">Update Email Preferences</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="mt-5" aria-labelledby="password-settings">
+        <h2 class="mb-3" id="password-settings">Update Password</h2>
+
+        <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post"
+              class="row g-3 needs-validation"
+              autocomplete="off">
+            <input type="hidden" class="form-control" name="formType" value="changePassword">
+
+            <div class="col-12">
+                <div class="mb-2">
+                    <label for="updatedPassword" class="form-label">New password</label>
+                    <input type="password" class="form-control" id="updatedPassword" required
+                           name="updatedPassword" placeholder="Password"
+                           minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                    <div class="invalid-feedback">
+                        Please enter a valid password.
+                    </div>
                 </div>
-                <div class="form-text">
-                    Password requirements: <%=pwMinLength%>-20 alphanumeric characters,
-                    no whitespace or special characters.
+
+                <div>
+                    <input type="password" class="form-control" id="repeatedPassword" name="repeatedPassword"
+                           placeholder="Confirm Password" aria-label="Confirm Password">
+                    <div class="invalid-feedback" id="confirm-password-feedback">
+                        Please confirm your password.
+                    </div>
+                    <div class="form-text">
+                        Password requirements: <%=pwMinLength%>-20 alphanumeric characters,
+                        no whitespace or special characters.
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <button id="submitChangePassword" type="submit" class="btn btn-primary">Change Password</button>
+            </div>
+
+            <script>
+                $(document).ready(() => {
+                    const passwordInput = document.getElementById('updatedPassword');
+                    const confirmPasswordInput = document.getElementById('repeatedPassword');
+                    const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
+
+                    const validateConfirmPassword = function () {
+                        if (passwordInput.value === confirmPasswordInput.value) {
+                            confirmPasswordInput.setCustomValidity('');
+                            confirmPasswordFeedback.innerText = '';
+                        } else {
+                            confirmPasswordInput.setCustomValidity('password-mismatch');
+                            confirmPasswordFeedback.innerText = "Passwords don't match.";
+                        }
+                    };
+
+                    passwordInput.addEventListener('input', validateConfirmPassword);
+                    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+                });
+            </script>
+        </form>
+    </section>
+
+    <section class="mt-5" aria-labelledby="delete-account">
+        <h2 class="mb-3" id="delete-account">Account Deletion</h2>
+
+        <p>Delete all personalized information related to your account.</p>
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#account-deletion-modal">
+            Delete Account
+        </button>
+
+        <div class="modal" id="account-deletion-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post">
+                        <input type="hidden" class="form-control" name="formType" value="deleteAccount">
+
+                        <div class="modal-header">
+                            <h3 class="modal-title">Confirm Account Deletion</h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><b>This cannot be undone.</b></p>
+                            <p class="mb-0">
+                                We will delete all personalized information related to your account.
+                                Please be aware that you will no longer be able to log in again.
+                                To play further games, you will have to create a new account.
+                            </p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger">Delete Account</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
-        <div class="col-12">
-            <button id="submitChangePassword" type="submit" class="btn btn-primary">Change Password</button>
-        </div>
-
-        <script>
-            $(document).ready(() => {
-                const passwordInput = document.getElementById('updatedPassword');
-                const confirmPasswordInput = document.getElementById('repeatedPassword');
-                const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
-
-                const validateConfirmPassword = function () {
-                    if (passwordInput.value === confirmPasswordInput.value) {
-                        confirmPasswordInput.setCustomValidity('');
-                        confirmPasswordFeedback.innerText = '';
-                    } else {
-                        confirmPasswordInput.setCustomValidity('password-mismatch');
-                        confirmPasswordFeedback.innerText = "Passwords don't match.";
-                    }
-                };
-
-                passwordInput.addEventListener('input', validateConfirmPassword);
-                confirmPasswordInput.addEventListener('input', validateConfirmPassword);
-            });
-        </script>
-    </form>
-
-    <h2 class="mt-4 mb-3">Account Deletion</h2>
-
-    <p>Delete all personalized information related to your account.</p>
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#account-deletion-modal">
-        Delete Account
-    </button>
-
-    <div class="modal" id="account-deletion-modal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post">
-                    <input type="hidden" class="form-control" name="formType" value="deleteAccount">
-
-                    <div class="modal-header">
-                        <h3 class="modal-title">Confirm Account Deletion</h3>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p><b>This cannot be undone.</b></p>
-                        <p class="mb-0">
-                            We will delete all personalized information related to your account.
-                            Please be aware that you will no longer be able to log in again.
-                            To play further games, you will have to create a new account.
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-danger">Delete Account</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    </section>
 
 </div>
 
