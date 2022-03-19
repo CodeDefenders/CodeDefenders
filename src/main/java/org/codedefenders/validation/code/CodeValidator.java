@@ -398,7 +398,7 @@ public class CodeValidator {
         while (s.contains(quotationMark)) {
             int indexFirstOcc = s.indexOf(quotationMark);
             int indexSecondOcc = indexFirstOcc + s.substring(indexFirstOcc + 1).indexOf(quotationMark);
-            s = s.substring(0, indexFirstOcc - 1) + s.substring(indexSecondOcc + 2);
+            s = s.substring(0, indexFirstOcc) + s.substring(indexSecondOcc + 2);
         }
         return s;
     }
