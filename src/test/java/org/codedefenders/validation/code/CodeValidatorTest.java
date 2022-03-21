@@ -492,57 +492,49 @@ public class CodeValidatorTest {
 
         @Test
         public void noQuotesRemoveSingleQuotes() {
-            assertThat("[Prefix][Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix][Postfix]", "'"));
+            assertThat(CodeValidator.removeQuoted("[Prefix][Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Test
         public void noQuotesRemoveDoubleQuotes() {
-            assertThat("[Prefix][Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix][Postfix]", "\""));
+            assertThat(CodeValidator.removeQuoted("[Prefix][Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Test
         public void singleQuotesOnlyRemoveDoubleQuotes() {
-            assertThat("[Prefix]'T'[Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix]'T'[Postfix]", "\""));
+            assertThat(CodeValidator.removeQuoted("[Prefix]'T'[Postfix]", "\"")).isEqualTo("[Prefix]'T'[Postfix]");
         }
 
         @Test
         public void doubleQuotesOnlyRemoveSingleQuotes() {
-            assertThat("[Prefix]\"Text\"[Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix]\"Text\"[Postfix]", "'"));
+            assertThat(CodeValidator.removeQuoted("[Prefix]\"Text\"[Postfix]", "'")).isEqualTo("[Prefix]\"Text\"[Postfix]");
         }
 
-        @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$RemoveQuotedTests.oneSingleQuotedText() is @Disabled\n"
-                + "because removeQuoted will also remove the character before the quotation character")
         @Test
         public void oneSingleQuotedCharacter() {
-            assertThat("[Prefix][Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix]'T'[Postfix]", "'"));
+            assertThat(CodeValidator.removeQuoted("[Prefix]'T'[Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
         }
 
-        @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$RemoveQuotedTests.oneDoubleQuotedText() is @Disabled\n"
-                + "because removeQuoted should not remove the character before a quotation character")
         @Test
         public void oneDoubleQuotedText() {
-            assertThat("[Prefix][Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix]\"Text\"[Postfix]", "\""));
+            assertThat(CodeValidator.removeQuoted("[Prefix]\"Text\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
 
-        @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$RemoveQuotedTests.oneSingleQuotedCharacterContainingEscapedSingleQuote() is @Disabled\n"
-                + "because removeQuoted should not remove the character before a quotation character")
         @Test
         public void oneSingleQuotedCharacterContainingEscapedSingleQuote() {
-            assertThat("[Prefix][Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix]'\\''[Postfix]", "'"));
+            assertThat(CodeValidator.removeQuoted("[Prefix]'\\''[Postfix]", "'")).isEqualTo("[Prefix][Postfix]");
         }
 
-        @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$RemoveQuotedTests.oneDoubleQuotedTextContainingEscapedDoubleQuoteAtTheEnd() is @Disabled"
-                + "\nbecause removeQuoted should not remove the character before a quotation character")
         @Test
         public void oneDoubleQuotedTextContainingEscapedDoubleQuoteAtTheEnd() {
-            assertThat("[Prefix][Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix]\"Text\\\"\"[Postfix]", "\""));
+            assertThat(CodeValidator.removeQuoted("[Prefix]\"Text\\\"\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
 
         @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$RemoveQuotedTests.oneDoubleQuotedTextContainingEscapedDoubleQuoteAtTheBeginning() is @Disabled\n"
-                + "because removeQuoted should not remove the character before a quotation character")
+                + "because removeQuoted can not deal properly with escaped quotes")
         @Test
         public void oneDoubleQuotedTextContainingEscapedDoubleQuoteAtTheBeginning() {
-            assertThat("[Prefix][Postfix]").isEqualTo(CodeValidator.removeQuoted("[Prefix]\"\\\"Text\"[Postfix]", "\""));
+            assertThat(CodeValidator.removeQuoted("[Prefix]\"\\\"Text\"[Postfix]", "\"")).isEqualTo("[Prefix][Postfix]");
         }
     }
 
@@ -564,8 +556,6 @@ public class CodeValidatorTest {
             assertThat(CodeValidator.onlyLiteralsChanged("public class Test { char var = 'A'; }", "public class Test { char var = 'B'; }")).isTrue();
         }
 
-        @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$OnlyLiteralsChangedTests.oneNestedQuotationCharacter01() is @Disabled\n"
-                + "because onlyLiteralChanged can't properly deal with escaped quotes inside of another quote")
         @Test
         public void oneNestedQuotationCharacter01() {
             String original = "public class Test { String var = \"Text\"; }";
@@ -575,7 +565,7 @@ public class CodeValidatorTest {
         }
 
         @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$OnlyLiteralsChangedTests.oneNestedQuotationCharacter02() is @Disabled\n"
-                + "because onlyLiteralChanged can't properly deal with escaped quotes inside of another quote")
+                + "because onlyLiteralChanged can't properly deal with escaped quotes inside another quote")
         @Test
         public void oneNestedQuotationCharacter02() {
             String original = "public class Test { String var = \"\\\"Text\"; }";
@@ -585,7 +575,7 @@ public class CodeValidatorTest {
         }
 
         @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$OnlyLiteralsChangedTests.oneNestedQuotationCharacter03() is @Disabled\n"
-                + "because onlyLiteralChanged can't properly deal with escaped quotes inside of another quote")
+                + "because onlyLiteralChanged can't properly deal with escaped quotes inside another quote")
         @Test
         public void oneNestedQuotationCharacter03() {
             String original = "public class Test { String var = \"\\\"Text\"; }";
@@ -594,8 +584,6 @@ public class CodeValidatorTest {
             assertThat(CodeValidator.onlyLiteralsChanged(original, mutated)).isTrue();
         }
 
-        @Disabled("public void org.codedefenders.validation.code.CodeValidatorTest$OnlyLiteralsChangedTests.oneNestedQuotationCharacter04() is @Disabled\n"
-                + "because onlyLiteralChanged can't properly deal with escaped quotes inside of another quote")
         @Test
         public void oneNestedQuotationCharacter04() {
             String original = "public class Test { char var = '\"'; }";
