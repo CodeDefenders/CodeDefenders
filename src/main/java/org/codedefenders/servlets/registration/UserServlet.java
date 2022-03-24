@@ -67,7 +67,7 @@ public class UserServlet extends HttpServlet {
                         messages.add("Could not create a user for you, sorry!");
                     }
                 }
-                response.sendRedirect(Paths.LOGIN);
+                response.sendRedirect(request.getContextPath() + Paths.LOGIN);
                 break;
 
             default:
