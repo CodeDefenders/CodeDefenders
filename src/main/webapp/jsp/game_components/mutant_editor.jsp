@@ -112,9 +112,6 @@
 
 </div>
 
-<script type="text/javascript" src="js/code_completion.js"></script>
-<script type="text/javascript" src="js/mutant_editor.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
@@ -129,7 +126,7 @@
             dependencyEditorElements.push(document.getElementById(`mutant-editor-code-\${i}`));
         }
 
-        CodeDefenders.objects.mutantEditor = new CodeDefenders.classes.MutantEditor(
+        CodeDefenders.objects.mutantEditor = new CodeDefenders.MutantEditor(
                 editorElement,
                 dependencyEditorElements,
                 editableLinesStart,

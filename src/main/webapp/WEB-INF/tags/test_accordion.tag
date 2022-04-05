@@ -59,15 +59,12 @@
     </c:forEach>
 </div>
 
-<script type="text/javascript" src="js/modal.js"></script>
-<script type="text/javascript" src="js/test_accordion.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
         const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
         const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
 
-        CodeDefenders.objects.testAccordion = new CodeDefenders.classes.TestAccordion(categories, tests);
+        CodeDefenders.objects.testAccordion = new CodeDefenders.TestAccordion(categories, tests);
     })();
 </script>

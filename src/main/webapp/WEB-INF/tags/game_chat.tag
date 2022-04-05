@@ -71,14 +71,12 @@
     <span id="chat-count" class="badge bg-secondary">0</span>
 </button>
 
-<script type="text/javascript" src="js/game_chat.js"></script>
-
 <script>
     $(document).ready(function() {
         const gameId = ${gameChat.gameId};
         const messageLimit = ${gameChat.messageLimit};
 
-        CodeDefenders.objects.gameChat = new CodeDefenders.classes.GameChat(
+        CodeDefenders.objects.gameChat = new CodeDefenders.GameChat(
                 gameId,
                 messageLimit);
     });

@@ -113,6 +113,7 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
+<script src="js/codedefenders_game.js" type="text/javascript"></script>
 <link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/push_socket.jsp"/>

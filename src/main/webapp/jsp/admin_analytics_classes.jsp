@@ -65,11 +65,9 @@
     </div>
 </div>
 
-<script src="js/datatables_utils.js" type="text/javascript" ></script>
-
 <script>
 (function () {
-    const DataTablesUtils = CodeDefenders.classes.DataTablesUtils;
+    const DataTablesUtils = CodeDefenders.DataTablesUtils;
     const div = DataTablesUtils.formatDivision;
     const valPercent = DataTablesUtils.formatValueAndPercent;
 

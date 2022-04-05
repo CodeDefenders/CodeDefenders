@@ -695,7 +695,6 @@
         (function () {
 
             $(document).ready(function () {
-                $.fn.dataTable.moment('YY/MM/DD HH:mm');
                 $('#tableMPGames').DataTable({
                     "paging": false,
                     "searching": false,

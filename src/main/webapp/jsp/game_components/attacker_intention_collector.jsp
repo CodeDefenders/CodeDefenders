@@ -18,8 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<script type="text/javascript" src="js/attacker_intention_collection.js"></script>
 
 <script>
-    CodeDefenders.objects.attackerIntentionCollection = new CodeDefenders.classes.AttackerIntentionCollection();
+    CodeDefenders.objects.attackerIntentionCollection = new CodeDefenders.AttackerIntentionCollection();
 </script>

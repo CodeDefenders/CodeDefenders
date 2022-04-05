@@ -20,15 +20,13 @@
 --%>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
-<script type="text/javascript" src="js/defender_intention_collection.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
         const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};
         console.log(lineToSelect);
 
-        CodeDefenders.objects.defenderIntentionCollection = new CodeDefenders.classes.DefenderIntentionCollection(
+        CodeDefenders.objects.defenderIntentionCollection = new CodeDefenders.DefenderIntentionCollection(
                 lineToSelect);
     })();
 </script>
