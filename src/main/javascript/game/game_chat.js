@@ -1,4 +1,4 @@
-import {objects, PushSocket} from '../main';
+import {objects, Draggable, PushSocket} from '../main';
 
 class GameChat {
     /**
@@ -27,6 +27,8 @@ class GameChat {
         this.channel = null;
         this.messageCount = null;
         this.chatInput = null;
+
+        this.draggable = null;
 
         this._init();
     }
@@ -682,23 +684,14 @@ class GameChat {
         });
 
         /* Make the chat window draggable. */
-        // $(this.chatElement).draggable({
-        //     /* Reset bottom and right properties, because they
-        //      * mess up the draggable, which uses top and left. */
-        //     start: event => {
-        //         event.target.style.bottom = null;
-        //         event.target.style.right = null;
-        //     },
-        //     stop: event => {
-        //         localStorage.setItem('chatPos',
-        //                 JSON.stringify({
-        //                     top: event.target.style.top,
-        //                     left: event.target.style.left
-        //                 })
-        //         );
-        //     },
-        //     handle: this.handleElement
-        // });
+        this.draggable = new Draggable(this.chatElement, this.handleElement);
+        this.draggable.addEventListener('stop', function (event) {
+            const chatPos = JSON.stringify({
+                top: self.chatElement.style.top,
+                left: self.chatElement.style.left
+            });
+            localStorage.setItem('chatPos', chatPos);
+        });
     }
 
     /**

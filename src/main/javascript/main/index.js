@@ -1,4 +1,5 @@
 import DataTablesUtils from './datatables_utils';
+import Draggable from "./draggable";
 import InfoApi from './info_api';
 import Modal from './modal';
 import objects from './objects';
@@ -8,6 +9,7 @@ import PuzzleAPI from "./puzzle_api";
 
 export {
     DataTablesUtils,
+    Draggable,
     InfoApi,
     Modal,
     objects,
