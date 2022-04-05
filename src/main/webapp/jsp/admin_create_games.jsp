@@ -40,20 +40,6 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<style>
-    /* Change colors of selected table rows. */
-    table.dataTable tbody > tr.selected,
-    table.dataTable tbody > tr > .selected {
-        background-color: #D8E0EA;
-        color: inherit;
-    }
-
-    /* Initially hide melee-specific forms. */
-    .melee-specific {
-        display: none;
-    }
-</style>
-
 <div class="container">
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
@@ -357,7 +343,7 @@
                                 <input type="number" value="3" id="defendersPerGame" name="defendersPerGame" min="1" class="form-control">
                             </div>
 
-                            <div class="col-12 melee-specific"
+                            <div class="col-12 melee-specific" hidden
                                  title="Players per game.">
                                 <label for="playersPerGame" class="form-label">Players per Game</label>
                                 <input type="number" value="6" id="playersPerGame" name="playersPerGame" min="1" class="form-control">
@@ -1293,12 +1279,20 @@
             $('#gameType-group').on('change', function (event) {
                 switch (event.target.value) {
                     case 'MULTIPLAYER':
-                        $('.melee-specific').hide();
-                        $('.multiplayer-specific').show();
+                        for (const element of document.querySelectorAll('.melee-specific')) {
+                            element.setAttribute('hidden', '');
+                        }
+                        for (const element of document.querySelectorAll('.multiplayer-specific')) {
+                            element.removeAttribute('hidden');
+                        }
                         break;
                     case 'MELEE':
-                        $('.multiplayer-specific').hide();
-                        $('.melee-specific').show();
+                        for (const element of document.querySelectorAll('.multiplayer-specific')) {
+                            element.setAttribute('hidden', '');
+                        }
+                        for (const element of document.querySelectorAll('.melee-specific')) {
+                            element.removeAttribute('hidden');
+                        }
                         break;
                 }
             });

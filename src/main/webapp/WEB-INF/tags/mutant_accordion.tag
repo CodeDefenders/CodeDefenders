@@ -18,88 +18,11 @@
   --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%@ tag import="org.codedefenders.util.Paths" %>
-
 <%--@elvariable id="mutantAccordion" type="org.codedefenders.beans.game.MutantAccordionBean"--%>
 
+<link href="${pageContext.request.contextPath}/css/specific/mutant_accordion.css" rel="stylesheet">
 
 <div id="mutants-div">
-
-    <style>
-        <%-- Prefix all classes with "ta-" to avoid conflicts.
-        We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
-
-        /* Customization of Bootstrap 5 accordion style.
-        ----------------------------------------------------------------------------- */
-
-        #mutants-accordion .accordion-button {
-            padding: .6rem .8rem;
-            background-color: rgba(0, 0, 0, .03);
-        }
-
-        /* Clear the box shadow from .accordion-button. This removes the blue outline when selecting a button, and the
-           border between the header and content of accordion items when expanded. */
-        #mutants-accordion .accordion-button {
-            box-shadow: none;
-        }
-
-        /* Add back the border between header and content of accordion items. */
-        #mutants-accordion .accordion-body {
-            border-top: 1px solid rgba(0, 0, 0, .125);
-        }
-
-        /* Always display the chevron icon in black. */
-        #mutants-accordion .accordion-button:not(.collapsed)::after {
-            /* Copied from Bootstrap 5. */
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
-        }
-
-        /* Categories.
-        ----------------------------------------------------------------------------- */
-
-        #mutants-accordion .accordion-button:not(.ma-covered) {
-            color: #B0B0B0;
-        }
-
-        #mutants-accordion .accordion-button.ma-covered {
-            color: black;
-        }
-
-        /* Tables.
-        ----------------------------------------------------------------------------- */
-
-        #mutants-accordion thead {
-            display: none;
-        }
-
-        #mutants-accordion .dataTables_scrollHead {
-            display: none;
-        }
-
-        #mutants-accordion td {
-            vertical-align: middle;
-        }
-
-        #mutants-accordion table {
-            font-size: inherit;
-        }
-
-        #mutants-accordion tr:last-child > td {
-            border-bottom: none;
-        }
-
-        /* Inline elements.
-        ----------------------------------------------------------------------------- */
-
-        #mutants-accordion .ma-column-name {
-            color: #B0B0B0;
-        }
-
-        #mutants-accordion .ma-mutant-link {
-            cursor: default;
-        }
-    </style>
-
 
     <div class="game-component-header">
         <h3>Existing Mutants</h3>

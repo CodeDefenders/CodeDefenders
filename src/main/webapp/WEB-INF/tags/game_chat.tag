@@ -5,35 +5,7 @@
 
 <c:if test="${gameChat.chatEnabled}">
 
-<style>
-    #chat .chat-message {
-        padding-top: 2px;
-        padding-bottom: 2px;
-    }
-    #chat .chat-tab-button {
-        border-radius: 50rem;
-        padding-left: .5rem;
-        padding-right: .5rem;
-    }
-
-    /* Role colors. */
-    #chat .chat-message-attacker .chat-message-name {
-        color: var(--fg-attacker);
-    }
-    #chat .chat-message-defender .chat-message-name {
-        color: var(--fg-defender);
-    }
-    #chat .chat-message-player .chat-message-name {
-        color: var(--fg-player);
-    }
-    #chat .chat-message-observer .chat-message-name {
-        color: #ff8300;
-        font-weight: bold;
-    }
-    #chat .chat-message-system {
-        color: gray;
-    }
-</style>
+<link href="${pageContext.request.contextPath}/css/specific/game_chat.css" rel="stylesheet">
 
 <div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;" hidden>
     <div class="card m-0">

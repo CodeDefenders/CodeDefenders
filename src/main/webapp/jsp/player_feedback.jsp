@@ -29,54 +29,7 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 
-<style>
-    .rating-grid {
-        display: grid;
-        grid-template-columns: max-content max-content;
-        grid-gap: 0 2rem;
-        align-items: center;
-    }
-
-    /****** Style Star Rating Widget *****/
-    .rating {
-        display: flex;
-        flex-direction: row-reverse;
-        flex-wrap: nowrap;
-        gap: .2em;
-        width: max-content;
-    }
-    .rating > input {
-        display: none;
-    }
-    .rating > label::before {
-        content: "\f005";
-        font: normal normal normal 1em/1 FontAwesome;
-    }
-    .rating > label {
-        color: #ddd;
-    }
-    /* Font sizes */
-    .rating.rating-interactive {
-        font-size: 20px;
-    }
-    .rating.rating-static {
-        font-size: 14px;
-    }
-
-    /***** CSS Magic to Highlight Stars on Hover *****/
-    .rating > input:checked ~ label, /* show gold star when clicked */
-    .rating:not(:checked) > label:hover, /* hover current star */
-    .rating:not(:checked) > label:hover ~ label {
-        color: #FFD700;
-    }
-    /* Hover previous stars in list */
-    .rating > input:checked + label:hover, /* hover current star when changing rating */
-    .rating > input:checked ~ label:hover,
-    .rating > label:hover ~ input:checked ~ label, /* lighten current selection */
-    .rating > input:checked ~ label:hover ~ label {
-        color: #FFED85;
-    }
-</style>
+<link href="${pageContext.request.contextPath}/css/specific/player_feedback.css" rel="stylesheet">
 
 <div id="playerFeedback" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-responsive">

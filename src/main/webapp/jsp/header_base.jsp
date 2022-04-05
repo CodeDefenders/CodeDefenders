@@ -34,7 +34,7 @@
     <!-- App context -->
     <base href="${pageContext.request.contextPath}/">
 
-    <link href="css/variables.css" rel="stylesheet">
+    <link href="css/global/variables.css" rel="stylesheet">
 
     <!-- Favicon.ico -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -49,7 +49,7 @@
     <!-- Bootstrap -->
     <script src="webjars/bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
     <link href="webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/bootstrap_customize.css" rel="stylesheet">
+    <link href="css/global/bootstrap_customize.css" rel="stylesheet">
     <script type="text/javascript" src="js/bootstrap_init.js"></script>
 
     <!-- Codemirror -->
@@ -76,7 +76,7 @@
     <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet">
     <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet">
     <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet">
-    <link href="css/codemirror_customize.css" rel="stylesheet">
+    <link href="css/global/codemirror_customize.css" rel="stylesheet">
 
     <link href="webjars/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
@@ -87,11 +87,11 @@
     <script type="text/javascript" src="webjars/momentjs/2.14.1/min/moment.min.js"></script> <!-- must come before datetime-moment -->
     <script type="text/javascript" src="webjars/datatables-plugins/1.10.24/sorting/datetime-moment.js"></script> <!-- must come after moment -->
     <link href="webjars/datatables/1.10.24/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="webjars/datatables-select/1.3.3/css/select.bootstrap5.min.css" rel="stylesheet">
-    <link href="css/datatables_customize.css" rel="stylesheet">
+    <%-- <link href="webjars/datatables-select/1.3.3/css/select.bootstrap5.min.css" rel="stylesheet"> We use custom CSS instead. --%>
+    <link href="css/global/datatables_customize.css" rel="stylesheet">
 
-    <link href="css/page.css" rel="stylesheet">
-    <link href="css/common.css" rel="stylesheet">
+    <link href="css/global/page.css" rel="stylesheet">
+    <link href="css/global/common.css" rel="stylesheet">
 
     <script type="text/javascript" src="js/global_object.js"></script>
     <script type="text/javascript" src="js/info_api.js"></script>
