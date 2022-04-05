@@ -20,9 +20,11 @@
 
 		<skipCheckstyle>false</skipCheckstyle>
 		<skipTests>false</skipTests>
+		<skipFrontend>false</skipFrontend>
 		<skipUnitTests>${skipTests}</skipUnitTests>
 		<skipIntegrationTests>${skipTests}</skipIntegrationTests>
 		<checkstyle.skip>${skipCheckstyle}</checkstyle.skip>
+		<skip.npm>${skipFrontend}</skip.npm>
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
@@ -288,6 +290,45 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<nodeVersion>v16.14.2</nodeVersion>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+						<phase>generate-resources</phase>
+					</execution>
+
+					<execution>
+						<id>npm run bundle</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run bundle</arguments>
+						</configuration>
+						<phase>compile</phase>
+					</execution>
+				</executions>
+			</plugin>
+
 			<!--
 			Plugins without any configured <executions>
 			-->
@@ -499,6 +540,12 @@
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>0.8.7</version>
+				</plugin>
+
+				<plugin>
+					<groupId>com.github.eirslett</groupId>
+					<artifactId>frontend-maven-plugin</artifactId>
+					<version>1.12.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
