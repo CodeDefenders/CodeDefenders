@@ -19,7 +19,7 @@ const MINIMIZE_OUTPUT = true;
 const FORCE_BUILD = false;
 
 const SRC_DIR = 'src/main/javascript';
-/* Warning: This directory is cleaned before build. */
+/* WARNING: This directory is deleted before build. */
 const BUILD_DIR = 'target/rollup/js';
 
 const PLUGINS = [
@@ -243,6 +243,7 @@ if (!FORCE_BUILD && shouldSkipBuild()) {
 
 /* Delete build folder. */
 if (CLEAN_BUILD) {
+    console.log(`Deleting build folder '${BUILD_DIR}'.`);
     fs.rmSync(BUILD_DIR, { recursive: true, force: true });
 }
 
