@@ -1,5 +1,4 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import {objects, PushSocket} from '../main';
 
 class GameChat {
     /**
@@ -509,7 +508,7 @@ class GameChat {
      * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
      */
     sendMessage (message, isAllChat) {
-        CodeDefenders.objects.pushSocket.send('chat.ClientGameChatEvent', {
+        objects.pushSocket.send('chat.ClientGameChatEvent', {
             gameId: this.gameId,
             allChat: isAllChat,
             message
@@ -683,23 +682,23 @@ class GameChat {
         });
 
         /* Make the chat window draggable. */
-        $(this.chatElement).draggable({
-            /* Reset bottom and right properties, because they
-             * mess up the draggable, which uses top and left. */
-            start: event => {
-                event.target.style.bottom = null;
-                event.target.style.right = null;
-            },
-            stop: event => {
-                localStorage.setItem('chatPos',
-                        JSON.stringify({
-                            top: event.target.style.top,
-                            left: event.target.style.left
-                        })
-                );
-            },
-            handle: this.handleElement
-        });
+        // $(this.chatElement).draggable({
+        //     /* Reset bottom and right properties, because they
+        //      * mess up the draggable, which uses top and left. */
+        //     start: event => {
+        //         event.target.style.bottom = null;
+        //         event.target.style.right = null;
+        //     },
+        //     stop: event => {
+        //         localStorage.setItem('chatPos',
+        //                 JSON.stringify({
+        //                     top: event.target.style.top,
+        //                     left: event.target.style.left
+        //                 })
+        //         );
+        //     },
+        //     handle: this.handleElement
+        // });
     }
 
     /**
@@ -729,8 +728,7 @@ class GameChat {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
-        const PushSocket = CodeDefenders.classes.PushSocket;
-        const pushSocket = CodeDefenders.objects.pushSocket;
+        const pushSocket = objects.pushSocket;
         pushSocket.subscribe('registration.GameChatRegistrationEvent', {gameId: this.gameId});
         pushSocket.register('chat.ServerGameChatEvent', this._onChatMessage.bind(this));
         pushSocket.register('chat.ServerSystemChatEvent', this._onSystemMessage.bind(this));
@@ -745,6 +743,5 @@ class GameChat {
 
 }
 
-CodeDefenders.classes.GameChat ??= GameChat;
 
-})();
+export default GameChat;

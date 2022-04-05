@@ -1,5 +1,5 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import {objects} from '../main';
+
 
 /* There is honestly not that much reason for this to be a class, other than consistency. */
 class AttackerIntentionCollection {
@@ -52,12 +52,11 @@ class AttackerIntentionCollection {
     /** @private */
     _submitForm (intention) {
         this.intentionInput.value = intention;
-        CodeDefenders.objects.mutantProgressBar.activate();
+        objects.mutantProgressBar.activate();
         this.attackForm.submit();
         this.attackButton.disabled = true;
     }
 }
 
-CodeDefenders.classes.AttackerIntentionCollection ??= AttackerIntentionCollection;
 
-})();
+export default AttackerIntentionCollection;

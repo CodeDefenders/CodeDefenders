@@ -1,5 +1,5 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import CodeMirror from '../thirdparty/codemirror';
+
 
 class CodeCompletion {
     constructor () {
@@ -141,6 +141,5 @@ class CodeCompletion {
 
 }
 
-CodeDefenders.classes.CodeCompletion ??= CodeCompletion;
 
-})();
+export default CodeCompletion;

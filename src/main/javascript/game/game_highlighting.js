@@ -1,5 +1,5 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import {objects} from "../main";
+
 
 class GameHighlighting {
 
@@ -90,10 +90,10 @@ class GameHighlighting {
          * @type {CodeMirror}
          */
         this.editor = null;
-        if (CodeDefenders.objects.classViewer != null) {
-            this.editor = CodeDefenders.objects.classViewer.editor;
-        } else if (CodeDefenders.objects.mutantEditor != null) {
-            this.editor = CodeDefenders.objects.mutantEditor.editor;
+        if (objects.classViewer != null) {
+            this.editor = objects.classViewer.editor;
+        } else if (objects.mutantEditor != null) {
+            this.editor = objects.mutantEditor.editor;
         }
     }
 
@@ -395,6 +395,5 @@ class GameHighlighting {
     }
 }
 
-CodeDefenders.classes.GameHighlighting = GameHighlighting;
 
-})();
+export default GameHighlighting;

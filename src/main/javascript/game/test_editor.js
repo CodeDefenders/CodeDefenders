@@ -1,5 +1,7 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import CodeMirror from '../thirdparty/codemirror'
+import CodeCompletion from './code_completion';
+import {objects} from '../main';
+
 
 class TestEditor {
 
@@ -115,7 +117,7 @@ class TestEditor {
 
     /** @private */
     _initCodeCompletion() {
-        this.codeCompletion = new CodeDefenders.classes.CodeCompletion();
+        this.codeCompletion = new CodeCompletion();
         this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
 
         let testMethods = [
@@ -153,16 +155,16 @@ class TestEditor {
         /* Gather classes to autocomplete. */
         const texts = [];
         /* Get classes from class viewer. */
-        if (CodeDefenders.objects.classViewer != null) {
-            const classViewer = CodeDefenders.objects.classViewer;
+        if (objects.classViewer != null) {
+            const classViewer = objects.classViewer;
             texts.push(classViewer.editor.getValue());
             for (const dependencyEditor of classViewer.dependencyEditors) {
                 texts.push(dependencyEditor.getValue());
             }
         }
         /* Get classes from mutant editor. */
-        if (CodeDefenders.objects.mutantEditor != null) {
-            const mutantEditor = CodeDefenders.objects.mutantEditor;
+        if (objects.mutantEditor != null) {
+            const mutantEditor = objects.mutantEditor;
             texts.push(mutantEditor.editor.getValue());
             for (const dependencyEditor of mutantEditor.dependencyEditors) {
                 texts.push(dependencyEditor.getValue());
@@ -184,6 +186,5 @@ class TestEditor {
     }
 }
 
-CodeDefenders.classes.TestEditor ??= TestEditor;
 
-})();
+export default TestEditor;

@@ -1,6 +1,3 @@
-/* Wrap in a function so it has it's own scope. */
-(function () {
-
 class PuzzleAPI {
     /**
      * Fetches an object from a given JSON API.
@@ -48,6 +45,5 @@ class PuzzleAPI {
     }
 }
 
-CodeDefenders.classes.PuzzleAPI ??= PuzzleAPI;
 
-})();
+export default PuzzleAPI;

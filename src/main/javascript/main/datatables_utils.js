@@ -1,6 +1,3 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
-
 class DataTablesUtils {
     /**
      * Divide two numbers and format the result.
@@ -134,9 +131,5 @@ class DataTablesUtils {
     };
 }
 
-CodeDefenders.classes.DataTablesUtils ??= DataTablesUtils;
 
-})();
-
-
-
+export default DataTablesUtils;

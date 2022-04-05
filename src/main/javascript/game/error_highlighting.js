@@ -1,6 +1,3 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
-
 class ErrorHighlighting {
     /**
      * @param {number[]} errorLines
@@ -34,6 +31,5 @@ class ErrorHighlighting {
 
 }
 
-CodeDefenders.classes.ErrorHighlighting ??= ErrorHighlighting;
 
-})();
+export default ErrorHighlighting;

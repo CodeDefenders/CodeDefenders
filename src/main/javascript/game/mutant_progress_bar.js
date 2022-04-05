@@ -1,7 +1,7 @@
-/* Wrap in a function so it has it's own scope. */
-(function () {
+import {objects, ProgressBar, PushSocket} from '../main';
 
-class MutantProgressBar extends CodeDefenders.classes.ProgressBar {
+
+class MutantProgressBar extends ProgressBar {
     constructor(progressElement, gameId) {
         super(progressElement);
 
@@ -13,8 +13,7 @@ class MutantProgressBar extends CodeDefenders.classes.ProgressBar {
     }
 
     activate () {
-        const PushSocket = CodeDefenders.classes.PushSocket;
-        const pushSocket = CodeDefenders.objects.pushSocket;
+        const pushSocket = objects.pushSocket;
 
         this.setProgress(16, 'Submitting Mutant');
         this._register();
@@ -30,13 +29,13 @@ class MutantProgressBar extends CodeDefenders.classes.ProgressBar {
     }
 
     _subscribe () {
-        CodeDefenders.objects.pushSocket.subscribe('registration.MutantProgressBarRegistrationEvent', {
+        objects.pushSocket.subscribe('registration.MutantProgressBarRegistrationEvent', {
             gameId: this.gameId
         });
     }
 
     _register () {
-        const pushSocket = CodeDefenders.objects.pushSocket;
+        const pushSocket = objects.pushSocket;
         pushSocket.register('mutant.MutantSubmittedEvent', this._onMutantSubmitted.bind(this));
         pushSocket.register('mutant.MutantValidatedEvent', this._onMutantValidated.bind(this));
         pushSocket.register('mutant.MutantDuplicateCheckedEvent', this._onDuplicateChecked.bind(this));
@@ -82,6 +81,5 @@ class MutantProgressBar extends CodeDefenders.classes.ProgressBar {
     }
 }
 
-CodeDefenders.classes.MutantProgressBar ??= MutantProgressBar;
 
-})();
+export default MutantProgressBar;

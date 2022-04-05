@@ -1,5 +1,5 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import CodeCompletion from './code_completion';
+
 
 class MutantEditor {
 
@@ -124,7 +124,7 @@ class MutantEditor {
 
     /** @private */
     _initCodeCompletion () {
-        this.codeCompletion = new CodeDefenders.classes.CodeCompletion();
+        this.codeCompletion = new CodeCompletion();
         this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeMutant');
 
         /* Gather classes to autocomplete. */
@@ -186,6 +186,5 @@ class MutantEditor {
     }
 }
 
-CodeDefenders.classes.MutantEditor ??= MutantEditor;
 
-})();
+export default MutantEditor;

@@ -1,5 +1,6 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import DataTable from '../thirdparty/datatables';
+import {InfoApi, Modal} from '../main';
+
 
 class TestAccordion {
 
@@ -71,7 +72,7 @@ class TestAccordion {
         }
 
         /* Create a new modal. */
-        modal = new CodeDefenders.classes.Modal();
+        modal = new Modal();
         modal.title.innerText = `Test ${test.id} (by ${test.creator.name})`;
         modal.body.innerHTML =
                 `<div class="card">
@@ -92,7 +93,7 @@ class TestAccordion {
             autoRefresh: true
         });
         editor.getWrapperElement().classList.add('codemirror-readonly');
-        CodeDefenders.classes.InfoApi.setTestEditorValue(editor, test.id);
+        InfoApi.setTestEditorValue(editor, test.id);
 
         modal.controls.show();
     };
@@ -110,7 +111,7 @@ class TestAccordion {
 
             /* Create the DataTable. */
             const tableElement = document.getElementById(`ta-table-${category.id}`);
-            const dataTable = $(tableElement).DataTable({
+            const dataTable = new DataTable(tableElement, {
                 data: rows,
                 columns: [
                     { data: null, title: '', defaultContent: '' },
@@ -257,6 +258,5 @@ class TestAccordion {
     }
 }
 
-CodeDefenders.classes.TestAccordion ??= TestAccordion;
 
-})();
+export default TestAccordion;

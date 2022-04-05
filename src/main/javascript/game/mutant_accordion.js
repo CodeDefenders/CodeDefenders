@@ -1,5 +1,6 @@
-/* Wrap in a function so it has it's own scope. */
-(function () {
+import DataTable from '../thirdparty/datatables';
+import {InfoApi, Modal, objects} from '../main';
+
 
 class MutantAccordion {
 
@@ -67,7 +68,7 @@ class MutantAccordion {
         }
 
         /* Create a new modal. */
-        modal = new CodeDefenders.classes.Modal();
+        modal = new Modal();
         modal.title.innerText = `Mutant ${mutant.id} (by ${mutant.creator.name})`;
         modal.body.innerHTML =
                 `<div class="card">
@@ -88,7 +89,7 @@ class MutantAccordion {
             autoRefresh: true
         });
         editor.getWrapperElement().classList.add('codemirror-readonly');
-        CodeDefenders.classes.InfoApi.setMutantEditorValue(editor, mutant.id);
+        InfoApi.setMutantEditorValue(editor, mutant.id);
 
         modal.controls.show();
     };
@@ -107,7 +108,7 @@ class MutantAccordion {
         }
 
         /* Create a new modal. */
-        modal = new CodeDefenders.classes.Modal();
+        modal = new Modal();
         modal.title.innerText =`Test ${mutant.killedByTestId} (by ${mutant.killedBy.name})`;
         modal.body.innerHTML =
                 `<div class="card mb-3">
@@ -133,7 +134,7 @@ class MutantAccordion {
             autoRefresh: true
         });
         editor.getWrapperElement().classList.add('codemirror-readonly');
-        CodeDefenders.classes.InfoApi.setTestEditorValue(editor, mutant.killedByTestId);
+        InfoApi.setTestEditorValue(editor, mutant.killedByTestId);
 
         modal.controls.show();
     };
@@ -151,7 +152,7 @@ class MutantAccordion {
 
             /* Create the DataTable. */
             const tableElement = document.getElementById(`ma-table-${category.id}`);
-            const dataTable = $(tableElement).DataTable({
+            const dataTable = new DataTable(tableElement, {
                 data: rows,
                 columns: [
                     {data: null, title: '', defaultContent: ''},
@@ -192,10 +193,10 @@ class MutantAccordion {
                     /* Assign function to the "Mutant <id>" link. */
                     row.querySelector('.ma-mutant-link').addEventListener('click', function (event) {
                         let editor = null;
-                        if (CodeDefenders.objects.classViewer != null) {
-                            editor = CodeDefenders.objects.classViewer.editor;
-                        } else if (CodeDefenders.objects.mutantEditor != null) {
-                            editor = CodeDefenders.objects.mutantEditor.editor;
+                        if (objects.classViewer != null) {
+                            editor = objects.classViewer.editor;
+                        } else if (objects.mutantEditor != null) {
+                            editor = objects.mutantEditor.editor;
                         }
 
                         if (editor == null) {
@@ -239,7 +240,7 @@ class MutantAccordion {
                                 || data.state === selectedCategory;
                     }
 
-                    $.fn.dataTable.ext.search.push(searchFunction);
+                    DataTable.ext.search.push(searchFunction);
 
                     for (const category of self.categories) {
                         self.dataTablesByCategory.get(category.id).draw();
@@ -253,7 +254,7 @@ class MutantAccordion {
                     }
 
                     /* Remove search function again after tables have been filtered. */
-                    $.fn.dataTable.ext.search.splice($.fn.dataTable.ext.search.indexOf(searchFunction), 1);
+                    DataTable.ext.search.splice(DataTable.ext.search.indexOf(searchFunction), 1);
                 })
     }
 
@@ -331,6 +332,5 @@ class MutantAccordion {
     }
 }
 
-CodeDefenders.classes.MutantAccordion ??= MutantAccordion;
 
-})();
+export default MutantAccordion;

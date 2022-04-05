@@ -1,6 +1,3 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
-
 class ProgressBar {
     constructor(progressElement) {
         /**
@@ -36,6 +33,5 @@ class ProgressBar {
     }
 }
 
-CodeDefenders.classes.ProgressBar ??= ProgressBar;
 
-})();
+export default ProgressBar;

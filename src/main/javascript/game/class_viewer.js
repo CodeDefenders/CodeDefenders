@@ -1,5 +1,5 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import CodeMirror from '../thirdparty/codemirror';
+
 
 class ClassViewer {
 
@@ -81,6 +81,5 @@ class ClassViewer {
     }
 }
 
-CodeDefenders.classes.ClassViewer ??= ClassViewer;
 
-})();
+export default ClassViewer;

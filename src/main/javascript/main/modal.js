@@ -1,5 +1,4 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import {Modal as BootstrapModal} from '../thirdparty/bootstrap';
 
 class Modal {
 
@@ -70,13 +69,12 @@ class Modal {
         /** @type HTMLButtonElement */
         this.footerCloseButton = footerCloseButton;
 
-        /** @type bootstrap.Modal */
-        this.controls = new bootstrap.Modal(modal, options);
+        /** @type BootstrapModal */
+        this.controls = new BootstrapModal(modal, options);
 
         document.body.appendChild(modal);
     }
 }
 
-CodeDefenders.classes.Modal ??= Modal;
 
-})();
+export default Modal;

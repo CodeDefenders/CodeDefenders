@@ -1,6 +1,3 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
-
 /**
  * Sets up a web socket for the page. It ensures that each request is validated against
  * an automatically generated ticket which it matched with the user. Components wishing to receive push events
@@ -199,6 +196,5 @@ class PushSocket {
     };
 }
 
-CodeDefenders.classes.PushSocket ??= PushSocket;
 
-})();
+export default PushSocket;

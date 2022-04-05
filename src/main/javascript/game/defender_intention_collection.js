@@ -1,5 +1,5 @@
-/* Wrap in a function to avoid polluting the global scope. */
-(function () {
+import {objects} from '../main';
+
 
 class DefenderIntentionCollection {
 
@@ -21,17 +21,17 @@ class DefenderIntentionCollection {
          * @type {CodeMirror}
          */
         this.classViewer = null;
-        if (CodeDefenders.objects.classViewer !== null) {
-            this.classViewer = CodeDefenders.objects.classViewer.editor; // Battleground mode
-        } else if (CodeDefenders.objects.mutantEditor !== null) {
-            this.classViewer = CodeDefenders.objects.mutantEditor.editor; // Melee mode
+        if (objects.classViewer !== null) {
+            this.classViewer = objects.classViewer.editor; // Battleground mode
+        } else if (objects.mutantEditor !== null) {
+            this.classViewer = objects.mutantEditor.editor; // Melee mode
         }
 
         /**
          * The test editor CodeMirror instance.
          * @type {CodeMirror}
          */
-        this.testEditor = CodeDefenders.objects.testEditor.editor;
+        this.testEditor = objects.testEditor.editor;
 
         /**
          * The (hidden) input to submit the selected line number with.
@@ -155,6 +155,5 @@ class DefenderIntentionCollection {
     }
 }
 
-CodeDefenders.classes.DefenderIntentionCollection ??= DefenderIntentionCollection;
 
-})();
+export default DefenderIntentionCollection;

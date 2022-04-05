@@ -1,7 +1,7 @@
-/* Wrap in a function so it has it's own scope. */
-(function () {
+import {objects, ProgressBar, PushSocket} from '../main';
 
-class TestProgressBar extends CodeDefenders.classes.ProgressBar {
+
+class TestProgressBar extends ProgressBar {
     constructor(progressElement, gameId) {
         super(progressElement);
 
@@ -13,8 +13,7 @@ class TestProgressBar extends CodeDefenders.classes.ProgressBar {
     }
 
     activate () {
-        const PushSocket = CodeDefenders.classes.PushSocket;
-        const pushSocket = CodeDefenders.objects.pushSocket;
+        const pushSocket = objects.pushSocket;
 
         this.setProgress(16, 'Submitting Test');
         this._register();
@@ -30,13 +29,13 @@ class TestProgressBar extends CodeDefenders.classes.ProgressBar {
     }
 
     _subscribe () {
-        CodeDefenders.objects.pushSocket.subscribe('registration.TestProgressBarRegistrationEvent', {
+        objects.pushSocket.subscribe('registration.TestProgressBarRegistrationEvent', {
             gameId: this.gameId
         });
     }
 
     _register () {
-        const pushSocket = CodeDefenders.objects.pushSocket;
+        const pushSocket = objects.pushSocket;
         pushSocket.register('test.TestSubmittedEvent', this._onTestSubmitted.bind(this));
         pushSocket.register('test.TestCompiledEvent', this._onTestCompiled.bind(this));
         pushSocket.register('test.TestValidatedEvent', this._onTestValidated.bind(this));
@@ -77,6 +76,5 @@ class TestProgressBar extends CodeDefenders.classes.ProgressBar {
     }
 }
 
-CodeDefenders.classes.TestProgressBar ??= TestProgressBar;
 
-})();
+export default TestProgressBar;
