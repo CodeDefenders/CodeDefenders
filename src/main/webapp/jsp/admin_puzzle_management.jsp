@@ -66,7 +66,7 @@
 
             const chapters = puzzleData.puzzleChapters;
             if (chapters) {
-                chapterTable = $('#tableChapters').DataTable({
+                chapterTable = new DataTable('#tableChapters', {
                     "data": chapters,
                     "columns": [
                         { "data": "id" },
@@ -158,7 +158,7 @@
 
             const puzzles = puzzleData.puzzles;
             if (puzzles) {
-                puzzleTable = $('#tablePuzzles').DataTable({
+                puzzleTable = new DataTable('#tablePuzzles', {
                     "data": puzzles,
                     "columns": [
                         { "data": "id" },

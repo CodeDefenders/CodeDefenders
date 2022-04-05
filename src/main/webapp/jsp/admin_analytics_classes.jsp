@@ -143,7 +143,7 @@
     }
 
     $(document).ready(function() {
-        const table = $('#tableClasses').DataTable({
+        const table = new DataTable('#tableClasses', {
             "ajax": {
                 "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_CLASSES + "?fileType=json"%>",
                 "dataSrc": "data"

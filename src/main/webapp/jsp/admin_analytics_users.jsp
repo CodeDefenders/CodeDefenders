@@ -138,7 +138,7 @@
     }
 
     $(document).ready(function() {
-        const table = $('#tableUsers').DataTable({
+        const table = new DataTable('#tableUsers', {
             "ajax": {
                 "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_USERS + "?fileType=json"%>",
                 "dataSrc": "data"

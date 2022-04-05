@@ -191,7 +191,7 @@
 
         <script>
             $(document).ready(function () {
-                $('#tableUsers').DataTable({
+                new DataTable('#tableUsers', {
                     searching: true,
                     order: [[4, "desc"]],
                     "columnDefs": [{

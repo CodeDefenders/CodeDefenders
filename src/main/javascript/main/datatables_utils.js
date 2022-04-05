@@ -47,7 +47,7 @@ class DataTablesUtils {
      *     </thead>
      * </table>
      *
-     * table = $(...).DataTable({
+     * table = new DataTable(..., {
      *     columns: [
      *         {
      *             className:       'toggle-details',

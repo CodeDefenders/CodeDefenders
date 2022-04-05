@@ -956,7 +956,7 @@
 
         /* Staged games table and related components. */
         $(document).ready(function () {
-            const stagedGamesTable = $('#table-staged-games').DataTable({
+            const stagedGamesTable = new DataTable('#table-staged-games', {
                 data: stagedGamesTableData,
                 columns: [
                     {
@@ -1140,7 +1140,7 @@
 
         /* Users table and related components. */
         $(document).ready(function () {
-            const usersTable = $('#table-users').DataTable({
+            const usersTable = new DataTable('#table-users', {
                 data: usersTableData,
                 columns: [
                     {
@@ -1194,7 +1194,7 @@
                     $(this).find('select').prop('selectedIndex', -1);
 
                     /* Hide hidden users. */
-                    $(this).DataTable().rows().every(function () {
+                    this.api().rows().every(function () {
                         const userInfo = this.data();
                         if (showAssignedUsers || unassignedUserIds.has(userInfo.user.id)) {
                             userInfo._hidden = false;

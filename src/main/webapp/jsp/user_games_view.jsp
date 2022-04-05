@@ -695,7 +695,7 @@
         (function () {
 
             $(document).ready(function () {
-                $('#tableMPGames').DataTable({
+                new DataTable('#tableMPGames', {
                     "paging": false,
                     "searching": false,
                     "order": [[5, "asc"]],
