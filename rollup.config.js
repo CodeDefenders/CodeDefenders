@@ -53,9 +53,15 @@ const GLOBALS = {
     [path.resolve(__dirname, `${SRC_DIR}/thirdparty/datatables`)]: 'DataTable',
     [path.resolve(__dirname, `${SRC_DIR}/thirdparty/jquery`)]: 'jQuery'
 };
-const IS_IN_GLOBALS = function (id, parentId, isResolved) {
-    const fullPath = path.resolve(parentId, '..', id);
-    return GLOBALS.hasOwnProperty(fullPath);
+const DATATABLES_GLOBALS = {
+    'jquery': 'jQuery'
+};
+const isExternalFor = function (globals) {
+    return function (id, parentId, isResolved) {
+        const fullPath = path.resolve(parentId, '..', id);
+        return globals.hasOwnProperty(id)
+            || globals.hasOwnProperty(fullPath);
+    };
 };
 
 /*
@@ -65,7 +71,7 @@ const IS_IN_GLOBALS = function (id, parentId, isResolved) {
 const initConfig = {
     input: `${SRC_DIR}/init/index.js`,
     plugins: PLUGINS,
-    external: IS_IN_GLOBALS,
+    external: isExternalFor(GLOBALS),
     output: {
         file: `${BUILD_DIR}/codedefenders_init.js`,
         name: 'CodeDefenders',
@@ -83,7 +89,7 @@ const initConfig = {
 const mainConfig = {
     input: `${SRC_DIR}/main/index.js`,
     plugins: PLUGINS,
-    external: IS_IN_GLOBALS,
+    external: isExternalFor(GLOBALS),
     output: {
         file: `${BUILD_DIR}/codedefenders_main.js`,
         name: 'CodeDefenders',
@@ -101,7 +107,7 @@ const mainConfig = {
 const gameConfig = {
     input: `${SRC_DIR}/game/index.js`,
     plugins: PLUGINS,
-    external: IS_IN_GLOBALS,
+    external: isExternalFor(GLOBALS),
     output: {
         file: `${BUILD_DIR}/codedefenders_game.js`,
         name: 'CodeDefenders',
@@ -114,11 +120,11 @@ const gameConfig = {
 
 /*
  * Bundle JS libraries ourself. At the moment, the only advantage will be that we can minify them ourselves,
- * but later it will help us import them as modules. */
+ * but later it will help us import them as modules.
+ */
 const thirdpartyConfigs = [
     ['bootstrap', 'bootstrap'],
     ['codemirror', 'CodeMirror'],
-    ['datatables', 'DataTable'],
     ['jquery', 'jquery']
 ].map(([id, globalName]) => {
     return {
@@ -131,7 +137,19 @@ const thirdpartyConfigs = [
             sourcemap: true
         }
     }
-})
+});
+thirdpartyConfigs.push({
+    input: `${SRC_DIR}/thirdparty/datatables.js`,
+    plugins: PLUGINS,
+    external: isExternalFor(DATATABLES_GLOBALS),
+    output: {
+        file: `${BUILD_DIR}/datatables.js`,
+        name: 'DataTable',
+        format: 'iife',
+        sourcemap: true,
+        globals: DATATABLES_GLOBALS
+    }
+});
 
 const bundleConfig = [
     initConfig,
