@@ -182,14 +182,6 @@
 							<tasks>
 								<echo>Displaying properties value</echo>
 								<echo>[data.dir] ${data.dir}</echo>
-								<echo>[db.url]${db.url}</echo>
-								<echo>[tomcat.path] ${tomcat.path}</echo>
-								<echo>[tomcat.url] ${tomcat.url}</echo>
-								<echo>[cluster.mode] ${cluster.mode}</echo>
-								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
-								<echo>[parallelize] ${parallelize}</echo>
-								<echo>[forceLocalExecution] ${forceLocalExecution}</echo>
-								<echo>[block.attacker] ${block.attacker}</echo>
 							</tasks>
 						</configuration>
 					</execution>

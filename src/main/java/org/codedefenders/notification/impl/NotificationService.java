@@ -48,12 +48,10 @@ public class NotificationService implements INotificationService {
 
     private final ExecutorService executor;
 
-    @SuppressWarnings("UnstableApiUsage")
     private final EventBus eventBus;
 
     public NotificationService() {
         executor = Executors.newFixedThreadPool(NUM_THREADS);
-        //noinspection UnstableApiUsage
         eventBus = new AsyncEventBus(executor, ((exception, context) -> {
             logger.warn("Got {} while calling notification handler.", exception.getClass().getSimpleName(), exception);
             logger.warn("Event was: {}", new Gson().toJson(context.getEvent()));
@@ -62,19 +60,16 @@ public class NotificationService implements INotificationService {
 
     @Override
     public void post(Object message) {
-        //noinspection UnstableApiUsage
         eventBus.post(message);
     }
 
     @Override
     public void register(Object eventHandler) {
-        //noinspection UnstableApiUsage
         eventBus.register(eventHandler);
     }
 
     @Override
     public void unregister(Object eventHandler) {
-        //noinspection UnstableApiUsage
         eventBus.unregister(eventHandler);
     }
 

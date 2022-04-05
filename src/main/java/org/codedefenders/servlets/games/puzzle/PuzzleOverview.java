@@ -34,12 +34,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +68,11 @@ public class PuzzleOverview extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
+        if (!checkEnabled()) {
+            // Send users to the home page
+            response.sendRedirect(ServletUtils.getBaseURL(request));
+            return;
+        }
         final Set<PuzzleGame> activePuzzles = new HashSet<>(PuzzleDAO.getActivePuzzleGamesForUser(login.getUserId()));
 
         final SortedSet<PuzzleChapterEntry> puzzles = PuzzleDAO.getPuzzleChapters()
@@ -82,6 +90,15 @@ public class PuzzleOverview extends HttpServlet {
         logger.info("Unsupported POST request to /puzzles");
         // aborts request and sends 400
         super.doPost(req, resp);
+    }
+
+    /**
+     * Checks whether users can play puzzles.
+     *
+     * @return {@code true} when users can play puzzles, {@code false} otherwise.
+     */
+    public static boolean checkEnabled() {
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_PUZZLE_SECTION).getBoolValue() && !PuzzleDAO.getPuzzles().isEmpty();
     }
 
     /**

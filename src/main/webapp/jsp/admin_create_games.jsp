@@ -406,9 +406,11 @@
         </div> <%-- row --%>
     </form>
 
-    <t:modal id="validatorExplanation" title="Mutant Validator Explanation">
+    <t:modal id="validatorExplanation" title="Validator Explanations">
         <jsp:attribute name="content">
-            <%@ include file="/jsp/validator_explanation.jsp"%>
+            <t:validator_explanation_mutant/>
+            <div class="mt-3"></div> <%-- spacing --%>
+            <t:validator_explanation_test/>
         </jsp:attribute>
     </t:modal>
 

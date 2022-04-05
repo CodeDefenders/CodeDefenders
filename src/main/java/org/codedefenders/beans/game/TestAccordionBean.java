@@ -86,9 +86,11 @@ public class TestAccordionBean {
         @SuppressWarnings("UnstableApiUsage")
         RangeMap<Integer, TestAccordionCategory> methodRanges = TreeRangeMap.create();
         for (TestAccordionCategory method : methodCategories) {
+            //noinspection UnstableApiUsage
             methodRanges.put(Range.closed(method.startLine, method.endLine), method);
         }
 
+        //noinspection UnstableApiUsage
         Range<Integer> beforeFirst = Range.closedOpen(0, methodRanges.span().lowerEndpoint());
 
         /* For every test, go through all covered lines and find the methods that are covered by it. */

@@ -6,7 +6,7 @@ COPY pom.xml .
 # Download dependencies before copying the source code as the dependencies don't change that often
 RUN mvn dependency:go-offline
 COPY ./src ./src/
-RUN mvn package -DskipTests -Dcheckstyle.skip
+RUN mvn package -DskipTests -DskipCheckstyle
 
 
 FROM tomcat:9.0-jdk11-openjdk AS tomcat

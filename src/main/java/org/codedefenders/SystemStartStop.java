@@ -43,6 +43,7 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private ThreadPoolManager mgr;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
 

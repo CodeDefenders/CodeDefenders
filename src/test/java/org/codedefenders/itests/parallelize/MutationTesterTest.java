@@ -36,6 +36,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.MutationTesterUtilities;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -47,7 +48,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.DatabaseRule;
 import org.codedefenders.util.Constants;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -71,18 +71,17 @@ import static org.junit.Assert.assertEquals;
  * Problematic cases: - More than 1 tests kill the same mutant - Mutant state is
  * reset from killed to alive while setting the score
  *
- * The problem lies in the fact that MutationTester set the state of the mutant
+ * <p>The problem lies in the fact that MutationTester set the state of the mutant
  * and forces it to the database, while the state of the mutants should be
  * handled by the database instead !
  *
  * @author gambi
- *
  */
 
 @Ignore // Test is broken, game232 data are no where..
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
+@PrepareForTest({DatabaseConnection.class}) // , MutationTester.class })
 public class MutationTesterTest {
     private static Logger logger = LoggerFactory.getLogger(MutationTesterTest.class);
 

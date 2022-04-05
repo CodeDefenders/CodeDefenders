@@ -346,7 +346,7 @@ public class KillMap {
         try {
             killmap.compute(executor);
         } catch (InterruptedException | ExecutionException e) {
-            logger.error("Exception while validating mutant {} using custom killmap", e);
+            logger.error("Exception while validating mutant {} using custom killmap", mutant.getId(), e);
             return null;
         }
 
@@ -388,7 +388,7 @@ public class KillMap {
      * @return A matrix that maps tests and mutants to their execution result.
      */
     public KillMapEntry[][] getMatrix() {
-        return (KillMapEntry[][]) ArrayUtils.clone(matrix);
+        return ArrayUtils.clone(matrix);
     }
 
     /**
@@ -398,7 +398,7 @@ public class KillMap {
      * @return All "test vs. mutant" execution results for the given test.
      */
     public KillMapEntry[] getEntriesForTest(Test test) {
-        return (KillMapEntry[]) ArrayUtils.clone(matrix[indexOf(test)]);
+        return ArrayUtils.clone(matrix[indexOf(test)]);
     }
 
     /**

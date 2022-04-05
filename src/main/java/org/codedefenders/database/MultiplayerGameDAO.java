@@ -426,7 +426,6 @@ public class MultiplayerGameDAO {
      * Retrieves the game in which the player plays.
      *
      * @param playerId The id of the player for which we lookup a game
-     * @return
      */
     public static AbstractGame getGameWherePlayerPlays(int playerId) {
         String query = String.join("\n",

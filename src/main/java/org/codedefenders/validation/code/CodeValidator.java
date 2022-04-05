@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -48,6 +49,9 @@ import org.codedefenders.game.Mutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.Chunk;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ParseProblemException;
@@ -66,12 +70,6 @@ import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
-import difflib.Chunk;
-import difflib.Delta;
-import difflib.DiffUtils;
-
-import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
-
 /**
  * This class offers static methods to validate code, primarily checking validity of tests and mutants.
  *
@@ -84,11 +82,10 @@ import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class CodeValidator {
-    private static Logger logger = LoggerFactory.getLogger(CodeValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
     //Default configurations: number of max. allowed assertions for battleground games
     public static final int DEFAULT_NB_ASSERTIONS = 2;
-    public static final AssertionLibrary DEFAULT_ASSERTION_LIBRARY = JUNIT4_HAMCREST;
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
     public static final String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
@@ -105,7 +102,7 @@ public class CodeValidator {
 
     public static String getMD5FromFile(String filePath) {
         try {
-            String code = new String(Files.readAllBytes(Paths.get(filePath)));
+            String code = new String(Files.readAllBytes(Paths.get(filePath)), StandardCharsets.UTF_8);
             return getMD5FromText(code);
         } catch (IOException e) {
             logger.error("Could not get MD5 hash for given file.", e);
@@ -113,10 +110,14 @@ public class CodeValidator {
         }
     }
 
+    public static String getMD5FromText(String code) {
+        String cleanedCode = code.replaceAll("\\s+", "");
+        return DigestUtils.md5Hex(cleanedCode);
+    }
+
     // TODO Cannot use ValidationMessage as that is an ENUM type...
-    public static List<String> validateTestCodeGetMessage(String testCode,
-                                                          int maxNumberOfAssertions,
-                                                          AssertionLibrary assertionLibrary) {
+    public static List<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
+            AssertionLibrary assertionLibrary) {
         try {
             CompilationUnit cu = getCompilationUnitFromText(testCode);
             return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, assertionLibrary);
@@ -124,17 +125,16 @@ public class CodeValidator {
             // Pretend this never happened so we send back to the user the compiler error message
             // return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});
             return new ArrayList<>();
-        } catch (Throwable e) {
-            logger.error("Problem in validating test code \n" + testCode, e);
+        } catch (IOException e) {
+            logger.error("Problem in validating test code \n {}", testCode, e);
             return Arrays.asList("Invalid test. Something went wrong.");
 
         }
     }
 
     // This validation pipeline should use the Chain-of-Responsibility design pattern
-    public static ValidationMessage validateMutantGetMessage(String originalCode,
-                                                             String mutatedCode,
-                                                             CodeValidatorLevel level) {
+    public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
+            CodeValidatorLevel level) {
 
         // Literally identical
         if (originalCode.equals(mutatedCode)) {
@@ -175,12 +175,15 @@ public class CodeValidator {
         }
 
         // If the mutants contains changes to method signatures, mark it as not valid
-        if (level == CodeValidatorLevel.STRICT) {
-            if (mutantChangesMethodSignatures(originalCU, mutatedCU)
-                    || mutantChangesFieldNames(originalCU, mutatedCU)
-                    || mutantChangesImportStatements(originalCU, mutatedCU)) {
-                return ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
-            }
+        if (level == CodeValidatorLevel.STRICT && mutantChangesMethodSignatures(originalCU, mutatedCU)) {
+            return ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
+        }
+        if (level == CodeValidatorLevel.STRICT && mutantChangesFieldNames(originalCU, mutatedCU)) {
+            return ValidationMessage.MUTANT_VALIDATION_FIELD_NAME;
+        }
+
+        if (level == CodeValidatorLevel.STRICT && mutantChangesImportStatements(originalCU, mutatedCU)) {
+            return ValidationMessage.MUTANT_VALIDATION_IMPORT_STATEMENT;
         }
 
         if (level == CodeValidatorLevel.STRICT && containsInstanceOfChanges(originalCU, mutatedCU)) {
@@ -193,8 +196,8 @@ public class CodeValidator {
         }
 
         // line-level diff
-        List<List<?>> originalLines = getOriginalLines(originalCode, mutatedCode);
-        List<List<?>> changedLines = getChangedLines(originalCode, mutatedCode);
+        List<List<String>> originalLines = getOriginalLines(originalCode, mutatedCode);
+        List<List<String>> changedLines = getChangedLines(originalCode, mutatedCode);
         assert (originalLines.size() == changedLines.size());
 
         if (level != CodeValidatorLevel.RELAXED && containsModifiedComments(originalCU, mutatedCU)) {
@@ -247,14 +250,14 @@ public class CodeValidator {
         return !originalCU.getPackageDeclaration().equals(mutatedCU.getPackageDeclaration());
     }
 
-    private static Map<String, EnumSet> extractTypeDeclaration(TypeDeclaration td) {
-        Map<String, EnumSet> typeData = new HashMap<>();
+    private static Map<String, EnumSet<?>> extractTypeDeclaration(TypeDeclaration<?> td) {
+        Map<String, EnumSet<?>> typeData = new HashMap<>();
         typeData.put(td.getNameAsString(), td.getModifiers());
         // Inspect if this type declares inner classes
         for (Object bd : td.getMembers()) {
             if (bd instanceof TypeDeclaration) {
                 // Handle Inner classes - recursively
-                typeData.putAll(extractTypeDeclaration((TypeDeclaration) bd));
+                typeData.putAll(extractTypeDeclaration((TypeDeclaration<?>) bd));
             }
         }
         return typeData;
@@ -264,13 +267,13 @@ public class CodeValidator {
      * Check if the mutation introduce a change to a class declaration in the mutant.
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
-        Map<String, EnumSet> originalTypes = new HashMap<>();
-        for (TypeDeclaration type : originalCU.getTypes()) {
+        Map<String, EnumSet<?>> originalTypes = new HashMap<>();
+        for (TypeDeclaration<?> type : originalCU.getTypes()) {
             originalTypes.putAll(extractTypeDeclaration(type));
         }
         //
-        Map<String, EnumSet> mutatedTypes = new HashMap<>();
-        for (TypeDeclaration type : mutatedCU.getTypes()) {
+        Map<String, EnumSet<?>> mutatedTypes = new HashMap<>();
+        for (TypeDeclaration<?> type : mutatedCU.getTypes()) {
             mutatedTypes.putAll(extractTypeDeclaration(type));
         }
         //
@@ -307,7 +310,7 @@ public class CodeValidator {
             }
         };
 
-        visitor.visit(originalCU,null);
+        visitor.visit(originalCU, null);
 
         if (!instanceOfInsideOriginal.isEmpty()) {
             analyzingMutant.set(true);
@@ -319,8 +322,8 @@ public class CodeValidator {
 
     private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         // We assume getAllContainedComments() preserves the order of comments
-        Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[] {});
-        Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[] {});
+        Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[]{});
+        Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[]{});
         if (originalComments.length != mutatedComments.length) {
             // added comments triggers validation
             return true;
@@ -337,11 +340,6 @@ public class CodeValidator {
         }
 
         return false;
-    }
-
-    public static String getMD5FromText(String code) {
-        String cleanedCode = code.replaceAll("\\s+", "");
-        return DigestUtils.md5Hex(cleanedCode);
     }
 
     private static List<DiffMatchPatch.Diff> tokenDiff(String orig, String mutated) {
@@ -390,18 +388,17 @@ public class CodeValidator {
     }
 
     private static boolean containsProhibitedModifierChanges(List<DiffMatchPatch.Diff> changes) {
-        return changes
-                .stream()
-                .anyMatch(diff -> Arrays
-                        .stream(PROHIBITED_MODIFIER_CHANGES)
-                        .anyMatch(operator -> diff.text.contains(operator)));
+        return changes.stream()
+                .anyMatch(diff -> Arrays.stream(PROHIBITED_MODIFIER_CHANGES)
+                        .anyMatch(operator -> diff.text.contains(operator))
+                );
     }
 
-    private static String removeQuoted(String s, String quotationMark) {
+    static String removeQuoted(String s, String quotationMark) {
         while (s.contains(quotationMark)) {
             int indexFirstOcc = s.indexOf(quotationMark);
             int indexSecondOcc = indexFirstOcc + s.substring(indexFirstOcc + 1).indexOf(quotationMark);
-            s = s.substring(0, indexFirstOcc - 1) + s.substring(indexSecondOcc + 2);
+            s = s.substring(0, indexFirstOcc) + s.substring(indexSecondOcc + 2);
         }
         return s;
     }
@@ -425,13 +422,13 @@ public class CodeValidator {
     }
 
     //FIXME this will not work if a string contains \"
-    private static boolean onlyLiteralsChanged(String orig, String muta) {
+    static boolean onlyLiteralsChanged(String orig, String muta) {
         final String originalWithout = removeQuoted(removeQuoted(orig, "\""), "\'");
         final String mutantWithout = removeQuoted(removeQuoted(muta, "\""), "\'");
         return originalWithout.equals(mutantWithout);
     }
 
-    private static Set<String> extractMethodSignaturesByType(TypeDeclaration td) {
+    private static Set<String> extractMethodSignaturesByType(TypeDeclaration<?> td) {
         Set<String> methodSignatures = new HashSet<>();
         // Method signatures in the class including constructors
         for (Object bd : td.getMembers()) {
@@ -441,7 +438,7 @@ public class CodeValidator {
                 methodSignatures.add(((ConstructorDeclaration) bd).getDeclarationAsString());
             } else if (bd instanceof TypeDeclaration) {
                 // Inner classes
-                methodSignatures.addAll(extractMethodSignaturesByType((TypeDeclaration) bd));
+                methodSignatures.addAll(extractMethodSignaturesByType((TypeDeclaration<?>) bd));
             }
         }
         return methodSignatures;
@@ -456,7 +453,7 @@ public class CodeValidator {
     }
 
     // TODO Maybe we should replace this with a visitor instead ?
-    private static Set<String> extractFieldNamesByType(TypeDeclaration td) {
+    private static Set<String> extractFieldNamesByType(TypeDeclaration<?> td) {
         Set<String> fieldNames = new HashSet<>();
 
         // Method signatures in the class including constructors
@@ -466,7 +463,7 @@ public class CodeValidator {
                     fieldNames.add(vd.getNameAsString());
                 }
             } else if (bd instanceof TypeDeclaration) {
-                fieldNames.addAll(extractFieldNamesByType((TypeDeclaration) bd));
+                fieldNames.addAll(extractFieldNamesByType((TypeDeclaration<?>) bd));
             }
         }
         return fieldNames;
@@ -477,11 +474,11 @@ public class CodeValidator {
         Set<String> cutMethodSignatures = new HashSet<>();
         Set<String> mutantMethodSignatures = new HashSet<>();
 
-        for (TypeDeclaration td : orig.getTypes()) {
+        for (TypeDeclaration<?> td : orig.getTypes()) {
             cutMethodSignatures.addAll(extractMethodSignaturesByType(td));
         }
 
-        for (TypeDeclaration td : muta.getTypes()) {
+        for (TypeDeclaration<?> td : muta.getTypes()) {
             mutantMethodSignatures.addAll(extractMethodSignaturesByType(td));
         }
 
@@ -502,11 +499,11 @@ public class CodeValidator {
         Set<String> cutFieldNames = new HashSet<>();
         Set<String> mutantFieldNames = new HashSet<>();
 
-        for (TypeDeclaration td : orig.getTypes()) {
+        for (TypeDeclaration<?> td : orig.getTypes()) {
             cutFieldNames.addAll(extractFieldNamesByType(td));
         }
 
-        for (TypeDeclaration td : muta.getTypes()) {
+        for (TypeDeclaration<?> td : muta.getTypes()) {
             mutantFieldNames.addAll(extractFieldNamesByType(td));
         }
 
@@ -549,11 +546,11 @@ public class CodeValidator {
         return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
     }
 
-    private static boolean ternaryAdded(List<List<?>> orig, List<List<?>> muta) {
+    private static boolean ternaryAdded(List<List<String>> orig, List<List<String>> muta) {
         final Pattern pattern = Pattern.compile(TERNARY_OP_REGEX);
 
-        Iterator<List<?>> it1 = orig.iterator();
-        Iterator<List<?>> it2 = muta.iterator();
+        Iterator<List<String>> it1 = orig.iterator();
+        Iterator<List<String>> it2 = muta.iterator();
         while (it1.hasNext() && it2.hasNext()) {
             final boolean foundInOriginal = pattern.matcher(it1.next().toString()).find();
             final boolean foundInMutant = pattern.matcher(it2.next().toString()).find();
@@ -565,9 +562,9 @@ public class CodeValidator {
         return false;
     }
 
-    private static boolean logicalOpAdded(List<List<?>> orig, List<List<?>> muta) {
-        Iterator<List<?>> it1 = orig.iterator();
-        Iterator<List<?>> it2 = muta.iterator();
+    private static boolean logicalOpAdded(List<List<String>> orig, List<List<String>> muta) {
+        Iterator<List<String>> it1 = orig.iterator();
+        Iterator<List<String>> it2 = muta.iterator();
         while (it1.hasNext() && it2.hasNext()) {
             final boolean foundInOriginal = containsAny(it1.next().toString(), PROHIBITED_LOGICAL_OPS);
             final boolean foundInMutant = containsAny(it2.next().toString(), PROHIBITED_LOGICAL_OPS);
@@ -593,7 +590,7 @@ public class CodeValidator {
         }
     }
 
-    private static List<Delta> getDeltas(String original, String changed) {
+    private static List<AbstractDelta<String>> getDeltas(String original, String changed) {
         List<String> originalLines = Arrays
                 .stream(original.split("\n"))
                 .map(String::trim)
@@ -606,18 +603,18 @@ public class CodeValidator {
         return DiffUtils.diff(originalLines, changedLines).getDeltas();
     }
 
-    private static List<List<?>> getChangedLines(String original, String changed) {
+    private static List<List<String>> getChangedLines(String original, String changed) {
         return getDeltas(original, changed)
                 .stream()
-                .map(Delta::getRevised)
+                .map(AbstractDelta::getTarget)
                 .map(Chunk::getLines)
                 .collect(Collectors.toList());
     }
 
-    private static List<List<?>> getOriginalLines(String original, String changed) {
+    private static List<List<String>> getOriginalLines(String original, String changed) {
         return getDeltas(original, changed)
                 .stream()
-                .map(Delta::getOriginal)
+                .map(AbstractDelta::getSource)
                 .map(Chunk::getLines)
                 .collect(Collectors.toList());
     }

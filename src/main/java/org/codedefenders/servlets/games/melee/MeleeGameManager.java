@@ -159,6 +159,7 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private EventDAO eventDAO;
 
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
 

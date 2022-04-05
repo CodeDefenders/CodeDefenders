@@ -1,0 +1,5 @@
+public class CUT {
+    public int test() {
+        return 1;
+    }
+};

@@ -77,8 +77,6 @@ public class ShiroConfig {
      * Configure the filtering mechanism. This might be replaced by annotations only
      * if we find a way to let the tomcat process them. Otherwise, we can use some
      * other configuration means
-     *
-     * @return
      */
     @Produces
     @Singleton
@@ -151,7 +149,6 @@ public class ShiroConfig {
 
         // API URLs. I assume they require authentication, but I might be wrong. Maybe
         // they require a different type of authentication, e.g., if the are REST
-        // org.codedefenders.util.Paths.API_NOTIFICATION = "/api/notifications";
         // org.codedefenders.util.Paths.API_MESSAGES = "/api/messages"; // path used in messaging.js
         // org.codedefenders.util.Paths.API_FEEDBACK = "/api/feedback";
         // org.codedefenders.util.Paths.API_SEND_EMAIL = "/api/sendmail";

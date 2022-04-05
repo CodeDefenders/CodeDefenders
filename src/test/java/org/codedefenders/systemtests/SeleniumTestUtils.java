@@ -20,13 +20,13 @@ package org.codedefenders.systemtests;
 
 import java.text.MessageFormat;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SeleniumTestUtils {
 
@@ -53,7 +53,7 @@ public class SeleniumTestUtils {
      * Fails the test if the element is not visible after 5 seconds.
      */
     public static void waitForVisible(WebElement element) throws InterruptedException {
-        for (int millis = 0; millis < 5000 ; millis += 500) {
+        for (int millis = 0; millis < 5000; millis += 500) {
             if (element.isDisplayed())
                 return;
             Thread.sleep(500);

@@ -36,7 +36,7 @@ public class MutationTesterProducer {
     private final EventDAO eventDAO;
 
     @Inject
-    public MutationTesterProducer(Configuration config, BackendExecutorService backend, @ThreadPool("test-executor") ExecutorService testExecutorThreadPool, EventDAO eventDAO) {
+    public MutationTesterProducer(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config, BackendExecutorService backend, @ThreadPool("test-executor") ExecutorService testExecutorThreadPool, EventDAO eventDAO) {
         this.config = config;
         this.backend = backend;
         this.testExecutorThreadPool = testExecutorThreadPool;

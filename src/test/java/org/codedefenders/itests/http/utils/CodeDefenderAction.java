@@ -20,30 +20,30 @@ package org.codedefenders.itests.http.utils;
 
 public abstract class CodeDefenderAction {
 
-	private long delay;
-	private String payload;
-	
-	private String userId;
+    private long delay;
+    private String payload;
 
-	public CodeDefenderAction(String userId, String payload) {
-		this.userId = userId;
-		this.payload = payload;
-	}
+    private String userId;
 
-	public void setDelay(long delay) {
-		this.delay = delay;
-	}
+    public CodeDefenderAction(String userId, String payload) {
+        this.userId = userId;
+        this.payload = payload;
+    }
 
-	public long getDelay() {
-		return delay;
-	}
+    public void setDelay(long delay) {
+        this.delay = delay;
+    }
 
-	public String getPayload() {
-		return payload;
-	}
-	
-	public String getUserId() {
-		return userId;
-	}
+    public long getDelay() {
+        return delay;
+    }
+
+    public String getPayload() {
+        return payload;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
 
 }

@@ -42,6 +42,7 @@ public class Paths {
     // TODO This might be duplicated. But then, why there's a profile
     public static final String USER = "/user";
     public static final String USER_PROFILE = "/profile";
+    public static final String USER_SETTINGS = "/account-settings";
 
     public static final String PASSWORD = "/password";
 
@@ -84,7 +85,6 @@ public class Paths {
     public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
     public static final String ADMIN_ANALYTICS_KILLMAPS = "/admin/analytics/killmaps";
 
-    public static final String API_NOTIFICATION = "/api/notifications";
     public static final String API_FEEDBACK = "/api/feedback";
     public static final String API_SEND_EMAIL = "/api/sendmail";
     public static final String API_CLASS = "/api/class";
