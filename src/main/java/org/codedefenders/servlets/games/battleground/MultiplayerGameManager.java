@@ -659,6 +659,7 @@ public class MultiplayerGameManager extends HttpServlet {
         mce.setMutantId(newMutant.getId());
         mce.setSuccess(compileSuccess);
         mce.setErrorMessage(errorMessage);
+        notificationService.post(mce);
 
         if (!compileSuccess) {
             messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
