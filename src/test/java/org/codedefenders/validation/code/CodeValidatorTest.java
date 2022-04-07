@@ -413,8 +413,8 @@ public class CodeValidatorTest {
                     testCase("packageSignature/changedPackage", RELAXED, MUTANT_VALIDATION_PACKAGE_SIGNATURE),
 
                     // MUTANT_VALIDATION_OPERATORS
-                    testCase("systemCalls/addedCallToJavaUtilRandom::nextInt", STRICT, MUTANT_VALIDATION_OPERATORS),
-                    testCase("systemCalls/addedCallToSystem::currentTimeMillis", STRICT, MUTANT_VALIDATION_OPERATORS),
+                    testCase("systemCalls/addedCallToJavaUtilRandom_nextInt", STRICT, MUTANT_VALIDATION_OPERATORS),
+                    testCase("systemCalls/addedCallToSystem_currentTimeMillis", STRICT, MUTANT_VALIDATION_OPERATORS),
 
                     // MUTANT_VALIDATION_SUCCESS
                     testCase("valid/addedSecondStatementOnSingleLine", STRICT, MUTANT_VALIDATION_SUCCESS),
