@@ -1,0 +1,6 @@
+#vm:
+#  memory: 8192
+#ports:
+#  tomcat: 8080
+#  database: 3306
+#  debugging: 8000
