@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page isErrorPage="true" %>
+<%@ page isErrorPage="true" pageEncoding="UTF-8" %>
 
 <!DOCTYPE html>
 <html>
