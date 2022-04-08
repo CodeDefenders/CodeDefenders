@@ -48,6 +48,8 @@
     boolean showTestAccordion = game.getLevel() == GameLevel.EASY || game.getState() == GameState.SOLVED;
 %>
 
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
 
@@ -106,8 +108,6 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
-<% previousSubmission.clear(); %>
-
 <%-- -------------------------------------------------------------------------------- --%>
 
 
@@ -153,18 +153,15 @@
                         </button>
                     </form>
 
-                    <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
-                            onclick="CodeDefenders.objects.mutantProgressBar.activate(); this.form.submit(); this.disabled=true;"
-                            <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                        Attack
-                    </button>
-
+                    <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
+                                            intentionCollectionEnabled="false"/>
                 </div>
             </div>
 
             <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
                 <input type="hidden" name="formType" value="createMutant">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
+                <input type="hidden" id="attacker_intention" name="attacker_intention" value="">
 
                 <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
                 <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
@@ -175,3 +172,6 @@
 </div>
 
 <%@ include file="/jsp/footer_game.jsp" %>
+
+
+<% previousSubmission.clear(); %>

@@ -70,8 +70,6 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean chatEnabled;
 
-    private boolean capturePlayersIntention;
-
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
@@ -242,10 +240,6 @@ public class MultiplayerGame extends AbstractGame {
     @Override
     public boolean isChatEnabled() {
         return chatEnabled;
-    }
-
-    public boolean isCapturePlayersIntention() {
-        return capturePlayersIntention;
     }
 
     public int getAutomaticMutantEquivalenceThreshold() {

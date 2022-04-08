@@ -51,6 +51,8 @@
     history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
+
 <jsp:include page="/jsp/header_game.jsp"/>
 
 <link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
@@ -87,17 +89,21 @@
 %>
 
 <%
-if (game.isCapturePlayersIntention()) {
-    if (role == Role.DEFENDER) {
+    if (game.isCapturePlayersIntention()) {
+        if (role == Role.DEFENDER) {
 %>
-<%@ include file="/jsp/game_components/defender_intention_collector.jsp" %>
+    <jsp:include page="/jsp/game_components/defender_intention_collector.jsp"/>
 <%
-	} else if (role == Role.ATTACKER) {
+        } else if (role == Role.ATTACKER) {
 %>
-<%@ include file="/jsp/game_components/attacker_intention_collector.jsp" %>
+    <jsp:include page="/jsp/game_components/attacker_intention_collector.jsp"/>
 <%
-	}
-}
+        }
+    }
 %>
+
 <!-- This corresponds to dispatcher.Dispatch -->
 <%@ include file="/jsp/footer_game.jsp" %>
+
+
+<% previousSubmission.clear(); %>
