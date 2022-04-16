@@ -108,7 +108,7 @@ public class LoginFilter implements Filter {
          * different Filter.
          *
          * TODO Maybe there's a way already to route Ws requests into WsFilters, but for
-         * the moment we need to match their URL
+         *      the moment we need to match their URL
          */
         if (path.matches("/notifications/.*/[0-9][0-9]*")) {
             logger.info("LoginFilter.loginRequired() " + request.getProtocol() + " " + path);
@@ -120,7 +120,7 @@ public class LoginFilter implements Filter {
                 || path.endsWith(context + "/video") || path.endsWith(context + "/video.mp4")
                 || path.contains(context + "/papers") || path.endsWith(context + Paths.API_SEND_EMAIL)
                 || path.endsWith(context + Paths.ABOUT_PAGE) || path.endsWith(context + Paths.CONTACT_PAGE)
-                || path.endsWith(context + Paths.IMPRINT_PAGE)) {
+                || path.endsWith(context + Paths.IMPRINT_PAGE) || path.endsWith(context + Paths.USER_PROFILE)) {
             return false;
         }
 

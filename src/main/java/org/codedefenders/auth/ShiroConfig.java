@@ -110,7 +110,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.USER = "/user";
         // fcMan.createChain(org.codedefenders.util.Paths.USER, AUTHENTICATION);
         // org.codedefenders.util.Paths.USER_PROFILE = "/profile";
-        fcMan.createChain(org.codedefenders.util.Paths.USER_PROFILE, AUTHENTICATION);
+        fcMan.createChain(org.codedefenders.util.Paths.USER_SETTINGS, AUTHENTICATION);
 
         // URLs that require authentication
 
