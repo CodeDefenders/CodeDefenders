@@ -69,7 +69,7 @@ public class UserProfileManager extends HttpServlet {
     /**
      * Retrieves and URL-decodes the user-parameter of a request. The Optional is empty if the parameter was not
      * given or empty. Due to URL-decoding the returned String might be blank.
-     *
+     * <p>
      * URL-decoding is not strictly needed, as usernames can only contain letters or numbers
      * (see {@link org.codedefenders.validation.input.CodeDefendersValidator#validUsername(String)}), but is used
      * to offer support for special characters in usernames by default.
