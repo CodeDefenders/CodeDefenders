@@ -18,17 +18,40 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("My Profile"); %>
-
-<jsp:include page="/jsp/header.jsp"/>
+<%@ page import="org.codedefenders.model.UserEntity" %>
+<%@ page import="java.util.Optional" %>
+<%@ page import="org.codedefenders.persistence.database.UserRepository" %>
+<%@ page import="javax.enterprise.inject.spi.CDI" %>
+<%@ page import="java.net.URLDecoder" %>
+<%@ page import="java.nio.charset.StandardCharsets" %>
+<%@ page import="java.io.UnsupportedEncodingException" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
+
+<%
+    final UserRepository userRepo = CDI.current().select(UserRepository.class).get();
+    final UserEntity user = Optional.ofNullable(request.getParameter("user"))
+            .filter(str -> str.length() > 0)
+            .flatMap(str -> {
+                try {
+                    return Optional.of(URLDecoder.decode(str, StandardCharsets.UTF_8.name()));
+                } catch (UnsupportedEncodingException e) {
+                    return Optional.empty();
+                }
+            })
+            .flatMap(userRepo::getUserByName)
+            .orElseGet(login::getUser); // TODO: Redirect to 404 or show "user not found" if URL-param invalid.
+
+    pageInfo.setPageTitle("Profile of " + user.getUsername()); // TODO: different message if viewing own profile.
+%>
+
+<jsp:include page="/jsp/header.jsp"/>
 
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
 
+    <% { //TODO: only show the links (& email) if viewing own profile. %>
     <section class="mt-5" aria-labelledby="played-games">
         <h2 class="mb-3" id="played-games">Played games</h2>
         <p>
@@ -41,7 +64,7 @@
         <h2 class="mb-3" id="account-information">Account Information</h2>
         <p>
             Your current email:
-            <span class="d-inline-block px-2 ms-2 border"><%=login.getUser().getEmail()%></span>
+            <span class="d-inline-block px-2 ms-2 border"><%=user.getEmail()%></span>
         </p>
         <p>
             Change your account information, password or delete your account in the
@@ -49,6 +72,7 @@
                title="Edit or delete your CodeDefenders account.">account settings</a>.
         </p>
     </section>
+    <% } %>
 
 </div>
 
