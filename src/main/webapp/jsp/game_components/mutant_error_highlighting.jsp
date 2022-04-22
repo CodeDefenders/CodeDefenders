@@ -27,14 +27,12 @@
 
 <jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
-<script type="text/javascript" src="js/error_highlighting.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
         const errorLines = JSON.parse('${mutantErrorHighlighting.errorLinesJSON}');
 
-        CodeDefenders.objects.mutantErrorHighlighting = new CodeDefenders.classes.ErrorHighlighting(
+        CodeDefenders.objects.mutantErrorHighlighting = new CodeDefenders.ErrorHighlighting(
                 errorLines,
                 CodeDefenders.objects.mutantEditor.editor);
 

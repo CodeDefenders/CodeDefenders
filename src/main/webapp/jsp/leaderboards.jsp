@@ -69,8 +69,7 @@
         (function () {
 
             $(document).ready(function () {
-                $.fn.dataTable.moment('DD/MM/YY HH:mm');
-                $('#tableMPLeaderboard').DataTable({
+                new DataTable('#tableMPLeaderboard', {
                     "order": [[6, "desc"]],
                     "columnDefs": [
                         {"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}

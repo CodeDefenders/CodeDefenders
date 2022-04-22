@@ -33,7 +33,7 @@
                         autoRefresh: true
                     });
                     editor.getWrapperElement().classList.add('codemirror-readonly');
-                    CodeDefenders.classes.InfoApi.setClassEditorValue(editor, ${classId});
+                    CodeDefenders.InfoApi.setClassEditorValue(editor, ${classId});
                 }
             })
         })();

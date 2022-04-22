@@ -126,8 +126,6 @@
 
 <jsp:include page="/jsp/push_socket.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/game.css" rel="stylesheet">
-
 <jsp:include page="/jsp/player_feedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 

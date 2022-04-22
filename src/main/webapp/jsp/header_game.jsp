@@ -49,6 +49,9 @@
 
 <jsp:include page="/jsp/header.jsp" />
 
+<script src="js/codedefenders_game.js" type="text/javascript"></script>
+<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
+
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
         <h2 class="m-0">${pageInfo.pageTitle}</h2>

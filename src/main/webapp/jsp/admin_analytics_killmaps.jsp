@@ -103,7 +103,7 @@
 (function () {
 
     $(document).ready(function () {
-        const table = $('#tableKillmaps').DataTable({
+        const table = new DataTable('#tableKillmaps', {
             "ajax": {
                 "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_KILLMAP + "?fileType=json"%>",
                 "dataSrc": "data"

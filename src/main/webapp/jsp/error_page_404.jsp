@@ -20,97 +20,40 @@
 --%>
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
     <title>The page you're looking for could not be found (404)</title>
-    <style>
-        body {
-            color: #666;
-            text-align: center;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            margin: auto;
-            font-size: 14px;
-        }
-
-        h1 {
-            font-size: 56px;
-            line-height: 100px;
-            font-weight: 400;
-            color: #456;
-        }
-
-        h2 {
-            font-size: 24px;
-            color: #666;
-            line-height: 1.5em;
-        }
-
-        h3 {
-            color: #456;
-            font-size: 20px;
-            font-weight: 400;
-            line-height: 28px;
-        }
-
-        hr {
-            max-width: 800px;
-            margin: 18px auto;
-            border: 0;
-            border-top: 1px solid #EEE;
-            border-bottom: 1px solid white;
-        }
-
-        img {
-            max-width: 40vw;
-            display: block;
-            margin: 40px auto;
-        }
-
-        a {
-            line-height: 100px;
-            font-weight: 400;
-            color: #4A8BEE;
-            font-size: 18px;
-            text-decoration: none;
-        }
-
-        .container {
-            margin: auto 20px;
-        }
-
-        .go-back {
-            display: none;
-        }
-
-    </style>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="${pageContext.request.contextPath}/css/specific/error_page.css" rel="stylesheet">
 </head>
 
 <body>
-	<a href="<%=request.getContextPath()%>"> <img
-		src="<%=request.getContextPath()%>/images/logo.png">
-	</a>
-<h1>
-    404
-</h1>
-<div class="container">
-    <h3>The page could not be found or you don't have permission to view it.</h3>
-    <hr/>
-    <p>The resource that you are attempting to access does not exist or you don't have the necessary permissions to view
-        it.</p>
-    <p>Make sure the address is correct and that the page hasn't moved.</p>
-    <p>Please contact your administrator if you think this is a mistake.</p>
-    <a href="javascript:history.back()" class="js-go-back go-back">Go back</a>
-</div>
-<script>
-    (function () {
-        var goBack = document.querySelector('.js-go-back');
-
-        if (history.length > 1) {
-            goBack.style.display = 'inline';
-        }
-    })();
-</script>
-
+    <div class="content">
+        <a href="${pageContext.request.contextPath}/" class="branding">
+            <img src="${pageContext.request.contextPath}/images/logo.png"
+                 alt="Code Defenders Logo"
+                 width="58">
+            <h1>Code Defenders</h1>
+        </a>
+        <h2>404</h2>
+        <h3>The page could not be found or you don't have permission to view it.</h3>
+        <hr/>
+        <p>
+            The resource that you are attempting to access does not exist or you don't have the necessary permissions to
+            view it.
+        </p>
+        <p>Make sure the address is correct and that the page hasn't moved.</p>
+        <p>Please contact your administrator if you think this is a mistake.</p>
+        <div class="go-back" hidden>
+            <a href="javascript:history.back()">Go back</a>
+        </div>
+        <script>
+            if (history.length > 1) {
+                document.querySelector('.go-back').removeAttribute('hidden');
+            }
+        </script>
+    </div>
 </body>
-</html>
 
+</html>

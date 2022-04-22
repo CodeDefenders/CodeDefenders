@@ -39,3 +39,6 @@ out/
 .idea/
 *.iml
 
+### Node.js ###
+node
+node_modules

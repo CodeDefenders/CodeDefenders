@@ -1,0 +1,100 @@
+/* (Page-wide) DataTables customizations
+============================================================================= */
+
+/* Consistent padding for child rows.
+----------------------------------------------------------------------------- */
+
+.child-row-wrapper {
+    padding-left: 5em;
+    padding-top: .25em;
+    padding-bottom: .25em;
+}
+
+/* Child row details (for child rows like in admin analytics or game overview).
+----------------------------------------------------------------------------- */
+
+/* Padding and layout. */
+
+/* Regular cells. */
+.child-row-details > tbody > tr > td,
+.child-row-details > thead > tr > th {
+    white-space: nowrap;
+    padding: .15em 1.5em;
+}
+/* No top padding for the very first row. */
+.child-row-details > thead:first-child > tr:first-child > th,
+.child-row-details > tbody:first-child > tr:first-child > td {
+    padding-top: 0;
+}
+/* Space between table sections (multiple thead elements). */
+.child-row-details > thead:not(:first-child) > tr:first-child > th {
+    padding-top: 1em;
+}
+/* Smaller padding for the first and last cell of each row, so the border doesn't extend too much. */
+.child-row-details > thead > tr > th:first-child,
+.child-row-details > tbody > tr > td:first-child {
+    padding-left: .75em;
+}
+.child-row-details > thead > tr > th:last-child,
+.child-row-details > tbody > tr > td:last-child {
+    padding-right: .75em;
+}
+
+/* Borders. */
+
+/* Borders for regular rows. */
+.child-row-details > tbody > tr {
+    border-top: solid 1px #dddddd;
+    border-bottom: solid 1px #dddddd;
+}
+/* No border after the last row. */
+.child-row-details > tbody > tr:last-child {
+    border-bottom: none;
+}
+
+/* Style for the toggle button of child tables.
+----------------------------------------------------------------------------- */
+
+.toggle-details,
+.toggle-all-details {
+    cursor: pointer;
+    color: #6c757d; /* Color of .text-muted in Bootstrap 5. */
+    transition: color .15s ease-in-out;
+}
+.toggle-details:hover,
+.toggle-all-details:hover {
+    color: black;
+}
+.toggle-details-icon {
+    width: 1rem;
+    text-align: center;
+}
+
+/* Style for the datatables-select plugin.
+----------------------------------------------------------------------------- */
+
+/* Change colors of selected table rows. */
+table.dataTable tbody > tr.selected,
+table.dataTable tbody > tr > .selected {
+    background-color: #d8e0ea;
+}
+
+/* Change checkbox icons to match Bootstrap 5. */
+table.dataTable tbody td.select-checkbox::after,
+table.dataTable tbody th.select-checkbox::after {
+    content: '';
+    display: block;
+    width: 1em;
+    height: 1em;
+    border-radius: .25em;
+    border: 1px solid rgba(0, 0, 0, .25);
+    margin: 0 1em;
+}
+table.dataTable tr.selected td.select-checkbox::after,
+table.dataTable tr.selected th.select-checkbox::after {
+    /* Taken from Bootstrap 5. */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}

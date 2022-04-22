@@ -38,9 +38,7 @@
 <div class="container py-4 h-100 d-flex flex-column justify-content-center align-items-center">
 
     <div class="d-flex align-items-center gap-3 mb-3">
-        <img href="${pageContext.request.contextPath}/"
-             src="images/logo.png" alt="Code Defenders Logo"
-             width="58">
+        <img src="images/logo.png" alt="Code Defenders Logo" width="58">
         <%-- Make the header break nicely on smaller screens. --%>
         <h1 class="d-lg-block d-flex flex-column">
             <span>Code Defenders: </span>

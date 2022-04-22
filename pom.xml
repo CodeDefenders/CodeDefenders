@@ -20,9 +20,11 @@
 
 		<skipCheckstyle>false</skipCheckstyle>
 		<skipTests>false</skipTests>
+		<skipFrontend>false</skipFrontend>
 		<skipUnitTests>${skipTests}</skipUnitTests>
 		<skipIntegrationTests>${skipTests}</skipIntegrationTests>
 		<checkstyle.skip>${skipCheckstyle}</checkstyle.skip>
+		<skip.npm>${skipFrontend}</skip.npm>
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
@@ -205,6 +207,11 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
+					<webResources>
+						<resource>
+							<directory>target/rollup</directory>
+						</resource>
+					</webResources>
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -279,6 +286,45 @@
 						<goals>
 							<goal>deploy-only</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<nodeVersion>v16.14.2</nodeVersion>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+						<phase>generate-resources</phase>
+					</execution>
+
+					<execution>
+						<id>npm run bundle</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run bundle</arguments>
+						</configuration>
+						<phase>compile</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -494,6 +540,12 @@
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>0.8.7</version>
+				</plugin>
+
+				<plugin>
+					<groupId>com.github.eirslett</groupId>
+					<artifactId>frontend-maven-plugin</artifactId>
+					<version>1.12.1</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -870,18 +922,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.6.0</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery-ui</artifactId>
-			<version>1.12.1</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
 			<artifactId>font-awesome</artifactId>
 			<version>4.7.0</version>
 			<scope>runtime</scope>
@@ -894,12 +934,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
-			<artifactId>momentjs</artifactId>
-			<version>2.14.1</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
 			<artifactId>datatables</artifactId>
 			<version>1.10.24</version>
 			<scope>runtime</scope>
@@ -908,13 +942,6 @@
 			<groupId>org.webjars</groupId>
 			<artifactId>datatables-select</artifactId>
 			<version>1.3.3</version>
-			<scope>runtime</scope>
-		</dependency>
-		<!-- Provides datetime-moment.js -->
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>datatables-plugins</artifactId>
-			<version>1.10.24</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!-- End Client Side Dependencies -->

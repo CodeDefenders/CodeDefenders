@@ -20,14 +20,12 @@
 --%>
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 
-<script type="text/javascript" src="js/mutant_progress_bar.js"></script>
-
 <script>
     /* Wrap in a function so it has it's own scope. */
     (function () {
         const progressElement = document.getElementById('progress');
         const gameId = ${mutantProgressBar.gameId};
 
-        CodeDefenders.objects.mutantProgressBar = new CodeDefenders.classes.MutantProgressBar(progressElement, gameId);
+        CodeDefenders.objects.mutantProgressBar = new CodeDefenders.MutantProgressBar(progressElement, gameId);
     })();
 </script>

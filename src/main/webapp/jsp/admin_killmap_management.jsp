@@ -411,7 +411,7 @@
     <% } %>
 
     $(document).ready(function() {
-        const classTable = $('#table-classes').DataTable({
+        const classTable = new DataTable('#table-classes', {
             ajax: {
                 url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json',
                 dataSrc: 'data'
@@ -431,7 +431,7 @@
             language: {emptyTable: emptyClassTableMessage}
         });
 
-        const gameTable = $('#table-games').DataTable({
+        const gameTable = new DataTable('#table-games', {
             ajax: {
                 url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json',
                 dataSrc: 'data'

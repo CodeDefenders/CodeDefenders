@@ -32,8 +32,6 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/uploadcut.css" rel="stylesheet">
-
 <div class="container">
 
     <h2 class="mb-3">${pageInfo.pageTitle}</h2>
@@ -245,7 +243,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#tableUploadedClasses').DataTable({
+        new DataTable('#tableUploadedClasses', {
             paging: false,
             order: [[0, 'desc']],
             scrollY: '600px',

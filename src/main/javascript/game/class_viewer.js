@@ -1,0 +1,85 @@
+import CodeMirror from '../thirdparty/codemirror';
+
+
+class ClassViewer {
+
+    /**
+     * @param {HTMLTextAreaElement} editorElement The text area to use as editor.
+     * @param {HTMLTextAreaElement[]} dependencyEditorElements Text areas to use as dependency editors.
+     */
+    constructor (editorElement, dependencyEditorElements) {
+        /**
+         * The text area element of the editor.
+         * @type {HTMLTextAreaElement}
+         */
+        this.editorElement = editorElement;
+        /**
+         * The CodeMirror instance used for the mutant editor.
+         * @type {CodeMirror}
+         */
+        this.editor = null;
+
+
+        /**
+         * Text area elements for displaying dependencies.
+         * @type {HTMLTextAreaElement[]}
+         */
+        this.dependencyEditorElements = dependencyEditorElements;
+        /**
+         * CodeMirror editors displaying dependencies.
+         * @type {CodeMirror[]}
+         */
+        this.dependencyEditors = [];
+
+
+        this._init();
+    }
+
+    /** @private */
+    _init () {
+        /* Create the editor. */
+        this.editor = CodeMirror.fromTextArea(this.editorElement, {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: 'text/x-java',
+            readOnly: true,
+            gutters: [
+                'CodeMirror-linenumbers',
+                'CodeMirror-mutantIcons'
+            ],
+            autoRefresh: true
+        });
+        this.editor.getWrapperElement().classList.add('codemirror-readonly');
+
+        /* Refresh editor when resized. */
+        if (window.hasOwnProperty('ResizeObserver')) {
+            new ResizeObserver(() => this.editor.refresh())
+                    .observe(this.editor.getWrapperElement());
+        }
+
+        this._initDependencies();
+    }
+
+    /** @private */
+    _initDependencies () {
+        for (const element of this.dependencyEditorElements) {
+            const editor = CodeMirror.fromTextArea(element, {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: 'text/x-java',
+                readOnly: true,
+                autoRefresh: true
+            });
+            editor.getWrapperElement().classList.add('codemirror-readonly');
+
+            if (window.hasOwnProperty('ResizeObserver')) {
+                new ResizeObserver(() => editor.refresh()).observe(editor.getWrapperElement());
+            }
+
+            this.dependencyEditors.push(editor);
+        }
+    }
+}
+
+
+export default ClassViewer;

@@ -1,0 +1,72 @@
+/* Add spacing on the top and bottom, but only when the page is large enough. */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+body {
+    display: flex;
+    flex-direction: column;
+}
+body > * {
+    flex: 0 0 auto;
+}
+body::before,
+body::after {
+    content: '';
+    flex: 0 1 7.5rem;
+}
+
+/* Font. */
+body {
+    color: #666;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}
+
+/* Center page horizontally. */
+.content {
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* Logo and "Code Defenders" text. */
+.branding {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.25rem;
+    text-decoration: none;
+}
+
+/* Big text. */
+h1, h2, h3 {
+    color: #444;
+    font-weight: 400;
+}
+h1 {
+    font-size: 40px;
+}
+h2 {
+    font-size: 80px;
+    margin: 2rem 0;
+}
+h3 {
+    font-size: 20px;
+}
+
+/* Separator. */
+hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 1.5rem 0;
+}
+
+/* "Go back" link. */
+.go-back {
+    margin-top: 2rem;
+}
+.go-back > a {
+    color: #4a8bee;
+    font-size: 18px;
+    text-decoration: none;
+}

@@ -30,8 +30,6 @@
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
-<script type="text/javascript" src="js/push_socket.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
@@ -41,6 +39,6 @@
         const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
         const userId = '${login.userId}';
         const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
-        CodeDefenders.objects.pushSocket = new CodeDefenders.classes.PushSocket(wsUri);
+        CodeDefenders.objects.pushSocket = new CodeDefenders.PushSocket(wsUri);
     })();
 </script>
