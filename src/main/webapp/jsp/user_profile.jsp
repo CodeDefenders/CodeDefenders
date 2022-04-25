@@ -35,6 +35,13 @@
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
 
+    <section class="mt-5" aria-labelledby="stats">
+        <h2 class="mb-3" id="stats">Public Statistics</h2>
+        <dl>
+            <dt>User-ID:</dt><dd><%=user.getId()%></dd>
+        </dl>
+    </section>
+
     <% if (isSelf) { %>
         <section class="mt-5" aria-labelledby="played-games">
             <h2 class="mb-3" id="played-games">Played games</h2>
