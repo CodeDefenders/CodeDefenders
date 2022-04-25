@@ -16,26 +16,36 @@
             </div>
         </jsp:attribute>
     </t:modal>
+
     <script>
         (function () {
-            const modal = document.currentScript.parentElement.querySelector('.modal');
-            const textarea = document.currentScript.parentElement.querySelector('textarea');
+            const currentScript = document.currentScript;
 
-            modal.addEventListener('shown.bs.modal', function () {
-                const codeMirrorContainer = this.querySelector('.CodeMirror');
-                if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                    codeMirrorContainer.CodeMirror.refresh();
-                } else {
-                    const editor = CodeMirror.fromTextArea(textarea, {
-                        lineNumbers: true,
-                        readOnly: true,
-                        mode: 'text/x-java',
-                        autoRefresh: true
-                    });
-                    editor.getWrapperElement().classList.add('codemirror-readonly');
-                    CodeDefenders.InfoApi.setClassEditorValue(editor, ${classId});
-                }
-            })
+            (async function () {
+
+                const modal = currentScript.parentElement.querySelector('.modal');
+                const textarea = currentScript.parentElement.querySelector('textarea');
+
+                modal.addEventListener('shown.bs.modal', async function () {
+                    const codeMirrorContainer = this.querySelector('.CodeMirror');
+                    if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+                        codeMirrorContainer.CodeMirror.refresh();
+                    } else {
+                        const {default: CodeMirror} = await import('./js/codemirror.mjs');
+                        const {InfoApi} = await import('./js/codedefenders_main.mjs');
+
+                        const editor = CodeMirror.fromTextArea(textarea, {
+                            lineNumbers: true,
+                            readOnly: true,
+                            mode: 'text/x-java',
+                            autoRefresh: true
+                        });
+                        editor.getWrapperElement().classList.add('codemirror-readonly');
+
+                        InfoApi.setClassEditorValue(editor, ${classId});
+                    }
+                });
+            })();
         })();
     </script>
 </div>

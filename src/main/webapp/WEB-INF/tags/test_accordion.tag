@@ -59,13 +59,13 @@
     </c:forEach>
 </div>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
-        const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
-        const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {TestAccordion} from './js/codedefenders_game.mjs';
 
-        const testAccordion = new CodeDefenders.TestAccordion(categories, tests);
-        CodeDefenders.objects.register('testAccordion', testAccordion);
-    })();
+    const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
+    const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
+
+    const testAccordion = new TestAccordion(categories, tests);
+    objects.register('testAccordion', testAccordion);
 </script>

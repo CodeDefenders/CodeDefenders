@@ -266,4 +266,4 @@ if (CLEAN_BUILD) {
 }
 
 
-export default bundleConfig;
+export default moduleConfig;

@@ -39,13 +39,10 @@
     <!-- Favicon.ico -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 
-    <!-- JS Build -->
-    <script src="js/jquery.js" type="text/javascript"></script>
-    <script src="js/bootstrap.js" type="text/javascript"></script>
-    <script src="js/datatables.js" type="text/javascript"></script>
-    <script src="js/codemirror.js" type="text/javascript"></script>
-    <script src="js/codedefenders_init.js" type="text/javascript"></script>
-    <script src="js/codedefenders_main.js" type="text/javascript"></script>
+    <!-- JS Init -->
+    <script type="module">
+        import './js/codedefenders_init.mjs';
+    </script>
 
     <!-- Bootstrap -->
     <link href="webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">

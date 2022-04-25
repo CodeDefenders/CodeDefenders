@@ -27,16 +27,16 @@
 
 <jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (async function () {
-        const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {ErrorHighlighting} from './js/codedefenders_game.mjs';
 
-        const testEditor = await CodeDefenders.components.await('testEditor');
+    const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
 
-        const testErrorHighlighting= new CodeDefenders.ErrorHighlighting(errorLines, testEditor.editor);
-        testErrorHighlighting.highlightErrors();
+    const testEditor = await objects.await('testEditor');
 
-        CodeDefenders.objects.register('testErrorHighlighting', testErrorHighlighting);
-    })();
+    const testErrorHighlighting= new ErrorHighlighting(errorLines, testEditor.editor);
+    testErrorHighlighting.highlightErrors();
+
+    objects.register('testErrorHighlighting', testErrorHighlighting);
 </script>

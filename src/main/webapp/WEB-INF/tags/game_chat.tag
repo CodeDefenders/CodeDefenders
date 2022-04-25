@@ -71,16 +71,17 @@
     <span id="chat-count" class="badge bg-secondary">0</span>
 </button>
 
-<script>
-    $(document).ready(async function() {
-        const gameId = ${gameChat.gameId};
-        const messageLimit = ${gameChat.messageLimit};
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {GameChat} from './js/codedefenders_game.mjs';
 
-        const gameChat = new CodeDefenders.GameChat(gameId, messageLimit);
-        await gameChat._initAsync();
+    const gameId = ${gameChat.gameId};
+    const messageLimit = ${gameChat.messageLimit};
 
-        CodeDefenders.objects.register('gameChat', gameChat);
-    });
+    const gameChat = new GameChat(gameId, messageLimit);
+    await gameChat._initAsync();
+
+    objects.register('gameChat', gameChat);
 </script>
 
 </c:if>

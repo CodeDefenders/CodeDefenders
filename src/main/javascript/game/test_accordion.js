@@ -1,4 +1,5 @@
 import DataTable from '../thirdparty/datatables';
+import {Popover} from '../thirdparty/bootstrap';
 import {InfoApi, Modal} from '../main';
 
 
@@ -42,7 +43,7 @@ class TestAccordion {
      * @private
      */
     _setupPopover (triggerElement, data, renderTitle, renderContent) {
-        new bootstrap.Popover(triggerElement, {
+        new Popover(triggerElement, {
             container: document.body,
             template:
                 `<div class="popover" role="tooltip">

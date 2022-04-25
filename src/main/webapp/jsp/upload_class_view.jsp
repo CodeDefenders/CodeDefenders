@@ -241,7 +241,10 @@
     </table>
 </div>
 
-<script>
+<script type="module">
+    import DataTable from './js/datatables.mjs';
+    import $ from './js/jquery.mjs';
+
     $(document).ready(function () {
         new DataTable('#tableUploadedClasses', {
             paging: false,

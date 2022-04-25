@@ -121,10 +121,22 @@
             <div>
 
                 <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                    onclick="CodeDefenders.objects.await('testProgressBar').then(progressBar => progressBar.activate()); this.form.submit(); this.disabled = true;"
                     <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend
                 </button>
+
+                <script type="module">
+                    import {objects} from './js/codedefenders_main.mjs';
+
+                    const progressBar = await objects.await('testProgressBar');
+                    const button = document.getElementById('submitTest');
+
+                    button.addEventListener('click', function (event) {
+                        progressBar.activate()
+                        this.form.submit();
+                        this.disabled = true;
+                    });
+                </script>
 
             </div>
         </div>

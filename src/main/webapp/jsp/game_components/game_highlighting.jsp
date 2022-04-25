@@ -36,22 +36,22 @@
     The CSS is located in codemirror_customize.css.
 --%>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (async function () {
-        const data = JSON.parse('${gameHighlighting.JSON}');
-        const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
-        const gameId = ${gameHighlighting.gameId};
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {GameHighlighting} from './js/codedefenders_game.mjs';
 
-        const gameHighlighting = new CodeDefenders.GameHighlighting(
-                data,
-                enableFlagging,
-                gameId);
-        await gameHighlighting._initAsync();
+    const data = JSON.parse('${gameHighlighting.JSON}');
+    const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
+    const gameId = ${gameHighlighting.gameId};
 
-        gameHighlighting.highlightCoverage();
-        gameHighlighting.highlightMutants();
+    const gameHighlighting = new GameHighlighting(
+            data,
+            enableFlagging,
+            gameId);
+    await gameHighlighting._initAsync();
 
-        CodeDefenders.objects.register('gameHighlighting', gameHighlighting);
-    })();
+    gameHighlighting.highlightCoverage();
+    gameHighlighting.highlightMutants();
+
+    objects.register('gameHighlighting', gameHighlighting);
 </script>

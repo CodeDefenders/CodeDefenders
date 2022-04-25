@@ -32,23 +32,23 @@
     </div>
 </div>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
-        const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};
-        const editableLinesEnd = ${testEditor.hasEditableLinesEnd() ? testEditor.editableLinesEnd : "null"};
-        const mockingEnabled = ${testEditor.mockingEnabled};
-        const keymap = '${login.user.keyMap.CMName}';
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {TestEditor} from './js/codedefenders_game.mjs';
 
-        const editorElement = document.getElementById('test-code');
+    const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};
+    const editableLinesEnd = ${testEditor.hasEditableLinesEnd() ? testEditor.editableLinesEnd : "null"};
+    const mockingEnabled = ${testEditor.mockingEnabled};
+    const keymap = '${login.user.keyMap.CMName}';
 
-        const testEditor = new CodeDefenders.TestEditor(
-                editorElement,
-                editableLinesStart,
-                editableLinesEnd,
-                mockingEnabled,
-                keymap);
+    const editorElement = document.getElementById('test-code');
 
-        CodeDefenders.objects.register('testEditor', testEditor);
-    })();
+    const testEditor = new TestEditor(
+            editorElement,
+            editableLinesStart,
+            editableLinesEnd,
+            mockingEnabled,
+            keymap);
+
+    objects.register('testEditor', testEditor);
 </script>

@@ -202,17 +202,17 @@
                 </div>
             </div>
 
-            <script>
-                (function () {
-                    const codemirror = CodeMirror.fromTextArea(document.getElementById('diff'), {
-                        lineNumbers: true,
-                        mode: "text/x-diff",
-                        readOnly: true,
-                        autoRefresh: true
-                    });
-                    codemirror.getWrapperElement().classList.add('codemirror-readonly');
-                    codemirror.setSize('100%', '100%');
-                })();
+            <script type="module">
+                import CodeMirror from './js/codemirror.mjs';
+
+                const codemirror = CodeMirror.fromTextArea(document.getElementById('diff'), {
+                    lineNumbers: true,
+                    mode: "text/x-diff",
+                    readOnly: true,
+                    autoRefresh: true
+                });
+                codemirror.getWrapperElement().classList.add('codemirror-readonly');
+                codemirror.setSize('100%', '100%');
             </script>
 
             <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
@@ -229,7 +229,12 @@
                 <div class="d-flex justify-content-between mt-2 mb-2">
                     <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent</button>
                     <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test</button>
-                    <script>
+
+                    <script type="module">
+                        import {objects} from './js/codedefenders_main.js';
+
+                        const testProgressBar = objects.await('testProgressBar');
+
                         document.getElementById("accept-equivalent-button").addEventListener('click', function (event) {
                             if (confirm('Accepting Equivalence will lose all mutant points. Are you sure?')) {
                                 this.form['resolveAction'].value = 'accept';
@@ -241,10 +246,10 @@
                             this.form['resolveAction'].value = 'reject';
                             this.form.submit();
                             this.disabled = true;
-                            CodeDefenders.objects.await('testProgressBar')
-                                    .then(testProgressBar => testProgressBar.activate());
+                            testProgressBar.activate();
                         });
                     </script>
+
                 </div>
 
                 <span>Note: If the game finishes with this equivalence unsolved, you will lose points!</span>
@@ -282,10 +287,14 @@
                         <i class="fa fa-check ms-1 btn-check-active"></i>
                     </label>
                 </div>
-                <script>
-                    $('#highlighting-switch').change(async function () {
-                        const gameHighlighting = await CodeDefenders.objects.await('gameHighlighting');
 
+                <script type="module">
+                    import $ from './js/jquery.mjs';
+                    import {objects} from './js/codedefenders_main.mjs';
+
+                    const gameHighlighting = await objects.await('gameHighlighting');
+
+                    $('#highlighting-switch').change(function () {
                         gameHighlighting.clearCoverage();
                         if (this.checked) {
                             gameHighlighting.highlightAlternativeCoverage();
@@ -334,10 +343,21 @@
             <div>
                 <button type="submit" class="btn btn-defender btn-highlight"
                         id="submitTest" form="def"
-                        onclick="CodeDefenders.objects.await('testProgressBar').then(progressBar => progressBar.activate()); this.form.submit(); this.disabled = true;"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
                     Defend
                 </button>
+
+                <script type="module">
+                    import {objects} from './js/codedefenders_main.mjs';
+
+                    const testProgressBar = await objects.await('testProgressBar');
+
+                    document.getElementById('submitTest').addEventListener('click', function (event) {
+                        this.form.submit();
+                        this.disabled = true;
+                        testProgressBar.activate();
+                    });
+                </script>
             </div>
         </div>
 

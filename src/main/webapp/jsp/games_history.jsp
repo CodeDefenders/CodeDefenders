@@ -296,8 +296,8 @@
         </tbody>
     </table>
 
-    <script>
-    (function () {
+    <script type="module">
+        import $ from './js/jquery.mjs';
 
         $('table td.toggle-details').on('click', function () {
             let id = '.' + $(this).attr('id');
@@ -311,8 +311,6 @@
                 $(id).show()
             }
         });
-
-    })();
     </script>
 
 </div>

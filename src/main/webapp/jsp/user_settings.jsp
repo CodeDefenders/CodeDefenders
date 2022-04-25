@@ -102,24 +102,22 @@
             </div>
 
             <script>
-                $(document).ready(() => {
-                    const passwordInput = document.getElementById('updatedPassword');
-                    const confirmPasswordInput = document.getElementById('repeatedPassword');
-                    const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
+                const passwordInput = document.getElementById('updatedPassword');
+                const confirmPasswordInput = document.getElementById('repeatedPassword');
+                const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
 
-                    const validateConfirmPassword = function () {
-                        if (passwordInput.value === confirmPasswordInput.value) {
-                            confirmPasswordInput.setCustomValidity('');
-                            confirmPasswordFeedback.innerText = '';
-                        } else {
-                            confirmPasswordInput.setCustomValidity('password-mismatch');
-                            confirmPasswordFeedback.innerText = "Passwords don't match.";
-                        }
-                    };
+                const validateConfirmPassword = function () {
+                    if (passwordInput.value === confirmPasswordInput.value) {
+                        confirmPasswordInput.setCustomValidity('');
+                        confirmPasswordFeedback.innerText = '';
+                    } else {
+                        confirmPasswordInput.setCustomValidity('password-mismatch');
+                        confirmPasswordFeedback.innerText = "Passwords don't match.";
+                    }
+                };
 
-                    passwordInput.addEventListener('input', validateConfirmPassword);
-                    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
-                });
+                passwordInput.addEventListener('input', validateConfirmPassword);
+                confirmPasswordInput.addEventListener('input', validateConfirmPassword);
             </script>
         </form>
     </section>

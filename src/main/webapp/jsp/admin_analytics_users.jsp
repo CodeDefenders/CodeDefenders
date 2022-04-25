@@ -64,9 +64,11 @@
     </div>
 </div>
 
-<script>
-(function () {
-    const DataTablesUtils = CodeDefenders.DataTablesUtils;
+<script type="module">
+    import {DataTablesUtils} from './js/codedefenders_main.mjs';
+    import DataTable from './js/datatables.mjs';
+    import $ from './js/jquery.mjs';
+
     const div = DataTablesUtils.formatDivision;
     const valPercent = DataTablesUtils.formatValueAndPercent;
 
@@ -171,8 +173,6 @@
 
         DataTablesUtils.setupChildRows(table, format);
     });
-
-})();
 </script>
 
 <%@ include file="/jsp/footer.jsp" %>

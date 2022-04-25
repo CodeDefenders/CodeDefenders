@@ -472,7 +472,11 @@
         </jsp:attribute>
     </t:modal>
 
-    <script>
+    <script type="module">
+        import DataTable from './js/datatables.mjs';
+        import $ from './js/jquery.mjs';
+        import {Popover} from './js/bootstrap.mjs';
+
         /**
          *  Maps IDs to staged games.
          */
@@ -1004,23 +1008,29 @@
                     className: 'selected'
                 },
                 drawCallback: function () {
+                    const table = this.api().table().container();
+
                     /* Select nothing in all selects in the table. */
-                    $(this).find('select').prop('selectedIndex', -1);
+                    for (const select of table.querySelectorAll('select')) {
+                        select.selectedIndex = -1;
+                    }
 
                     /* Setup popovers to display the game settings. */
-                    $(this).find('.show-settings').popover({
-                        container: document.body,
-                        placement: 'right',
-                        trigger: 'hover',
-                        html: true,
-                        title: 'Game Settings',
-                        content: function () {
-                            const tr = $(this).closest('tr').get(0);
-                            const row = stagedGamesTable.row(tr);
-                            const stagedGame = row.data();
-                            return createSettingsTable(stagedGame.gameSettings);
-                        }
-                    });
+                    for (const button of table.querySelectorAll('.show-settings')) {
+                        new Popover(button, {
+                            container: document.body,
+                            placement: 'right',
+                            trigger: 'hover',
+                            html: true,
+                            title: 'Game Settings',
+                            content: function () {
+                                const tr = $(this).closest('tr').get(0);
+                                const row = stagedGamesTable.row(tr);
+                                const stagedGame = row.data();
+                                return createSettingsTable(stagedGame.gameSettings);
+                            }
+                        });
+                    }
                 },
                 order: [[1, 'asc']],
                 scrollY: '800px',

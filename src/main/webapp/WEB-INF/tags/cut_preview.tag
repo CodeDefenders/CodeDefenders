@@ -25,35 +25,36 @@
     </div>
 </div>
 
-<script>
-    (function () {
-        const cutPreview = document.querySelector('#create-game-cut-preview')
+<script type="module">
+    import {InfoApi} from './js/codedefenders_main.mjs';
+    import CodeMirror from './js/codemirror.mjs';
 
-        const classSelector = document.querySelector('#class-select');
-        const textarea = cutPreview.querySelector('textarea');
+    const cutPreview = document.querySelector('#create-game-cut-preview')
 
-        const updatePreview = function () {
-            const classId = Number(classSelector.value);
-            const codeMirrorContainer = cutPreview.querySelector('.CodeMirror');
+    const classSelector = document.querySelector('#class-select');
+    const textarea = cutPreview.querySelector('textarea');
 
-            if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                CodeDefenders.InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
-            } else {
-                const editor = CodeMirror.fromTextArea(textarea, {
-                    lineNumbers: true,
-                    readOnly: true,
-                    mode: 'text/x-java',
-                    autoRefresh: true
-                });
-                editor.getWrapperElement().classList.add('codemirror-readonly');
-                CodeDefenders.InfoApi.setClassEditorValue(editor, classId);
-            }
-        };
+    const updatePreview = function () {
+        const classId = Number(classSelector.value);
+        const codeMirrorContainer = cutPreview.querySelector('.CodeMirror');
 
-        // Load initial selected class
-        document.addEventListener("DOMContentLoaded", updatePreview);
+        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+            InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
+        } else {
+            const editor = CodeMirror.fromTextArea(textarea, {
+                lineNumbers: true,
+                readOnly: true,
+                mode: 'text/x-java',
+                autoRefresh: true
+            });
+            editor.getWrapperElement().classList.add('codemirror-readonly');
+            InfoApi.setClassEditorValue(editor, classId);
+        }
+    };
 
-        classSelector.addEventListener('change', updatePreview);
-    })();
+    // Load initial selected class
+    document.addEventListener("DOMContentLoaded", updatePreview);
+
+    classSelector.addEventListener('change', updatePreview);
 </script>
 </div>

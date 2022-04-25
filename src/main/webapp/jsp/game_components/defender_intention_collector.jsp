@@ -20,14 +20,14 @@
 --%>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (async function () {
-        const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {DefenderIntentionCollection} from './js/codedefenders_game.mjs';
 
-        const defenderIntentionCollection = new CodeDefenders.DefenderIntentionCollection(lineToSelect);
-        await defenderIntentionCollection._initAsync();
+    const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};
 
-        CodeDefenders.objects.register('defenderIntentionCollection', defenderIntentionCollection);
-    })();
+    const defenderIntentionCollection = new DefenderIntentionCollection(lineToSelect);
+    await defenderIntentionCollection._initAsync();
+
+    objects.register('defenderIntentionCollection', defenderIntentionCollection);
 </script>

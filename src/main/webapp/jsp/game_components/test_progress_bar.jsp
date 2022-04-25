@@ -20,15 +20,15 @@
 --%>
 <jsp:useBean id="testProgressBar" class="org.codedefenders.beans.game.TestProgressBarBean" scope="request"/>
 
-<script>
-    /* Wrap in a function so it has it's own scope. */
-    (function () {
-        const progressElement = document.getElementById('progress');
-        const gameId = ${testProgressBar.gameId};
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {TestProgressBar} from './js/codedefenders_game.mjs';
 
-        const testProgressBar = new CodeDefenders.TestProgressBar(progressElement, gameId);
-        CodeDefenders.objects.register('testProgressBar', testProgressBar);
-    })();
+    const progressElement = document.getElementById('progress');
+    const gameId = ${testProgressBar.gameId};
+
+    const testProgressBar = new TestProgressBar(progressElement, gameId);
+    objects.register('testProgressBar', testProgressBar);
 </script>
 
 

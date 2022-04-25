@@ -109,18 +109,18 @@
 
 </div>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
-        const numDependencies = ${classViewer.hasDependencies() ? classViewer.dependencies.size() : 0};
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {ClassViewer} from './js/codedefenders_game.mjs';
 
-        const editorElement = document.getElementById('sut');
-        const dependencyEditorElements = [];
-        for (let i = 1; i <= numDependencies; i++) {
-            dependencyEditorElements.push(document.getElementById(`class-viewer-code-\${i}`));
-        }
+    const numDependencies = ${classViewer.hasDependencies() ? classViewer.dependencies.size() : 0};
 
-        CodeDefenders.objects.register('classViewer',
-                new CodeDefenders.ClassViewer(editorElement, dependencyEditorElements));
-    })();
+    const editorElement = document.getElementById('sut');
+    const dependencyEditorElements = [];
+    for (let i = 1; i <= numDependencies; i++) {
+        dependencyEditorElements.push(document.getElementById(`class-viewer-code-\${i}`));
+    }
+
+    const classViewer = new ClassViewer(editorElement, dependencyEditorElements);
+    objects.register('classViewer', classViewer);
 </script>

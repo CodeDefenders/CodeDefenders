@@ -57,12 +57,16 @@
         </thead>
     </table>
 
-    <script type="text/javascript">
+    <script type="module">
+        import {PuzzleAPI} from './js/codedefenders_main.mjs';
+        import DataTable from './js/datatables.mjs';
+        import $ from './js/jquery.mjs';
+
         let puzzleTable;
         let chapterTable;
 
         $(document).ready(async function() {
-            const puzzleData = await CodeDefenders.PuzzleAPI.fetchPuzzleData();
+            const puzzleData = await PuzzleAPI.fetchPuzzleData();
 
             const chapters = puzzleData.puzzleChapters;
             if (chapters) {
@@ -296,7 +300,7 @@
                 position: parseIntOrNull(document.getElementById(`positionForPuzzleChapter\${puzzleChapterId}`).value)
             };
 
-            CodeDefenders.PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
+            PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
                 .then(responseJSON => {
                     chapterTable.row(row).data(updateChapterData);
 
@@ -311,7 +315,7 @@
             let confirmResult = confirm('Are you sure you want to delete puzzle chapter ' + puzzleChapterId + '?'
                 + ' This will not remove the puzzles of the chapter.');
             if (confirmResult) {
-                CodeDefenders.PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
+                PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
                     .then(responseJSON => {
                         chapterTable.row(row).remove();
 
@@ -340,7 +344,7 @@
                 editableLinesEnd: parseIntOrNull(document.getElementById(`editableLinesEndForPuzzle` + puzzleId).value)
             };
 
-            CodeDefenders.PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
+            PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
                 .then(responseJSON => {
                     puzzleTable.row(row).data(updatedPuzzleData);
 
@@ -354,7 +358,7 @@
         function removePuzzle(puzzleId, row, column) {
             let confirmResult = confirm(`Are you sure you want to delete puzzle \${puzzleId}?`);
             if (confirmResult) {
-                CodeDefenders.PuzzleAPI.deletePuzzle(puzzleId)
+                PuzzleAPI.deletePuzzle(puzzleId)
                     .then(responseJSON => {
                         puzzleTable.row(row).remove();
 

@@ -691,36 +691,35 @@
         }
     %>
 
-    <script>
-        (function () {
+    <script type="module">
+        import DataTable from './js/datatables.mjs';
+        import $ from './js/jquery.mjs';
 
-            $(document).ready(function () {
-                new DataTable('#tableMPGames', {
-                    "paging": false,
-                    "searching": false,
-                    "order": [[5, "asc"]],
-                    "language": {
-                        "info": ""
-                    }
-                });
-            });
-
-            $('table td.toggle-details').on('click', function () {
-                const details = $('.' + $(this).attr('id'));
-                const icon = $(this).find('.toggle-details-icon')
-
-                if (details.is(':visible')) {
-                    icon.removeClass('fa-chevron-down');
-                    icon.addClass('fa-chevron-right');
-                    details.hide()
-                } else {
-                    icon.removeClass('fa-chevron-right');
-                    icon.addClass('fa-chevron-down');
-                    details.show()
+        $(document).ready(function () {
+            new DataTable('#tableMPGames', {
+                "paging": false,
+                "searching": false,
+                "order": [[5, "asc"]],
+                "language": {
+                    "info": ""
                 }
             });
+        });
 
-        })();
+        $('table td.toggle-details').on('click', function () {
+            const details = $('.' + $(this).attr('id'));
+            const icon = $(this).find('.toggle-details-icon')
+
+            if (details.is(':visible')) {
+                icon.removeClass('fa-chevron-down');
+                icon.addClass('fa-chevron-right');
+                details.hide()
+            } else {
+                icon.removeClass('fa-chevron-right');
+                icon.addClass('fa-chevron-down');
+                details.show()
+            }
+        });
     </script>
 
 </div>

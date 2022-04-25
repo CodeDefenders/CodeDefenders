@@ -30,17 +30,16 @@
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
-        const baseWsUri = document.baseURI
-                .replace(/^http/, 'ws')
-                .replace(/\/$/, '');
-        const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
-        const userId = '${login.userId}';
-        const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
+<script type="module">
+    import {objects, PushSocket} from './js/codedefenders_main.mjs';
 
-        const pushSocket = new CodeDefenders.PushSocket(wsUri);
-        CodeDefenders.objects.register('pushSocket', pushSocket);
-    })();
+    const baseWsUri = document.baseURI
+            .replace(/^http/, 'ws')
+            .replace(/\/$/, '');
+    const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
+    const userId = '${login.userId}';
+    const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
+
+    const pushSocket = new PushSocket(wsUri);
+    objects.register('pushSocket', pushSocket);
 </script>

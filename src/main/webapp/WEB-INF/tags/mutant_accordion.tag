@@ -84,18 +84,18 @@
         </c:forEach>
     </div>
 
-    <script>
-        /* Wrap in a function to avoid polluting the global scope. */
-        (function () {
-            const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
-            const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
-            const gameId = ${mutantAccordion.gameId};
+    <script type="module">
+        import {objects} from './js/codedefenders_main.mjs';
+        import {MutantAccordion} from './js/codedefenders_game.mjs';
 
-            const mutantAccordion = new CodeDefenders.MutantAccordion(
-                    categories,
-                    mutants,
-                    gameId);
-            CodeDefenders.objects.register('mutantAccordion', mutantAccordion);
-        })();
+        const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
+        const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
+        const gameId = ${mutantAccordion.gameId};
+
+        const mutantAccordion = new MutantAccordion(
+                categories,
+                mutants,
+                gameId);
+        objects.register('mutantAccordion', mutantAccordion);
     </script>
 </div>

@@ -13,13 +13,16 @@
         </c:forEach>
     </div>
 
-    <script>
+    <script type="module">
+        import $ from './js/jquery.mjs';
+        import {Alert} from './js/bootstrap.mjs';
+
         $(document).ready(() => {
             <c:forEach items="${messages.messages}" var="message">
                 <c:if test="${message.fadeOut}">
                     setTimeout(function () {
                         const element = document.getElementById('message-${message.id}');
-                        const alert = new bootstrap.Alert(element);
+                        const alert = new Alert(element);
                         alert.close();
                     }, 10000);
                 </c:if>

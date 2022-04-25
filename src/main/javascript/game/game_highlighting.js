@@ -1,4 +1,5 @@
-import {objects} from "../main";
+import {Popover} from '../thirdparty/bootstrap';
+import {objects} from '../main';
 
 
 class GameHighlighting {
@@ -180,7 +181,7 @@ class GameHighlighting {
         };
 
         for (const mutantIcon of mutantIcons.querySelectorAll('.gh-mutant-icon')) {
-            const popover = new bootstrap.Popover(mutantIcon, {
+            const popover = new Popover(mutantIcon, {
                 /* Append to body instead of the element itself, so that the icons don't overlap modals. */
                 container: document.body,
                 placement: 'right',
