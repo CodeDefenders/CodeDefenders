@@ -72,13 +72,14 @@
 </button>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(async function() {
         const gameId = ${gameChat.gameId};
         const messageLimit = ${gameChat.messageLimit};
 
-        CodeDefenders.objects.gameChat = new CodeDefenders.GameChat(
-                gameId,
-                messageLimit);
+        const gameChat = new CodeDefenders.GameChat(gameId, messageLimit);
+        await gameChat._initAsync();
+
+        CodeDefenders.objects.register('gameChat', gameChat);
     });
 </script>
 

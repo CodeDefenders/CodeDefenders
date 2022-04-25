@@ -39,6 +39,8 @@
         const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';
         const userId = '${login.userId}';
         const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
-        CodeDefenders.objects.pushSocket = new CodeDefenders.PushSocket(wsUri);
+
+        const pushSocket = new CodeDefenders.PushSocket(wsUri);
+        CodeDefenders.objects.register('pushSocket', pushSocket);
     })();
 </script>

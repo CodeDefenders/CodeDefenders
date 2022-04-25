@@ -191,18 +191,11 @@ class MutantAccordion {
                     }
 
                     /* Assign function to the "Mutant <id>" link. */
-                    row.querySelector('.ma-mutant-link').addEventListener('click', function (event) {
-                        let editor = null;
-                        if (objects.classViewer != null) {
-                            editor = objects.classViewer.editor;
-                        } else if (objects.mutantEditor != null) {
-                            editor = objects.mutantEditor.editor;
-                        }
-
-                        if (editor == null) {
-                            return;
-                        }
-
+                    row.querySelector('.ma-mutant-link').addEventListener('click', async function (event) {
+                        const editor = (await Promise.race([
+                                objects.await('classViewer'),
+                                objects.await('mutantEditor')
+                        ])).editor;
                         editor.getWrapperElement().scrollIntoView();
                         editor.scrollIntoView(
                                 {line: data.lines[0] - 1, char: 0},

@@ -26,6 +26,7 @@
         const progressElement = document.getElementById('progress');
         const gameId = ${mutantProgressBar.gameId};
 
-        CodeDefenders.objects.mutantProgressBar = new CodeDefenders.MutantProgressBar(progressElement, gameId);
+        const mutantProgressBar = new CodeDefenders.MutantProgressBar(progressElement, gameId);
+        CodeDefenders.objects.register('mutantProgressBar', mutantProgressBar);
     })();
 </script>

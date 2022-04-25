@@ -65,6 +65,7 @@
         const categories = JSON.parse('${testAccordion.categoriesAsJSON}');
         const tests = new Map(JSON.parse('${testAccordion.testsAsJSON}'));
 
-        CodeDefenders.objects.testAccordion = new CodeDefenders.TestAccordion(categories, tests);
+        const testAccordion = new CodeDefenders.TestAccordion(categories, tests);
+        CodeDefenders.objects.register('testAccordion', testAccordion);
     })();
 </script>

@@ -151,10 +151,11 @@
                             }
                         });
                         document.getElementById("reject-equivalent-button").addEventListener('click', function (event) {
-                            CodeDefenders.objects.testProgressBar.activate();
                             this.form['resolveAction'].value = 'reject';
                             this.form.submit();
                             this.disabled = true;
+                            CodeDefenders.objects.await('testProgressBar')
+                                    .then(progressBar => progressBar.activate());
                         });
                     </script>
                 </div>

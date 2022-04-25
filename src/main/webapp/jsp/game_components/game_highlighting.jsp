@@ -38,17 +38,20 @@
 
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
+    (async function () {
         const data = JSON.parse('${gameHighlighting.JSON}');
         const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
         const gameId = ${gameHighlighting.gameId};
 
-        CodeDefenders.objects.gameHighlighting = new CodeDefenders.GameHighlighting(
+        const gameHighlighting = new CodeDefenders.GameHighlighting(
                 data,
                 enableFlagging,
                 gameId);
+        await gameHighlighting._initAsync();
 
-        CodeDefenders.objects.gameHighlighting.highlightCoverage();
-        CodeDefenders.objects.gameHighlighting.highlightMutants();
+        gameHighlighting.highlightCoverage();
+        gameHighlighting.highlightMutants();
+
+        CodeDefenders.objects.register('gameHighlighting', gameHighlighting);
     })();
 </script>

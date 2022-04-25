@@ -121,7 +121,7 @@
             <div>
 
                 <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                    onclick="CodeDefenders.objects.testProgressBar.activate(); this.form.submit(); this.disabled = true;"
+                    onclick="CodeDefenders.objects.await('testProgressBar').then(progressBar => progressBar.activate()); this.form.submit(); this.disabled = true;"
                     <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend
                 </button>

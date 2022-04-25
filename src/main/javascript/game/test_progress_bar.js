@@ -12,12 +12,12 @@ class TestProgressBar extends ProgressBar {
         this.gameId = gameId;
     }
 
-    activate () {
-        const pushSocket = objects.pushSocket;
+    async activate () {
+        const pushSocket = await objects.await('pushSocket');
 
         this.setProgress(16, 'Submitting Test');
-        this._register();
-        this._subscribe();
+        await this._register();
+        await this._subscribe();
 
         /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
         const reconnect = event => {
@@ -28,14 +28,15 @@ class TestProgressBar extends ProgressBar {
         pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
     }
 
-    _subscribe () {
-        objects.pushSocket.subscribe('registration.TestProgressBarRegistrationEvent', {
+    async _subscribe () {
+        const pushSocket = await objects.await('pushSocket');
+        pushSocket.subscribe('registration.TestProgressBarRegistrationEvent', {
             gameId: this.gameId
         });
     }
 
-    _register () {
-        const pushSocket = objects.pushSocket;
+    async _register () {
+        const pushSocket = await objects.await('pushSocket');
         pushSocket.register('test.TestSubmittedEvent', this._onTestSubmitted.bind(this));
         pushSocket.register('test.TestCompiledEvent', this._onTestCompiled.bind(this));
         pushSocket.register('test.TestValidatedEvent', this._onTestValidated.bind(this));

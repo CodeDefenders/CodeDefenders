@@ -152,28 +152,25 @@ class TestEditor {
 
         this.codeCompletion.setCompletionPool('testMethods', new Set(testMethods));
 
-        /* Gather classes to autocomplete. */
-        const texts = [];
-        /* Get classes from class viewer. */
-        if (objects.classViewer != null) {
-            const classViewer = objects.classViewer;
-            texts.push(classViewer.editor.getValue());
+        /* Add class viewer code to completions. */
+        objects.await('classViewer').then(classViewer => {
+            const texts = [classViewer.editor.getValue()];
             for (const dependencyEditor of classViewer.dependencyEditors) {
                 texts.push(dependencyEditor.getValue());
             }
-        }
-        /* Get classes from mutant editor. */
-        if (objects.mutantEditor != null) {
-            const mutantEditor = objects.mutantEditor;
-            texts.push(mutantEditor.editor.getValue());
+            const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
+            this.codeCompletion.setCompletionPool('classViewer', completions);
+        });
+
+        /* Add mutant editor code to completions. */
+        objects.await('mutantEditor').then(mutantEditor => {
+            const texts = [mutantEditor.editor.getValue()];
             for (const dependencyEditor of mutantEditor.dependencyEditors) {
                 texts.push(dependencyEditor.getValue());
             }
-        }
-
-        /* Add words from classes to completion. */
-        const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
-        this.codeCompletion.setCompletionPool('classes', completions);
+            const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
+            this.codeCompletion.setCompletionPool('mutantEditor', completions);
+        });
     }
 
     /**

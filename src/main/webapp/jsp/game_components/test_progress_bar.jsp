@@ -26,7 +26,8 @@
         const progressElement = document.getElementById('progress');
         const gameId = ${testProgressBar.gameId};
 
-        CodeDefenders.objects.testProgressBar = new CodeDefenders.TestProgressBar(progressElement, gameId);
+        const testProgressBar = new CodeDefenders.TestProgressBar(progressElement, gameId);
+        CodeDefenders.objects.register('testProgressBar', testProgressBar);
     })();
 </script>
 

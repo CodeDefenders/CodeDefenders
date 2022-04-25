@@ -12,12 +12,12 @@ class MutantProgressBar extends ProgressBar {
         this.gameId = gameId;
     }
 
-    activate () {
-        const pushSocket = objects.pushSocket;
+    async activate () {
+        const pushSocket = await objects.await('pushSocket');
 
         this.setProgress(16, 'Submitting Mutant');
-        this._register();
-        this._subscribe();
+        await this._register();
+        await this._subscribe();
 
         /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
         const reconnect = () => {
@@ -28,14 +28,15 @@ class MutantProgressBar extends ProgressBar {
         pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
     }
 
-    _subscribe () {
-        objects.pushSocket.subscribe('registration.MutantProgressBarRegistrationEvent', {
+    async _subscribe () {
+        const pushSocket = await objects.await('pushSocket');
+        pushSocket.subscribe('registration.MutantProgressBarRegistrationEvent', {
             gameId: this.gameId
         });
     }
 
-    _register () {
-        const pushSocket = objects.pushSocket;
+    async _register () {
+        const pushSocket = await objects.await('pushSocket');
         pushSocket.register('mutant.MutantSubmittedEvent', this._onMutantSubmitted.bind(this));
         pushSocket.register('mutant.MutantValidatedEvent', this._onMutantValidated.bind(this));
         pushSocket.register('mutant.MutantDuplicateCheckedEvent', this._onDuplicateChecked.bind(this));

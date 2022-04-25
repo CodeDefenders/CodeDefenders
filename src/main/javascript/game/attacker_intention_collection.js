@@ -52,9 +52,10 @@ class AttackerIntentionCollection {
     /** @private */
     _submitForm (intention) {
         this.intentionInput.value = intention;
-        objects.mutantProgressBar.activate();
         this.attackForm.submit();
         this.attackButton.disabled = true;
+        objects.await('mutantProgressBar')
+                .then(mutantProgressBar => mutantProgressBar.activate());
     }
 }
 

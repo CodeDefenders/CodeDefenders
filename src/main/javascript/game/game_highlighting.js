@@ -75,7 +75,7 @@ class GameHighlighting {
          * @type {?number}
          * @private
          */
-        this._activePopoverTimeout = null;
+        this._popoverTimeout = null;
         /**
          * The currently active popover.
          * This is saved to enable hiding the currently active popover and to avoid showing the same popover twice.
@@ -83,18 +83,17 @@ class GameHighlighting {
          * @private
          */
         this._activePopover = null;
+    }
 
-
+    async _initAsync () {
         /**
          * The CodeMirror editor to provide highlighting on.
          * @type {CodeMirror}
          */
-        this.editor = null;
-        if (objects.classViewer != null) {
-            this.editor = objects.classViewer.editor;
-        } else if (objects.mutantEditor != null) {
-            this.editor = objects.mutantEditor.editor;
-        }
+        this.editor = (await Promise.race([
+            objects.await('classViewer'),
+            objects.await('mutantEditor')
+        ])).editor;
     }
 
     static MutantStatuses = {
@@ -170,7 +169,7 @@ class GameHighlighting {
             self._popoverTimeout = setTimeout(function () {
                 popover.hide();
                 self._activePopover = null;
-                self._activePopoverTimeout = null;
+                self._popoverTimeout = null;
             }, 500);
         };
 

@@ -510,7 +510,7 @@ class GameChat {
      * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
      */
     sendMessage (message, isAllChat) {
-        objects.pushSocket.send('chat.ClientGameChatEvent', {
+        this.pushSocket.send('chat.ClientGameChatEvent', {
             gameId: this.gameId,
             allChat: isAllChat,
             message
@@ -546,12 +546,15 @@ class GameChat {
         });
     }
 
-    _init () {
+    async _init () {
         this._initElements();
         this._initComponents();
         this._initEvents();
         this._loadSettings();
-        this._initSocket();
+    }
+
+    async _initAsync () {
+        await this._initSocket();
     }
 
     /**
@@ -717,19 +720,20 @@ class GameChat {
      * Register for WebSocket events.
      * @private
      */
-    _initSocket () {
+    async _initSocket () {
+        this.pushSocket = await objects.await('pushSocket');
+
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
-        const pushSocket = objects.pushSocket;
-        pushSocket.subscribe('registration.GameChatRegistrationEvent', {gameId: this.gameId});
-        pushSocket.register('chat.ServerGameChatEvent', this._onChatMessage.bind(this));
-        pushSocket.register('chat.ServerSystemChatEvent', this._onSystemMessage.bind(this));
-        pushSocket.register(PushSocket.WSEventType.CLOSE,
+        this.pushSocket.subscribe('registration.GameChatRegistrationEvent', {gameId: this.gameId});
+        this.pushSocket.register('chat.ServerGameChatEvent', this._onChatMessage.bind(this));
+        this.pushSocket.register('chat.ServerSystemChatEvent', this._onSystemMessage.bind(this));
+        this.pushSocket.register(PushSocket.WSEventType.CLOSE,
                 () => self.messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_DISCONNECT));
-        pushSocket.register(PushSocket.WSEventType.OPEN, () =>
+        this.pushSocket.register(PushSocket.WSEventType.OPEN, () =>
                 () => self.messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_CONNECT));
-        if (pushSocket.readyState === 1) {
+        if (this.pushSocket.readyState === 1) {
             self.messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_CONNECT);
         }
     }

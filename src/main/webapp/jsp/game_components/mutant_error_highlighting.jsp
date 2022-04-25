@@ -29,13 +29,15 @@
 
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
+    (async function () {
         const errorLines = JSON.parse('${mutantErrorHighlighting.errorLinesJSON}');
 
-        CodeDefenders.objects.mutantErrorHighlighting = new CodeDefenders.ErrorHighlighting(
-                errorLines,
-                CodeDefenders.objects.mutantEditor.editor);
+        const mutantEditor = await CodeDefenders.objects.await('mutantEditor');
 
-        CodeDefenders.objects.mutantErrorHighlighting.highlightErrors();
+        const mutantErrorHighlighting = new CodeDefenders.ErrorHighlighting(
+                errorLines, mutantEditor.editor);
+        mutantErrorHighlighting.highlightErrors();
+
+        CodeDefenders.objects.register('mutantErrorHighlighting', mutantErrorHighlighting);
     })();
 </script>

@@ -523,9 +523,9 @@ public class MultiplayerGameManager extends HttpServlet {
     String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
         String editor = "";
         if (forTest) {
-            editor = "CodeDefenders.objects.testEditor";
+            editor = "testEditor";
         } else if (forMutant) {
-            editor = "CodeDefenders.objects.mutantEditor";
+            editor = "mutantEditor";
         }
 
         StringBuilder decorated = new StringBuilder();
@@ -535,7 +535,7 @@ public class MultiplayerGameManager extends HttpServlet {
             if (m.find()) {
                 // Replace the entire line with a link to the source code
                 String replacedLine = MessageFormat.format(
-                        "<a onclick=\"{0}.jumpToLine({1});\" href=\"javascript:void(0);\">{2}</a>",
+                        "<a onclick=\"CodeDefenders.objects.await('{0}').then(editor => editor.jumpToLine({1}));\" href=\"javascript:void(0);\">{2}</a>",
                         editor, m.group(1), line);
                 decorated.append(replacedLine).append("\n");
             } else {

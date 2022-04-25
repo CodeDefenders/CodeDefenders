@@ -120,8 +120,7 @@
             dependencyEditorElements.push(document.getElementById(`class-viewer-code-\${i}`));
         }
 
-        CodeDefenders.objects.classViewer = new CodeDefenders.ClassViewer(
-                editorElement,
-                dependencyEditorElements);
+        CodeDefenders.objects.register('classViewer',
+                new CodeDefenders.ClassViewer(editorElement, dependencyEditorElements));
     })();
 </script>

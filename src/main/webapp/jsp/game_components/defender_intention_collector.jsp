@@ -22,11 +22,12 @@
 
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
+    (async function () {
         const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};
-        console.log(lineToSelect);
 
-        CodeDefenders.objects.defenderIntentionCollection = new CodeDefenders.DefenderIntentionCollection(
-                lineToSelect);
+        const defenderIntentionCollection = new CodeDefenders.DefenderIntentionCollection(lineToSelect);
+        await defenderIntentionCollection._initAsync();
+
+        CodeDefenders.objects.register('defenderIntentionCollection', defenderIntentionCollection);
     })();
 </script>

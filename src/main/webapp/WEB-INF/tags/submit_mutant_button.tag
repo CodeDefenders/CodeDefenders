@@ -9,7 +9,7 @@
     <c:when test="${!intentionCollectionEnabled}">
         <button type="submit" form="atk"
                 id="submitMutant" class="btn btn-attacker btn-highlight"
-                onclick="CodeDefenders.objects.mutantProgressBar.activate(); this.form.submit(); this.disabled=true;"
+                onclick="CodeDefenders.objects.await('mutantProgressBar').then(progressBar => progressBar.activate()); this.form.submit(); this.disabled=true;"
                 <c:if test="${!gameActive}">disabled</c:if>>
             Attack
         </button>

@@ -29,13 +29,14 @@
 
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
+    (async function () {
         const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');
 
-        CodeDefenders.objects.testErrorHighlighting = new CodeDefenders.ErrorHighlighting(
-                errorLines,
-                CodeDefenders.objects.testEditor.editor);
+        const testEditor = await CodeDefenders.components.await('testEditor');
 
-        CodeDefenders.objects.testErrorHighlighting.highlightErrors();
+        const testErrorHighlighting= new CodeDefenders.ErrorHighlighting(errorLines, testEditor.editor);
+        testErrorHighlighting.highlightErrors();
+
+        CodeDefenders.objects.register('testErrorHighlighting', testErrorHighlighting);
     })();
 </script>

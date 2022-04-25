@@ -126,11 +126,13 @@
             dependencyEditorElements.push(document.getElementById(`mutant-editor-code-\${i}`));
         }
 
-        CodeDefenders.objects.mutantEditor = new CodeDefenders.MutantEditor(
+        const mutantEditor = new CodeDefenders.MutantEditor(
                 editorElement,
                 dependencyEditorElements,
                 editableLinesStart,
                 editableLinesEnd,
                 keymap);
+
+        CodeDefenders.objects.register('mutantEditor', mutantEditor);
     })();
 </script>

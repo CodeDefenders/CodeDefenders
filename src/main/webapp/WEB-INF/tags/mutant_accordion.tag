@@ -91,10 +91,11 @@
             const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
             const gameId = ${mutantAccordion.gameId};
 
-            CodeDefenders.objects.mutantAccordion = new CodeDefenders.MutantAccordion(
+            const mutantAccordion = new CodeDefenders.MutantAccordion(
                     categories,
                     mutants,
                     gameId);
+            CodeDefenders.objects.register('mutantAccordion', mutantAccordion);
         })();
     </script>
 </div>

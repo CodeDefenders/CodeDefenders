@@ -238,10 +238,11 @@
                             }
                         });
                         document.getElementById("reject-equivalent-button").addEventListener('click', function (event) {
-                            CodeDefenders.objects.testProgressBar.activate();
                             this.form['resolveAction'].value = 'reject';
                             this.form.submit();
                             this.disabled = true;
+                            CodeDefenders.objects.await('testProgressBar')
+                                    .then(testProgressBar => testProgressBar.activate());
                         });
                     </script>
                 </div>
@@ -282,12 +283,14 @@
                     </label>
                 </div>
                 <script>
-                    $('#highlighting-switch').change(function () {
-                        CodeDefenders.objects.gameHighlighting.clearCoverage();
+                    $('#highlighting-switch').change(async function () {
+                        const gameHighlighting = await CodeDefenders.objects.await('gameHighlighting');
+
+                        gameHighlighting.clearCoverage();
                         if (this.checked) {
-                            CodeDefenders.objects.gameHighlighting.highlightAlternativeCoverage();
+                            gameHighlighting.highlightAlternativeCoverage();
                         } else {
-                            CodeDefenders.objects.gameHighlighting.highlightCoverage();
+                            gameHighlighting.highlightCoverage();
                         }
                     })
                 </script>
@@ -331,7 +334,7 @@
             <div>
                 <button type="submit" class="btn btn-defender btn-highlight"
                         id="submitTest" form="def"
-                        onclick="CodeDefenders.objects.testProgressBar.activate(); this.form.submit(); this.disabled = true;"
+                        onclick="CodeDefenders.objects.await('testProgressBar').then(progressBar => progressBar.activate()); this.form.submit(); this.disabled = true;"
                         <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
                     Defend
                 </button>

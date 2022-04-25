@@ -20,5 +20,6 @@
 --%>
 
 <script>
-    CodeDefenders.objects.attackerIntentionCollection = new CodeDefenders.AttackerIntentionCollection();
+    CodeDefenders.objects.register('attackerIntentionCollection',
+            new CodeDefenders.AttackerIntentionCollection());
 </script>

@@ -42,11 +42,13 @@
 
         const editorElement = document.getElementById('test-code');
 
-        CodeDefenders.objects.testEditor = new CodeDefenders.TestEditor(
+        const testEditor = new CodeDefenders.TestEditor(
                 editorElement,
                 editableLinesStart,
                 editableLinesEnd,
                 mockingEnabled,
                 keymap);
+
+        CodeDefenders.objects.register('testEditor', testEditor);
     })();
 </script>
