@@ -35,6 +35,7 @@ import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.persistence.database.UserStatsDAO;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -53,6 +54,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private UserRepository userRepo;
+
+    @Inject
+    private UserStatsDAO userStatsDAO;
 
     @Inject
     private LoginBean login;
@@ -128,6 +132,7 @@ public class UserProfileManager extends HttpServlet {
 
         request.setAttribute("user", urlParamUser.orElseGet(login::getUser));
         request.setAttribute("self", isSelf);
+        request.setAttribute("userStats", userStatsDAO);
         request.getRequestDispatcher(Constants.USER_PROFILE_JSP).forward(request, response);
     }
 

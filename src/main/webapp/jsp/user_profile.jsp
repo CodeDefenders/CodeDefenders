@@ -19,6 +19,9 @@
 
 --%>
 <%@ page import="org.codedefenders.model.UserEntity" %>
+<%@ page import="org.codedefenders.persistence.database.UserStatsDAO" %>
+<%@ page import="javax.enterprise.inject.spi.CDI" %>
+<%@ page import="org.codedefenders.persistence.database.UserRepository" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -26,8 +29,14 @@
 <%
     final UserEntity user = (UserEntity) request.getAttribute("user");
     final boolean isSelf = (boolean) request.getAttribute("self");
+    final UserStatsDAO userStats = (UserStatsDAO) request.getAttribute("userStats");
+    //    UserStatsDAO userStats = CDI.current().select(UserStatsDAO.class).get();
 
     pageInfo.setPageTitle(isSelf ? "My Profile" : "Profile of " + user.getUsername());
+
+    final int userId = user.getId();
+    final int killedMutants = userStats.getNumKilledMutantsByUser(userId);
+    final int aliveMutants = userStats.getNumAliveMutantsByUser(userId);
 %>
 
 <jsp:include page="/jsp/header.jsp"/>
@@ -38,7 +47,9 @@
     <section class="mt-5" aria-labelledby="stats">
         <h2 class="mb-3" id="stats">Public Statistics</h2>
         <dl>
-            <dt>User-ID:</dt><dd><%=user.getId()%></dd>
+            <dt>User-ID:</dt><dd><%=userId%></dd>
+            <dt>Killed Mutants:</dt><dd><%=killedMutants%></dd>
+            <dt>Alive Mutants:</dt><dd><%=aliveMutants%></dd>
         </dl>
     </section>
 
