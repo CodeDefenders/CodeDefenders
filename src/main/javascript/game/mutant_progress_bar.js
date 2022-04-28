@@ -12,36 +12,36 @@ class MutantProgressBar extends ProgressBar {
         this.gameId = gameId;
     }
 
-    async activate () {
-        const pushSocket = await objects.await('pushSocket');
+    async initAsync () {
+        this.pushSocket = await objects.await('pushSocket');
+    }
 
+    async activate () {
         this.setProgress(16, 'Submitting Mutant');
         await this._register();
         await this._subscribe();
 
         /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
         const reconnect = () => {
-            pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
-            pushSocket.reconnect();
+            this.pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
+            this.pushSocket.reconnect();
             this._subscribe();
         };
-        pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
+        this.pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
     }
 
     async _subscribe () {
-        const pushSocket = await objects.await('pushSocket');
-        pushSocket.subscribe('registration.MutantProgressBarRegistrationEvent', {
+        this.pushSocket.subscribe('registration.MutantProgressBarRegistrationEvent', {
             gameId: this.gameId
         });
     }
 
     async _register () {
-        const pushSocket = await objects.await('pushSocket');
-        pushSocket.register('mutant.MutantSubmittedEvent', this._onMutantSubmitted.bind(this));
-        pushSocket.register('mutant.MutantValidatedEvent', this._onMutantValidated.bind(this));
-        pushSocket.register('mutant.MutantDuplicateCheckedEvent', this._onDuplicateChecked.bind(this));
-        pushSocket.register('mutant.MutantCompiledEvent', this._onMutantCompiled.bind(this));
-        pushSocket.register('mutant.MutantTestedEvent', this._onMutantTested.bind(this));
+        this.pushSocket.register('mutant.MutantSubmittedEvent', this._onMutantSubmitted.bind(this));
+        this.pushSocket.register('mutant.MutantValidatedEvent', this._onMutantValidated.bind(this));
+        this.pushSocket.register('mutant.MutantDuplicateCheckedEvent', this._onDuplicateChecked.bind(this));
+        this.pushSocket.register('mutant.MutantCompiledEvent', this._onMutantCompiled.bind(this));
+        this.pushSocket.register('mutant.MutantTestedEvent', this._onMutantTested.bind(this));
     }
 
     _onMutantSubmitted (event) {

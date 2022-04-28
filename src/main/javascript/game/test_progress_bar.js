@@ -12,36 +12,36 @@ class TestProgressBar extends ProgressBar {
         this.gameId = gameId;
     }
 
-    async activate () {
-        const pushSocket = await objects.await('pushSocket');
+    async initAsync () {
+        this.pushSocket = await objects.await('pushSocket');
+    }
 
+    async activate () {
         this.setProgress(16, 'Submitting Test');
         await this._register();
         await this._subscribe();
 
         /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
         const reconnect = event => {
-            pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
-            pushSocket.reconnect();
+            this.pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
+            this.pushSocket.reconnect();
             this._subscribe();
         };
-        pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
+        this.pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
     }
 
     async _subscribe () {
-        const pushSocket = await objects.await('pushSocket');
-        pushSocket.subscribe('registration.TestProgressBarRegistrationEvent', {
+        this.pushSocket.subscribe('registration.TestProgressBarRegistrationEvent', {
             gameId: this.gameId
         });
     }
 
     async _register () {
-        const pushSocket = await objects.await('pushSocket');
-        pushSocket.register('test.TestSubmittedEvent', this._onTestSubmitted.bind(this));
-        pushSocket.register('test.TestCompiledEvent', this._onTestCompiled.bind(this));
-        pushSocket.register('test.TestValidatedEvent', this._onTestValidated.bind(this));
-        pushSocket.register('test.TestTestedOriginalEvent', this._onTestTestedOriginal.bind(this));
-        pushSocket.register('test.TestTestedMutantsEvent', this._onTestTestedMutants.bind(this));
+        this.pushSocket.register('test.TestSubmittedEvent', this._onTestSubmitted.bind(this));
+        this.pushSocket.register('test.TestCompiledEvent', this._onTestCompiled.bind(this));
+        this.pushSocket.register('test.TestValidatedEvent', this._onTestValidated.bind(this));
+        this.pushSocket.register('test.TestTestedOriginalEvent', this._onTestTestedOriginal.bind(this));
+        this.pushSocket.register('test.TestTestedMutantsEvent', this._onTestTestedMutants.bind(this));
     }
 
     _onTestSubmitted (event) {

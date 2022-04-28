@@ -553,7 +553,7 @@ class GameChat {
         this._loadSettings();
     }
 
-    async _initAsync () {
+    async initAsync () {
         await this._initSocket();
     }
 

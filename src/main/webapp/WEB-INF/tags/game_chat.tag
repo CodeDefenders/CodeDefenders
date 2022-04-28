@@ -79,7 +79,7 @@
     const messageLimit = ${gameChat.messageLimit};
 
     const gameChat = new GameChat(gameId, messageLimit);
-    await gameChat._initAsync();
+    await gameChat.initAsync();
 
     objects.register('gameChat', gameChat);
 </script>

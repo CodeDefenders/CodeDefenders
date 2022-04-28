@@ -28,6 +28,7 @@
     const gameId = ${testProgressBar.gameId};
 
     const testProgressBar = new TestProgressBar(progressElement, gameId);
+    await testProgressBar.initAsync();
     objects.register('testProgressBar', testProgressBar);
 </script>
 

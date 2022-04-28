@@ -35,8 +35,7 @@
 
     const mutantEditor = await objects.await('mutantEditor');
 
-    const mutantErrorHighlighting = new ErrorHighlighting(
-            errorLines, mutantEditor.editor);
+    const mutantErrorHighlighting = new ErrorHighlighting(errorLines, mutantEditor.editor);
     mutantErrorHighlighting.highlightErrors();
 
     objects.register('mutantErrorHighlighting', mutantErrorHighlighting);

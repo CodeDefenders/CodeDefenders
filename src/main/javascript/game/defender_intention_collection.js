@@ -31,12 +31,12 @@ class DefenderIntentionCollection {
         this._init(previouslySelectedLine);
     }
 
-    async _initAsync () {
+    async initAsync () {
         /**
          * The class viewer CodeMirror instance.
          * @type {CodeMirror}
          */
-        this.editor = (await Promise.race([
+        this.classEditor = (await Promise.race([
             objects.await('classViewer'),
             objects.await('mutantEditor')
         ])).editor;
@@ -56,7 +56,7 @@ class DefenderIntentionCollection {
         this.testEditor.getWrapperElement().classList.add('codemirror-readonly-toggle');
 
         /* Select line on class viewer gutter click. */
-        this.editor.on('gutterClick', function (cm, line) {
+        this.classEditor.on('gutterClick', function (cm, line) {
             line++; // Make line 1-indexed.
             if (line !== self.selectedLine) {
                 self.selectLine(line);
@@ -90,7 +90,7 @@ class DefenderIntentionCollection {
             this._removeLineMarker(this.selectedLine);
         }
 
-        if (line > this.editor.lineCount()) {
+        if (line > this.classEditor.lineCount()) {
             console.log('Selected line is out of bounds.');
             this.unselectLine();
             return;
@@ -112,12 +112,12 @@ class DefenderIntentionCollection {
         marker.classList.add('text-center');
         marker.innerHTML = '<i class="fa fa-arrow-right marker ps-1"></i>';
 
-        this.editor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', marker);
+        this.classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', marker);
     }
 
     /** @private */
     _removeLineMarker (line) {
-        this.editor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', null);
+        this.classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', null);
     }
 
     /** @private */

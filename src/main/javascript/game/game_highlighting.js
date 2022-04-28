@@ -86,7 +86,7 @@ class GameHighlighting {
         this._activePopover = null;
     }
 
-    async _initAsync () {
+    async initAsync () {
         /**
          * The CodeMirror editor to provide highlighting on.
          * @type {CodeMirror}

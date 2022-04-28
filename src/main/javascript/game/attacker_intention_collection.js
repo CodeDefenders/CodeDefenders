@@ -50,12 +50,13 @@ class AttackerIntentionCollection {
     }
 
     /** @private */
-    _submitForm (intention) {
+    async _submitForm (intention) {
         this.intentionInput.value = intention;
         this.attackForm.submit();
         this.attackButton.disabled = true;
-        objects.await('mutantProgressBar')
-                .then(mutantProgressBar => mutantProgressBar.activate());
+
+        const mutantProgressBar = await objects.await('mutantProgressBar');
+        mutantProgressBar.activate;
     }
 }
 
