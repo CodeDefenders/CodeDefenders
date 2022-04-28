@@ -1,6 +1,6 @@
 import CodeMirror from '../thirdparty/codemirror'
 import CodeCompletion from './code_completion';
-import {objects} from '../main';
+import {LoadingAnimation, objects} from '../main';
 
 
 class TestEditor {
@@ -113,6 +113,8 @@ class TestEditor {
         });
 
         this._initCodeCompletion();
+
+        LoadingAnimation.hideAnimation(this.editorElement);
     }
 
     /** @private */

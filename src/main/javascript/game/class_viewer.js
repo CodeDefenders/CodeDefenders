@@ -1,3 +1,4 @@
+import {LoadingAnimation} from "../main";
 import CodeMirror from '../thirdparty/codemirror';
 
 
@@ -58,6 +59,8 @@ class ClassViewer {
         }
 
         this._initDependencies();
+
+        LoadingAnimation.hideAnimation(this.editorElement);
     }
 
     /** @private */

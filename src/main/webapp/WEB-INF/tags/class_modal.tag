@@ -7,7 +7,9 @@
 <%@ attribute name="htmlId" required="true" %>
 
 <div>
-    <t:modal title="${classAlias}" id="${htmlId}" modalDialogClasses="modal-dialog-responsive">
+    <t:modal title="${classAlias}" id="${htmlId}"
+             modalDialogClasses="modal-dialog-responsive"
+             modalBodyClasses="loading loading-bg-gray loading-height-200">
         <jsp:attribute name="content">
             <div class="card">
                 <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
@@ -32,7 +34,7 @@
                         codeMirrorContainer.CodeMirror.refresh();
                     } else {
                         const {default: CodeMirror} = await import('./js/codemirror.mjs');
-                        const {InfoApi} = await import('./js/codedefenders_main.mjs');
+                        const {InfoApi, LoadingAnimation} = await import('./js/codedefenders_main.mjs');
 
                         const editor = CodeMirror.fromTextArea(textarea, {
                             lineNumbers: true,
@@ -42,7 +44,8 @@
                         });
                         editor.getWrapperElement().classList.add('codemirror-readonly');
 
-                        InfoApi.setClassEditorValue(editor, ${classId});
+                        await InfoApi.setClassEditorValue(editor, ${classId});
+                        LoadingAnimation.hideAnimation(textarea);
                     }
                 });
             })();

@@ -31,7 +31,7 @@
 
 <link href="${pageContext.request.contextPath}/css/specific/test_accordion.css" rel="stylesheet">
 
-<div class="accordion" id="tests-accordion">
+<div class="accordion loading loading-border-card loading-bg-gray" id="tests-accordion">
     <c:forEach items="${testAccordion.categories}" var="category">
         <div class="accordion-item">
             <h2 class="accordion-header" id="ta-heading-${category.id}">

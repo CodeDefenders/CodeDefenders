@@ -1,6 +1,6 @@
 import DataTable from '../thirdparty/datatables';
 import $ from '../thirdparty/jquery';
-import {InfoApi, Modal, objects} from '../main';
+import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
 
 
 class MutantAccordion {
@@ -61,7 +61,7 @@ class MutantAccordion {
      * @param {MutantDTO} mutant The mutant DTO to display.
      * @private
      */
-    _viewMutantModal (mutant) {
+    async _viewMutantModal (mutant) {
         let modal = this.mutantModals.get(mutant.id);
         if (modal !== undefined) {
             modal.controls.show();
@@ -78,6 +78,7 @@ class MutantAccordion {
                     </div>
                 </div>`;
         modal.dialog.classList.add('modal-dialog-responsive');
+        modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
         this.mutantModals.set(mutant.id, modal);
 
         /* Initialize the editor. */
@@ -90,9 +91,11 @@ class MutantAccordion {
             autoRefresh: true
         });
         editor.getWrapperElement().classList.add('codemirror-readonly');
-        InfoApi.setMutantEditorValue(editor, mutant.id);
 
         modal.controls.show();
+
+        await InfoApi.setMutantEditorValue(editor, mutant.id);
+        LoadingAnimation.hideAnimation(modal.body);
     };
 
     /**
@@ -101,7 +104,7 @@ class MutantAccordion {
      * @param {MutantDTO} mutant The mutant DTO for which to display the test.
      * @private
      */
-    _viewTestModal (mutant) {
+    async _viewTestModal (mutant) {
         let modal = this.testModals.get(mutant.id);
         if (modal !== undefined) {
             modal.controls.show();
@@ -119,6 +122,7 @@ class MutantAccordion {
                 </div>
                 <pre class="m-0 terminal-pre"></pre>`;
         modal.dialog.classList.add('modal-dialog-responsive');
+        modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
         this.testModals.set(mutant.killedByTestId, modal);
 
         /* Set the kill message. */
@@ -135,9 +139,11 @@ class MutantAccordion {
             autoRefresh: true
         });
         editor.getWrapperElement().classList.add('codemirror-readonly');
-        InfoApi.setTestEditorValue(editor, mutant.killedByTestId);
 
         modal.controls.show();
+
+        await InfoApi.setTestEditorValue(editor, mutant.killedByTestId);
+        LoadingAnimation.hideAnimation(modal.body);
     };
 
     /** @private */
@@ -209,6 +215,8 @@ class MutantAccordion {
         }
 
         this._initFilters();
+
+        LoadingAnimation.hideAnimation(document.getElementById('mutants-accordion'));
     }
 
     /**

@@ -1,4 +1,5 @@
 import CodeCompletion from './code_completion';
+import {LoadingAnimation} from '../main';
 
 
 class MutantEditor {
@@ -120,6 +121,8 @@ class MutantEditor {
         this._initDependencies();
         this._initCodeCompletion();
         this._greyOutReadOnlyLines();
+
+        LoadingAnimation.hideAnimation(this.editorElement);
     }
 
     /** @private */

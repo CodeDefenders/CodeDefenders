@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class="accordion" id="mutants-accordion">
+    <div class="accordion loading loading-border-card loading-bg-gray" id="mutants-accordion">
         <c:forEach items="${mutantAccordion.categories}" var="category">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="ma-heading-${category.id}">

@@ -64,6 +64,7 @@
 
     <link href="css/global/page.css" rel="stylesheet">
     <link href="css/global/common.css" rel="stylesheet">
+    <link href="css/global/loading_animation.css" rel="stylesheet">
 </head>
 
 <body>

@@ -29,7 +29,7 @@
         if (!classViewer.hasDependencies()) {
     %>
 
-        <div class="card-body p-0 codemirror-fill">
+        <div class="card-body p-0 codemirror-fill loading">
             <pre class="m-0"><textarea id="sut" name="cut" title="cut" readonly>${classViewer.classCode}</textarea></pre>
         </div>
 
@@ -73,7 +73,7 @@
             currentId = 0;
         %>
 
-        <div class="card-body p-0 codemirror-fill">
+        <div class="card-body p-0 codemirror-fill loading">
             <div class="tab-content">
                 <div class="tab-pane active"
                      id="class-viewer-pane-<%=currentId%>"

@@ -1,6 +1,6 @@
 import DataTable from '../thirdparty/datatables';
 import {Popover} from '../thirdparty/bootstrap';
-import {InfoApi, Modal} from '../main';
+import {InfoApi, LoadingAnimation, Modal} from '../main';
 
 
 class TestAccordion {
@@ -65,7 +65,7 @@ class TestAccordion {
      * @param {TestDTO} test The test DTO to display.
      * @private
      */
-    _viewTestModal (test) {
+    async _viewTestModal (test) {
         let modal = this.testModals.get(test.id);
         if (modal !== undefined) {
             modal.controls.show();
@@ -82,6 +82,7 @@ class TestAccordion {
                     </div>
                 </div>`;
         modal.dialog.classList.add('modal-dialog-responsive');
+        modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
         this.testModals.set(test.id, modal);
 
         /* Initialize the editor. */
@@ -94,9 +95,11 @@ class TestAccordion {
             autoRefresh: true
         });
         editor.getWrapperElement().classList.add('codemirror-readonly');
-        InfoApi.setTestEditorValue(editor, test.id);
 
         modal.controls.show();
+
+        await InfoApi.setTestEditorValue(editor, test.id);
+        LoadingAnimation.hideAnimation(modal.body);
     };
 
     /** @private */
@@ -164,6 +167,8 @@ class TestAccordion {
                 }
             });
         }
+
+        LoadingAnimation.hideAnimation(document.getElementById('tests-accordion'));
     }
 
     /** @private */
