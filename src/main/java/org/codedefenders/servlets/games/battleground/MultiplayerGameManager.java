@@ -534,8 +534,8 @@ public class MultiplayerGameManager extends HttpServlet {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // Replace the entire line with a link to the source code
-                String replacedLine = MessageFormat.format(
-                        "<a onclick=\"CodeDefenders.objects.await('{0}').then(editor => editor.jumpToLine({1}));\" href=\"javascript:void(0);\">{2}</a>",
+                String replacedLine = String.format(
+                        "<a onclick=\"import('./js/codedefenders_main.mjs').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
                         editor, m.group(1), line);
                 decorated.append(replacedLine).append("\n");
             } else {
