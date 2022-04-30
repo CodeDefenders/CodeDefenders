@@ -57,7 +57,7 @@
             <dt>User-ID:</dt><dd><%=userId%></dd>
             <dt>Killed Mutants:</dt><dd><%=killedMutants%></dd>
             <dt>Alive Mutants:</dt><dd><%=aliveMutants%></dd>
-            <div class="pie" style="--percentage:<%=aliveMutantsPercentage%>"><%=aliveMutantsPercentage%>%</div>
+            <div class="pie animate" style="--percentage:<%=aliveMutantsPercentage%>"><%=aliveMutantsPercentage%>%</div>
         </dl>
     </section>
 
