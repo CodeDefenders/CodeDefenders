@@ -65,9 +65,11 @@
 </div>
 
 <script type="module">
-    import {DataTablesUtils} from './js/codedefenders_main.mjs';
     import DataTable from './js/datatables.mjs';
     import $ from './js/jquery.mjs';
+
+    import {DataTablesUtils} from './js/codedefenders_main.mjs';
+
 
     const div = DataTablesUtils.formatDivision;
     const valPercent = DataTablesUtils.formatValueAndPercent;

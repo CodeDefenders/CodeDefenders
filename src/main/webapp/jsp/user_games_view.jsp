@@ -695,6 +695,7 @@
         import DataTable from './js/datatables.mjs';
         import $ from './js/jquery.mjs';
 
+
         $(document).ready(function () {
             new DataTable('#tableMPGames', {
                 "paging": false,

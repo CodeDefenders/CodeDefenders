@@ -88,6 +88,7 @@
         import {objects} from './js/codedefenders_main.mjs';
         import {MutantAccordion} from './js/codedefenders_game.mjs';
 
+
         const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
         const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
         const gameId = ${mutantAccordion.gameId};
@@ -96,6 +97,8 @@
                 categories,
                 mutants,
                 gameId);
+
+
         objects.register('mutantAccordion', mutantAccordion);
     </script>
 </div>

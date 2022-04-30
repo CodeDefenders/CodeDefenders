@@ -68,6 +68,7 @@
     <script type="module">
         import DataTable from './js/datatables.mjs';
 
+
         new DataTable('#tableMPLeaderboard', {
             "order": [[6, "desc"]],
             "columnDefs": [

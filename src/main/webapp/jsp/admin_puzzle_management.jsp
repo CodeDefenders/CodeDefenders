@@ -58,12 +58,14 @@
     </table>
 
     <script type="module">
-        import {PuzzleAPI} from './js/codedefenders_main.mjs';
         import DataTable from './js/datatables.mjs';
         import $ from './js/jquery.mjs';
 
-        let puzzleTable;
-        let chapterTable;
+        import {PuzzleAPI} from './js/codedefenders_main.mjs';
+
+
+        let puzzleTable = null;
+        let chapterTable = null;
 
         $(document).ready(async function() {
             const puzzleData = await PuzzleAPI.fetchPuzzleData();

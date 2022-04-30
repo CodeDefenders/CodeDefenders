@@ -205,6 +205,7 @@
             <script type="module">
                 import CodeMirror from './js/codemirror.mjs';
 
+
                 const codemirror = CodeMirror.fromTextArea(document.getElementById('diff'), {
                     lineNumbers: true,
                     mode: "text/x-diff",
@@ -232,8 +233,8 @@
 
                     <script type="module">
                         import {objects} from './js/codedefenders_main.js';
-
                         const testProgressBar = objects.await('testProgressBar');
+
 
                         document.getElementById("accept-equivalent-button").addEventListener('click', function (event) {
                             if (confirm('Accepting Equivalence will lose all mutant points. Are you sure?')) {
@@ -290,7 +291,9 @@
 
                 <script type="module">
                     import $ from './js/jquery.mjs';
+
                     import {objects} from './js/codedefenders_main.mjs';
+
 
                     const gameHighlighting = await objects.await('gameHighlighting');
 
@@ -349,8 +352,8 @@
 
                 <script type="module">
                     import {objects} from './js/codedefenders_main.mjs';
-
                     const testProgressBar = await objects.await('testProgressBar');
+
 
                     document.getElementById('submitTest').addEventListener('click', function (event) {
                         this.form.submit();

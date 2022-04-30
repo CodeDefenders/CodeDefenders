@@ -103,6 +103,7 @@
     import DataTable from './js/datatables.mjs';
     import $ from './js/jquery.mjs';
 
+
     $(document).ready(function () {
         const table = new DataTable('#tableKillmaps', {
             "ajax": {

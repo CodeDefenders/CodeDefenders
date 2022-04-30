@@ -1,5 +1,5 @@
 import DataTable from '../thirdparty/datatables';
-import $ from '../thirdparty/jquery';
+import jquery from '../thirdparty/jquery';
 import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
 
 
@@ -242,7 +242,7 @@ class MutantAccordion {
                                 || data.state === selectedCategory;
                     }
 
-                    $.fn.dataTable.ext.search.push(searchFunction);
+                    jquery.fn.dataTable.ext.search.push(searchFunction);
 
                     for (const category of self.categories) {
                         self.dataTablesByCategory.get(category.id).draw();
@@ -256,7 +256,7 @@ class MutantAccordion {
                     }
 
                     /* Remove search function again after tables have been filtered. */
-                    $.fn.dataTable.ext.search.splice(DataTable.ext.search.indexOf(searchFunction), 1);
+                    jquery.fn.dataTable.ext.search.splice(DataTable.ext.search.indexOf(searchFunction), 1);
                 })
     }
 

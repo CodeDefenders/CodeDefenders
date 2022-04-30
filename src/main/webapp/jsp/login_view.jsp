@@ -286,6 +286,7 @@
 <script type="module">
     import {Modal} from './js/bootstrap.mjs';
 
+
     const passwordInput = document.getElementById('changepw-password-input');
     const confirmPasswordInput = document.getElementById('changepw-confirm-password-input');
     const confirmPasswordFeedback = document.getElementById('changepw-confirm-password-feedback');

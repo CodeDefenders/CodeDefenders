@@ -33,6 +33,7 @@
 <script type="module">
     import {objects, PushSocket} from './js/codedefenders_main.mjs';
 
+
     const baseWsUri = document.baseURI
             .replace(/^http/, 'ws')
             .replace(/\/$/, '');
@@ -41,5 +42,7 @@
     const wsUri = `\${baseWsUri}/notifications/\${ticket}/\${userId}`;
 
     const pushSocket = new PushSocket(wsUri);
+
+
     objects.register('pushSocket', pushSocket);
 </script>

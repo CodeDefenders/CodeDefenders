@@ -31,12 +31,14 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {ErrorHighlighting} from './js/codedefenders_game.mjs';
 
+
     const errorLines = JSON.parse('${mutantErrorHighlighting.errorLinesJSON}');
 
     const mutantEditor = await objects.await('mutantEditor');
 
     const mutantErrorHighlighting = new ErrorHighlighting(errorLines, mutantEditor.editor);
     mutantErrorHighlighting.highlightErrors();
+
 
     objects.register('mutantErrorHighlighting', mutantErrorHighlighting);
 </script>

@@ -473,9 +473,10 @@
     </t:modal>
 
     <script type="module">
+        import {Popover} from './js/bootstrap.mjs';
         import DataTable from './js/datatables.mjs';
         import $ from './js/jquery.mjs';
-        import {Popover} from './js/bootstrap.mjs';
+
 
         /**
          *  Maps IDs to staged games.

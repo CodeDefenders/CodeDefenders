@@ -40,6 +40,7 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {GameHighlighting} from './js/codedefenders_game.mjs';
 
+
     const data = JSON.parse('${gameHighlighting.JSON}');
     const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
     const gameId = ${gameHighlighting.gameId};
@@ -52,6 +53,7 @@
 
     gameHighlighting.highlightCoverage();
     gameHighlighting.highlightMutants();
+
 
     objects.register('gameHighlighting', gameHighlighting);
 </script>

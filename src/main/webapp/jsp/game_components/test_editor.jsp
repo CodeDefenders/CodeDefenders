@@ -36,6 +36,7 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {TestEditor} from './js/codedefenders_game.mjs';
 
+
     const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};
     const editableLinesEnd = ${testEditor.hasEditableLinesEnd() ? testEditor.editableLinesEnd : "null"};
     const mockingEnabled = ${testEditor.mockingEnabled};
@@ -49,6 +50,7 @@
             editableLinesEnd,
             mockingEnabled,
             keymap);
+
 
     objects.register('testEditor', testEditor);
 </script>

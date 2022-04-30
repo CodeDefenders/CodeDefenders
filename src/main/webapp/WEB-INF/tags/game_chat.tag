@@ -75,11 +75,13 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {GameChat} from './js/codedefenders_game.mjs';
 
+
     const gameId = ${gameChat.gameId};
     const messageLimit = ${gameChat.messageLimit};
 
     const gameChat = new GameChat(gameId, messageLimit);
     await gameChat.initAsync();
+
 
     objects.register('gameChat', gameChat);
 </script>

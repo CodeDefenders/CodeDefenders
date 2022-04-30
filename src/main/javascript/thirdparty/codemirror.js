@@ -17,5 +17,6 @@ import 'codemirror/keymap/emacs';
 import 'codemirror/keymap/sublime';
 import 'codemirror/keymap/vim';
 
+
 window.CodeMirror = CodeMirror;
 export default CodeMirror;

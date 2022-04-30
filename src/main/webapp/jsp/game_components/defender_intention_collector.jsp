@@ -24,10 +24,12 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {DefenderIntentionCollection} from './js/codedefenders_game.mjs';
 
+
     const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};
 
     const defenderIntentionCollection = new DefenderIntentionCollection(lineToSelect);
     await defenderIntentionCollection.initAsync();
+
 
     objects.register('defenderIntentionCollection', defenderIntentionCollection);
 </script>

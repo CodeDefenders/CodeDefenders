@@ -145,8 +145,8 @@
 
                     <script type="module">
                         import {objects} from './js/codedefenders_main.mjs';
-
                         const testProgressBar = await objects.await('testProgressBar');
+
 
                         document.getElementById('submitTest').addEventListener('click', function (event) {
                             this.form.submit();

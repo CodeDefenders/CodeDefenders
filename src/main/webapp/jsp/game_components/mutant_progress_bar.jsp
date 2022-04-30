@@ -24,10 +24,13 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {MutantProgressBar} from './js/codedefenders_game.mjs';
 
+
     const progressElement = document.getElementById('progress');
     const gameId = ${mutantProgressBar.gameId};
 
     const mutantProgressBar = new MutantProgressBar(progressElement, gameId);
     await mutantProgressBar.initAsync();
+
+
     objects.register('mutantProgressBar', mutantProgressBar);
 </script>

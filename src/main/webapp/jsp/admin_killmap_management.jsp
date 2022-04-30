@@ -300,6 +300,7 @@
     import DataTable from './js/datatables.mjs';
     import $ from './js/jquery.mjs';
 
+
     const postIds = function (idsString, formType, killmapType) {
         const form = $(
               '<form method="post">'

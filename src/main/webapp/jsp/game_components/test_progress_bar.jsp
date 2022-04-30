@@ -24,11 +24,14 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {TestProgressBar} from './js/codedefenders_game.mjs';
 
+
     const progressElement = document.getElementById('progress');
     const gameId = ${testProgressBar.gameId};
 
     const testProgressBar = new TestProgressBar(progressElement, gameId);
     await testProgressBar.initAsync();
+
+
     objects.register('testProgressBar', testProgressBar);
 </script>
 

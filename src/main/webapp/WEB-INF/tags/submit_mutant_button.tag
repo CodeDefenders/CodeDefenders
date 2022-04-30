@@ -15,8 +15,8 @@
 
         <script type="module">
             import {objects} from './js/codedefenders_main.mjs';
-
             const mutantProgressBar = await objects.await('mutantProgressBar');
+
 
             document.getElementById('submitMutant').addEventListener('click', function (event) {
                 this.form.submit();

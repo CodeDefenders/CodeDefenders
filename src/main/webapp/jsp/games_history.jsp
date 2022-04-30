@@ -299,6 +299,7 @@
     <script type="module">
         import $ from './js/jquery.mjs';
 
+
         $('table td.toggle-details').on('click', function () {
             let id = '.' + $(this).attr('id');
             if ($(id).is(':visible')) {

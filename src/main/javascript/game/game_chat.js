@@ -1,4 +1,5 @@
-import {objects, Draggable, PushSocket} from '../main';
+import {Draggable, objects, PushSocket} from '../main';
+
 
 class GameChat {
     /**

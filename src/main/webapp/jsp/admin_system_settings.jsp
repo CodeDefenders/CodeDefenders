@@ -142,6 +142,7 @@
     <script type="module">
         import $ from './js/jquery.mjs';
 
+
         $(document).ready(() => {
             const emailSwitch = document.getElementById('<%=AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED.name()%>');
             const otherEmailInputs = [

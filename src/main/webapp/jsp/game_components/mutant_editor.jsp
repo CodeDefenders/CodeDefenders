@@ -116,6 +116,7 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {MutantEditor} from './js/codedefenders_game.mjs';
 
+
     const editableLinesStart = ${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"};
     const editableLinesEnd = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
     const keymap = '${login.user.keyMap.CMName}';
@@ -133,6 +134,7 @@
             editableLinesStart,
             editableLinesEnd,
             keymap);
+
 
     objects.register('mutantEditor', mutantEditor);
 </script>

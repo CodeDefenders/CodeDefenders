@@ -14,8 +14,9 @@
     </div>
 
     <script type="module">
-        import $ from './js/jquery.mjs';
         import {Alert} from './js/bootstrap.mjs';
+        import $ from './js/jquery.mjs';
+
 
         $(document).ready(() => {
             <c:forEach items="${messages.messages}" var="message">

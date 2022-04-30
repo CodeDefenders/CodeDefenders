@@ -128,6 +128,7 @@
                 <script type="module">
                     import {objects} from './js/codedefenders_main.mjs';
 
+
                     const progressBar = await objects.await('testProgressBar');
                     const button = document.getElementById('submitTest');
 

@@ -26,8 +26,10 @@
 </div>
 
 <script type="module">
-    import {InfoApi} from './js/codedefenders_main.mjs';
     import CodeMirror from './js/codemirror.mjs';
+
+    import {InfoApi} from './js/codedefenders_main.mjs';
+
 
     const cutPreview = document.querySelector('#create-game-cut-preview')
 

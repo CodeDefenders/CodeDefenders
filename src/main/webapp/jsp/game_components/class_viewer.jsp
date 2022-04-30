@@ -113,6 +113,7 @@
     import {objects} from './js/codedefenders_main.mjs';
     import {ClassViewer} from './js/codedefenders_game.mjs';
 
+
     const numDependencies = ${classViewer.hasDependencies() ? classViewer.dependencies.size() : 0};
 
     const editorElement = document.getElementById('sut');
@@ -122,5 +123,7 @@
     }
 
     const classViewer = new ClassViewer(editorElement, dependencyEditorElements);
+
+
     objects.register('classViewer', classViewer);
 </script>
