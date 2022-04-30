@@ -1,0 +1,65 @@
+.pie {
+    --percentage: 0;
+    --border-width: 22px;
+    --color: darkred;
+    --color-bg: #8b000052;
+    --width: 12rem;
+
+    position: relative;
+    display: inline-grid;
+
+    width: var(--width);
+    height: var(--width);
+    aspect-ratio: 1;
+
+    margin: 5px;
+
+    place-content: center;
+
+    font-size: 1.5rem;
+}
+
+.pie::before,
+.pie::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+}
+
+.pie::before {
+    inset: 0;
+    background: radial-gradient(
+            farthest-side,
+            var(--color) 98%,
+            #0000
+    ) top/var(--border-width) var(--border-width) no-repeat,
+    conic-gradient(
+            var(--color) calc(var(--percentage) * 1%),
+            var(--color-bg, #0000) 0);
+    -webkit-mask: radial-gradient(
+            farthest-side,
+            #0000 calc(99% - var(--border-width)),
+            #000 calc(100% - var(--border-width))
+    );
+    mask: radial-gradient(
+            farthest-side,
+            #0000 calc(99% - var(--border-width)),
+            #000 calc(100% - var(--border-width))
+    );
+}
+
+.pie::after {
+    inset: calc(50% - var(--border-width) / 2);
+    background: var(--color);
+    transform: rotate(calc(var(--percentage) * 3.6deg)) translateY(calc(50% - var(--width) / 2));
+}
+
+.pie.no-round::before {
+    background-size: 0 0, auto;
+}
+
+.pie.no-round::after {
+    content: none;
+}
+
+

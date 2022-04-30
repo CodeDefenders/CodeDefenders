@@ -36,6 +36,8 @@
     final int userId = user.getId();
     final int killedMutants = userStats.getNumKilledMutantsByUser(userId);
     final int aliveMutants = userStats.getNumAliveMutantsByUser(userId);
+    final int totalMutants = killedMutants + aliveMutants;
+    final int aliveMutantsPercentage = (aliveMutants * 100) / totalMutants;
 %>
 
 <% if (login.isLoggedIn()) { %>
@@ -43,6 +45,8 @@
 <% } else { %>
 <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
+
+<link rel="stylesheet" href="css/piechart.css">
 
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
@@ -53,6 +57,7 @@
             <dt>User-ID:</dt><dd><%=userId%></dd>
             <dt>Killed Mutants:</dt><dd><%=killedMutants%></dd>
             <dt>Alive Mutants:</dt><dd><%=aliveMutants%></dd>
+            <div class="pie" style="--percentage:<%=aliveMutantsPercentage%>"><%=aliveMutantsPercentage%>%</div>
         </dl>
     </section>
 
