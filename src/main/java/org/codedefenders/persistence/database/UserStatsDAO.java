@@ -36,7 +36,7 @@ public class UserStatsDAO {
         final String query = "SELECT count(Mutant_ID) AS mutants " +
                 "FROM view_valid_mutants " +
                 "WHERE User_ID = ? " +
-                "AND Alive = ?";
+                "AND Alive = ?;";
         try {
             return connectionFactory.getQueryRunner().query(
                     query,
@@ -45,6 +45,33 @@ public class UserStatsDAO {
                     ),
                     userId,
                     alive ? 1 : 0
+            ).orElse(0);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public int getNumKillingTestsByUser(int userId) {
+        return getNumTestsByUser(userId, true);
+    }
+
+    public int getNumNonKillingTestsByUser(int userId) {
+        return getNumTestsByUser(userId, false);
+    }
+
+    private int getNumTestsByUser(int userId, boolean killingTest) {
+        final String query = "SELECT count(Test_ID) AS tests " +
+                "FROM view_valid_tests " +
+                "WHERE Player_ID IN (SELECT ID as Player_ID FROM players WHERE ID = ?) " +
+                "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;";
+        try {
+            return connectionFactory.getQueryRunner().query(
+                    query,
+                    resultSet -> DatabaseUtils.nextFromRS(
+                            resultSet, rs -> rs.getInt("tests")
+                    ),
+                    userId
             ).orElse(0);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);

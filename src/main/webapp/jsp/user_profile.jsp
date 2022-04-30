@@ -34,10 +34,16 @@
     pageInfo.setPageTitle(isSelf ? "My Profile" : "Profile of " + user.getUsername());
 
     final int userId = user.getId();
+
     final int killedMutants = userStats.getNumKilledMutantsByUser(userId);
     final int aliveMutants = userStats.getNumAliveMutantsByUser(userId);
     final int totalMutants = killedMutants + aliveMutants;
-    final int aliveMutantsPercentage = (aliveMutants * 100) / totalMutants;
+    final int aliveMutantsPercentage = (aliveMutants * 100) / Math.max(totalMutants, 1); // avoid division by 0
+
+    final int killingTests = userStats.getNumKillingTestsByUser(userId);
+    final int nonKillingTests = userStats.getNumNonKillingTestsByUser(userId);
+    final int totalTests = killingTests + nonKillingTests;
+    final int killingTestsPercentage = (killingTests * 100) / Math.max(totalTests, 1); // avoid division by 0
 %>
 
 <% if (login.isLoggedIn()) { %>
@@ -51,16 +57,26 @@
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
 
-    <section class="mt-5" aria-labelledby="stats">
+    <section class="mt-5 clearfix" aria-labelledby="stats">
         <h2 class="mb-3" id="stats">Public Statistics</h2>
         <dl>
             <dt>User-ID:</dt>
             <dd><%=userId%></dd>
         </dl>
-        <h3>Mutants:</h3>
-        <div class="pie animate" style="--percentage:<%=aliveMutantsPercentage%>"><%=totalMutants%>%</div>
-        <span class="mutants-killed">Killed Mutants:</span><span><%=killedMutants%></span>
-        <span class="mutants-alive">Alive Mutants:</span><span><%=aliveMutants%></span>
+
+        <div class="w-50 float-start text-center">
+            <h3>Mutants</h3>
+            <div class="pie animate" style="--percentage:<%=aliveMutantsPercentage%>"><%=totalMutants%></div><br>
+            <span class="mutants-killed">Killed mutants:</span><span><%=killedMutants%></span><br>
+            <span class="mutants-alive">Alive mutants:</span><span><%=aliveMutants%></span>
+        </div>
+
+        <div class="w-50 float-end text-center">
+            <h3>Tests</h3>
+            <div class="pie animate" style="--percentage:<%=killingTestsPercentage%>"><%=totalTests%></div><br>
+            <span class="mutants-killed">Killing tests:</span><span><%=killingTests%></span><br>
+            <span class="mutants-alive">Non-killing tests:</span><span><%=nonKillingTests%></span>
+        </div>
     </section>
 
     <% if (isSelf) { %>
