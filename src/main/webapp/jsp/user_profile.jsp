@@ -20,8 +20,7 @@
 --%>
 <%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="org.codedefenders.persistence.database.UserStatsDAO" %>
-<%@ page import="javax.enterprise.inject.spi.CDI" %>
-<%@ page import="org.codedefenders.persistence.database.UserRepository" %>
+<!--%@ page import="javax.enterprise.inject.spi.CDI" %-->
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -39,7 +38,11 @@
     final int aliveMutants = userStats.getNumAliveMutantsByUser(userId);
 %>
 
+<% if (login.isLoggedIn()) { %>
 <jsp:include page="/jsp/header.jsp"/>
+<% } else { %>
+<jsp:include page="/jsp/header_logout.jsp"/>
+<% } %>
 
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
