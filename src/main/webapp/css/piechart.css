@@ -62,4 +62,24 @@
     content: none;
 }
 
+.pie.animate {
+    animation: pie 1s 0.5s both;
+}
+
+/*
+ * Required for animating a custom property.
+ * This is an experimental feature. It's support cannot be checked with @supports because it's an at-rule.
+ */
+@property --percentage {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
+@keyframes pie {
+    from {
+        --percentage: 0;
+    }
+}
+
 
