@@ -11,7 +11,6 @@ import TestAccordion from './test_accordion';
 import TestEditor from './test_editor';
 import TestProgressBar from './test_progress_bar';
 
-export * from '../main';
 
 export {
     AttackerIntentionCollection,
