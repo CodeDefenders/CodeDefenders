@@ -54,34 +54,36 @@
     <section class="mt-5" aria-labelledby="stats">
         <h2 class="mb-3" id="stats">Public Statistics</h2>
         <dl>
-            <dt>User-ID:</dt><dd><%=userId%></dd>
-            <dt>Killed Mutants:</dt><dd><%=killedMutants%></dd>
-            <dt>Alive Mutants:</dt><dd><%=aliveMutants%></dd>
-            <div class="pie animate" style="--percentage:<%=aliveMutantsPercentage%>"><%=aliveMutantsPercentage%>%</div>
+            <dt>User-ID:</dt>
+            <dd><%=userId%></dd>
         </dl>
+        <h3>Mutants:</h3>
+        <div class="pie animate" style="--percentage:<%=aliveMutantsPercentage%>"><%=totalMutants%>%</div>
+        <span class="mutants-killed">Killed Mutants:</span><span><%=killedMutants%></span>
+        <span class="mutants-alive">Alive Mutants:</span><span><%=aliveMutants%></span>
     </section>
 
     <% if (isSelf) { %>
-        <section class="mt-5" aria-labelledby="played-games">
-            <h2 class="mb-3" id="played-games">Played games</h2>
-            <p>
-                You can find a list of your past games in the
-                <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
-            </p>
-        </section>
+    <section class="mt-5" aria-labelledby="played-games">
+        <h2 class="mb-3" id="played-games">Played games</h2>
+        <p>
+            You can find a list of your past games in the
+            <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
+        </p>
+    </section>
 
-        <section class="mt-5" aria-labelledby="account-information">
-            <h2 class="mb-3" id="account-information">Account Information</h2>
-            <p>
-                Your current email:
-                <span class="d-inline-block px-2 ms-2 border"><%=user.getEmail()%></span>
-            </p>
-            <p>
-                Change your account information, password or delete your account in the
-                <a href="<%=request.getContextPath() + Paths.USER_SETTINGS%>"
-                   title="Edit or delete your CodeDefenders account.">account settings</a>.
-            </p>
-        </section>
+    <section class="mt-5" aria-labelledby="account-information">
+        <h2 class="mb-3" id="account-information">Account Information</h2>
+        <p>
+            Your current email:
+            <span class="d-inline-block px-2 ms-2 border"><%=user.getEmail()%></span>
+        </p>
+        <p>
+            Change your account information, password or delete your account in the
+            <a href="<%=request.getContextPath() + Paths.USER_SETTINGS%>"
+               title="Edit or delete your CodeDefenders account.">account settings</a>.
+        </p>
+    </section>
     <% } %>
 
 </div>
