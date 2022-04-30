@@ -35,7 +35,7 @@ public class UserStatsDAO {
     private int getNumMutantsByUser(int userId, boolean alive) {
         final String query = "SELECT count(Mutant_ID) AS mutants " +
                 "FROM view_valid_mutants " +
-                "WHERE Player_ID = ? " +
+                "WHERE User_ID = ? " +
                 "AND Alive = ?";
         try {
             return connectionFactory.getQueryRunner().query(
