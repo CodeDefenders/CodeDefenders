@@ -1,8 +1,8 @@
 .pie {
     --percentage: 0;
     --border-width: 22px;
-    --color: darkred;
-    --color-bg: #8b000052;
+    --color-primary: inherit;
+    --color-secondary: inherit;
     --width: 12rem;
 
     position: relative;
@@ -30,12 +30,12 @@
     inset: 0;
     background: radial-gradient(
             farthest-side,
-            var(--color) 98%,
+            var(--color-primary) 98%,
             #0000
     ) top/var(--border-width) var(--border-width) no-repeat,
     conic-gradient(
-            var(--color) calc(var(--percentage) * 1%),
-            var(--color-bg, #0000) 0);
+            var(--color-primary) calc(var(--percentage) * 1%),
+            var(--color-secondary, #0000) 0);
     -webkit-mask: radial-gradient(
             farthest-side,
             #0000 calc(99% - var(--border-width)),
@@ -50,7 +50,7 @@
 
 .pie::after {
     inset: calc(50% - var(--border-width) / 2);
-    background: var(--color);
+    background: var(--color-primary);
     transform: rotate(calc(var(--percentage) * 3.6deg)) translateY(calc(50% - var(--width) / 2));
 }
 
@@ -83,3 +83,67 @@
 }
 
 
+/* General Dashboard design for layout & legend below: */
+
+.dashboards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    align-items: flex-start;
+    gap: 4rem;
+}
+
+.dashboard-box {
+    max-width: 25%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.pie {
+
+}
+
+.legend {
+
+}
+
+.legend-title {
+    font-weight: bold;
+    margin-right: .5ch;
+}
+
+.legend-title::before {
+    content: '';
+    display: inline-block;
+
+    --size: 1rem;
+    height: var(--size);
+    width: var(--size);
+
+    margin: 2px;
+    vertical-align: middle;
+}
+
+.dashboard-box .legend:nth-of-type(2) .legend-title::before {
+    background-color: var(--color-primary);
+}
+.dashboard-box .legend:nth-of-type(3) .legend-title::before {
+    background-color: var(--color-secondary);
+}
+
+.dashboard-mutants {
+    --color-primary: #730000;
+    --color-secondary: #ef6b0b;
+}
+
+.dashboard-tests {
+    --color-primary: #4a8a04;
+    --color-secondary: #9ba473;
+}
+
+.dashboard-points,
+.dashboard-games {
+    --color-primary: #00a466;
+    --color-secondary: #ffce53;
+}

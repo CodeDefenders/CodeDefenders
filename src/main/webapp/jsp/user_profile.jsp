@@ -68,46 +68,84 @@
 <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<link rel="stylesheet" href="css/piechart.css">
+<link rel="stylesheet" href="css/dashboard.css">
 
 <div class="container form-width">
     <h1>${pageInfo.pageTitle}</h1>
 
-    <section class="mt-5 clearfix" aria-labelledby="stats">
-        <h2 class="mb-3" id="stats">Public Statistics</h2>
-        <dl>
-            <dt>User-ID:</dt>
-            <dd><%=userId%></dd>
-        </dl>
+    <section class="mt-5 statistics" aria-labelledby="stats">
+        <h2 class="mb-3" id="stats">Player Statistics</h2>
 
-        <div class="w-50 float-start text-center mt-3">
-            <h3>Mutants</h3>
-            <div class="pie animate" style="--percentage:<%=aliveMutantsPercentage%>"><%=totalMutants%></div><br>
-            <span class="mutants-killed">Killed mutants:</span><span><%=killedMutants%></span><br>
-            <span class="mutants-alive">Alive mutants:</span><span><%=aliveMutants%></span>
-        </div>
+        <div class="dashboards">
+            <div class="dashboard-box dashboard-mutants">
+                <h3>Mutants created</h3>
+                <div class="pie animate no-round" style="--percentage:<%=aliveMutantsPercentage%>">
+                    <%=totalMutants%>
+                </div>
 
-        <div class="w-50 float-start text-center mt-3">
-            <h3>Tests</h3>
-            <div class="pie animate" style="--percentage:<%=killingTestsPercentage%>"><%=totalTests%></div><br>
-            <span class="mutants-killed">Killing tests:</span><span><%=killingTests%></span><br>
-            <span class="mutants-alive">Non-killing tests:</span><span><%=nonKillingTests%></span>
-        </div>
+                <div class="legend">
+                    <span class="legend-title">Killed mutants:</span>
+                    <span class="legend-value"><%=killedMutants%></span>
+                </div>
+                <div class="legend">
+                    <span class="legend-title">Mutants still alive:</span>
+                    <span class="legend-value"><%=aliveMutants%></span>
+                </div>
+            </div>
 
-        <div class="w-50 float-start text-center mt-3">
-            <h3>Points</h3>
-            <div class="pie animate" style="--percentage:<%=testPointsPercentage%>"><%=totalPoints%></div><br>
-            <span class="test-points">From tests:</span><span><%=testPoints%></span><br>
-            <span class="mutant-points">From mutants:</span><span><%=mutantPoints%></span><br>
-            <span class="test-points-avg">Average points per tests:</span><span><%=avgPointsPerTest%></span><br>
-            <span class="test-points-avg">Average points per mutant:</span><span><%=avgPointsPerMutant%></span>
-        </div>
+            <div class="dashboard-box dashboard-tests">
+                <h3>Tests written</h3>
 
-        <div class="w-50 float-start text-center mt-3">
-            <h3>Games and Roles</h3>
-            <div class="pie animate" style="--percentage:<%=defenderGamesPercentage%>"><%=totalGames%></div><br>
-            <span class="defender-games">As defender:</span><span><%=defenderGames%></span><br>
-            <span class="attacker-games">As attacker:</span><span><%=attackerGames%></span>
+                <div class="pie animate no-round" style="--percentage:<%=killingTestsPercentage%>">
+                    <%=totalTests%>
+                </div>
+
+                <div class="legend">
+                    <span class="legend-title">Tests that killed mutants:</span>
+                    <span class="legend-value"><%=killingTests%></span>
+                </div>
+                <div class="legend">
+                    <span class="legend-title">Non-killing tests:</span>
+                    <span class="legend-value"><%=nonKillingTests%></span>
+                </div>
+            </div>
+
+            <div class="dashboard-box dashboard-points">
+                <h3>Points earned</h3>
+
+                <div class="pie animate no-round" style="--percentage:<%=testPointsPercentage%>">
+                    <%=totalPoints%>
+                </div>
+
+                <div class="legend">
+                    <span class="legend-title">By writing tests:</span>
+                    <span class="legend-value"><%=testPoints%></span>
+                </div>
+                <div class="legend">
+                    <span class="legend-title">By creating mutants:</span>
+                    <span class="legend-value"><%=mutantPoints%></span>
+                </div>
+
+                <span class="test-points-avg">Average points per tests:</span><span><%=avgPointsPerTest%></span><br>
+                <span class="test-points-avg">Average points per mutant:</span><span><%=avgPointsPerMutant%></span>
+            </div>
+
+            <div class="dashboard-box dashboard-games">
+                <h3>Games played</h3>
+
+                <div class="pie animate no-round" style="--percentage:<%=defenderGamesPercentage%>">
+                    <%=totalGames%>
+                </div>
+
+                <div class="legend">
+                    <span class="legend-title">As defender:</span>
+                    <span class="legend-value"><%=defenderGames%></span>
+                </div>
+                <div class="legend">
+                    <span class="legend-title">As attacker:</span>
+                    <span class="legend-value"><%=attackerGames%></span>
+                </div>
+            </div>
         </div>
     </section>
 
