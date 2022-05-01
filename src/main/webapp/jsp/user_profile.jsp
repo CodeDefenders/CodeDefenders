@@ -55,6 +55,11 @@
     final double avgPointsPerMutant = userStats.getAveragePointsMutantByUser(userId);
     final int totalPoints = testPoints + mutantPoints;
     final int testPointsPercentage = percentage.apply(testPoints, totalPoints);
+
+    final int attackerGames = userStats.getAttackerGamesByUser(userId);
+    final int defenderGames = userStats.getDefenderGamesByUser(userId);
+    final int totalGames = attackerGames + defenderGames;
+    final int defenderGamesPercentage = percentage.apply(defenderGames, totalGames);
 %>
 
 <% if (login.isLoggedIn()) { %>
@@ -75,27 +80,34 @@
             <dd><%=userId%></dd>
         </dl>
 
-        <div class="w-50 float-start text-center">
+        <div class="w-50 float-start text-center mt-3">
             <h3>Mutants</h3>
             <div class="pie animate" style="--percentage:<%=aliveMutantsPercentage%>"><%=totalMutants%></div><br>
             <span class="mutants-killed">Killed mutants:</span><span><%=killedMutants%></span><br>
             <span class="mutants-alive">Alive mutants:</span><span><%=aliveMutants%></span>
         </div>
 
-        <div class="w-50 float-start text-center">
+        <div class="w-50 float-start text-center mt-3">
             <h3>Tests</h3>
             <div class="pie animate" style="--percentage:<%=killingTestsPercentage%>"><%=totalTests%></div><br>
             <span class="mutants-killed">Killing tests:</span><span><%=killingTests%></span><br>
             <span class="mutants-alive">Non-killing tests:</span><span><%=nonKillingTests%></span>
         </div>
 
-        <div class="w-50 float-start text-center">
+        <div class="w-50 float-start text-center mt-3">
             <h3>Points</h3>
             <div class="pie animate" style="--percentage:<%=testPointsPercentage%>"><%=totalPoints%></div><br>
             <span class="test-points">From tests:</span><span><%=testPoints%></span><br>
             <span class="mutant-points">From mutants:</span><span><%=mutantPoints%></span><br>
             <span class="test-points-avg">Average points per tests:</span><span><%=avgPointsPerTest%></span><br>
             <span class="test-points-avg">Average points per mutant:</span><span><%=avgPointsPerMutant%></span>
+        </div>
+
+        <div class="w-50 float-start text-center mt-3">
+            <h3>Games and Roles</h3>
+            <div class="pie animate" style="--percentage:<%=defenderGamesPercentage%>"><%=totalGames%></div><br>
+            <span class="defender-games">As defender:</span><span><%=defenderGames%></span><br>
+            <span class="attacker-games">As attacker:</span><span><%=attackerGames%></span>
         </div>
     </section>
 

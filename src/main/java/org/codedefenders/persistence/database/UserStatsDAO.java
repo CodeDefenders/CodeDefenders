@@ -9,6 +9,7 @@ import javax.inject.Named;
 
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.game.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,6 +128,35 @@ public class UserStatsDAO {
                     ),
                     userId
             ).orElse(0d);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public int getAttackerGamesByUser(int userId) {
+        return getGamesOfRoleByUser(userId, false);
+    }
+
+    public int getDefenderGamesByUser(int userId) {
+        return getGamesOfRoleByUser(userId, true);
+    }
+
+    private int getGamesOfRoleByUser(int userId, boolean defender) {
+        final Role role = defender ? Role.DEFENDER : Role.ATTACKER;
+        final String query = "SELECT count(ID) AS games " +
+                "FROM view_players " +
+                "WHERE User_ID = ? " +
+                "AND Role = ?";
+        try {
+            return connectionFactory.getQueryRunner().query(
+                    query,
+                    resultSet -> DatabaseUtils.nextFromRS(
+                            resultSet, rs -> rs.getInt("games")
+                    ),
+                    userId,
+                    role.toString()
+            ).orElse(0);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
