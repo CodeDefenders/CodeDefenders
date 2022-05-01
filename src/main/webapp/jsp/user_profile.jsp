@@ -20,6 +20,7 @@
 --%>
 <%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="org.codedefenders.persistence.database.UserStatsDAO" %>
+<%@ page import="java.util.function.BiFunction" %>
 <!--%@ page import="javax.enterprise.inject.spi.CDI" %-->
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
@@ -35,22 +36,25 @@
 
     final int userId = user.getId();
 
+    final BiFunction<Integer, Integer, Integer> percentage
+            = (subject, total) -> (subject * 100) / Math.max(total, 1); // avoid division by 0
+
     final int killedMutants = userStats.getNumKilledMutantsByUser(userId);
     final int aliveMutants = userStats.getNumAliveMutantsByUser(userId);
     final int totalMutants = killedMutants + aliveMutants;
-    final int aliveMutantsPercentage = (aliveMutants * 100) / Math.max(totalMutants, 1); // avoid division by 0
+    final int aliveMutantsPercentage = percentage.apply(aliveMutants, totalMutants);
 
     final int killingTests = userStats.getNumKillingTestsByUser(userId);
     final int nonKillingTests = userStats.getNumNonKillingTestsByUser(userId);
     final int totalTests = killingTests + nonKillingTests;
-    final int killingTestsPercentage = (killingTests * 100) / Math.max(totalTests, 1); // avoid division by 0
+    final int killingTestsPercentage = percentage.apply(killingTests, totalTests);
 
     final int testPoints = userStats.getTotalPointsTestsByUser(userId);
     final int mutantPoints = userStats.getTotalPointsMutantByUser(userId);
     final double avgPointsPerTest = userStats.getAveragePointsTestByUser(userId);
     final double avgPointsPerMutant = userStats.getAveragePointsMutantByUser(userId);
     final int totalPoints = testPoints + mutantPoints;
-    final int testPointsPercentage = (testPoints * 100) / Math.max(totalPoints, 1); // avoid division by 0
+    final int testPointsPercentage = percentage.apply(testPoints, totalPoints);
 %>
 
 <% if (login.isLoggedIn()) { %>
