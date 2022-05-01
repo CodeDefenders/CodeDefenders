@@ -64,7 +64,7 @@ public class UserStatsDAO {
     private int getNumTestsByUser(int userId, boolean killingTest) {
         final String query = "SELECT count(Test_ID) AS tests " +
                 "FROM view_valid_tests " +
-                "WHERE Player_ID IN (SELECT ID as Player_ID FROM players WHERE ID = ?) " +
+                "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?) " +
                 "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;";
         try {
             return connectionFactory.getQueryRunner().query(
@@ -92,7 +92,7 @@ public class UserStatsDAO {
         final String acc = avg ? "avg" : "sum";
         final String query = "SELECT " + acc + "(Points) AS points " +
                 "FROM view_valid_tests " +
-                "WHERE Player_ID IN (SELECT ID as Player_ID FROM players WHERE ID = ?);";
+                "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?);";
         try {
             return connectionFactory.getQueryRunner().query(
                     query,
