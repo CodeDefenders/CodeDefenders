@@ -78,4 +78,58 @@ public class UserStatsDAO {
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
+
+    public double getAveragePointsTestByUser(int userId) {
+        return getPointsTestByUser(userId, true);
+    }
+
+    public int getTotalPointsTestsByUser(int userId) {
+        return (int) getPointsTestByUser(userId, false);
+    }
+
+    public double getPointsTestByUser(int userId, boolean avg) {
+        final String acc = avg ? "avg" : "sum";
+        final String query = "SELECT " + acc + "(Points) AS points " +
+                "FROM view_valid_tests " +
+                "WHERE Player_ID IN (SELECT ID as Player_ID FROM players WHERE ID = ?);";
+        try {
+            return connectionFactory.getQueryRunner().query(
+                    query,
+                    resultSet -> DatabaseUtils.nextFromRS(
+                            resultSet, rs -> rs.getDouble("points")
+                    ),
+                    userId
+            ).orElse(0d);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public double getAveragePointsMutantByUser(int userId) {
+        return getPointsMutantByUser(userId, true);
+    }
+
+    public int getTotalPointsMutantByUser(int userId) {
+        return (int) getPointsMutantByUser(userId, false);
+    }
+
+    private double getPointsMutantByUser(int userId, boolean avg) {
+        final String acc = avg ? "avg" : "sum";
+        final String query = "SELECT " + acc + "(Points) AS points " +
+                "FROM view_valid_mutants " +
+                "WHERE User_ID = ?;";
+        try {
+            return connectionFactory.getQueryRunner().query(
+                    query,
+                    resultSet -> DatabaseUtils.nextFromRS(
+                            resultSet, rs -> rs.getDouble("points")
+                    ),
+                    userId
+            ).orElse(0d);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
 }

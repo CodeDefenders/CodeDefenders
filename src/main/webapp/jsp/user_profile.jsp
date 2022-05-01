@@ -44,6 +44,13 @@
     final int nonKillingTests = userStats.getNumNonKillingTestsByUser(userId);
     final int totalTests = killingTests + nonKillingTests;
     final int killingTestsPercentage = (killingTests * 100) / Math.max(totalTests, 1); // avoid division by 0
+
+    final int testPoints = userStats.getTotalPointsTestsByUser(userId);
+    final int mutantPoints = userStats.getTotalPointsMutantByUser(userId);
+    final double avgPointsPerTest = userStats.getAveragePointsTestByUser(userId);
+    final double avgPointsPerMutant = userStats.getAveragePointsMutantByUser(userId);
+    final int totalPoints = testPoints + mutantPoints;
+    final int testPointsPercentage = (testPoints * 100) / Math.max(totalPoints, 1); // avoid division by 0
 %>
 
 <% if (login.isLoggedIn()) { %>
@@ -71,11 +78,20 @@
             <span class="mutants-alive">Alive mutants:</span><span><%=aliveMutants%></span>
         </div>
 
-        <div class="w-50 float-end text-center">
+        <div class="w-50 float-start text-center">
             <h3>Tests</h3>
             <div class="pie animate" style="--percentage:<%=killingTestsPercentage%>"><%=totalTests%></div><br>
             <span class="mutants-killed">Killing tests:</span><span><%=killingTests%></span><br>
             <span class="mutants-alive">Non-killing tests:</span><span><%=nonKillingTests%></span>
+        </div>
+
+        <div class="w-50 float-start text-center">
+            <h3>Points</h3>
+            <div class="pie animate" style="--percentage:<%=testPointsPercentage%>"><%=totalPoints%></div><br>
+            <span class="test-points">From tests:</span><span><%=testPoints%></span><br>
+            <span class="mutant-points">From mutants:</span><span><%=mutantPoints%></span><br>
+            <span class="test-points-avg">Average points per tests:</span><span><%=avgPointsPerTest%></span><br>
+            <span class="test-points-avg">Average points per mutant:</span><span><%=avgPointsPerMutant%></span>
         </div>
     </section>
 
