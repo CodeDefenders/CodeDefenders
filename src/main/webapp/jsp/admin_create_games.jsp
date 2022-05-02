@@ -575,7 +575,7 @@
         });
 
         /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
-        $.fn.dataTable.ext.order['select-extension'] = function (settings, col) {
+        DataTable.ext.order['select-extension'] = function (settings, col) {
             return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
                 return $(td).closest('tr').hasClass('selected') ? '0' : '1';
             });
