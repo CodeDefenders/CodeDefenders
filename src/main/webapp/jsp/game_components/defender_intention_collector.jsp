@@ -27,8 +27,7 @@
 
     const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};
 
-    const defenderIntentionCollection = new DefenderIntentionCollection(lineToSelect);
-    await defenderIntentionCollection.initAsync();
+    const defenderIntentionCollection = await new DefenderIntentionCollection(lineToSelect).initAsync();
 
 
     objects.register('defenderIntentionCollection', defenderIntentionCollection);

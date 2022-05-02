@@ -16,19 +16,19 @@ class TestAccordion {
          * The categories of tests to display, i.e. one category per method + all.
          * @type {TestAccordionCategory[]}
          */
-        this.categories = categories;
+        this._categories = categories;
         /**
          * Maps test ids to their test DTO.
          * @type {Map<number, TestDTO>}
          */
-        this.tests = tests
+        this._tests = tests
 
 
         /**
          * Maps test ids to the modal that show the test's code.
          * @type {Map<number, Modal>}
          */
-        this.testModals = new Map();
+        this._testModals = new Map();
 
 
         this._init();
@@ -66,7 +66,7 @@ class TestAccordion {
      * @private
      */
     async _viewTestModal (test) {
-        let modal = this.testModals.get(test.id);
+        let modal = this._testModals.get(test.id);
         if (modal !== undefined) {
             modal.controls.show();
             return;
@@ -83,7 +83,7 @@ class TestAccordion {
                 </div>`;
         modal.dialog.classList.add('modal-dialog-responsive');
         modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
-        this.testModals.set(test.id, modal);
+        this._testModals.set(test.id, modal);
 
         /* Initialize the editor. */
         const textarea = modal.body.querySelector('textarea');
@@ -108,10 +108,10 @@ class TestAccordion {
         const self = this;
 
         /* Loop through the categories and create a test table for each one. */
-        for (const category of this.categories) {
+        for (const category of this._categories) {
             const rows = category.testIds
                     .sort()
-                    .map(this.tests.get, this.tests);
+                    .map(this._tests.get, this._tests);
 
             /* Create the DataTable. */
             const tableElement = document.getElementById(`ta-table-${category.id}`);

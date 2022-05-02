@@ -8,25 +8,25 @@ class DefenderIntentionCollection {
          * An note telling the user to select a line.
          * @type {HTMLElement}
          */
-        this.lineChooseNote = document.getElementById('line-choose-note');
+        this._lineChooseNote = document.getElementById('line-choose-note');
 
         /**
          * The selected line number, or null if no line is selected.
          * @type {?number}
          */
-        this.selectedLine = null;
+        this._selectedLine = null;
 
         /**
          * The (hidden) input to submit the selected line number with.
          * @type {HTMLInputElement}
          */
-        this.selectedLineInput = document.getElementById('selected_lines');
+        this._selectedLineInput = document.getElementById('selected_lines');
 
         /**
          * The "Defend" button used to submit tests.
          * @type {HTMLElement}
          */
-        this.submitTestButton = document.getElementById('submitTest');
+        this._submitTestButton = document.getElementById('submitTest');
 
         this._init(previouslySelectedLine);
     }
@@ -36,7 +36,7 @@ class DefenderIntentionCollection {
          * The class viewer CodeMirror instance.
          * @type {CodeMirror}
          */
-        this.classEditor = (await Promise.race([
+        this._classEditor = (await Promise.race([
             objects.await('classViewer'),
             objects.await('mutantEditor')
         ])).editor;
@@ -45,7 +45,9 @@ class DefenderIntentionCollection {
          * The test editor CodeMirror instance.
          * @type {CodeMirror}
          */
-        this.testEditor = (await objects.await('testEditor')).editor;
+        this._testEditor = (await objects.await('testEditor')).editor;
+
+        return this;
     }
 
     _init (previouslySelectedLine) {
@@ -53,12 +55,12 @@ class DefenderIntentionCollection {
         const self = this;
 
         /* Set the editor styling. */
-        this.testEditor.getWrapperElement().classList.add('codemirror-readonly-toggle');
+        this._testEditor.getWrapperElement().classList.add('codemirror-readonly-toggle');
 
         /* Select line on class viewer gutter click. */
-        this.classEditor.on('gutterClick', function (cm, line) {
+        this._classEditor.on('gutterClick', function (cm, line) {
             line++; // Make line 1-indexed.
-            if (line !== self.selectedLine) {
+            if (line !== self._selectedLine) {
                 self.selectLine(line);
             } else {
                 self.unselectLine();
@@ -75,8 +77,8 @@ class DefenderIntentionCollection {
     }
 
     unselectLine () {
-        const previousSelectedLine = this.selectedLine;
-        this.selectedLine = null;
+        const previousSelectedLine = this._selectedLine;
+        this._selectedLine = null;
 
         this._setInputValue('');
         this._lockTestEditor();
@@ -86,17 +88,17 @@ class DefenderIntentionCollection {
     }
 
     selectLine (line) {
-        if (this.selectedLine !== null) {
-            this._removeLineMarker(this.selectedLine);
+        if (this._selectedLine !== null) {
+            this._removeLineMarker(this._selectedLine);
         }
 
-        if (line > this.classEditor.lineCount()) {
+        if (line > this._classEditor.lineCount()) {
             console.log('Selected line is out of bounds.');
             this.unselectLine();
             return;
         }
 
-        this.selectedLine = line;
+        this._selectedLine = line;
 
         this._setInputValue(String(line));
         this._unlockTestEditor();
@@ -112,46 +114,46 @@ class DefenderIntentionCollection {
         marker.classList.add('text-center');
         marker.innerHTML = '<i class="fa fa-arrow-right marker ps-1"></i>';
 
-        this.classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', marker);
+        this._classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', marker);
     }
 
     /** @private */
     _removeLineMarker (line) {
-        this.classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', null);
+        this._classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', null);
     }
 
     /** @private */
     _lockTestEditor() {
-        this.testEditor.setOption('readOnly', true);
-        this.testEditor.getWrapperElement().classList.add('codemirror-readonly');
-        this.submitTestButton.disabled = true;
+        this._testEditor.setOption('readOnly', true);
+        this._testEditor.getWrapperElement().classList.add('codemirror-readonly');
+        this._submitTestButton.disabled = true;
     }
 
     /** @private */
     _unlockTestEditor() {
-        this.testEditor.setOption('readOnly', false);
-        this.testEditor.getWrapperElement().classList.remove('codemirror-readonly');
-        this.submitTestButton.disabled = false;
+        this._testEditor.setOption('readOnly', false);
+        this._testEditor.getWrapperElement().classList.remove('codemirror-readonly');
+        this._submitTestButton.disabled = false;
     }
 
     /** @private */
     _showLineChooseNote() {
-        this.lineChooseNote.removeAttribute('hidden');
+        this._lineChooseNote.removeAttribute('hidden');
     }
 
     /** @private */
     _hideLineChooseNote() {
-        this.lineChooseNote.setAttribute('hidden', '');
+        this._lineChooseNote.setAttribute('hidden', '');
     }
 
     /** @private */
     _setInputValue(value) {
-        this.selectedLineInput.value = value;
+        this._selectedLineInput.value = value;
     }
 
     /** @private */
     _setButtonText(text) {
-        this.submitTestButton.innerText = text;
+        this._submitTestButton.innerText = text;
     }
 }
 

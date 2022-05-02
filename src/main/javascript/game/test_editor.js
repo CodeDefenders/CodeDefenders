@@ -51,17 +51,17 @@ class TestEditor {
          * Whether to include mocking keywords in the code completion.
          * @type {boolean}
          */
-        this.mockingEnabled = mockingEnabled;
+        this._mockingEnabled = mockingEnabled;
         /**
          * Name of the keymap to be used in the editor.
          * @type {string}
          */
-        this.keymap = keymap;
+        this._keymap = keymap;
         /**
          * Code completion instance to handle the completion command.
          * @type {CodeCompletion}
          */
-        this.codeCompletion = null;
+        this._codeCompletion = null;
 
 
         this._init();
@@ -85,7 +85,7 @@ class TestEditor {
                 'Ctrl-Space': 'completeTest',
                 'Tab': "insertSoftTab"
             },
-            keyMap: this.keymap,
+            keyMap: this._keymap,
             gutters: [
                     'CodeMirror-linenumbers',
                     'CodeMirror-mutantIcons'
@@ -119,8 +119,8 @@ class TestEditor {
 
     /** @private */
     _initCodeCompletion() {
-        this.codeCompletion = new CodeCompletion();
-        this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
+        this._codeCompletion = new CodeCompletion();
+        this._codeCompletion.registerCodeCompletionCommand(this.editor, 'completeTest');
 
         let testMethods = [
             "assertArrayEquals",
@@ -134,7 +134,7 @@ class TestEditor {
             "fail"
         ];
 
-        if (this.mockingEnabled) {
+        if (this._mockingEnabled) {
             // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
             // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)
             // Behavior verification is currently not implemented (Mockito.verify)
@@ -152,7 +152,7 @@ class TestEditor {
             testMethods = testMethods.concat(mockitoMethods);
         }
 
-        this.codeCompletion.setCompletionPool('testMethods', new Set(testMethods));
+        this._codeCompletion.setCompletionPool('testMethods', new Set(testMethods));
 
         /* Add class viewer code to completions. */
         objects.await('classViewer').then(classViewer => {
@@ -160,8 +160,8 @@ class TestEditor {
             for (const dependencyEditor of classViewer.dependencyEditors) {
                 texts.push(dependencyEditor.getValue());
             }
-            const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
-            this.codeCompletion.setCompletionPool('classViewer', completions);
+            const completions = this._codeCompletion.getCompletionsForJavaFiles(texts);
+            this._codeCompletion.setCompletionPool('classViewer', completions);
         });
 
         /* Add mutant editor code to completions. */
@@ -170,8 +170,8 @@ class TestEditor {
             for (const dependencyEditor of mutantEditor.dependencyEditors) {
                 texts.push(dependencyEditor.getValue());
             }
-            const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
-            this.codeCompletion.setCompletionPool('mutantEditor', completions);
+            const completions = this._codeCompletion.getCompletionsForJavaFiles(texts);
+            this._codeCompletion.setCompletionPool('mutantEditor', completions);
         });
     }
 

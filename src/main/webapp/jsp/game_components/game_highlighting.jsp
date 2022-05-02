@@ -45,11 +45,10 @@
     const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
     const gameId = ${gameHighlighting.gameId};
 
-    const gameHighlighting = new GameHighlighting(
+    const gameHighlighting = await new GameHighlighting(
             data,
             enableFlagging,
-            gameId);
-    await gameHighlighting._initAsync();
+            gameId).initAsync();
 
     gameHighlighting.highlightCoverage();
     gameHighlighting.highlightMutants();

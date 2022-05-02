@@ -28,8 +28,7 @@
     const progressElement = document.getElementById('progress');
     const gameId = ${mutantProgressBar.gameId};
 
-    const mutantProgressBar = new MutantProgressBar(progressElement, gameId);
-    await mutantProgressBar.initAsync();
+    const mutantProgressBar = await new MutantProgressBar(progressElement, gameId).initAsync();
 
 
     objects.register('mutantProgressBar', mutantProgressBar);

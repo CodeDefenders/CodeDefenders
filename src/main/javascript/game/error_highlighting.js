@@ -10,7 +10,7 @@ class ErrorHighlighting {
          * The line numbers of lines containing errors.
          * @type {number[]}
          */
-        this.errorLines = errorLines;
+        this._errorLines = errorLines;
 
         /**
          * The CodeMirror editor to highlight errors on.
@@ -24,7 +24,7 @@ class ErrorHighlighting {
      * See: https://creativewebspecialist.co.uk/2013/07/15/highlight-errors-in-codemirror/
      */
     highlightErrors () {
-        for (const errorLine of this.errorLines) {
+        for (const errorLine of this._errorLines) {
             this.editor.addLineClass(errorLine - 1, 'background', 'line-error');
         }
     }

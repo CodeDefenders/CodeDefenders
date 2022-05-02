@@ -79,8 +79,7 @@
     const gameId = ${gameChat.gameId};
     const messageLimit = ${gameChat.messageLimit};
 
-    const gameChat = new GameChat(gameId, messageLimit);
-    await gameChat.initAsync();
+    const gameChat = await new GameChat(gameId, messageLimit).initAsync();
 
 
     objects.register('gameChat', gameChat);

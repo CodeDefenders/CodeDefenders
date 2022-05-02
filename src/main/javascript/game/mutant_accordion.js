@@ -18,38 +18,38 @@ class MutantAccordion {
          * The categories of mutants to display, i.e. one category per method + all + outside methods.
          * @type {MutantAccordionCategory[]}
          */
-        this.categories = categories;
+        this._categories = categories;
         /**
          * Maps mutant ids to their mutant DTO.
          * @type {Map<number, MutantDTO>}
          */
-        this.mutants = mutants
+        this._mutants = mutants
 
 
         /**
          * The id of the current game.
          * @type {number}
          */
-        this.gameId = gameId;
+        this._gameId = gameId;
 
 
         /**
          * Maps mutant ids to the modal that show the mutant's code.
          * @type {Map<number, Modal>}
          */
-        this.mutantModals = new Map();
+        this._mutantModals = new Map();
         /**
          * Maps mutant ids to the modal that shows the code of the mutant's killing test.
          * @type {Map<number, Modal>}
          */
-        this.testModals = new Map();
+        this._testModals = new Map();
 
 
         /**
          * Maps category ids to the datatable that displays the category.
          * @type {Map<number, DataTable>}
          */
-        this.dataTablesByCategory = new Map();
+        this._dataTablesByCategory = new Map();
 
 
         this._init();
@@ -62,7 +62,7 @@ class MutantAccordion {
      * @private
      */
     async _viewMutantModal (mutant) {
-        let modal = this.mutantModals.get(mutant.id);
+        let modal = this._mutantModals.get(mutant.id);
         if (modal !== undefined) {
             modal.controls.show();
             return;
@@ -79,7 +79,7 @@ class MutantAccordion {
                 </div>`;
         modal.dialog.classList.add('modal-dialog-responsive');
         modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
-        this.mutantModals.set(mutant.id, modal);
+        this._mutantModals.set(mutant.id, modal);
 
         /* Initialize the editor. */
         const textarea = modal.body.querySelector('textarea');
@@ -105,7 +105,7 @@ class MutantAccordion {
      * @private
      */
     async _viewTestModal (mutant) {
-        let modal = this.testModals.get(mutant.id);
+        let modal = this._testModals.get(mutant.id);
         if (modal !== undefined) {
             modal.controls.show();
             return;
@@ -123,7 +123,7 @@ class MutantAccordion {
                 <pre class="m-0 terminal-pre"></pre>`;
         modal.dialog.classList.add('modal-dialog-responsive');
         modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
-        this.testModals.set(mutant.killedByTestId, modal);
+        this._testModals.set(mutant.killedByTestId, modal);
 
         /* Set the kill message. */
         const killMessageElement = modal.body.querySelector('.terminal-pre');
@@ -152,10 +152,10 @@ class MutantAccordion {
         const self = this;
 
         /* Loop through the categories and create a mutant table for each one. */
-        for (const category of this.categories) {
+        for (const category of this._categories) {
             const rows = category.mutantIds
                     .sort()
-                    .map(this.mutants.get, this.mutants);
+                    .map(this._mutants.get, this._mutants);
 
             /* Create the DataTable. */
             const tableElement = document.getElementById(`ma-table-${category.id}`);
@@ -211,7 +211,7 @@ class MutantAccordion {
                 }
             });
 
-            this.dataTablesByCategory.set(category.id, dataTable);
+            this._dataTablesByCategory.set(category.id, dataTable);
         }
 
         this._initFilters();
@@ -244,11 +244,11 @@ class MutantAccordion {
 
                     jquery.fn.dataTable.ext.search.push(searchFunction);
 
-                    for (const category of self.categories) {
-                        self.dataTablesByCategory.get(category.id).draw();
+                    for (const category of self._categories) {
+                        self._dataTablesByCategory.get(category.id).draw();
 
                         const filteredMutants = category.mutantIds
-                                .map(self.mutants.get, self.mutants)
+                                .map(self._mutants.get, self._mutants)
                                 .filter(mutant => selectedCategory === 'ALL'
                                         || mutant.state === selectedCategory);
 
@@ -312,7 +312,7 @@ class MutantAccordion {
                             onsubmit="return confirm('This will mark all player-created mutants on line(s) ${data.lineString} as equivalent. Are you sure?');">
                                 <input type="hidden" name="formType" value="claimEquivalent">
                                 <input type="hidden" name="equivLines" value="${data.lineString}">
-                                <input type="hidden" name="gameId" value="${this.gameId}">
+                                <input type="hidden" name="gameId" value="${this._gameId}">
                                 <button type="submit" class="btn btn-outline-danger btn-xs text-nowrap">Claim Equivalent</button>
                             </form>`;
                     } else {

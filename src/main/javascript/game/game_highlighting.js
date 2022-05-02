@@ -5,7 +5,6 @@ import {objects} from '../main';
 class GameHighlighting {
 
     /**
-     *
      * @param {object} data
      *      Given by [JSON.parse('${gameHighlighting.JSON}')]
      * @param {boolean} enableFlagging
@@ -91,10 +90,12 @@ class GameHighlighting {
          * The CodeMirror editor to provide highlighting on.
          * @type {CodeMirror}
          */
-        this.editor = (await Promise.race([
+        this._editor = (await Promise.race([
             objects.await('classViewer'),
             objects.await('mutantEditor')
         ])).editor;
+
+        return this;
     }
 
     static MutantStatuses = {
@@ -343,7 +344,7 @@ class GameHighlighting {
     highlightCoverage () {
         for (const [line, testIds] of this._testIdsPerLine) {
             const coveragePercent = (testIds.length * 100 / this._tests.size).toFixed(0);
-            this.editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
+            this._editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
         }
     }
 
@@ -353,7 +354,7 @@ class GameHighlighting {
     highlightAlternativeCoverage () {
         for (const [line, testIds] of this._alternativeTestIdsPerLine) {
             const coveragePercent = (testIds.length * 100 / this._alternativeTests.size).toFixed(0);
-            this.editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
+            this._editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
         }
     }
 
@@ -365,7 +366,7 @@ class GameHighlighting {
             const mutantsOnLine = mutantIds.map(id => this._mutants.get(id));
             const marker = this._createMutantIcons(line, mutantsOnLine);
             this._addPopoverTriggerToMutantIcons(marker);
-            this.editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
+            this._editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
         }
     }
 
@@ -375,12 +376,12 @@ class GameHighlighting {
      * place the highlighting onto the wrong lines.
      */
     clearCoverage () {
-        this.editor.eachLine(line => {
+        this._editor.eachLine(line => {
             const bgClasses = line.bgClass ?? '';
 
             /* Match all coverage classes. */
             for (const match of (bgClasses.match(/coverage-\d+/g) ?? [])) {
-                this.editor.removeLineClass(line, 'background', match);
+                this._editor.removeLineClass(line, 'background', match);
             }
         });
     }
@@ -391,7 +392,7 @@ class GameHighlighting {
      * place the highlighting onto the wrong lines.
      */
     clearMutants () {
-        this.editor.clearGutter('CodeMirror-mutantIcons');
+        this._editor.clearGutter('CodeMirror-mutantIcons');
     }
 }
 

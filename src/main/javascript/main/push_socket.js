@@ -28,33 +28,33 @@ class PushSocket {
         /**
          * The URL to connect the WebSocket to.
          */
-        this.url = url;
+        this._url = url;
 
         /**
          * Event handlers by the event name they handle.
          * @type {Map<string, function[]>}
          */
-        this.handlers = new Map();
+        this._handlers = new Map();
 
         /**
          * A queue to buffer messages and send them once the connection has been established.
          * @type {PushSocketMessage[]}
          */
-        this.queue = [];
+        this._queue = [];
 
         this._initWebSocket();
     }
 
     _initWebSocket () {
-        this.websocket = new WebSocket(this.url);
+        this.websocket = new WebSocket(this._url);
 
         this.websocket.onopen = evt => {
             console.log('WebSocket connection established.');
             this.dispatch(PushSocket.WSEventType.OPEN, evt);
-            for (const event of this.queue) {
+            for (const event of this._queue) {
                 this.websocket.send(JSON.stringify(event));
             }
-            this.queue = [];
+            this._queue = [];
         };
 
         this.websocket.onerror = evt => {
@@ -90,11 +90,11 @@ class PushSocket {
      * @param {function} callback The callback to register.
      */
     register (type, callback) {
-        let callbacks = this.handlers.get(type);
+        let callbacks = this._handlers.get(type);
 
         if (callbacks === undefined) {
             callbacks = [];
-            this.handlers.set(type, callbacks);
+            this._handlers.set(type, callbacks);
         }
 
         callbacks.push(callback);
@@ -107,7 +107,7 @@ class PushSocket {
      * @param {function} callback The callback to register.
      */
     unregister (type, callback) {
-        const callbacks = this.handlers.get(type);
+        const callbacks = this._handlers.get(type);
         if (callbacks === undefined || callbacks.length === 0) {
             console.error(`Tried to unregister callback for type '${type}', `
                     + 'but no callback is registered for the type.');
@@ -163,7 +163,7 @@ class PushSocket {
         if (this.readyState === WebSocket.OPEN) {
             this.websocket.send(JSON.stringify(event));
         } else if (this.readyState === WebSocket.CONNECTING) {
-            this.queue.push(event)
+            this._queue.push(event)
         } else {
             console.error('Tried to send WebSocket event when the connection is closed.');
         }
@@ -176,7 +176,7 @@ class PushSocket {
      * @param {object} data The data of the event.
      */
     dispatch (type, data) {
-        const callbacks = this.handlers.get(type);
+        const callbacks = this._handlers.get(type);
         if (callbacks !== undefined) {
             for (const callback of callbacks) {
                 callback(data);
