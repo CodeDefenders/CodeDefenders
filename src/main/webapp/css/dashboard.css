@@ -90,15 +90,18 @@
     flex-wrap: wrap;
     justify-content: stretch;
     align-items: flex-start;
-    gap: 0;
+    gap: var(--padding);
 }
 
 .dashboard-box {
-    min-width: clamp(12rem, calc(50% - var(--padding) * 2), 100%);
-    margin: var(--padding);
+    background-color: #f8f9fa; /* .bg-light */
+    border-radius: .3rem; /* .rounded-3 */
+    padding: var(--padding);
+    flex: 1;
 
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .legend {
@@ -139,10 +142,10 @@
 
 /* dashboard semantic coloring */
 
-.dashboard-box .legend:nth-of-type(2) .legend-title::before {
+.dashboard-box .legend:nth-child(1) .legend-title::before {
     background-color: var(--color-primary);
 }
-.dashboard-box .legend:nth-of-type(3) .legend-title::before {
+.dashboard-box .legend:nth-child(2) .legend-title::before {
     background-color: var(--color-secondary);
 }
 
