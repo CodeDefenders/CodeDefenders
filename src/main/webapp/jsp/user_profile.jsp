@@ -79,7 +79,8 @@
         <div class="dashboards">
             <div class="dashboard-box dashboard-mutants">
                 <h3>Mutants created</h3>
-                <div class="pie animate no-round" style="--percentage:<%=aliveMutantsPercentage%>">
+                <div class="pie animate no-round <%=totalMutants == 0 ? "no-data" : ""%>"
+                     style="--percentage:<%=aliveMutantsPercentage%>">
                     <%=totalMutants%>
                 </div>
 
@@ -98,7 +99,8 @@
             <div class="dashboard-box dashboard-tests">
                 <h3>Tests written</h3>
 
-                <div class="pie animate no-round" style="--percentage:<%=killingTestsPercentage%>">
+                <div class="pie animate no-round <%=totalTests == 0 ? "no-data" : ""%>"
+                     style="--percentage:<%=killingTestsPercentage%>">
                     <%=totalTests%>
                 </div>
 
@@ -117,7 +119,8 @@
             <div class="dashboard-box dashboard-points">
                 <h3>Points earned</h3>
 
-                <div class="pie animate no-round" style="--percentage:<%=testPointsPercentage%>">
+                <div class="pie animate no-round <%=totalPoints == 0 ? "no-data" : ""%>"
+                     style="--percentage:<%=testPointsPercentage%>">
                     <%=totalPoints%>
                 </div>
 
@@ -136,7 +139,8 @@
             <div class="dashboard-box dashboard-games">
                 <h3>Games played</h3>
 
-                <div class="pie animate no-round" style="--percentage:<%=defenderGamesPercentage%>">
+                <div class="pie animate no-round <%=totalGames == 0 ? "no-data" : ""%>"
+                     style="--percentage:<%=defenderGamesPercentage%>">
                     <%=totalGames%>
                 </div>
 

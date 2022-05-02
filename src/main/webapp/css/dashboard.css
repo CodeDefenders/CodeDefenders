@@ -59,6 +59,11 @@
     content: none;
 }
 
+.pie.no-data {
+    --color-primary: var(--bs-gray);
+    --color-secondary: var(--bs-gray);
+}
+
 .pie.animate {
     animation: pie 1s 0.5s both;
 }
