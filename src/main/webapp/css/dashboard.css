@@ -1,22 +1,19 @@
 .pie {
     --percentage: 0;
-    --border-width: 22px;
+    --border-width: 1.5rem;
     --color-primary: inherit;
     --color-secondary: inherit;
-    --width: 12rem;
+    --width: inherit;
 
     position: relative;
     display: inline-grid;
 
     width: var(--width);
     height: var(--width);
-    aspect-ratio: 1;
 
-    margin: 5px;
-
+    margin: 1rem 0;
     place-content: center;
-
-    font-size: 1.5rem;
+    font-size: 1.75rem;
 }
 
 .pie::before,
@@ -86,44 +83,61 @@
 /* General Dashboard design for layout & legend below: */
 
 .dashboards {
+    --width: 12rem;
+    --padding: 3rem;
+
     display: flex;
     flex-wrap: wrap;
     justify-content: stretch;
     align-items: flex-start;
-    gap: 4rem;
+    gap: 0;
 }
 
 .dashboard-box {
-    max-width: 25%;
+    min-width: clamp(12rem, calc(50% - var(--padding) * 2), 100%);
+    margin: var(--padding);
 
     display: flex;
     flex-direction: column;
 }
 
-.pie {
-
-}
-
 .legend {
-
+    display: flex;
+    align-items: center;
 }
 
-.legend-title {
+.legend .legend-title,
+.legend .legend-value {
+    display: contents;
+}
+
+.legend .legend-title {
     font-weight: bold;
-    margin-right: .5ch;
 }
 
-.legend-title::before {
+.legend .legend-title::before {
     content: '';
     display: inline-block;
 
-    --size: 1rem;
+    --size: 2ch;
     height: var(--size);
     width: var(--size);
 
-    margin: 2px;
-    vertical-align: middle;
+    margin: 1ch;
 }
+
+.other-stats dt {
+    float: left;
+    clear: left;
+    margin-right: 1ch;
+    font-weight: bold;
+}
+
+.other-stats dd {
+    margin-left: 0;
+}
+
+/* dashboard semantic coloring */
 
 .dashboard-box .legend:nth-of-type(2) .legend-title::before {
     background-color: var(--color-primary);
@@ -138,12 +152,12 @@
 }
 
 .dashboard-tests {
-    --color-primary: #4a8a04;
-    --color-secondary: #9ba473;
+    --color-primary: #008080;
+    --color-secondary: #32CD32;
 }
 
 .dashboard-points,
 .dashboard-games {
-    --color-primary: #00a466;
-    --color-secondary: #ffce53;
+    --color-primary: #008080;
+    --color-secondary: #730000;
 }
