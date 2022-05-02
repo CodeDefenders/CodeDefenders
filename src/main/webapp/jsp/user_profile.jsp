@@ -76,7 +76,7 @@
     <section class="mt-5 statistics" aria-labelledby="stats">
         <h2 class="mb-3" id="stats">Player Statistics</h2>
 
-        <div class="dashboards">
+        <div class="dashboards bg-light rounded-3">
             <div class="dashboard-box dashboard-mutants">
                 <h3>Mutants created</h3>
                 <div class="pie animate no-round" style="--percentage:<%=aliveMutantsPercentage%>">
@@ -125,9 +125,6 @@
                     <span class="legend-title">By creating mutants:</span>
                     <span class="legend-value"><%=mutantPoints%></span>
                 </div>
-
-                <span class="test-points-avg">Average points per tests:</span><span><%=avgPointsPerTest%></span><br>
-                <span class="test-points-avg">Average points per mutant:</span><span><%=avgPointsPerMutant%></span>
             </div>
 
             <div class="dashboard-box dashboard-games">
@@ -147,6 +144,14 @@
                 </div>
             </div>
         </div>
+
+        <dl class="other-stats mt-3">
+            <dt>Average points per tests:</dt>
+            <dd><%=avgPointsPerTest%></dd>
+
+            <dt>Average points per mutant:</dt>
+            <dd><%=avgPointsPerMutant%></dd>
+        </dl>
     </section>
 
     <% if (isSelf) { %>
