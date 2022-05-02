@@ -110,16 +110,18 @@
 
             <h3>Diff</h3>
             <div class="card">
-                <div class="card-body p-0">
+                <div class="card-body p-0 loading loading-height-200">
                     <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff" readonly><%=equivMutant.getHTMLEscapedPatchString()%></textarea></pre>
                 </div>
             </div>
 
             <script type="module">
                 import CodeMirror from './js/codemirror.mjs';
+                import {LoadingAnimation} from './js/codedefenders_main.mjs';
 
 
-                const codemirror = CodeMirror.fromTextArea(document.getElementById('diff'), {
+                const textarea = document.getElementById('diff');
+                const codemirror = CodeMirror.fromTextArea(textarea, {
                     lineNumbers: true,
                     mode: "text/x-diff",
                     readOnly: true,
@@ -127,6 +129,7 @@
                 });
                 codemirror.getWrapperElement().classList.add('codemirror-readonly');
                 codemirror.setSize('100%', '100%');
+                LoadingAnimation.hideAnimation(textarea);
             </script>
 
             <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>

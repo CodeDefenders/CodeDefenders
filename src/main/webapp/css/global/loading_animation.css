@@ -6,6 +6,7 @@
 /* The loading animation itself. */
 .loading {
     position: relative;
+    min-height: 100px;
 }
 .loading::after {
     content: url('../../images/loading.png');
