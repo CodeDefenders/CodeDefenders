@@ -70,26 +70,28 @@
 
 <link rel="stylesheet" href="css/dashboard.css">
 
-<div class="container form-width">
+<div class="container">
     <h1>${pageInfo.pageTitle}</h1>
 
     <section class="mt-5 statistics" aria-labelledby="stats">
         <h2 class="mb-3" id="stats">Player Statistics</h2>
 
-        <div class="dashboards bg-light rounded-3">
+        <div class="dashboards">
             <div class="dashboard-box dashboard-mutants">
                 <h3>Mutants created</h3>
                 <div class="pie animate no-round" style="--percentage:<%=aliveMutantsPercentage%>">
                     <%=totalMutants%>
                 </div>
 
-                <div class="legend">
-                    <span class="legend-title">Killed mutants:</span>
-                    <span class="legend-value"><%=killedMutants%></span>
-                </div>
-                <div class="legend">
-                    <span class="legend-title">Mutants still alive:</span>
-                    <span class="legend-value"><%=aliveMutants%></span>
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">Killed mutants:</span>
+                        <span class="legend-value"><%=killedMutants%></span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">Mutants still alive:</span>
+                        <span class="legend-value"><%=aliveMutants%></span>
+                    </div>
                 </div>
             </div>
 
@@ -100,13 +102,15 @@
                     <%=totalTests%>
                 </div>
 
-                <div class="legend">
-                    <span class="legend-title">Tests that killed mutants:</span>
-                    <span class="legend-value"><%=killingTests%></span>
-                </div>
-                <div class="legend">
-                    <span class="legend-title">Non-killing tests:</span>
-                    <span class="legend-value"><%=nonKillingTests%></span>
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">Tests that killed mutants:</span>
+                        <span class="legend-value"><%=killingTests%></span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">Non-killing tests:</span>
+                        <span class="legend-value"><%=nonKillingTests%></span>
+                    </div>
                 </div>
             </div>
 
@@ -117,13 +121,15 @@
                     <%=totalPoints%>
                 </div>
 
-                <div class="legend">
-                    <span class="legend-title">By writing tests:</span>
-                    <span class="legend-value"><%=testPoints%></span>
-                </div>
-                <div class="legend">
-                    <span class="legend-title">By creating mutants:</span>
-                    <span class="legend-value"><%=mutantPoints%></span>
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">By writing tests:</span>
+                        <span class="legend-value"><%=testPoints%></span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">By creating mutants:</span>
+                        <span class="legend-value"><%=mutantPoints%></span>
+                    </div>
                 </div>
             </div>
 
@@ -134,23 +140,27 @@
                     <%=totalGames%>
                 </div>
 
-                <div class="legend">
-                    <span class="legend-title">As defender:</span>
-                    <span class="legend-value"><%=defenderGames%></span>
-                </div>
-                <div class="legend">
-                    <span class="legend-title">As attacker:</span>
-                    <span class="legend-value"><%=attackerGames%></span>
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">As defender:</span>
+                        <span class="legend-value"><%=defenderGames%></span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">As attacker:</span>
+                        <span class="legend-value"><%=attackerGames%></span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <dl class="other-stats mt-3">
             <dt>Average points per tests:</dt>
-            <dd><%=avgPointsPerTest%></dd>
+            <dd><%=avgPointsPerTest%>
+            </dd>
 
             <dt>Average points per mutant:</dt>
-            <dd><%=avgPointsPerMutant%></dd>
+            <dd><%=avgPointsPerMutant%>
+            </dd>
         </dl>
     </section>
 
