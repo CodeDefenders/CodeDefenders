@@ -296,7 +296,7 @@
     <% } %>
 </div>
 
-<script>
+<script type="module">
     import DataTable from './js/datatables.mjs';
     import $ from './js/jquery.mjs';
 
