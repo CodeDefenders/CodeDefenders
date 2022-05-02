@@ -28,7 +28,11 @@ class DefenderIntentionCollection {
          */
         this._submitTestButton = document.getElementById('submitTest');
 
-        this._init(previouslySelectedLine);
+        /**
+         * The line that was selected for the last (failed) submission, if any.
+         * @type {?number}
+         */
+        this._previouslySelectedLine = previouslySelectedLine;
     }
 
     async initAsync () {
@@ -47,10 +51,12 @@ class DefenderIntentionCollection {
          */
         this._testEditor = (await objects.await('testEditor')).editor;
 
+        this._init();
+
         return this;
     }
 
-    _init (previouslySelectedLine) {
+    _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
@@ -69,8 +75,8 @@ class DefenderIntentionCollection {
 
         /* If there was a problem with the player's last submission, select previously selected line again,
            otherwise, initialize without a selected line. */
-        if (previouslySelectedLine !== null) {
-            self.selectLine(previouslySelectedLine);
+        if (this._previouslySelectedLine !== null) {
+            self.selectLine(this._previouslySelectedLine);
         } else {
             self.unselectLine();
         }
