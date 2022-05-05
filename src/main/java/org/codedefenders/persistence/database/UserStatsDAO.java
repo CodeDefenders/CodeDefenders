@@ -13,6 +13,10 @@ import org.codedefenders.game.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Provides methods to query user statistics from the database. This includes metrics like written tests and mutants,
+ * points, games played.
+ */
 @Named(value = "userStats")
 @ApplicationScoped
 public class UserStatsDAO {
@@ -25,10 +29,20 @@ public class UserStatsDAO {
         this.connectionFactory = connectionFactory;
     }
 
+    /**
+     * Fetches the amount of killed mutants a given user has written from the database.
+     * @param userId The id of the user
+     * @return amount of killed mutants written by a user
+     */
     public int getNumKilledMutantsByUser(int userId) {
         return getNumMutantsByUser(userId, false);
     }
 
+    /**
+     * Fetches the amount of alive mutants a given user has written from the database.
+     * @param userId The id of the user
+     * @return amount of alive mutants written by a user
+     */
     public int getNumAliveMutantsByUser(int userId) {
         return getNumMutantsByUser(userId, true);
     }
@@ -53,10 +67,20 @@ public class UserStatsDAO {
         }
     }
 
+    /**
+     * Fetches the amount of tests written by a user that killed mutants.
+     * @param userId The id of the user
+     * @return amount of killing tests written by a user
+     */
     public int getNumKillingTestsByUser(int userId) {
         return getNumTestsByUser(userId, true);
     }
 
+    /**
+     * Fetches the amount of tests written by a user that did not (yet) kill mutants.
+     * @param userId The id of the user
+     * @return amount of non-killing tests written by a user
+     */
     public int getNumNonKillingTestsByUser(int userId) {
         return getNumTestsByUser(userId, false);
     }
@@ -80,10 +104,20 @@ public class UserStatsDAO {
         }
     }
 
+    /**
+     * Fetches the amount of points a given user received through a test on average.
+     * @param userId The id of the user
+     * @return average points received through tests
+     */
     public double getAveragePointsTestByUser(int userId) {
         return getPointsTestByUser(userId, true);
     }
 
+    /**
+     * Fetches the amount of total points a given user received through all of their tests.
+     * @param userId The id of the user
+     * @return total points received through tests
+     */
     public int getTotalPointsTestsByUser(int userId) {
         return (int) getPointsTestByUser(userId, false);
     }
@@ -107,10 +141,20 @@ public class UserStatsDAO {
         }
     }
 
+    /**
+     * Fetches the amount of points a given user received through a mutant on average.
+     * @param userId The id of the user
+     * @return average points received through mutants
+     */
     public double getAveragePointsMutantByUser(int userId) {
         return getPointsMutantByUser(userId, true);
     }
 
+    /**
+     * Fetches the amount of total points a given user received through all of their mutants.
+     * @param userId The id of the user
+     * @return total points received through mutants
+     */
     public int getTotalPointsMutantByUser(int userId) {
         return (int) getPointsMutantByUser(userId, false);
     }
@@ -134,10 +178,20 @@ public class UserStatsDAO {
         }
     }
 
+    /**
+     * Fetches the amount of total games a user played as attacker.
+     * @param userId The id of the user
+     * @return games played as attacker
+     */
     public int getAttackerGamesByUser(int userId) {
         return getGamesOfRoleByUser(userId, false);
     }
 
+    /**
+     * Fetches the amount of total games a user played as defender.
+     * @param userId The id of the user
+     * @return games played as defender
+     */
     public int getDefenderGamesByUser(int userId) {
         return getGamesOfRoleByUser(userId, true);
     }
