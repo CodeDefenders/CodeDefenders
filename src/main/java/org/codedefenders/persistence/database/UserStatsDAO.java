@@ -88,7 +88,7 @@ public class UserStatsDAO {
         return (int) getPointsTestByUser(userId, false);
     }
 
-    public double getPointsTestByUser(int userId, boolean avg) {
+    private double getPointsTestByUser(int userId, boolean avg) {
         final String acc = avg ? "avg" : "sum";
         final String query = "SELECT " + acc + "(Points) AS points "
                 + "FROM view_valid_tests "
