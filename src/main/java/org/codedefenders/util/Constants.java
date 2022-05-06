@@ -21,8 +21,6 @@ package org.codedefenders.util;
 import java.io.File;
 import java.nio.file.Paths;
 
-import javax.enterprise.inject.spi.CDI;
-
 import org.codedefenders.configuration.Configuration;
 
 /**
@@ -94,7 +92,8 @@ public class Constants {
     public static final String LIB_HAMCREST = Paths.get(DATA_DIR, "lib", "hamcrest-all-1.3.jar").toString();
     public static final String LIB_MOCKITO = Paths.get(DATA_DIR, "lib", "mockito-all-1.10.19.jar").toString();
     public static final String LIB_GOOGLE_TRUTH = Paths.get(DATA_DIR, "lib", "truth-1.1.2.jar").toString();
-    public static final String LIB_GOOGLE_TRUTH_EXTENSION = Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.1.2.jar").toString();
+    public static final String LIB_GOOGLE_TRUTH_EXTENSION =
+            Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.1.2.jar").toString();
     public static final String LIB_GUAVA_ANDROID = Paths.get(DATA_DIR, "lib", "guava-29.0-android.jar").toString();
 
     // TODO Is this really necessary since we set the CP using build.xml?
@@ -118,6 +117,7 @@ public class Constants {
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
 
     public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();
+    public static final String USER_SETTINGS_JSP = Paths.get("jsp", "user_settings.jsp").toString();
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
     public static final String MELEE_GAME_VIEW_JSP = "/jsp/melee/game_view.jsp";

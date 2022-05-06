@@ -21,7 +21,6 @@ package org.codedefenders.validation.code;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
@@ -34,6 +33,7 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 /**
  * This class checks mutant code and checks whether the code is valid or not.
@@ -42,17 +42,19 @@ import com.github.javaparser.ast.visitor.ModifierVisitor;
  * parameter on {@code visit(Node, __)}, so it's set to {@link Void} here.
  *
  * <p>Instances of this class can be used as follows:
- * <pre><code>Node node = ...;
-MutationVisitor visitor = new MutationVisitor(level);
-visitor.visit(node, null);
-if (!visitor.isValid()) {
-     result = visitor.getMessage();
- }</code></pre>
+ * <pre><code>
+ * Node node = ...;
+ * MutationVisitor visitor = new MutationVisitor(level);
+ * visitor.visit(node, null);
+ * if (!visitor.isValid()) {
+ *     result = visitor.getMessage();
+ * }
+ * </code></pre>
  *
  * @author Jose Rojas
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
-class MutationVisitor extends ModifierVisitor<Void> {
+class MutationVisitor extends VoidVisitorAdapter<Void> {
     private static final Logger logger = LoggerFactory.getLogger(MutationVisitor.class);
 
     private final CodeValidatorLevel level;
@@ -73,148 +75,136 @@ class MutationVisitor extends ModifierVisitor<Void> {
     }
 
     @Override
-    public Node visit(ClassOrInterfaceDeclaration stmt, Void args) {
+    public void visit(ClassOrInterfaceDeclaration stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         this.message = ValidationMessage.MUTATION_CLASS_DECLARATION;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(MethodDeclaration stmt, Void args) {
+    public void visit(MethodDeclaration stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         this.message = ValidationMessage.MUTATION_METHOD_DECLARATION;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(NameExpr stmt, Void args) {
+    public void visit(NameExpr stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (stmt.getNameAsString().equals("System")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_USE;
             isValid = false;
         }
-        return stmt;
     }
 
     @Override
-    public Node visit(ForeachStmt stmt, Void args) {
+    public void visit(ForeachStmt stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (level.equals(CodeValidatorLevel.RELAXED)) {
-            return stmt;
+            return;
         }
         this.message = ValidationMessage.MUTATION_FOR_EACH_STATEMENT;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(IfStmt stmt, Void args) {
+    public void visit(IfStmt stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (level.equals(CodeValidatorLevel.RELAXED)) {
-            return stmt;
+            return;
         }
         this.message = ValidationMessage.MUTATION_IF_STATEMENT;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(ForStmt stmt, Void args) {
+    public void visit(ForStmt stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (level.equals(CodeValidatorLevel.RELAXED)) {
-            return stmt;
+            return;
         }
         this.message = ValidationMessage.MUTATION_FOR_STATEMENT;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(WhileStmt stmt, Void args) {
+    public void visit(WhileStmt stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (level.equals(CodeValidatorLevel.RELAXED)) {
-            return stmt;
+            return;
         }
         this.message = ValidationMessage.MUTATION_WHILE_STATEMENT;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(DoStmt stmt, Void args) {
+    public void visit(DoStmt stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (level.equals(CodeValidatorLevel.RELAXED)) {
-            return stmt;
+            return;
         }
         this.message = ValidationMessage.MUTATION_DO_STATEMENT;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(SwitchStmt stmt, Void args) {
+    public void visit(SwitchStmt stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (level.equals(CodeValidatorLevel.RELAXED)) {
-            return stmt;
+            return;
         }
         this.message = ValidationMessage.MUTATION_SWITCH_STATEMENT;
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(MethodCallExpr stmt, Void args) {
+    public void visit(MethodCallExpr stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (stmt.toString().startsWith("System.")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_CALL;
             isValid = false;
         }
-        return stmt;
     }
 
     @Override
-    public Node visit(VariableDeclarator stmt, Void args) {
+    public void visit(VariableDeclarator stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
         if (stmt.getInitializer().isPresent() && stmt.getInitializer().get().toString().startsWith("System.*")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_DECLARATION;
             isValid = false;
         }
-        return stmt;
     }
-
 }

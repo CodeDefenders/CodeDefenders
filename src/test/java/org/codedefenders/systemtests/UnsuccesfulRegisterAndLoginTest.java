@@ -25,7 +25,6 @@ import com.palantir.docker.compose.connection.waiting.HealthChecks;
 */
 
 import org.codedefenders.util.Paths;
-import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -37,7 +36,7 @@ import static org.codedefenders.systemtests.SeleniumTestUtils.waitForVisible;
 /**
  * System test which tries to register with invalid data.
  *
- * The data:
+ * <p>The data:
  * <ul>
  *     <li>missing fields</li>
  *     <li>invalid email address</li>
@@ -67,8 +66,8 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
     /**
      * Unsuccessful account registration due to missing data.
      */
-	@Test
-	public void testUnsuccessfulRegisterNoData() throws Exception {
+    @Test
+    public void testUnsuccessfulRegisterNoData() throws Exception {
         driver.get(codeDefendersHome);
         driver.findElement(By.id("enter")).click();
         driver.findElement(By.id("createAccountToggle")).click();
@@ -80,14 +79,14 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 
         /* Make sure the registration wasn't successful */
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
-	}
+    }
 
 
     /**
      * Unsuccessful account registration due to invalid email address.
      */
-	@Test
-	public void testUnsuccessfulRegisterInvalidEmail() throws Exception {
+    @Test
+    public void testUnsuccessfulRegisterInvalidEmail() throws Exception {
         driver.get(codeDefendersHome);
         driver.findElement(By.id("enter")).click();
         driver.findElement(By.id("createAccountToggle")).click();
@@ -109,13 +108,13 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 
         /* Make sure the registration wasn't successful */
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
-	}
+    }
 
     /**
      * Unsuccessful account registration due to "password" and "confirm password" not matching.
      */
-	@Test
-	public void testUnsuccessfulRegisterNonmatchingPasswords() throws Exception {
+    @Test
+    public void testUnsuccessfulRegisterNonmatchingPasswords() throws Exception {
         driver.get(codeDefendersHome);
         driver.findElement(By.id("enter")).click();
         driver.findElement(By.id("createAccountToggle")).click();
@@ -165,7 +164,7 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 
         /* Make sure the registration wasn't successful */
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
-	}
+    }
 
 
     /**
@@ -194,5 +193,5 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 
         /* Make sure the registration wasn't successful */
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
-	}
+    }
 }

@@ -19,17 +19,12 @@
 package org.codedefenders.model;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.enterprise.inject.spi.CDI;
 
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

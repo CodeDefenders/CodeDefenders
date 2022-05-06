@@ -1,0 +1,7 @@
+package another;
+
+public class CUT {
+    public void test() {
+        int a = 0;
+    }
+};

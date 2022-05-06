@@ -34,8 +34,10 @@
     @param MeleeGame game
         The game to be displayed.
 --%>
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean"
-             scope="request"/>
+
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");
     final GameClass cut = game.getCUT();
@@ -179,8 +181,6 @@
     classViewer.setDependenciesForClass(game.getCUT());
 %>
 
-<% previousSubmission.clear(); %>
-
 
 <div class="row">
 
@@ -254,6 +254,7 @@
 
     <div class="col-xl-6 col-12" id="cut-div">
         <div class="game-component-header"><h3>Class Under Test</h3></div>
+        <t:defender_intention_collection_note/>
         <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
         <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
     </div>
@@ -297,20 +298,19 @@
                     <button class="btn btn-warning" id="btnReset">Reset</button>
                 </form>
 
-                <button type="submit" class="btn btn-attacker btn-highlight" id="submitMutant" form="atk"
-                        onclick="CodeDefenders.objects.mutantProgressBar.activate(); this.form.submit(); this.disabled=true;"
-                        <%if (game.getState() != GameState.ACTIVE) {%> disabled <%}%>>
-                    Attack
-                </button>
-
+                <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
+                                        intentionCollectionEnabled="${gameProducer.game.capturePlayersIntention}"/>
             </div>
         </div>
+
+        <t:defender_intention_collection_note/>
 
         <form id="atk"
               action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
               method="post">
-            <input type="hidden" name="formType" value="createMutant"> <input
-                type="hidden" name="gameId" value="<%=game.getId()%>"/>
+            <input type="hidden" name="formType" value="createMutant">
+            <input type="hidden" name="gameId" value="<%=game.getId()%>">
+            <input type="hidden" id="attacker_intention" name="attacker_intention" value="">
 
             <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
@@ -342,8 +342,9 @@
               action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
               method="post">
             <jsp:include page="/jsp/game_components/test_editor.jsp"/>
-            <input type="hidden" name="formType" value="createTest"> <input
-                type="hidden" name="gameId" value="<%=game.getId()%>"/>
+            <input type="hidden" name="formType" value="createTest">
+            <input type="hidden" name="gameId" value="<%=game.getId()%>">
+            <input type="hidden" id="selected_lines" name="selected_lines" value="">
         </form>
         <jsp:include page="/jsp/game_components/test_error_highlighting.jsp"/>
 

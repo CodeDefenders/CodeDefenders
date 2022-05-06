@@ -1,0 +1,5 @@
+public class Test {
+    public void test() {
+        if (x >= 0) { System.currentTimeMillis(); return x; } else return -x;
+    }
+}

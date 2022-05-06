@@ -49,7 +49,7 @@ class PropertiesFileConfiguration extends BaseConfiguration {
     private final Properties properties;
 
     @Inject
-    PropertiesFileConfiguration(List<ConfigFileResolver> configFileResolvers) {
+    PropertiesFileConfiguration(@SuppressWarnings("CdiInjectionPointsInspection") List<ConfigFileResolver> configFileResolvers) {
         super();
         properties = new Properties();
         readProperties(configFileResolvers, "codedefenders.properties");

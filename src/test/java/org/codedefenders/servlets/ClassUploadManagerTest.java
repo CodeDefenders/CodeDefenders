@@ -18,30 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.DatabaseRule;
-import org.codedefenders.util.Constants;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,6 +43,30 @@ import javax.servlet.http.HttpSession;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.codedefenders.DatabaseRule;
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.itests.IntegrationTest;
+import org.codedefenders.util.Constants;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -76,7 +76,7 @@ import static org.mockito.Mockito.when;
 @RunWith(PowerMockRunner.class)
 // This is required otherwise PowerMock breaks ToolProvider
 
-@PowerMockIgnore({"javax.tools.*" })
+@PowerMockIgnore({"javax.tools.*"})
 @PrepareForTest({DatabaseConnection.class})
 public class ClassUploadManagerTest {
 
@@ -94,7 +94,7 @@ public class ClassUploadManagerTest {
     public static void setupEnvironment() throws IOException {
 
         JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();
-        Assume.assumeNotNull( javaCompiler );
+        Assume.assumeNotNull(javaCompiler);
 
         codedefendersHome = Files.createTempDirectory("integration-tests").toFile();
         codedefendersHome.deleteOnExit();
@@ -192,11 +192,11 @@ public class ClassUploadManagerTest {
         int availableBytes = inputStream.available();
 
         // Write the inputStream to a FileItem
-        File outFile = codedefendersHome.createTempFile("ClassUploadManagerTest","");
+        File outFile = codedefendersHome.createTempFile("ClassUploadManagerTest", "");
         outFile.deleteOnExit();
 
         String contentType = null;
-        if( classPathResource.endsWith(".zip") ){
+        if (classPathResource.endsWith(".zip")) {
             contentType = "application/zip";
         } else {
             contentType = "plain/text";

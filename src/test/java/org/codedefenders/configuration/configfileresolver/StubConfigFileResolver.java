@@ -26,7 +26,7 @@ import java.io.StringReader;
  * The StubConfigFileResolver is used for testing the
  * {@link org.codedefenders.configuration.implementation.PropertiesFileConfiguration}.
  *
- * As the returned content (the reader for a config file) can be set by the developer.
+ * <p>As the returned content (the reader for a config file) can be set by the developer.
  *
  * @author degenhart
  */

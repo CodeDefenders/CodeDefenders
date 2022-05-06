@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -42,13 +43,9 @@
     <p>Below these panels are two more panels, which show existing mutants and tests. In the mutants panel, mutants can be claimed as being equivalent (which is covered at the end of this page). Existing mutants can also be seen by the icon present in the margin of the CUT panel.</p>
     <p><img style="margin-top:16px" src="images/help/defend_02.png" class="img-responsive"/></p>
     <p>We&#39;re going to submit a test to kill an alive mutant. Tests don&#39;t necessarily have to target alive mutants, and can simply be made to kill possible future mutants.</p>
-    <p>Tests are limited by the following rules:</p>
-    <ul>
-        <li>They cannot contain loops.</li>
-        <li>They cannot make calls to System.*</li>
-        <li>They cannot contain new methods or conditionals.</li>
-        <li>They can only make two assertions each.</li>
-    </ul>
+    <div class="card p-4">
+        <t:validator_explanation_test/>
+    </div>
     <p><img style="margin-top:16px" src="images/help/defend_03.png" class="img-responsive"/></p>
     <p>If an error is made in your test and it does not compile, a full compiler error is shown at the top of the screen. In this case, I did not add the brackets at the end of a function call.</p>
     <p><img style="margin-top:16px" src="images/help/defend_04.png" class="img-responsive"/></p>
@@ -67,8 +64,10 @@
     <p>The attack page only has two panels, existing mutants, and a panel containing the CUT, which can be modified to create mutants. Green lines are covered by existing tests, with darker green showing more coverage.</p>
     <p><img style="margin-top:16px" src="images/help/attack_01.png" class="img-responsive"/></p>
     <p>Similarly to tests, mutants are limited by rules, which come in three strictness levels:</p>
-    <div class = "panel" style="margin: 30px"><%@ include file="/jsp/validator_explanation.jsp" %></div>
-    <p>Here I have created a mutant by changing the > comparator to <. Return values, variables, etc. can also be changed.</p>
+    <div class="card p-4">
+        <t:validator_explanation_mutant/>
+    </div>
+    <p>Here I have created a mutant by changing the &gt; comparator to &lt;. Return values, variables, etc. can also be changed.</p>
     <p>
         <img style="margin-top:16px" src="images/help/attack_02_originalsnippet.png" class="img-responsive"/>
         <img style="margin-top:16px" src="images/help/attack_02_mutated.png" class="img-responsive"/>

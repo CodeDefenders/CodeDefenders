@@ -109,8 +109,6 @@
 
 </div>
 
-<script type="text/javascript" src="js/class_viewer.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
@@ -122,7 +120,7 @@
             dependencyEditorElements.push(document.getElementById(`class-viewer-code-\${i}`));
         }
 
-        CodeDefenders.objects.classViewer = new CodeDefenders.classes.ClassViewer(
+        CodeDefenders.objects.classViewer = new CodeDefenders.ClassViewer(
                 editorElement,
                 dependencyEditorElements);
     })();

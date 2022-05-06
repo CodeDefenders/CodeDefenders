@@ -32,9 +32,6 @@
     </div>
 </div>
 
-<script type="text/javascript" src="js/code_completion.js"></script>
-<script type="text/javascript" src="js/test_editor.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
@@ -45,7 +42,7 @@
 
         const editorElement = document.getElementById('test-code');
 
-        CodeDefenders.objects.testEditor = new CodeDefenders.classes.TestEditor(
+        CodeDefenders.objects.testEditor = new CodeDefenders.TestEditor(
                 editorElement,
                 editableLinesStart,
                 editableLinesEnd,

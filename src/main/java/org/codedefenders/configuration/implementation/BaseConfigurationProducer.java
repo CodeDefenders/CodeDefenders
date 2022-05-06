@@ -33,6 +33,7 @@ public class BaseConfigurationProducer {
      *
      * @return A list of Configuration classes sorted by ascending priority.
      */
+    @SuppressWarnings("CdiInjectionPointsInspection")
     @Produces
     public List<BaseConfiguration> getConfiguration(SystemPropertyConfiguration sysPropConf,
             ContextConfiguration contextConf,

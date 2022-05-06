@@ -133,7 +133,6 @@ public class AdminPuzzleUpload extends HttpServlet {
         }
     }
 
-    @SuppressWarnings("Duplicates")
     private void createPuzzles(HttpServletRequest request, List<FileItem> fileParameters) throws IOException {
         for (FileItem fileParameter : fileParameters) {
             final String fieldName = fileParameter.getFieldName();

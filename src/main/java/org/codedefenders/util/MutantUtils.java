@@ -26,9 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.patch.AbstractDelta;
+import com.github.difflib.patch.DeltaType;
+import com.github.difflib.patch.Patch;
 
 /**
  * Basic utilities for mutants.
@@ -48,23 +49,22 @@ public class MutantUtils {
         List<String> sutLines = new ArrayList<>(Arrays.asList(originalCode.split("\\r?\\n")));
         List<String> mutantLines = new ArrayList<>(Arrays.asList(mutatedCode.split("\\r?\\n")));
 
-        Patch differences = DiffUtils.diff(sutLines, mutantLines);
+        Patch<String> differences = DiffUtils.diff(sutLines, mutantLines);
         List<Integer> reversedLinesToDelete = new ArrayList<>();
         // Position are 0-indexed
-        for (Delta delta : differences.getDeltas()) {
-            final Delta.TYPE type = delta.getType();
+        for (AbstractDelta<String> delta : differences.getDeltas()) {
+            final DeltaType type = delta.getType();
             switch (type) {
                 case CHANGE:
-                    if (delta.getOriginal().size() >= delta.getRevised().size()) {
+                    if (delta.getSource().size() >= delta.getTarget().size()) {
                         break;
                     }
                 case INSERT:
-                    for (int nestedIndex = 0; nestedIndex < delta.getRevised().getLines().size(); nestedIndex++) {
-                        Object o = delta.getRevised().getLines().get(nestedIndex);
-                        if (o instanceof String) {
-                            String line = (String) o;
+                    for (int nestedIndex = 0; nestedIndex < delta.getTarget().getLines().size(); nestedIndex++) {
+                        String line = delta.getTarget().getLines().get(nestedIndex);
+                        if (line != null) {
                             if (line.trim().length() == 0) {
-                                int pos = delta.getRevised().getPosition() + nestedIndex;
+                                int pos = delta.getTarget().getPosition() + nestedIndex;
                                 reversedLinesToDelete.add(0, pos);
                             }
                         }

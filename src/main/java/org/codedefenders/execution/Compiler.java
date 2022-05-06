@@ -97,7 +97,6 @@ public class Compiler {
      * {@code javac} requires no options, but here, somehow the standard tomcat directory
      * is used, so the option {@code -d} is required.
      */
-    @SuppressWarnings("Duplicates")
     private static String compileJavaFile(JavaFileObject javaFile) throws CompileException, IllegalStateException {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here

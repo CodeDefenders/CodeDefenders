@@ -188,14 +188,12 @@
 
                 <div class="row mb-1"
                      title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
-                    <label class="col-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture
-                        Intentions</label>
+                    <label class="col-4 col-form-label" id="capture-intentions-label" for="capture-intentions-switch">Capture Intentions</label>
                     <div class="col-8 d-flex align-items-center">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="capture-intentions-switch"
                                    name="capturePlayersIntention">
-                            <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players'
-                                Intentions</label>
+                            <label class="form-check-label" for="capture-intentions-switch">Enable Capturing Players' Intentions</label>
                         </div>
                     </div>
                 </div>
@@ -239,22 +237,14 @@
 
             </form>
 
-            <div class="modal fade" id="validatorExplanation" tabindex="-1">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Mutant Validator Explanation</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <%@ include file="/jsp/validator_explanation.jsp" %>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <t:modal id="validatorExplanation" title="Validator Explanations">
+                <jsp:attribute name="content">
+                    <t:validator_explanation_mutant/>
+                    <div class="mt-3"></div> <%-- spacing --%>
+                    <t:validator_explanation_test/>
+                </jsp:attribute>
+            </t:modal>
+
             <div class="modal fade" id="automaticEquivalenceTriggerExplanation" tabindex="-1">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -263,7 +253,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body p-4">
-                            <%@ include file="/jsp/automatic_duels_explanation.jsp" %>
+                            <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -271,6 +261,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="form-width w-100">

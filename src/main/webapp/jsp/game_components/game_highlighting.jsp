@@ -36,8 +36,6 @@
     The CSS is located in codemirror_customize.css.
 --%>
 
-<script type="text/javascript" src="js/game_highlighting.js"></script>
-
 <script>
     /* Wrap in a function to avoid polluting the global scope. */
     (function () {
@@ -45,7 +43,7 @@
         const enableFlagging = Boolean(${gameHighlighting.enableFlagging});
         const gameId = ${gameHighlighting.gameId};
 
-        CodeDefenders.objects.gameHighlighting = new CodeDefenders.classes.GameHighlighting(
+        CodeDefenders.objects.gameHighlighting = new CodeDefenders.GameHighlighting(
                 data,
                 enableFlagging,
                 gameId);

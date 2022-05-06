@@ -75,6 +75,7 @@
                         style="left: auto; right: 0;">
                         <% if (profileEnabled) { %>
                             <li><a class="dropdown-item" id="header-profile" href="<%=request.getContextPath() + Paths.USER_PROFILE%>">Profile</a></li>
+                            <li><a class="dropdown-item" id="header-account" href="<%=request.getContextPath() + Paths.USER_SETTINGS%>">Account</a></li>
                         <% } %>
                         <li><a class="dropdown-item" id="header-help" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a></li>
                         <li><a class="dropdown-item" id="header-logout" href="<%=request.getContextPath() + Paths.LOGOUT%>">Logout</a></li>

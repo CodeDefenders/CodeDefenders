@@ -1,0 +1,1 @@
+public class CUT { public void test() { currentFloor--; }}

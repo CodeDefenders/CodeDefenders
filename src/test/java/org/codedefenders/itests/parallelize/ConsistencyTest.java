@@ -61,6 +61,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.IMutationTester;
@@ -71,7 +72,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.junit.Before;
@@ -97,7 +97,7 @@ import static org.junit.Assert.assertNotNull;
 @Ignore
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class }) // , mutationTester.class })
+@PrepareForTest({DatabaseConnection.class}) // , mutationTester.class })
 public class ConsistencyTest {
 
     // PowerMock does not work with @ClassRule !!
@@ -229,7 +229,7 @@ public class ConsistencyTest {
         //
         UserEntity[] defenders = new UserEntity[3];
         for (int i = 0; i < defenders.length; i++) {
-            defenders[i] = new UserEntity("demodefender" + i, UserEntity.encodePassword("password"), "demo"+i+"@defender.com");
+            defenders[i] = new UserEntity("demodefender" + i, UserEntity.encodePassword("password"), "demo" + i + "@defender.com");
             defenders[i].insert();
             System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
         }

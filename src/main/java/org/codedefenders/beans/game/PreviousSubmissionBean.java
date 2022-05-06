@@ -18,6 +18,12 @@ public class PreviousSubmissionBean implements Serializable {
     private String testCode;
     private List<Integer> errorLines;
 
+    /**
+     * The selected line for the defender intention collection.
+     * (The server-side implementation seems to be able to deal with multiple selected lines, but this is unused.)
+     */
+    private Integer selectedLine;
+
     public PreviousSubmissionBean() {
         mutantCode = null;
         testCode = null;
@@ -36,27 +42,21 @@ public class PreviousSubmissionBean implements Serializable {
         this.errorLines = errorLines;
     }
 
-    // public void clearMutant() {
-    //     mutantCode = null;
-    // }
-
-    // public void clearTest() {
-    //     testCode = null;
-    // }
-
-    // public void clearErrorLines() {
-    //     errorLines = null;
-    // }
+    public void setSelectedLine(int selectedLine) {
+        this.selectedLine = selectedLine;
+    }
 
     public void clear() {
         mutantCode = null;
         testCode = null;
         errorLines = null;
+        selectedLine = null;
     }
 
     public void clearButKeepMutant() {
         testCode = null;
         errorLines = null;
+        selectedLine = null;
     }
 
     // --------------------------------------------------------------------------------
@@ -73,6 +73,10 @@ public class PreviousSubmissionBean implements Serializable {
         return errorLines != null;
     }
 
+    public boolean hasSelectedLine() {
+        return selectedLine != null;
+    }
+
     public String getMutantCode() {
         return mutantCode;
     }
@@ -83,5 +87,9 @@ public class PreviousSubmissionBean implements Serializable {
 
     public List<Integer> getErrorLines() {
         return errorLines;
+    }
+
+    public Integer getSelectedLine() {
+        return selectedLine;
     }
 }

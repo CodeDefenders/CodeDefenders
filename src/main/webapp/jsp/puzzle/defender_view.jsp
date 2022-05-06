@@ -105,14 +105,12 @@
 <% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
 
 
-<% previousSubmission.clear(); %>
-
-
 <%-- -------------------------------------------------------------------------------- --%>
 
 
 <jsp:include page="/jsp/header.jsp"/>
 
+<script src="js/codedefenders_game.js" type="text/javascript"></script>
 <link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/push_socket.jsp"/>
@@ -129,6 +127,8 @@
     <div class="row">
         <div class="col-xl-6 col-12" id="cut-div">
             <div class="game-component-header"><h3>Class Under Test</h3></div>
+            <%-- <t:defender_intention_collection_note/>
+                 for defender intetion collection, not needed here --%>
             <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
             <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         </div>
@@ -154,6 +154,8 @@
                   method="post">
                 <input type="hidden" name="formType" value="createTest">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
+                <%-- <input type="hidden" id="selected_lines" name="selected_lines" value="">
+                     for defender intention collection, not needed here --%>
 
                 <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             </form>
@@ -172,3 +174,6 @@
     </div>
 
 <%@ include file="/jsp/footer_game.jsp"%>
+
+
+<% previousSubmission.clear(); %>

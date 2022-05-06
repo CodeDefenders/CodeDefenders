@@ -57,18 +57,16 @@
         </thead>
     </table>
 
-    <script type="text/javascript" src="js/puzzle_api.js"></script>
-
     <script type="text/javascript">
         let puzzleTable;
         let chapterTable;
 
         $(document).ready(async function() {
-            const puzzleData = await CodeDefenders.classes.PuzzleAPI.fetchPuzzleData();
+            const puzzleData = await CodeDefenders.PuzzleAPI.fetchPuzzleData();
 
             const chapters = puzzleData.puzzleChapters;
             if (chapters) {
-                chapterTable = $('#tableChapters').DataTable({
+                chapterTable = new DataTable('#tableChapters', {
                     "data": chapters,
                     "columns": [
                         { "data": "id" },
@@ -160,7 +158,7 @@
 
             const puzzles = puzzleData.puzzles;
             if (puzzles) {
-                puzzleTable = $('#tablePuzzles').DataTable({
+                puzzleTable = new DataTable('#tablePuzzles', {
                     "data": puzzles,
                     "columns": [
                         { "data": "id" },
@@ -298,7 +296,7 @@
                 position: parseIntOrNull(document.getElementById(`positionForPuzzleChapter\${puzzleChapterId}`).value)
             };
 
-            CodeDefenders.classes.PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
+            CodeDefenders.PuzzleAPI.updatePuzzleChapter(puzzleChapterId, updateChapterData)
                 .then(responseJSON => {
                     chapterTable.row(row).data(updateChapterData);
 
@@ -313,7 +311,7 @@
             let confirmResult = confirm('Are you sure you want to delete puzzle chapter ' + puzzleChapterId + '?'
                 + ' This will not remove the puzzles of the chapter.');
             if (confirmResult) {
-                CodeDefenders.classes.PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
+                CodeDefenders.PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
                     .then(responseJSON => {
                         chapterTable.row(row).remove();
 
@@ -342,7 +340,7 @@
                 editableLinesEnd: parseIntOrNull(document.getElementById(`editableLinesEndForPuzzle` + puzzleId).value)
             };
 
-            CodeDefenders.classes.PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
+            CodeDefenders.PuzzleAPI.updatePuzzle(puzzleId, updatedPuzzleData)
                 .then(responseJSON => {
                     puzzleTable.row(row).data(updatedPuzzleData);
 
@@ -356,7 +354,7 @@
         function removePuzzle(puzzleId, row, column) {
             let confirmResult = confirm(`Are you sure you want to delete puzzle \${puzzleId}?`);
             if (confirmResult) {
-                CodeDefenders.classes.PuzzleAPI.deletePuzzle(puzzleId)
+                CodeDefenders.PuzzleAPI.deletePuzzle(puzzleId)
                     .then(responseJSON => {
                         puzzleTable.row(row).remove();
 

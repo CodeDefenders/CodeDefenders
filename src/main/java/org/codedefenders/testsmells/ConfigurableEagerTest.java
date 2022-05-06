@@ -75,7 +75,7 @@ public class ConfigurableEagerTest extends AbstractSmell {
      */
     @Override
     public boolean getHasSmell() {
-        return smellyElementList.stream().filter(x -> x.getHasSmell()).count() >= 1;
+        return smellyElementList.stream().anyMatch(SmellyElement::getHasSmell);
     }
 
     /**
@@ -168,8 +168,8 @@ public class ConfigurableEagerTest extends AbstractSmell {
                 }
             } else { // collect a list of all public/protected members of the production class
                 for (Modifier modifier : n.getModifiers()) {
-                    if (modifier.name().toLowerCase().equals("public")
-                            || modifier.name().toLowerCase().equals("protected")) {
+                    if (modifier.name().equalsIgnoreCase("public")
+                            || modifier.name().equalsIgnoreCase("protected")) {
                         productionMethods.add(n);
                     }
                 }

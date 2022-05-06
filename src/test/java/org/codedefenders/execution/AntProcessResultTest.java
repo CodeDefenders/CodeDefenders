@@ -20,16 +20,17 @@ package org.codedefenders.execution;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.regex.Matcher;
 
 import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
 
 public class AntProcessResultTest {
 
     @Test
-    public void reduceJUnitOutputToEssential(){
+    public void reduceJUnitOutputToEssential() {
         String fullJUnitOutput = ""
                 + "[junit] Running TestLift" + "\n"
                 + "[junit] Testsuite: TestLift" + "\n"
@@ -43,11 +44,11 @@ public class AntProcessResultTest {
                 + "[junit]         at java.util.concurrent.FutureTask.run(FutureTask.java:266)" + "\n"
                 + "[junit]         at java.lang.Thread.run(Thread.java:748)" + "\n"
                 + "[junit] Test TestLift FAILED";
-        
+
         AntProcessResult result = new AntProcessResult();
-        result.setInputStream( new BufferedReader( new StringReader( fullJUnitOutput ) ));
+        result.setInputStream(new BufferedReader(new StringReader(fullJUnitOutput)));
         //
         String reducedJunitOutput = result.getJUnitMessage();
-        assertThat( reducedJunitOutput.split("\n").length, is( lessThan( fullJUnitOutput.split("\n").length)));
+        assertThat(reducedJunitOutput.split("\n").length, is(lessThan(fullJUnitOutput.split("\n").length)));
     }
 }

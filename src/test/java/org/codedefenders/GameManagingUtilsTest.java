@@ -18,9 +18,6 @@
  */
 package org.codedefenders;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -53,6 +50,9 @@ import org.mockito.Mockito;
 
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GameManagingUtilsTest {
 
@@ -165,7 +165,7 @@ public class GameManagingUtilsTest {
 
         // TODO Probably some smart argument matcher might be needed
         // TODO Matching by string is britlle, maybe match by "class/type"?
-        Set<String> expectedSmells = new HashSet<>(Arrays.asList(new String[] {}));
+        Set<String> expectedSmells = new HashSet<>(Arrays.asList(new String[]{}));
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {
@@ -203,7 +203,7 @@ public class GameManagingUtilsTest {
         ArgumentCaptor<TestFile> argument = ArgumentCaptor.forClass(TestFile.class);
         Mockito.verify(mockedTestSmellDAO).storeSmell(Mockito.any(), argument.capture());
         // We expect no smells
-        Set<String> noSmellsExpected = new HashSet<>(Arrays.asList(new String[] {}));
+        Set<String> noSmellsExpected = new HashSet<>(Arrays.asList(new String[]{}));
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {
@@ -245,7 +245,7 @@ public class GameManagingUtilsTest {
         Mockito.verify(mockedTestSmellDAO).storeSmell(Mockito.any(), argument.capture());
         // TODO Probably some smart argument matcher might be needed
         // TODO Matching by string is britlle, maybe match by "class/type"?
-        Set<String> expectedSmells = new HashSet<>(Arrays.asList(new String[] { "Eager Test" }));
+        Set<String> expectedSmells = new HashSet<>(Arrays.asList(new String[]{"Eager Test"}));
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {

@@ -84,9 +84,6 @@
         </c:forEach>
     </div>
 
-    <script type="text/javascript" src="js/modal.js"></script>
-    <script type="text/javascript" src="js/mutant_accordion.js"></script>
-
     <script>
         /* Wrap in a function to avoid polluting the global scope. */
         (function () {
@@ -94,7 +91,7 @@
             const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
             const gameId = ${mutantAccordion.gameId};
 
-            CodeDefenders.objects.mutantAccordion = new CodeDefenders.classes.MutantAccordion(
+            CodeDefenders.objects.mutantAccordion = new CodeDefenders.MutantAccordion(
                     categories,
                     mutants,
                     gameId);

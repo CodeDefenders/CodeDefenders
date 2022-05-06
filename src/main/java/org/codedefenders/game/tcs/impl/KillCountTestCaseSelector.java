@@ -55,7 +55,7 @@ public class KillCountTestCaseSelector extends PrioritizedTestCaseSelector {
                 }
             });
         } catch (Exception e) {
-            logger.error("Cannot compute killmap: {} ", e);
+            logger.error("Cannot compute killmap:", e);
         }
         logger.debug("Prioritized test case {} ", allTests);
         return allTests;

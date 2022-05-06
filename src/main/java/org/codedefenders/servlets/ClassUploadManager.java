@@ -578,7 +578,6 @@ public class ClassUploadManager extends HttpServlet {
      * @return {@code true} if addition fails, {@code fail} otherwise.
      * @throws IOException when aborting the request fails.
      */
-    @SuppressWarnings("Duplicates")
     private boolean addMutants(HttpServletRequest request, HttpServletResponse response,
                                List<CompiledClass> compiledClasses, int cutId, String cutFileName, Path cutDir,
                                SimpleFile mutantsZipFile, List<JavaFileObject> dependencies) throws IOException {
@@ -717,7 +716,6 @@ public class ClassUploadManager extends HttpServlet {
      * @return {@code true} if addition fails, {@code fail} otherwise.
      * @throws IOException when aborting the request fails.
      */
-    @SuppressWarnings("Duplicates")
     private boolean addTests(HttpServletRequest request, HttpServletResponse response,
                              List<CompiledClass> compiledClasses, int cutId, Path cutDir, GameClass cut,
                              SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {

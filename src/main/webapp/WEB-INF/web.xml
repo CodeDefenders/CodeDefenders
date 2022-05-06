@@ -152,4 +152,8 @@
 		<location>/jsp/error_page_500.jsp</location>
 	</error-page>
 
+	<mime-mapping>
+		<extension>mjs</extension>
+		<mime-type>text/javascript</mime-type>
+	</mime-mapping>
 </web-app>

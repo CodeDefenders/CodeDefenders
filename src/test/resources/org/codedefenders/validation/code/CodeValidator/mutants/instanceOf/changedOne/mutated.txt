@@ -1,0 +1,8 @@
+public class CUT {
+    public void test() {
+        Integer a = new Integer(0);
+        if (a instanceof Object) {
+            String b = a.toString();
+        }
+    }
+}

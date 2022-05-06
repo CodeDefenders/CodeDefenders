@@ -1,0 +1,9 @@
+public class Test {
+
+    public void pow() {
+        Integer a = new Integer(3);
+        if (a instanceof Number) {
+            int b = a.intValue();
+        }
+    }
+}

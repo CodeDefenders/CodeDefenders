@@ -233,7 +233,6 @@ public class Test {
         return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
     }
 
-    @SuppressWarnings("Duplicates")
     public String getAsHTMLEscapedString() {
         return StringEscapeUtils.escapeHtml4(getAsString());
     }

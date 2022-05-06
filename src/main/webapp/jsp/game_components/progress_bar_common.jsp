@@ -8,5 +8,3 @@
          aria-valuenow="0">
     </div>
 </div>
-
-<script type="text/javascript" src="js/progress_bar_common.js"></script>

@@ -73,7 +73,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private static final int MIN_NUMBER_OF_STATEMENTS = 0;
 
     private boolean isValid = true;
-    private List<String> messages = new LinkedList<>();
+    private final List<String> messages = new LinkedList<>();
 
     private int classCount = 0;
     private int methodCount = 0;
@@ -155,6 +155,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
+        stmtCount++;
         String stringStmt = stmt.toString(new PrettyPrinterConfiguration().setPrintComments(false));
         for (String prohibited : CodeValidator.PROHIBITED_CALLS) {
             // This might be a bit too strict... We shall use typeSolver otherwise.
@@ -164,7 +165,6 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
                 return;
             }
         }
-        stmtCount++;
         super.visit(stmt, args);
     }
 
@@ -315,6 +315,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
                     || initString.contains("Thread")) {
                 messages.add("Test contains an invalid variable declaration: " + initString);
                 isValid = false;
+                return;
             }
         }
         super.visit(stmt, args);
@@ -329,6 +330,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
             messages.add("Test contains an invalid statement: " + stmt.toString());
             isValid = false;
+            return;
         }
         super.visit(stmt, args);
     }
@@ -342,8 +344,8 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (operator != null && (Stream.of(AssignExpr.Operator.AND, AssignExpr.Operator.OR, AssignExpr.Operator.XOR)
                 .anyMatch(op -> operator == op))) {
             isValid = false;
+            return;
         }
         super.visit(stmt, args);
     }
-
 }

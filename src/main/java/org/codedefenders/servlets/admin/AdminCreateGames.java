@@ -78,7 +78,7 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        synchronized (adminCreateGamesBean) {
+        synchronized (adminCreateGamesBean.getSynchronizer()) {
             adminCreateGamesBean.update();
             stagedGameList = adminCreateGamesBean.getStagedGameList();
 
@@ -88,7 +88,7 @@ public class AdminCreateGames extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        synchronized (adminCreateGamesBean) {
+        synchronized (adminCreateGamesBean.getSynchronizer()) {
             adminCreateGamesBean.update();
             stagedGameList = adminCreateGamesBean.getStagedGameList();
 

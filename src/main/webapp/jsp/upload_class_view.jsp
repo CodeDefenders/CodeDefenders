@@ -243,7 +243,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#tableUploadedClasses').DataTable({
+        new DataTable('#tableUploadedClasses', {
             paging: false,
             order: [[0, 'desc']],
             scrollY: '600px',

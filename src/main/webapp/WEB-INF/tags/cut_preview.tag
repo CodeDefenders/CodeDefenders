@@ -37,7 +37,7 @@
             const codeMirrorContainer = cutPreview.querySelector('.CodeMirror');
 
             if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                CodeDefenders.classes.InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
+                CodeDefenders.InfoApi.setClassEditorValue(codeMirrorContainer.CodeMirror, classId);
             } else {
                 const editor = CodeMirror.fromTextArea(textarea, {
                     lineNumbers: true,
@@ -46,7 +46,7 @@
                     autoRefresh: true
                 });
                 editor.getWrapperElement().classList.add('codemirror-readonly');
-                CodeDefenders.classes.InfoApi.setClassEditorValue(editor, classId);
+                CodeDefenders.InfoApi.setClassEditorValue(editor, classId);
             }
         };
 

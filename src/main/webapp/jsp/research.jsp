@@ -24,7 +24,7 @@
 <div id="research" class="paper-list">
     <ul class="papercite_bibliography">
         <li>
-            <a href="http://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="Download PDF" class="pdf_link">
                 <img src='images/pdf.png' alt="[PDF]"/>
             </a>
             Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
@@ -32,20 +32,19 @@
             In <span class="paper_venue">Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)</span>, ACM, 2019.
             <a href="#" data-bs-toggle="collapse" data-bs-target="#sigcse19_bibtex">[Bibtex]</a>
             <div id="sigcse19_bibtex" class="bibtex collapse" >
-<pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
+<pre class="tex"><code>@inproceedings{SIGSCE_2019_CodeDefenders,
     author = {Gordon Fraser and Alessio Gambi and Marvin Kreis and Jos{\'e} Miguel Rojas},
     title = {Gamifying a Software Testing Course with Code Defenders},
     booktitle = {Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)},
     series = {SIGCSE'19},
     publisher = {ACM},
-    note = {To appear},
     year = {2019}
 }</code></pre>
                 <button class="btn btn-xs btn-outline-secondary btn-bibtex-copy" onclick="copyBibtex(this);">Copy</button>
             </div>
         </li>
         <li>
-            <a href="http://study.code-defenders.org/papers/ECSEE18_Course.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ECSEE18_Course.pdf" title="Download PDF" class="pdf_link">
                 <img src='images/pdf.png' alt="[PDF]"/>
             </a>
             Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
@@ -66,7 +65,7 @@
             </div>
         </li>
         <li>
-            <a href="http://study.code-defenders.org/papers/ICSE17_Education.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ICSE17_Education.pdf" title="Download PDF" class="pdf_link">
                 <img src='images/pdf.png' alt="[PDF]"/>
             </a>
             Benjamin Clegg, Jos&eacute; Miguel Rojas, Gordon Fraser.
@@ -87,7 +86,7 @@
             </div>
         </li>
         <li>
-            <a href="http://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf" title="Download PDF" class="pdf_link">
                 <img src='images/pdf.png' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
@@ -107,7 +106,7 @@
             </div>
         </li>
         <li>
-            <a href="http://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf" title="Download PDF" class="pdf_link">
                 <img src='images/pdf.png' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
@@ -125,7 +124,7 @@
             </div>
         </li>
         <li>
-            <a href="http://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf" title="Download PDF" class="pdf_link">
                 <img src='images/pdf.png' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
@@ -145,7 +144,7 @@
             </div>
         </li>
         <li>
-            <a href="http://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf" title="Download PDF" class="pdf_link">
+            <a href="https://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf" title="Download PDF" class="pdf_link">
                 <img src='images/pdf.png' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.

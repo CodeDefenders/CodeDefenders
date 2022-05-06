@@ -64,11 +64,9 @@
     </div>
 </div>
 
-<script src="js/datatables_utils.js" type="text/javascript" ></script>
-
 <script>
 (function () {
-    const DataTablesUtils = CodeDefenders.classes.DataTablesUtils;
+    const DataTablesUtils = CodeDefenders.DataTablesUtils;
     const div = DataTablesUtils.formatDivision;
     const valPercent = DataTablesUtils.formatValueAndPercent;
 
@@ -140,7 +138,7 @@
     }
 
     $(document).ready(function() {
-        const table = $('#tableUsers').DataTable({
+        const table = new DataTable('#tableUsers', {
             "ajax": {
                 "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_USERS + "?fileType=json"%>",
                 "dataSrc": "data"

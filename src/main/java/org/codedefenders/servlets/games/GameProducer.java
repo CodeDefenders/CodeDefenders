@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
@@ -13,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RequestScoped
+@Named("gameProducer")
 public class GameProducer implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(GameProducer.class);
 

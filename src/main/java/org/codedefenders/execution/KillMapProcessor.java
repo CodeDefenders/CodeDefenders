@@ -92,8 +92,6 @@ public class KillMapProcessor implements ServletContextListener {
                     case CLASS:
                         try {
                             KillMap.forClass(theJob.getId());
-                        } catch (InterruptedException | ExecutionException e) {
-                            logger.warn("Killmap computation failed!", e);
                         } catch (Throwable e) {
                             logger.warn("Killmap computation failed!", e);
                         } finally {

@@ -39,6 +39,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
+import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -55,7 +56,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -75,8 +75,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import difflib.DiffUtils;
-import difflib.Patch;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.Patch;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
@@ -89,7 +90,7 @@ import static org.junit.Assume.assumeTrue;
 @Ignore
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class, MutationTester.class}) // , mutationTester.class })
+@PrepareForTest({DatabaseConnection.class, MutationTester.class}) // , mutationTester.class })
 public class ParallelizeTest {
 
     @Inject
@@ -286,11 +287,11 @@ public class ParallelizeTest {
         // Those calls update also the DB
         boolean playerAdded = activeGame.addPlayer(defender.getId(), Role.DEFENDER);
         assumeTrue(playerAdded);
-        System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added defender " + defender.getId() );
+        System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added defender " + defender.getId());
 
         playerAdded = activeGame.addPlayer(attacker.getId(), Role.ATTACKER);
         assumeTrue(playerAdded);
-        System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added attacker " + attacker.getId() );
+        System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added attacker " + attacker.getId());
 
         return activeGame;
     }
@@ -330,7 +331,7 @@ public class ParallelizeTest {
             mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
             assumeThat(battlegroundGame.getTests(true).size(), is(1));
             // Append this for oracles and mocks
-            submittedTests.add( newTest );
+            submittedTests.add(newTest);
 
 
             // Submit and execute a Test
@@ -345,7 +346,7 @@ public class ParallelizeTest {
                     + "    public void test() throws Throwable {" + "\n"
                     + "        // test here!" + "\n"
                     + "        Lift l = new Lift(10,10);" + "\n"
-                    + "        assertEquals(10, l.getCapacity());"+ "\n"
+                    + "        assertEquals(10, l.getCapacity());" + "\n"
                     + "" + "\n"
                     + "    }" + "\n"
                     + "}";
@@ -353,7 +354,7 @@ public class ParallelizeTest {
             mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
             assumeThat(battlegroundGame.getTests(true).size(), is(2));
             // Append this for oracles and mocks
-            submittedTests.add( newTest );
+            submittedTests.add(newTest);
 
             // Create the mutant from the patch
             List<String> diff = Arrays.asList("--- null",
@@ -369,20 +370,20 @@ public class ParallelizeTest {
                     "     public int getTopFloor() {"
             );
 
-            Patch patch = DiffUtils.parseUnifiedDiff(diff);
+            Patch<String> patch = UnifiedDiffUtils.parseUnifiedDiff(diff);
             // Read the CUT code
-            List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getSourceCode().split("\n") );
+            List<String> origincalCode = Arrays.asList(battlegroundGame.getCUT().getSourceCode().split("\n"));
             // Apply the patch
 
-            List<String> mutantCode = (List<String>) DiffUtils.patch( origincalCode, patch);
+            List<String> mutantCode = DiffUtils.patch(origincalCode, patch);
             String mutantText = String.join("\n", mutantCode);
 
             Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
                     mutantText, attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
             // Mock the scheduler to return a random but known test distribution:
-            TestScheduler mockedTestScheduler = Mockito.mock( TestScheduler.class );
-            List<org.codedefenders.game.Test> randomSchedule = new RandomTestScheduler().scheduleTests( submittedTests );
+            TestScheduler mockedTestScheduler = Mockito.mock(TestScheduler.class);
+            List<org.codedefenders.game.Test> randomSchedule = new RandomTestScheduler().scheduleTests(submittedTests);
             Mockito.doReturn(randomSchedule).when(mockedTestScheduler)
                     .scheduleTests(org.mockito.Matchers.anyList());
 
