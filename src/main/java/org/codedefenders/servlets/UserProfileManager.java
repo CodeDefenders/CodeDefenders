@@ -97,23 +97,24 @@ public class UserProfileManager extends HttpServlet {
         final Optional<String> urlParam = userParameter(request);
         final Optional<UserEntity> urlParamUser = urlParam.flatMap(userRepo::getUserByName);
 
-        if (urlParam.isPresent() && !urlParamUser.isPresent()) {
+        final boolean explicitUserGiven = urlParamUser.isPresent();
+        final boolean isLoggedIn = loggedInUser.isPresent();
+        final boolean isSelf = (!explicitUserGiven // no URL-parameter given -> logged in user is used
+                || isLoggedIn && loggedInUser.get().equals(urlParamUser.get())); // explicit user is self
+
+        if (urlParam.isPresent() && !explicitUserGiven) {
             // Invalid URL parameter/ user not found.
             response.setStatus(HttpServletResponse.SC_NOT_FOUND); //TODO: proper redirect to 404 page
             return;
         }
 
-        final boolean isSelf = urlParamUser.map(p -> loggedInUser.map(l -> p.getId() == l.getId())
-                        .orElse(false)) // valid URL-parameter & not logged in
-                .orElse(true); // no URL-parameter given -> logged in user is used
+        if (!explicitUserGiven && !isLoggedIn) {
+            // Enforce user to be logged in to view own profile without URL-parameter.
+            response.sendRedirect(request.getContextPath());
+            return;
+        }
 
         if (isSelf) {
-            if (!loggedInUser.isPresent()) {
-                // Enforce user to be logged in to view own profile without URL-parameter.
-                response.sendRedirect(request.getContextPath());
-                return;
-            }
-
             // If logged in the own profile page shows private data. Disable cache.
             response.setHeader("Pragma", "No-cache");
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
