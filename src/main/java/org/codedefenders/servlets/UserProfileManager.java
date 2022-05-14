@@ -19,9 +19,6 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -71,8 +68,8 @@ public class UserProfileManager extends HttpServlet {
     }
 
     /**
-     * Retrieves and URL-decodes the user-parameter of a request. The Optional is empty if the parameter was not
-     * given or empty. Due to URL-decoding the returned String might be blank.
+     * Retrieves the user-parameter of a request. The Optional is empty if the parameter was not given or empty.
+     * Due to URL-decoding the returned String might be blank.
      *
      * <p>URL-decoding is not strictly needed, as usernames can only contain letters or numbers
      * (see {@link org.codedefenders.validation.input.CodeDefendersValidator#validUsername(String)}), but is used
@@ -83,14 +80,7 @@ public class UserProfileManager extends HttpServlet {
      */
     private static Optional<String> userParameter(HttpServletRequest request) {
         return Optional.ofNullable(request.getParameter("user"))
-                .filter(str -> str.length() > 0)
-                .flatMap(str -> {
-                    try {
-                        return Optional.of(URLDecoder.decode(str, StandardCharsets.UTF_8.name()));
-                    } catch (UnsupportedEncodingException e) {
-                        return Optional.empty();
-                    }
-                });
+                .filter(str -> str.length() > 0);
     }
 
     @Override
