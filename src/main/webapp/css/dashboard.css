@@ -160,12 +160,12 @@
 }
 
 .dashboard-tests {
-    --color-primary: #32CD32;
-    --color-secondary: var(--bg-defender-contrast, #008080);
+    --color-primary: var(--bg-codedefenders, #32CD32);
+    --color-secondary: var(--bg-defender-contrast-dark, #008080);
 }
 
 .dashboard-points,
 .dashboard-games {
-    --color-primary: var(--bg-defender-contrast-dark, #008080);
+    --color-primary: var(--bg-defender-contrast, #008080);
     --color-secondary: var(--bg-attacker-contrast-dark, #730000);
 }
