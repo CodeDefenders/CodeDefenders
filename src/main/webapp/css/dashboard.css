@@ -156,16 +156,16 @@
 
 .dashboard-mutants {
     --color-primary: #ef6b0b;
-    --color-secondary: #730000;
+    --color-secondary: var(--bg-attacker-contrast-dark, #730000);
 }
 
 .dashboard-tests {
     --color-primary: #32CD32;
-    --color-secondary: #008080;
+    --color-secondary: var(--bg-defender-contrast, #008080);
 }
 
 .dashboard-points,
 .dashboard-games {
-    --color-primary: #008080;
-    --color-secondary: #730000;
+    --color-primary: var(--bg-defender-contrast-dark, #008080);
+    --color-secondary: var(--bg-attacker-contrast-dark, #730000);
 }
