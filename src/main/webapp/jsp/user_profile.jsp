@@ -21,7 +21,7 @@
 <%@ page import="org.codedefenders.model.UserEntity" %>
 <%@ page import="org.codedefenders.persistence.database.UserStatsDAO" %>
 <%@ page import="java.util.function.BiFunction" %>
-<!--%@ page import="javax.enterprise.inject.spi.CDI" %-->
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -29,8 +29,7 @@
 <%
     final UserEntity user = (UserEntity) request.getAttribute("user");
     final boolean isSelf = (boolean) request.getAttribute("self");
-    final UserStatsDAO userStats = (UserStatsDAO) request.getAttribute("userStats");
-    //    UserStatsDAO userStats = CDI.current().select(UserStatsDAO.class).get();
+    final UserStatsDAO userStats = CDIUtil.getBeanFromCDI(UserStatsDAO.class);
 
     pageInfo.setPageTitle(isSelf ? "My Profile" : "Profile of " + user.getUsername());
 
