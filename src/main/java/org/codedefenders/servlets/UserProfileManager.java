@@ -104,7 +104,8 @@ public class UserProfileManager extends HttpServlet {
 
         if (urlParam.isPresent() && !explicitUserGiven) {
             // Invalid URL parameter/ user not found.
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND); //TODO: proper redirect to 404 page
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            request.getRequestDispatcher(Constants.ERROR_PAGE_JSP).forward(request, response);
             return;
         }
 

@@ -115,6 +115,7 @@ public class Constants {
     public static final String INDEX_JSP = "/jsp/index.jsp";
     public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
+    public static final String ERROR_PAGE_JSP = Paths.get("jsp", "error_page_404.jsp").toString();
 
     public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();
     public static final String USER_SETTINGS_JSP = Paths.get("jsp", "user_settings.jsp").toString();
@@ -122,7 +123,6 @@ public class Constants {
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
     public static final String MELEE_GAME_VIEW_JSP = "/jsp/melee/game_view.jsp";
     public static final String MELEE_GAME_HISTORY_VIEW_JSP = "/jsp/melee/history_game_view.jsp";
-
 
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
     public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";
