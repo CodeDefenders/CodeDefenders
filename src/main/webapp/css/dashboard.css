@@ -27,12 +27,12 @@
     inset: 0;
     background: radial-gradient(
             farthest-side,
-            var(--color-primary) 98%,
+            var(--color-secondary) 98%,
             #0000
     ) top/var(--border-width) var(--border-width) no-repeat,
     conic-gradient(
-            var(--color-primary) calc(var(--percentage) * 1%),
-            var(--color-secondary, #0000) 0);
+            var(--color-secondary) calc((100 - var(--percentage)) * 1%),
+            var(--color-primary, #0000) 0);
     -webkit-mask: radial-gradient(
             farthest-side,
             #0000 calc(99% - var(--border-width)),
@@ -47,8 +47,8 @@
 
 .pie::after {
     inset: calc(50% - var(--border-width) / 2);
-    background: var(--color-primary);
-    transform: rotate(calc(var(--percentage) * 3.6deg)) translateY(calc(50% - var(--width) / 2));
+    background: var(--color-secondary);
+    transform: rotate(calc((100 - var(--percentage)) * 3.6deg)) translateY(calc(50% - var(--width) / 2));
 }
 
 .pie.no-round::before {
@@ -160,8 +160,8 @@
 }
 
 .dashboard-tests {
-    --color-primary: #008080;
-    --color-secondary: #32CD32;
+    --color-primary: #32CD32;
+    --color-secondary: #008080;
 }
 
 .dashboard-points,
