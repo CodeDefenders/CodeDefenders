@@ -155,8 +155,8 @@
 }
 
 .dashboard-mutants {
-    --color-primary: #730000;
-    --color-secondary: #ef6b0b;
+    --color-primary: #ef6b0b;
+    --color-secondary: #730000;
 }
 
 .dashboard-tests {

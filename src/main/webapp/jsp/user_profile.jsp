@@ -86,12 +86,12 @@
 
                 <div>
                     <div class="legend">
-                        <span class="legend-title">Killed mutants:</span>
-                        <span class="legend-value"><%=killedMutants%></span>
-                    </div>
-                    <div class="legend">
                         <span class="legend-title">Mutants still alive:</span>
                         <span class="legend-value"><%=aliveMutants%></span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">Killed mutants:</span>
+                        <span class="legend-value"><%=killedMutants%></span>
                     </div>
                 </div>
             </div>
