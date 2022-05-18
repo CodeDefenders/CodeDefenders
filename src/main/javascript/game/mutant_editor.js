@@ -1,4 +1,5 @@
 import CodeCompletion from './code_completion';
+import {LoadingAnimation} from '../main';
 
 
 class MutantEditor {
@@ -61,12 +62,12 @@ class MutantEditor {
          * Name of the keymap to be used in the editor.
          * @type {string}
          */
-        this.keymap = keymap;
+        this._keymap = keymap;
         /**
          * Code completion instance to handle the completion command.
          * @type {CodeCompletion}
          */
-        this.codeCompletion = null;
+        this._codeCompletion = null;
 
 
         this._init();
@@ -90,7 +91,7 @@ class MutantEditor {
                 'Ctrl-Space': 'completeMutant',
                 'Tab': "insertSoftTab"
             },
-            keyMap: this.keymap,
+            keyMap: this._keymap,
             gutters: [
                 'CodeMirror-linenumbers',
                 'CodeMirror-mutantIcons'
@@ -120,12 +121,14 @@ class MutantEditor {
         this._initDependencies();
         this._initCodeCompletion();
         this._greyOutReadOnlyLines();
+
+        LoadingAnimation.hideAnimation(this.editorElement);
     }
 
     /** @private */
     _initCodeCompletion () {
-        this.codeCompletion = new CodeCompletion();
-        this.codeCompletion.registerCodeCompletionCommand(this.editor, 'completeMutant');
+        this._codeCompletion = new CodeCompletion();
+        this._codeCompletion.registerCodeCompletionCommand(this.editor, 'completeMutant');
 
         /* Gather classes to autocomplete. */
         const texts = [];
@@ -135,8 +138,8 @@ class MutantEditor {
         }
 
         /* Add words from classes to completion. */
-        const completions = this.codeCompletion.getCompletionsForJavaFiles(texts);
-        this.codeCompletion.setCompletionPool('classes', completions);
+        const completions = this._codeCompletion.getCompletionsForJavaFiles(texts);
+        this._codeCompletion.setCompletionPool('classes', completions);
     }
 
     /** @private */

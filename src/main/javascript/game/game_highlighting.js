@@ -1,10 +1,10 @@
-import {objects} from "../main";
+import {Popover} from '../thirdparty/bootstrap';
+import {objects} from '../main';
 
 
 class GameHighlighting {
 
     /**
-     *
      * @param {object} data
      *      Given by [JSON.parse('${gameHighlighting.JSON}')]
      * @param {boolean} enableFlagging
@@ -75,7 +75,7 @@ class GameHighlighting {
          * @type {?number}
          * @private
          */
-        this._activePopoverTimeout = null;
+        this._popoverTimeout = null;
         /**
          * The currently active popover.
          * This is saved to enable hiding the currently active popover and to avoid showing the same popover twice.
@@ -83,18 +83,19 @@ class GameHighlighting {
          * @private
          */
         this._activePopover = null;
+    }
 
-
+    async initAsync () {
         /**
          * The CodeMirror editor to provide highlighting on.
          * @type {CodeMirror}
          */
-        this.editor = null;
-        if (objects.classViewer != null) {
-            this.editor = objects.classViewer.editor;
-        } else if (objects.mutantEditor != null) {
-            this.editor = objects.mutantEditor.editor;
-        }
+        this._editor = (await Promise.race([
+            objects.await('classViewer'),
+            objects.await('mutantEditor')
+        ])).editor;
+
+        return this;
     }
 
     static MutantStatuses = {
@@ -170,7 +171,7 @@ class GameHighlighting {
             self._popoverTimeout = setTimeout(function () {
                 popover.hide();
                 self._activePopover = null;
-                self._activePopoverTimeout = null;
+                self._popoverTimeout = null;
             }, 500);
         };
 
@@ -181,7 +182,7 @@ class GameHighlighting {
         };
 
         for (const mutantIcon of mutantIcons.querySelectorAll('.gh-mutant-icon')) {
-            const popover = new bootstrap.Popover(mutantIcon, {
+            const popover = new Popover(mutantIcon, {
                 /* Append to body instead of the element itself, so that the icons don't overlap modals. */
                 container: document.body,
                 placement: 'right',
@@ -343,7 +344,7 @@ class GameHighlighting {
     highlightCoverage () {
         for (const [line, testIds] of this._testIdsPerLine) {
             const coveragePercent = (testIds.length * 100 / this._tests.size).toFixed(0);
-            this.editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
+            this._editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
         }
     }
 
@@ -353,7 +354,7 @@ class GameHighlighting {
     highlightAlternativeCoverage () {
         for (const [line, testIds] of this._alternativeTestIdsPerLine) {
             const coveragePercent = (testIds.length * 100 / this._alternativeTests.size).toFixed(0);
-            this.editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
+            this._editor.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
         }
     }
 
@@ -365,7 +366,7 @@ class GameHighlighting {
             const mutantsOnLine = mutantIds.map(id => this._mutants.get(id));
             const marker = this._createMutantIcons(line, mutantsOnLine);
             this._addPopoverTriggerToMutantIcons(marker);
-            this.editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
+            this._editor.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
         }
     }
 
@@ -375,12 +376,12 @@ class GameHighlighting {
      * place the highlighting onto the wrong lines.
      */
     clearCoverage () {
-        this.editor.eachLine(line => {
+        this._editor.eachLine(line => {
             const bgClasses = line.bgClass ?? '';
 
             /* Match all coverage classes. */
             for (const match of (bgClasses.match(/coverage-\d+/g) ?? [])) {
-                this.editor.removeLineClass(line, 'background', match);
+                this._editor.removeLineClass(line, 'background', match);
             }
         });
     }
@@ -391,7 +392,7 @@ class GameHighlighting {
      * place the highlighting onto the wrong lines.
      */
     clearMutants () {
-        this.editor.clearGutter('CodeMirror-mutantIcons');
+        this._editor.clearGutter('CodeMirror-mutantIcons');
     }
 }
 

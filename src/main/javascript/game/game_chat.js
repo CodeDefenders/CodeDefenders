@@ -1,4 +1,5 @@
-import {objects, Draggable, PushSocket} from '../main';
+import {Draggable, objects, PushSocket} from '../main';
+
 
 class GameChat {
     /**
@@ -8,29 +9,42 @@ class GameChat {
      *      Given by [${gameChat.messageLimit}]
      */
     constructor (gameId, messageLimit) {
-        this.gameId = gameId;
-        this.messageLimit = messageLimit;
+        this._gameId = gameId;
+        this._messageLimit = messageLimit;
 
         /* Used DOM elements. */
-        this.chatElement = null;
-        this.handleElement = null;
-        this.closeButton = null;
-        this.messagesContainerElement = null;
-        this.messagesElement = null;
-        this.channelElement = null;
-        this.inputElement = null;
-        this.countElement = null;
-        this.indicatorElement = null;
+        this._chatElement = null;
+        this._handleElement = null;
+        this._closeButton = null;
+        this._messagesContainerElement = null;
+        this._messagesElement = null;
+        this._channelElement = null;
+        this._inputElement = null;
+        this._countElement = null;
+        this._indicatorElement = null;
 
         /* Instances of the inner classes. */
-        this.messages = null;
-        this.channel = null;
-        this.messageCount = null;
-        this.chatInput = null;
+        this._messages = null;
+        this._channel = null;
+        this._messageCount = null;
+        this._input = null;
 
-        this.draggable = null;
+        this._draggable = null;
 
         this._init();
+    }
+
+    _init () {
+        this._initElements();
+        this._initComponents();
+        this._initEvents();
+        this._loadSettings();
+    }
+
+    async initAsync () {
+        await this._initSocket();
+
+        return this;
     }
 
     /**
@@ -84,7 +98,7 @@ class GameChat {
             for (const message of messages) {
                 this.messages.push(message);
                 if (this.filter.call(this, message)) {
-                    this.gameChat.messagesElement.appendChild(this.renderMessage(message));
+                    this.gameChat._messagesElement.appendChild(this.renderMessage(message));
                 }
             }
 
@@ -101,7 +115,7 @@ class GameChat {
             this.messages.push(message);
             if (this.filter.call(this, message)) {
                 const wasScrolledToBottom = this.isScrolledToBottom();
-                this.gameChat.messagesElement.appendChild(this.renderMessage(message));
+                this.gameChat._messagesElement.appendChild(this.renderMessage(message));
                 if (wasScrolledToBottom) {
                     this.scrollToBottom();
                 }
@@ -112,11 +126,11 @@ class GameChat {
          * Clears the displayed messages and redraws them, filtering them according to the set filter.
          */
         redraw () {
-            this.gameChat.messagesElement.innerHTML = '';
+            this.gameChat._messagesElement.innerHTML = '';
 
             const messages = this.messages.filter(this.filter);
             for (const message of messages) {
-                this.gameChat.messagesElement.appendChild(this.renderMessage(message));
+                this.gameChat._messagesElement.appendChild(this.renderMessage(message));
             }
 
             this.scrollToBottom();
@@ -126,7 +140,7 @@ class GameChat {
          * Checks whether the container element is scrolled all the way to the bottom.
          */
         isScrolledToBottom () {
-            const container = this.gameChat.messagesContainerElement;
+            const container = this.gameChat._messagesContainerElement;
             return container.scrollTop === (container.scrollHeight - container.clientHeight);
         }
 
@@ -134,7 +148,7 @@ class GameChat {
          * Scrolls the container element all the way to the bottom.
          */
         scrollToBottom () {
-            const container = this.gameChat.messagesContainerElement;
+            const container = this.gameChat._messagesContainerElement;
             container.scrollTop = container.scrollHeight;
         }
 
@@ -189,7 +203,7 @@ class GameChat {
          * Fetches the messages for the game from the API and adds them.
          */
         async fetch () {
-            const response = await fetch(`api/game-chat?gameId=${this.gameChat.gameId}&limit=1000`, {
+            const response = await fetch(`api/game-chat?gameId=${this.gameChat._gameId}&limit=1000`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -349,9 +363,9 @@ class GameChat {
          */
         updateButton () {
             if (this.isAllChat()) {
-                this.gameChat.channelElement.textContent = Channel.CHANNEL_ALL;
+                this.gameChat._channelElement.textContent = Channel.CHANNEL_ALL;
             } else {
-                this.gameChat.channelElement.textContent = Channel.CHANNEL_TEAM;
+                this.gameChat._channelElement.textContent = Channel.CHANNEL_TEAM;
             }
         }
 
@@ -396,7 +410,7 @@ class GameChat {
          * @param {number} count The count to set.
          */
         setCount (count) {
-            const countElement = this.gameChat.countElement;
+            const countElement = this.gameChat._countElement;
 
             this.count = count;
             if (count > 0) {
@@ -431,7 +445,7 @@ class GameChat {
          * In order for this method to work, the text area has to be ready and visible.
          */
         init () {
-            this.gameChat.inputElement.value = '';
+            this.gameChat._inputElement.value = '';
             this.resize();
         }
 
@@ -439,7 +453,7 @@ class GameChat {
          *  Resizes the text area to its text. (adopted from https://stackoverflow.com/a/36958094/9360382).
          */
         resize () {
-            const textarea = this.gameChat.inputElement;
+            const textarea = this.gameChat._inputElement;
 
             /* Shrink the text area to one line. */
             textarea.style['height'] = '0px';
@@ -460,7 +474,7 @@ class GameChat {
          * @return {string}
          */
         getText () {
-            return this.gameChat.inputElement.value;
+            return this.gameChat._inputElement.value;
         }
 
         /**
@@ -468,7 +482,7 @@ class GameChat {
          * @param {string} text
          */
         setText (text) {
-            this.gameChat.inputElement.value = text;
+            this.gameChat._inputElement.value = text;
             this.resize();
         }
 
@@ -510,8 +524,8 @@ class GameChat {
      * @param {boolean} isAllChat Whether the message should be sent to all players or the own team.
      */
     sendMessage (message, isAllChat) {
-        objects.pushSocket.send('chat.ClientGameChatEvent', {
-            gameId: this.gameId,
+        this._pushSocket.send('chat.ClientGameChatEvent', {
+            gameId: this._gameId,
             allChat: isAllChat,
             message
         });
@@ -522,10 +536,10 @@ class GameChat {
      * @param {ServerGameChatEvent} serverChatEvent The received message.
      */
     _onChatMessage (serverChatEvent) {
-        if (this.chatElement.hasAttribute('hidden')) {
-            this.messageCount.setCount(this.messageCount.getCount() + 1);
+        if (this._chatElement.hasAttribute('hidden')) {
+            this._messageCount.setCount(this._messageCount.getCount() + 1);
         }
-        this.messages.addMessage({
+        this._messages.addMessage({
             system: false,
             isAllChat: serverChatEvent.isAllChat,
             role: serverChatEvent.role,
@@ -540,18 +554,10 @@ class GameChat {
      * @param {ServerSystemChatEvent} serverChatEvent The received message.
      */
     _onSystemMessage (serverChatEvent) {
-        this.messages.addMessage({
+        this._messages.addMessage({
             system: true,
             message: serverChatEvent.message
         });
-    }
-
-    _init () {
-        this._initElements();
-        this._initComponents();
-        this._initEvents();
-        this._loadSettings();
-        this._initSocket();
     }
 
     /**
@@ -559,15 +565,15 @@ class GameChat {
      * @private
      */
     _initElements () {
-        this.chatElement = document.getElementById('chat');
-        this.handleElement = document.getElementById('chat-handle');
-        this.closeButton = document.getElementById('chat-close');
-        this.messagesContainerElement = document.getElementById('chat-messages-container');
-        this.messagesElement = document.getElementById('chat-messages');
-        this.channelElement = document.getElementById('chat-channel');
-        this.inputElement = document.getElementById('chat-input');
-        this.countElement = document.getElementById('chat-count');
-        this.indicatorElement = document.getElementById('chat-indicator');
+        this._chatElement = document.getElementById('chat');
+        this._handleElement = document.getElementById('chat-handle');
+        this._closeButton = document.getElementById('chat-close');
+        this._messagesContainerElement = document.getElementById('chat-messages-container');
+        this._messagesElement = document.getElementById('chat-messages');
+        this._channelElement = document.getElementById('chat-channel');
+        this._inputElement = document.getElementById('chat-input');
+        this._countElement = document.getElementById('chat-count');
+        this._indicatorElement = document.getElementById('chat-indicator');
     }
 
     /**
@@ -575,25 +581,25 @@ class GameChat {
      * @private
      */
     _initComponents () {
-        this.input = new GameChat.ChatInput(this, this.inputElement);
+        this._input = new GameChat.ChatInput(this, this._inputElement);
         /* Initialize the textarea heights needed for the resizing once the textarea is shown. */
         new MutationObserver((mutations, observer) => {
             for (const mutation of mutations) {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'hidden') {
-                    setTimeout(this.input.init.bind(this.input), 0);
+                    setTimeout(this._input.init.bind(this._input), 0);
                     observer.disconnect();
                 }
             }
-        }).observe(this.chatElement, {attributes: true});
+        }).observe(this._chatElement, {attributes: true});
 
-        this.messages = new GameChat.Messages(this);
-        this.messages.fetch();
+        this._messages = new GameChat.Messages(this);
+        this._messages.fetch();
 
-        this.messageCount = new GameChat.MessageCount(this);
-        this.messageCount.setCount(0);
+        this._messageCount = new GameChat.MessageCount(this);
+        this._messageCount.setCount(0);
 
-        this.channel = new GameChat.Channel(this);
-        this.channel.setAllChat(false);
+        this._channel = new GameChat.Channel(this);
+        this._channel.setAllChat(false);
     }
 
     /**
@@ -605,90 +611,90 @@ class GameChat {
         const self = this;
 
         /* Resize after typing. Override message channel when "/all " or "/team " is entered. */
-        this.inputElement.addEventListener('input', function (event) {
-            self.input.resize();
-            self.channel.setOverrideByCommand(self.input.getCommand());
+        this._inputElement.addEventListener('input', function (event) {
+            self._input.resize();
+            self._channel.setOverrideByCommand(self._input.getCommand());
         });
-        this.inputElement.addEventListener('paste', function (event) {
-            self.input.resize();
-            self.channel.setOverrideByCommand(self.input.getCommand());
+        this._inputElement.addEventListener('paste', function (event) {
+            self._input.resize();
+            self._channel.setOverrideByCommand(self._input.getCommand());
         });
 
         /* Submit message on enter. */
-        this.inputElement.addEventListener('keypress', function (event) {
+        this._inputElement.addEventListener('keypress', function (event) {
             if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey) {
                 event.preventDefault();
-                const message = self.input.getText().trim();
+                const message = self._input.getText().trim();
                 if (message.length > 0) {
-                    self.sendMessage(message, self.channel.isAllChat());
-                    self.input.setText('');
-                    self.channel.removeOverride();
-                    self.messages.scrollToBottom();
+                    self.sendMessage(message, self._channel.isAllChat());
+                    self._input.setText('');
+                    self._channel.removeOverride();
+                    self._messages.scrollToBottom();
                 }
             }
         });
 
         /* Toggle message channel (all / team). */
-        this.channelElement.addEventListener('click', function (event) {
-            self.channel.setAllChat(!self.channel.isAllChat());
+        this._channelElement.addEventListener('click', function (event) {
+            self._channel.setAllChat(!self._channel.isAllChat());
         });
 
         /* Filter messages based on the active tab. */
-        this.chatElement.addEventListener('click', function (event) {
+        this._chatElement.addEventListener('click', function (event) {
             const tabButton = event.target.closest('.chat-tab-button');
             if (tabButton === null) {
                 return;
             }
 
-            for (const otherTabButton of self.chatElement.querySelectorAll('.chat-tab-button')) {
+            for (const otherTabButton of self._chatElement.querySelectorAll('.chat-tab-button')) {
                 otherTabButton.classList.remove('active');
             }
 
             tabButton.classList.add('active');
             switch (tabButton.getAttribute('data-tab')) {
                 case 'ALL':
-                    self.messages.setFilter(GameChat.Messages.FILTER_ALL);
+                    self._messages.setFilter(GameChat.Messages.FILTER_ALL);
                     break;
                 case 'ATTACKERS':
-                    self.messages.setFilter(GameChat.Messages.FILTER_ATTACKERS);
+                    self._messages.setFilter(GameChat.Messages.FILTER_ATTACKERS);
                     break;
                 case 'DEFENDERS':
-                    self.messages.setFilter(GameChat.Messages.FILTER_DEFENDERS);
+                    self._messages.setFilter(GameChat.Messages.FILTER_DEFENDERS);
                     break;
             }
-            self.messages.redraw();
+            self._messages.redraw();
         });
 
         /* Toggle the chat and reset it's position when the indicator is clicked. */
-        this.indicatorElement.addEventListener('click', function (event) {
-            if (!self.chatElement.hasAttribute('hidden')) {
-                self.chatElement.setAttribute('hidden', '');
+        this._indicatorElement.addEventListener('click', function (event) {
+            if (!self._chatElement.hasAttribute('hidden')) {
+                self._chatElement.setAttribute('hidden', '');
                 localStorage.setItem('showChat', JSON.stringify(false))
             } else {
-                self.chatElement.style.top = null;
-                self.chatElement.style.right = null;
-                self.chatElement.style.bottom = '0px';
-                self.chatElement.style.left = '0px';
-                self.messageCount.setCount(0);
-                self.chatElement.removeAttribute('hidden');
-                self.messages.scrollToBottom();
+                self._chatElement.style.top = null;
+                self._chatElement.style.right = null;
+                self._chatElement.style.bottom = '0px';
+                self._chatElement.style.left = '0px';
+                self._messageCount.setCount(0);
+                self._chatElement.removeAttribute('hidden');
+                self._messages.scrollToBottom();
                 localStorage.setItem('showChat', JSON.stringify(true))
             }
             localStorage.removeItem('chatPos');
         });
 
         /* Close chat when the X on the chat window is clicked. */
-        this.closeButton.addEventListener('click', function (event) {
-            self.chatElement.setAttribute('hidden', '');
+        this._closeButton.addEventListener('click', function (event) {
+            self._chatElement.setAttribute('hidden', '');
             localStorage.setItem('showChat', JSON.stringify(false))
         });
 
         /* Make the chat window draggable. */
-        this.draggable = new Draggable(this.chatElement, this.handleElement);
-        this.draggable.addEventListener('stop', function (event) {
+        this._draggable = new Draggable(this._chatElement, this._handleElement);
+        this._draggable.addEventListener('stop', function (event) {
             const chatPos = JSON.stringify({
-                top: self.chatElement.style.top,
-                left: self.chatElement.style.left
+                top: self._chatElement.style.top,
+                left: self._chatElement.style.left
             });
             localStorage.setItem('chatPos', chatPos);
         });
@@ -704,12 +710,12 @@ class GameChat {
 
         if (showChat) {
             if (chatPos !== null) {
-                this.chatElement.style.bottom = null;
-                this.chatElement.style.right = null;
-                this.chatElement.style.top = chatPos.top;
-                this.chatElement.style.left = chatPos.left;
+                this._chatElement.style.bottom = null;
+                this._chatElement.style.right = null;
+                this._chatElement.style.top = chatPos.top;
+                this._chatElement.style.left = chatPos.left;
             }
-            this.chatElement.removeAttribute('hidden');
+            this._chatElement.removeAttribute('hidden');
         }
     }
 
@@ -717,20 +723,21 @@ class GameChat {
      * Register for WebSocket events.
      * @private
      */
-    _initSocket () {
+    async _initSocket () {
+        this._pushSocket = await objects.await('pushSocket');
+
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
-        const pushSocket = objects.pushSocket;
-        pushSocket.subscribe('registration.GameChatRegistrationEvent', {gameId: this.gameId});
-        pushSocket.register('chat.ServerGameChatEvent', this._onChatMessage.bind(this));
-        pushSocket.register('chat.ServerSystemChatEvent', this._onSystemMessage.bind(this));
-        pushSocket.register(PushSocket.WSEventType.CLOSE,
-                () => self.messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_DISCONNECT));
-        pushSocket.register(PushSocket.WSEventType.OPEN, () =>
-                () => self.messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_CONNECT));
-        if (pushSocket.readyState === 1) {
-            self.messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_CONNECT);
+        this._pushSocket.subscribe('registration.GameChatRegistrationEvent', {gameId: this._gameId});
+        this._pushSocket.register('chat.ServerGameChatEvent', this._onChatMessage.bind(this));
+        this._pushSocket.register('chat.ServerSystemChatEvent', this._onSystemMessage.bind(this));
+        this._pushSocket.register(PushSocket.WSEventType.CLOSE,
+                () => self._messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_DISCONNECT));
+        this._pushSocket.register(PushSocket.WSEventType.OPEN, () =>
+                () => self._messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_CONNECT));
+        if (this._pushSocket.readyState === 1) {
+            self._messages.addMessage(GameChat.Messages.SYSTEM_MESSAGE_CONNECT);
         }
     }
 

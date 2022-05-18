@@ -4,20 +4,20 @@ class ProgressBar {
          * The container element of the progress bar.
          * @type {HTMLDivElement}
          */
-        this.progressElement = progressElement;
+        this._progressElement = progressElement;
 
         /**
          * The variable-width bar element of the progress bar.
          * @type {HTMLDivElement}
          */
-        this.barElement = progressElement.children[0];
+        this._barElement = progressElement.children[0];
     }
 
     /**
      * Hides the progress bar.
      */
     hide () {
-        this.progressElement.setAttribute('hidden', '');
+        this._progressElement.setAttribute('hidden', '');
     }
 
     /**
@@ -26,10 +26,10 @@ class ProgressBar {
      * @param {string} text The text to display on the progress bar.
      */
     setProgress (value, text) {
-        this.progressElement.removeAttribute('hidden');
-        this.barElement.setAttribute('aria-valuenow', String(value));
-        this.barElement.style.width = value + '%';
-        this.barElement.textContent = text;
+        this._progressElement.removeAttribute('hidden');
+        this._barElement.setAttribute('aria-valuenow', String(value));
+        this._barElement.style.width = value + '%';
+        this._barElement.textContent = text;
     }
 }
 

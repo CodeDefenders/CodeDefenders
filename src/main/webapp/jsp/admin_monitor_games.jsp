@@ -500,7 +500,10 @@
         <% } %>
     </form>
 
-    <script>
+    <script type="module">
+        import $ from './js/jquery.mjs';
+
+
         $('#selectAllGamesMultiplayer').click(function () {
             $(this).closest('table')
                     .find('tbody')

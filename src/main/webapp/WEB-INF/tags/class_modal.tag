@@ -7,7 +7,9 @@
 <%@ attribute name="htmlId" required="true" %>
 
 <div>
-    <t:modal title="${classAlias}" id="${htmlId}" modalDialogClasses="modal-dialog-responsive">
+    <t:modal title="${classAlias}" id="${htmlId}"
+             modalDialogClasses="modal-dialog-responsive"
+             modalBodyClasses="loading loading-bg-gray loading-height-200">
         <jsp:attribute name="content">
             <div class="card">
                 <div class="card-body p-0 codemirror-expand codemirror-class-modal-size">
@@ -16,26 +18,33 @@
             </div>
         </jsp:attribute>
     </t:modal>
+
     <script>
         (function () {
             const modal = document.currentScript.parentElement.querySelector('.modal');
             const textarea = document.currentScript.parentElement.querySelector('textarea');
 
-            modal.addEventListener('shown.bs.modal', function () {
+            modal.addEventListener('shown.bs.modal', async function () {
                 const codeMirrorContainer = this.querySelector('.CodeMirror');
                 if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
                     codeMirrorContainer.CodeMirror.refresh();
-                } else {
-                    const editor = CodeMirror.fromTextArea(textarea, {
-                        lineNumbers: true,
-                        readOnly: true,
-                        mode: 'text/x-java',
-                        autoRefresh: true
-                    });
-                    editor.getWrapperElement().classList.add('codemirror-readonly');
-                    CodeDefenders.InfoApi.setClassEditorValue(editor, ${classId});
+                    return;
                 }
-            })
+
+                const {default: CodeMirror} = await import('./js/codemirror.mjs');
+                const {InfoApi, LoadingAnimation} = await import('./js/codedefenders_main.mjs');
+
+                const editor = CodeMirror.fromTextArea(textarea, {
+                    lineNumbers: true,
+                    readOnly: true,
+                    mode: 'text/x-java',
+                    autoRefresh: true
+                });
+                editor.getWrapperElement().classList.add('codemirror-readonly');
+
+                await InfoApi.setClassEditorValue(editor, ${classId});
+                LoadingAnimation.hideAnimation(textarea);
+            });
         })();
     </script>
 </div>

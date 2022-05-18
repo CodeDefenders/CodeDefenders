@@ -26,27 +26,31 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
-<div class="card game-component-resize">
+<div class="card game-component-resize loading">
     <div class="card-body p-0 codemirror-fill">
         <pre class="m-0"><textarea id="test-code" name="test" title="test">${testEditor.testCode}</textarea></pre>
     </div>
 </div>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
-        const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};
-        const editableLinesEnd = ${testEditor.hasEditableLinesEnd() ? testEditor.editableLinesEnd : "null"};
-        const mockingEnabled = ${testEditor.mockingEnabled};
-        const keymap = '${login.user.keyMap.CMName}';
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {TestEditor} from './js/codedefenders_game.mjs';
 
-        const editorElement = document.getElementById('test-code');
 
-        CodeDefenders.objects.testEditor = new CodeDefenders.TestEditor(
-                editorElement,
-                editableLinesStart,
-                editableLinesEnd,
-                mockingEnabled,
-                keymap);
-    })();
+    const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};
+    const editableLinesEnd = ${testEditor.hasEditableLinesEnd() ? testEditor.editableLinesEnd : "null"};
+    const mockingEnabled = ${testEditor.mockingEnabled};
+    const keymap = '${login.user.keyMap.CMName}';
+
+    const editorElement = document.getElementById('test-code');
+
+    const testEditor = new TestEditor(
+            editorElement,
+            editableLinesStart,
+            editableLinesEnd,
+            mockingEnabled,
+            keymap);
+
+
+    objects.register('testEditor', testEditor);
 </script>

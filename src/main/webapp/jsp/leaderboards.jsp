@@ -65,20 +65,17 @@
         </tbody>
     </table>
 
-    <script>
-        (function () {
+    <script type="module">
+        import DataTable from './js/datatables.mjs';
 
-            $(document).ready(function () {
-                new DataTable('#tableMPLeaderboard', {
-                    "order": [[6, "desc"]],
-                    "columnDefs": [
-                        {"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
-                    ],
-                    "pageLength": 50
-                });
-            });
 
-        })();
+        new DataTable('#tableMPLeaderboard', {
+            "order": [[6, "desc"]],
+            "columnDefs": [
+                {"searchable": false, "targets": [1, 2, 3, 4, 5, 6]}
+            ],
+            "pageLength": 50
+        });
     </script>
 </div>
 

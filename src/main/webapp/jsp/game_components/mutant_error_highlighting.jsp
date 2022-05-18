@@ -27,15 +27,18 @@
 
 <jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
-        const errorLines = JSON.parse('${mutantErrorHighlighting.errorLinesJSON}');
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {ErrorHighlighting} from './js/codedefenders_game.mjs';
 
-        CodeDefenders.objects.mutantErrorHighlighting = new CodeDefenders.ErrorHighlighting(
-                errorLines,
-                CodeDefenders.objects.mutantEditor.editor);
 
-        CodeDefenders.objects.mutantErrorHighlighting.highlightErrors();
-    })();
+    const errorLines = JSON.parse('${mutantErrorHighlighting.errorLinesJSON}');
+
+    const mutantEditor = await objects.await('mutantEditor');
+
+    const mutantErrorHighlighting = new ErrorHighlighting(errorLines, mutantEditor.editor);
+    mutantErrorHighlighting.highlightErrors();
+
+
+    objects.register('mutantErrorHighlighting', mutantErrorHighlighting);
 </script>

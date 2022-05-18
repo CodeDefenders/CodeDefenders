@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class="accordion" id="mutants-accordion">
+    <div class="accordion loading loading-border-card loading-bg-gray" id="mutants-accordion">
         <c:forEach items="${mutantAccordion.categories}" var="category">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="ma-heading-${category.id}">
@@ -84,17 +84,21 @@
         </c:forEach>
     </div>
 
-    <script>
-        /* Wrap in a function to avoid polluting the global scope. */
-        (function () {
-            const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
-            const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
-            const gameId = ${mutantAccordion.gameId};
+    <script type="module">
+        import {objects} from './js/codedefenders_main.mjs';
+        import {MutantAccordion} from './js/codedefenders_game.mjs';
 
-            CodeDefenders.objects.mutantAccordion = new CodeDefenders.MutantAccordion(
-                    categories,
-                    mutants,
-                    gameId);
-        })();
+
+        const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');
+        const mutants = new Map(JSON.parse('${mutantAccordion.jsonMutants()}'));
+        const gameId = ${mutantAccordion.gameId};
+
+        const mutantAccordion = new MutantAccordion(
+                categories,
+                mutants,
+                gameId);
+
+
+        objects.register('mutantAccordion', mutantAccordion);
     </script>
 </div>

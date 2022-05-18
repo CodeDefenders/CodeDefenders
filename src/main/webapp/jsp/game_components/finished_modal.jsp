@@ -31,6 +31,8 @@
     <jsp:attribute name="content">${finishedModal.message}</jsp:attribute>
 </t:modal>
 
-<script>
-    new bootstrap.Modal('#finishedModal').show();
+<script type="module">
+    import {Modal} from './js/bootstrap.mjs';
+
+    new Modal('#finishedModal').show();
 </script>

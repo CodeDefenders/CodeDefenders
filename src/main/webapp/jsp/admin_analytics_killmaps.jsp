@@ -99,8 +99,10 @@
     </t:modal>
 </div>
 
-<script>
-(function () {
+<script type="module">
+    import DataTable from './js/datatables.mjs';
+    import $ from './js/jquery.mjs';
+
 
     $(document).ready(function () {
         const table = new DataTable('#tableKillmaps', {
@@ -134,8 +136,6 @@
             "language": {"info": "Showing _TOTAL_ entries"}
         });
     });
-
-})();
 </script>
 
 <%@ include file="/jsp/footer.jsp" %>

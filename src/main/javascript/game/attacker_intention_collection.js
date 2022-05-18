@@ -9,25 +9,25 @@ class AttackerIntentionCollection {
          * The dropdown containing the attacker intentions.
          * @type {HTMLElement}
          */
-        this.dropdown = document.getElementById('attacker-intention-dropdown');
+        this._dropdown = document.getElementById('attacker-intention-dropdown');
 
         /**
          * The "Attack" button normally used to submit mutants.
          * @type {HTMLElement}
          */
-        this.attackButton = document.getElementById('submitMutant');
+        this._attackButton = document.getElementById('submitMutant');
 
         /**
          * The form to submit for attacking.
          * @type {HTMLFormElement}
          */
-        this.attackForm = document.forms['atk'];
+        this._attackForm = document.forms['atk'];
 
         /**
          * The (hidden) input to submit the intention with.
          * @type {HTMLInputElement}
          */
-        this.intentionInput = this.attackForm.querySelector('input[name="attacker_intention"]');
+        this._intentionInput = this._attackForm.querySelector('input[name="attacker_intention"]');
 
         this._init();
     }
@@ -37,7 +37,7 @@ class AttackerIntentionCollection {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
-        this.dropdown.addEventListener('click', function (event) {
+        this._dropdown.addEventListener('click', function (event) {
             if (event.target instanceof HTMLLIElement) {
                 const intention = event.target.firstElementChild.dataset.intention;
                 self._submitForm(intention);
@@ -50,11 +50,13 @@ class AttackerIntentionCollection {
     }
 
     /** @private */
-    _submitForm (intention) {
-        this.intentionInput.value = intention;
-        objects.mutantProgressBar.activate();
-        this.attackForm.submit();
-        this.attackButton.disabled = true;
+    async _submitForm (intention) {
+        this._intentionInput.value = intention;
+        this._attackForm.submit();
+        this._attackButton.disabled = true;
+
+        const mutantProgressBar = await objects.await('mutantProgressBar');
+        mutantProgressBar.activate;
     }
 }
 

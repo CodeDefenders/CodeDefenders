@@ -472,7 +472,12 @@
         </jsp:attribute>
     </t:modal>
 
-    <script>
+    <script type="module">
+        import {Popover} from './js/bootstrap.mjs';
+        import DataTable from './js/datatables.mjs';
+        import $ from './js/jquery.mjs';
+
+
         /**
          *  Maps IDs to staged games.
          */
@@ -570,7 +575,7 @@
         });
 
         /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
-        $.fn.dataTable.ext.order['select-extension'] = function (settings, col) {
+        DataTable.ext.order['select-extension'] = function (settings, col) {
             return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
                 return $(td).closest('tr').hasClass('selected') ? '0' : '1';
             });
@@ -1004,23 +1009,29 @@
                     className: 'selected'
                 },
                 drawCallback: function () {
+                    const table = this.api().table().container();
+
                     /* Select nothing in all selects in the table. */
-                    $(this).find('select').prop('selectedIndex', -1);
+                    for (const select of table.querySelectorAll('select')) {
+                        select.selectedIndex = -1;
+                    }
 
                     /* Setup popovers to display the game settings. */
-                    $(this).find('.show-settings').popover({
-                        container: document.body,
-                        placement: 'right',
-                        trigger: 'hover',
-                        html: true,
-                        title: 'Game Settings',
-                        content: function () {
-                            const tr = $(this).closest('tr').get(0);
-                            const row = stagedGamesTable.row(tr);
-                            const stagedGame = row.data();
-                            return createSettingsTable(stagedGame.gameSettings);
-                        }
-                    });
+                    for (const button of table.querySelectorAll('.show-settings')) {
+                        new Popover(button, {
+                            container: document.body,
+                            placement: 'right',
+                            trigger: 'hover',
+                            html: true,
+                            title: 'Game Settings',
+                            content: function () {
+                                const tr = $(this).closest('tr').get(0);
+                                const row = stagedGamesTable.row(tr);
+                                const stagedGame = row.data();
+                                return createSettingsTable(stagedGame.gameSettings);
+                            }
+                        });
+                    }
                 },
                 order: [[1, 'asc']],
                 scrollY: '800px',

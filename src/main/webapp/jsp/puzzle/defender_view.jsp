@@ -110,7 +110,6 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<script src="js/codedefenders_game.js" type="text/javascript"></script>
 <link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
 
 <jsp:include page="/jsp/push_socket.jsp"/>
@@ -139,13 +138,22 @@
             <div class="game-component-header">
                 <h3>Write a new JUnit test here</h3>
                 <div>
-
                     <button type="submit" class="btn btn-defender btn-highlight" id="submitTest" form="def"
-                            onclick="CodeDefenders.objects.testProgressBar.activate(); this.form.submit(); this.disabled=true;"
                             <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                         Defend
                     </button>
 
+                    <script type="module">
+                        import {objects} from './js/codedefenders_main.mjs';
+                        const testProgressBar = await objects.await('testProgressBar');
+
+
+                        document.getElementById('submitTest').addEventListener('click', function (event) {
+                            this.form.submit();
+                            this.disabled = true;
+                            testProgressBar.activate();
+                        });
+                    </script>
                 </div>
             </div>
 

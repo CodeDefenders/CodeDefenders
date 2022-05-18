@@ -543,9 +543,9 @@ public class MeleeGameManager extends HttpServlet {
     String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
         String editor = "";
         if (forTest) {
-            editor = "CodeDefenders.objects.testEditor";
+            editor = "testEditor";
         } else if (forMutant) {
-            editor = "CodeDefenders.objects.mutantEditor";
+            editor = "mutantEditor";
         }
 
         StringBuilder decorated = new StringBuilder();
@@ -554,8 +554,8 @@ public class MeleeGameManager extends HttpServlet {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // Replace the entire line with a link to the source code
-                String replacedLine = MessageFormat.format(
-                        "<a onclick=\"{0}.jumpToLine({1});\" href=\"javascript:void(0);\">{2}</a>",
+                String replacedLine = String.format(
+                        "<a onclick=\"import('./js/codedefenders_main.mjs').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
                         editor, m.group(1), line);
                 decorated.append(replacedLine).append("\n");
             } else {

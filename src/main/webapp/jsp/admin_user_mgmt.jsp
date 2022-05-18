@@ -106,7 +106,10 @@
                 </div>
             </div>
 
-            <script>
+            <script type="module">
+                import $ from './js/jquery.mjs';
+
+
                 $(document).ready(() => {
                     const passwordInput = document.getElementById('password');
                     const confirmPasswordInput = document.getElementById('confirm_password');
@@ -189,7 +192,11 @@
             </tbody>
         </table>
 
-        <script>
+        <script type="module">
+            import DataTable from './js/datatables.mjs';
+            import $ from './js/jquery.mjs';
+
+
             $(document).ready(function () {
                 new DataTable('#tableUsers', {
                     searching: true,

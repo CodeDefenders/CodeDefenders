@@ -9,10 +9,21 @@
     <c:when test="${!intentionCollectionEnabled}">
         <button type="submit" form="atk"
                 id="submitMutant" class="btn btn-attacker btn-highlight"
-                onclick="CodeDefenders.objects.mutantProgressBar.activate(); this.form.submit(); this.disabled=true;"
                 <c:if test="${!gameActive}">disabled</c:if>>
             Attack
         </button>
+
+        <script type="module">
+            import {objects} from './js/codedefenders_main.mjs';
+            const mutantProgressBar = await objects.await('mutantProgressBar');
+
+
+            document.getElementById('submitMutant').addEventListener('click', function (event) {
+                this.form.submit();
+                this.disabled = true;
+                mutantProgressBar.activate();
+            });
+        </script>
     </c:when>
     <c:otherwise>
         <div id="attacker-intention-dropdown" class="dropdown">

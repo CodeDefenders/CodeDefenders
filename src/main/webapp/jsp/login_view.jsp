@@ -147,28 +147,26 @@
 </div>
 
 <script>
-    $(document).ready(() => {
-        const passwordInput = document.getElementById('createacc-password-input');
-        const confirmPasswordInput = document.getElementById('createacc-confirm-password-input');
-        const confirmPasswordFeedback = document.getElementById('createacc-confirm-password-feedback');
+    const passwordInput = document.getElementById('createacc-password-input');
+    const confirmPasswordInput = document.getElementById('createacc-confirm-password-input');
+    const confirmPasswordFeedback = document.getElementById('createacc-confirm-password-feedback');
 
-        const validateConfirmPassword = function () {
-            if (confirmPasswordInput.validity.valueMissing) {
-                confirmPasswordFeedback.innerText = 'Please confirm your password.';
+    const validateConfirmPassword = function () {
+        if (confirmPasswordInput.validity.valueMissing) {
+            confirmPasswordFeedback.innerText = 'Please confirm your password.';
+        } else {
+            if (passwordInput.value === confirmPasswordInput.value)  {
+                confirmPasswordInput.setCustomValidity('');
+                confirmPasswordFeedback.innerText = '';
             } else {
-                if (passwordInput.value === confirmPasswordInput.value)  {
-                    confirmPasswordInput.setCustomValidity('');
-                    confirmPasswordFeedback.innerText = '';
-                } else {
-                    confirmPasswordInput.setCustomValidity('password-mismatch');
-                    confirmPasswordFeedback.innerText = "Passwords don't match.";
-                }
+                confirmPasswordInput.setCustomValidity('password-mismatch');
+                confirmPasswordFeedback.innerText = "Passwords don't match.";
             }
-        };
+        }
+    };
 
-        passwordInput.addEventListener('input', validateConfirmPassword);
-        confirmPasswordInput.addEventListener('input', validateConfirmPassword);
-    });
+    passwordInput.addEventListener('input', validateConfirmPassword);
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
 </script>
 
 <div id="resetpw-modal" class="modal fade" tabindex="-1" aria-labelledby="resetpw-modal-title" aria-hidden="true">
@@ -220,17 +218,15 @@
 </div>
 
 <script>
-    $(document).ready(() => {
-        const emailInput = document.getElementById('resetpw-email-input');
-        const emailFeedback = document.getElementById('resetpw-email-feedback');
+    const emailInput = document.getElementById('resetpw-email-input');
+    const emailFeedback = document.getElementById('resetpw-email-feedback');
 
-        emailInput.addEventListener('input', function () {
-            if (emailInput.validity.valueMissing) {
-                emailFeedback.innerText = 'Please enter your email address.';
-            } else if (emailInput.validity.typeMismatch) {
-                emailFeedback.innerText = 'Please enter a valid email address.';
-            }
-        });
+    emailInput.addEventListener('input', function () {
+        if (emailInput.validity.valueMissing) {
+            emailFeedback.innerText = 'Please enter your email address.';
+        } else if (emailInput.validity.typeMismatch) {
+            emailFeedback.innerText = 'Please enter a valid email address.';
+        }
     });
 </script>
 
@@ -287,31 +283,32 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function() {
-        const passwordInput = document.getElementById('changepw-password-input');
-        const confirmPasswordInput = document.getElementById('changepw-confirm-password-input');
-        const confirmPasswordFeedback = document.getElementById('changepw-confirm-password-feedback');
+<script type="module">
+    import {Modal} from './js/bootstrap.mjs';
 
-        const validateConfirmPassword = function () {
-            if (confirmPasswordInput.validity.valueMissing) {
-                confirmPasswordFeedback.innerText = 'Please confirm your password.';
+
+    const passwordInput = document.getElementById('changepw-password-input');
+    const confirmPasswordInput = document.getElementById('changepw-confirm-password-input');
+    const confirmPasswordFeedback = document.getElementById('changepw-confirm-password-feedback');
+
+    const validateConfirmPassword = function () {
+        if (confirmPasswordInput.validity.valueMissing) {
+            confirmPasswordFeedback.innerText = 'Please confirm your password.';
+        } else {
+            if (passwordInput.value === confirmPasswordInput.value)  {
+                confirmPasswordInput.setCustomValidity('');
+                confirmPasswordFeedback.innerText = '';
             } else {
-                if (passwordInput.value === confirmPasswordInput.value)  {
-                    confirmPasswordInput.setCustomValidity('');
-                    confirmPasswordFeedback.innerText = '';
-                } else {
-                    confirmPasswordInput.setCustomValidity('password-mismatch');
-                    confirmPasswordFeedback.innerText = "Passwords don't match.";
-                }
+                confirmPasswordInput.setCustomValidity('password-mismatch');
+                confirmPasswordFeedback.innerText = "Passwords don't match.";
             }
-        };
+        }
+    };
 
-        passwordInput.addEventListener('input', validateConfirmPassword);
-        confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+    passwordInput.addEventListener('input', validateConfirmPassword);
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
 
-        new bootstrap.Modal('#changepw-modal').show();
-    });
+    new Modal('#changepw-modal').show();
 </script>
 
 <%

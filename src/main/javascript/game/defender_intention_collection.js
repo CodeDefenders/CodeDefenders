@@ -8,57 +8,65 @@ class DefenderIntentionCollection {
          * An note telling the user to select a line.
          * @type {HTMLElement}
          */
-        this.lineChooseNote = document.getElementById('line-choose-note');
+        this._lineChooseNote = document.getElementById('line-choose-note');
 
         /**
          * The selected line number, or null if no line is selected.
          * @type {?number}
          */
-        this.selectedLine = null;
-
-        /**
-         * The class viewer CodeMirror instance.
-         * @type {CodeMirror}
-         */
-        this.classViewer = null;
-        if (objects.classViewer !== null) {
-            this.classViewer = objects.classViewer.editor; // Battleground mode
-        } else if (objects.mutantEditor !== null) {
-            this.classViewer = objects.mutantEditor.editor; // Melee mode
-        }
-
-        /**
-         * The test editor CodeMirror instance.
-         * @type {CodeMirror}
-         */
-        this.testEditor = objects.testEditor.editor;
+        this._selectedLine = null;
 
         /**
          * The (hidden) input to submit the selected line number with.
          * @type {HTMLInputElement}
          */
-        this.selectedLineInput = document.getElementById('selected_lines');
+        this._selectedLineInput = document.getElementById('selected_lines');
 
         /**
          * The "Defend" button used to submit tests.
          * @type {HTMLElement}
          */
-        this.submitTestButton = document.getElementById('submitTest');
+        this._submitTestButton = document.getElementById('submitTest');
 
-        this._init(previouslySelectedLine);
+        /**
+         * The line that was selected for the last (failed) submission, if any.
+         * @type {?number}
+         */
+        this._previouslySelectedLine = previouslySelectedLine;
     }
 
-    _init (previouslySelectedLine) {
+    async initAsync () {
+        /**
+         * The class viewer CodeMirror instance.
+         * @type {CodeMirror}
+         */
+        this._classEditor = (await Promise.race([
+            objects.await('classViewer'),
+            objects.await('mutantEditor')
+        ])).editor;
+
+        /**
+         * The test editor CodeMirror instance.
+         * @type {CodeMirror}
+         */
+        this._testEditor = (await objects.await('testEditor')).editor;
+
+        this._init();
+
+        return this;
+    }
+
+    _init () {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
         /* Set the editor styling. */
-        this.testEditor.getWrapperElement().classList.add('codemirror-readonly-toggle');
+        this._testEditor.getWrapperElement().classList.add('codemirror-readonly-toggle');
 
         /* Select line on class viewer gutter click. */
-        this.classViewer.on('gutterClick', function (cm, line) {
+        this._classEditor.on('gutterClick', function (cm, line) {
             line++; // Make line 1-indexed.
-            if (line !== self.selectedLine) {
+            if (line !== self._selectedLine) {
                 self.selectLine(line);
             } else {
                 self.unselectLine();
@@ -67,16 +75,16 @@ class DefenderIntentionCollection {
 
         /* If there was a problem with the player's last submission, select previously selected line again,
            otherwise, initialize without a selected line. */
-        if (previouslySelectedLine !== null) {
-            self.selectLine(previouslySelectedLine);
+        if (this._previouslySelectedLine !== null) {
+            self.selectLine(this._previouslySelectedLine);
         } else {
             self.unselectLine();
         }
     }
 
     unselectLine () {
-        const previousSelectedLine = this.selectedLine;
-        this.selectedLine = null;
+        const previousSelectedLine = this._selectedLine;
+        this._selectedLine = null;
 
         this._setInputValue('');
         this._lockTestEditor();
@@ -86,17 +94,17 @@ class DefenderIntentionCollection {
     }
 
     selectLine (line) {
-        if (this.selectedLine !== null) {
-            this._removeLineMarker(this.selectedLine);
+        if (this._selectedLine !== null) {
+            this._removeLineMarker(this._selectedLine);
         }
 
-        if (line > this.classViewer.lineCount()) {
+        if (line > this._classEditor.lineCount()) {
             console.log('Selected line is out of bounds.');
             this.unselectLine();
             return;
         }
 
-        this.selectedLine = line;
+        this._selectedLine = line;
 
         this._setInputValue(String(line));
         this._unlockTestEditor();
@@ -112,46 +120,46 @@ class DefenderIntentionCollection {
         marker.classList.add('text-center');
         marker.innerHTML = '<i class="fa fa-arrow-right marker ps-1"></i>';
 
-        this.classViewer.setGutterMarker(line - 1, 'CodeMirror-linenumbers', marker);
+        this._classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', marker);
     }
 
     /** @private */
     _removeLineMarker (line) {
-        this.classViewer.setGutterMarker(line - 1, 'CodeMirror-linenumbers', null);
+        this._classEditor.setGutterMarker(line - 1, 'CodeMirror-linenumbers', null);
     }
 
     /** @private */
     _lockTestEditor() {
-        this.testEditor.setOption('readOnly', true);
-        this.testEditor.getWrapperElement().classList.add('codemirror-readonly');
-        this.submitTestButton.disabled = true;
+        this._testEditor.setOption('readOnly', true);
+        this._testEditor.getWrapperElement().classList.add('codemirror-readonly');
+        this._submitTestButton.disabled = true;
     }
 
     /** @private */
     _unlockTestEditor() {
-        this.testEditor.setOption('readOnly', false);
-        this.testEditor.getWrapperElement().classList.remove('codemirror-readonly');
-        this.submitTestButton.disabled = false;
+        this._testEditor.setOption('readOnly', false);
+        this._testEditor.getWrapperElement().classList.remove('codemirror-readonly');
+        this._submitTestButton.disabled = false;
     }
 
     /** @private */
     _showLineChooseNote() {
-        this.lineChooseNote.removeAttribute('hidden');
+        this._lineChooseNote.removeAttribute('hidden');
     }
 
     /** @private */
     _hideLineChooseNote() {
-        this.lineChooseNote.setAttribute('hidden', '');
+        this._lineChooseNote.setAttribute('hidden', '');
     }
 
     /** @private */
     _setInputValue(value) {
-        this.selectedLineInput.value = value;
+        this._selectedLineInput.value = value;
     }
 
     /** @private */
     _setButtonText(text) {
-        this.submitTestButton.innerText = text;
+        this._submitTestButton.innerText = text;
     }
 }
 

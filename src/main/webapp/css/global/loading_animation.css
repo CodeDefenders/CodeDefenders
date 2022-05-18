@@ -1,0 +1,44 @@
+/* Hide everything else during the loading animation. */
+.loading > * {
+    visibility: hidden !important;
+}
+
+/* The loading animation itself. */
+.loading {
+    position: relative;
+    min-height: 100px;
+}
+.loading::after {
+    content: "";
+
+    position: absolute;
+    top: calc(50% - 32px);
+    left: calc(50% - 32px);
+
+    display: block;
+    width: 64px;
+    height: 64px;
+
+    border-radius: 100%;
+    border: 6px solid #ccc;
+    border-left-color: transparent;
+
+    animation: loading 1.2s linear infinite;
+}
+@keyframes loading {
+    100% {
+        transform: rotate(360deg)
+    }
+}
+
+/* Styles for the element while loading. */
+.loading.loading-border-card {
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+}
+.loading.loading-bg-gray {
+    background: #f7f7f7;
+}
+.loading.loading-height-200 {
+    height: 200px;
+}

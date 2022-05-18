@@ -33,7 +33,7 @@
         if (!mutantEditor.hasDependencies()) {
     %>
 
-        <div class="card-body p-0 codemirror-fill">
+        <div class="card-body p-0 codemirror-fill loading">
             <pre class="m-0"><textarea id="mutant-code" name="mutant" title="mutant">${mutantEditor.mutantCode}</textarea></pre>
         </div>
 
@@ -77,7 +77,7 @@
             currentId = 0;
         %>
 
-        <div class="card-body p-0 codemirror-fill">
+        <div class="card-body p-0 codemirror-fill loading">
             <div class="tab-content">
                 <div class="tab-pane active"
                      id="mutant-editor-pane-<%=currentId%>"
@@ -112,25 +112,29 @@
 
 </div>
 
-<script>
-    /* Wrap in a function to avoid polluting the global scope. */
-    (function () {
-        const editableLinesStart = ${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"};
-        const editableLinesEnd = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
-        const keymap = '${login.user.keyMap.CMName}';
-        const numDependencies = ${mutantEditor.hasDependencies() ? mutantEditor.dependencies.size() : 0};
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {MutantEditor} from './js/codedefenders_game.mjs';
 
-        const editorElement = document.getElementById('mutant-code');
-        const dependencyEditorElements = [];
-        for (let i = 1; i <= numDependencies; i++) {
-            dependencyEditorElements.push(document.getElementById(`mutant-editor-code-\${i}`));
-        }
 
-        CodeDefenders.objects.mutantEditor = new CodeDefenders.MutantEditor(
-                editorElement,
-                dependencyEditorElements,
-                editableLinesStart,
-                editableLinesEnd,
-                keymap);
-    })();
+    const editableLinesStart = ${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"};
+    const editableLinesEnd = ${mutantEditor.hasEditableLinesEnd() ? mutantEditor.editableLinesEnd : "null"};
+    const keymap = '${login.user.keyMap.CMName}';
+    const numDependencies = ${mutantEditor.hasDependencies() ? mutantEditor.dependencies.size() : 0};
+
+    const editorElement = document.getElementById('mutant-code');
+    const dependencyEditorElements = [];
+    for (let i = 1; i <= numDependencies; i++) {
+        dependencyEditorElements.push(document.getElementById(`mutant-editor-code-\${i}`));
+    }
+
+    const mutantEditor = new MutantEditor(
+            editorElement,
+            dependencyEditorElements,
+            editableLinesStart,
+            editableLinesEnd,
+            keymap);
+
+
+    objects.register('mutantEditor', mutantEditor);
 </script>

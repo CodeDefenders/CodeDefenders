@@ -19,6 +19,13 @@
 
 --%>
 
-<script>
-    CodeDefenders.objects.attackerIntentionCollection = new CodeDefenders.AttackerIntentionCollection();
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+    import {AttackerIntentionCollection} from './js/codedefenders_game.mjs';
+
+
+    const attackerIntentionCollection = new AttackerIntentionCollection();
+
+
+    objects.register('attackerIntentionCollection', attackerIntentionCollection);
 </script>

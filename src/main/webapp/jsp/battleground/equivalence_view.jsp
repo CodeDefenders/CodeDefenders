@@ -110,22 +110,26 @@
 
             <h3>Diff</h3>
             <div class="card">
-                <div class="card-body p-0">
+                <div class="card-body p-0 loading loading-height-200">
                     <pre id="diff-pre" class="m-0"><textarea id="diff" class="mutdiff" title="mutdiff" readonly><%=equivMutant.getHTMLEscapedPatchString()%></textarea></pre>
                 </div>
             </div>
 
-            <script>
-                (function () {
-                    const codemirror = CodeMirror.fromTextArea(document.getElementById('diff'), {
-                        lineNumbers: true,
-                        mode: "text/x-diff",
-                        readOnly: true,
-                        autoRefresh: true
-                    });
-                    codemirror.getWrapperElement().classList.add('codemirror-readonly');
-                    codemirror.setSize('100%', '100%');
-                })();
+            <script type="module">
+                import CodeMirror from './js/codemirror.mjs';
+                import {LoadingAnimation} from './js/codedefenders_main.mjs';
+
+
+                const textarea = document.getElementById('diff');
+                const codemirror = CodeMirror.fromTextArea(textarea, {
+                    lineNumbers: true,
+                    mode: "text/x-diff",
+                    readOnly: true,
+                    autoRefresh: true
+                });
+                codemirror.getWrapperElement().classList.add('codemirror-readonly');
+                codemirror.setSize('100%', '100%');
+                LoadingAnimation.hideAnimation(textarea);
             </script>
 
             <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
@@ -142,7 +146,12 @@
                 <div class="d-flex justify-content-between mt-2 mb-2">
                     <button class="btn btn-danger" id="accept-equivalent-button" type="button">Accept As Equivalent</button>
                     <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test</button>
-                    <script>
+
+                    <script type="module">
+                        import {objects} from "./js/codedefenders_main.mjs";
+                        const testProgressBar = await objects.await('testProgressBar');
+
+
                         document.getElementById("accept-equivalent-button").addEventListener('click', function (event) {
                             if (confirm('Accepting Equivalence will lose all mutant points. Are you sure?')) {
                                 this.form['resolveAction'].value = 'accept';
@@ -151,12 +160,13 @@
                             }
                         });
                         document.getElementById("reject-equivalent-button").addEventListener('click', function (event) {
-                            CodeDefenders.objects.testProgressBar.activate();
                             this.form['resolveAction'].value = 'reject';
                             this.form.submit();
                             this.disabled = true;
+                            testProgressBar.activate();
                         });
                     </script>
+
                 </div>
 
                 <span>Note: If the game finishes with this equivalence unsolved, you will lose points!</span>

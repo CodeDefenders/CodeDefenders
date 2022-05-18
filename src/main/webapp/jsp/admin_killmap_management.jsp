@@ -296,8 +296,10 @@
     <% } %>
 </div>
 
-<script>
-(function () {
+<script type="module">
+    import DataTable from './js/datatables.mjs';
+    import $ from './js/jquery.mjs';
+
 
     const postIds = function (idsString, formType, killmapType) {
         const form = $(
@@ -482,8 +484,6 @@
     });
 
 <% } %>
-
-})();
 </script>
 
 <%@ include file="/jsp/footer.jsp" %>

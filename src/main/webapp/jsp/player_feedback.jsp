@@ -214,7 +214,10 @@
     </div>
 </div>
 
-<script>
+<script type="module">
+    import $ from './js/jquery.mjs';
+
+
     $(document).ready(() => {
         $('#give-feedback-form').on('change', '.rating input', function () {
             $('#give-feedback-button').removeAttr('disabled');

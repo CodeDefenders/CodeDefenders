@@ -1,5 +1,6 @@
 import {Modal as BootstrapModal} from '../thirdparty/bootstrap';
 
+
 class Modal {
 
     /**
