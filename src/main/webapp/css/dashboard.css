@@ -25,14 +25,17 @@
 
 .pie::before {
     inset: 0;
+    /* anti-aliasing by using a small gradient instead of instant color change: */
+    --smoothing-percentage: .15;
+    --secondary-percentage: calc(100 - var(--percentage));
     background: radial-gradient(
             farthest-side,
             var(--color-secondary) 98%,
             #0000
     ) top/var(--border-width) var(--border-width) no-repeat,
     conic-gradient(
-            var(--color-secondary) calc((100 - var(--percentage)) * 1%),
-            var(--color-primary, #0000) 0);
+            var(--color-secondary) calc((var(--secondary-percentage) * 1%)),
+            var(--color-primary, #0000) calc((var(--secondary-percentage) + var(--smoothing-percentage)) * 1%));
     -webkit-mask: radial-gradient(
             farthest-side,
             #0000 calc(99% - var(--border-width)),
@@ -150,22 +153,23 @@
 .dashboard-box .legend:nth-child(1) .legend-title::before {
     background-color: var(--color-primary);
 }
+
 .dashboard-box .legend:nth-child(2) .legend-title::before {
     background-color: var(--color-secondary);
 }
 
 .dashboard-mutants {
-    --color-primary: #ef6b0b;
+    --color-primary: #ee9023;
     --color-secondary: var(--bg-attacker-contrast-dark, #730000);
 }
 
 .dashboard-tests {
-    --color-primary: var(--bg-codedefenders, #32CD32);
+    --color-primary: var(--bg-codedefenders-lighter, #32CD32);
     --color-secondary: var(--bg-defender-contrast-dark, #008080);
 }
 
 .dashboard-points,
 .dashboard-games {
-    --color-primary: var(--bg-defender-contrast, #008080);
+    --color-primary: var(--bg-codedefenders-lighter, #008080);
     --color-secondary: var(--bg-attacker-contrast-dark, #730000);
 }
