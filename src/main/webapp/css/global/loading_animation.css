@@ -9,19 +9,25 @@
     min-height: 100px;
 }
 .loading::after {
-    content: url('../../images/loading.png');
+    content: "";
+
     position: absolute;
     top: calc(50% - 32px);
     left: calc(50% - 32px);
-    animation: spin 1s linear infinite;
 
-    /* Dimensions of the image. For some reason, the image has other dimensions when not set here. */
-    height: 64px;
+    display: block;
     width: 64px;
+    height: 64px;
+
+    border-radius: 100%;
+    border: 6px solid #ccc;
+    border-left-color: transparent;
+
+    animation: loading 1.2s linear infinite;
 }
-@keyframes spin {
+@keyframes loading {
     100% {
-        transform: rotate(360deg);
+        transform: rotate(360deg)
     }
 }
 
