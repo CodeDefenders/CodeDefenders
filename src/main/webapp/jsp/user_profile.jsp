@@ -67,7 +67,7 @@
 <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="css/specific/dashboard.css">
 
 <div class="container">
     <h1>${pageInfo.pageTitle}</h1>
