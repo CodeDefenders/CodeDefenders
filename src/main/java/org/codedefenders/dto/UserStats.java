@@ -37,6 +37,61 @@ public class UserStats {
         this.defenderGames = defenderGames;
     }
 
+    private int calcPercentage(int subject, int total) {
+        if (subject > total) throw new IllegalArgumentException("Total must be greater than or equal to the portion.");
+        if (subject < 0) throw new IllegalArgumentException("Amount must be positive or zero.");
+        if (subject == 0) return 0; // avoid division by 0
+        return (subject * 100) / total;
+    }
+
+    public int getTotalMutants() {
+        return killedMutants + aliveMutants;
+    }
+
+    public int getAliveMutantsPercentage() {
+        return calcPercentage(aliveMutants, getTotalMutants());
+    }
+
+    public int getKilledMutantsPercentage() {
+        return calcPercentage(killedMutants, getTotalMutants());
+    }
+
+    public int getTotalTests() {
+        return killingTests + nonKillingTests;
+    }
+
+    public int getKillingTestsPercentage() {
+        return calcPercentage(killingTests, getTotalTests());
+    }
+
+    public int getNonKillingTestsPercentage() {
+        return calcPercentage(nonKillingTests, getTotalTests());
+    }
+
+    public int getTotalPoints() {
+        return totalPointsTests + totalPointsMutants;
+    }
+
+    public int getTestPointsPercentage() {
+        return calcPercentage(totalPointsTests, getTotalPoints());
+    }
+
+    public int getMutantPointsPercentage() {
+        return calcPercentage(totalPointsMutants, getTotalPoints());
+    }
+
+    public int getTotalGames() {
+        return attackerGames + defenderGames;
+    }
+
+    public int getDefenderGamesPercentage() {
+        return calcPercentage(defenderGames, getTotalGames());
+    }
+
+    public int getAttackerGamesPercentage() {
+        return calcPercentage(attackerGames, getTotalGames());
+    }
+
     public int getUserId() {
         return userId;
     }
