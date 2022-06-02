@@ -23,6 +23,17 @@ public class UserStatsService {
     }
 
     public UserStats getStatsByUserId(int userId) {
-        return new UserStats(userId);
+        return new UserStats(userId,
+                dao.getNumKilledMutantsByUser(userId),
+                dao.getNumAliveMutantsByUser(userId),
+                dao.getNumKillingTestsByUser(userId),
+                dao.getNumNonKillingTestsByUser(userId),
+                dao.getAveragePointsTestByUser(userId),
+                dao.getTotalPointsTestsByUser(userId),
+                dao.getAveragePointsMutantByUser(userId),
+                dao.getTotalPointsMutantByUser(userId),
+                dao.getAttackerGamesByUser(userId),
+                dao.getDefenderGamesByUser(userId)
+        );
     }
 }
