@@ -29,9 +29,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.beans.user.UserProfileBean;
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.dto.UserStats;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserStatsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -53,6 +56,12 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private LoginBean login;
+
+    @Inject
+    private UserStatsService userStatsService;
+
+    @Inject
+    private UserProfileBean userProfileBean;
 
     /**
      * Checks whether users can view and update their profile information.
@@ -118,9 +127,13 @@ public class UserProfileManager extends HttpServlet {
             response.setDateHeader("Expires", -1);
         }
 
-        request.setAttribute("user", urlParamUser.orElseGet(login::getUser));
-        request.setAttribute("self", isSelf);
+        final UserEntity user = urlParamUser.orElseGet(login::getUser);
+        final UserStats stats = userStatsService.getStatsByUserId(user.getId());
+
+        userProfileBean.setUser(user);
+        userProfileBean.setSelf(isSelf);
+        userProfileBean.setStats(stats);
+
         request.getRequestDispatcher(Constants.USER_PROFILE_JSP).forward(request, response);
     }
-
 }

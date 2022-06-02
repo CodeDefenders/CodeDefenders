@@ -18,48 +18,12 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.UserEntity" %>
-<%@ page import="org.codedefenders.persistence.database.UserStatsDAO" %>
-<%@ page import="java.util.function.BiFunction" %>
-<%@ page import="org.codedefenders.util.CDIUtil" %>
 
+<jsp:useBean id="profile" class="org.codedefenders.beans.user.UserProfileBean" scope="request"/>
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
-<%
-    final UserEntity user = (UserEntity) request.getAttribute("user");
-    final boolean isSelf = (boolean) request.getAttribute("self");
-    final UserStatsDAO userStats = CDIUtil.getBeanFromCDI(UserStatsDAO.class);
-
-    pageInfo.setPageTitle(isSelf ? "My Profile" : "Profile of " + user.getUsername());
-
-    final int userId = user.getId();
-
-    final BiFunction<Integer, Integer, Integer> percentage
-            = (subject, total) -> (subject * 100) / Math.max(total, 1); // avoid division by 0
-
-    final int killedMutants = userStats.getNumKilledMutantsByUser(userId);
-    final int aliveMutants = userStats.getNumAliveMutantsByUser(userId);
-    final int totalMutants = killedMutants + aliveMutants;
-    final int aliveMutantsPercentage = percentage.apply(aliveMutants, totalMutants);
-
-    final int killingTests = userStats.getNumKillingTestsByUser(userId);
-    final int nonKillingTests = userStats.getNumNonKillingTestsByUser(userId);
-    final int totalTests = killingTests + nonKillingTests;
-    final int killingTestsPercentage = percentage.apply(killingTests, totalTests);
-
-    final int testPoints = userStats.getTotalPointsTestsByUser(userId);
-    final int mutantPoints = userStats.getTotalPointsMutantByUser(userId);
-    final double avgPointsPerTest = userStats.getAveragePointsTestByUser(userId);
-    final double avgPointsPerMutant = userStats.getAveragePointsMutantByUser(userId);
-    final int totalPoints = testPoints + mutantPoints;
-    final int testPointsPercentage = percentage.apply(testPoints, totalPoints);
-
-    final int attackerGames = userStats.getAttackerGamesByUser(userId);
-    final int defenderGames = userStats.getDefenderGamesByUser(userId);
-    final int totalGames = attackerGames + defenderGames;
-    final int defenderGamesPercentage = percentage.apply(defenderGames, totalGames);
-%>
+<% pageInfo.setPageTitle(profile.isSelf() ? "My Profile" : "Profile of " + profile.getUser().getUsername()); %>
 
 <% if (login.isLoggedIn()) { %>
 <jsp:include page="/jsp/header.jsp"/>
@@ -78,19 +42,19 @@
         <div class="dashboards">
             <div class="dashboard-box dashboard-mutants">
                 <h3>Mutants created</h3>
-                <div class="pie animate no-round <%=totalMutants == 0 ? "no-data" : ""%>"
-                     style="--percentage:<%=aliveMutantsPercentage%>">
-                    <%=totalMutants%>
+                <div class="pie animate no-round ${profile.stats.totalMutants == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.aliveMutantsPercentage}">
+                    ${profile.stats.totalMutants}
                 </div>
 
                 <div>
                     <div class="legend">
                         <span class="legend-title">Mutants still alive:</span>
-                        <span class="legend-value"><%=aliveMutants%></span>
+                        <span class="legend-value">${profile.stats.aliveMutants}</span>
                     </div>
                     <div class="legend">
                         <span class="legend-title">Killed mutants:</span>
-                        <span class="legend-value"><%=killedMutants%></span>
+                        <span class="legend-value">${profile.stats.killedMutants}</span>
                     </div>
                 </div>
             </div>
@@ -98,19 +62,19 @@
             <div class="dashboard-box dashboard-tests">
                 <h3>Tests written</h3>
 
-                <div class="pie animate no-round <%=totalTests == 0 ? "no-data" : ""%>"
-                     style="--percentage:<%=killingTestsPercentage%>">
-                    <%=totalTests%>
+                <div class="pie animate no-round ${profile.stats.totalTests == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.killingTestsPercentage}">
+                    ${profile.stats.totalTests}
                 </div>
 
                 <div>
                     <div class="legend">
                         <span class="legend-title">Tests that killed mutants:</span>
-                        <span class="legend-value"><%=killingTests%></span>
+                        <span class="legend-value">${profile.stats.killingTests}</span>
                     </div>
                     <div class="legend">
                         <span class="legend-title">Non-killing tests:</span>
-                        <span class="legend-value"><%=nonKillingTests%></span>
+                        <span class="legend-value">${profile.stats.nonKillingTests}</span>
                     </div>
                 </div>
             </div>
@@ -118,19 +82,19 @@
             <div class="dashboard-box dashboard-points">
                 <h3>Points earned</h3>
 
-                <div class="pie animate no-round <%=totalPoints == 0 ? "no-data" : ""%>"
-                     style="--percentage:<%=testPointsPercentage%>">
-                    <%=totalPoints%>
+                <div class="pie animate no-round ${profile.stats.totalPoints == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.testPointsPercentage}">
+                    ${profile.stats.totalPoints}
                 </div>
 
                 <div>
                     <div class="legend">
                         <span class="legend-title">By writing tests:</span>
-                        <span class="legend-value"><%=testPoints%></span>
+                        <span class="legend-value">${profile.stats.totalPointsTests}</span>
                     </div>
                     <div class="legend">
                         <span class="legend-title">By creating mutants:</span>
-                        <span class="legend-value"><%=mutantPoints%></span>
+                        <span class="legend-value">${profile.stats.totalPointsMutants}</span>
                     </div>
                 </div>
             </div>
@@ -138,19 +102,19 @@
             <div class="dashboard-box dashboard-games">
                 <h3>Games played</h3>
 
-                <div class="pie animate no-round <%=totalGames == 0 ? "no-data" : ""%>"
-                     style="--percentage:<%=defenderGamesPercentage%>">
-                    <%=totalGames%>
+                <div class="pie animate no-round ${profile.stats.totalGames == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.defenderGamesPercentage}">
+                    ${profile.stats.totalGames}
                 </div>
 
                 <div>
                     <div class="legend">
                         <span class="legend-title">As defender:</span>
-                        <span class="legend-value"><%=defenderGames%></span>
+                        <span class="legend-value">${profile.stats.defenderGames}</span>
                     </div>
                     <div class="legend">
                         <span class="legend-title">As attacker:</span>
-                        <span class="legend-value"><%=attackerGames%></span>
+                        <span class="legend-value">${profile.stats.attackerGames}</span>
                     </div>
                 </div>
             </div>
@@ -158,16 +122,14 @@
 
         <dl class="other-stats mt-3">
             <dt>Average points per tests:</dt>
-            <dd><%=avgPointsPerTest%>
-            </dd>
+            <dd>${profile.stats.avgPointsTests}</dd>
 
             <dt>Average points per mutant:</dt>
-            <dd><%=avgPointsPerMutant%>
-            </dd>
+            <dd>${profile.stats.avgPointsMutants}</dd>
         </dl>
     </section>
 
-    <% if (isSelf) { %>
+    <% if (profile.isSelf()) { %>
     <section class="mt-5" aria-labelledby="played-games">
         <h2 class="mb-3" id="played-games">Played games</h2>
         <p>
@@ -180,7 +142,7 @@
         <h2 class="mb-3" id="account-information">Account Information</h2>
         <p>
             Your current email:
-            <span class="d-inline-block px-2 ms-2 border"><%=user.getEmail()%></span>
+            <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
         </p>
         <p>
             Change your account information, password or delete your account in the
