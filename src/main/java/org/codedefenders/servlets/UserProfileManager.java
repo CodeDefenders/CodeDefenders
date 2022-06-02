@@ -130,9 +130,11 @@ public class UserProfileManager extends HttpServlet {
         final UserEntity user = urlParamUser.orElseGet(login::getUser);
         final UserStats stats = userStatsService.getStatsByUserId(user.getId());
 
+        // Pass values to JSP page
         userProfileBean.setUser(user);
         userProfileBean.setSelf(isSelf);
         userProfileBean.setStats(stats);
+        request.setAttribute("profile", userProfileBean);
 
         request.getRequestDispatcher(Constants.USER_PROFILE_JSP).forward(request, response);
     }
