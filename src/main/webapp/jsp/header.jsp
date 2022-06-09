@@ -21,12 +21,14 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 <%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
+<%@ page import="org.codedefenders.servlets.UserSettingsManager" %>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <%
     boolean profileEnabled = UserProfileManager.checkEnabled();
+    boolean accountEnabled = UserSettingsManager.checkEnabled();
     boolean puzzleEnabled = PuzzleGameManager.checkEnabled();
 %>
 
@@ -75,6 +77,8 @@
                         style="left: auto; right: 0;">
                         <% if (profileEnabled) { %>
                             <li><a class="dropdown-item" id="header-profile" href="<%=request.getContextPath() + Paths.USER_PROFILE%>">Profile</a></li>
+                        <% } %>
+                        <% if (accountEnabled) { %>
                             <li><a class="dropdown-item" id="header-account" href="<%=request.getContextPath() + Paths.USER_SETTINGS%>">Account</a></li>
                         <% } %>
                         <li><a class="dropdown-item" id="header-help" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a></li>

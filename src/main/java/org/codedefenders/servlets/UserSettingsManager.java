@@ -80,8 +80,8 @@ public class UserSettingsManager extends HttpServlet {
      * @return {@code true} when users can access their profile, {@code false} otherwise.
      */
     public static boolean checkEnabled() {
-        // please, in the name of the lord, can we change the way system settings are
-        // implemented?
+        // TODO: add ALLOW_USER_SETTINGS to DB and use it instead of ALLOW_USER_PROFILE.
+        // return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_SETTINGS).getBoolValue();
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
     }
 
