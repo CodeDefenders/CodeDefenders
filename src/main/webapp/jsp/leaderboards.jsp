@@ -19,6 +19,7 @@
 
 --%>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
+<%@ page import="org.codedefenders.util.LinkUtils" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Attributes set in the servlet --%>
@@ -54,8 +55,7 @@
         <tbody>
             <c:forEach var="entry" items="${leaderboardService.all}">
                 <tr>
-                    <td><a href="<%=ServletUtils.ctx(request) + Paths.USER_PROFILE%>?user=${
-                                    ServletUtils.urlEncode(entry.username)}">${entry.username}</a></td>
+                    <td>${LinkUtils.getUserProfileAnchorOrText(pageContext.request, entry.username)}</td>
                     <td>${entry.mutantsSubmitted}</td>
                     <td>${entry.attackerScore}</td>
                     <td>${entry.testsSubmitted}</td>

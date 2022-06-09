@@ -24,6 +24,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.dto.User" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
+<%@ page import="org.codedefenders.util.LinkUtils" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -163,8 +164,7 @@
                             <%=userId%>
                             <input type="hidden" name="added_uid" value=<%=userId%>>
                         </td>
-                        <td><a href="<%=ServletUtils.ctx(request) + Paths.USER_PROFILE + "?user="
-                                    + ServletUtils.urlEncode(username)%>"><%=username%></a></td>
+                        <td><%=LinkUtils.getUserProfileAnchorOrText(request, username)%></td>
                         <td><%=email%></td>
                         <td><%=totalScore%></td>
                         <td><%=lastLogin%></td>
