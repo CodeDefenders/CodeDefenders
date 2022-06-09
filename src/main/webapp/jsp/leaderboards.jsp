@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Attributes set in the servlet --%>
@@ -53,7 +54,8 @@
         <tbody>
             <c:forEach var="entry" items="${leaderboardService.all}">
                 <tr>
-                    <td>${entry.username}</td>
+                    <td><a href="<%=ServletUtils.ctx(request) + Paths.USER_PROFILE%>?user=${
+                                    ServletUtils.urlEncode(entry.username)}">${entry.username}</a></td>
                     <td>${entry.mutantsSubmitted}</td>
                     <td>${entry.attackerScore}</td>
                     <td>${entry.testsSubmitted}</td>
