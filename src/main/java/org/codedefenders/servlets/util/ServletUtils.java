@@ -18,8 +18,11 @@
  */
 package org.codedefenders.servlets.util;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServlet;
@@ -168,5 +171,17 @@ public final class ServletUtils {
      */
     public static <T> T parameterThenOrOther(HttpServletRequest request, String parameter, T then, T other) {
         return Optional.ofNullable(request.getParameter(parameter)).map(s -> then).orElse(other);
+    }
+
+    public static String urlEncode(String stringToEncode) {
+        try {
+            return URLEncoder.encode(
+                    stringToEncode,
+                    StandardCharsets.UTF_8.toString() // use Charset instead of String for Java version >= 10
+            );
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Error while URL-encoding the string \""+ stringToEncode + "\"", e);
+            return null;
+        }
     }
 }
