@@ -23,6 +23,7 @@
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.dto.User" %>
+<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -88,7 +89,7 @@
 
                     <div>
                         <input id="confirm_password" type="password" class="form-control"
-                               name="confirm_password" placeholder="Confirm Password">
+                               name="confirm_password" placeholder="Confirm Password" aria-label="Confirm Password">
                         <div class="invalid-feedback" id="confirm-password-feedback">
                             Please confirm your password.
                         </div>
@@ -162,7 +163,8 @@
                             <%=userId%>
                             <input type="hidden" name="added_uid" value=<%=userId%>>
                         </td>
-                        <td><%=username%></td>
+                        <td><a href="<%=ServletUtils.ctx(request) + Paths.USER_PROFILE + "?user="
+                                    + ServletUtils.urlEncode(username)%>"><%=username%></a></td>
                         <td><%=email%></td>
                         <td><%=totalScore%></td>
                         <td><%=lastLogin%></td>
