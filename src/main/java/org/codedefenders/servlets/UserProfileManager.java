@@ -84,8 +84,7 @@ public class UserProfileManager extends HttpServlet {
      * @return An Optional containing the name parameters value if given.
      */
     private static Optional<String> userParameter(HttpServletRequest request) {
-        return Optional.ofNullable(request.getParameter("user"))
-                .filter(str -> str.length() > 0);
+        return ServletUtils.getStringParameter(request, "user");
     }
 
     @Override
