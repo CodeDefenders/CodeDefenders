@@ -17,6 +17,12 @@ import org.slf4j.LoggerFactory;
 public final class LinkUtils {
     private static final Logger logger = LoggerFactory.getLogger(LinkUtils.class);
 
+    /**
+     * Translates a string into application/x-www-form-urlencoded format.
+     *
+     * @param stringToEncode the string that should get encoded
+     * @return the encoded string
+     */
     public static String urlEncode(String stringToEncode) {
         try {
             return URLEncoder.encode(
@@ -24,11 +30,18 @@ public final class LinkUtils {
                     StandardCharsets.UTF_8.toString() // use Charset instead of String for Java version >= 10
             );
         } catch (UnsupportedEncodingException e) {
-            logger.error("Error while URL-encoding the string \""+ stringToEncode + "\"", e);
+            logger.error("Error while URL-encoding the string \"" + stringToEncode + "\"", e);
             return null;
         }
     }
 
+    /**
+     * Returns the URL to the user profile of the given username.
+     *
+     * @param request The current servlet request on which the path will be based on
+     * @param username The username for which the link will be created
+     * @return the URL to the user profile
+     */
     public static String getUserProfileHyperlink(HttpServletRequest request, String username) {
         return ServletUtils.ctx(request) + Paths.USER_PROFILE + "?user=" + urlEncode(username);
     }

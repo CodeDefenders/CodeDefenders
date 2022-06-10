@@ -38,9 +38,15 @@ public class UserStats {
     }
 
     private int calcPercentage(int subject, int total) {
-        if (subject > total) throw new IllegalArgumentException("Total must be greater than or equal to the portion.");
-        if (subject < 0) throw new IllegalArgumentException("Amount must be positive or zero.");
-        if (subject == 0) return 0; // avoid division by 0
+        if (subject > total) {
+            throw new IllegalArgumentException("Total must be greater than or equal to the portion.");
+        }
+        if (subject < 0) {
+            throw new IllegalArgumentException("Amount must be positive or zero.");
+        }
+        if (subject == 0) {
+            return 0; // avoid division by 0
+        }
         return (subject * 100) / total;
     }
 
