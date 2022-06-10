@@ -38,6 +38,7 @@ import org.codedefenders.service.UserStatsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 
 /**
  * This {@link HttpServlet} handles requests for viewing the currently logged
@@ -116,7 +117,8 @@ public class UserProfileManager extends HttpServlet {
 
         if (!explicitUserGiven && !isLoggedIn) {
             // Enforce user to be logged in to view own profile without URL-parameter.
-            response.sendRedirect(request.getContextPath());
+            login.redirectAfterLogin(request.getRequestURI()); // TODO: redirect after login not working
+            response.sendRedirect(request.getContextPath() + Paths.LOGIN);
             return;
         }
 
