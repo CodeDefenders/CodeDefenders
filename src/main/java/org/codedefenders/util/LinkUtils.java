@@ -6,8 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.UserProfileManager;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public final class LinkUtils {
      * @return HTML code containing an anchor-tag or plain text
      */
     public static String getUserProfileAnchorOrText(HttpServletRequest request, String username) {
-        if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue()) {
+        if (UserProfileManager.checkEnabled()) {
             return "<a href=\"" + getUserProfileHyperlink(request, username) + "\">" + username + "</a>";
         } else {
             return username;
