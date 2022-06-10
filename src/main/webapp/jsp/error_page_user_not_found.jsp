@@ -1,4 +1,4 @@
-<%--
+<%@ page import="org.codedefenders.util.Paths" %><%--
 
     Copyright (C) 2016-2019 Code Defenders contributors
 
@@ -44,6 +44,10 @@
         <hr/>
         <p>Make sure the address and the username are correct and that the page hasn't moved.</p>
         <p>Please contact your administrator if you think this is a mistake.</p>
+        <p>
+            Looking for your own profile?
+            <a href="<%=request.getContextPath() + Paths.USER_PROFILE%>" title="your profile">Click here.</a>
+        </p>
         <div class="go-back" hidden>
             <a href="javascript:history.back()">Go back</a>
         </div>
