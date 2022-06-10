@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page isErrorPage="true" import="java.io.*" contentType="text/html;" pageEncoding="UTF-8" %>
+<%@ page isErrorPage="true" pageEncoding="UTF-8" %>
 
 <!DOCTYPE html>
 <html>

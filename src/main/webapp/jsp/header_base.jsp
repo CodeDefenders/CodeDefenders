@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page pageEncoding="UTF-8" %>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
