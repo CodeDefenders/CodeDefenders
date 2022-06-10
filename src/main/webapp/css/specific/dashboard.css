@@ -1,0 +1,175 @@
+.pie {
+    --percentage: 0;
+    --border-width: 1.5rem;
+    --color-primary: inherit;
+    --color-secondary: inherit;
+    --width: inherit;
+
+    position: relative;
+    display: inline-grid;
+
+    width: var(--width);
+    height: var(--width);
+
+    margin: 1rem 0;
+    place-content: center;
+    font-size: 1.75rem;
+}
+
+.pie::before,
+.pie::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+}
+
+.pie::before {
+    inset: 0;
+    /* anti-aliasing by using a small gradient instead of instant color change: */
+    --smoothing-percentage: .15;
+    --secondary-percentage: calc(100 - var(--percentage));
+    background: radial-gradient(
+            farthest-side,
+            var(--color-secondary) 98%,
+            #0000
+    ) top/var(--border-width) var(--border-width) no-repeat,
+    conic-gradient(
+            var(--color-secondary) calc((var(--secondary-percentage) * 1%)),
+            var(--color-primary, #0000) calc((var(--secondary-percentage) + var(--smoothing-percentage)) * 1%));
+    -webkit-mask: radial-gradient(
+            farthest-side,
+            #0000 calc(99% - var(--border-width)),
+            #000 calc(100% - var(--border-width))
+    );
+    mask: radial-gradient(
+            farthest-side,
+            #0000 calc(99% - var(--border-width)),
+            #000 calc(100% - var(--border-width))
+    );
+}
+
+.pie::after {
+    inset: calc(50% - var(--border-width) / 2);
+    background: var(--color-secondary);
+    transform: rotate(calc((100 - var(--percentage)) * 3.6deg)) translateY(calc(50% - var(--width) / 2));
+}
+
+.pie.no-round::before {
+    background-size: 0 0, auto;
+}
+
+.pie.no-round::after {
+    content: none;
+}
+
+.pie.no-data {
+    --color-primary: var(--bs-gray);
+    --color-secondary: var(--bs-gray);
+}
+
+.pie.animate {
+    animation: pie 1s 0.5s both;
+}
+
+/*
+ * Required for animating a custom property.
+ * This is an experimental feature. It's support cannot be checked with @supports because it's an at-rule.
+ */
+@property --percentage {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
+@keyframes pie {
+    from {
+        --percentage: 0;
+    }
+}
+
+
+/* General Dashboard design for layout & legend below: */
+
+.dashboards {
+    --width: 12rem;
+    --padding: 3rem;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: stretch;
+    align-items: flex-start;
+    gap: var(--padding);
+}
+
+.dashboard-box {
+    background-color: #f8f9fa; /* .bg-light */
+    border-radius: .3rem; /* .rounded-3 */
+    padding: var(--padding);
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.legend {
+    display: flex;
+    align-items: center;
+}
+
+.legend .legend-title,
+.legend .legend-value {
+    display: contents;
+}
+
+.legend .legend-title {
+    font-weight: bold;
+}
+
+.legend .legend-title::before {
+    content: '';
+    display: inline-block;
+
+    --size: 2ch;
+    height: var(--size);
+    width: var(--size);
+
+    margin: 1ch;
+}
+
+.other-stats dt {
+    float: left;
+    clear: left;
+    margin-right: 1ch;
+    font-weight: bold;
+}
+
+.other-stats dd {
+    margin-left: 0;
+}
+
+/* dashboard semantic coloring */
+
+.dashboard-box .legend:nth-child(1) .legend-title::before {
+    background-color: var(--color-primary);
+}
+
+.dashboard-box .legend:nth-child(2) .legend-title::before {
+    background-color: var(--color-secondary);
+}
+
+.dashboard-mutants {
+    --color-primary: #ee9023;
+    --color-secondary: var(--bg-attacker-contrast-dark, #730000);
+}
+
+.dashboard-tests {
+    --color-primary: var(--bg-codedefenders-lighter, #32CD32);
+    --color-secondary: var(--bg-defender-contrast-dark, #008080);
+}
+
+.dashboard-points,
+.dashboard-games {
+    --color-primary: var(--bg-codedefenders-lighter, #008080);
+    --color-secondary: var(--bg-attacker-contrast-dark, #730000);
+}

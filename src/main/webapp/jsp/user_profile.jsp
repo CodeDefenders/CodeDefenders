@@ -19,16 +19,117 @@
 
 --%>
 
-<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
-<% pageInfo.setPageTitle("My Profile"); %>
-
-<jsp:include page="/jsp/header.jsp"/>
-
+<jsp:useBean id="profile" class="org.codedefenders.beans.user.UserProfileBean" scope="request"/>
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
-<div class="container form-width">
+<% pageInfo.setPageTitle(profile.isSelf() ? "My Profile" : "Profile of " + profile.getUser().getUsername()); %>
+
+<% if (login.isLoggedIn()) { %>
+<jsp:include page="/jsp/header.jsp"/>
+<% } else { %>
+<jsp:include page="/jsp/header_logout.jsp"/>
+<% } %>
+
+<link rel="stylesheet" href="css/specific/dashboard.css">
+
+<div class="container">
     <h1>${pageInfo.pageTitle}</h1>
 
+    <section class="mt-5 statistics" aria-labelledby="stats">
+        <h2 class="mb-3" id="stats">Player Statistics</h2>
+
+        <div class="dashboards">
+            <div class="dashboard-box dashboard-mutants">
+                <h3>Mutants created</h3>
+                <div class="pie animate no-round ${profile.stats.totalMutants == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.aliveMutantsPercentage}">
+                    ${profile.stats.totalMutants}
+                </div>
+
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">Mutants still alive:</span>
+                        <span class="legend-value">${profile.stats.aliveMutants}</span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">Killed mutants:</span>
+                        <span class="legend-value">${profile.stats.killedMutants}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-box dashboard-tests">
+                <h3>Tests written</h3>
+
+                <div class="pie animate no-round ${profile.stats.totalTests == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.killingTestsPercentage}">
+                    ${profile.stats.totalTests}
+                </div>
+
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">Tests that killed mutants:</span>
+                        <span class="legend-value">${profile.stats.killingTests}</span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">Non-killing tests:</span>
+                        <span class="legend-value">${profile.stats.nonKillingTests}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-box dashboard-points">
+                <h3>Points earned</h3>
+
+                <div class="pie animate no-round ${profile.stats.totalPoints == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.testPointsPercentage}">
+                    ${profile.stats.totalPoints}
+                </div>
+
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">By writing tests:</span>
+                        <span class="legend-value">${profile.stats.totalPointsTests}</span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">By creating mutants:</span>
+                        <span class="legend-value">${profile.stats.totalPointsMutants}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-box dashboard-games">
+                <h3>Games played</h3>
+
+                <div class="pie animate no-round ${profile.stats.totalGames == 0 ? "no-data" : ""}"
+                     style="--percentage: ${profile.stats.defenderGamesPercentage}">
+                    ${profile.stats.totalGames}
+                </div>
+
+                <div>
+                    <div class="legend">
+                        <span class="legend-title">As defender:</span>
+                        <span class="legend-value">${profile.stats.defenderGames}</span>
+                    </div>
+                    <div class="legend">
+                        <span class="legend-title">As attacker:</span>
+                        <span class="legend-value">${profile.stats.attackerGames}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <dl class="other-stats mt-3">
+            <dt>Average points per tests:</dt>
+            <dd>${profile.stats.avgPointsTests}</dd>
+
+            <dt>Average points per mutant:</dt>
+            <dd>${profile.stats.avgPointsMutants}</dd>
+        </dl>
+    </section>
+
+    <% if (profile.isSelf()) { %>
     <section class="mt-5" aria-labelledby="played-games">
         <h2 class="mb-3" id="played-games">Played games</h2>
         <p>
@@ -41,7 +142,7 @@
         <h2 class="mb-3" id="account-information">Account Information</h2>
         <p>
             Your current email:
-            <span class="d-inline-block px-2 ms-2 border"><%=login.getUser().getEmail()%></span>
+            <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
         </p>
         <p>
             Change your account information, password or delete your account in the
@@ -49,6 +150,7 @@
                title="Edit or delete your CodeDefenders account.">account settings</a>.
         </p>
     </section>
+    <% } %>
 
 </div>
 

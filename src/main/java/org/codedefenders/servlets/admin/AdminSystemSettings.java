@@ -167,10 +167,18 @@ public class AdminSystemSettings extends HttpServlet {
         ALLOW_USER_PROFILE {
             @Override
             public String toString() {
-                return "Let users view and edit their profile.";
+                return "Let users manage their account and view their own profile and the profile pages of others.";
             }
         },
-        ALLOW_PUZZLE_SECTION{
+        /*
+        ALLOW_USER_SETTINGS {
+            @Override
+            public String toString() {
+                return "Let users manage their account.";
+            }
+        },
+        */
+        ALLOW_PUZZLE_SECTION {
             @Override
             public String toString() {
                 return "Let users play the puzzles in the puzzle section.";

@@ -19,6 +19,7 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -28,9 +29,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.beans.user.UserProfileBean;
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.dto.UserStats;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserStatsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -53,6 +57,12 @@ public class UserProfileManager extends HttpServlet {
     @Inject
     private LoginBean login;
 
+    @Inject
+    private UserStatsService userStatsService;
+
+    @Inject
+    private UserProfileBean userProfileBean;
+
     /**
      * Checks whether users can view and update their profile information.
      *
@@ -60,6 +70,21 @@ public class UserProfileManager extends HttpServlet {
      */
     public static boolean checkEnabled() {
         return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
+    }
+
+    /**
+     * Retrieves the user-parameter of a request. The Optional is empty if the parameter was not given or empty.
+     * Due to URL-decoding the returned String might be blank.
+     *
+     * <p>URL-decoding is not strictly needed, as usernames can only contain letters or numbers
+     * (see {@link org.codedefenders.validation.input.CodeDefendersValidator#validUsername(String)}), but is used
+     * to offer support for special characters in usernames by default.
+     *
+     * @param request The HttpServletRequest with the desired parameter.
+     * @return An Optional containing the name parameters value if given.
+     */
+    private static Optional<String> userParameter(HttpServletRequest request) {
+        return ServletUtils.getStringParameter(request, "user");
     }
 
     @Override
@@ -71,12 +96,45 @@ public class UserProfileManager extends HttpServlet {
             return;
         }
 
-        if (!userRepo.getUserById(login.getUserId()).isPresent()) {
+        final Optional<UserEntity> loggedInUser = login.isLoggedIn()
+                ? userRepo.getUserById(login.getUserId()) : Optional.empty();
+        final Optional<String> urlParam = userParameter(request);
+        final Optional<UserEntity> urlParamUser = urlParam.flatMap(userRepo::getUserByName);
+
+        final boolean explicitUserGiven = urlParamUser.isPresent();
+        final boolean isLoggedIn = loggedInUser.isPresent();
+        final boolean isSelf = (!explicitUserGiven // no URL-parameter given -> logged in user is used
+                || isLoggedIn && loggedInUser.get().equals(urlParamUser.get())); // explicit user is self
+
+        if (urlParam.isPresent() && !explicitUserGiven) {
+            // Invalid URL parameter/ user not found.
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            request.getRequestDispatcher(Constants.ERROR_PAGE_JSP).forward(request, response);
+            return;
+        }
+
+        if (!explicitUserGiven && !isLoggedIn) {
+            // Enforce user to be logged in to view own profile without URL-parameter.
             response.sendRedirect(request.getContextPath());
             return;
         }
 
+        if (isSelf) {
+            // If logged in the own profile page shows private data. Disable cache.
+            response.setHeader("Pragma", "No-cache");
+            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+            response.setDateHeader("Expires", -1);
+        }
+
+        final UserEntity user = urlParamUser.orElseGet(login::getUser);
+        final UserStats stats = userStatsService.getStatsByUserId(user.getId());
+
+        // Pass values to JSP page
+        userProfileBean.setUser(user);
+        userProfileBean.setSelf(isSelf);
+        userProfileBean.setStats(stats);
+        request.setAttribute("profile", userProfileBean);
+
         request.getRequestDispatcher(Constants.USER_PROFILE_JSP).forward(request, response);
     }
-
 }
