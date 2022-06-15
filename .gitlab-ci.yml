@@ -28,7 +28,7 @@ default:
 
 variables:
   # Arguments passed to maven before CLI arguments, only used from Maven 4 onward
-  MAVEN_ARGS: '--no-transfer-progress -Dmaven.repo.local=.m2/repository -Dmaven.compiler.useIncrementalCompilation=false'
+  MAVEN_ARGS: '--no-transfer-progress -Dmaven.repo.local=.m2/repository -Dmaven.compiler.useIncrementalCompilation=false -Prelease'
   # Jobs are executed in docker, fetch should be available and faster. Could be already configured in the executor.
   GIT_STRATEGY: fetch
   # Do a shallow clone. 50 is the default value for new repositories from GitLab 12 onwards
