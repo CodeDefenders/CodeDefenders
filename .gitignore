@@ -23,6 +23,10 @@ docker/.env
 # Maven #
 target/
 
+# Vagrant
+.vagrant
+vagrant.yml
+
 ### Backup ###
 *~
 
