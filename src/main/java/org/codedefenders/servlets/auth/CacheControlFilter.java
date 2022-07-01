@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 @WebFilter(urlPatterns = "/*")
 public class CacheControlFilter implements Filter {
-    private static final Logger logger = LoggerFactory.getLogger(CacheControlFilter.class);
+    // private static final Logger logger = LoggerFactory.getLogger(CacheControlFilter.class);
 
     @Inject
     LoginBean login;
@@ -45,7 +45,7 @@ public class CacheControlFilter implements Filter {
 
         if (!isResource && isLoggedIn) {
             disableCache(httpRes);
-            logger.info("Disabled cache for: " + httpReq.getRequestURI());
+            // logger.info("Disabled cache for: " + httpReq.getRequestURI());
         }
 
         chain.doFilter(request, response);
