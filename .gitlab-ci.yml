@@ -249,7 +249,9 @@ visualize-coverage:
     - python /opt/cover2cover.py target/site/jacoco/jacoco.xml $CI_PROJECT_DIR/src/main/java/ > target/site/cobertura.xml
   artifacts:
     reports:
-      cobertura: target/site/cobertura.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: target/site/cobertura.xml
 
 
 ###
