@@ -850,7 +850,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.27</version>
+			<version>8.0.29</version>
 		</dependency>
 
 		<!-- Installer -->
@@ -877,14 +877,14 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
-			<version>5.6.1</version>
+			<version>5.7.1</version>
 		</dependency>
 
 		<!-- ReflectionUtils -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>5.3.14</version>
+			<version>5.3.20</version>
 		</dependency>
 
 		<dependency>
