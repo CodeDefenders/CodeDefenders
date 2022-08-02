@@ -50,7 +50,7 @@
         <p>Please contact your administrator if you think this is a mistake.</p>
         <p>
             Looking for your own profile?
-            <a href="<%=request.getContextPath() + Paths.USER_PROFILE%>" title="your profile">Click here.</a>
+            <a href="${pageContext.request.contextPath}${Paths.USER_PROFILE}" title="your profile">Click here.</a>
         </p>
         <div class="go-back" hidden>
             <a href="javascript:history.back()">Go back</a>
