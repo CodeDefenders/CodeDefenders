@@ -36,6 +36,7 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserStatsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -63,6 +64,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private UserProfileBean userProfileBean;
+
+    @Inject
+    private CodeDefendersFormAuthenticationFilter codedefendersFormAuthenticationFilter;
 
     /**
      * Checks whether users can view and update their profile information.
@@ -116,8 +120,7 @@ public class UserProfileManager extends HttpServlet {
 
         if (!explicitUserGiven && !isLoggedIn) {
             // Enforce user to be logged in to view own profile without URL-parameter.
-            login.redirectAfterLogin(request.getRequestURI()); // TODO: redirect after login not working
-            response.sendRedirect(request.getContextPath() + Paths.LOGIN);
+            codedefendersFormAuthenticationFilter.requireLogin(request, response);
             return;
         }
 

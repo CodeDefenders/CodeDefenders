@@ -118,6 +118,10 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         super.saveRequest(request);
     }
 
+    public void requireLogin(ServletRequest request, ServletResponse response) throws IOException {
+        saveRequestAndRedirectToLogin(request, response);
+    }
+
     private String getClientIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
         if (invalidIP(ip)) {
