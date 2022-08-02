@@ -107,7 +107,7 @@ public class UserProfileManager extends HttpServlet {
                 || isLoggedIn && loggedInUser.get().equals(urlParamUser.get())); // explicit user is self
 
         if (urlParam.isPresent() && !explicitUserGiven) {
-            // Invalid URL parameter/ user not found.
+            // Invalid URL parameter or user not found.
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             request.getRequestDispatcher(Constants.ERROR_PAGE_JSP).forward(request, response);
             return;
@@ -119,13 +119,12 @@ public class UserProfileManager extends HttpServlet {
             return;
         }
 
-        if (isSelf) {
-            // If logged in the own profile page shows private data. Disable cache.
-            response.setHeader("Pragma", "No-cache");
-            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            response.setDateHeader("Expires", -1);
-        }
+        /*
+         * If logged in, the own profile page shows private data (isSelf == true).
+         * The cache should be disabled in this case. This is now done by the CacheControlFilter.
+         */
 
+        // load stats
         final UserEntity user = urlParamUser.orElseGet(login::getUser);
         final UserStats stats = userStatsService.getStatsByUserId(user.getId());
 
