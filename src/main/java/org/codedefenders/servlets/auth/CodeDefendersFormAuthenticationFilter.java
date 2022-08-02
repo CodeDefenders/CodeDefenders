@@ -68,18 +68,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             ServletResponse response) throws Exception {
         // Make sure that the session and the like are correctly configured
 
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-
-        // From LoginFilter
-        /*
-         * Disable caching in the HTTP header.
-         * https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for
-         * -php-site
-         */
-        httpResponse.setHeader("Pragma", "No-cache");
-        httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        httpResponse.setDateHeader("Expires", -1);
 
         final int userId = ((UserEntity) subject.getPrincipal()).getId();
         final String ipAddress = getClientIpAddress(httpRequest);
