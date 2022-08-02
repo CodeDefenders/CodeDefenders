@@ -54,11 +54,9 @@ public class CacheControlFilter implements Filter {
         final HttpServletResponse httpRes = (HttpServletResponse) response;
 
         /* All resources are public and can be always cached, independent of the login status. */
-        final Stream<String> resourceURIs = Stream
+        final boolean isResource = Stream
                 .of("images", "webjars", "css", "js")
-                .map(dir -> httpReq.getContextPath() + "/" + dir + "/");
-        final boolean isResource = resourceURIs.anyMatch(
-                uri -> httpReq.getRequestURI().startsWith(uri));
+                .anyMatch(uri -> httpReq.getServletPath().startsWith("/" + uri));
 
         final boolean isLoggedIn = login.isLoggedIn() && login.getUser().isActive();
 
