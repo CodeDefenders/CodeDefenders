@@ -110,7 +110,6 @@ public class UserProfileManager extends HttpServlet {
         if (urlParam.isPresent() && !explicitUserGiven) {
             // Invalid URL parameter/ user not found.
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            request.setAttribute("user", urlParam.get());
             request.getRequestDispatcher(Constants.USER_NOT_FOUND_JSP).forward(request, response);
             return;
         }

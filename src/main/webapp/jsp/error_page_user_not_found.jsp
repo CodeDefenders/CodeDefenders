@@ -40,7 +40,11 @@
             <h1>Code Defenders</h1>
         </a>
         <h2>404</h2>
-        <h3>The user with the name "${fn:escapeXml(pageContext.request.getAttribute("user"))}" does not exist.</h3>
+        <%--
+        Escaping is necessary here, because the displayed value is taken from the URL directly.
+        This prevents XSS attacks (e.g. /profile?user=<script>alert(1)</script>).
+        --%>
+        <h3>The user with the name "${fn:escapeXml(param.user)}" does not exist.</h3>
         <hr/>
         <p>Make sure the address and the username are correct and that the page hasn't moved.</p>
         <p>Please contact your administrator if you think this is a mistake.</p>
