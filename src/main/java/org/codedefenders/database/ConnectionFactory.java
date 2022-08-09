@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -36,6 +37,8 @@ import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 import org.codedefenders.configuration.Configuration;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
+import org.flywaydb.core.api.migration.BaseJavaMigration;
+import org.flywaydb.core.api.migration.JavaMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +102,9 @@ public class ConnectionFactory {
         FluentConfiguration flywayConfig = Flyway.configure();
         flywayConfig.dataSource(dataSource);
         flywayConfig.locations("classpath:db/migrations");
+
+        // Load JavaMigrations from CDI
+        flywayConfig.javaMigrations(CDI.current().select(BaseJavaMigration.class).stream().toArray(JavaMigration[]::new));
 
         Map<String, Boolean> check = checkDatabase(dbName);
 
