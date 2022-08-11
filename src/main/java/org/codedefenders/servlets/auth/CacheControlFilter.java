@@ -45,7 +45,7 @@ public class CacheControlFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(CacheControlFilter.class);
 
     @Inject
-    LoginBean login;
+    private LoginBean login;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
