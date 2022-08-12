@@ -36,8 +36,10 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserStatsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 
 /**
  * This {@link HttpServlet} handles requests for viewing the currently logged
@@ -62,6 +64,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private UserProfileBean userProfileBean;
+
+    @Inject
+    private CodeDefendersFormAuthenticationFilter codedefendersFormAuthenticationFilter;
 
     /**
      * Checks whether users can view and update their profile information.
@@ -109,13 +114,13 @@ public class UserProfileManager extends HttpServlet {
         if (urlParam.isPresent() && !explicitUserGiven) {
             // Invalid URL parameter or user not found.
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            request.getRequestDispatcher(Constants.ERROR_PAGE_JSP).forward(request, response);
+            request.getRequestDispatcher(Constants.USER_NOT_FOUND_JSP).forward(request, response);
             return;
         }
 
         if (!explicitUserGiven && !isLoggedIn) {
             // Enforce user to be logged in to view own profile without URL-parameter.
-            response.sendRedirect(request.getContextPath());
+            codedefendersFormAuthenticationFilter.requireLogin(request, response);
             return;
         }
 
