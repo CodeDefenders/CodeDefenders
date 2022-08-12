@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.codedefenders.servlets.auth;
 
 import java.io.IOException;
@@ -49,18 +68,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             ServletResponse response) throws Exception {
         // Make sure that the session and the like are correctly configured
 
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-
-        // From LoginFilter
-        /*
-         * Disable caching in the HTTP header.
-         * https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for
-         * -php-site
-         */
-        httpResponse.setHeader("Pragma", "No-cache");
-        httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        httpResponse.setDateHeader("Expires", -1);
 
         final int userId = ((UserEntity) subject.getPrincipal()).getId();
         final String ipAddress = getClientIpAddress(httpRequest);

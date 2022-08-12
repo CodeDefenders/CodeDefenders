@@ -106,13 +106,15 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.CONTACT_PAGE = "/contact";
         // org.codedefenders.util.Paths.LEADERBOARD_PAGE = "/leaderboard";
 
-        // "Semi"-public. TODO Do we allow accessing the "public" profile of a user?
+        // "Semi"-public.
         // org.codedefenders.util.Paths.USER = "/user";
         // fcMan.createChain(org.codedefenders.util.Paths.USER, AUTHENTICATION);
         // org.codedefenders.util.Paths.USER_PROFILE = "/profile";
-        fcMan.createChain(org.codedefenders.util.Paths.USER_SETTINGS, AUTHENTICATION);
+
 
         // URLs that require authentication
+
+        fcMan.createChain(org.codedefenders.util.Paths.USER_SETTINGS, AUTHENTICATION);
 
         // org.codedefenders.util.Paths.GAMES_OVERVIEW = "/games/overview";
         // org.codedefenders.util.Paths.GAMES_HISTORY = "/games/history";
