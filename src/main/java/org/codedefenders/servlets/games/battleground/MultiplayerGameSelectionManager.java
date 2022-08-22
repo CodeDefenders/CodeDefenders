@@ -110,8 +110,17 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
         final String action = formType(request);
+
+        if (!action.equals("createGame")) {
+            MultiplayerGame game = gameProducer.getGame();
+            if (game == null) {
+                logger.error("No game or wrong type of game found. Aborting request.");
+                Redirect.redirectBack(request, response);
+                return;
+            }
+        }
+
         switch (action) {
             case "createGame":
                 createGame(request, response);
@@ -235,14 +244,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         int gameId = game.getId();
-
         Role role = game.getRole(login.getUserId());
 
         if (role != Role.NONE) {
@@ -298,17 +300,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contextPath = request.getContextPath();
         final MultiplayerGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
@@ -345,16 +336,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MultiplayerGame game = gameProducer.getGame();
 
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
             Redirect.redirectBack(request, response);
@@ -381,16 +362,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MultiplayerGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can end the game.");

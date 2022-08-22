@@ -114,6 +114,16 @@ public class MeleeGameSelectionManager extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final String action = formType(request);
+
+        if (!action.equals("createGame")) {
+            MeleeGame game = gameProducer.getGame();
+            if (game == null) {
+                logger.error("No game or wrong type of game found. Aborting request.");
+                Redirect.redirectBack(request, response);
+                return;
+            }
+        }
+
         switch (action) {
             case "createGame":
                 createGame(request, response);
@@ -227,13 +237,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
 
         MeleeGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         int gameId = game.getId();
 
         if (game.hasUserJoined(login.getUserId())) {
@@ -275,16 +278,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contextPath = request.getContextPath();
         MeleeGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -328,15 +321,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getGame();
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -364,15 +348,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getGame();
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can end the game.");
