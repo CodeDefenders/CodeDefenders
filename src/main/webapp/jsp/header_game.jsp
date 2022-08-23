@@ -68,7 +68,9 @@
                         </button>
                     </form>
             <%
-                    } else if (game.getState() == GameState.CREATED) {
+                    }
+
+                    if (game.getState() == GameState.CREATED) {
             %>
                     <form id="adminStartBtn" action="<%=selectionManagerUrl%>" method="post">
                         <input type="hidden" name="formType" value="startGame">
@@ -77,6 +79,32 @@
                             Start Game
                         </button>
                     </form>
+            <%
+                    }
+
+                    if (game.getState() == GameState.ACTIVE || game.getState() == GameState.FINISHED) {
+            %>
+                <div>
+                    <div data-bs-toggle="tooltip"
+                         title="Start a new game with the same settings and opposite roles.">
+                        <button type="submit" class="btn btn-sm btn-warning" id="rematch"
+                                data-bs-toggle="modal" data-bs-target="#rematch-modal">
+                            Rematch
+                        </button>
+                    </div>
+                    <form id="rematch-form" action="<%=selectionManagerUrl%>" method="post">
+                        <input type="hidden" name="formType" value="rematch">
+                        <input type="hidden" name="gameId" value="<%=game.getId()%>">
+                        <t:modal title="Confirm Rematch" id="rematch-modal" closeButtonText="Cancel">
+                            <jsp:attribute name="content">
+                                Are you sure you want to create a new game with opposite roles?
+                            </jsp:attribute>
+                            <jsp:attribute name="footer">
+                                <button type="submit" class="btn btn-primary">Confirm Rematch</button>
+                            </jsp:attribute>
+                        </t:modal>
+                    </form>
+                </div>
             <%
                     }
                 }
