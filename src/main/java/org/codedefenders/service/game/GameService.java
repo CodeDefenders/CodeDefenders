@@ -37,6 +37,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.persistence.database.GameRepository;
 
 @ApplicationScoped
 public class GameService implements IGameService {
@@ -45,12 +46,15 @@ public class GameService implements IGameService {
     private final MeleeGameService meleeGameService;
     private final PuzzleGameService puzzleGameService;
 
+    private final GameRepository gameRepository;
+
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
-            PuzzleGameService puzzleGameService) {
+                       PuzzleGameService puzzleGameService, GameRepository gameRepository) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
         this.puzzleGameService = puzzleGameService;
+        this.gameRepository = gameRepository;
     }
 
     @Override
@@ -133,6 +137,10 @@ public class GameService implements IGameService {
         } else {
             return null;
         }
+    }
+
+    public int closeExpiredGames() {
+        return gameRepository.closeExpiredGames();
     }
 
     private IGameService getGameServiceForGameId(int gameId) {
