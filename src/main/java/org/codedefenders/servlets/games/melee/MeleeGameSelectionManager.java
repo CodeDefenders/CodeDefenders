@@ -363,7 +363,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private boolean handleCreateGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {
         final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
         if (!canCreateGames) {
-            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
+            logger.warn("User {} tried to create a melee game, but creating games is not permitted.",
                     login.getUserId());
             messages.add("Creating games is currently not enabled.");
             return false;
