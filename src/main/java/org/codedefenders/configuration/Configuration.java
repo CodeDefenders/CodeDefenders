@@ -35,6 +35,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -149,10 +150,9 @@ public class Configuration {
                 }
             }
 
-            if (javaHome == null || javaHome.equals("")) {
-                validationErrors.add("Property " + resolveAttributeName("javaHome") + " is missing");
-            } else {
-                File javaExecutable = new File(getJavaHome(), "/bin/java");
+            javaHome = javaHome.trim().isEmpty() ? null : javaHome;
+            if (javaHome != null) {
+                File javaExecutable = new File(javaHome, "/bin/java");
                 if (!javaExecutable.exists() || !javaExecutable.isFile()) {
                     validationErrors.add(resolveAttributeName("javaHome") + " doesn't contain the java executable "
                             + javaExecutable);
@@ -317,8 +317,10 @@ public class Configuration {
         return new File(antHome);
     }
 
-    public File getJavaHome() {
-        return new File(javaHome);
+    public Optional<File> getJavaHome() {
+        return javaHome == null
+                ? Optional.empty()
+                : Optional.of(new File(javaHome));
     }
 
     public String getDbUrl() {
