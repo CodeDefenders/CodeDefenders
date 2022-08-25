@@ -83,7 +83,7 @@ public class Configuration {
     // All the attributes need to be initialized with a null value and therefore need to be objects
     protected String dataDir;
     protected String antHome;
-    protected String javaHome;
+    protected String antJavaHome;
     protected String dbHost;
     protected Integer dbPort;
     protected String dbName;
@@ -150,9 +150,9 @@ public class Configuration {
                 }
             }
 
-            javaHome = javaHome.trim().isEmpty() ? null : javaHome;
-            if (javaHome != null) {
-                File javaExecutable = new File(javaHome, "/bin/java");
+            antJavaHome = antJavaHome.trim().isEmpty() ? null : antJavaHome;
+            if (antJavaHome != null) {
+                File javaExecutable = new File(antJavaHome, "/bin/java");
                 if (!javaExecutable.exists() || !javaExecutable.isFile()) {
                     validationErrors.add(resolveAttributeName("javaHome") + " doesn't contain the java executable "
                             + javaExecutable);
@@ -317,10 +317,10 @@ public class Configuration {
         return new File(antHome);
     }
 
-    public Optional<File> getJavaHome() {
-        return javaHome == null
+    public Optional<File> getAntJavaHome() {
+        return antJavaHome == null
                 ? Optional.empty()
-                : Optional.of(new File(javaHome));
+                : Optional.of(new File(antJavaHome));
     }
 
     public String getDbUrl() {

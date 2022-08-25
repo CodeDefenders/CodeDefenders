@@ -386,8 +386,8 @@ public class AntRunner implements //
         List<String> command = new ArrayList<>();
         String cutDir = Paths.get(cut.getJavaFile()).getParent().toString();
 
-        config.getJavaHome()
-                .ifPresent(javaHome -> env.put("JAVA_HOME", javaHome.toString()));
+        config.getAntJavaHome()
+                .ifPresent(file -> env.put("JAVA_HOME", file.toString()));
 
         /*
          * Clustered execution uses almost the same command than normal
