@@ -67,7 +67,7 @@
     <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="startStopGame">
 
-        <h3 class="mb-3">You Multiplayer Games</h3>
+        <h3 class="mb-3">Multiplayer Games</h3>
         <table id="table-multiplayer" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
@@ -284,7 +284,7 @@
 
         <%-- ------------------------------------------------------------------------------------------------------ --%>
 
-        <h3 class="mb-3 mt-4">Your Melee Games</h3>
+        <h3 class="mb-3 mt-4">Melee Games</h3>
         <%
             List<MeleeGame> meleeGames = (List<MeleeGame>) request.getAttribute("meleeGames");
             Map<Integer, String> meleeGameCreatorNames = (Map<Integer, String>) request.getAttribute("meleeGameCreatorNames");
