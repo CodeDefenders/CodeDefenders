@@ -150,7 +150,9 @@ public class Configuration {
                 }
             }
 
-            antJavaHome = antJavaHome.trim().isEmpty() ? null : antJavaHome;
+            if (antJavaHome != null && antJavaHome.trim().isEmpty()) {
+                antJavaHome = null;
+            }
             if (antJavaHome != null) {
                 File javaExecutable = new File(antJavaHome, "/bin/java");
                 if (!javaExecutable.exists() || !javaExecutable.isFile()) {
