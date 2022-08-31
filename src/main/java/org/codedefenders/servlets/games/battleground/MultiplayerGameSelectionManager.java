@@ -356,6 +356,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
+        if (game.getCreatorId() != login.getUserId()) {
+            messages.add("Only the game's creator can start the game.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         int gameId = game.getId();
 
         if (game.getState() == GameState.CREATED) {
@@ -383,6 +389,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         } else if (!(game instanceof MultiplayerGame)) {
             logger.error("Game found is no MultiplayerGame. Aborting request.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        if (game.getCreatorId() != login.getUserId()) {
+            messages.add("Only the game's creator can end the game.");
             Redirect.redirectBack(request, response);
             return;
         }
