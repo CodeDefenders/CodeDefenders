@@ -5,7 +5,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
+import org.codedefenders.service.game.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,16 +16,23 @@ public class GameCronJobManager {
 
     private static final Logger logger = LoggerFactory.getLogger(GameCronJobManager.class);
     private static final int INITIAL_DELAY_VALUE = 10;
-    private static final int EXECUTION_DELAY_VALUE = 60 * 5; // execute task every 5 minutes
+    private static final int EXECUTION_DELAY_VALUE = 30; // execute task every .5 minutes
     private static final int AWAIT_SHUTDOWN_TIME = 20; // wait 20 seconds for tasks to complete before shutting down
     private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
     private static ScheduledExecutorService executor;
+
+    private final GameService gameService;
+
+    @Inject
+    public GameCronJobManager(GameService gameService) {
+        this.gameService = gameService;
+    }
 
     public void startup() {
         executor = Executors.newScheduledThreadPool(1);
         logger.debug("GameCronJobManager Started ");
         executor.scheduleWithFixedDelay(
-                new GameCronJobProcessor(),
+                new GameCronJobProcessor(gameService),
                 INITIAL_DELAY_VALUE,
                 EXECUTION_DELAY_VALUE,
                 TIME_UNIT

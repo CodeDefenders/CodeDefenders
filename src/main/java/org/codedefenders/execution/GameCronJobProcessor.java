@@ -11,14 +11,22 @@ public class GameCronJobProcessor implements Runnable {
 
     private final GameService gameService;
 
-    GameCronJobProcessor() {
-        gameService = CDIUtil.getBeanFromCDI(GameService.class);
+    GameCronJobProcessor(GameService gameService) {
+        this.gameService = gameService;
         logger.info("GameCronJobProcessor initialized ");
     }
 
     @Override
     public void run() {
         logger.info("execute GameCronJobProcessor");
+        try {
+            closeExpiredGames();
+        } catch (Exception e) {
+            logger.error("GameCronJobProcessor encountered error:", e);
+        }
+    }
+
+    private void closeExpiredGames() {
         gameService.closeExpiredGames();
     }
 
