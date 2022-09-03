@@ -241,8 +241,6 @@ public abstract class AbstractGameService implements IGameService {
             return false;
         }
 
-        KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, game.getId()));
-
         GameStoppedEvent gse = new GameStoppedEvent();
         gse.setGameId(game.getId());
         notificationService.post(gse);
