@@ -4,15 +4,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import javax.enterprise.context.ApplicationScoped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@WebListener
-public class GameCronJobManager implements ServletContextListener {
+@ApplicationScoped
+public class GameCronJobManager {
 
     private static final Logger logger = LoggerFactory.getLogger(GameCronJobManager.class);
     private static final int INITIAL_DELAY_VALUE = 10;
@@ -21,8 +19,7 @@ public class GameCronJobManager implements ServletContextListener {
     private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
     private static ScheduledExecutorService executor;
 
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
+    public void startup() {
         executor = Executors.newScheduledThreadPool(1);
         logger.debug("GameCronJobManager Started ");
         executor.scheduleWithFixedDelay(
@@ -33,8 +30,7 @@ public class GameCronJobManager implements ServletContextListener {
         );
     }
 
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
+    public void shutdown() {
         try {
             logger.info("GameCronJobManager shutting down");
             executor.shutdownNow();

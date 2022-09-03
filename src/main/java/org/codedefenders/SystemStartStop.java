@@ -30,6 +30,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
+import org.codedefenders.execution.GameCronJobManager;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,9 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private Configuration config;
 
+    @Inject
+    GameCronJobManager gameCronJobManager;
+
     /**
      * This method is called when the servlet context is initialized(when
      * the Web application is deployed). You can initialize servlet context
@@ -62,6 +66,7 @@ public class SystemStartStop implements ServletContextListener {
         }
         mgr.register("test-executor").withMax(4).withCore(2).add();
 
+        gameCronJobManager.startup();
     }
 
     /**
@@ -70,6 +75,7 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        gameCronJobManager.shutdown();
 
         // https://stackoverflow.com/questions/11872316/tomcat-guice-jdbc-memory-leak
         AbandonedConnectionCleanupThread.checkedShutdown();
