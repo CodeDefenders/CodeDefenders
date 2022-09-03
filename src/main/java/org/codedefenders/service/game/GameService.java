@@ -37,24 +37,24 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
-import org.codedefenders.persistence.database.GameRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class GameService implements IGameService {
+
+    private static final Logger logger = LoggerFactory.getLogger(GameService.class);
 
     private final MultiplayerGameService multiplayerGameService;
     private final MeleeGameService meleeGameService;
     private final PuzzleGameService puzzleGameService;
 
-    private final GameRepository gameRepository;
-
     @Inject
     public GameService(MultiplayerGameService multiplayerGameService, MeleeGameService meleeGameService,
-                       PuzzleGameService puzzleGameService, GameRepository gameRepository) {
+                       PuzzleGameService puzzleGameService) {
         this.multiplayerGameService = multiplayerGameService;
         this.meleeGameService = meleeGameService;
         this.puzzleGameService = puzzleGameService;
-        this.gameRepository = gameRepository;
     }
 
     @Override
@@ -139,8 +139,30 @@ public class GameService implements IGameService {
         }
     }
 
+    @Override
+    public boolean closeGame(AbstractGame game) {
+        IGameService gameService = getGameServiceForGame(game);
+        if (gameService != null) {
+            boolean closed = gameService.closeGame(game);
+            if (closed) {
+                logger.info("Closed game with id {}", game.getId());
+            } else {
+                logger.warn("Failed to close game with id {}", game.getId());
+            }
+            return closed;
+        }
+        return false;
+    }
+
     public int closeExpiredGames() {
-        return gameRepository.closeExpiredGames();
+        final List<AbstractGame> expiredGames = GameDAO.getExpiredGames();
+        int closedGames = 0;
+
+        for (AbstractGame game : expiredGames) {
+            final boolean closed = closeGame(game);
+            closedGames += closed ? 1 : 0;
+        }
+        return closedGames;
     }
 
     private IGameService getGameServiceForGameId(int gameId) {

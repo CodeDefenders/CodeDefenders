@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TestDAO;
@@ -35,11 +36,16 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 
@@ -58,6 +64,9 @@ public abstract class AbstractGameService implements IGameService {
 
     @Inject
     protected UserService userService;
+
+    @Inject
+    private INotificationService notificationService;
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
@@ -221,5 +230,23 @@ public abstract class AbstractGameService implements IGameService {
             }
         }
         return result;
+    }
+
+    @Override
+    public boolean closeGame(AbstractGame game) {
+        game.setState(GameState.FINISHED);
+        boolean updated = game.update();
+
+        if (!updated) {
+            return false;
+        }
+
+        KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, game.getId()));
+
+        GameStoppedEvent gse = new GameStoppedEvent();
+        gse.setGameId(game.getId());
+        notificationService.post(gse);
+
+        return true;
     }
 }

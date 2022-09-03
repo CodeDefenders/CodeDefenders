@@ -42,7 +42,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -52,7 +51,7 @@ import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
-import org.codedefenders.notification.events.server.game.GameStoppedEvent;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
@@ -100,13 +99,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private EventDAO eventDAO;
 
     @Inject
-    private ScoreCalculator scoreCalculator;
-
-    @Inject
     private GameManagingUtils gameManagingUtils;
 
     @Inject
     private GameProducer gameProducer;
+
+    @Inject
+    private GameService gameService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -337,21 +336,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         int gameId = game.getId();
 
         if (game.getState() == GameState.ACTIVE) {
-            logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);
-            game.setState(GameState.FINISHED);
-            boolean updated = game.update();
-            if (updated) {
-                KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, gameId));
-            }
-
-            scoreCalculator.storeScoresToDB(game.getId());
-
-            /*
-             * Publish the event about the user
-             */
-            GameStoppedEvent gse = new GameStoppedEvent();
-            gse.setGameId(game.getId());
-            notificationService.post(gse);
+            gameService.closeGame(game);
 
             response.sendRedirect(ctx(request) + Paths.MELEE_SELECTION);
         } else {

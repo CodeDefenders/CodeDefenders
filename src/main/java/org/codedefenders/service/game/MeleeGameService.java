@@ -20,6 +20,7 @@
 package org.codedefenders.service.game;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -28,11 +29,15 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Player;
 import org.codedefenders.util.Constants;
 
 @ApplicationScoped
 public class MeleeGameService extends AbstractGameService {
+
+    @Inject
+    private ScoreCalculator scoreCalculator;
 
     @Override
     protected boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player) {
@@ -70,5 +75,21 @@ public class MeleeGameService extends AbstractGameService {
                 || playerRole == Role.OBSERVER
                 || game.getLevel() == GameLevel.EASY
                 || test.getPlayerId() == player.getId();
+    }
+
+    /**
+     * Close the game and additionally write the calculated scores to persistent storage.
+     *
+     * @param game The game to close.
+     *
+     * @return {@code true} if the game was closed, {@code false} otherwise.
+     */
+    @Override
+    public boolean closeGame(AbstractGame game) {
+        boolean closed = super.closeGame(game);
+        if (closed) {
+            scoreCalculator.storeScoresToDB(game.getId());
+        }
+        return closed;
     }
 }

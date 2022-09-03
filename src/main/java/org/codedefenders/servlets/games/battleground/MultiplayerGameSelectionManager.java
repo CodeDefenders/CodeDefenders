@@ -50,8 +50,8 @@ import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
-import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -101,6 +101,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Inject
     private GameProducer gameProducer;
+
+    @Inject
+    private GameService gameService;
 
     @Inject
     private UserRepository userRepo;
@@ -345,18 +348,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         if (game.getState() == GameState.ACTIVE) {
             logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);
-            game.setState(GameState.FINISHED);
-            boolean updated = game.update();
-            if (updated) {
-                KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, gameId));
-            }
-
-            /*
-             * Publish the event about the user
-             */
-            GameStoppedEvent gse = new GameStoppedEvent();
-            gse.setGameId(game.getId());
-            notificationService.post(gse);
+            gameService.closeGame(game);
 
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
         } else {

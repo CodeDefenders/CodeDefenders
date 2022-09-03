@@ -436,6 +436,16 @@ public class MultiplayerGameDAO {
                 "WHERE (p.ID = ?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
+        // why do we return melee games here?
         return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
+    }
+
+    public static List<MultiplayerGame> getExpiredGames() {
+        final String sql = "SELECT games " +
+                "WHERE State = '?' " +
+                "AND Finish_Time <= NOW()" +
+                "AND Finish_Time <> '1970-02-02 01:01:01.0'";
+        DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
+        return DB.executeQueryReturnList(sql, MultiplayerGameDAO::multiplayerGameFromRS, state);
     }
 }

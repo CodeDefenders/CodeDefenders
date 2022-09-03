@@ -47,4 +47,6 @@ public interface IGameService {
 
     @Deprecated
     List<TestDTO> getTests(SimpleUser user, AbstractGame game);
+
+    boolean closeGame(AbstractGame game);
 }

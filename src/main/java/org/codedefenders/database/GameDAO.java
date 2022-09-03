@@ -206,6 +206,13 @@ public class GameDAO {
                 DatabaseValue.of(gameId));
     }
 
+    public static List<AbstractGame> getExpiredGames() {
+        List<AbstractGame> games = new ArrayList<>();
+        games.addAll(MultiplayerGameDAO.getExpiredGames());
+        games.addAll(MeleeGameDAO.getExpiredGames());
+        return games;
+    }
+
     public static Role getRole(int userId, int gameId) {
         String query = String.join("\n",
                 "SELECT *",
