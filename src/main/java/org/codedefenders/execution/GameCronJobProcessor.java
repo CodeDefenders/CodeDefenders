@@ -1,7 +1,5 @@
 package org.codedefenders.execution;
 
-import org.codedefenders.database.ConnectionFactory;
-import org.codedefenders.persistence.database.GameRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
