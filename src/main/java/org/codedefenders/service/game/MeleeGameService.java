@@ -22,6 +22,7 @@ package org.codedefenders.service.game;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -30,14 +31,22 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.scoring.ScoreCalculator;
+import org.codedefenders.game.scoring.ScoringPolicyProducer;
 import org.codedefenders.model.Player;
 import org.codedefenders.util.Constants;
 
 @ApplicationScoped
 public class MeleeGameService extends AbstractGameService {
 
+    private final EventDAO eventDAO;
+
+    private final ScoreCalculator scoreCalculator;
+
     @Inject
-    private ScoreCalculator scoreCalculator;
+    public MeleeGameService(EventDAO eventDAO) {
+        this.eventDAO = eventDAO;
+        this.scoreCalculator = getScoreCalculator();
+    }
 
     @Override
     protected boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player) {
@@ -91,5 +100,10 @@ public class MeleeGameService extends AbstractGameService {
             scoreCalculator.storeScoresToDB(game.getId());
         }
         return closed;
+    }
+
+    public ScoreCalculator getScoreCalculator() {
+        ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
+        return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO));
     }
 }
