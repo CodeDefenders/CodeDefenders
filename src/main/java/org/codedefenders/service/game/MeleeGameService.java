@@ -38,14 +38,12 @@ import org.codedefenders.util.Constants;
 @ApplicationScoped
 public class MeleeGameService extends AbstractGameService {
 
-    private final EventDAO eventDAO;
-
     private final ScoreCalculator scoreCalculator;
 
     @Inject
     public MeleeGameService(EventDAO eventDAO) {
-        this.eventDAO = eventDAO;
-        this.scoreCalculator = getScoreCalculator();
+        // create new instance instead of using injection, as games can be closed outside a request context
+        this.scoreCalculator = createNewScoreCalculator(eventDAO);
     }
 
     @Override
@@ -102,7 +100,7 @@ public class MeleeGameService extends AbstractGameService {
         return closed;
     }
 
-    public ScoreCalculator getScoreCalculator() {
+    private ScoreCalculator createNewScoreCalculator(EventDAO eventDAO) {
         ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
         return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO));
     }
