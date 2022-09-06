@@ -124,10 +124,12 @@
                         </td>
                         <td><%=gid%></td>
                         <td>
-                            <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                               href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gid%>">
-                                Observe
-                            </a>
+                            <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
+                                <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
+                                   href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gid%>">
+                                    Observe
+                                </a>
+                            <% } %>
                         </td>
                         <td>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">
@@ -346,10 +348,12 @@
                         </td>
                         <td><%=gid%></td>
                         <td>
-                            <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                               href="<%=request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gid%>">
-                                Observe
-                            </a>
+                            <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
+                                <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
+                                   href="<%=request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gid%>">
+                                    Observe
+                                </a>
+                            <% } %>
                         </td>
                         <td>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">
