@@ -31,6 +31,7 @@ import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ import com.google.common.cache.LoadingCache;
 /**
  * Provides an API for user retrieval and management.
  */
+@Transactional
 @ApplicationScoped
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);

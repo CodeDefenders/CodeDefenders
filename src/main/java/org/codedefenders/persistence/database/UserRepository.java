@@ -35,6 +35,7 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
 /**
  * Provides methods for querying and updating the {@code users} table in the database.
  */
+@Transactional
 @ApplicationScoped
 public class UserRepository {
     private static final Logger logger = LoggerFactory.getLogger(UserRepository.class);
