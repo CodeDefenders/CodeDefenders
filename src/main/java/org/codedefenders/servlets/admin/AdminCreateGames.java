@@ -150,6 +150,7 @@ public class AdminCreateGames extends HttpServlet {
             gameSettings.setMaxAssertionsPerTest(getIntParameter(request, "maxAssertionsPerTest").get());
             gameSettings.setMutantValidatorLevel(
                     CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel")));
+            gameSettings.setCreatorRole(Role.valueOf(request.getParameter("creatorRole")));
             gameSettings.setChatEnabled(request.getParameter("chatEnabled") != null);
             gameSettings.setCaptureIntentions(request.getParameter("captureIntentions") != null);
             gameSettings.setEquivalenceThreshold(
@@ -169,7 +170,7 @@ public class AdminCreateGames extends HttpServlet {
 
     /**
      * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGamesWithUsers(Set,
-     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int) AdminCreateGamesBean#stageGames()}.
+     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int, int) AdminCreateGamesBean#stageGames()}.
      * @param request The HTTP request.
      */
     private void stageGamesWithUsers(HttpServletRequest request) {

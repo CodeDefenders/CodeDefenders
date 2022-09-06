@@ -135,7 +135,7 @@
                             <div class="col-12">
                                 <label for="class-select" class="form-label">Class Under Test</label>
                                 <div class="input-group mb-2">
-                                    <select id="class-select" name="cut" class="form-control">
+                                    <select id="class-select" name="cut" class="form-control form-select">
                                         <% for (GameClass clazz : GameClassDAO.getAllPlayableClasses()) { %>
                                             <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
                                         <% } %>
@@ -223,9 +223,19 @@
                                 <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
                                        value="0" min="0" required>
                             </div>
+
+                            <div class="col-12"
+                                 title="Select the role you will have in the game.">
+                                <label for="role-select" class="form-label">Your Role</label>
+                                <select id="role-select" name="creatorRole" class="form-control form-select">
+                                    <option value="OBSERVER" selected>Observer</option>
+                                    <option value="ATTACKER">Attacker</option>
+                                    <option value="DEFENDER">Defender</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="row g-2">
+                        <div class="row g-2 mt-2">
                             <div class="col-12"
                                  title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
                                 <div class="form-check form-switch">
@@ -941,6 +951,10 @@
             tr.insertCell().textContent = CodeValidatorLevel[gameSettings.mutantValidatorLevel].display;
 
             tr = table.insertRow();
+            tr.insertCell().textContent = 'Creator Role';
+            tr.insertCell().textContent = gameSettings.creatorRole;
+
+            tr = table.insertRow();
             tr.insertCell().textContent = 'Chat Enabled';
             tr.insertCell().textContent = gameSettings.chatEnabled;
 
@@ -1291,6 +1305,11 @@
 
             /* Toggle multiplayer/melee specific forms based on selected game type. */
             $('#gameType-group').on('change', function (event) {
+                const roleSelect = document.getElementById('role-select');
+                const observerOption = document.createElement('option');
+                observerOption.value = Role.OBSERVER.name;
+                observerOption.innerText = Role.OBSERVER.display;
+
                 switch (event.target.value) {
                     case 'MULTIPLAYER':
                         for (const element of document.querySelectorAll('.melee-specific')) {
@@ -1299,6 +1318,14 @@
                         for (const element of document.querySelectorAll('.multiplayer-specific')) {
                             element.removeAttribute('hidden');
                         }
+                        const attackerOption = document.createElement('option');
+                        attackerOption.value = Role.ATTACKER.name;
+                        attackerOption.innerText = Role.ATTACKER.display;
+                        const defenderOption = document.createElement('option');
+                        defenderOption.value = Role.DEFENDER.name;
+                        defenderOption.innerText = Role.DEFENDER.display;
+                        roleSelect.replaceChildren(observerOption, attackerOption, defenderOption);
+                        roleSelect.selectedIndex = 0;
                         break;
                     case 'MELEE':
                         for (const element of document.querySelectorAll('.multiplayer-specific')) {
@@ -1307,6 +1334,11 @@
                         for (const element of document.querySelectorAll('.melee-specific')) {
                             element.removeAttribute('hidden');
                         }
+                        const playerOption = document.createElement('option');
+                        playerOption.value = Role.PLAYER.name;
+                        playerOption.innerText = Role.PLAYER.display;
+                        roleSelect.replaceChildren(observerOption, playerOption);
+                        roleSelect.selectedIndex = 0;
                         break;
                 }
             });

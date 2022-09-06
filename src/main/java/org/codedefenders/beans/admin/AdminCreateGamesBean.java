@@ -641,6 +641,9 @@ public class AdminCreateGamesBean implements Serializable {
 
         /* Add users to the game. */
         if (gameSettings.getGameType() == MULTIPLAYER) {
+            if (gameSettings.getCreatorRole() == Role.ATTACKER || gameSettings.getCreatorRole() == Role.DEFENDER) {
+                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
+            }
             for (int userId : stagedGame.getAttackers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
@@ -662,6 +665,9 @@ public class AdminCreateGamesBean implements Serializable {
                 }
             }
         } else if (gameSettings.getGameType() == MELEE) {
+            if (gameSettings.getCreatorRole() == Role.PLAYER) {
+                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
+            }
             for (int userId : stagedGame.getPlayers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
