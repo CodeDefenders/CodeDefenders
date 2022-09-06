@@ -112,6 +112,9 @@ public class AdminCreateGamesBean implements Serializable {
     public void update() {
         userInfos.clear();
         for (UserInfo userInfo : AdminDAO.getAllUsersInfo()) {
+            if (userInfo.getUser().getId() == login.getUserId()) {
+                continue;
+            }
             userInfos.put(userInfo.getUser().getId(), userInfo);
         }
         for (StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
@@ -720,6 +723,7 @@ public class AdminCreateGamesBean implements Serializable {
     public String getUnassignedUserIdsJSON() {
         List<Integer> userIds = userRepo.getUnassignedUsers().stream()
                 .map(UserEntity::getId)
+                .filter(userId -> userId != login.getUserId())
                 .collect(Collectors.toList());
         Gson gson = new GsonBuilder().create();
         return gson.toJson(userIds);
