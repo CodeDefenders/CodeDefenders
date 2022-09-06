@@ -952,7 +952,7 @@
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Creator Role';
-            tr.insertCell().textContent = gameSettings.creatorRole;
+            tr.insertCell().textContent = Role[gameSettings.creatorRole].display;
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Chat Enabled';
