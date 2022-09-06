@@ -226,7 +226,7 @@
                         </div>
 
                         <div class="row g-2">
-                            <div class="col-12 multiplayer-specific"
+                            <div class="col-12"
                                  title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
