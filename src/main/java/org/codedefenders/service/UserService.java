@@ -66,6 +66,7 @@ public class UserService {
                 .build(
                         new CacheLoader<Integer, SimpleUser>() {
                             @Override
+                            @Nonnull
                             public SimpleUser load(@Nonnull Integer userId) throws Exception {
                                 return getSimpleUserByIdInternal(userId)
                                         .orElseThrow(() -> new Exception("No user found for given userId"));

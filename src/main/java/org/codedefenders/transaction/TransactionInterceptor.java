@@ -40,6 +40,7 @@ public class TransactionInterceptor implements Serializable { // TODO(Alex): Che
         this.txManager = txManager;
     }
 
+    @SuppressWarnings("unused")
     @AroundInvoke
     public Object manageTransaction(InvocationContext ctx) throws Exception {
         WeldInvocationContext weldContext = (WeldInvocationContext) ctx;

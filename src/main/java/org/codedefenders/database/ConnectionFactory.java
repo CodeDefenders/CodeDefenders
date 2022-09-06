@@ -58,7 +58,7 @@ public class ConnectionFactory {
             dataSource = new BasicDataSource();
             try {
                 dataSource.setDriver(new Driver());
-            } catch (SQLException e) {
+            } catch (SQLException e) { // TODO(Alex): This doesn't look right?!
                 logger.error("Couldn't setup connection to database", e);
             }
             dataSource.setUrl(config.getDbUrl());
