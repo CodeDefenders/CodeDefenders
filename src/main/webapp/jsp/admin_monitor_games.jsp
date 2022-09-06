@@ -67,7 +67,7 @@
     <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="startStopGame">
 
-        <h3 class="mb-3">You Multiplayer Games</h3>
+        <h3 class="mb-3">Multiplayer Games</h3>
         <table id="table-multiplayer" class="table table-v-align-middle table-striped">
             <thead>
                 <tr>
@@ -124,10 +124,12 @@
                         </td>
                         <td><%=gid%></td>
                         <td>
-                            <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                               href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gid%>">
-                                Observe
-                            </a>
+                            <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
+                                <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
+                                   href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gid%>">
+                                    Observe
+                                </a>
+                            <% } %>
                         </td>
                         <td>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">
@@ -284,7 +286,7 @@
 
         <%-- ------------------------------------------------------------------------------------------------------ --%>
 
-        <h3 class="mb-3 mt-4">Your Melee Games</h3>
+        <h3 class="mb-3 mt-4">Melee Games</h3>
         <%
             List<MeleeGame> meleeGames = (List<MeleeGame>) request.getAttribute("meleeGames");
             Map<Integer, String> meleeGameCreatorNames = (Map<Integer, String>) request.getAttribute("meleeGameCreatorNames");
@@ -346,10 +348,12 @@
                         </td>
                         <td><%=gid%></td>
                         <td>
-                            <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                               href="<%=request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gid%>">
-                                Observe
-                            </a>
+                            <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
+                                <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
+                                   href="<%=request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gid%>">
+                                    Observe
+                                </a>
+                            <% } %>
                         </td>
                         <td>
                             <a href="#" data-bs-toggle="modal" data-bs-target="#class-modal-for-game-<%=gid%>">

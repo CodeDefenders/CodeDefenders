@@ -81,7 +81,7 @@ public class AdminMonitorGames extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy(login.getUserId());
+        List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
 
         Map<Integer, String> multiplayerGameCreatorNames = multiplayerGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
@@ -105,7 +105,7 @@ public class AdminMonitorGames extends HttpServlet {
         request.setAttribute("multiplayerPlayersInfoForGame", multiplayerPlayersInfoForGame);
         request.setAttribute("multiplayerUserIdForPlayerIds", multiplayerUserIdForPlayerIds);
 
-        List<MeleeGame> meleeGames = MeleeGameDAO.getUnfinishedMeleeGamesCreatedBy(login.getUserId());
+        List<MeleeGame> meleeGames = MeleeGameDAO.getAvailableMeleeGames();
         Map<Integer, String> meleeGameCreatorNames = meleeGames.stream()
                 .collect(Collectors.toMap(AbstractGame::getId,
                         game -> userService.getSimpleUserById(game.getCreatorId())
