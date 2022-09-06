@@ -581,6 +581,21 @@
             });
         };
 
+        /* Search function added to DataTables to filter the users table. */
+        const searchFunction = function(settings, renderedData, index, data, counter) {
+            /* Let this search function only affect the users table. */
+            if (settings.nTable.id !== 'table-users') {
+                return true;
+            }
+
+            if (showAssignedUsers) {
+                return true;
+            } else {
+                return unassignedUserIds.has(data.user.id);
+            }
+        };
+        DataTable.ext.search.push(searchFunction);
+
         const renderUserLastRole = function (lastRole, type, row, meta) {
             switch (type) {
                 case 'type':
@@ -1067,10 +1082,10 @@
 
             /* Select / deselect all visible staged games. */
             $('#select-visible-games').on('click', function () {
-                stagedGamesTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).select();
+                stagedGamesTable.rows({search: 'applied'}).select();
             })
             $('#deselect-visible-games').on('click', function () {
-                stagedGamesTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).deselect();
+                stagedGamesTable.rows({search: 'applied'}).deselect();
             });
 
             /* Set role options according to the game type when a game id is selected. */
@@ -1203,18 +1218,6 @@
                 drawCallback: function () {
                     /* Select nothing in all selects in the table. */
                     $(this).find('select').prop('selectedIndex', -1);
-
-                    /* Hide hidden users. */
-                    this.api().rows().every(function () {
-                        const userInfo = this.data();
-                        if (showAssignedUsers || unassignedUserIds.has(userInfo.user.id)) {
-                            userInfo._hidden = false;
-                            $(this.node()).show();
-                        } else {
-                            userInfo._hidden = true;
-                            $(this.node()).hide();
-                        }
-                    });
                 },
                 order: [[5, 'asc']],
                 scrollY: '600px',
@@ -1238,10 +1241,10 @@
 
             /* Select / deselect all visible users. */
             $('#select-visible-users').on('click', function () {
-                usersTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).select();
+                usersTable.rows({search: 'applied'}).select();
             })
             $('#deselect-visible-users').on('click', function () {
-                usersTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).deselect();
+                usersTable.rows({search: 'applied'}).deselect();
             });
 
             /* Set role options according to the game type when a game id is selected. */
