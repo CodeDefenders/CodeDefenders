@@ -86,6 +86,18 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
         return tx;
     }
 
+    @Override
+    public void terminateTransaction() throws SQLException { // TODO(Alex): Handle the SQL Exception?!
+        ManagedTransaction currentTransaction = transaction.get();
+        if (currentTransaction != null) {
+            String txId = currentTransaction.getTransactionIdentifier();
+            while (currentTransaction != null) {
+                currentTransaction.close();
+                currentTransaction = transaction.get();
+            }
+            throw new IllegalStateException("Forcefully terminated Transaction " + txId);
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -224,11 +236,11 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
         return withConnection(conn -> queryRunner.execute(conn, sql, mapper, params));
     }
 
-    private void closeTransaction() {
+    private void removeCurrentTransaction() {
         transaction.remove();
     }
 
-    private void closeTransaction(@Nonnull ManagedTransaction outerTransaction) {
+    private void replaceCurrentTransaction(@Nonnull ManagedTransaction outerTransaction) {
         transaction.set(outerTransaction);
     }
 
@@ -280,7 +292,7 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
                     logger.debug("Successfully rolled back {} to savepoint", this);
                 }
             } finally {
-                closeTransaction(transaction);
+                TransactionAwareQueryRunner.this.replaceCurrentTransaction(transaction);
                 logger.debug("Successfully closed {}", this);
                 MDC.put("tx", transaction.getTransactionIdentifier());
             }
@@ -342,7 +354,7 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
                         connection.close();
                         logger.debug("Successfully closed underlying connection {} of {}", connection, this);
                     } finally {
-                        closeTransaction();
+                        TransactionAwareQueryRunner.this.removeCurrentTransaction();
                         logger.debug("Successfully closed {}", this);
                         MDC.remove("tx");
                     }

@@ -1,5 +1,7 @@
 package org.codedefenders.transaction;
 
+import java.sql.SQLException;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -43,6 +45,19 @@ public interface TransactionManager {
     @Nonnull
     Transaction startTransaction(@Nullable Integer transactionIsolation);
 
+    /**
+     * Forcefully closes a–in the current thread–running transaction.
+     *
+     * <p>If no transaction is running this is a no-op.
+     *
+     * <p>This method should only be used to ensure no transaction remains running if a thread will be reused.
+     * E.g. in the case of thread pools like the one handling the http requests of the tomcat server.
+     *
+     * @throws IllegalStateException If a transaction had to be closed.
+     * @see org.codedefenders.servlets.util.TransactionCleanupFilter
+     */
+    void terminateTransaction() throws IllegalStateException, SQLException;
+
     // TODO: Should this do an automatic commit if no exception was thrown within {@code execution} ?!
 
     /**
@@ -50,7 +65,7 @@ public interface TransactionManager {
      * {@link TransactionalExecution} {@code execution} with the current {@link Transaction} as parameter.
      *
      * <p>The transaction will automatically be aborted before this method call ends and if it was not committed
-     * already.
+     * already. E.g. if {@code execution} throws any {@link Exception}.
      *
      * @param execution The code to execute within the current transaction.
      * @throws Exception if a {@code Exception} occurred in the {@code execution}

@@ -108,6 +108,11 @@
 	<!-- End Filter Declarations -->
 
 	<!-- Begin Filter Mapping/Ordering -->
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
+		<filter-name>TransactionCleanupFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<filter-mapping> <!-- See: Filter Declarations above -->
 		<filter-name>RequestCharacterEncoding</filter-name>
 		<url-pattern>/*</url-pattern>
