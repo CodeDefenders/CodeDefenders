@@ -90,11 +90,30 @@
 		<param-value>org.codedefenders.auth.CodeDefendersWebEnvironment</param-value>
 	</context-param>
 
+	<!-- Begin WebFilter Section -->
+	<!-- Begin Filter Declarations -->
+	<filter> <!-- Set character encoding -->
+		<filter-name>RequestCharacterEncoding</filter-name>
+		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+
 	<filter>
 		<filter-name>ShiroFilter</filter-name>
 		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
 	</filter>
-	<filter-mapping>
+	<!-- End Filter Declarations -->
+
+	<!-- Begin Filter Mapping/Ordering -->
+	<filter-mapping> <!-- See: Filter Declarations above -->
+		<filter-name>RequestCharacterEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping> <!-- See: Filter Declarations above -->
 		<filter-name>ShiroFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
@@ -103,46 +122,24 @@
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
 
-	<!-- Set character encoding -->
-
-	<filter>
-		<filter-name>RequestCharacterEncoding</filter-name>
-		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>RequestCharacterEncoding</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<filter>
-		<filter-name>ResponseCharacterEncoding</filter-name>
-		<filter-class>org.codedefenders.configuration.SetResponseCharacterEncodingFilter</filter-class>
-		<init-param>
-			<param-name>encoding</param-name>
-			<param-value>UTF-8</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>ResponseCharacterEncoding</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<!-- CodeDefenders filters -->
-
-	<filter-mapping>
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>TicketingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<filter-mapping>
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>BeanFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
+		<filter-name>ResponseCharacterEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<!-- End Filter Mapping/Ordering -->
+	<!-- End WebFilter Section -->
+
+	<!-- Begin Error Pages Section -->
 	<error-page>
 		<location>/jsp/error_page_404.jsp</location>
 	</error-page>
@@ -151,6 +148,7 @@
 		<error-code>500</error-code>
 		<location>/jsp/error_page_500.jsp</location>
 	</error-page>
+	<!-- End Error Pages Section -->
 
 	<mime-mapping>
 		<extension>mjs</extension>
