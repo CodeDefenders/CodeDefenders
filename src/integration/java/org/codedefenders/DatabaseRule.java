@@ -24,8 +24,9 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbutils.QueryRunner;
 import org.codedefenders.database.ConnectionFactory;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.persistence.database.util.TransactionAwareQueryRunner;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.junit.rules.ExternalResource;
@@ -46,14 +47,16 @@ public class DatabaseRule extends ExternalResource {
     private final String username = "root";
     private final String password = "";
 
+    public QueryRunner getQueryRunner() throws SQLException {
+        return new TransactionAwareQueryRunner(getConnectionFactory());
+    }
+
     public ConnectionFactory getConnectionFactory() throws SQLException {
         DataSource dataSourceMock = mock(DataSource.class);
         when(dataSourceMock.getConnection()).thenAnswer(invocation -> getConnection());
-        QueryRunner queryRunner = new QueryRunner(dataSourceMock);
 
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
         when(connectionFactory.getConnection()).thenAnswer(invocation -> getConnection());
-        when(connectionFactory.getQueryRunner()).thenReturn(queryRunner);
         return connectionFactory;
     }
 

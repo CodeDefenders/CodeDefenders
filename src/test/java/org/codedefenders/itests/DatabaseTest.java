@@ -236,7 +236,7 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testInsertPlayer() throws Exception {
-        UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+        UserRepository userRepo = new UserRepository(db.getQueryRunner());
 
         assumeTrue(creator.insert());
         assumeTrue(user1.insert());

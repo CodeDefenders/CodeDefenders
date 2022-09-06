@@ -31,10 +31,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +55,11 @@ public class UserRepository {
 
     private final LoadingCache<Integer, Integer> userIdForPlayerIdCache;
 
-    private final ConnectionFactory connectionFactory;
+    private final QueryRunner queryRunner;
 
     @Inject
-    public UserRepository(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
+    public UserRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
 
         userIdForPlayerIdCache = CacheBuilder.newBuilder()
                 .maximumSize(400)
@@ -67,6 +67,7 @@ public class UserRepository {
                 .build(
                         new CacheLoader<Integer, Integer>() {
                             @Override
+                            @Nonnull
                             public Integer load(@Nonnull Integer playerId) throws Exception {
                                 return getUserIdForPlayerIdInternal(playerId)
                                         .orElseThrow(() -> new Exception("No userId found for given playerId"));
@@ -116,7 +117,7 @@ public class UserRepository {
                 + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?);";
         try {
-            return connectionFactory.getQueryRunner()
+            return queryRunner
                     .insert(query, resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
                             userEntity.getUsername(),
                             userEntity.getEncodedPassword(),
@@ -148,7 +149,7 @@ public class UserRepository {
                 + "  KeyMap = ?"
                 + "WHERE User_ID = ?;";
         try {
-            return connectionFactory.getQueryRunner().update(query,
+            return queryRunner.update(query,
                     userEntity.getUsername(),
                     userEntity.getEmail(),
                     userEntity.getEncodedPassword(),
@@ -172,7 +173,7 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE User_ID = ?;";
         try {
-            return connectionFactory.getQueryRunner()
+            return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), userId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -189,7 +190,7 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE Username = ?;";
         try {
-            return connectionFactory.getQueryRunner()
+            return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), username);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -206,7 +207,7 @@ public class UserRepository {
                 + "FROM  users "
                 + "WHERE Email = ?;";
         try {
-            return connectionFactory.getQueryRunner()
+            return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), email);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -234,7 +235,7 @@ public class UserRepository {
                 + "WHERE players.User_ID = users.User_ID "
                 + "AND players.ID = ?";
         try {
-            return Optional.ofNullable(connectionFactory.getQueryRunner()
+            return Optional.ofNullable(queryRunner
                     .query(query, new ScalarHandler<>(), playerId));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -252,7 +253,7 @@ public class UserRepository {
         String query = "SELECT * "
                 + "FROM  users;";
         try {
-            return connectionFactory.getQueryRunner()
+            return queryRunner
                     .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -281,7 +282,7 @@ public class UserRepository {
                 + "    )"
                 + "ORDER BY Username, User_ID;";
         try {
-            return connectionFactory.getQueryRunner()
+            return queryRunner
                     .query(query, resultSet -> listFromRS(resultSet, UserRepository::userFromRS));
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -293,7 +294,7 @@ public class UserRepository {
         String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
 
         try {
-            connectionFactory.getQueryRunner().update(query, userId, ipAddress);
+            queryRunner.update(query, userId, ipAddress);
             return true;
         } catch (SQLException e) {
             logger.warn("SQLException while logging session", e);
@@ -305,7 +306,7 @@ public class UserRepository {
         String query = "DELETE FROM sessions WHERE User_ID = ?;";
 
         try {
-            connectionFactory.getQueryRunner().update(query, userId);
+            queryRunner.update(query, userId);
             return true;
         } catch (SQLException e) {
             logger.warn("SQLException while executing query", e);
@@ -320,7 +321,7 @@ public class UserRepository {
                 + "WHERE User_ID = ?;";
 
         try {
-            connectionFactory.getQueryRunner().update(query, passwordResetSecret, userId);
+            queryRunner.update(query, passwordResetSecret, userId);
             return true;
         } catch (SQLException e) {
             logger.warn("SQLException while executing query", e);
@@ -339,7 +340,7 @@ public class UserRepository {
                 + ") AND pw_reset_secret = ?;";
 
         try {
-            return Optional.ofNullable(connectionFactory.getQueryRunner()
+            return Optional.ofNullable(queryRunner
                     .query(query, new ScalarHandler<>(), passwordResetSecret));
         } catch (SQLException e) {
             logger.warn("SQLException while executing query", e);

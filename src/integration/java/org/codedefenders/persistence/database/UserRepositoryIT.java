@@ -50,7 +50,7 @@ public class UserRepositoryIT {
 
     @Before
     public void setUp() throws Exception {
-        userRepo = new UserRepository(databaseRule.getConnectionFactory());
+        userRepo = new UserRepository(databaseRule.getQueryRunner());
     }
 
     private final String username1 = "user";

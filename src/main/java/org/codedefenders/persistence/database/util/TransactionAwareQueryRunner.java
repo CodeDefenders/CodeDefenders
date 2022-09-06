@@ -1,0 +1,358 @@
+package org.codedefenders.persistence.database.util;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Savepoint;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.codedefenders.database.ConnectionFactory;
+import org.codedefenders.transaction.Transaction;
+import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.transaction.TransactionalExecution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
+
+/**
+ * Implements the {@link QueryRunner} and {@link TransactionManager} interfaces, so it can execute database operations
+ * within a transaction that is running in the current thread.
+ *
+ * @author degenhart
+ */
+// TODO This requires `connectionFactory` to be ThreadSafe. `queryRunner` is ThreadSafe and `transaction`
+//  is thread-confined (also ThreadSafe).
+@ThreadSafe
+@ApplicationScoped
+public class TransactionAwareQueryRunner implements TransactionManager, QueryRunner {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionAwareQueryRunner.class);
+
+    private final ConnectionFactory connectionFactory;
+    private final org.apache.commons.dbutils.QueryRunner queryRunner = new org.apache.commons.dbutils.QueryRunner();
+    private final ThreadLocal<ManagedTransaction> transaction = new ThreadLocal<>();
+
+    /**
+     * Creates e new TransactionAwareQueryRunner which will retrieve the connections used for transactions and to run
+     * execute the SQL statements from the given {@code connectionFactory}.
+     *
+     * @param connectionFactory The object from which needed connections are acquired
+     */
+    @Inject
+    public TransactionAwareQueryRunner(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Nonnull
+    public Transaction startTransaction() {
+        return startTransaction(null);
+    }
+
+    @Override
+    @Nonnull
+    public Transaction startTransaction(@Nullable Integer transactionIsolation) {
+        ManagedTransaction currentTransaction = transaction.get();
+
+        ManagedTransaction tx = null;
+
+        if (currentTransaction != null) {
+            try {
+                if (transactionIsolation != null &&
+                        transactionIsolation > currentTransaction.getConnection().getTransactionIsolation()) {
+                    throw new RuntimeException("Requested higher transaction isolation as the current running"
+                            + "transaction can provide");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException("Could not query transaction isolation level", e);
+            }
+
+            tx = new InnerManagedTransaction(currentTransaction);
+        } else {
+            tx = new OuterManagedTransaction(getInternalConnection(), transactionIsolation);
+        }
+        transaction.set(tx);
+        MDC.put("tx", tx.getTransactionIdentifier());
+        return tx;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T executeInTransaction(@Nonnull TransactionalExecution<T> execution) throws Exception {
+        return executeInTransaction(execution, null);
+    }
+
+    @Override
+    public <T> T executeInTransaction(@Nonnull TransactionalExecution<T> execution,
+            @Nullable Integer transactionIsolation) throws Exception {
+        try (Transaction transaction = startTransaction(transactionIsolation)) {
+            return execution.executeInTransaction(transaction);
+        }
+    }
+
+    /**
+     * Returns either the connection of the current transaction or a new Connection with {@code AutoCommit} set to true.
+     *
+     * @return The connection of the transaction or a connection in autocommit mode
+     */
+    @Nonnull
+    private Connection getInternalConnection() {
+        ManagedTransaction currentTransaction = transaction.get();
+        if (currentTransaction != null) {
+            return currentTransaction.getConnection();
+        } else {
+            try {
+                Connection result = connectionFactory.getConnection();
+                result.setAutoCommit(true);
+                return result;
+            } catch (SQLException e) {
+                // TODO
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
+    // Can't add the @FunctionalInterface annotation to an inner interface.
+    private interface Executor<T> {
+        @Nullable
+        T execute(@Nonnull Connection connection) throws SQLException;
+    }
+
+    @Nullable
+    private <T> T withConnection(@Nonnull Executor<T> function) throws SQLException {
+        T result;
+
+        ManagedTransaction currentTransaction = transaction.get();
+        if (currentTransaction != null && currentTransaction.committed) {
+            throw new IllegalStateException("The transaction used to execute the SQL statement is already committed.");
+        }
+
+        Connection conn = null;
+        try {
+            conn = getInternalConnection();
+            result = function.execute(conn);
+        } finally {
+            // Only close the connection if we are outside a transaction (aka transaction.get() == null)
+            if (conn != null && transaction.get() == null) {
+                conn.close();
+            }
+        }
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T query(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper) throws SQLException {
+        return withConnection(conn -> queryRunner.query(conn, sql, mapper));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T query(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
+            @Nonnull Object... params) throws SQLException {
+        return withConnection(conn -> queryRunner.query(conn, sql, mapper, params));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T insert(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper) throws SQLException {
+        return withConnection(conn -> queryRunner.insert(conn, sql, mapper));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T insert(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
+            @Nonnull Object... params) throws SQLException {
+        return withConnection(conn -> queryRunner.insert(conn, sql, mapper, params));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int update(@Nonnull String sql) throws SQLException {
+        Integer result = withConnection(conn -> queryRunner.update(conn, sql));
+        return result != null ? result : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int update(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+        Integer result = withConnection(conn -> queryRunner.update(conn, sql, params));
+        return result != null ? result : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int execute(@Nonnull String sql, @Nonnull Object... params) throws SQLException {
+        Integer result = withConnection(conn -> queryRunner.execute(conn, sql, params));
+        return result != null ? result : 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> List<T> execute(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
+            @Nonnull Object... params) throws SQLException {
+        return withConnection(conn -> queryRunner.execute(conn, sql, mapper, params));
+    }
+
+    private void closeTransaction() {
+        transaction.remove();
+    }
+
+    private void closeTransaction(@Nonnull ManagedTransaction outerTransaction) {
+        transaction.set(outerTransaction);
+    }
+
+
+    private abstract static class ManagedTransaction implements Transaction {
+        final UUID uuid = UUID.randomUUID();
+        boolean committed = false;
+
+        abstract Connection getConnection();
+    }
+
+    private class InnerManagedTransaction extends ManagedTransaction {
+        final ManagedTransaction transaction;
+        final Savepoint savepoint;
+
+        InnerManagedTransaction(@Nonnull ManagedTransaction transaction) {
+            this.transaction = transaction;
+            // Set this already here, so log statements in the constructor already have the MDC set.
+            MDC.put("tx", this.getTransactionIdentifier());
+            try {
+                this.savepoint = getConnection().setSavepoint();
+                logger.debug("Successfully started {}", this);
+            } catch (SQLException e) {
+                throw new RuntimeException("Could not create savepoint on connection, when creating transaction", e);
+            }
+        }
+
+        @Override
+        public String getTransactionIdentifier() {
+            return transaction.getTransactionIdentifier() + ":" + uuid;
+        }
+
+        @Override
+        @Nonnull
+        Connection getConnection() {
+            return transaction.getConnection();
+        }
+
+        @Override
+        public void commit() throws SQLException {
+            committed = true;
+        }
+
+        @Override
+        public void close() throws SQLException {
+            try {
+                if (!committed) {
+                    getConnection().rollback(savepoint);
+                    logger.debug("Successfully rolled back {} to savepoint", this);
+                }
+            } finally {
+                closeTransaction(transaction);
+                logger.debug("Successfully closed {}", this);
+                MDC.put("tx", transaction.getTransactionIdentifier());
+            }
+        }
+
+        @Override
+        public String toString() {
+            return transaction + ":" + uuid.toString().substring(0, 8);
+        }
+    }
+
+    private class OuterManagedTransaction extends ManagedTransaction {
+        @Nonnull
+        final Connection connection;
+
+        OuterManagedTransaction(@Nonnull Connection connection, @Nullable Integer transactionIsolation) {
+            this.connection = connection;
+            // Set this already here, so log statements in the constructor already have the MDC set.
+            MDC.put("tx", this.getTransactionIdentifier());
+            try {
+                connection.setAutoCommit(false);
+                if (transactionIsolation != null) {
+                    connection.setTransactionIsolation(transactionIsolation);
+                }
+                logger.debug("Successfully started {}", this);
+            } catch (SQLException e) {
+                throw new RuntimeException("Could not set autocommit on connection, when creating transaction", e);
+            }
+        }
+
+        @Override
+        public String getTransactionIdentifier() {
+            return uuid.toString();
+        }
+
+        @Override
+        @Nonnull
+        Connection getConnection() {
+            return connection;
+        }
+
+        @Override
+        public void commit() throws SQLException {
+            connection.commit();
+            committed = true;
+            logger.debug("Successfully committed {}", this);
+        }
+
+        @Override
+        public void close() throws SQLException {
+            if (!connection.isClosed()) {
+                try {
+                    if (!committed) {
+                        connection.rollback();
+                        logger.debug("Successfully rolled back {}", this);
+                    }
+                } finally {
+                    try {
+                        connection.close();
+                        logger.debug("Successfully closed underlying connection {} of {}", connection, this);
+                    } finally {
+                        closeTransaction();
+                        logger.debug("Successfully closed {}", this);
+                        MDC.remove("tx");
+                    }
+                }
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "Transaction " + uuid.toString().substring(0, 8);
+        }
+    }
+}

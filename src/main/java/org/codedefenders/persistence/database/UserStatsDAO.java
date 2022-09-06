@@ -7,9 +7,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Role;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +24,16 @@ import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFrom
 public class UserStatsDAO {
     private static final Logger logger = LoggerFactory.getLogger(UserStatsDAO.class);
 
-    private final ConnectionFactory connectionFactory;
+    private final QueryRunner queryRunner;
 
     @Inject
-    private UserStatsDAO(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
+    private UserStatsDAO(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
     }
 
     /**
      * Fetches the amount of killed mutants a given user has written from the database.
+     *
      * @param userId The id of the user
      * @return amount of killed mutants written by a user
      */
@@ -42,6 +43,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of alive mutants a given user has written from the database.
+     *
      * @param userId The id of the user
      * @return amount of alive mutants written by a user
      */
@@ -55,7 +57,7 @@ public class UserStatsDAO {
                 + "WHERE User_ID = ? "
                 + "AND Alive = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(
+            return queryRunner.query(
                     query,
                     resultSet -> oneFromRS(resultSet, rs -> rs.getInt("mutants")),
                     userId,
@@ -69,6 +71,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of tests written by a user that killed mutants.
+     *
      * @param userId The id of the user
      * @return amount of killing tests written by a user
      */
@@ -78,6 +81,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of tests written by a user that did not (yet) kill mutants.
+     *
      * @param userId The id of the user
      * @return amount of non-killing tests written by a user
      */
@@ -91,7 +95,7 @@ public class UserStatsDAO {
                 + "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?) "
                 + "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;";
         try {
-            return connectionFactory.getQueryRunner().query(
+            return queryRunner.query(
                     query,
                     resultSet -> oneFromRS(resultSet, rs -> rs.getInt("tests")),
                     userId
@@ -104,6 +108,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of points a given user received through a test on average.
+     *
      * @param userId The id of the user
      * @return average points received through tests
      */
@@ -113,6 +118,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of total points a given user received through all of their tests.
+     *
      * @param userId The id of the user
      * @return total points received through tests
      */
@@ -126,7 +132,7 @@ public class UserStatsDAO {
                 + "FROM view_valid_tests "
                 + "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?);";
         try {
-            return connectionFactory.getQueryRunner().query(
+            return queryRunner.query(
                     query,
                     resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
                     userId
@@ -139,6 +145,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of points a given user received through a mutant on average.
+     *
      * @param userId The id of the user
      * @return average points received through mutants
      */
@@ -148,6 +155,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of total points a given user received through all of their mutants.
+     *
      * @param userId The id of the user
      * @return total points received through mutants
      */
@@ -161,7 +169,7 @@ public class UserStatsDAO {
                 + "FROM view_valid_mutants "
                 + "WHERE User_ID = ?;";
         try {
-            return connectionFactory.getQueryRunner().query(
+            return queryRunner.query(
                     query,
                     resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
                     userId
@@ -174,6 +182,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of total games a user played as attacker.
+     *
      * @param userId The id of the user
      * @return games played as attacker
      */
@@ -183,6 +192,7 @@ public class UserStatsDAO {
 
     /**
      * Fetches the amount of total games a user played as defender.
+     *
      * @param userId The id of the user
      * @return games played as defender
      */
@@ -197,7 +207,7 @@ public class UserStatsDAO {
                 + "WHERE User_ID = ? "
                 + "AND Role = ?";
         try {
-            return connectionFactory.getQueryRunner().query(
+            return queryRunner.query(
                     query,
                     resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
                     userId,
