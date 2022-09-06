@@ -92,7 +92,7 @@
 %>
     <jsp:include page="/jsp/game_components/defender_intention_collector.jsp"/>
 <%
-        } else if (role == Role.ATTACKER) {
+        } else if (role == Role.ATTACKER && !openEquivalenceDuel) {
 %>
     <jsp:include page="/jsp/game_components/attacker_intention_collector.jsp"/>
 <%
