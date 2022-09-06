@@ -13,6 +13,8 @@ import org.codedefenders.game.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
+
 /**
  * Provides methods to query user statistics from the database. This includes metrics like written tests and mutants,
  * points, games played.
@@ -55,9 +57,7 @@ public class UserStatsDAO {
         try {
             return connectionFactory.getQueryRunner().query(
                     query,
-                    resultSet -> DatabaseUtils.nextFromRS(
-                            resultSet, rs -> rs.getInt("mutants")
-                    ),
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("mutants")),
                     userId,
                     alive ? 1 : 0
             ).orElse(0);
@@ -93,9 +93,7 @@ public class UserStatsDAO {
         try {
             return connectionFactory.getQueryRunner().query(
                     query,
-                    resultSet -> DatabaseUtils.nextFromRS(
-                            resultSet, rs -> rs.getInt("tests")
-                    ),
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("tests")),
                     userId
             ).orElse(0);
         } catch (SQLException e) {
@@ -130,9 +128,7 @@ public class UserStatsDAO {
         try {
             return connectionFactory.getQueryRunner().query(
                     query,
-                    resultSet -> DatabaseUtils.nextFromRS(
-                            resultSet, rs -> rs.getDouble("points")
-                    ),
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
                     userId
             ).orElse(0d);
         } catch (SQLException e) {
@@ -167,9 +163,7 @@ public class UserStatsDAO {
         try {
             return connectionFactory.getQueryRunner().query(
                     query,
-                    resultSet -> DatabaseUtils.nextFromRS(
-                            resultSet, rs -> rs.getDouble("points")
-                    ),
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getDouble("points")),
                     userId
             ).orElse(0d);
         } catch (SQLException e) {
@@ -205,9 +199,7 @@ public class UserStatsDAO {
         try {
             return connectionFactory.getQueryRunner().query(
                     query,
-                    resultSet -> DatabaseUtils.nextFromRS(
-                            resultSet, rs -> rs.getInt("games")
-                    ),
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
                     userId,
                     role.toString()
             ).orElse(0);

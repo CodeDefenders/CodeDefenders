@@ -17,7 +17,7 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.persistence.database;
+package org.codedefenders.persistence.database.util;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,17 +29,18 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.dbutils.ResultSetHandler;
 
-public class DatabaseUtils {
+public class ResultSetUtils {
 
     /**
-     * Map the first entry of a given {@link ResultSet} {@code rs} with the given {@code handler} to an object and
+     * Map the next entry of a given {@link ResultSet} {@code rs} with the given {@code handler} to an object and
      * return it wrapped in an Optional if {@code rs} has a next row, or return an empty {@code Optional} if {@code rs}
      * has no next row.
      *
      * @throws SQLException if an {@code SQLException} occurs while accessing the {@code ResultSet}
      */
-    public static <T> Optional<T> nextFromRS(@Nonnull ResultSet rs, @Nonnull ResultSetHandler<T> handler)
-            throws SQLException {
+    @Nonnull
+    public static <T> Optional<T> nextFromRS(@Nonnull ResultSet rs,
+            @Nonnull ResultSetHandler<T> handler) throws SQLException {
         if (rs.next()) {
             return Optional.ofNullable(handler.handle(rs));
         } else {
@@ -58,6 +59,24 @@ public class DatabaseUtils {
         List<T> result = new ArrayList<>();
         while (rs.next()) {
             result.add(handler.handle(rs));
+        }
+        return result;
+    }
+
+    /**
+     * Map the next entry of a given {@link ResultSet} {@code rs} with the given {@code handler} to an object ensure it
+     * is the last entry of {@code rs} and return it wrapped in an Optional if {@code rs} has a next row, or return an
+     * empty {@code Optional} if {@code rs} has no next row.
+     *
+     * @throws SQLException          if an {@code SQLException} occurs while accessing the {@code ResultSet}
+     * @throws IllegalStateException if there are more than on entry in the {@link ResultSet}.
+     */
+    @Nonnull
+    public static <T> Optional<T> oneFromRS(@Nonnull ResultSet rs,
+            @Nonnull ResultSetHandler<T> handler) throws SQLException {
+        Optional<T> result = nextFromRS(rs, handler);
+        if (rs.next()) {
+            throw new IllegalStateException("Provided ResultSet has more then one entry!");
         }
         return result;
     }

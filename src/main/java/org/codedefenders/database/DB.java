@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * method you don't need to provide a connection, it will handle the connection transparently for you (so no need to
  * use the {@link org.apache.commons.dbutils.QueryRunner} methods which require a connection.
  * Another thing to watch out for is the need to call {@link ResultSet#next()}, to simplify this you can use
- * {@link org.codedefenders.persistence.database.DatabaseUtils#nextFromRS(ResultSet, org.apache.commons.dbutils.ResultSetHandler)}
+ * {@link org.codedefenders.persistence.database.util.ResultSetUtils#nextFromRS(ResultSet, org.apache.commons.dbutils.ResultSetHandler)}
  * which will wrap the {@link ResultSet#next()} check for you.
  * If you use the methods which require a connection please watch out for differing behaviour: You are responsible for
  * closing the passed {@link Connection}. So the easiest way is to use a try-with-resource statement when getting the

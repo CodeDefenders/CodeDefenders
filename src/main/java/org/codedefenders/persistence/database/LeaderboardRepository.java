@@ -34,8 +34,8 @@ import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.persistence.database.DatabaseUtils.listFromRS;
-import static org.codedefenders.persistence.database.DatabaseUtils.nextFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 @ApplicationScoped
 public class LeaderboardRepository {
@@ -96,7 +96,7 @@ public class LeaderboardRepository {
 
         try {
             return connectionFactory.getQueryRunner()
-                    .query(query, rs -> nextFromRS(rs, LeaderboardRepository::leaderboardEntryFromRS),
+                    .query(query, rs -> oneFromRS(rs, LeaderboardRepository::leaderboardEntryFromRS),
                             userId);
         } catch (SQLException e) {
             logger.error("Exception while querying score for userId {}", userId, e);

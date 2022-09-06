@@ -42,8 +42,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import static org.codedefenders.persistence.database.DatabaseUtils.listFromRS;
-import static org.codedefenders.persistence.database.DatabaseUtils.nextFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 /**
  * Provides methods for querying and updating the {@code users} table in the database.
@@ -172,7 +173,7 @@ public class UserRepository {
                 + "WHERE User_ID = ?;";
         try {
             return connectionFactory.getQueryRunner()
-                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), userId);
+                    .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), userId);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -189,7 +190,7 @@ public class UserRepository {
                 + "WHERE Username = ?;";
         try {
             return connectionFactory.getQueryRunner()
-                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), username);
+                    .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), username);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -206,7 +207,7 @@ public class UserRepository {
                 + "WHERE Email = ?;";
         try {
             return connectionFactory.getQueryRunner()
-                    .query(query, resultSet -> nextFromRS(resultSet, UserRepository::userFromRS), email);
+                    .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), email);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
