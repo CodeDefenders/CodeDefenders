@@ -260,6 +260,14 @@
                                     <label class="form-check-label" for="start-games-switch">Start Games</label>
                                 </div>
                             </div>
+
+                            <div class="col-12" title="The duration in minutes for how long the games will be open.">
+                                <label for="game-duration" class="form-label">Game Duration in Minutes</label>
+                                <input id="game-duration" name="gameDurationMinutes" class="form-control"
+                                       type="number" required min="1"
+                                       value="<%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue() %>"
+                                       max="<%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue() %>">
+                            </div>
                         </div>
 
                     </div>
@@ -1054,6 +1062,10 @@
             tr = table.insertRow();
             tr.insertCell().textContent = 'Start Game';
             tr.insertCell().textContent = gameSettings.startGame;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Game Duration';
+            tr.insertCell().textContent = gameSettings.gameDurationMinutes;
 
             return table;
         };
