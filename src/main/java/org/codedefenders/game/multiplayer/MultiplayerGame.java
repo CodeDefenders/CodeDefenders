@@ -70,6 +70,8 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean chatEnabled;
 
+    private int gameDurationMinutes;
+
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
@@ -87,6 +89,7 @@ public class MultiplayerGame extends AbstractGame {
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
         private boolean chatEnabled = false;
+        private int gameDurationMinutes;
         private float lineCoverage = 1f;
         private float mutantCoverage = 1f;
         private float prize = 1f;
@@ -126,6 +129,11 @@ public class MultiplayerGame extends AbstractGame {
 
         public Builder chatEnabled(boolean chatEnabled) {
             this.chatEnabled = chatEnabled;
+            return this;
+        }
+
+        public Builder gameDurationMinutes(int gameDurationMinutes) {
+            this.gameDurationMinutes = gameDurationMinutes;
             return this;
         }
 
@@ -211,6 +219,10 @@ public class MultiplayerGame extends AbstractGame {
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
+    }
+
+    public int getGameDurationMinutes() {
+        return gameDurationMinutes;
     }
 
     public int getDefenderValue() {

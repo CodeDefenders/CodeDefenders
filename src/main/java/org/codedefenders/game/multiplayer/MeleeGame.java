@@ -89,6 +89,8 @@ public class MeleeGame extends AbstractGame {
 
     private boolean chatEnabled;
 
+    private int gameDurationMinutes;
+
     // We need a temporary location where to store information about system tests
     // and mutants
     private boolean withTests;
@@ -121,6 +123,8 @@ public class MeleeGame extends AbstractGame {
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
+
+        private int gameDurationMinutes;
 
         private boolean withTests = false;
         private boolean withMutants = false;
@@ -203,6 +207,11 @@ public class MeleeGame extends AbstractGame {
             return this;
         }
 
+        public Builder gameDurationMinutes(int gameDurationMinutes) {
+            this.gameDurationMinutes = gameDurationMinutes;
+            return this;
+        }
+
         public Builder withTests(boolean withTests) {
             this.withTests = withTests;
             return this;
@@ -241,6 +250,7 @@ public class MeleeGame extends AbstractGame {
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
+        this.gameDurationMinutes = builder.gameDurationMinutes;
 
         // This is mostly a temporary patch
         this.withMutants = builder.withMutants;
@@ -290,6 +300,10 @@ public class MeleeGame extends AbstractGame {
         } else {
             return Role.NONE;
         }
+    }
+
+    public int getGameDurationMinutes() {
+        return gameDurationMinutes;
     }
 
     // TODO Those methods should be removed? The scoring bean should take the game

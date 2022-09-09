@@ -166,6 +166,7 @@ public class MeleeGameDAO {
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
+        int gameDurationMinutes = game.getGameDurationMinutes();
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -183,8 +184,9 @@ public class MeleeGameDAO {
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention,",
-                "EquivalenceThreshold)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "EquivalenceThreshold,",
+                "Game_Duration_Minutes)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -201,7 +203,8 @@ public class MeleeGameDAO {
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
                 DatabaseValue.of(capturePlayersIntention),
-                DatabaseValue.of(automaticMutantEquivalenceThreshold)
+                DatabaseValue.of(automaticMutantEquivalenceThreshold),
+                DatabaseValue.of(gameDurationMinutes),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);

@@ -165,6 +165,7 @@ public class MultiplayerGameDAO {
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
+        int gameDurationMinutes = game.getGameDurationMinutes();
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -182,7 +183,8 @@ public class MultiplayerGameDAO {
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention,",
-                "EquivalenceThreshold)",
+                "EquivalenceThreshold,",
+                "Game_Duration_Minutes)",
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
@@ -200,7 +202,8 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
                 DatabaseValue.of(capturePlayersIntention),
-                DatabaseValue.of(automaticMutantEquivalenceThreshold)
+                DatabaseValue.of(automaticMutantEquivalenceThreshold),
+                DatabaseValue.of(gameDurationMinutes),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
