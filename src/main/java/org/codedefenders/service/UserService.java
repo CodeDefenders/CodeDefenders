@@ -32,6 +32,7 @@ import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.transaction.Transactional;
+import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +73,11 @@ public class UserService {
                         }
                 );
     }
+
+
+    //
+    // User querying
+    //
 
     /**
      * Query a {@link User} by its id.
@@ -137,6 +143,56 @@ public class UserService {
     private SimpleUser simpleUserFromUserEntity(@Nonnull UserEntity user) {
         return new SimpleUser(user.getId(), user.getUsername());
     }
+
+
+    //
+    // Mutations (aka User Creation/Editing/Deletion)
+    //
+
+    /**
+     * Perform a registration with the provided parameters.
+     */
+    @Nonnull
+    public String registerUser(String username, String password, String email) {
+        CodeDefendersValidator validator = new CodeDefendersValidator();
+
+        String result;
+
+        // TODO(Alex): Change result messages so enumeration attacks are not possible.
+        //  See: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages
+        //  Examples can be found at https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#incorrect-and-correct-response-examples
+        //  Note: Usernames can currently be discovered through the leaderboard!
+        // TODO(Alex): Harden against timing attacks!
+        if (!(validator.validUsername(username))) {
+            // This check should be performed in the user interface too.
+            result = "Could not create user. Invalid username.";
+        } else if (!validator.validPassword(password)) {
+            // This check should be performed in the user interface too.
+            result = "Could not create user. Invalid password.";
+        } else if (!validator.validEmailAddress(email)) {
+            // This check should be performed in the user interface too.
+            result = "Could not create user. Invalid Email address.";
+        } else if (userRepo.getUserByName(username).isPresent()) {
+            result = "Could not create user. Username is already taken.";
+        } else if (userRepo.getUserByEmail(email).isPresent()) {
+            result = "Could not create user. Email has already been used. You can reset your password.";
+        } else {
+            UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);
+            if (userRepo.insert(newUser).isPresent()) {
+                result = "Your user has been created. You can login now.";
+            } else {
+                // TODO: How about some error handling?
+                result = "Could not create user.";
+            }
+        }
+
+        return result;
+    }
+
+
+    //
+    // Session Recording
+    //
 
     public boolean recordSession(int userId, String ipAddress) {
         return deleteRecordedSessions(userId) && userRepo.insertSession(userId, ipAddress);
