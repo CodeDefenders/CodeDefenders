@@ -37,7 +37,7 @@ import org.codedefenders.util.Paths;
  *
  * <p>Serves under {@code /admin/puzzles} and {@code /admin/puzzles/management}.
  *
- * @author <a href=https://github.com/werli>Phil Werli</a>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 @WebServlet({Paths.ADMIN_PUZZLE_OVERVIEW, Paths.ADMIN_PUZZLE_MANAGEMENT})
 public class AdminPuzzleManagement extends HttpServlet {

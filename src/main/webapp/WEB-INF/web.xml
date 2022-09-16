@@ -46,39 +46,11 @@
 	<!-- Security Configuration -->
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>SecuredBookSite</web-resource-name>
-			<url-pattern>/admin</url-pattern>
-			<url-pattern>/admin/*</url-pattern>
-			<url-pattern>/admin/games</url-pattern>
-			<url-pattern>/admin/manage</url-pattern>
-			<url-pattern>/admin/monitor</url-pattern>
-			<url-pattern>/admin/users</url-pattern>
-			<url-pattern>/admin/settings</url-pattern>
-			<url-pattern>/admin/api/*</url-pattern>
-			<http-method>GET</http-method>
-			<http-method>POST</http-method>
-		</web-resource-collection>
-
-		<auth-constraint>
-			<role-name>manager-gui</role-name>
-		</auth-constraint>
-	</security-constraint>
-
-	<security-constraint>
-		<web-resource-collection>
 			<web-resource-name>no_access</web-resource-name>
 			<url-pattern>/jsp/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint/>
 	</security-constraint>
-
-	<security-role>
-		<role-name>manager-gui</role-name>
-	</security-role>
-
-	<login-config>
-		<auth-method>BASIC</auth-method>
-	</login-config>
 
 	<!-- Shiro -->
 	<listener>
@@ -92,7 +64,7 @@
 
 	<!-- Begin WebFilter Section -->
 	<!-- Begin Filter Declarations -->
-	<filter> <!-- Set character encoding -->
+	<filter><!-- Set character encoding -->
 		<filter-name>RequestCharacterEncoding</filter-name>
 		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
 		<init-param>
@@ -118,6 +90,11 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
+		<filter-name>ResponseCharacterEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<filter-mapping> <!-- See: Filter Declarations above -->
 		<filter-name>ShiroFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -134,11 +111,6 @@
 
 	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>BeanFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
-		<filter-name>ResponseCharacterEncoding</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	<!-- End Filter Mapping/Ordering -->

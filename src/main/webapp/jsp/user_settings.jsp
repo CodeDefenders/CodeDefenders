@@ -47,7 +47,7 @@
                 <div class="mb-2">
                     <label for="updatedEmail" class="form-label">Email</label>
                     <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
-                           value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
+                           value="${login.user.email}" placeholder="Email" required>
                 </div>
 
                 <div class="form-check">

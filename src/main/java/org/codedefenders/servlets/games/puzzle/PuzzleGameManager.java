@@ -104,7 +104,7 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  *
  * <p>Serves under {@code /puzzlegame}.
  *
- * @author <a href=https://github.com/werli>Phil Werli</a>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleGame
  */
 @WebServlet(org.codedefenders.util.Paths.PUZZLE_GAME)
@@ -669,7 +669,7 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = true;
-            Message message = messages.add(generateWinningMessage(request, game, isAnAttackGame))
+            messages.add(generateWinningMessage(request, game, isAnAttackGame))
                     .escape(false).fadeOut(false);
         }
         PuzzleDAO.updatePuzzleGame(game);

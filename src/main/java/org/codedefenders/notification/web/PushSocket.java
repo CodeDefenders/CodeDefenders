@@ -40,7 +40,6 @@ import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.handling.ServerEventHandlerContainer;
-import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
@@ -78,23 +77,16 @@ import org.slf4j.LoggerFactory;
  * Client-to-server events are located in the package events/client.
  * </p>
  */
-// @RequestScoped -> TODO What's this?
 @ServerEndpoint(
         value = "/notifications/{ticket}/{userId}",
         encoders = {EventEncoder.class},
         decoders = {EventDecoder.class})
 public class PushSocket {
-    // TODO Make an Inject for this
     private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
 
-    // @Inject
     private final INotificationService notificationService;
-
-    // @Inject
     private final ITicketingService ticketingServices;
 
-    // @Inject
-    private final UserRepository userRepo;
     private final UserService userService;
 
     // Authorization
@@ -112,10 +104,7 @@ public class PushSocket {
         // Since @Inject does not work with WebSocket ...
 
         notificationService = CDIUtil.getBeanFromCDI(INotificationService.class);
-
         ticketingServices = CDIUtil.getBeanFromCDI(ITicketingService.class);
-
-        userRepo = CDIUtil.getBeanFromCDI(UserRepository.class);
 
         userService = CDIUtil.getBeanFromCDI(UserService.class);
 

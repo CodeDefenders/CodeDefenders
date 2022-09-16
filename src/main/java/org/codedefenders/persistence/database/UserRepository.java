@@ -106,7 +106,7 @@ public class UserRepository {
      * @param userEntity The new {@code UserEntity} to store in the database.
      * @return The id of the inserted {@code UserEntity} wrapped in an {@code Optional} or an empty optional if
      *         inserting the {@code userEntity} failed.
-     * @throws IllegalArgumentException if {@code userEntity.id} is greater then 0.
+     * @throws IllegalArgumentException if {@code userEntity.id} is greater than 0.
      */
     // TODO: This gives no information why we couldn't insert the UserEntity into the database
     @Nonnull

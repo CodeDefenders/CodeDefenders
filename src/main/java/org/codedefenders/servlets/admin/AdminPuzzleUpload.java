@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  *
  * <p>Serves under {@code /admin/puzzles/upload}.
  *
- * @author <a href=https://github.com/werli>Phil Werli</a>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 @WebServlet(Paths.ADMIN_PUZZLE_UPLOAD)
 public class AdminPuzzleUpload extends HttpServlet {
