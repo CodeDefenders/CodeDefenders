@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -208,7 +209,7 @@ public class UserService {
      * See {@link org.codedefenders.servlets.UserSettingsManager#changeUserPassword(UserEntity, String)} and
      * {@link org.codedefenders.servlets.admin.AdminUserManagement#resetUserPW(int)}
      */
-    public void changePassword() {
+    public void changePassword(@Nonnull String newPassword) {
         throw new NotImplementedException();
     }
 
@@ -216,8 +217,54 @@ public class UserService {
      * See {@link org.codedefenders.servlets.UserSettingsManager#updateUserInformation(UserEntity, Optional, boolean)}
      * and {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
      */
-    public void changeEmail() {
+    public void changeEmail(@Nonnull String newEmail) {
         throw new NotImplementedException();
+    }
+
+
+    /**
+     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}.
+     * Admin only method!
+     */
+    //@Transactional // TODO(Alex): This should be wrapped in a transaction!
+    @Nonnull
+    public Optional<String> updateUser(int userId, @Nonnull String newUsername, @Nonnull String newEmail,
+            @Nullable String newPassword) {
+        CodeDefendersValidator validator = new CodeDefendersValidator();
+
+        Optional<UserEntity> u = userRepo.getUserById(userId);
+        if (!u.isPresent()) {
+            return Optional.of("Error. User " + userId + " cannot be retrieved from database.");
+        }
+        UserEntity user = u.get();
+
+        if (!newUsername.equals(user.getUsername()) && userRepo.getUserByName(newUsername).isPresent()) {
+            return Optional.of("Username " + newUsername + " is already taken");
+        }
+
+        if (!newEmail.equals(user.getEmail()) && userRepo.getUserByEmail(newEmail).isPresent()) {
+            return Optional.of("Email " + newEmail + " is already in use");
+        }
+
+        if (!validator.validEmailAddress(newEmail)) {
+            return Optional.of("Email Address is not valid");
+        }
+
+        if (newPassword != null) {
+            if (!validator.validPassword(newPassword)) {
+                return Optional.of("Password is not valid");
+            }
+            user.setEncodedPassword(UserEntity.encodePassword(newPassword));
+        }
+        user.setUsername(newUsername);
+        user.setEmail(newEmail);
+
+        if (!userRepo.update(user)) {
+            return Optional.of("Error trying to update info for user " + userId + "!");
+        }
+
+        simpleUserForUserIdCache.invalidate(userId);
+        return Optional.empty();
     }
 
 
@@ -236,6 +283,7 @@ public class UserService {
     public void resetPassword() {
         throw new NotImplementedException();
     }
+
 
     // TODO(Alex): How does this differ from {@link #deactivateAccount} ?!
     public void setAccountInactive() {
