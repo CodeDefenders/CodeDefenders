@@ -32,6 +32,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
+<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -487,6 +488,7 @@
         import DataTable from './js/datatables.mjs';
         import $ from './js/jquery.mjs';
 
+        const loggedInUserId = ${login.userId};
 
         /**
          *  Maps IDs to staged games.
@@ -598,11 +600,17 @@
                 return true;
             }
 
+            /* Filter out logged-in user. */
+            if (data.user.id === loggedInUserId) {
+                return false;
+            }
+
             if (showAssignedUsers) {
                 return true;
-            } else {
-                return unassignedUserIds.has(data.user.id);
             }
+
+            /* Filter out assigned users. */
+            return unassignedUserIds.has(data.user.id);
         };
         DataTable.ext.search.push(searchFunction);
 
