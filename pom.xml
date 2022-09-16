@@ -10,6 +10,7 @@
 		<slf4j.version>1.7.36</slf4j.version>
 		<junit5.version>5.8.2</junit5.version>
 		<junit4.version>4.13.2</junit4.version>
+		<prometheus-client.version>0.16.0</prometheus-client.version>
 
 		<config.properties>config.properties</config.properties>
 
@@ -844,6 +845,28 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Metrics -->
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_hotspot</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_servlet</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_guava</artifactId>
+			<version>${prometheus-client.version}</version>
 		</dependency>
 
 		<!-- Annotations -->

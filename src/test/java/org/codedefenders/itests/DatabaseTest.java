@@ -48,6 +48,7 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.MetricsService;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
@@ -67,6 +68,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Jose Rojas
@@ -235,7 +237,7 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testInsertPlayer() throws Exception {
-        UserRepository userRepo = new UserRepository(db.getQueryRunner());
+        UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsService.class));
 
         assumeTrue(creator.insert());
         assumeTrue(user1.insert());

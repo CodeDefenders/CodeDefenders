@@ -53,6 +53,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.SettingsRepository;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.MetricsService;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,13 +80,17 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     private final UserDatabase userDatabase;
 
     @Inject
-    public CodeDefendersRealm(SettingsRepository settingsRepository, UserRepository userRepo, Configuration config) {
+    public CodeDefendersRealm(SettingsRepository settingsRepository, UserRepository userRepo, Configuration config,
+            MetricsService metricsService) {
         super(
                 new AbstractCacheManager() {
                     @Override
                     protected Cache<Object, Object> createCache(String s) throws CacheException {
                         com.google.common.cache.Cache<Object, Object> cache = CacheBuilder.newBuilder()
+                                .recordStats()
                                 .build();
+
+                        metricsService.registerGuavaCache("shiroCache_" + s, cache);
 
                         return new GuavaCache(cache);
                     }

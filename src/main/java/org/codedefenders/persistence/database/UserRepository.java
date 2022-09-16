@@ -36,6 +36,7 @@ import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.transaction.Transactional;
+import org.codedefenders.service.MetricsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,12 +61,12 @@ public class UserRepository {
     private final QueryRunner queryRunner;
 
     @Inject
-    public UserRepository(QueryRunner queryRunner) {
+    public UserRepository(QueryRunner queryRunner, MetricsService metricsService) {
         this.queryRunner = queryRunner;
 
         userIdForPlayerIdCache = CacheBuilder.newBuilder()
                 .maximumSize(400)
-                //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
+                .recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
                 .build(
                         new CacheLoader<Integer, Integer>() {
                             @Override
@@ -76,6 +77,8 @@ public class UserRepository {
                             }
                         }
                 );
+
+        metricsService.registerGuavaCache("userIdForPlayerId", userIdForPlayerIdCache);
     }
 
     /**

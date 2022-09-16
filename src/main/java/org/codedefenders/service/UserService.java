@@ -53,7 +53,7 @@ public class UserService {
     private final UserRepository userRepo;
 
     @Inject
-    public UserService(UserRepository userRepo) {
+    public UserService(UserRepository userRepo, MetricsService metricsService) {
         this.userRepo = userRepo;
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
@@ -62,9 +62,10 @@ public class UserService {
                 // places where SimpleUser objects are used.
                 .expireAfterWrite(30, TimeUnit.SECONDS)
                 .maximumSize(200)
-                //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
+                .recordStats()
                 .build(
                         new CacheLoader<Integer, SimpleUser>() {
+                            @Nonnull
                             @Override
                             public SimpleUser load(@Nonnull Integer userId) throws Exception {
                                 return getSimpleUserByIdInternal(userId)
@@ -72,6 +73,8 @@ public class UserService {
                             }
                         }
                 );
+
+        metricsService.registerGuavaCache("simpleUserForUserId", simpleUserForUserIdCache);
     }
 
 

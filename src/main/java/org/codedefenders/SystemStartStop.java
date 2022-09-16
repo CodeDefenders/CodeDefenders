@@ -31,10 +31,12 @@ import javax.servlet.annotation.WebListener;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.execution.ThreadPoolManager;
+import org.codedefenders.service.MetricsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
+import io.prometheus.client.exporter.MetricsServlet;
 
 @WebListener
 public class SystemStartStop implements ServletContextListener {
@@ -46,6 +48,9 @@ public class SystemStartStop implements ServletContextListener {
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
+
+    @Inject
+    MetricsService metricsService;
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -62,6 +67,10 @@ public class SystemStartStop implements ServletContextListener {
         }
         mgr.register("test-executor").withMax(4).withCore(2).add();
 
+        if (config.isMetricsCollectionEnabled()) {
+            metricsService.registerDefaultCollectors();
+            sce.getServletContext().addServlet("prom", new MetricsServlet()).addMapping("/metrics");
+        }
     }
 
     /**

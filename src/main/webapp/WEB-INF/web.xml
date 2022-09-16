@@ -80,6 +80,14 @@
 	<!-- End Filter Declarations -->
 
 	<!-- Begin Filter Mapping/Ordering -->
+	<!-- You will most likely want this to be the first filter in the chain
+	(therefore the first <filter-mapping> in the web.xml file), so that you can get
+	the most accurate measurement of latency. -->
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
+		<filter-name>metricsFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>TransactionCleanupFilter</filter-name>
 		<url-pattern>/*</url-pattern>

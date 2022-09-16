@@ -102,6 +102,8 @@ public class Configuration {
 
     protected String authAdminRole;
 
+    protected Boolean metrics;
+
     /**
      * Validates the currently configured Configuration.
      *
@@ -389,6 +391,10 @@ public class Configuration {
 
     public int getNumberOfKillmapThreads() {
         return 40;
+    }
+
+    public boolean isMetricsCollectionEnabled() {
+        return metrics;
     }
 
     public String getAuthAdminRole() {

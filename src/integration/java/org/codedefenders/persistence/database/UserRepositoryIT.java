@@ -27,6 +27,7 @@ import org.codedefenders.DatabaseTest;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.UserEntity;
+import org.codedefenders.service.MetricsService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.mockito.Mockito.mock;
 
 @Category(DatabaseTest.class)
 public class UserRepositoryIT {
@@ -51,7 +53,7 @@ public class UserRepositoryIT {
 
     @Before
     public void setUp() throws Exception {
-        userRepo = new UserRepository(databaseRule.getQueryRunner());
+        userRepo = new UserRepository(databaseRule.getQueryRunner(), mock(MetricsService.class));
     }
 
     private final String username1 = "user";
