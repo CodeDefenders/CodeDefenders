@@ -82,7 +82,8 @@
                         <label for="password" class="form-label">Password</label>
                         <input id="password" type="password" class="form-control"
                                name="password" placeholder="Password"
-                               minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
+                               minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*"
+                               autocomplete="new-password">
                         <div class="invalid-feedback">
                             Please enter a valid password.
                         </div>
@@ -90,7 +91,8 @@
 
                     <div>
                         <input id="confirm_password" type="password" class="form-control"
-                               name="confirm_password" placeholder="Confirm Password" aria-label="Confirm Password">
+                               name="confirm_password" placeholder="Confirm Password" aria-label="Confirm Password"
+                               autocomplete="new-password">
                         <div class="invalid-feedback" id="confirm-password-feedback">
                             Please confirm your password.
                         </div>
