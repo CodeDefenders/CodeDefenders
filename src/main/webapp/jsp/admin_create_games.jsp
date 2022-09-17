@@ -752,15 +752,20 @@
         const createStagedGamePlayersTable = function (stagedGame) {
             const attackers = stagedGame.attackers.map(userInfos.get, userInfos)
             const defenders = stagedGame.defenders.map(userInfos.get, userInfos);
+            const creator = userInfos.get(loggedInUserId);
+            const creatorRole = stagedGame.gameSettings.creatorRole;
 
             const table = document.createElement('table');
-            table.classList.add('staged-game-players');
+            table.classList.add('staged-game-players', 'table', 'table-sm', 'table-borderless', 'table-v-align-middle');
             table.style.width = '100%';
 
             if (stagedGame.gameSettings.gameType === GameType.MELEE.name) {
                 const players = [...attackers, ...defenders];
                 players.sort((a, b) => a.user.id - b.user.id);
 
+                if (creatorRole === Role.PLAYER.name) {
+                    addCreatorRow(table, stagedGame, creator, creatorRole);
+                }
                 for (const player of players) {
                     addStagedGamePlayersRow(table, stagedGame, player, Role.PLAYER.name);
                 }
@@ -768,8 +773,14 @@
                 attackers.sort((a, b) => a.user.id - b.user.id);
                 defenders.sort((a, b) => a.user.id - b.user.id);
 
+                if (creatorRole === Role.ATTACKER.name) {
+                    addCreatorRow(table, stagedGame, creator, Role.ATTACKER.name);
+                }
                 for (const attacker of attackers) {
                     addStagedGamePlayersRow(table, stagedGame, attacker, Role.ATTACKER.name);
+                }
+                if (creatorRole === Role.DEFENDER.name) {
+                    addCreatorRow(table, stagedGame, creator, Role.DEFENDER.name);
                 }
                 for (const defender of defenders) {
                     addStagedGamePlayersRow(table, stagedGame, defender, Role.DEFENDER.name);
@@ -777,6 +788,61 @@
             }
 
             return table.outerHTML;
+        };
+
+        /**
+         * Adds a row to the players table for a staged game.
+         * @param {HTMLTableElement} table The table to add the row to.
+         * @param {StagedGame} stagedGame The staged game the row is for.
+         * @param {UserInfo} userInfo The user assigned to the staged game.
+         * @param {String} role The role of the user.
+         */
+        const addCreatorRow = function (table, stagedGame, userInfo, role) {
+            const tr = table.insertRow();
+            tr.setAttribute('data-user-id', userInfo.user.id);
+            if (role === Role.ATTACKER.name) {
+                tr.classList.add('bg-attacker-light');
+            } else if (role === Role.DEFENDER.name) {
+                tr.classList.add('bg-defender-light');
+            }
+
+            const userNameCell = tr.insertCell();
+            userNameCell.style.paddingLeft = '1em';
+            userNameCell.style.width = '20%';
+            userNameCell.textContent = userInfo.user.username;
+
+            const lastRoleCell = tr.insertCell();
+            lastRoleCell.style.width = '15%';
+            lastRoleCell.innerHTML = renderUserLastRole(userInfo.lastRole, 'display');
+
+            const totalScoreCell = tr.insertCell();
+            totalScoreCell.style.width = '8%';
+            totalScoreCell.textContent = userInfo.totalScore;
+
+            const switchRolesCell = tr.insertCell();
+            switchRolesCell.style.width = '0px';
+            switchRolesCell.innerHTML =
+                    `<button class="switch-creator-role-button btn btn-sm btn-primary" title="Switch your role">
+                         <i class="fa fa-exchange"></i>
+                     </button>`;
+
+            /* Hide switch role button for melee games. */
+            if (role === Role.PLAYER.name) {
+                switchRolesCell.firstChild.style.visibility = 'hidden';
+            }
+
+            const removeCell = tr.insertCell();
+            removeCell.style.width = '0px';
+            removeCell.innerHTML =
+                    `<button class="remove-creator-button btn btn-sm btn-danger" title="Change to Observer">
+                         <i class="fa fa-trash"></i>
+                     </button>`;
+
+            const moveGameIdCell = tr.insertCell();
+            moveGameIdCell.style.width = '5em';
+
+            const paddingCell = tr.insertCell();
+            paddingCell.colSpan = 3;
         };
 
         /**
@@ -816,7 +882,7 @@
                      </button>`;
 
             /* Hide switch role button for melee games. */
-            if (role === 'PLAYER') {
+            if (role === Role.PLAYER.name) {
                 switchRolesCell.firstChild.style.visibility = 'hidden';
             }
 
@@ -1131,6 +1197,16 @@
                 });
             });
 
+            /* Switch creator role. */
+            $(stagedGamesTable.table().node()).on('click', '.switch-creator-role-button', function () {
+                const outerTr = $(this).parents('tr').get(1);
+                const stagedGame = stagedGamesTable.row(outerTr).data();
+                postForm({
+                    formType: 'switchCreatorRole',
+                    gameId: 'T' + stagedGame.id,
+                });
+            });
+
             /* Remove a player from a staged game. */
             $(stagedGamesTable.table().node()).on('click', '.remove-player-button', function () {
                 const innerTr = $(this).parents('tr').get(0);
@@ -1139,6 +1215,16 @@
                 postForm({
                     formType: 'removePlayerFromStagedGame',
                     userId: innerTr.getAttribute('data-user-id'),
+                    gameId: 'T' + stagedGame.id,
+                });
+            });
+
+            /* Remove creator from staged game. */
+            $(stagedGamesTable.table().node()).on('click', '.remove-creator-button', function () {
+                const outerTr = $(this).parents('tr').get(1);
+                const stagedGame = stagedGamesTable.row(outerTr).data();
+                postForm({
+                    formType: 'removeCreatorFromStagedGame',
                     gameId: 'T' + stagedGame.id,
                 });
             });
