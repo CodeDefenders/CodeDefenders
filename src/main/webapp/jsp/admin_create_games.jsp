@@ -679,6 +679,10 @@
                 option.value = String(gameId);
                 gameIdSelect.add(option);
             }
+            debugger;
+            if (stagedGamesTableData.length === 0 && activeGameIds.length === 0) {
+                gameIdSelect.disabled = true;
+            }
 
             const roleCell = tr.insertCell();
             roleCell.style.width = '8em';
@@ -686,6 +690,7 @@
             /* The role select is generated empty, as options are set based on the type of the selected game. */
             const roleSelect = document.createElement('select');
             roleSelect.classList.add('add-player-role');
+            roleSelect.disabled = true;
             roleCell.appendChild(roleSelect);
 
             const addToGameCell = tr.insertCell();
@@ -908,12 +913,16 @@
                     gameIdSelect.add(option);
                 }
             }
+            if (stagedGames.size === 1) {
+                gameIdSelect.disabled = true;
+            }
 
             const moveRoleCell = tr.insertCell();
             moveRoleCell.style.width = '8em';
 
             const roleSelect = document.createElement('select');
             roleSelect.classList.add('move-player-role');
+            roleSelect.disabled = true;
             moveRoleCell.appendChild(roleSelect);
 
             const moveButtonCell = tr.insertCell();
@@ -934,6 +943,7 @@
         const adjustFormForGame = function (roleSelect, submitButton, gameIdStr) {
             roleSelect.innerHTML = '';
             submitButton.disabled = true;
+            roleSelect.disabled = true;
 
             let gameType;
             if (gameIdStr.startsWith('T')) {
@@ -957,12 +967,14 @@
                 defenderOption.textContent = Role.DEFENDER.display;
                 defenderOption.value = Role.DEFENDER.name;
                 roleSelect.appendChild(defenderOption);
+                roleSelect.disabled = false;
                 submitButton.disabled = false;
             } else if (gameType === GameType.MELEE.name) {
                 const playerOption = document.createElement('option');
                 playerOption.textContent = Role.PLAYER.display;
                 playerOption.value = Role.PLAYER.name;
                 roleSelect.appendChild(playerOption);
+                roleSelect.disabled = false;
                 submitButton.disabled = false;
             }
         };
@@ -1324,8 +1336,12 @@
                     className: 'selected'
                 },
                 drawCallback: function () {
+                    const table = this.api().table().container();
+
                     /* Select nothing in all selects in the table. */
-                    $(this).find('select').prop('selectedIndex', -1);
+                    for (const select of table.querySelectorAll('select')) {
+                        select.selectedIndex = -1;
+                    }
                 },
                 order: [[5, 'asc']],
                 scrollY: '600px',
