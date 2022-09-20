@@ -34,9 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.dto.TestDTO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -86,7 +86,7 @@ public class GameChatAPI extends HttpServlet {
         final int limit = ServletUtils.getIntParameter(request, "limit").orElse(DEFAULT_LIMIT);
         final int gameId = gameIdOpt.get();
 
-        final Role role = DatabaseAccess.getRole(login.getUserId(), gameId);
+        final Role role = GameDAO.getRole(login.getUserId(), gameId);
         if (role == Role.NONE || role == null) {
             logger.warn("Requesting user is not part of game.");
             response.setStatus(HttpStatus.SC_BAD_REQUEST);

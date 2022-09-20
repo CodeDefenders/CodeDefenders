@@ -49,9 +49,9 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
@@ -72,7 +72,6 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
@@ -196,7 +195,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
-                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
+                    int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
                     Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);;
 
                     // TODO
@@ -301,7 +300,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 /*
                  * Register the event to DB
                  */
-                DatabaseAccess.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
@@ -761,7 +760,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     // tests on the same class from different games
                     m.kill(Mutant.Equivalence.DECLARED_YES);
 
-                    PlayerDAO.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
+                    PlayerDAO.increasePlayerPoints(1, MutantDAO.getEquivalentDefenderId(m));
                     messages.add(message);
 
                     // Notify the attacker
@@ -774,7 +773,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
-                        int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+                        int defenderId = MutantDAO.getEquivalentDefenderId(m);
                         Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
                         notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
@@ -1031,7 +1030,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                         new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(event);
 
-                                DatabaseAccess.insertEquivalence(m, playerId);
+                                MutantDAO.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });

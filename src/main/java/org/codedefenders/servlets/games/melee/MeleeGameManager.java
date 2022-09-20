@@ -49,9 +49,9 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -205,7 +205,7 @@ public class MeleeGameManager extends HttpServlet {
         game.getMutantsMarkedEquivalentPending().stream().filter(m -> m.getPlayerId() == playerId).findFirst()
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
-                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
+                    int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
                     Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
                     // TODO This should be a better name
                     request.setAttribute("equivDefender", defender.orElse(null));
@@ -340,7 +340,7 @@ public class MeleeGameManager extends HttpServlet {
                 /*
                  * Register the event to DB
                  */
-                DatabaseAccess.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
@@ -1035,7 +1035,7 @@ public class MeleeGameManager extends HttpServlet {
 
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
-                                DatabaseAccess.insertEquivalence(m, playerId);
+                                MutantDAO.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });

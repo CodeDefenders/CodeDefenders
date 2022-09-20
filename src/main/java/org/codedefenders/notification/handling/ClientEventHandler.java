@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codedefenders.beans.game.GameChatBean;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.SimpleUser;
@@ -62,7 +61,7 @@ public class ClientEventHandler {
 
     public void visit(ClientGameChatEvent event) {
         GameChatDAO gameChatDAO = CDIUtil.getBeanFromCDI(GameChatDAO.class);
-        Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
+        Role role = GameDAO.getRole(user.getId(), event.getGameId());
 
         AbstractGame game = GameDAO.getGame(event.getGameId());
         if (game == null) {

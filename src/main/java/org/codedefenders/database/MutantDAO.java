@@ -421,4 +421,24 @@ public class MutantDAO {
                 DatabaseValue.of(mutantId));
         return Optional.ofNullable(kills).orElse(0);
     }
+
+    public static int getEquivalentDefenderId(Mutant m) {
+        String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
+        final Integer id = DB.executeQueryReturnValue(query,
+                rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
+        return Optional.ofNullable(id).orElse(-1);
+    }
+
+    public static boolean insertEquivalence(Mutant mutant, int defender) {
+        String query = String.join("\n",
+                "INSERT INTO equivalences (Mutant_ID, Defender_ID, Mutant_Points)",
+                "VALUES (?, ?, ?)"
+        );
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(mutant.getId()),
+                DatabaseValue.of(defender),
+                DatabaseValue.of(mutant.getScore())
+        };
+        return DB.executeUpdateQuery(query, values);
+    }
 }

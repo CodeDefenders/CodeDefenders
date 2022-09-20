@@ -38,8 +38,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Dependency;
@@ -82,7 +82,7 @@ public class ProjectExportManager extends HttpServlet {
             return;
         }
 
-        if (DatabaseAccess.getRole(login.getUserId(), gameId.get()) == Role.NONE) {
+        if (GameDAO.getRole(login.getUserId(), gameId.get()) == Role.NONE) {
             Redirect.redirectBack(request, response);
             return;
         }

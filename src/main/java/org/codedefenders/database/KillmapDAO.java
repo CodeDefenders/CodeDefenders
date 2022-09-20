@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @see KillMap
  */
 public class KillmapDAO {
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
+    private static final Logger logger = LoggerFactory.getLogger(KillmapDAO.class);
 
     // TODO: remove (hasKillMap will be replaced with progress)
     /**

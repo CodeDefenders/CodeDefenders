@@ -24,7 +24,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.persistence.database.LeaderboardRepository;
 import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
 
