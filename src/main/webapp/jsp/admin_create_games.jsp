@@ -679,7 +679,6 @@
                 option.value = String(gameId);
                 gameIdSelect.add(option);
             }
-            debugger;
             if (stagedGamesTableData.length === 0 && activeGameIds.length === 0) {
                 gameIdSelect.disabled = true;
             }
