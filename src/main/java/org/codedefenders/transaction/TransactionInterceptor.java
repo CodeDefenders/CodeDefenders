@@ -54,7 +54,7 @@ public class TransactionInterceptor implements Serializable { // TODO(Alex): Che
             }
         }
 
-        TransactionalExecution<Object> txExec = transaction -> {
+        TransactionalSupplier<Object> txExec = transaction -> {
             Object result = ctx.proceed();
             transaction.commit();
             return result;

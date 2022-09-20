@@ -60,7 +60,6 @@ public class DatabaseRule extends ExternalResource {
     }
 
     public Connection getConnection() throws SQLException {
-        logger.debug(dbConnectionUrl);
         return DriverManager.getConnection(dbConnectionUrl, username, password);
     }
 

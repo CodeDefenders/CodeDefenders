@@ -19,6 +19,7 @@
 
 package org.codedefenders.persistence.database.util;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -159,6 +160,39 @@ public class TransactionAwareQueryRunnerIT {
                 }
             }
         }
+    }
+
+    @Test
+    public void wrongClosingOrderThrows() throws Exception {
+        Transaction outerTx = transactionManager.startTransaction();
+
+        Transaction innerTx1 = transactionManager.startTransaction();
+
+        assertThrows(IllegalStateException.class, outerTx::close);
+
+        innerTx1.close();
+        outerTx.close();
+    }
+
+    @Test
+    public void commitWithoutCurrentlyActiveTransactionThrows() throws Exception {
+        TransactionAwareQueryRunner txAwareQueryRunner = (TransactionAwareQueryRunner) transactionManager;
+
+        Transaction outerTx = transactionManager.startTransaction();
+
+        Field field = TransactionAwareQueryRunner.class.getDeclaredField("transaction");
+        field.setAccessible(true);
+        ThreadLocal<Transaction> transactionThreadLocal = (ThreadLocal<Transaction>) field.get(txAwareQueryRunner);
+
+        Transaction tx = transactionThreadLocal.get();
+
+        transactionThreadLocal.remove();
+
+        assertThrows(IllegalStateException.class, outerTx::commit);
+
+        transactionThreadLocal.set(tx);
+
+        outerTx.close();
     }
 
     @Test

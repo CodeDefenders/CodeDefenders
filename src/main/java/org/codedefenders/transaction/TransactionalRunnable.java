@@ -22,28 +22,20 @@ package org.codedefenders.transaction;
 import java.sql.SQLException;
 
 /**
- * Interface which provides methods for committing and closing and thereby aborting a transaction.
+ * This is a functional interface for executing code, which can throw exceptions, within a transaction.
  *
  * @author degenhart
  */
-public interface Transaction extends AutoCloseable {
+@FunctionalInterface
+public interface TransactionalRunnable {
 
-    String getTransactionIdentifier();
-
-    /**
-     * Commit any changes made in this transaction.
-     *
-     * @throws SQLException if a database access error occurs
-     */
-    void commit() throws SQLException;
+    // TODO: Should we limit the thrown exceptions?!
 
     /**
-     * Closes the underlying connection and aborts the transaction (which will roll back any changes made) if it was not
-     * already committed.
+     * Execute this function within a {@link Transaction}.
      *
-     * <p>This method is idempotent. Calling {@code close()} on an already closed connection is a no-op.
-     *
+     * @param transaction The transaction active for the code execution.
      * @throws SQLException if a database access error occurs
      */
-    void close() throws SQLException;
+    void executeInTransaction(Transaction transaction) throws Exception;
 }

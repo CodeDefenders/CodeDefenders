@@ -1,6 +1,7 @@
 package org.codedefenders.servlets.registration;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -37,8 +38,12 @@ public class UserServlet extends HttpServlet {
                 messages.add("Could not create user. Password entries did not match.");
             } else {
 
-                String result = userService.registerUser(username, password, email);
-                messages.add(result);
+                Optional<String> result = userService.registerUser(username, password, email);
+                if (!result.isPresent()) {
+                    messages.add("Your user has been created. You can login now.");
+                } else {
+                    messages.add(result.get());
+                }
             }
             response.sendRedirect(request.getContextPath() + Paths.LOGIN);
         } else { // Anything different from "create" is an error, so we not allow it

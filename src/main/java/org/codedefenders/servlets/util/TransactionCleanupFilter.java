@@ -30,6 +30,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.transaction.TransactionManager;
 
 @WebFilter(filterName = "TransactionCleanupFilter")
@@ -47,7 +48,7 @@ public class TransactionCleanupFilter implements Filter {
         try {
             transactionManager.terminateTransaction();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedSQLException(e);
         }
     }
 }

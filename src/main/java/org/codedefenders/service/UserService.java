@@ -154,10 +154,10 @@ public class UserService {
      * Perform a registration with the provided parameters.
      */
     @Nonnull
-    public String registerUser(String username, String password, String email) {
+    public Optional<String> registerUser(String username, String password, String email) {
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
-        String result;
+        String result = null;
 
         // TODO(Alex): Change result messages so enumeration attacks are not possible.
         //  See: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html#authentication-and-error-messages
@@ -179,15 +179,13 @@ public class UserService {
             result = "Could not create user. Email has already been used. You can reset your password.";
         } else {
             UserEntity newUser = new UserEntity(username, UserEntity.encodePassword(password), email);
-            if (userRepo.insert(newUser).isPresent()) {
-                result = "Your user has been created. You can login now.";
-            } else {
+            if (!userRepo.insert(newUser).isPresent()) {
                 // TODO: How about some error handling?
                 result = "Could not create user.";
             }
         }
 
-        return result;
+        return Optional.ofNullable(result);
     }
 
 

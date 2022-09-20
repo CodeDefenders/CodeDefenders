@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.codedefenders.transaction;
 
 import java.sql.SQLException;
@@ -16,9 +35,9 @@ import javax.annotation.Nullable;
  * <p>Nested transactions are realized via savepoint.
  *
  * <p>This interface provides two methods:
- * {@link #startTransaction()} and {@link #executeInTransaction(TransactionalExecution)}
+ * {@link #startTransaction()} and {@link #executeInTransaction(TransactionalSupplier)}
  *
- * <p>In most cases {@link #executeInTransaction(TransactionalExecution)} should be used instead of
+ * <p>In most cases {@link #executeInTransaction(TransactionalSupplier)} should be used instead of
  * {@link #startTransaction()}.<br>
  * The only advantage the later one provides, is the ability to spread the start and the end (either 'commit' or
  * 'rollback') over multiple methods. This is strongly discouraged, because it will be very hard to ensure every started
@@ -26,7 +45,7 @@ import javax.annotation.Nullable;
  *
  * @author degenhart
  * @see Transaction
- * @see TransactionalExecution
+ * @see TransactionalSupplier
  */
 public interface TransactionManager {
 
@@ -62,7 +81,7 @@ public interface TransactionManager {
 
     /**
      * This will begin a new database-{@link Transaction} specific to the current thread, and execute the provided
-     * {@link TransactionalExecution} {@code execution} with the current {@link Transaction} as parameter.
+     * {@link TransactionalSupplier} {@code execution} with the current {@link Transaction} as parameter.
      *
      * <p>The transaction will automatically be aborted before this method call ends and if it was not committed
      * already. E.g. if {@code execution} throws any {@link Exception}.
@@ -70,8 +89,13 @@ public interface TransactionManager {
      * @param execution The code to execute within the current transaction.
      * @throws Exception if a {@code Exception} occurred in the {@code execution}
      */
-    <T> T executeInTransaction(@Nonnull TransactionalExecution<T> execution) throws Exception;
+    <T> T executeInTransaction(@Nonnull TransactionalSupplier<T> execution) throws Exception;
 
-    <T> T executeInTransaction(@Nonnull TransactionalExecution<T> execution,
+    <T> T executeInTransaction(@Nonnull TransactionalSupplier<T> execution,
+            @Nullable Integer transactionIsolation) throws Exception;
+
+    void executeInTransaction(@Nonnull TransactionalRunnable execution) throws Exception;
+
+    void executeInTransaction(@Nonnull TransactionalRunnable execution,
             @Nullable Integer transactionIsolation) throws Exception;
 }
