@@ -14,7 +14,7 @@ public class ServerGameChatEvent extends ServerChatEvent {
     @Expose private int senderId;
 
     /**
-     * The user name of the sender.
+     * The username of the sender.
      */
     @Expose private String senderName;
 

@@ -89,8 +89,8 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
 
         if (currentTransaction != null) {
             try {
-                if (transactionIsolation != null &&
-                        transactionIsolation > currentTransaction.getConnection().getTransactionIsolation()) {
+                if (transactionIsolation != null
+                        && transactionIsolation > currentTransaction.getConnection().getTransactionIsolation()) {
                     throw new IllegalArgumentException("Requested higher transaction isolation as the current running"
                             + "transaction can provide");
                 }

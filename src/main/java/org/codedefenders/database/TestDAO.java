@@ -79,15 +79,15 @@ public class TestDAO {
         List<Integer> linesCovered = new ArrayList<>();
         if (linesCoveredString != null && !linesCoveredString.isEmpty()) {
             linesCovered.addAll(Arrays.stream(linesCoveredString.split(","))
-                            .map(Integer::parseInt)
-                            .collect(Collectors.toList()));
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList()));
         }
 
         List<Integer> linesUncovered = new ArrayList<>();
         if (linesUncoveredString != null && !linesUncoveredString.isEmpty()) {
             linesUncovered.addAll(Arrays.stream(linesUncoveredString.split(","))
-                            .map(Integer::parseInt)
-                            .collect(Collectors.toList()));
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList()));
         }
 
         return new Test(testId, classId, gameId, absoluteJavaFile, absoluteClassFile, roundCreated, mutantsKilled,
@@ -333,11 +333,11 @@ public class TestDAO {
 
         String query = "UPDATE tests SET mutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
         DatabaseValue[] values = new DatabaseValue[]{
-            DatabaseValue.of(mutantsKilled),
-            DatabaseValue.of(linesCoveredString),
-            DatabaseValue.of(linesUncoveredString),
-            DatabaseValue.of(score),
-            DatabaseValue.of(testId)
+                DatabaseValue.of(mutantsKilled),
+                DatabaseValue.of(linesCoveredString),
+                DatabaseValue.of(linesUncoveredString),
+                DatabaseValue.of(score),
+                DatabaseValue.of(testId)
         };
 
         return DB.executeUpdateQuery(query, values);

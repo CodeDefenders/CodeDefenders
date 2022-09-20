@@ -46,6 +46,7 @@ import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
 @WebServlet(Paths.PASSWORD)
 public class PasswordServlet extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(PasswordServlet.class);
 
     @Inject
     private MessagesBean messages;
@@ -55,8 +56,6 @@ public class PasswordServlet extends HttpServlet {
 
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
-
-    private static final Logger logger = LoggerFactory.getLogger(PasswordServlet.class);
 
     private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
             + "This link is only valid for %d hours.\n\n" + "Greetings, your Code Defenders team";
