@@ -253,6 +253,7 @@
                         <div class="col-12">
                             <div class="mb-2">
                                 <label for="changepw-password-input" class="form-label">Password</label>
+                                <!-- TODO(Alex): Increase maxLength. OWASP says: "A common maximum length is 64 characters due to limitations in certain hashing algorithms […]"  -->
                                 <input type="password" class="form-control" id="changepw-password-input" name="inputPasswordChange" placeholder="Password"
                                        required minlength="<%=pwMinLength%>" maxlength="20" pattern="[a-zA-Z0-9]*">
                                 <div class="invalid-feedback">

@@ -41,7 +41,7 @@ public class LeaderboardRepositoryIT {
 
     @Before
     public void setup() throws SQLException {
-        leaderboardRepo = new LeaderboardRepository(databaseRule.getConnectionFactory());
+        leaderboardRepo = new LeaderboardRepository(databaseRule.getQueryRunner());
     }
 
     @Test

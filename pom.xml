@@ -846,6 +846,14 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- Annotations -->
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+			<version>13.0</version>
+			<scope>compile</scope>
+		</dependency>
+
 		<!-- Begin Misc Dependencies -->
 		<dependency>
 			<groupId>mysql</groupId>

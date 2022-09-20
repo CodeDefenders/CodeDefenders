@@ -194,7 +194,7 @@ public class AdminUserManagementIT {
 
             Field fieldUserRepo = AdminUserManagement.class.getDeclaredField("userRepo");
             fieldUserRepo.setAccessible(true);
-            UserRepository userRepo = new UserRepository(db.getConnectionFactory());
+            UserRepository userRepo = new UserRepository(db.getQueryRunner());
             fieldUserRepo.set(adminUserManagement, userRepo);
 
             Field fieldMessages = AdminUserManagement.class.getDeclaredField("messages");

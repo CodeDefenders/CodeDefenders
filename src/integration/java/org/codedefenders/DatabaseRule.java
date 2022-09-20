@@ -24,16 +24,17 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbutils.QueryRunner;
 import org.codedefenders.database.ConnectionFactory;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.persistence.database.util.TransactionAwareQueryRunner;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.configuration.FluentConfiguration;
 import org.junit.rules.ExternalResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Jose Rojas, Alessio Gambi
@@ -41,38 +42,34 @@ import static org.mockito.Mockito.when;
 public class DatabaseRule extends ExternalResource {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseRule.class);
 
-    private String dbConnectionUrl;
-
+    private final String dbConnectionUrl = "jdbc:mysql://database:3306/codedefenders";
     private final String username = "root";
     private final String password = "";
 
+    public QueryRunner getQueryRunner() throws SQLException {
+        return new TransactionAwareQueryRunner(getConnectionFactory());
+    }
+
     public ConnectionFactory getConnectionFactory() throws SQLException {
         DataSource dataSourceMock = mock(DataSource.class);
-        when(dataSourceMock.getConnection()).thenAnswer(invocation -> getConnection());
-        QueryRunner queryRunner = new QueryRunner(dataSourceMock);
+        doAnswer(invocation -> getConnection()).when(dataSourceMock).getConnection();
 
         ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
-        when(connectionFactory.getConnection()).thenAnswer(invocation -> getConnection());
-        when(connectionFactory.getQueryRunner()).thenReturn(queryRunner);
+        doAnswer(invocation -> getConnection()).when(connectionFactory).getConnection();
         return connectionFactory;
     }
 
     public Connection getConnection() throws SQLException {
-        logger.debug(dbConnectionUrl);
         return DriverManager.getConnection(dbConnectionUrl, username, password);
     }
 
     @Override
     public void before() throws Exception {
-        logger.debug("Started Embedded Database creation");
-
-        dbConnectionUrl = "jdbc:mysql://database:3306/codedefenders";
-        logger.debug("Finished Embedded Database creation");
+        logger.debug("Started Database Migrations");
 
         // Load the Database Driver
         Class.forName("com.mysql.cj.jdbc.Driver");
 
-        logger.debug("Started Database Migrations");
         FluentConfiguration flywayConfig = Flyway.configure();
         flywayConfig.dataSource(dbConnectionUrl, username, password);
         flywayConfig.locations("classpath:db/migrations");

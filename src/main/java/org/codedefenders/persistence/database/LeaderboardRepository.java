@@ -29,19 +29,19 @@ import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.ConnectionFactory;
+import org.codedefenders.persistence.database.util.QueryRunner;
 import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.persistence.database.DatabaseUtils.listFromRS;
-import static org.codedefenders.persistence.database.DatabaseUtils.nextFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.listFromRS;
+import static org.codedefenders.persistence.database.util.ResultSetUtils.oneFromRS;
 
 @ApplicationScoped
 public class LeaderboardRepository {
     private static final Logger logger = LoggerFactory.getLogger(LeaderboardRepository.class);
 
-    private final ConnectionFactory connectionFactory;
+    private final QueryRunner queryRunner;
 
     private static final String baseQuery = "SELECT U.username AS username, "
             + "  IFNULL(NMutants,0) AS NMutants, "
@@ -70,8 +70,8 @@ public class LeaderboardRepository {
             + ") AS Player ON U.User_ID = Player.User_ID ";
 
     @Inject
-    public LeaderboardRepository(ConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
+    public LeaderboardRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
     }
 
     @Nonnull
@@ -80,7 +80,7 @@ public class LeaderboardRepository {
                 + ";";
 
         try {
-            return connectionFactory.getQueryRunner()
+            return queryRunner
                     .query(query, rs -> listFromRS(rs, LeaderboardRepository::leaderboardEntryFromRS));
         } catch (SQLException e) {
             logger.error("Exception while querying leaderboard", e);
@@ -95,9 +95,8 @@ public class LeaderboardRepository {
                 + " WHERE U.user_id = ?;";
 
         try {
-            return connectionFactory.getQueryRunner()
-                    .query(query, rs -> nextFromRS(rs, LeaderboardRepository::leaderboardEntryFromRS),
-                            userId);
+            return queryRunner
+                    .query(query, rs -> oneFromRS(rs, LeaderboardRepository::leaderboardEntryFromRS), userId);
         } catch (SQLException e) {
             logger.error("Exception while querying score for userId {}", userId, e);
         }
