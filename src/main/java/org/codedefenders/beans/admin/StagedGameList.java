@@ -12,12 +12,14 @@ import java.util.Set;
 
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.Role;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
 
 import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
 import static org.codedefenders.game.GameLevel.HARD;
+import static org.codedefenders.game.Role.OBSERVER;
 import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
 
 /**
@@ -293,6 +295,7 @@ public class StagedGameList implements Serializable {
         @Expose private Boolean captureIntentions;
         @Expose private Integer equivalenceThreshold;
         @Expose private GameLevel level;
+        @Expose private Role creatorRole;
 
         @Expose private Boolean startGame;
 
@@ -318,6 +321,7 @@ public class StagedGameList implements Serializable {
             this.captureIntentions = other.captureIntentions;
             this.equivalenceThreshold = other.equivalenceThreshold;
             this.level = other.level;
+            this.creatorRole = other.creatorRole;
             this.startGame = other.startGame;
         }
 
@@ -401,6 +405,14 @@ public class StagedGameList implements Serializable {
             this.level = level;
         }
 
+        public Role getCreatorRole() {
+            return creatorRole;
+        }
+
+        public void setCreatorRole(Role creatorRole) {
+            this.creatorRole = creatorRole;
+        }
+
         public boolean isStartGame() {
             return startGame;
         }
@@ -420,6 +432,7 @@ public class StagedGameList implements Serializable {
             gameSettings.setCaptureIntentions(false);
             gameSettings.setEquivalenceThreshold(0);
             gameSettings.setLevel(HARD);
+            gameSettings.setCreatorRole(OBSERVER);
             gameSettings.setStartGame(false);
             return gameSettings;
         }
@@ -428,7 +441,7 @@ public class StagedGameList implements Serializable {
             MULTIPLAYER("Multiplayer"),
             MELEE("Melee");
 
-            String name;
+            private final String name;
 
             GameType(String name) {
                 this.name = name;

@@ -114,9 +114,14 @@ public class AdminCreateGames extends HttpServlet {
                     break;
                 case "removePlayerFromStagedGame":
                     removePlayerFromStagedGame(request);
+                case "removeCreatorFromStagedGame":
+                    removeCreatorFromStagedGame(request);
                     break;
                 case "switchRole":
                     switchRole(request);
+                    break;
+                case "switchCreatorRole":
+                    switchCreatorRole(request);
                     break;
                 case "movePlayerBetweenStagedGames":
                     movePlayerBetweenStagedGames(request);
@@ -150,6 +155,7 @@ public class AdminCreateGames extends HttpServlet {
             gameSettings.setMaxAssertionsPerTest(getIntParameter(request, "maxAssertionsPerTest").get());
             gameSettings.setMutantValidatorLevel(
                     CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel")));
+            gameSettings.setCreatorRole(Role.valueOf(request.getParameter("creatorRole")));
             gameSettings.setChatEnabled(request.getParameter("chatEnabled") != null);
             gameSettings.setCaptureIntentions(request.getParameter("captureIntentions") != null);
             gameSettings.setEquivalenceThreshold(
@@ -169,7 +175,7 @@ public class AdminCreateGames extends HttpServlet {
 
     /**
      * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGamesWithUsers(Set,
-     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int) AdminCreateGamesBean#stageGames()}.
+     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int, int) AdminCreateGamesBean#stageGames()}.
      * @param request The HTTP request.
      */
     private void stageGamesWithUsers(HttpServletRequest request) {
@@ -417,6 +423,34 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     /**
+     * Extract and validate POST parameters and forward them to
+     * {@link AdminCreateGamesBean#removeCreatorFromStagedGame(StagedGame)}
+     * AdminCreateGamesBean#removeCreatorFromStagedGame()}.
+     * @param request The HTTP request.
+     */
+    private void removeCreatorFromStagedGame(HttpServletRequest request) {
+        int gameId;
+        try {
+            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
+        } catch (NullPointerException e) {
+            messages.add("ERROR: Missing parameter.");
+            return;
+        } catch (NoSuchElementException | IllegalArgumentException e) {
+            messages.add("ERROR: Invalid parameter.");
+            return;
+        }
+
+        StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
+        if (stagedGame == null) {
+            messages.add(format("ERROR: Cannot remove you from staged game {1}. Staged game does not exist.",
+                    stagedGameList.numericToFormattedGameId(gameId)));
+            return;
+        }
+
+        adminCreateGamesBean.removeCreatorFromStagedGame(stagedGame);
+    }
+
+    /**
      * Extract and validate POST parameters for {@link AdminCreateGamesBean#switchRole(StagedGame, UserEntity)
      * AdminCreateGamesBean#switchRole()}.
      * @param request The HTTP request.
@@ -449,6 +483,33 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         adminCreateGamesBean.switchRole(stagedGame, user.getUser());
+    }
+
+    /**
+     * Extract and validate POST parameters for {@link AdminCreateGamesBean#switchCreatorRole(StagedGame)
+     * AdminCreateGamesBean#switchCreatorRole()}.
+     * @param request The HTTP request.
+     */
+    private void switchCreatorRole(HttpServletRequest request) {
+        int gameId;
+        try {
+            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
+        } catch (NullPointerException e) {
+            messages.add("ERROR: Missing parameter.");
+            return;
+        } catch (IllegalArgumentException | NoSuchElementException e) {
+            messages.add("ERROR: Invalid parameter.");
+            return;
+        }
+
+        StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
+        if (stagedGame == null) {
+            messages.add(format("ERROR: Cannot switch creator role in staged game {1}. Staged game does not exist.",
+                    stagedGameList.numericToFormattedGameId(gameId)));
+            return;
+        }
+
+        adminCreateGamesBean.switchCreatorRole(stagedGame);
     }
 
     /**

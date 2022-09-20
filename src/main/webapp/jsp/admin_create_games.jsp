@@ -32,6 +32,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
+<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -135,7 +136,7 @@
                             <div class="col-12">
                                 <label for="class-select" class="form-label">Class Under Test</label>
                                 <div class="input-group mb-2">
-                                    <select id="class-select" name="cut" class="form-control">
+                                    <select id="class-select" name="cut" class="form-control form-select">
                                         <% for (GameClass clazz : GameClassDAO.getAllPlayableClasses()) { %>
                                             <option value="<%=clazz.getId()%>"><%=clazz.getAlias()%></option>
                                         <% } %>
@@ -223,10 +224,20 @@
                                 <input class="form-control" type="number" id="equiv-threshold-input" name="automaticEquivalenceTrigger"
                                        value="0" min="0" required>
                             </div>
+
+                            <div class="col-12"
+                                 title="Select the role you will have in the game.">
+                                <label for="role-select" class="form-label">Your Role</label>
+                                <select id="role-select" name="creatorRole" class="form-control form-select">
+                                    <option value="OBSERVER" selected>Observer</option>
+                                    <option value="ATTACKER">Attacker</option>
+                                    <option value="DEFENDER">Defender</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="row g-2">
-                            <div class="col-12 multiplayer-specific"
+                        <div class="row g-2 mt-2">
+                            <div class="col-12"
                                  title="Forces players to specify the intentions of their mutants/tests before they can submit them.">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" type="checkbox" id="capture-intentions-switch" name="capturePlayersIntention">
@@ -477,6 +488,7 @@
         import DataTable from './js/datatables.mjs';
         import $ from './js/jquery.mjs';
 
+        const loggedInUserId = ${login.userId};
 
         /**
          *  Maps IDs to staged games.
@@ -581,6 +593,27 @@
             });
         };
 
+        /* Search function added to DataTables to filter the users table. */
+        const searchFunction = function(settings, renderedData, index, data, counter) {
+            /* Let this search function only affect the users table. */
+            if (settings.nTable.id !== 'table-users') {
+                return true;
+            }
+
+            /* Filter out logged-in user. */
+            if (data.user.id === loggedInUserId) {
+                return false;
+            }
+
+            if (showAssignedUsers) {
+                return true;
+            }
+
+            /* Filter out assigned users. */
+            return unassignedUserIds.has(data.user.id);
+        };
+        DataTable.ext.search.push(searchFunction);
+
         const renderUserLastRole = function (lastRole, type, row, meta) {
             switch (type) {
                 case 'type':
@@ -646,6 +679,9 @@
                 option.value = String(gameId);
                 gameIdSelect.add(option);
             }
+            if (stagedGamesTableData.length === 0 && activeGameIds.length === 0) {
+                gameIdSelect.disabled = true;
+            }
 
             const roleCell = tr.insertCell();
             roleCell.style.width = '8em';
@@ -653,6 +689,7 @@
             /* The role select is generated empty, as options are set based on the type of the selected game. */
             const roleSelect = document.createElement('select');
             roleSelect.classList.add('add-player-role');
+            roleSelect.disabled = true;
             roleCell.appendChild(roleSelect);
 
             const addToGameCell = tr.insertCell();
@@ -719,15 +756,20 @@
         const createStagedGamePlayersTable = function (stagedGame) {
             const attackers = stagedGame.attackers.map(userInfos.get, userInfos)
             const defenders = stagedGame.defenders.map(userInfos.get, userInfos);
+            const creator = userInfos.get(loggedInUserId);
+            const creatorRole = stagedGame.gameSettings.creatorRole;
 
             const table = document.createElement('table');
-            table.classList.add('staged-game-players');
+            table.classList.add('staged-game-players', 'table', 'table-sm', 'table-borderless', 'table-v-align-middle');
             table.style.width = '100%';
 
             if (stagedGame.gameSettings.gameType === GameType.MELEE.name) {
                 const players = [...attackers, ...defenders];
                 players.sort((a, b) => a.user.id - b.user.id);
 
+                if (creatorRole === Role.PLAYER.name) {
+                    addCreatorRow(table, stagedGame, creator, creatorRole);
+                }
                 for (const player of players) {
                     addStagedGamePlayersRow(table, stagedGame, player, Role.PLAYER.name);
                 }
@@ -735,8 +777,14 @@
                 attackers.sort((a, b) => a.user.id - b.user.id);
                 defenders.sort((a, b) => a.user.id - b.user.id);
 
+                if (creatorRole === Role.ATTACKER.name) {
+                    addCreatorRow(table, stagedGame, creator, Role.ATTACKER.name);
+                }
                 for (const attacker of attackers) {
                     addStagedGamePlayersRow(table, stagedGame, attacker, Role.ATTACKER.name);
+                }
+                if (creatorRole === Role.DEFENDER.name) {
+                    addCreatorRow(table, stagedGame, creator, Role.DEFENDER.name);
                 }
                 for (const defender of defenders) {
                     addStagedGamePlayersRow(table, stagedGame, defender, Role.DEFENDER.name);
@@ -744,6 +792,61 @@
             }
 
             return table.outerHTML;
+        };
+
+        /**
+         * Adds a row to the players table for a staged game.
+         * @param {HTMLTableElement} table The table to add the row to.
+         * @param {StagedGame} stagedGame The staged game the row is for.
+         * @param {UserInfo} userInfo The user assigned to the staged game.
+         * @param {String} role The role of the user.
+         */
+        const addCreatorRow = function (table, stagedGame, userInfo, role) {
+            const tr = table.insertRow();
+            tr.setAttribute('data-user-id', userInfo.user.id);
+            if (role === Role.ATTACKER.name) {
+                tr.classList.add('bg-attacker-light');
+            } else if (role === Role.DEFENDER.name) {
+                tr.classList.add('bg-defender-light');
+            }
+
+            const userNameCell = tr.insertCell();
+            userNameCell.style.paddingLeft = '1em';
+            userNameCell.style.width = '20%';
+            userNameCell.textContent = userInfo.user.username;
+
+            const lastRoleCell = tr.insertCell();
+            lastRoleCell.style.width = '15%';
+            lastRoleCell.innerHTML = renderUserLastRole(userInfo.lastRole, 'display');
+
+            const totalScoreCell = tr.insertCell();
+            totalScoreCell.style.width = '8%';
+            totalScoreCell.textContent = userInfo.totalScore;
+
+            const switchRolesCell = tr.insertCell();
+            switchRolesCell.style.width = '0px';
+            switchRolesCell.innerHTML =
+                    `<button class="switch-creator-role-button btn btn-sm btn-primary" title="Switch your role">
+                         <i class="fa fa-exchange"></i>
+                     </button>`;
+
+            /* Hide switch role button for melee games. */
+            if (role === Role.PLAYER.name) {
+                switchRolesCell.firstChild.style.visibility = 'hidden';
+            }
+
+            const removeCell = tr.insertCell();
+            removeCell.style.width = '0px';
+            removeCell.innerHTML =
+                    `<button class="remove-creator-button btn btn-sm btn-danger" title="Change to Observer">
+                         <i class="fa fa-trash"></i>
+                     </button>`;
+
+            const moveGameIdCell = tr.insertCell();
+            moveGameIdCell.style.width = '5em';
+
+            const paddingCell = tr.insertCell();
+            paddingCell.colSpan = 3;
         };
 
         /**
@@ -783,7 +886,7 @@
                      </button>`;
 
             /* Hide switch role button for melee games. */
-            if (role === 'PLAYER') {
+            if (role === Role.PLAYER.name) {
                 switchRolesCell.firstChild.style.visibility = 'hidden';
             }
 
@@ -809,12 +912,16 @@
                     gameIdSelect.add(option);
                 }
             }
+            if (stagedGames.size === 1) {
+                gameIdSelect.disabled = true;
+            }
 
             const moveRoleCell = tr.insertCell();
             moveRoleCell.style.width = '8em';
 
             const roleSelect = document.createElement('select');
             roleSelect.classList.add('move-player-role');
+            roleSelect.disabled = true;
             moveRoleCell.appendChild(roleSelect);
 
             const moveButtonCell = tr.insertCell();
@@ -835,6 +942,7 @@
         const adjustFormForGame = function (roleSelect, submitButton, gameIdStr) {
             roleSelect.innerHTML = '';
             submitButton.disabled = true;
+            roleSelect.disabled = true;
 
             let gameType;
             if (gameIdStr.startsWith('T')) {
@@ -858,12 +966,14 @@
                 defenderOption.textContent = Role.DEFENDER.display;
                 defenderOption.value = Role.DEFENDER.name;
                 roleSelect.appendChild(defenderOption);
+                roleSelect.disabled = false;
                 submitButton.disabled = false;
             } else if (gameType === GameType.MELEE.name) {
                 const playerOption = document.createElement('option');
                 playerOption.textContent = Role.PLAYER.display;
                 playerOption.value = Role.PLAYER.name;
                 roleSelect.appendChild(playerOption);
+                roleSelect.disabled = false;
                 submitButton.disabled = false;
             }
         };
@@ -924,6 +1034,10 @@
             tr = table.insertRow();
             tr.insertCell().textContent = 'Mutant Validator Level';
             tr.insertCell().textContent = CodeValidatorLevel[gameSettings.mutantValidatorLevel].display;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Creator Role';
+            tr.insertCell().textContent = Role[gameSettings.creatorRole].display;
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Chat Enabled';
@@ -1067,10 +1181,10 @@
 
             /* Select / deselect all visible staged games. */
             $('#select-visible-games').on('click', function () {
-                stagedGamesTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).select();
+                stagedGamesTable.rows({search: 'applied'}).select();
             })
             $('#deselect-visible-games').on('click', function () {
-                stagedGamesTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).deselect();
+                stagedGamesTable.rows({search: 'applied'}).deselect();
             });
 
             /* Set role options according to the game type when a game id is selected. */
@@ -1094,6 +1208,16 @@
                 });
             });
 
+            /* Switch creator role. */
+            $(stagedGamesTable.table().node()).on('click', '.switch-creator-role-button', function () {
+                const outerTr = $(this).parents('tr').get(1);
+                const stagedGame = stagedGamesTable.row(outerTr).data();
+                postForm({
+                    formType: 'switchCreatorRole',
+                    gameId: 'T' + stagedGame.id,
+                });
+            });
+
             /* Remove a player from a staged game. */
             $(stagedGamesTable.table().node()).on('click', '.remove-player-button', function () {
                 const innerTr = $(this).parents('tr').get(0);
@@ -1102,6 +1226,16 @@
                 postForm({
                     formType: 'removePlayerFromStagedGame',
                     userId: innerTr.getAttribute('data-user-id'),
+                    gameId: 'T' + stagedGame.id,
+                });
+            });
+
+            /* Remove creator from staged game. */
+            $(stagedGamesTable.table().node()).on('click', '.remove-creator-button', function () {
+                const outerTr = $(this).parents('tr').get(1);
+                const stagedGame = stagedGamesTable.row(outerTr).data();
+                postForm({
+                    formType: 'removeCreatorFromStagedGame',
                     gameId: 'T' + stagedGame.id,
                 });
             });
@@ -1201,20 +1335,12 @@
                     className: 'selected'
                 },
                 drawCallback: function () {
-                    /* Select nothing in all selects in the table. */
-                    $(this).find('select').prop('selectedIndex', -1);
+                    const table = this.api().table().container();
 
-                    /* Hide hidden users. */
-                    this.api().rows().every(function () {
-                        const userInfo = this.data();
-                        if (showAssignedUsers || unassignedUserIds.has(userInfo.user.id)) {
-                            userInfo._hidden = false;
-                            $(this.node()).show();
-                        } else {
-                            userInfo._hidden = true;
-                            $(this.node()).hide();
-                        }
-                    });
+                    /* Select nothing in all selects in the table. */
+                    for (const select of table.querySelectorAll('select')) {
+                        select.selectedIndex = -1;
+                    }
                 },
                 order: [[5, 'asc']],
                 scrollY: '600px',
@@ -1238,10 +1364,10 @@
 
             /* Select / deselect all visible users. */
             $('#select-visible-users').on('click', function () {
-                usersTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).select();
+                usersTable.rows({search: 'applied'}).select();
             })
             $('#deselect-visible-users').on('click', function () {
-                usersTable.rows((index, data, tr) => !data._hidden, {search: 'applied'}).deselect();
+                usersTable.rows({search: 'applied'}).deselect();
             });
 
             /* Set role options according to the game type when a game id is selected. */
@@ -1288,6 +1414,11 @@
 
             /* Toggle multiplayer/melee specific forms based on selected game type. */
             $('#gameType-group').on('change', function (event) {
+                const roleSelect = document.getElementById('role-select');
+                const observerOption = document.createElement('option');
+                observerOption.value = Role.OBSERVER.name;
+                observerOption.innerText = Role.OBSERVER.display;
+
                 switch (event.target.value) {
                     case 'MULTIPLAYER':
                         for (const element of document.querySelectorAll('.melee-specific')) {
@@ -1296,6 +1427,14 @@
                         for (const element of document.querySelectorAll('.multiplayer-specific')) {
                             element.removeAttribute('hidden');
                         }
+                        const attackerOption = document.createElement('option');
+                        attackerOption.value = Role.ATTACKER.name;
+                        attackerOption.innerText = Role.ATTACKER.display;
+                        const defenderOption = document.createElement('option');
+                        defenderOption.value = Role.DEFENDER.name;
+                        defenderOption.innerText = Role.DEFENDER.display;
+                        roleSelect.replaceChildren(observerOption, attackerOption, defenderOption);
+                        roleSelect.selectedIndex = 0;
                         break;
                     case 'MELEE':
                         for (const element of document.querySelectorAll('.multiplayer-specific')) {
@@ -1304,6 +1443,11 @@
                         for (const element of document.querySelectorAll('.melee-specific')) {
                             element.removeAttribute('hidden');
                         }
+                        const playerOption = document.createElement('option');
+                        playerOption.value = Role.PLAYER.name;
+                        playerOption.innerText = Role.PLAYER.display;
+                        roleSelect.replaceChildren(observerOption, playerOption);
+                        roleSelect.selectedIndex = 0;
                         break;
                 }
             });

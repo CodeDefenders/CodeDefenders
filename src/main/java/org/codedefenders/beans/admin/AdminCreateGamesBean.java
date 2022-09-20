@@ -262,7 +262,21 @@ public class AdminCreateGamesBean implements Serializable {
     }
 
     /**
+     * Removes the creator from a staged game, i.e. sets their Role to Observer.
+     *
+     * @param stagedGame The staged game.
+     */
+    public void removeCreatorFromStagedGame(StagedGame stagedGame) {
+        stagedGame.getGameSettings().setCreatorRole(Role.OBSERVER);
+        messages.add(format(
+                "Removed you from staged game {0}. Your role is now {1} again.",
+                stagedGame.getFormattedId(), Role.OBSERVER)
+        );
+    }
+
+    /**
      * Switches the role of a user assigned to a staged game.
+     *
      * @param stagedGame The staged game.
      * @param user The user.
      * @return {@code true} if the user's role could be switched, {@code false} if not.
@@ -282,6 +296,29 @@ public class AdminCreateGamesBean implements Serializable {
         }
         messages.add(format("Switched role of user {0} in staged game {1}.",
                 user.getId(), stagedGame.getFormattedId()));
+        return true;
+    }
+
+    /**
+     * Switches the creator's role of a staged game.
+     * @param stagedGame The staged game.
+     * @return {@code true} if the creator's role could be switched, {@code false} if not.
+     */
+    public boolean switchCreatorRole(StagedGame stagedGame) {
+        if (stagedGame.getGameSettings().getCreatorRole() == Role.PLAYER) {
+            stagedGame.getGameSettings().setCreatorRole(Role.PLAYER);
+        } else if (stagedGame.getGameSettings().getCreatorRole() == Role.ATTACKER) {
+            stagedGame.getGameSettings().setCreatorRole(Role.DEFENDER);
+        } else if (stagedGame.getGameSettings().getCreatorRole() == Role.DEFENDER) {
+            stagedGame.getGameSettings().setCreatorRole(Role.ATTACKER);
+        } else {
+            messages.add(format("ERROR: Cannot switch your role in staged game {0}. "
+                            + "You are not assigned to the staged game.",
+                    stagedGame.getFormattedId()));
+            return false;
+        }
+        messages.add(format("Switched your role in staged game {0}.",
+                stagedGame.getFormattedId()));
         return true;
     }
 
@@ -638,6 +675,9 @@ public class AdminCreateGamesBean implements Serializable {
 
         /* Add users to the game. */
         if (gameSettings.getGameType() == MULTIPLAYER) {
+            if (gameSettings.getCreatorRole() == Role.ATTACKER || gameSettings.getCreatorRole() == Role.DEFENDER) {
+                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
+            }
             for (int userId : stagedGame.getAttackers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
@@ -659,6 +699,9 @@ public class AdminCreateGamesBean implements Serializable {
                 }
             }
         } else if (gameSettings.getGameType() == MELEE) {
+            if (gameSettings.getCreatorRole() == Role.PLAYER) {
+                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
+            }
             for (int userId : stagedGame.getPlayers()) {
                 UserInfo user = userInfos.get(userId);
                 if (user != null) {
