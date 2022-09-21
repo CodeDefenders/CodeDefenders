@@ -424,7 +424,7 @@ public class Mutant implements Serializable {
     }
 
     public Test getKillingTest() {
-        return TestDAO.getKillingTestForMutantId(id);
+        return TestDAO.getKillingTestForMutantIdInSameGame(id);
     }
 
     public String getKillMessage() {

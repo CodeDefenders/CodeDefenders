@@ -412,14 +412,18 @@ public class TestDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
-    public static int getKillingTestIdForMutant(int mutantId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM targetexecutions",
-                "WHERE Target = ?",
-                "  AND Status != ?",
-                "  AND Mutant_ID = ?;"
-        );
+    /**
+     * Returns the id of the first Test (from the same game) that killed the mutant with the provided ID.
+     */
+    public static int getKillingTestIdForMutantInSameGame(int mutantId) {
+        String query = "SELECT te.* "
+                + "FROM targetexecutions te "
+                + "JOIN mutants m on m.Mutant_ID = te.Mutant_ID "
+                + "JOIN tests t on te.Test_ID = t.Test_ID "
+                + "WHERE te.Target = ? "
+                + "  AND te.Status != ? "
+                + "  AND t.Game_ID = m.Game_ID"
+                + "  AND te.Mutant_ID = ?;";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
@@ -430,8 +434,11 @@ public class TestDAO {
         return Optional.ofNullable(targ).map(t -> t.testId).orElse(-1);
     }
 
-    public static Test getKillingTestForMutantId(int mutantId) {
-        int testId = getKillingTestIdForMutant(mutantId);
+    /**
+     * Returns the first Test (from the same game) that killed the mutant with the provided ID.
+     */
+    public static Test getKillingTestForMutantIdInSameGame(int mutantId) {
+        int testId = getKillingTestIdForMutantInSameGame(mutantId);
         if (testId == -1) {
             return null;
         } else {
@@ -439,15 +446,19 @@ public class TestDAO {
         }
     }
 
-    public static Set<Mutant> getKilledMutantsForTestId(int testId) {
-        String query = String.join("\n",
-                "SELECT DISTINCT m.*",
-                "FROM targetexecutions te, mutants m",
-                "WHERE te.Target = ?",
-                "  AND te.Status != ?",
-                "  AND te.Test_ID = ?",
-                "  AND te.Mutant_ID = m.Mutant_ID",
-                "ORDER BY m.Mutant_ID ASC");
+    /**
+     * Returns the Mutants (from the same game) that got killed by the Test with the provided ID.
+     */
+    public static Set<Mutant> getKilledMutantsForTestIdInSameGame(int testId) {
+        String query = "SELECT DISTINCT m.* "
+                + "FROM targetexecutions te "
+                + "JOIN mutants m on m.Mutant_ID = te.Mutant_ID "
+                + "JOIN tests t on te.Test_ID = t.Test_ID "
+                + "WHERE te.Target = ? "
+                + "  AND te.Status != ? "
+                + "  AND t.Game_ID = m.Game_ID"
+                + "  AND te.Test_ID = ? "
+                + "ORDER BY m.Mutant_ID ASC";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),

@@ -225,7 +225,7 @@ public class Test {
 
     public Set<Mutant> getKilledMutants() {
         // TODO This does not recover the points of the mutant... why not?
-        return TestDAO.getKilledMutantsForTestId(id);
+        return TestDAO.getKilledMutantsForTestIdInSameGame(id);
     }
 
     public String getAsString() {
