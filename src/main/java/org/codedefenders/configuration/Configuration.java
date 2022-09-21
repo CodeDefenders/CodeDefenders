@@ -35,6 +35,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -82,6 +83,7 @@ public class Configuration {
     // All the attributes need to be initialized with a null value and therefore need to be objects
     protected String dataDir;
     protected String antHome;
+    protected String antJavaHome;
     protected String dbHost;
     protected Integer dbPort;
     protected String dbName;
@@ -145,6 +147,17 @@ public class Configuration {
                 if (!antExecutable.exists() || !antExecutable.isFile()) {
                     validationErrors.add(resolveAttributeName("antHome") + " doesn't contain the ant executable "
                             + antExecutable);
+                }
+            }
+
+            if (antJavaHome != null && antJavaHome.trim().isEmpty()) {
+                antJavaHome = null;
+            }
+            if (antJavaHome != null) {
+                File javaExecutable = new File(antJavaHome, "/bin/java");
+                if (!javaExecutable.exists() || !javaExecutable.isFile()) {
+                    validationErrors.add(resolveAttributeName("javaHome") + " doesn't contain the java executable "
+                            + javaExecutable);
                 }
             }
 
@@ -304,6 +317,12 @@ public class Configuration {
 
     public File getAntHome() {
         return new File(antHome);
+    }
+
+    public Optional<File> getAntJavaHome() {
+        return antJavaHome == null
+                ? Optional.empty()
+                : Optional.of(new File(antJavaHome));
     }
 
     public String getDbUrl() {

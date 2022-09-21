@@ -24,13 +24,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.tools.JavaCompiler;
@@ -101,17 +101,11 @@ public class Compiler {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
         final Path baseDir = Paths.get(javaFile.getPath()).getParent();
-        javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        if (compiler == null) {
-            throw new IllegalStateException("Platform provided no java compiler.");
-        }
+        javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
         final List<? extends javax.tools.JavaFileObject> compilationUnits = Arrays.asList(javaFile);
-        final List<String> options = Arrays.asList(
-                "-encoding", "UTF-8",
-                "-d", baseDir.toString()
-        );
+        final List<String> options = getCliParameters(baseDir.toString(), null);
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
 
@@ -210,20 +204,13 @@ public class Compiler {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
         final Path baseDir = Paths.get(javaFile.getPath()).getParent();
-        javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        if (compiler == null) {
-            throw new IllegalStateException("Platform provided no java compiler.");
-        }
+        javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
 
         final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
         compilationUnits.add(javaFile);
-
-        final List<String> options = Arrays.asList(
-                "-encoding", "UTF-8",
-                "-d", baseDir.toString()
-        );
+        final List<String> options = getCliParameters(baseDir.toString(), null);
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
         final Boolean success = task.call();
@@ -328,21 +315,13 @@ public class Compiler {
         // the directory this java file is compiled to. If a class
         // is in a package the package folder structure starts here
         final Path baseDir = Paths.get(testFile.getPath()).getParent();
-
-        javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        if (compiler == null) {
-            throw new IllegalStateException("Platform provided no java compiler.");
-        }
+        javax.tools.JavaCompiler compiler = getCompiler();
 
         final StringWriter writer = new StringWriter();
         final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
         compilationUnits.add(testFile);
 
-        final List<String> options = Arrays.asList(
-                "-encoding", "UTF-8",
-                "-d", baseDir.toString(),
-                "-classpath", TEST_CLASSPATH
-        );
+        final List<String> options = getCliParameters(baseDir.toString(), TEST_CLASSPATH);
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
 
@@ -439,5 +418,37 @@ public class Compiler {
         return first
                 .map(Path::toAbsolutePath)
                 .orElseGet(() -> Paths.get(javaFile.getPath().replace(".java", ".class")));
+    }
+
+    private static javax.tools.JavaCompiler getCompiler() {
+        javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new IllegalStateException("Platform provided no java compiler.");
+        }
+        return compiler;
+    }
+
+    private static List<String> getCliParameters(String basedir, String classpath) {
+        List<String> options = new ArrayList<>();
+
+        options.add("-encoding");
+        options.add("UTF-8");
+
+        if (basedir != null) {
+            options.add("-d");
+            options.add(basedir);
+        }
+
+        if (classpath != null) {
+            options.add("-cp");
+            options.add(classpath);
+        }
+
+        options.add("-source");
+        options.add("1.8");
+        options.add("-target");
+        options.add("1.8");
+
+        return options;
     }
 }
