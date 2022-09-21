@@ -19,7 +19,6 @@
 package org.codedefenders.servlets.api;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +35,6 @@ import org.apache.http.HttpStatus;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameChatDAO;
-import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -46,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 
 /**
  * This {@link HttpServlet} offers an API for chat messages.
