@@ -81,6 +81,15 @@
     gameHighlighting.setCodeDivSelector("#cut-div");
 %>
 
+
+<jsp:useBean id="mutantErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
+<%
+    mutantErrorHighlighting.setCodeDivSelector("#cut-div");
+    if (previousSubmission.hasErrorLines()) {
+        mutantErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
+    }
+%>
+
 <%--
 <jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
 <%
@@ -165,6 +174,7 @@
 
                 <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
                 <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+                <jsp:include page="/jsp/game_components/mutant_error_highlighting.jsp"/>
             </form>
         </div>
     </div>
