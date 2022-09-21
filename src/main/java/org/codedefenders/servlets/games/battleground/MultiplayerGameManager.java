@@ -20,17 +20,13 @@ package org.codedefenders.servlets.games.battleground;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -449,11 +445,11 @@ public class MultiplayerGameManager extends HttpServlet {
             // We escape the content of the message for new tests since user can embed there anything
             String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
             // Extract the line numbers of the errors
-            List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+            List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+            String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
             messages.add(decorate).escape(false).fadeOut(false);
             //
             previousSubmission.setTestCode(testText);
@@ -494,56 +490,6 @@ public class MultiplayerGameManager extends HttpServlet {
         // Clean up the session
         previousSubmission.clear();
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-    }
-
-    /**
-     * Returns the line numbers mentioned in the error message of the compiler.
-     *
-     * @param compilerOutput The compiler output.
-     * @return A list of (1-indexed) line numbers.
-     */
-    List<Integer> extractErrorLines(String compilerOutput) {
-        Set<Integer> errorLines = new TreeSet<>(); // Use TreeSet for the ordering
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
-        for (String line : compilerOutput.split("\n")) {
-            Matcher m = p.matcher(line);
-            if (m.find()) {
-                // TODO may be not robust
-                errorLines.add(Integer.parseInt(m.group(1)));
-            }
-        }
-        return new ArrayList<>(errorLines);
-    }
-
-    /**
-     * Add links that points to line for errors. Not sure that invoking a JS
-     * function suing a link in this way is 100% safe ! XXX Consider to move the
-     * decoration utility, and possibly the sanitize methods to some other
-     * components.
-     */
-    String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
-        String editor = "";
-        if (forTest) {
-            editor = "testEditor";
-        } else if (forMutant) {
-            editor = "mutantEditor";
-        }
-
-        StringBuilder decorated = new StringBuilder();
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
-        for (String line : compilerOutput.split("\n")) {
-            Matcher m = p.matcher(line);
-            if (m.find()) {
-                // Replace the entire line with a link to the source code
-                String replacedLine = String.format(
-                        "<a onclick=\"import('./js/codedefenders_main.mjs').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
-                        editor, m.group(1), line);
-                decorated.append(replacedLine).append("\n");
-            } else {
-                decorated.append(line).append("\n");
-            }
-        }
-        return decorated.toString();
     }
 
     private void createMutant(HttpServletRequest request,
@@ -668,11 +614,11 @@ public class MultiplayerGameManager extends HttpServlet {
                 // We escape the content of the message for new tests since user can embed there anything
                 String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
                 // Extract the line numbers of the errors
-                List<Integer> errorLines = extractErrorLines(errorMessage);
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
                 // Store them in the session so they can be picked up later
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
-                String decorate = decorateWithLinksToCode(escapedHtml, false, true);
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate).escape(false).fadeOut(false);
             }
             previousSubmission.setMutantCode(mutantText);
@@ -866,11 +812,11 @@ public class MultiplayerGameManager extends HttpServlet {
                 if (compileTestTarget != null) {
                     String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
                     // Extract the line numbers of the errors
-                    List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+                    List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
                     // Store them in the session so they can be picked up later
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
-                    String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+                    String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
                     messages.add(decorate).escape(false).fadeOut(false);
                 }
 
