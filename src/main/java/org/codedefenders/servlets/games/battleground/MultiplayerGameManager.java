@@ -572,7 +572,16 @@ public class MultiplayerGameManager extends HttpServlet {
                     TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, COMPILE_MUTANT);
             if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
-                messages.add(existingMutantTarget.message);
+                // We escape the content of the message for new tests since user can embed there
+                // anything
+                String escapedHtml = StringEscapeUtils.escapeHtml4(existingMutantTarget.message);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(existingMutantTarget.message);
+                // Store them in the session so they can be picked up later
+                previousSubmission.setErrorLines(errorLines);
+                // We introduce our decoration
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+                messages.add(decorate).escape(false);
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
