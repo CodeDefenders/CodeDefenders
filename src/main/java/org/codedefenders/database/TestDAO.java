@@ -450,18 +450,25 @@ public class TestDAO {
      * Returns the Mutants (from the same game) that got killed by the Test with the provided ID.
      */
     public static Set<Mutant> getKilledMutantsForTestIdInSameGame(int testId) {
-        String query = "SELECT DISTINCT m.* "
-                + "FROM targetexecutions te "
-                + "JOIN mutants m on m.Mutant_ID = te.Mutant_ID "
-                + "JOIN tests t on te.Test_ID = t.Test_ID "
-                + "WHERE te.Target = ? "
-                + "  AND te.Status != ? "
-                + "  AND t.Game_ID = m.Game_ID"
-                + "  AND te.Test_ID = ? "
-                + "ORDER BY m.Mutant_ID ASC";
+        String query = "SELECT * FROM (SELECT TargetExecution_ID, "
+                + "                      te.Test_ID, "
+                + "                      m.*, "
+                + "                      RANK() over (PARTITION BY te.Mutant_ID ORDER BY TargetExecution_ID) AS ranks "
+                + "               FROM targetexecutions te "
+                + "                        JOIN mutants m on m.Mutant_ID = te.Mutant_ID "
+                + "                        JOIN tests t on te.Test_ID = t.Test_ID "
+                + "               WHERE te.Target = ? "
+                + "                 AND te.Status != ? "
+                + "                 AND t.Game_ID = m.Game_ID "
+                + "                 AND t.Game_ID = (SELECT Game_ID "
+                + "                                  FROM tests "
+                + "                                  WHERE Test_ID = ?) "
+                + "               ORDER BY Mutant_ID, TargetExecution_ID) tmp "
+                + "WHERE Test_ID = ? AND ranks = 1;";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
+                DatabaseValue.of(testId),
                 DatabaseValue.of(testId)
         };
         final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
