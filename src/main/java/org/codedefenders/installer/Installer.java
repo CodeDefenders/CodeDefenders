@@ -40,7 +40,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.naming.NamingException;
 
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -61,28 +60,21 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
-import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.jboss.weld.environment.se.Weld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lexicalscope.jewel.cli.CliFactory;
-import com.lexicalscope.jewel.cli.Option;
 
 /**
  * This class allows adding {@link GameClass game classes (CUTs)}, {@link Mutant mutants},
  * {@link Test tests}, {@link PuzzleChapter puzzle chapters} and {@link Puzzle puzzles}
  * programmatically.
  *
- * <p>Using {@link #main(String[]) the main method}, this installer can be used
- * as a command line tool.
- *
- * <p>Using {@link #installPuzzles(Path, BackendExecutorService) installPuzzles()}, the
+ * <p>Using {@link #installPuzzles(Path) installPuzzles()}, the
  * installer can be called programmatically inside code defenders.
  *
  * @author gambi
@@ -94,30 +86,9 @@ public class Installer {
 
     private final BackendExecutorService backend;
 
-    /**
-     * This exposes a File object when running in standalone mode, so the ConfigFileResolverProducer can consider this
-     * when creating the config.
-     */
-    public static File configFile = null;
-
     @Inject
     public Installer(BackendExecutorService backend) {
         this.backend = backend;
-    }
-
-    /**
-     * Used for parsing the command line.
-     */
-    private interface ParsingInterface {
-        @Option(defaultToNull = true)
-        File getConfigurations();
-
-        /**
-         * Directory containing the resources for creating the puzzled. Same as
-         * the one used to generate the zip file
-         */
-        @Option(longName = "bundle-directory")
-        File getBundleDirectory();
     }
 
     /**
@@ -137,25 +108,6 @@ public class Installer {
      */
     private Set<Integer> puzzleChapters = new HashSet<>();
 
-    /**
-     * Inserts in order: game classes (CUTs), mutants, tests, puzzle chapters and puzzles.
-     */
-    public static void main(String[] args) throws IOException, NamingException {
-        // We have to do this before initializing the CDI so the PropertiesFileConfiguration can access the configFile.
-        ParsingInterface commandLine = CliFactory.parseArguments(ParsingInterface.class, args);
-        configFile = commandLine.getConfigurations();
-
-        // Initialize CDI
-        new Weld().initialize();
-
-        // No need to create the zip file, we can directly use the "exploded" directory
-        Installer installer = CDIUtil.getBeanFromCDI(Installer.class);
-        installer.installPuzzles(commandLine.getBundleDirectory().toPath());
-
-        // Weld will be automatically closed at system.exit
-        // the exit
-        System.exit(0);
-    }
 
     /**
      * Looks for puzzle related files in a given directory.
