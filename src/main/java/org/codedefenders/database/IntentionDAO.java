@@ -20,6 +20,8 @@ package org.codedefenders.database;
 
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.AttackerIntention;
@@ -31,6 +33,7 @@ import org.codedefenders.model.DefenderIntention;
  * @see AttackerIntention
  * @see DefenderIntention
  */
+@ApplicationScoped
 public class IntentionDAO {
 
     /**
@@ -44,7 +47,7 @@ public class IntentionDAO {
      * @return the generated identifier of the intention as an {@code int}.
      * @throws Exception If storing the intention was not successful.
      */
-    public static int storeIntentionForTest(Test test, DefenderIntention intention) throws Exception {
+    public int storeIntentionForTest(Test test, DefenderIntention intention) throws Exception {
         int testId = test.getId();
         int gameId = test.getGameId();
 
@@ -72,7 +75,7 @@ public class IntentionDAO {
     /**
      * Stores a given {@link AttackerIntention} in the database.
      *
-     * <p>For context information, the associated {@link Test} of the intention
+     * <p>For context information, the associated {@link Mutant} of the intention
      * is provided as well.
      *
      * @param mutant      the given mutant as a {@link Mutant}.
@@ -80,7 +83,7 @@ public class IntentionDAO {
      * @return the generated identifier of the intention as an {@code int}.
      * @throws Exception If storing the intention was not successful.
      */
-    public static int storeIntentionForMutant(Mutant mutant, AttackerIntention intention) throws Exception {
+    public int storeIntentionForMutant(Mutant mutant, AttackerIntention intention) throws Exception {
         final String query = String.join("\n",
                 "INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type)",
                 "VALUES (?,?,?);"

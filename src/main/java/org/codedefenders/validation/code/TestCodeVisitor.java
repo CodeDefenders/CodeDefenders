@@ -295,7 +295,8 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
 
         if (assertionCount > maxNumberOfAssertions) {
-            messages.add("Test contains more than " + maxNumberOfAssertions + " assertions");
+            messages.add("Test contains more than "
+                    + maxNumberOfAssertions + (maxNumberOfAssertions < 2 ? "assertion" : " assertions"));
             isValid = false;
             return;
         }

@@ -199,7 +199,7 @@
                 </div>
 
                 <div class="row mb-3"
-                     title="Allows players to chat within their team and with the enemy team.">
+                     title="Allows players to chat with each other.">
                     <label class="col-4 col-form-label" id="chat-label" for="chat-switch">Game Chat</label>
                     <div class="col-8 d-flex align-items-center">
                         <div class="form-check form-switch">

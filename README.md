@@ -41,7 +41,7 @@ The only required value is `data.dir`, all other properties have sensible defaul
 #### Adapt the systemd service
 
 On Debian 10 tomcat9 by default has only very limited write permissions.  
-To allow the `data.dir` to be located outside of the `/var/lib/tomcat9/webapps/` folder hierarchie you have to `systemctl edit tomcat9` and add the following code:  
+To allow the `data.dir` to be located outside of the `/var/lib/tomcat9/webapps/` folder hierarchy you have to `systemctl edit tomcat9` and add the following code:  
 ```ini
 [Service]
 ReadWritePaths="<data.dir path>"

@@ -386,6 +386,9 @@ public class AntRunner implements //
         List<String> command = new ArrayList<>();
         String cutDir = Paths.get(cut.getJavaFile()).getParent().toString();
 
+        config.getAntJavaHome()
+                .ifPresent(file -> env.put("JAVA_HOME", file.toString()));
+
         /*
          * Clustered execution uses almost the same command than normal
          * execution. But it prefixes that with "srun". This assumes that the
@@ -399,7 +402,7 @@ public class AntRunner implements //
             }
 
             env.put("CLASSPATH", Constants.TEST_CLASSPATH);
-            //
+
             command.add("srun");
 
             // Select reservation cluster
@@ -413,7 +416,7 @@ public class AntRunner implements //
             if (config.getClusterTimeout() > -1) {
                 command.add("--time=" + config.getClusterTimeout());
             }
-            //
+
             command.add("ant");
         } else {
             logger.debug("Local Execution");

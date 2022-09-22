@@ -171,6 +171,9 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private UserService userService;
 
+    @Inject
+    private IntentionDAO intentionDAO;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -1064,7 +1067,7 @@ public class MeleeGameManager extends HttpServlet {
     private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {
         try {
             DefenderIntention intention = new DefenderIntention(selectedLines, selectedMutants);
-            IntentionDAO.storeIntentionForTest(newTest, intention);
+            intentionDAO.storeIntentionForTest(newTest, intention);
         } catch (Exception e) {
             logger.error("Cannot store intention to database.", e);
         }
@@ -1072,7 +1075,7 @@ public class MeleeGameManager extends HttpServlet {
 
     private void collectAttackerIntentions(Mutant newMutant, AttackerIntention intention) {
         try {
-            IntentionDAO.storeIntentionForMutant(newMutant, intention);
+            intentionDAO.storeIntentionForMutant(newMutant, intention);
         } catch (Exception e) {
             logger.error("Cannot store intention to database.", e);
         }
