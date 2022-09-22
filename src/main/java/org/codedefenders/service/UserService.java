@@ -226,7 +226,6 @@ public class UserService {
      * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}.
      * Admin only method!
      */
-    //@Transactional // TODO(Alex): This should be wrapped in a transaction!
     @Nonnull
     public Optional<String> updateUser(int userId, @Nonnull String newUsername, @Nonnull String newEmail,
             @Nullable String newPassword) {

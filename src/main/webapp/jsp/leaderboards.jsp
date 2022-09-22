@@ -18,9 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
-<%@ page import="org.codedefenders.util.LinkUtils" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%@ page import="org.codedefenders.util.LinkUtils" %>
 
 <%-- Attributes set in the servlet --%>
 

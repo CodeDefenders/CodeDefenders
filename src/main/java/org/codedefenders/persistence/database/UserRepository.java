@@ -66,7 +66,7 @@ public class UserRepository {
 
         userIdForPlayerIdCache = CacheBuilder.newBuilder()
                 .maximumSize(400)
-                .recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
+                .recordStats()
                 .build(
                         new CacheLoader<Integer, Integer>() {
                             @Override
@@ -151,7 +151,7 @@ public class UserRepository {
                 + "  Validated = ?, "
                 + "  Active = ?, "
                 + "  AllowContact = ?, "
-                + "  KeyMap = ?"
+                + "  KeyMap = ? "
                 + "WHERE User_ID = ?;";
         try {
             return queryRunner.update(query,

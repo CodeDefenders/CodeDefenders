@@ -3,17 +3,16 @@
 gen_tomcat_users() {
     FILE="$1"
     ADMIN_USERNAME="$2"
-    ADMIN_PASSWORD="$3"
 
     echo '<?xml version="1.0" encoding="UTF-8"?>' > "$FILE"
     echo '<tomcat-users xmlns="http://tomcat.apache.org/xml"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
               version="1.0">' >> "$FILE"
-    if [ ! -z "$ADMIN_USERNAME" ] && [ ! -z "$ADMIN_PASSWORD" ]
+    if [ ! -z "$ADMIN_USERNAME" ]
     then
-        echo '<role rolename="manager-gui"/>' >> "$FILE"
-        echo "<user username=\"$ADMIN_USERNAME\" password=\"$ADMIN_PASSWORD\" roles=\"manager-gui\"/>" >> "$FILE"
+        echo '<role rolename="codedefenders-admin"/>' >> "$FILE"
+        echo "<user username=\"$ADMIN_USERNAME\" roles=\"codedefenders-admin\"/>" >> "$FILE"
     fi
     echo '</tomcat-users>' >> "$FILE"
 }
@@ -30,7 +29,7 @@ download_dependencies() {
 }
 
 main() {
-    gen_tomcat_users "/usr/local/tomcat/conf/tomcat-users.xml" "$CODEDEFENDERS_ADMIN_USERNAME" "$CODEDEFENDERS_ADMIN_PASSWORD"
+    gen_tomcat_users "/usr/local/tomcat/conf/tomcat-users.xml" "$CODEDEFENDERS_ADMIN_USERNAME"
     download_dependencies "/srv/codedefenders"
 }
 

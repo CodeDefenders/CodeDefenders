@@ -21,9 +21,8 @@ services:
       - CODEDEFENDERS_DB_USERNAME=${CODEDEFENDERS_DB_USERNAME:-defender}
       - CODEDEFENDERS_DB_PASSWORD=${CODEDEFENDERS_DB_PASSWORD:-defender}
       - CODEDEFENDERS_DB_NAME=${CODEDEFENDERS_DB_NAME:-defender}
-      # These two are for configuring the basic auth credentials for the /admin/* url
+      # This configures which Codedefenders User (identified by the provided name) should be granted admin privileges.
       - CODEDEFENDERS_ADMIN_USERNAME
-      - CODEDEFENDERS_ADMIN_PASSWORD
       # These are the other relevant variables to pass if they exist
       - CODEDEFENDERS_PARALLELIZE
       - CODEDEFENDERS_MUTANT_COVERAGE

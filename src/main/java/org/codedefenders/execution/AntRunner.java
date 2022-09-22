@@ -88,6 +88,7 @@ public class AntRunner implements //
      */
     public TargetExecution testMutant(Mutant mutant, Test test) {
         logger.info("Running test {} on mutant {}", test.getId(), mutant.getId());
+
         GameClass cut = GameClassDAO.getClassForGameId(mutant.getGameId());
         if (cut == null) {
             cut = GameClassDAO.getClassForId(mutant.getClassId());

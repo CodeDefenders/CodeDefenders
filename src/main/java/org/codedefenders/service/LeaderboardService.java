@@ -20,6 +20,7 @@ package org.codedefenders.service;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -27,6 +28,7 @@ import javax.inject.Named;
 import org.codedefenders.persistence.database.LeaderboardRepository;
 import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
 
+@SuppressWarnings("unused") // Used in leaderboards.jsp
 @Named
 @ApplicationScoped
 public class LeaderboardService {
@@ -38,6 +40,7 @@ public class LeaderboardService {
         this.leaderboardRepo = leaderboardRepo;
     }
 
+    @Nonnull
     public List<LeaderboardEntryEntity> getAll() {
         return leaderboardRepo.getLeaderboard();
     }

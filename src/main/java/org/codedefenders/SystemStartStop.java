@@ -50,7 +50,7 @@ public class SystemStartStop implements ServletContextListener {
     private Configuration config;
 
     @Inject
-    MetricsService metricsService;
+    private MetricsService metricsService;
 
     /**
      * This method is called when the servlet context is initialized(when

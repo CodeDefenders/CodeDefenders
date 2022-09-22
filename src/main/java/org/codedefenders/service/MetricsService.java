@@ -25,17 +25,21 @@ import com.google.common.cache.Cache;
 import io.prometheus.client.guava.cache.CacheMetricsCollector;
 import io.prometheus.client.hotspot.DefaultExports;
 
-
+/**
+ * Provides additional functionality for Metrics collection.
+ */
 @ApplicationScoped
 public class MetricsService {
 
-    private final CacheMetricsCollector cacheMetrics;
+    private CacheMetricsCollector cacheMetrics;
 
     public MetricsService() {
-        cacheMetrics = new CacheMetricsCollector().register();
     }
 
-    public void registerGuavaCache(String name, Cache<?, ?> cache) {
+    synchronized public void registerGuavaCache(String name, Cache<?, ?> cache) {
+        if (cacheMetrics == null) {
+            cacheMetrics = new CacheMetricsCollector().register();
+        }
         cacheMetrics.addCache(name, cache);
     }
 

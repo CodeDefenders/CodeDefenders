@@ -124,13 +124,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     protected void saveRequest(ServletRequest request) {
         if (request instanceof HttpServletRequest) {
             String httpRequestURI = ((HttpServletRequest) request).getRequestURI();
-            // Don't save request in this case because otherwise user is redirected to an API or asset url on successful
-            // login
-            if (httpRequestURI.startsWith("/api/")
-                    // TODO(Alex): Do we have more here?
-                    // TODO(Alex): Filtering for asset URLs should not be necessary, because those URLs are not
-                    //    authenticated?!
-                    || Stream.of(".ico", ".css", ".js").anyMatch(httpRequestURI::endsWith)) {
+            // Don't save request in this case because otherwise user is redirected to an API url on successful login
+            if (httpRequestURI.startsWith("/api/")) {
                 return;
             }
         }
