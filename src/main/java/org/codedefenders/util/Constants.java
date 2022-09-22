@@ -88,20 +88,22 @@ public class Constants {
     @Deprecated
     public static final String AI_DIR = Paths.get(DATA_DIR, "ai").toString();
 
-    public static final String LIB_JUNIT = Paths.get(DATA_DIR, "lib", "junit-4.13.1.jar").toString();
-    public static final String LIB_HAMCREST = Paths.get(DATA_DIR, "lib", "hamcrest-all-1.3.jar").toString();
-    public static final String LIB_MOCKITO = Paths.get(DATA_DIR, "lib", "mockito-all-1.10.19.jar").toString();
-    public static final String LIB_GOOGLE_TRUTH = Paths.get(DATA_DIR, "lib", "truth-1.1.2.jar").toString();
-    public static final String LIB_GOOGLE_TRUTH_EXTENSION =
-            Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.1.2.jar").toString();
-    public static final String LIB_GUAVA_ANDROID = Paths.get(DATA_DIR, "lib", "guava-29.0-android.jar").toString();
-
-    // TODO Is this really necessary since we set the CP using build.xml?
-    public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST
-            + File.pathSeparatorChar + Constants.LIB_MOCKITO //
-            + File.pathSeparatorChar + Constants.LIB_GOOGLE_TRUTH //
-            + File.pathSeparatorChar + Constants.LIB_GOOGLE_TRUTH_EXTENSION //
-            + File.pathSeparatorChar + Constants.LIB_GUAVA_ANDROID;
+    public static final String TEST_CLASSPATH = String.join(Character.toString(File.pathSeparatorChar),
+            Paths.get(DATA_DIR, "lib", "byte-buddy-1.12.14.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "byte-buddy-agent-1.12.14.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "guava-31.1-jre.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "hamcrest-2.2.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "junit-4.13.2.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "junit-jupiter-api-5.9.0.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "mockito-core-4.8.0.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "objenesis-3.2.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "org.jacoco.agent-0.8.8.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "org.jacoco.ant-0.8.8.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "org.jacoco.core-0.8.8.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "org.jacoco.report-0.8.8.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "truth-1.1.3.jar").toString(),
+            Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.1.3.jar").toString()
+    );
 
     public static final String TEST_PREFIX = "Test";
     public static final String JAVA_SOURCE_EXT = ".java";
