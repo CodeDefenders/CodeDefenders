@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.NotImplementedException;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
 import org.codedefenders.notification.INotificationService;
@@ -79,7 +79,7 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(GameChatRegistrationEvent event) {
-        Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
+        Role role = GameDAO.getRole(user.getId(), event.getGameId());
         if (role == null) {
             logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
                     user.getId(), GameChatEventHandler.class.getSimpleName(), event.getGameId());
@@ -95,7 +95,7 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(MutantProgressBarRegistrationEvent event) {
-        Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
+        Role role = GameDAO.getRole(user.getId(), event.getGameId());
         if (role == null) {
             logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
                     user.getId(), MutantProgressBarEventHandler.class.getSimpleName(), event.getGameId());
@@ -111,7 +111,7 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(TestProgressBarRegistrationEvent event) {
-        Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
+        Role role = GameDAO.getRole(user.getId(), event.getGameId());
         if (role == null) {
             logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
                     user.getId(), TestProgressBarEventHandler.class.getSimpleName(), event.getGameId());

@@ -25,7 +25,6 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 
 import org.codedefenders.DatabaseRule;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -414,8 +413,8 @@ public class DatabaseTest {
         assumeTrue(multiplayerGame.addPlayer(user2.getId(), Role.DEFENDER));
 
         int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
-        assertTrue(DatabaseAccess.insertEquivalence(mutant1, pid));
-        assertEquals(DatabaseAccess.getEquivalentDefenderId(mutant1), pid);
+        assertTrue(MutantDAO.insertEquivalence(mutant1, pid));
+        assertEquals(MutantDAO.getEquivalentDefenderId(mutant1), pid);
     }
 
     //FIXME

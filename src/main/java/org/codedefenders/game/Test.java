@@ -33,7 +33,6 @@ import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.TestDAO;
@@ -226,7 +225,7 @@ public class Test {
 
     public Set<Mutant> getKilledMutants() {
         // TODO This does not recover the points of the mutant... why not?
-        return DatabaseAccess.getKilledMutantsForTestId(id);
+        return TestDAO.getKilledMutantsForTestId(id);
     }
 
     public String getAsString() {

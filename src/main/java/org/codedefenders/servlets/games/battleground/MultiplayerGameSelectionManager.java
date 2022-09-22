@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap;
@@ -320,7 +319,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
 
         messages.add("Game " + gameId + " left");
-        DatabaseAccess.removePlayerEventsForGame(gameId, login.getUserId());
+        eventDAO.removePlayerEventsForGame(gameId, login.getUserId());
 
         final EventType notifType = EventType.GAME_PLAYER_LEFT;
         final String message = "You successfully left the game.";

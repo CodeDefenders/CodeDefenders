@@ -36,7 +36,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -425,7 +424,7 @@ public class Mutant implements Serializable {
     }
 
     public Test getKillingTest() {
-        return DatabaseAccess.getKillingTestForMutantId(id);
+        return TestDAO.getKillingTestForMutantId(id);
     }
 
     public String getKillMessage() {

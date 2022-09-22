@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -231,7 +230,7 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
 
-    private static boolean deletePlayer(int playerId, int gameId, int userId) {
+    private boolean deletePlayer(int playerId, int gameId, int userId) {
         for (Test t : TestDAO.getTestsForGame(gameId)) {
             if (t.getPlayerId() == playerId) {
                 AdminDAO.deleteTestTargetExecutions(t.getId());
@@ -242,7 +241,7 @@ public class AdminMonitorGames extends HttpServlet {
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
             }
         }
-        DatabaseAccess.removePlayerEventsForGame(gameId, userId);
+        eventDAO.removePlayerEventsForGame(gameId, userId);
         AdminDAO.deleteAttackerEquivalences(playerId);
         AdminDAO.deleteDefenderEquivalences(playerId);
         AdminDAO.deletePlayerTest(playerId);

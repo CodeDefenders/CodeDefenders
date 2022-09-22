@@ -22,11 +22,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
@@ -75,15 +79,15 @@ public class TestDAO {
         List<Integer> linesCovered = new ArrayList<>();
         if (linesCoveredString != null && !linesCoveredString.isEmpty()) {
             linesCovered.addAll(Arrays.stream(linesCoveredString.split(","))
-                            .map(Integer::parseInt)
-                            .collect(Collectors.toList()));
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList()));
         }
 
         List<Integer> linesUncovered = new ArrayList<>();
         if (linesUncoveredString != null && !linesUncoveredString.isEmpty()) {
             linesUncovered.addAll(Arrays.stream(linesUncoveredString.split(","))
-                            .map(Integer::parseInt)
-                            .collect(Collectors.toList()));
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList()));
         }
 
         return new Test(testId, classId, gameId, absoluteJavaFile, absoluteClassFile, roundCreated, mutantsKilled,
@@ -329,11 +333,11 @@ public class TestDAO {
 
         String query = "UPDATE tests SET mutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
         DatabaseValue[] values = new DatabaseValue[]{
-            DatabaseValue.of(mutantsKilled),
-            DatabaseValue.of(linesCoveredString),
-            DatabaseValue.of(linesUncoveredString),
-            DatabaseValue.of(score),
-            DatabaseValue.of(testId)
+                DatabaseValue.of(mutantsKilled),
+                DatabaseValue.of(linesCoveredString),
+                DatabaseValue.of(linesUncoveredString),
+                DatabaseValue.of(score),
+                DatabaseValue.of(testId)
         };
 
         return DB.executeUpdateQuery(query, values);
@@ -408,4 +412,48 @@ public class TestDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
+    public static int getKillingTestIdForMutant(int mutantId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM targetexecutions",
+                "WHERE Target = ?",
+                "  AND Status != ?",
+                "  AND Mutant_ID = ?;"
+        );
+        DatabaseValue<?>[] values = new DatabaseValue[]{
+                DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
+                DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
+                DatabaseValue.of(mutantId)
+        };
+        TargetExecution targ = DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
+        // TODO: We shouldn't give away that we don't know which test killed the mutant?
+        return Optional.ofNullable(targ).map(t -> t.testId).orElse(-1);
+    }
+
+    public static Test getKillingTestForMutantId(int mutantId) {
+        int testId = getKillingTestIdForMutant(mutantId);
+        if (testId == -1) {
+            return null;
+        } else {
+            return getTestById(testId);
+        }
+    }
+
+    public static Set<Mutant> getKilledMutantsForTestId(int testId) {
+        String query = String.join("\n",
+                "SELECT DISTINCT m.*",
+                "FROM targetexecutions te, mutants m",
+                "WHERE te.Target = ?",
+                "  AND te.Status != ?",
+                "  AND te.Test_ID = ?",
+                "  AND te.Mutant_ID = m.Mutant_ID",
+                "ORDER BY m.Mutant_ID ASC");
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
+                DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
+                DatabaseValue.of(testId)
+        };
+        final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
+        return new HashSet<>(mutants);
+    }
 }
