@@ -205,10 +205,6 @@ public class Configuration {
                 }
             }
 
-            if (getJavaMajorVersion() > 11) {
-                validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 11");
-            }
-
             /*
             if (clusterMode) {
                 // TODO: Validate clusterOptions
