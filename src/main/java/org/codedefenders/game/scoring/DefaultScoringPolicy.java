@@ -69,7 +69,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
         // Retrieve the event log
         List<Event> eventLog = eventDAO.getEventsForGame(gameId);
         // Sort by Timestamp
-        eventLog.sort((o1, o2) -> o1.getTimestamp().compareTo(o2.getTimestamp()));
+        eventLog.sort(Comparator.comparing(Event::getTimestamp));
         // Reset Old State
         testsScore.clear();
         mutantsScore.clear();

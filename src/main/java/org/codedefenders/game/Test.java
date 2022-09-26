@@ -312,7 +312,7 @@ public class Test {
 
     // First created appears first
     public static Comparator<Test> orderByIdAscending() {
-        return (o1, o2) -> o1.id - o2.id;
+        return Comparator.comparingInt(o -> o.id);
     }
 
     // Last created appears first

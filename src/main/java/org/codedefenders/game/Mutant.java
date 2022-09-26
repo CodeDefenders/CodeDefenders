@@ -603,7 +603,7 @@ public class Mutant implements Serializable {
     // TODO Ideally this should have a timestamp ... we use the ID instead
     // First created appears first
     public static Comparator<Mutant> orderByIdAscending() {
-        return (o1, o2) -> o1.id - o2.id;
+        return Comparator.comparingInt(o -> o.id);
     }
 
     // Last created appears first
