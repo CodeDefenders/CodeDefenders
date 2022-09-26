@@ -175,7 +175,7 @@ public class Configuration {
             if (dbPort == null) {
                 validationErrors.add("Property " + resolveAttributeName("dbPort") + " is missing");
                 dbvalid = false;
-            } else if (dbPort <= 0 | dbPort > 65535) {
+            } else if (dbPort <= 0 || dbPort > 65535) {
                 validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort + " is not a valid port number");
                 dbvalid = false;
             }
