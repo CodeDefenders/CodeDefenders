@@ -391,7 +391,7 @@ public class ParallelizeTest {
             mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages, mockedTestScheduler);
 
             // Check that the test execution logged in the DB are in the same order
-            List<TargetExecution> executedTargets = new ArrayList<TargetExecution>();
+            List<TargetExecution> executedTargets = new ArrayList<>();
             for (org.codedefenders.game.Test submittedTest : randomSchedule) {
                 executedTargets.add(TargetExecutionDAO.getTargetExecutionForPair(submittedTest.getId(), mutant.getId()));
             }

@@ -94,7 +94,7 @@ public class DoubleEquivalenceSubmissionTest {
     private static int TIMEOUT = 10000;
 
     static class WebClientFactory {
-        private static Collection<WebClient> clients = new ArrayList<WebClient>();
+        private static Collection<WebClient> clients = new ArrayList<>();
 
         public static WebClient getNewWebClient() {
             java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
@@ -198,7 +198,7 @@ public class DoubleEquivalenceSubmissionTest {
 
         public int createNewGame() throws FailingHttpStatusCodeException, IOException {
             // List the games already there
-            Set<String> myGames = new HashSet<String>();
+            Set<String> myGames = new HashSet<>();
             //
             HtmlPage gameUsers = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
             for (HtmlAnchor a : gameUsers.getAnchors()) {

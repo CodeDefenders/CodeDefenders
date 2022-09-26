@@ -81,7 +81,7 @@ public class ParallelMutationTester extends MutationTester //
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         mutants.addAll(game.getMutantsMarkedEquivalentPending());
-        List<Mutant> killedMutants = new ArrayList<Mutant>();
+        List<Mutant> killedMutants = new ArrayList<>();
 
         // Acquire and release the connection
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(test.getPlayerId()).flatMap(userId -> userRepo.getUserById(userId));
@@ -91,7 +91,7 @@ public class ParallelMutationTester extends MutationTester //
         }
 
         // Fork and Join parallelization
-        Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
+        Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<>();
         for (final Mutant mutant : mutants) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
                 // System.out.println("Skipping non-covered mutant "
@@ -99,7 +99,7 @@ public class ParallelMutationTester extends MutationTester //
                 continue;
             }
 
-            FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+            FutureTask<Boolean> task = new FutureTask<>(new Callable<Boolean>() {
 
                 @Override
                 public Boolean call() throws Exception {
@@ -144,7 +144,7 @@ public class ParallelMutationTester extends MutationTester //
 
         for (Mutant mutant : mutants) {
             if (mutant.isAlive()) {
-                ArrayList<Test> missedTests = new ArrayList<Test>();
+                ArrayList<Test> missedTests = new ArrayList<>();
 
                 for (int lm : mutant.getLines()) {
                     boolean found = false;
@@ -211,14 +211,14 @@ public class ParallelMutationTester extends MutationTester //
             throw new RuntimeException();
         }
 
-        final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
+        final Map<Test, FutureTask<Boolean>> tasks = new HashMap<>();
         for (Test test : tests) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
                 logger.info("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
                 continue;
             }
 
-            FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+            FutureTask<Boolean> task = new FutureTask<>(new Callable<Boolean>() {
 
                 @Override
                 public Boolean call() throws Exception {
@@ -267,7 +267,7 @@ public class ParallelMutationTester extends MutationTester //
                     messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 
                     if (game instanceof MultiplayerGame) {
-                        ArrayList<Mutant> mlist = new ArrayList<Mutant>();
+                        ArrayList<Mutant> mlist = new ArrayList<>();
                         mlist.add(mutant);
 
                         logger.info(">> Test {} kills mutant {} get {} points. Mutant is still alive ? {}",
@@ -296,7 +296,7 @@ public class ParallelMutationTester extends MutationTester //
         // TODO In the original implementation (see commit
         // 4fbdc78304374ee31a06d56f8ce67ca80309e24c for example)
         // the first block and the second one are swapped. Why ?
-        ArrayList<Test> missedTests = new ArrayList<Test>();
+        ArrayList<Test> missedTests = new ArrayList<>();
         if (game instanceof MultiplayerGame) {
             for (Test t : tests) {
                 if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines())) {

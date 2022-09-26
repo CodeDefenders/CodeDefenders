@@ -39,7 +39,7 @@ public class WebClientFactory {
 
     private static int TIMEOUT = 60000;
 
-    private static Collection<WebClient> clients = new ArrayList<WebClient>();
+    private static Collection<WebClient> clients = new ArrayList<>();
 
     public static WebClient getNewWebClient() {
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);

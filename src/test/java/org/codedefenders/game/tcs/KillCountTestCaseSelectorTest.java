@@ -44,7 +44,7 @@ public class KillCountTestCaseSelectorTest {
         PowerMockito.when(GameDAO.class, "getCurrentRound", gameId).thenReturn(0);
 
 
-        List<KillMapEntry> killMapEntriesForClass = new ArrayList<KillMap.KillMapEntry>();
+        List<KillMapEntry> killMapEntriesForClass = new ArrayList<>();
 
 
         // Test calss is UNTESTABLE ! it requires the Database !

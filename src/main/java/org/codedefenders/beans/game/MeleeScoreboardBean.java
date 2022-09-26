@@ -59,9 +59,9 @@ public class MeleeScoreboardBean {
     // Load data
     public void setGameId(int gameId) {
         this.gameId = gameId;
-        this.mutantsScores = new HashMap<Integer, PlayerScore>();
-        this.testsScores = new HashMap<Integer, PlayerScore>();
-        this.duelsScores = new HashMap<Integer, PlayerScore>();
+        this.mutantsScores = new HashMap<>();
+        this.testsScores = new HashMap<>();
+        this.duelsScores = new HashMap<>();
     }
 
     public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testsScores,
@@ -90,7 +90,7 @@ public class MeleeScoreboardBean {
     }
 
     public void setPlayers(List<Player> players) {
-        this.players = new HashSet<Player>(players);
+        this.players = new HashSet<>(players);
     }
 
     // --------------------------------------------------------------------------------
@@ -126,7 +126,7 @@ public class MeleeScoreboardBean {
     }
 
     public List<ScoreItem> getScoreItems() {
-        List<ScoreItem> currentScore = new ArrayList<ScoreItem>();
+        List<ScoreItem> currentScore = new ArrayList<>();
 
         for (Player player : this.players) {
             // We need user id because User is not Hashable (maybe it does not redefine

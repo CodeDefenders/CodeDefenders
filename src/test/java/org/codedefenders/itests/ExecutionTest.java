@@ -184,7 +184,7 @@ public class ExecutionTest {
     @Test
     public void testMutant9559() throws IOException {
         // MOVE THIS CODE TO BEFORE OF FACTORY METHOD
-        ArrayList<String> messages = new ArrayList<String>();
+        ArrayList<String> messages = new ArrayList<>();
         // Create the users
         UserEntity observer = new UserEntity("observer", UserEntity.encodePassword("password"), "demo@observer.com");
         observer.insert();

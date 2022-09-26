@@ -335,11 +335,11 @@ public class MultiplayerGame extends AbstractGame {
     public HashMap<Integer, PlayerScore> getMutantScores() {
         final HashMap<Integer, PlayerScore> mutantScores = new HashMap<>();
 
-        final HashMap<Integer, Integer> mutantsAlive = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> mutantsChallenged = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> duelsWon = new HashMap<Integer, Integer>();
+        final HashMap<Integer, Integer> mutantsAlive = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsEquiv = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsChallenged = new HashMap<>();
+        final HashMap<Integer, Integer> duelsWon = new HashMap<>();
 
         // TODO why not getMutants()
         List<Mutant> allMutants = getAliveMutants();

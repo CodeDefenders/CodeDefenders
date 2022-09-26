@@ -94,7 +94,7 @@ public class HelperUser {
     ) throws FailingHttpStatusCodeException, IOException {
 
         // List the games already there
-        Set<String> myGames = new HashSet<String>();
+        Set<String> myGames = new HashSet<>();
         //
         HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
         for (HtmlAnchor a : gameUsers.getAnchors()) {
@@ -136,7 +136,7 @@ public class HelperUser {
     @Deprecated// Backwards compatibility
     public int createNewGame(int classID) throws FailingHttpStatusCodeException, IOException {
         // List the games already there
-        Set<String> myGames = new HashSet<String>();
+        Set<String> myGames = new HashSet<>();
         //
         HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
         for (HtmlAnchor a : gameUsers.getAnchors()) {

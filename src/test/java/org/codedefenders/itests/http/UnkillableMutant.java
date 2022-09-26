@@ -61,7 +61,7 @@ public class UnkillableMutant {
     private static int TIMEOUT = 10000;
 
     static class WebClientFactory {
-        private static Collection<WebClient> clients = new ArrayList<WebClient>();
+        private static Collection<WebClient> clients = new ArrayList<>();
 
         public static WebClient getNewWebClient() {
             java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);

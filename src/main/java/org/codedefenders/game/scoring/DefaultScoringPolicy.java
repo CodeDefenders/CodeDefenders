@@ -52,13 +52,13 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     // TODO Convert this to PlayerScore so we can keep track of won/lost equivalence
     // duels !
     // TestID, Score
-    private Map<Integer, Integer> testsScore = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> testsScore = new HashMap<>();
     // MutantID, Score
-    private Map<Integer, Integer> mutantsScore = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> mutantsScore = new HashMap<>();
     // PlayerID, PointsForWinningDuels
-    private Map<Integer, Integer> duelsScore = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> duelsScore = new HashMap<>();
     // MutantID, PlayerClaimingEquivalence
-    private Map<Integer, Integer> flaggedMutants = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> flaggedMutants = new HashMap<>();
 
     public DefaultScoringPolicy(EventDAO eventDAO) {
         this.eventDAO = eventDAO;
