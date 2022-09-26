@@ -47,7 +47,7 @@ public class EventDecoder implements Decoder.Text<ClientEvent> {
         Class<ClientEvent> eventClass;
 
         try {
-            obj = new JsonParser().parse(s).getAsJsonObject();
+            obj = JsonParser.parseString(s).getAsJsonObject();
             type = obj.getAsJsonPrimitive("type").getAsString();
             data = obj.get("data");
         } catch (ClassCastException | IllegalStateException e) {
