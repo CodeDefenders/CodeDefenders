@@ -47,7 +47,7 @@ public class KillCountTestCaseSelector extends PrioritizedTestCaseSelector {
                 }
             }
 
-            Collections.sort(allTests, (o1, o2) -> {
+            allTests.sort((o1, o2) -> {
                 // Reverse
                 return -1 * (o1.getScore() - o2.getScore());
             });
