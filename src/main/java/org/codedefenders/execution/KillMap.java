@@ -325,7 +325,7 @@ public class KillMap {
      *
      * <p>The tests and mutants must belong to the same class (with the same class id).
      *
-     * <bf>This operation is blocking and may take a long time</bf>
+     * <p><bf>This operation is blocking and may take a long time</bf>
      *
      * @param tests   The tests used for the validation.
      * @param mutant  The mutant to validate.

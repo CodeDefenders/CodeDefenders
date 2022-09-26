@@ -208,9 +208,6 @@ public class ConsistencyTest {
     /**
      * Setup a game with an attacker and multiple defendes and check that a
      * mutant can be killed only once and points are reported correctly.
-     *
-     * @throws IOException
-     * @throws InterruptedException
      */
     @Test
     public void testRunAllTestsOnMutant() throws IOException, InterruptedException {

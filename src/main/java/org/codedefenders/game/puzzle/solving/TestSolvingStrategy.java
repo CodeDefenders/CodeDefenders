@@ -26,7 +26,7 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 /**
  * Interface for a test solving strategy.
  *
- * {@link #solve(PuzzleGame, Test)} returns whether a submitted test resulted in a state
+ * <p>{@link #solve(PuzzleGame, Test)} returns whether a submitted test resulted in a state
  * of the puzzle game, which the strategy marks as solved.
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>

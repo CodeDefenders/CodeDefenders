@@ -187,12 +187,6 @@ public class HelperUser {
 
     /**
      * Returns the landing HtmlPage after joining the game
-     *
-     * @param gameID
-     * @param isAttacker
-     * @return
-     * @throws FailingHttpStatusCodeException
-     * @throws IOException
      */
     public HtmlPage joinOpenGame(int gameID, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
         HtmlPage openGames = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
@@ -318,12 +312,6 @@ public class HelperUser {
 
     /**
      * Return the Class ID
-     *
-     * @param file
-     * @return
-     * @throws FailingHttpStatusCodeException
-     * @throws MalformedURLException
-     * @throws IOException
      */
     public int uploadClass(File file) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
         HtmlPage uploadPage = browser.getPage(codedefendersHome + Paths.CLASS_UPLOAD);

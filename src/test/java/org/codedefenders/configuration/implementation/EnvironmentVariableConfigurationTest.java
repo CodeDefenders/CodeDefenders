@@ -49,7 +49,7 @@ public class EnvironmentVariableConfigurationTest {
     }
 
     /**
-     * This is taken from: https://stackoverflow.com/a/7201825/13653257
+     * This is taken from: <a href="https://stackoverflow.com/a/7201825/13653257">Stackoverflow</a>
      * TODO: Maybe instead of this bad hack we simply don't test environment variable configuration?
      *
      * @param newenv The environment variables to add to

@@ -43,12 +43,10 @@ import org.slf4j.LoggerFactory;
  * killmap to be computed, and processes them one at the time. Results are then
  * stored to killmap, and the job is removed from the database
  *
- * TODO We should need to decouple the actual processor from the context
- * listener for better testing.
- *
  * @author gambi
  *
  */
+// TODO We should need to decouple the actual processor from the context listener for better testing.
 @WebListener
 public class KillMapProcessor implements ServletContextListener {
 

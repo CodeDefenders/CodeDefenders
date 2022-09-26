@@ -102,8 +102,6 @@ public class UploadUncompilableClassTest {
 
     /**
      * This test contains and shall only contain the client logic
-     *
-     * @throws Exception
      */
     @Test
     public void testUntitledTestCase() throws Exception {

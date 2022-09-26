@@ -36,7 +36,6 @@ import com.google.gson.Gson;
 /**
  * Notification Service implementation.
  * This service behaves like a singleton in the app.
- * See https://docs.oracle.com/javaee/6/api/javax/enterprise/context/ApplicationScoped.html
  *
  * @author gambi
  */

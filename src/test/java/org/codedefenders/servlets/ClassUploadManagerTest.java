@@ -175,13 +175,6 @@ public class ClassUploadManagerTest {
 
     /**
      * Create an instance of FileItem in a temporary file.
-     *
-     * @param fieldName
-     * @param fileName
-     * @param classPathResource
-     * @return
-     * @throws IOException
-     * @throws URISyntaxException
      */
     private FileItem createFileItemFromClassPathResource(String fieldName, String fileName, String classPathResource)
             throws IOException, URISyntaxException {
