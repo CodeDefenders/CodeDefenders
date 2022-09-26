@@ -20,6 +20,7 @@ package org.codedefenders;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -119,10 +120,10 @@ public class MutantTest {
                 + "}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
@@ -189,10 +190,10 @@ public class MutantTest {
                 + "}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
@@ -249,10 +250,10 @@ public class MutantTest {
                 + "}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
@@ -310,10 +311,10 @@ public class MutantTest {
                 + "}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
@@ -373,10 +374,10 @@ public class MutantTest {
                 + "}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
@@ -450,10 +451,10 @@ public class MutantTest {
                 + "}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
@@ -518,10 +519,10 @@ public class MutantTest {
                 + "return temp.toString();}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
@@ -583,10 +584,10 @@ public class MutantTest {
                 + "return temp.toString();}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
         //
         File mutantJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);

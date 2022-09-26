@@ -21,6 +21,7 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -125,7 +126,7 @@ public class GameManagingUtilsTest {
                 + "}";
 
         File cutJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(cutJavaFile, originalCode, Charset.defaultCharset());
+        FileUtils.writeStringToFile(cutJavaFile, originalCode, StandardCharsets.UTF_8);
 
         GameClass mockedGameClass = mock(GameClass.class);
 
@@ -135,7 +136,7 @@ public class GameManagingUtilsTest {
 
     private org.codedefenders.game.Test createMockedTest(String testCode) throws IOException {
         File testJavaFile = temporaryFolder.newFile();
-        FileUtils.writeStringToFile(testJavaFile, testCode, Charset.defaultCharset());
+        FileUtils.writeStringToFile(testJavaFile, testCode, StandardCharsets.UTF_8);
 
         org.codedefenders.game.Test mockedTest = mock(org.codedefenders.game.Test.class);
 
