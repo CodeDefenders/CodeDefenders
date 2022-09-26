@@ -96,7 +96,9 @@ public class DatabaseValueTest {
     public void testWrongDatabaseValueType() {
         final Dependency value = new Dependency(1, 1, "", "");
         try {
-            // TODO(Alex): Suppress this one?!
+            // Disable inspection because the type parameter information of 'DatabaseValue' is not retained at runtime,
+            // and so can't be used with reflection
+            //noinspection rawtypes
             final Constructor<DatabaseValue> constructor = DatabaseValue.class.getDeclaredConstructor(Object.class);
             constructor.setAccessible(true);
             final DatabaseValue<?> dbv = constructor.newInstance(value);
