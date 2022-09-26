@@ -18,6 +18,8 @@
  */
 package org.codedefenders.game.puzzle.solving;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.codedefenders.game.Test;
 import org.codedefenders.game.puzzle.PuzzleGame;
 
@@ -38,8 +40,9 @@ public interface TestSolvingStrategy {
             return null;
         }
         try {
-            return ((TestSolvingStrategy) Types.valueOf(name).clazz.newInstance());
-        } catch (IllegalArgumentException | IllegalAccessException | InstantiationException ignored) {
+            return ((TestSolvingStrategy) Types.valueOf(name).clazz.getDeclaredConstructor().newInstance());
+        } catch (IllegalArgumentException | IllegalAccessException | InstantiationException | NoSuchMethodException |
+                 InvocationTargetException ignored) {
             // ignored
         }
         return null;

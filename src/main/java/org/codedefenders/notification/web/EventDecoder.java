@@ -92,8 +92,8 @@ public class EventDecoder implements Decoder.Text<ClientEvent> {
                                   JsonDeserializationContext context) throws JsonParseException {
             ClientEvent event;
             try {
-                event = clazz.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                event = clazz.getDeclaredConstructor().newInstance();
+            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                 throw new JsonParseException("Error while creating event object of type: " + clazz.getName() + ". "
                         + "JSON was: " + jsonElement, e);
             }
