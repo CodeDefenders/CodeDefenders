@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.MutantDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.service.game.GameService;

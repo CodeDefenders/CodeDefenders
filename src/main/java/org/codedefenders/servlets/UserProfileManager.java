@@ -39,7 +39,6 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
 
 /**
  * This {@link HttpServlet} handles requests for viewing the currently logged

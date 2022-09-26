@@ -36,7 +36,6 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
@@ -111,7 +110,7 @@ public class ClassCodeAnalyser {
             nonEmptyLines.add(blockStart);
             nonEmptyLines.add(blockEnd);
 
-            // Since #872, we consider lines with comments as EMPTY so we can cover them as well. 
+            // Since #872, we consider lines with comments as EMPTY so we can cover them as well.
 
             // Processing the block
             NodeList<Statement> statements = n.getStatements();

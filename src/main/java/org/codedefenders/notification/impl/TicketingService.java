@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.ManagedBean;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Singleton;
 
 import org.codedefenders.notification.ITicketingService;

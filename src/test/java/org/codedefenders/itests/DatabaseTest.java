@@ -20,9 +20,7 @@
 package org.codedefenders.itests;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
 
 import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseConnection;
@@ -56,7 +54,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;

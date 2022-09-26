@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.Test;
 import org.codedefenders.service.game.GameService;

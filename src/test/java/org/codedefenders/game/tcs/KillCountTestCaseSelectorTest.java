@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.KillMap.KillMapEntry.Status;
 import org.codedefenders.game.tcs.impl.KillCountTestCaseSelector;
