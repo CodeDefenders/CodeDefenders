@@ -234,7 +234,7 @@ public class PuzzleDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(puzzle.getClassId()),
                 DatabaseValue.of(puzzle.getActiveRole().toString()),
                 DatabaseValue.of(puzzle.getLevel().toString()),
@@ -269,7 +269,7 @@ public class PuzzleDAO {
                 "VALUES (?, ?, ?, ?);"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(chapter.getChapterId()),
                 DatabaseValue.of(chapter.getPosition()),
                 DatabaseValue.of(chapter.getTitle()),
@@ -303,7 +303,7 @@ public class PuzzleDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(game.getClassId()),
                 DatabaseValue.of(game.getLevel().toString()),
                 DatabaseValue.of(game.getCreatorId()),
@@ -368,7 +368,7 @@ public class PuzzleDAO {
                 "WHERE Chapter_ID = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
             DatabaseValue.of(chapter.getPosition()),
             DatabaseValue.of(chapter.getTitle()),
             DatabaseValue.of(chapter.getDescription()),
@@ -402,7 +402,7 @@ public class PuzzleDAO {
                 "WHERE ID = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(game.getClassId()),
                 DatabaseValue.of(game.getLevel().toString()),
                 DatabaseValue.of(game.getCreatorId()),
@@ -450,7 +450,7 @@ public class PuzzleDAO {
                     "WHERE Puzzle_ID = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
             DatabaseValue.of(active),
             DatabaseValue.of(puzzle.getPuzzleId())
         };

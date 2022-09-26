@@ -70,7 +70,7 @@ public class TargetExecutionDAO {
      */
     public static int storeTargetExecution(TargetExecution targetExecution) {
         final String query;
-        final DatabaseValue[] values;
+        final DatabaseValue<?>[] values;
 
         final String insertedMessage = targetExecution.message == null ? ""
                 : targetExecution.message.length() <= MESSAGE_LIMIT ? targetExecution.message
@@ -135,7 +135,7 @@ public class TargetExecutionDAO {
                         "  AND Mutant_ID = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                DatabaseValue.of(testId),
                DatabaseValue.of(mutantId)
         };
@@ -158,7 +158,7 @@ public class TargetExecutionDAO {
                 "  AND Target = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                DatabaseValue.of(test.getId()),
                DatabaseValue.of(target.name())
         };
@@ -181,7 +181,7 @@ public class TargetExecutionDAO {
                 "  AND Target = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                DatabaseValue.of(mutant.getId()),
                DatabaseValue.of(target.name())
         };

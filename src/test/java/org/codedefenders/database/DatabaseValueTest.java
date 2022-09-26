@@ -96,9 +96,10 @@ public class DatabaseValueTest {
     public void testWrongDatabaseValueType() {
         final Dependency value = new Dependency(1, 1, "", "");
         try {
+            // TODO(Alex): Suppress this one?!
             final Constructor<DatabaseValue> constructor = DatabaseValue.class.getDeclaredConstructor(Object.class);
             constructor.setAccessible(true);
-            final DatabaseValue dbv = constructor.newInstance(value);
+            final DatabaseValue<?> dbv = constructor.newInstance(value);
             fail("Should not successfully instantiate DatabaseValue for unsupported type: " + value.getClass().getName());
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             final Throwable cause = e.getCause();

@@ -174,7 +174,7 @@ public class TestDAO {
                 "  AND u.User_ID = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(DUMMY_DEFENDER_USER_ID)
         };
@@ -281,7 +281,7 @@ public class TestDAO {
                 "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID,",
                 "Points, Class_ID, Lines_Covered, Lines_Uncovered)",
                 "VALUES (?,?,?,?,?,?,?,?,?,?);");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(relativeJavaFile),
                 DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(gameId),
@@ -332,7 +332,7 @@ public class TestDAO {
 
 
         String query = "UPDATE tests SET mutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(mutantsKilled),
                 DatabaseValue.of(linesCoveredString),
                 DatabaseValue.of(linesUncoveredString),
@@ -355,7 +355,7 @@ public class TestDAO {
                 "INSERT INTO test_uploaded_with_class (Test_ID, Class_ID)",
                 "VALUES (?, ?);"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(testId),
                 DatabaseValue.of(classId)
         };
@@ -407,7 +407,7 @@ public class TestDAO {
 
         // Hack to make sure all values are listed in both 'ranges'.
         tests.addAll(new LinkedList<>(tests));
-        DatabaseValue[] values = tests.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
+        DatabaseValue<?>[] values = tests.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
     }
@@ -448,7 +448,7 @@ public class TestDAO {
                 "  AND te.Test_ID = ?",
                 "  AND te.Mutant_ID = m.Mutant_ID",
                 "ORDER BY m.Mutant_ID ASC");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
                 DatabaseValue.of(testId)

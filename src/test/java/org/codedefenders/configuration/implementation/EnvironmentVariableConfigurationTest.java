@@ -67,9 +67,9 @@ public class EnvironmentVariableConfigurationTest {
             Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
             cienv.putAll(newenv);
         } catch (NoSuchFieldException e) {
-            Class[] classes = Collections.class.getDeclaredClasses();
+            Class<?>[] classes = Collections.class.getDeclaredClasses();
             Map<String, String> env = System.getenv();
-            for (Class cl : classes) {
+            for (Class<?> cl : classes) {
                 if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
                     Field field = cl.getDeclaredField("m");
                     field.setAccessible(true);

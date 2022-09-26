@@ -38,7 +38,8 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleChapterEntry
  */
-public class PuzzleEntry implements Comparable {
+// TODO(Alex): This should prob. be only comparable with another PuzzleEntry?!!
+public class PuzzleEntry implements Comparable<Object> {
     public enum Type {
         PUZZLE,
         GAME

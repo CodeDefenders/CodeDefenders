@@ -280,7 +280,7 @@ public class Mutant implements Serializable {
         String query = "UPDATE mutants SET Points = Points + ? WHERE Mutant_ID=? AND Alive=1;";
         Connection conn = DB.getConnection();
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
+        DatabaseValue<?>[] valueList = new DatabaseValue[]{
                 DatabaseValue.of(score), DatabaseValue.of(id)
         };
 
@@ -314,7 +314,7 @@ public class Mutant implements Serializable {
             query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
         }
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(equivalent.name()),
                 DatabaseValue.of(alive),
                 DatabaseValue.of(roundKilled),

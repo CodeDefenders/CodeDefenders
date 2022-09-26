@@ -142,7 +142,7 @@ public class Test {
         String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
         Connection conn = DB.getConnection();
 
-        DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
+        DatabaseValue<?>[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
 
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
@@ -194,7 +194,7 @@ public class Test {
         String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
         Connection conn = DB.getConnection();
 
-        DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
+        DatabaseValue<?>[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
 
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 

@@ -130,7 +130,7 @@ public class DatabaseValue<T> {
         int typeValue;
         Class<?> clazz;
 
-        Type(int typeValue, Class clazz) {
+        Type(int typeValue, Class<?> clazz) {
             this.typeValue = typeValue;
             this.clazz = clazz;
         }

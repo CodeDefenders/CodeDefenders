@@ -330,7 +330,7 @@ public class GameClassDAO {
                 "Parent_Class,",
                 "Active",
                 ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
                 DatabaseValue.of(relativeJavaFile),
@@ -375,7 +375,7 @@ public class GameClassDAO {
                 "WHERE class_ID = ?"
 
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(alias),
                 DatabaseValue.of(isMockingEnabled),
                 DatabaseValue.of(isActive),
@@ -451,7 +451,7 @@ public class GameClassDAO {
         bob.append("?);");
 
         String query = bob.toString();
-        DatabaseValue[] values = classes.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
+        DatabaseValue<?>[] values = classes.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
     }

@@ -36,7 +36,8 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleEntry
  */
-public class PuzzleChapterEntry implements Comparable {
+// TODO(Alex): This should prob. be only comparable with another PuzzleChapterEntry?!!
+public class PuzzleChapterEntry implements Comparable<Object> {
     private PuzzleChapter chapter;
     private SortedSet<PuzzleEntry> puzzleEntries;
 
