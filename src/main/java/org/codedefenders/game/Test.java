@@ -148,7 +148,7 @@ public class Test {
 
         boolean incremented = DB.executeUpdate(stmt, conn);
 
-        logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
+        logger.info("Increment score for {} by {}. Update? {} ", this, score, incremented);
     }
 
     @Deprecated
@@ -203,7 +203,7 @@ public class Test {
         // Eventually update the kill count from the DB
         mutantsKilled = TestDAO.getTestById(getId()).getMutantsKilled();
 
-        logger.info("Test {} new killcount is {}. Was updated ? {} ", toString(), mutantsKilled, updated);
+        logger.info("Test {} new killcount is {}. Was updated ? {} ", this, mutantsKilled, updated);
     }
 
     public boolean isMutantCovered(Mutant mutant) {
