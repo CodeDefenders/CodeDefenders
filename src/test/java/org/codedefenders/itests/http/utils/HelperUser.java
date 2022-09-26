@@ -86,7 +86,7 @@ public class HelperUser {
         HtmlPage retunToGamePage = browser.getPage(loginRequest);
     }
 
-    public int createNewGame(int classID, //
+    public int createNewGame(int classId, //
             boolean isHardGame, // Level
             int maxAssertionsPerTest, // maxAssertionsPerTest
             int mutantValidatorLevel, // mutantValidatorLevel
@@ -107,7 +107,7 @@ public class HelperUser {
                 HttpMethod.POST);
         createGameRequest.setRequestParameters(Arrays.asList(
                 new NameValuePair("formType", "createGame"),
-                new NameValuePair("class", "" + classID),
+                new NameValuePair("class", "" + classId),
                 new NameValuePair("level", "" + isHardGame), // TODO What happens id this is false? Of shall we omit that in that case?
                 new NameValuePair("maxAssertionsPerTest", "" + maxAssertionsPerTest),
                 new NameValuePair("mutantValidatorLevel", "" + mutantValidatorLevel), // 0 - 1 - 2
@@ -134,7 +134,7 @@ public class HelperUser {
     }
 
     @Deprecated// Backwards compatibility
-    public int createNewGame(int classID) throws FailingHttpStatusCodeException, IOException {
+    public int createNewGame(int classId) throws FailingHttpStatusCodeException, IOException {
         // List the games already there
         Set<String> myGames = new HashSet<>();
         //
@@ -148,7 +148,7 @@ public class HelperUser {
         WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME),
                 HttpMethod.POST);
         createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classID), //
+                new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classId), //
                 new NameValuePair("level", "true"), //
 
         }));
@@ -174,12 +174,12 @@ public class HelperUser {
 
     }
 
-    public HtmlPage startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
+    public HtmlPage startGame(int gameId) throws FailingHttpStatusCodeException, IOException {
 
         WebRequest startGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
         // // Then we set the request parameters
         startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameID)}));
+                new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameId)}));
         // Finally, we can get the page
         return browser.getPage(startGameRequest);
 
@@ -188,15 +188,15 @@ public class HelperUser {
     /**
      * Returns the landing HtmlPage after joining the game
      */
-    public HtmlPage joinOpenGame(int gameID, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
+    public HtmlPage joinOpenGame(int gameId, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
         HtmlPage openGames = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
 
-        // Really we can simply click on that link once we know the gameID,
+        // Really we can simply click on that link once we know the gameId,
         // no need to go to openGame page
         HtmlAnchor joinLink = null;
         for (HtmlAnchor a : openGames.getAnchors()) {
             if (a.getHrefAttribute()
-                    .contains(Paths.BATTLEGROUND_GAME + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&gameId=" + gameID)) {
+                    .contains(Paths.BATTLEGROUND_GAME + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&gameId=" + gameId)) {
                 joinLink = a;
                 break;
             }
@@ -318,11 +318,11 @@ public class HelperUser {
 
         // Class IDs before
         //
-        List<String> classIDs = new ArrayList<>();
+        List<String> classIds = new ArrayList<>();
         for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
             if (l instanceof HtmlTableDataCell) {
                 HtmlTableDataCell td = (HtmlTableDataCell) l;
-                classIDs.add(td.getTextContent());
+                classIds.add(td.getTextContent());
             }
         }
 
@@ -340,9 +340,9 @@ public class HelperUser {
         for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
             if (l instanceof HtmlTableDataCell) {
                 HtmlTableDataCell td = (HtmlTableDataCell) l;
-                if (classIDs.contains(td.getTextContent()))
+                if (classIds.contains(td.getTextContent())) {
                     continue;
-                else {
+                } else {
                     return Integer.parseInt(td.getTextContent());
                 }
             }

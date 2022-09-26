@@ -49,7 +49,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 /**
  * This is taken from:
  * <a href="https://rmannibucau.wordpress.com/2016/02/29/cdi-replace-the-configuration-by-a-register-pattern/">
- *     CDI: replace the configuration by a register pattern</a>
+ *     CDI: replace the configuration by a register pattern</a>.
  */
 @ApplicationScoped
 public class ThreadPoolManager {

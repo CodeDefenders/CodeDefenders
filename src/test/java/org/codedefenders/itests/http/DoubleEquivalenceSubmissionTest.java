@@ -228,28 +228,28 @@ public class DoubleEquivalenceSubmissionTest {
 
         }
 
-        public void startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
+        public void startGame(int gameId) throws FailingHttpStatusCodeException, IOException {
 
             WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
                     HttpMethod.POST);
             // // Then we set the request parameters
             startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameID)}));
+                    new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameId)}));
             // Finally, we can get the page
             // Not sure why this returns TextPage and not HtmlPage
             browser.getPage(startGameRequest);
 
         }
 
-        public void joinOpenGame(int gameID, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
+        public void joinOpenGame(int gameId, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
             HtmlPage openGames = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
 
-            // Really we can simply click on that link once we know the gameID,
+            // Really we can simply click on that link once we know the gameId,
             // no need to go to openGame page
             HtmlAnchor joinLink = null;
             for (HtmlAnchor a : openGames.getAnchors()) {
                 if (a.getHrefAttribute().contains(
-                        Paths.BATTLEGROUND_GAME + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&gameId=" + gameID)) {
+                        Paths.BATTLEGROUND_GAME + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&gameId=" + gameId)) {
                     joinLink = a;
                     break;
                 }

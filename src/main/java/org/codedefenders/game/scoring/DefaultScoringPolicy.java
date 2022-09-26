@@ -150,6 +150,8 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         mutantScore = mutantScore + 1;
                         mutantsScore.put(mutantId, mutantScore);
                         break;
+                    default:
+                        // Ignore other events
 
                 }
             }

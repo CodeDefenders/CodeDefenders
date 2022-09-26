@@ -150,12 +150,12 @@ public class UnkillableMutant {
         System.out.println("Creator Login");
 
         // Upload the class
-        int classID = creator.uploadClass(new File("src/test/resources/itests/sources/XmlElement/XmlElement.java"));
+        int classId = creator.uploadClass(new File("src/test/resources/itests/sources/XmlElement/XmlElement.java"));
 
-        System.out.println("UnkillableMutant.testUnkillableMutant() Class ID = " + classID);
+        System.out.println("UnkillableMutant.testUnkillableMutant() Class ID = " + classId);
 
         //
-        int newGameId = creator.createNewGame(classID);
+        int newGameId = creator.createNewGame(classId);
         System.out.println("Creator Create new Game: " + newGameId);
         //
         creator.startGame(newGameId);

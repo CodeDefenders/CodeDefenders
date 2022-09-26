@@ -41,8 +41,8 @@ public interface TestSolvingStrategy {
         }
         try {
             return ((TestSolvingStrategy) Types.valueOf(name).clazz.getDeclaredConstructor().newInstance());
-        } catch (IllegalArgumentException | IllegalAccessException | InstantiationException | NoSuchMethodException |
-                 InvocationTargetException ignored) {
+        } catch (IllegalArgumentException | IllegalAccessException | InstantiationException | NoSuchMethodException
+                 | InvocationTargetException ignored) {
             // ignored
         }
         return null;

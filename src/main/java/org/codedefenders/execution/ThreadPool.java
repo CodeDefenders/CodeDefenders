@@ -32,7 +32,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 /**
  * This is taken from:
  * <a href="https://rmannibucau.wordpress.com/2016/02/29/cdi-replace-the-configuration-by-a-register-pattern/">
- *     CDI: replace the configuration by a register pattern</a>
+ *     CDI: replace the configuration by a register pattern</a>.
  */
 @Qualifier
 @Target({METHOD, FIELD, PARAMETER})

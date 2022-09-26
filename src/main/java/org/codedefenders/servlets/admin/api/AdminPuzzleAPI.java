@@ -458,16 +458,16 @@ public class AdminPuzzleAPI extends HttpServlet {
         @Override
         public void write(JsonWriter out, Puzzle puzzle) throws IOException {
             out.beginObject()
-                .name("id").value(puzzle.getPuzzleId())
-                .name("position").value(puzzle.getPosition())
-                .name("title").value(puzzle.getTitle())
-                .name("description").value(puzzle.getDescription())
-                .name("maxAssertionsPerTest").value(puzzle.getMaxAssertionsPerTest())
-                .name("editableLinesStart").value(puzzle.getEditableLinesStart())
-                .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
-                .name("chapterId").value(puzzle.getChapterId())
-                .name("classId").value(puzzle.getClassId())
-                .endObject();
+                    .name("id").value(puzzle.getPuzzleId())
+                    .name("position").value(puzzle.getPosition())
+                    .name("title").value(puzzle.getTitle())
+                    .name("description").value(puzzle.getDescription())
+                    .name("maxAssertionsPerTest").value(puzzle.getMaxAssertionsPerTest())
+                    .name("editableLinesStart").value(puzzle.getEditableLinesStart())
+                    .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
+                    .name("chapterId").value(puzzle.getChapterId())
+                    .name("classId").value(puzzle.getClassId())
+                    .endObject();
             out.close();
         }
 
@@ -500,11 +500,11 @@ public class AdminPuzzleAPI extends HttpServlet {
         @Override
         public void write(JsonWriter out, PuzzleChapter chapter) throws IOException {
             out.beginObject()
-                .name("id").value(chapter.getChapterId())
-                .name("position").value(chapter.getPosition())
-                .name("title").value(chapter.getTitle())
-                .name("description").value(chapter.getDescription())
-                .endObject();
+                    .name("id").value(chapter.getChapterId())
+                    .name("position").value(chapter.getPosition())
+                    .name("title").value(chapter.getTitle())
+                    .name("description").value(chapter.getDescription())
+                    .endObject();
             out.close();
         }
 

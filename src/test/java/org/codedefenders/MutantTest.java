@@ -128,28 +128,28 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         // This call causes the connection lookup
-        PowerMockito.when(MultiplayerGameDAO.getMultiplayerGame(mockedGameID)).thenReturn(mockedGame);
+        PowerMockito.when(MultiplayerGameDAO.getMultiplayerGame(mockedGameId)).thenReturn(mockedGame);
 
 
         when(mockedGame.getClassId()).thenReturn(1);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedClassID, mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedClassId, mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         Patch<String> p = m.getDifferences();
 
@@ -198,25 +198,25 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
         when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         Patch<String> p = m.getDifferences();
 
@@ -258,25 +258,25 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
         when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         Patch<String> p = m.getDifferences();
 
@@ -319,25 +319,25 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
         when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         Patch<String> p = m.getDifferences();
 
@@ -382,24 +382,24 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         Patch<String> p = m.getDifferences();
 
@@ -412,8 +412,8 @@ public class MutantTest {
 
     @Test
     public void testGetLinesForInsertionMutantOnDisjointLines() throws IOException {
-//        int classId = MultiplayerGameDAO.getMultiplayerGame(gameId).getClassId();
-//        GameClass sut = MultiplayerGameDAO.getClassForId(classId);
+        //int classId = MultiplayerGameDAO.getMultiplayerGame(gameId).getClassId();
+        //GameClass sut = MultiplayerGameDAO.getClassForId(classId);
 
         // Mock the class provide a temmp sourceFile with original content in it
         String originalCode = "public class Lift {" + "\n"
@@ -459,25 +459,25 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
         when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getLines());
         System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
@@ -527,30 +527,30 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
         when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         Patch<String> p = m.getDifferences();
 
         assertEquals(1, p.getDeltas().size());
-//        assertEquals(Arrays.asList(7), m.getLines());
+        //assertEquals(Arrays.asList(7), m.getLines());
 
         for (AbstractDelta<String> d : p.getDeltas()) {
             System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
@@ -592,25 +592,25 @@ public class MutantTest {
         GameClass mockedGameClass = mock(GameClass.class);
         MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
-        int mockedClassID = 1;
-        int mockedGameID = 1;
+        int mockedClassId = 1;
+        int mockedGameId = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
-        when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedGame.getId()).thenReturn(mockedGameID);
+        when(mockedGameClass.getId()).thenReturn(mockedClassId);
+        when(mockedGame.getClassId()).thenReturn(mockedClassId);
+        when(mockedGame.getId()).thenReturn(mockedGameId);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
         when(mockedGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassId)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
-        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
+        when(GameDAO.getCurrentRound(mockedGameId)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameID));
+        Mutant m = new Mutant(mockedGameId, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1, GameDAO.getCurrentRound(mockedGameId));
 
         Patch<String> p = m.getDifferences();
 
