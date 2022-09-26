@@ -56,7 +56,7 @@ class AttackerIntentionCollection {
         this._attackButton.disabled = true;
 
         const mutantProgressBar = await objects.await('mutantProgressBar');
-        mutantProgressBar.activate;
+        mutantProgressBar.activate();
     }
 }
 
