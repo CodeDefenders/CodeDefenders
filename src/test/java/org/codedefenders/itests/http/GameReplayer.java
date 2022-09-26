@@ -269,30 +269,26 @@ public class GameReplayer {
             CodeDefenderAction action = actions.get(i);
             System.out.println("GameReplayer.replay() Scheduling action for " + action.getUserId() + " after "
                     + ((action.getDelay() + INITIAL_DELAY_MILLIS) / speedUp));
-            scheduledExecutors.schedule(new Runnable() {
+            scheduledExecutors.schedule(() -> {
+                HelperUser user = actors.get(action.getUserId());
 
-                @Override
-                public void run() {
-                    HelperUser user = actors.get(action.getUserId());
-
-                    if (action instanceof DefendAction) {
-                        try {
-                            System.out.println((index + 1) + "/" + total + ") Defend " + user.getUser().getUsername()
-                                    + " using " + action.getPayload());
-                            user.defend(mpGameId, readFile(action.getPayload(), Charset.defaultCharset()));
-                        } catch (FailingHttpStatusCodeException | IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    } else {
-                        try {
-                            System.out.println((index + 1) + "/" + total + ") Attack " + user.getUser().getUsername()
-                                    + " using " + action.getPayload());
-                            user.attack(mpGameId, readFile(action.getPayload(), Charset.defaultCharset()));
-                        } catch (FailingHttpStatusCodeException | IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                if (action instanceof DefendAction) {
+                    try {
+                        System.out.println((index + 1) + "/" + total + ") Defend " + user.getUser().getUsername()
+                                + " using " + action.getPayload());
+                        user.defend(mpGameId, readFile(action.getPayload(), Charset.defaultCharset()));
+                    } catch (FailingHttpStatusCodeException | IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        System.out.println((index + 1) + "/" + total + ") Attack " + user.getUser().getUsername()
+                                + " using " + action.getPayload());
+                        user.attack(mpGameId, readFile(action.getPayload(), Charset.defaultCharset()));
+                    } catch (FailingHttpStatusCodeException | IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
                 }
             }, (action.getDelay() + INITIAL_DELAY_MILLIS) / speedUp, TimeUnit.MILLISECONDS);

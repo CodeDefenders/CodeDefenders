@@ -121,12 +121,9 @@ public class ConsistencyTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -299,13 +296,10 @@ public class ConsistencyTest {
         ExecutorService executorService = Executors.newFixedThreadPool(defenders.length);
 
         for (final org.codedefenders.game.Test newTest : tests) {
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("Submit test " + newTest.getId());
-                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
-                    activeGame.update();
-                }
+            executorService.submit(() -> {
+                System.out.println("Submit test " + newTest.getId());
+                mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
+                activeGame.update();
             });
         }
         executorService.shutdown();

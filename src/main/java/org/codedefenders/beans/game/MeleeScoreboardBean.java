@@ -106,19 +106,15 @@ public class MeleeScoreboardBean {
      */
     public List<ScoreItem> getSortedScoreItems() {
         List<ScoreItem> scoreItems = getScoreItems();
-        Collections.sort(scoreItems, new Comparator<ScoreItem>() {
+        Collections.sort(scoreItems, (o1, o2) -> {
+            // We need to reverse the sorting, the higher number is above
+            int diff = (o2.getAttackScore().getTotalScore() + o2.getDefenseScore().getTotalScore() + o2.getDuelScore().getTotalScore())
+                    - (o1.getAttackScore().getTotalScore() + o1.getDefenseScore().getTotalScore() + o1.getDuelScore().getTotalScore());
 
-            @Override
-            public int compare(ScoreItem o1, ScoreItem o2) {
-                // We need to reverse the sorting, the higher number is above
-                int diff = (o2.getAttackScore().getTotalScore() + o2.getDefenseScore().getTotalScore() + o2.getDuelScore().getTotalScore())
-                        - (o1.getAttackScore().getTotalScore() + o1.getDefenseScore().getTotalScore() + o1.getDuelScore().getTotalScore());
-
-                if (diff == 0) {
-                    return o1.getUser().getName().compareTo(o2.getUser().getName());
-                } else {
-                    return diff;
-                }
+            if (diff == 0) {
+                return o1.getUser().getName().compareTo(o2.getUser().getName());
+            } else {
+                return diff;
             }
         });
         return scoreItems;

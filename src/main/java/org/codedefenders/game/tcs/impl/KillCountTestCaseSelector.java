@@ -47,12 +47,9 @@ public class KillCountTestCaseSelector extends PrioritizedTestCaseSelector {
                 }
             }
 
-            Collections.sort(allTests, new Comparator<Test>() {
-                @Override
-                public int compare(Test o1, Test o2) {
-                    // Reverse
-                    return -1 * (o1.getScore() - o2.getScore());
-                }
+            Collections.sort(allTests, (o1, o2) -> {
+                // Reverse
+                return -1 * (o1.getScore() - o2.getScore());
             });
         } catch (Exception e) {
             logger.error("Cannot compute killmap:", e);

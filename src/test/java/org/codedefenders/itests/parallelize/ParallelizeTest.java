@@ -117,12 +117,9 @@ public class ParallelizeTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 

@@ -138,11 +138,9 @@ public class AdminUserManagementIT {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -166,11 +164,7 @@ public class AdminUserManagementIT {
 
         PowerMockito.mockStatic(EmailUtils.class);
         PowerMockito.when(EmailUtils.class, "sendEmail", Mockito.anyString(), Mockito.anyString(), Mockito.anyString())
-                .thenAnswer(new Answer<Boolean>() {
-                    public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                        return true;
-                    }
-                });
+                .thenAnswer((Answer<Boolean>) invocation -> true);
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);

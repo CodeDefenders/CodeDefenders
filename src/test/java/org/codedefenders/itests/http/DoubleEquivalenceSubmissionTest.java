@@ -120,13 +120,7 @@ public class DoubleEquivalenceSubmissionTest {
             webClient.getOptions().setTimeout(TIMEOUT);
             webClient.getOptions().setPrintContentOnFailingStatusCode(false);
             webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-            webClient.setAlertHandler(new AlertHandler() {
-
-                public void handleAlert(Page page, String message) {
-                    System.err.println("[alert] " + message);
-                }
-
-            });
+            webClient.setAlertHandler((page, message) -> System.err.println("[alert] " + message));
             // Shut down HtmlUnit
             // webClient.setIncorrectnessListener(new IncorrectnessListener() {
             //
@@ -435,27 +429,20 @@ public class DoubleEquivalenceSubmissionTest {
         //
         // Claim the equivalence "at the same time" using threads/runnables
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        executorService.submit(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    defender.claimEquivalenceOnLine(newGameId, 9);
-                    System.out.println("Defender claim equivalence in game " + newGameId);
-                } catch (FailingHttpStatusCodeException | IOException e) {
-                    e.printStackTrace();
-                }
+        executorService.submit(() -> {
+            try {
+                defender.claimEquivalenceOnLine(newGameId, 9);
+                System.out.println("Defender claim equivalence in game " + newGameId);
+            } catch (FailingHttpStatusCodeException | IOException e) {
+                e.printStackTrace();
             }
         });
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    defender2.claimEquivalenceOnLine(newGameId, 9);
-                    System.out.println("Defender 2 claim equivalence in game " + newGameId);
-                } catch (FailingHttpStatusCodeException | IOException e) {
-                    e.printStackTrace();
-                }
+        executorService.submit(() -> {
+            try {
+                defender2.claimEquivalenceOnLine(newGameId, 9);
+                System.out.println("Defender 2 claim equivalence in game " + newGameId);
+            } catch (FailingHttpStatusCodeException | IOException e) {
+                e.printStackTrace();
             }
         });
         executorService.shutdown();

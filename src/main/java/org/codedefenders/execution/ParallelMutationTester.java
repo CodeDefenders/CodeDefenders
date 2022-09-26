@@ -99,14 +99,10 @@ public class ParallelMutationTester extends MutationTester //
                 continue;
             }
 
-            FutureTask<Boolean> task = new FutureTask<>(new Callable<Boolean>() {
-
-                @Override
-                public Boolean call() throws Exception {
-                    // This automatically update the 'mutants' and 'tests'
-                    // tables, as well as the test and mutant objects.
-                    return testVsMutant(test, mutant);
-                }
+            FutureTask<Boolean> task = new FutureTask<>(() -> {
+                // This automatically update the 'mutants' and 'tests'
+                // tables, as well as the test and mutant objects.
+                return testVsMutant(test, mutant);
             });
 
             // This is for checking later
@@ -218,14 +214,10 @@ public class ParallelMutationTester extends MutationTester //
                 continue;
             }
 
-            FutureTask<Boolean> task = new FutureTask<>(new Callable<Boolean>() {
-
-                @Override
-                public Boolean call() throws Exception {
-                    logger.info("Executing mutant " + mutant.getId() + ", test " + test.getId());
-                    // TODO Is this testVsMutant thread safe?
-                    return testVsMutant(test, mutant);
-                }
+            FutureTask<Boolean> task = new FutureTask<>(() -> {
+                logger.info("Executing mutant " + mutant.getId() + ", test " + test.getId());
+                // TODO Is this testVsMutant thread safe?
+                return testVsMutant(test, mutant);
             });
 
             // Book keeping

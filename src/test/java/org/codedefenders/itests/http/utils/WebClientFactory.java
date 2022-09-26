@@ -65,13 +65,7 @@ public class WebClientFactory {
         webClient.getOptions().setTimeout(TIMEOUT);
         webClient.getOptions().setPrintContentOnFailingStatusCode(false);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-        webClient.setAlertHandler(new AlertHandler() {
-
-            public void handleAlert(Page page, String message) {
-                System.err.println("[alert] " + message);
-            }
-
-        });
+        webClient.setAlertHandler((page, message) -> System.err.println("[alert] " + message));
         // Shut down HtmlUnit
         // webClient.setIncorrectnessListener(new IncorrectnessListener() {
         //
