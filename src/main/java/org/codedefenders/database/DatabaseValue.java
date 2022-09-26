@@ -127,8 +127,8 @@ public class DatabaseValue<T> {
         TIMESTAMP(Types.TIMESTAMP, Timestamp.class),
         BOOLEAN(Types.BOOLEAN, Boolean.class);
 
-        int typeValue;
-        Class<?> clazz;
+        final int typeValue;
+        final Class<?> clazz;
 
         Type(int typeValue, Class<?> clazz) {
             this.typeValue = typeValue;

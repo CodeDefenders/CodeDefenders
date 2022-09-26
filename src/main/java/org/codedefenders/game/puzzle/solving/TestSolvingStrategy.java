@@ -51,8 +51,8 @@ public interface TestSolvingStrategy {
     enum Types {
         KILLED_ALL_MUTANTS(KilledAllMutantsTestSolvingStrategy.class, "Tests killed all mutants.");
 
-        Class<?> clazz;
-        String description;
+        final Class<?> clazz;
+        final String description;
 
         Types(Class<?> clazz, String description) {
             this.clazz = clazz;
