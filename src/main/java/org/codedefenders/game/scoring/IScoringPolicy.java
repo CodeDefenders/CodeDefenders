@@ -16,17 +16,17 @@ public interface IScoringPolicy {
      * Associate this test with a score.
      * TODO Consider returning or updating PlayerScore instead of test
      */
-    public void scoreTest(Test test);
+    void scoreTest(Test test);
 
     /**
      * Associate this mutant with a score.
      * TODO Consider returning or updating PlayerScore instead of mutant
      */
-    public void scoreMutant(Mutant mutant);
+    void scoreMutant(Mutant mutant);
 
     /**
      * Associate this PlayerScore with points gained by winning equivalence duels.
      */
-    public void scoreDuels(PlayerScore duelScore);
+    void scoreDuels(PlayerScore duelScore);
 
 }
