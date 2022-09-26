@@ -504,7 +504,7 @@ public class MultiplayerGameManager extends HttpServlet {
      */
     List<Integer> extractErrorLines(String compilerOutput) {
         Set<Integer> errorLines = new TreeSet<>(); // Use TreeSet for the ordering
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
+        Pattern p = Pattern.compile("\\[javac].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
@@ -530,7 +530,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
 
         StringBuilder decorated = new StringBuilder();
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
+        Pattern p = Pattern.compile("\\[javac].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {

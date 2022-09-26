@@ -130,7 +130,7 @@ public class HelperUser {
         // There's should be only one
         System.out.println("HelperUser.createNewGame() " + newGameLink);
         //
-        return Integer.parseInt(newGameLink.replaceAll("/multiplayer\\/games\\?gameId=", ""));
+        return Integer.parseInt(newGameLink.replaceAll("/multiplayer/games\\?gameId=", ""));
     }
 
     @Deprecated// Backwards compatibility
@@ -170,7 +170,7 @@ public class HelperUser {
         // There's should be only one
         System.out.println("UnkillableMutant.HelperUser.createNewGame() " + newGameLink);
         //
-        return Integer.parseInt(newGameLink.replaceAll("/multiplayer\\/games\\?gameId=", ""));
+        return Integer.parseInt(newGameLink.replaceAll("/multiplayer/games\\?gameId=", ""));
 
     }
 

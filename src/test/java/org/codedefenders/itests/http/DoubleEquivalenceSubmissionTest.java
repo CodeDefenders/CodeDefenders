@@ -226,7 +226,7 @@ public class DoubleEquivalenceSubmissionTest {
             // There's should be only one
 
             //
-            return Integer.parseInt(newGameLink.replaceAll("multiplayer\\/games\\?gameId=", ""));
+            return Integer.parseInt(newGameLink.replaceAll("multiplayer/games\\?gameId=", ""));
 
         }
 
