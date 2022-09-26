@@ -317,16 +317,7 @@ public class GameReplayer {
             gr.replay(20);
             System.out.println("GameReplayer.main() Replayed");
 
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (FailingHttpStatusCodeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException | FailingHttpStatusCodeException | ParseException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
