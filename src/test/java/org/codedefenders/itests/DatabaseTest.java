@@ -63,6 +63,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -280,8 +281,8 @@ public class DatabaseTest {
         assertTrue(mutant1.insert());
         assertTrue(mutant2.insert());
         Mutant[] ml = {mutant1, mutant2};
-        assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
-        assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml));
+        assertArrayEquals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml);
+        assertArrayEquals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml);
     }
 
     //FIXME
