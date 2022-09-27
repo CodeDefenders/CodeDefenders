@@ -440,6 +440,11 @@ public class MeleeGameDAO {
         return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
     }
 
+    /**
+     * Fetches all expired melee games.
+     *
+     * @return the expired melee games.
+     */
     public static List<MeleeGame> getExpiredGames() {
         final String sql = String.join("\n",
                 "SELECT * ",

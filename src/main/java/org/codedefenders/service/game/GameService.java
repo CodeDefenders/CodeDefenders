@@ -154,6 +154,11 @@ public class GameService implements IGameService {
         return false;
     }
 
+    /**
+     * Fetches and closes all expired multiplayer and melee games.
+     *
+     * @return the amount of games closed.
+     */
     public int closeExpiredGames() {
         final List<AbstractGame> expiredGames = GameDAO.getExpiredGames();
         int closedGames = 0;

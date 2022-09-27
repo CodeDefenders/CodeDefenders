@@ -206,6 +206,11 @@ public class GameDAO {
                 DatabaseValue.of(gameId));
     }
 
+    /**
+     * Fetches a List of Multiplayer- and Melee-Games that have expired.
+     *
+     * @return the expired games.
+     */
     public static List<AbstractGame> getExpiredGames() {
         List<AbstractGame> games = new ArrayList<>();
         games.addAll(MultiplayerGameDAO.getExpiredGames());

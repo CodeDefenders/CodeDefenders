@@ -1,10 +1,13 @@
 package org.codedefenders.execution;
 
 import org.codedefenders.service.game.GameService;
-import org.codedefenders.util.CDIUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This processor is executed regular to handle tasks asynchronous.
+ * Its only task (for now) is to regularly detect and close expired games.
+ */
 public class GameCronJobProcessor implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(GameCronJobProcessor.class);

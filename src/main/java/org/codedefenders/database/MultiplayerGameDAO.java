@@ -443,6 +443,11 @@ public class MultiplayerGameDAO {
         return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
     }
 
+    /**
+     * Fetches all expired multiplayer games.
+     *
+     * @return the expired multiplayer games.
+     */
     public static List<MultiplayerGame> getExpiredGames() {
         final String sql = "SELECT * " +
                 "FROM view_battleground_games " +

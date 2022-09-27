@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TestDAO;
@@ -36,8 +35,6 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
-import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;

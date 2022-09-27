@@ -11,6 +11,10 @@ import org.codedefenders.service.game.GameService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This classes manages the {@link GameCronJobProcessor}. It provides an interface to start and stop its execution.
+ * The processor will be initialized once and executed in a regular time interval.
+ */
 @ApplicationScoped
 public class GameCronJobManager {
 
