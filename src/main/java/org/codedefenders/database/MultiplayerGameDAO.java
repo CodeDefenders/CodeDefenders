@@ -449,11 +449,14 @@ public class MultiplayerGameDAO {
      * @return the expired multiplayer games.
      */
     public static List<MultiplayerGame> getExpiredGames() {
-        final String sql = "SELECT * " +
-                "FROM view_battleground_games " +
-                "WHERE State = ? " +
-                "AND Finish_Time <= NOW() " +
-                "AND Finish_Time <> '1970-02-02 01:01:01.0'";
+        final String sql = String.join("\n",
+                "SELECT bg.*",
+                "FROM view_battleground_games bg, games g",
+                "WHERE g.ID = bg.ID",
+                "AND g.State = ?",
+                "AND TIMESTAMPADD(MINUTE, g.Game_Duration_Minutes, g.Start_Time) <= NOW();"
+        );
+
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
         return DB.executeQueryReturnList(sql, MultiplayerGameDAO::multiplayerGameFromRS, state);
     }

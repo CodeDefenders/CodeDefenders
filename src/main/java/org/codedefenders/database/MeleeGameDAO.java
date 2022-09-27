@@ -447,11 +447,11 @@ public class MeleeGameDAO {
      */
     public static List<MeleeGame> getExpiredGames() {
         final String sql = String.join("\n",
-                "SELECT * ",
-                "FROM view_melee_games ",
-                "WHERE State = ? ",
-                "AND Finish_Time <= NOW() ",
-                "AND Finish_Time <> '1970-02-02 01:01:01.0';"
+                "SELECT mg.*",
+                "FROM view_melee_games mg, games g",
+                "WHERE g.ID = mg.ID",
+                "AND g.State = ?",
+                "AND TIMESTAMPADD(MINUTE, g.Game_Duration_Minutes, g.Start_Time) <= NOW();"
         );
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
