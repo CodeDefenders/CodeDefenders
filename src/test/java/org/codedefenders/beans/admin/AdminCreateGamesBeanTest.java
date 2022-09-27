@@ -27,10 +27,13 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -52,6 +55,7 @@ import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -215,8 +219,24 @@ public class AdminCreateGamesBeanTest {
         assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame4));
     }
 
+    private static void mockGameDurationAdminSettings() {
+        PowerMockito.when(
+                AdminDAO.getSystemSetting(argThat(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT::equals))
+        ).thenReturn(
+                new AdminSystemSettings.SettingsDTO(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT, 60)
+        );
+
+        PowerMockito.when(
+                AdminDAO.getSystemSetting(argThat(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX::equals))
+        ).thenReturn(
+                new AdminSystemSettings.SettingsDTO(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX, 10080)
+        );
+    }
+
     @Test
     public void testCreateStagedGames() throws Exception {
+        mockGameDurationAdminSettings();
+
         GameSettings gameSettings = GameSettings.getDefault();
         GameClass cut = PowerMockito.mock(GameClass.class);
         PowerMockito.when(cut.getId()).thenReturn(0);
