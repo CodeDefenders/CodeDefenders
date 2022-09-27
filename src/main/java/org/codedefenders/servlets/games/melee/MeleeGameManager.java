@@ -398,7 +398,7 @@ public class MeleeGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.getBridge().addAll(validationMessages);
+            messages.addAll(validationMessages);
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
@@ -495,7 +495,7 @@ public class MeleeGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
         // Include Test Smells in the messages back to user
-        includeDetectTestSmellsInMessages(newTest, messages.getBridge());
+        includeDetectTestSmellsInMessages(newTest);
 
         final String message = user.getName() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -503,7 +503,7 @@ public class MeleeGameManager extends HttpServlet {
                 EventStatus.GAME, timestamp);
         eventDAO.insert(notif);
 
-        mutationTester.runTestOnAllMeleeMutants(game, newTest, messages.getBridge());
+        messages.add(mutationTester.runTestOnAllMeleeMutants(game, newTest));
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -697,7 +697,7 @@ public class MeleeGameManager extends HttpServlet {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        mutationTester.runAllTestsOnMeleeMutant(game, newMutant, messages.getBridge());
+        messages.add(mutationTester.runAllTestsOnMeleeMutant(game, newMutant));
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -813,7 +813,7 @@ public class MeleeGameManager extends HttpServlet {
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.getBridge().addAll(validationMessage);
+                messages.addAll(validationMessage);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
                 return;
@@ -1081,7 +1081,7 @@ public class MeleeGameManager extends HttpServlet {
         }
     }
 
-    private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
+    private void includeDetectTestSmellsInMessages(Test newTest) {
         List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {

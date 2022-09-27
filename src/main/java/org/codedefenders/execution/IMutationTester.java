@@ -18,8 +18,6 @@
  */
 package org.codedefenders.execution;
 
-import java.util.ArrayList;
-
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -28,34 +26,34 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 public interface IMutationTester {
 
-    void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages);
+    String runTestOnAllMutants(AbstractGame game, Test test);
 
-    void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages);
+    String runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test);
 
     // TODO Note that we need duplicate methods because the basic runAll methods use
     // AbstractGame !
     /**
      * Execute the test against all the other players' mutants
      */
-    void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages);
+    String runTestOnAllMeleeMutants(MeleeGame game, Test test);
 
     /**
      * Execute all the tests registered from all the other players against the
      * provided mutant, using a random scheduling of test execution.
      */
-    void runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant, ArrayList<String> messages);
+    String runAllTestsOnMeleeMutant(MeleeGame game, Mutant newMutant);
 
     /**
      * Execute all the tests registered for the defenders against the provided
      * mutant, using a random scheduling of test execution.
      */
-    void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages);
+    String runAllTestsOnMutant(AbstractGame game, Mutant mutant);
 
     /**
      * Execute all the tests registered for the defenders against the provided
      * mutant, using a the given TestScheduler for ordering the execution of tests.
      */
-    void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages, TestScheduler scheduler);
+    String runAllTestsOnMutant(AbstractGame game, Mutant mutant, TestScheduler scheduler);
 
     /**
      * Runs an equivalence test using an attacker supplied test and a mutant thought

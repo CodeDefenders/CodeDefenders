@@ -423,7 +423,7 @@ public class PuzzleGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.getBridge().addAll(validationMessage);
+            messages.addAll(validationMessage);
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -467,7 +467,7 @@ public class PuzzleGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
         previousSubmission.clear();
 
-        mutationTester.runTestOnAllMutants(game, newTest, messages.getBridge());
+        messages.add(mutationTester.runTestOnAllMutants(game, newTest));
 
         TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
         ttme.setGameId(gameId);
@@ -648,7 +648,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         messages.add(MUTANT_COMPILED_MESSAGE);
         previousSubmission.clear();
-        mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
+        messages.add(mutationTester.runAllTestsOnMutant(game, newMutant));
 
         MutantTestedEvent mte = new MutantTestedEvent();
         mte.setGameId(gameId);

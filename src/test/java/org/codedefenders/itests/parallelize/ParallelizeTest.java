@@ -306,7 +306,6 @@ public class ParallelizeTest {
 
         int defenderID = battlegroundGame.getDefenderPlayers().get(0).getUser().getId();
         int attackerID = battlegroundGame.getAttackerPlayers().get(0).getUser().getId();
-        ArrayList<String> messages = new ArrayList<>();
 
         List<org.codedefenders.game.Test> submittedTests = new ArrayList<>();
         try {
@@ -328,7 +327,7 @@ public class ParallelizeTest {
                     + "}";
 
             org.codedefenders.game.Test newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
-            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest);
             assumeThat(battlegroundGame.getTests(true).size(), is(1));
             // Append this for oracles and mocks
             submittedTests.add(newTest);
@@ -351,7 +350,7 @@ public class ParallelizeTest {
                     + "    }" + "\n"
                     + "}";
             newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
-            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest);
             assumeThat(battlegroundGame.getTests(true).size(), is(2));
             // Append this for oracles and mocks
             submittedTests.add(newTest);
@@ -388,7 +387,7 @@ public class ParallelizeTest {
                     .scheduleTests(org.mockito.Matchers.anyList());
 
             // Do the execution
-            mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages, mockedTestScheduler);
+            mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, mockedTestScheduler);
 
             // Check that the test execution logged in the DB are in the same order
             List<TargetExecution> executedTargets = new ArrayList<TargetExecution>();
@@ -466,11 +465,10 @@ public class ParallelizeTest {
 
         assertNotNull("Invalid mutant", mutant.getClassFile());
 
-        ArrayList<String> messages = new ArrayList<>();
         // TODO Mock the AntRunner... an interface would make things a lot
         // easier!
         // Finally invoke the method.... For the moment this invokes AntRunner
-        mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages);
+        mutationTester.runAllTestsOnMutant(battlegroundGame, mutant);
 
         // assertMutant is killed!
         assertFalse("Mutant not killed", mutant.isAlive());

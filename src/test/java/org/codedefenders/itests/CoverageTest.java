@@ -227,7 +227,7 @@ public class CoverageTest {
         Mutant mutant = gameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
                 attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
-        mutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
+        mutationTester.runAllTestsOnMutant(multiplayerGame, mutant);
         // Probably I need to store the mutant ?
         multiplayerGame.update();
 
@@ -237,11 +237,11 @@ public class CoverageTest {
         String testText = new String(Files.readAllBytes(new File("src/test/resources/itests/tests/ClassWithPrivateInnerClass/TestClassWithPrivateInnerClass.java").toPath()), Charset.defaultCharset());
         org.codedefenders.game.Test newTest = gameManagingUtils.createTest(multiplayerGame.getId(), multiplayerGame.getClassId(),
                 testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
-        mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest, messages);
+        String message = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
         multiplayerGame.update();
         //
-        System.out.println("MutationTesterTest.defend() " + defender.getId() + ": " + messages.get(messages.size() - 1));
-        Assert.assertEquals(Constants.TEST_KILLED_LAST_MESSAGE, messages.get(messages.size() - 1));
+        System.out.println("MutationTesterTest.defend() " + defender.getId() + ": " + message);
+        Assert.assertEquals(Constants.TEST_KILLED_LAST_MESSAGE, message);
 
     }
 }
