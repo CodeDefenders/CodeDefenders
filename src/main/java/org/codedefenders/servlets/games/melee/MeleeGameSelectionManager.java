@@ -34,6 +34,7 @@ import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameLevel;
@@ -45,6 +46,7 @@ import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
@@ -114,6 +116,16 @@ public class MeleeGameSelectionManager extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final String action = formType(request);
+
+        if (!action.equals("createGame")) {
+            MeleeGame game = gameProducer.getGame();
+            if (game == null) {
+                logger.error("No game or wrong type of game found. Aborting request.");
+                Redirect.redirectBack(request, response);
+                return;
+            }
+        }
+
         switch (action) {
             case "createGame":
                 createGame(request, response);
@@ -130,6 +142,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
             case "endGame":
                 endGame(request, response);
                 return;
+            case "rematch":
+                rematch(request, response);
+                return;
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
@@ -138,14 +153,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
-        if (!canCreateGames) {
-            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
-                    login.getUserId());
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         String contextPath = request.getContextPath();
 
         int classId;
@@ -175,37 +182,19 @@ public class MeleeGameSelectionManager extends HttpServlet {
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
         MeleeGame nGame = new MeleeGame.Builder(classId, login.getUserId(), maxAssertionsPerTest)
-                .level(level).chatEnabled(chatEnabled).capturePlayersIntention(capturePlayersIntention)
-                .lineCoverage(lineCoverage).mutantCoverage(mutantCoverage).mutantValidatorLevel(mutantValidatorLevel)
-                .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger).build();
-
-        // TODO This should be handled by MeleeGameDAO. See #687
-        if (nGame.insert()) {
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event event = new Event(-1, nGame.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
-                    EventStatus.GAME, timestamp);
-            // eventDAO.insert(event);
-        }
-
-        // Always add system player to send mutants and tests at runtime!
-        nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER);
-        // TODO: Add two players or only one?
-        // TODO: If only one, then GameManagingUtils.addPredefinedMutantsAndTests needs to be changed.
-        nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.PLAYER);
-
-        // Add selected role to game if the creator participates as non-observer (i.e., player)
-        if (selectedRole == Role.PLAYER) {
-            nGame.addPlayer(login.getUserId(), selectedRole);
-        }
+                .level(level)
+                .chatEnabled(chatEnabled)
+                .capturePlayersIntention(capturePlayersIntention)
+                .lineCoverage(lineCoverage)
+                .mutantCoverage(mutantCoverage)
+                .mutantValidatorLevel(mutantValidatorLevel)
+                .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
+                .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
         boolean withMutants = parameterThenOrOther(request, "withMutants", true, false);
-        gameManagingUtils.addPredefinedMutantsAndTests(nGame, withMutants, withTests);
 
-        /* Publish the event that a new game started */
-        GameCreatedEvent gce = new GameCreatedEvent();
-        gce.setGameId(nGame.getId());
-        notificationService.post(gce);
+        handleCreateGame(nGame, withMutants, withTests, selectedRole);
 
         // Redirect to admin interface
         if (request.getParameter("fromAdmin").equals("true")) {
@@ -227,13 +216,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
 
         MeleeGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         int gameId = game.getId();
 
         if (game.hasUserJoined(login.getUserId())) {
@@ -275,16 +257,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contextPath = request.getContextPath();
         MeleeGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -328,15 +300,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getGame();
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -364,15 +327,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MeleeGame game = gameProducer.getGame();
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MeleeGame)) {
-            logger.error("Game found is no MeleeGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can end the game.");
@@ -404,5 +358,87 @@ public class MeleeGameSelectionManager extends HttpServlet {
             // TODO Update this later !
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_HISTORY + "?gameId=" + gameId);
         }
+    }
+
+    private boolean handleCreateGame(MeleeGame game, boolean withMutants, boolean withTests, Role creatorRole) {
+        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
+        if (!canCreateGames) {
+            logger.warn("User {} tried to create a melee game, but creating games is not permitted.",
+                    login.getUserId());
+            messages.add("Creating games is currently not enabled.");
+            return false;
+        }
+
+        int newGameId = MeleeGameDAO.storeMeleeGame(game);
+        game.setId(newGameId);
+
+        /*
+        Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
+                EventStatus.GAME, new Timestamp(System.currentTimeMillis());
+        eventDAO.insert(event);
+        */
+
+        // Always add system player to send mutants and tests at runtime!
+        game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER);
+        // TODO: Add two players or only one?
+        // TODO: If only one, then GameManagingUtils.addPredefinedMutantsAndTests needs to be changed.
+        game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.PLAYER);
+
+        // Add selected role to game if the creator participates as non-observer (i.e., player)
+        if (creatorRole == Role.PLAYER) {
+            game.addPlayer(login.getUserId(), Role.PLAYER);
+        }
+
+        gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests);
+
+        /* Publish the event that a new game started */
+        GameCreatedEvent gce = new GameCreatedEvent();
+        gce.setGameId(game.getId());
+        notificationService.post(gce);
+
+        return true;
+    }
+
+    private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        MeleeGame oldGame = gameProducer.getGame();
+
+        if (login.getUser().getId() != oldGame.getCreatorId()) {
+            messages.add("Only the creator of this game can call a rematch.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        MeleeGame newGame = new MeleeGame.Builder(
+                oldGame.getClassId(),
+                login.getUserId(),
+                oldGame.getMaxAssertionsPerTest())
+                .level(oldGame.getLevel())
+                .chatEnabled(oldGame.isChatEnabled())
+                .capturePlayersIntention(oldGame.isCapturePlayersIntention())
+                .lineCoverage(oldGame.getLineCoverage())
+                .mutantCoverage(oldGame.getMutantCoverage())
+                .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
+                .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
+                .build();
+
+        boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);
+        boolean withTests = gameManagingUtils.hasPredefinedTests(oldGame);
+        Role creatorRole = oldGame.getRole(oldGame.getCreatorId());
+
+        boolean success = handleCreateGame(newGame, withMutants, withTests, creatorRole);
+
+        if (!success) {
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        for (Player player : oldGame.getPlayers()) {
+            if (player.getRole() == Role.PLAYER
+                    && player.getUser().getId() != oldGame.getCreatorId()) {
+                newGame.addPlayer(player.getUser().getId(), player.getRole());
+            }
+        }
+
+        response.sendRedirect(request.getContextPath() + Paths.MELEE_GAME + "?gameId=" + newGame.getId());
     }
 }

@@ -312,4 +312,16 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
         */
     }
+
+    public boolean hasPredefinedMutants(AbstractGame game) {
+        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.getId());
+        return game.getMutants().stream()
+                .anyMatch(mutant -> mutant.getPlayerId() == dummyAttackerPlayerId);
+    }
+
+    public boolean hasPredefinedTests(AbstractGame game) {
+        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
+        return game.getMutants().stream()
+                .anyMatch(mutant -> mutant.getPlayerId() == dummyDefenderPlayerId);
+    }
 }
