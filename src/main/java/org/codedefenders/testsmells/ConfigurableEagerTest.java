@@ -168,8 +168,8 @@ public class ConfigurableEagerTest extends AbstractSmell {
                 }
             } else { // collect a list of all public/protected members of the production class
                 for (Modifier modifier : n.getModifiers()) {
-                    if (modifier.name().equalsIgnoreCase("public")
-                            || modifier.name().equalsIgnoreCase("protected")) {
+                    if (modifier.getKeyword() == Modifier.Keyword.PUBLIC
+                            || modifier.getKeyword() == Modifier.Keyword.PROTECTED) {
                         productionMethods.add(n);
                     }
                 }

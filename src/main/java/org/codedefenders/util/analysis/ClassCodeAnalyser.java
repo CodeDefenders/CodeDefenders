@@ -21,13 +21,15 @@ package org.codedefenders.util.analysis;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Range;
+import org.codedefenders.util.AnalysisUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseProblemException;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.NodeList;
@@ -36,13 +38,11 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 /**
  * Code analysing class which uses {@link ResultVisitor} to iterate through java class code
@@ -75,12 +75,19 @@ public class ClassCodeAnalyser {
      */
     public static CodeAnalysisResult visitCode(String className, String sourceCode) {
         final CodeAnalysisResult result = new CodeAnalysisResult();
-        try {
-            final CompilationUnit cu = JavaParser.parse(sourceCode);
-            resultVisitor.visit(cu, result);
-        } catch (ParseProblemException e) {
-            logger.warn("Failed to parse {}. Aborting code visit.", className);
+
+        final ParseResult<CompilationUnit> parseResult =
+                AnalysisUtils.getDefaultParser().parse(sourceCode);
+
+        if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
+            resultVisitor.visit(parseResult.getResult().get(), result);
+        } else {
+            final String problems = parseResult.getProblems().stream()
+                    .map(Problem::getMessage)
+                    .collect(Collectors.joining("\n"));
+            logger.warn("Failed to parse {}. Aborting code visit. Problems:\n{}", className, problems);
         }
+
         return result;
     }
 
@@ -89,7 +96,6 @@ public class ClassCodeAnalyser {
      * initialized fields and ranges of methods and its signatures as well as matching brackets.
      */
     private static class ResultVisitor extends VoidVisitorAdapter<CodeAnalysisResult> {
-        private final PrettyPrinterConfiguration printer = new PrettyPrinterConfiguration().setPrintComments(false);
 
         @Override
         public void visit(IfStmt ifStmt, CodeAnalysisResult result) {
@@ -111,7 +117,7 @@ public class ClassCodeAnalyser {
             nonEmptyLines.add(blockStart);
             nonEmptyLines.add(blockEnd);
 
-            // Since #872, we consider lines with comments as EMPTY so we can cover them as well. 
+            // Since #872, we consider lines with comments as EMPTY so we can cover them as well.
 
             // Processing the block
             NodeList<Statement> statements = n.getStatements();
@@ -191,8 +197,8 @@ public class ClassCodeAnalyser {
         @Override
         public void visit(ImportDeclaration n, CodeAnalysisResult arg) {
             super.visit(n, arg);
-            final String imported = n.toString(printer);
-            arg.imported(imported);
+            String importStatement = n.toString();
+            arg.imported(importStatement);
         }
 
         @Override

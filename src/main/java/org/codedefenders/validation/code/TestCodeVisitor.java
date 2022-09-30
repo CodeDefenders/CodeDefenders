@@ -42,13 +42,12 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import static org.codedefenders.game.AssertionLibrary.GOOGLE_TRUTH;
 import static org.codedefenders.game.AssertionLibrary.HAMCREST;
@@ -156,10 +155,10 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         stmtCount++;
-        String stringStmt = stmt.toString(new PrettyPrinterConfiguration().setPrintComments(false));
+        String stmtString = stmt.toString();
         for (String prohibited : CodeValidator.PROHIBITED_CALLS) {
             // This might be a bit too strict... We shall use typeSolver otherwise.
-            if (stringStmt.contains(prohibited)) {
+            if (stmtString.contains(prohibited)) {
                 messages.add("Test contains a prohibited call to " + prohibited);
                 isValid = false;
                 return;
@@ -183,7 +182,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ForeachStmt stmt, Void args) {
+    public void visit(ForEachStmt stmt, Void args) {
         if (!isValid) {
             return;
         }
@@ -342,8 +341,13 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         final AssignExpr.Operator operator = stmt.getOperator();
-        if (operator != null && (Stream.of(AssignExpr.Operator.AND, AssignExpr.Operator.OR, AssignExpr.Operator.XOR)
-                .anyMatch(op -> operator == op))) {
+
+        boolean isIllegal = Stream.of(
+                    AssignExpr.Operator.BINARY_AND,
+                    AssignExpr.Operator.BINARY_OR,
+                    AssignExpr.Operator.XOR)
+                .anyMatch(op -> operator == op);
+        if (isIllegal) {
             isValid = false;
             return;
         }

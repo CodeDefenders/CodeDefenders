@@ -27,8 +27,8 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
@@ -107,7 +107,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ForeachStmt stmt, Void args) {
+    public void visit(ForEachStmt stmt, Void args) {
         if (!isValid) {
             return;
         }
