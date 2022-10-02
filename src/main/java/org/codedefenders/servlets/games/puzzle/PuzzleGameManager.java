@@ -303,7 +303,7 @@ public class PuzzleGameManager extends HttpServlet {
             return null;
         }
 
-        game.setState(GameState.ACTIVE);
+        game.startGame();
         if (!game.update()) {
             logger.error(errorMsg + " Could not update game state.");
             return null;

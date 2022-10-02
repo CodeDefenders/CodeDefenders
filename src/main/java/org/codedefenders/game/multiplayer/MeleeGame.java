@@ -328,6 +328,14 @@ public class MeleeGame extends AbstractGame {
         return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
+    @Override
+    public void startGame() {
+        if (getState() == GameState.CREATED) {
+            setState(GameState.ACTIVE);
+            GameDAO.storeStartTime(this.id);
+        }
+    }
+
     public boolean addPlayer(int userId) {
         if (canJoinGame(userId) && addPlayerForce(userId, Role.PLAYER)) {
             Optional<UserEntity> u = userRepository.getUserById(userId);

@@ -246,4 +246,14 @@ public class GameDAO {
 
         return Optional.ofNullable(role).orElse(Role.NONE);
     }
+
+    public static boolean storeStartTime(int gameId) {
+        String query = String.join("\n",
+                "UPDATE games",
+                "SET Start_Time = NOW()",
+                "WHERE ID = ?"
+        );
+        DatabaseValue[] values = {DatabaseValue.of(gameId)};
+        return DB.executeUpdateQuery(query, values);
+    }
 }

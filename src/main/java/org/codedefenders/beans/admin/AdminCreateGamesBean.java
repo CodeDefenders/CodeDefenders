@@ -716,7 +716,7 @@ public class AdminCreateGamesBean implements Serializable {
 
         /* Start game if configured to. */
         if (gameSettings.isStartGame()) {
-            game.setState(GameState.ACTIVE);
+            game.startGame();
             game.update();
         }
 
