@@ -185,7 +185,7 @@ public class MultiplayerGameDAO {
                 "CapturePlayersIntention,",
                 "EquivalenceThreshold,",
                 "Game_Duration_Minutes)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
