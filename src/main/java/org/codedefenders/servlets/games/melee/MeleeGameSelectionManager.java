@@ -159,6 +159,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
         Role selectedRole;
+        int duration;
 
         try {
             classId = getIntParameter(request, "class").get();
@@ -168,6 +169,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                     .map(CodeValidatorLevel::valueOrNull).get();
             // If we select "player in the UI this should not result in a null value
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).orElse(Role.NONE);
+            duration = getIntParameter(request, "gameDurationMinutes").get();
         } catch (NoSuchElementException e) {
             logger.error("At least one request parameter was missing or was no valid integer value.", e);
             Redirect.redirectBack(request, response);
@@ -188,6 +190,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 .mutantCoverage(mutantCoverage)
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
+                .gameDurationMinutes(duration)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);

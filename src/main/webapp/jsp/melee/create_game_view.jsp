@@ -224,6 +224,21 @@
                     </div>
                 </div>
 
+                <div class="row mb-3" title="The duration in minutes for how long the games will be open.">
+                    <label class="col-4 col-form-label" for="game-duration">
+                        Game Duration in Minutes
+                    </label>
+                    <div class="col-8">
+                        <input id="game-duration" name="gameDurationMinutes" class="form-control"
+                               type="number" required min="1"
+                               value="<%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue() %>"
+                               max="<%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue() %>">
+                        <div class="invalid-feedback">
+                            Please provide a valid number. Must be less than <%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue() %>.
+                        </div>
+                    </div>
+                </div>
+
                 <c:choose>
                     <c:when test="${empty param.origin}">
                         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>

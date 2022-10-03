@@ -15,4 +15,4 @@ WHERE `Game_Duration_Minutes` IS NULL;
 
 ALTER TABLE `games`
 ALTER Start_Time
-SET DEFAULT (CURRENT_TIMESTAMP());
+SET DEFAULT (CURRENT_TIMESTAMP());  -- creation time. Will be reset at game start.

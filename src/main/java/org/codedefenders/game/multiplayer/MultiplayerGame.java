@@ -219,6 +219,7 @@ public class MultiplayerGame extends AbstractGame {
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
+        this.gameDurationMinutes = builder.gameDurationMinutes;
     }
 
     public int getGameDurationMinutes() {

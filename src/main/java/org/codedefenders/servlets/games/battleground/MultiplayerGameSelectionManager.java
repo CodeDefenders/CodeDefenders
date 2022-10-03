@@ -158,6 +158,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
         Role creatorRole;
+        int duration;
 
         try {
             classId = getIntParameter(request, "class").get();
@@ -167,6 +168,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     .map(CodeValidatorLevel::valueOrNull)
                     .get();
             creatorRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
+            duration = getIntParameter(request, "gameDurationMinutes").get();
         } catch (NoSuchElementException e) {
             logger.error("At least one request parameter was missing or was no valid integer value.", e);
             Redirect.redirectBack(request, response);
@@ -187,6 +189,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantCoverage(mutantCoverage)
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
+                .gameDurationMinutes(duration)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
