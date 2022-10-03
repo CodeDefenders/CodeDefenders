@@ -5,14 +5,11 @@ VALUES ('GAME_DURATION_MINUTES_MAX',     'INT_VALUE', NULL,         10080,     N
 ALTER TABLE `games`
 ADD COLUMN IF NOT EXISTS `Game_Duration_Minutes` int(11) DEFAULT NULL;
 
+# Migrate existing games by letting them stay open for the maximum duration from now on.
 UPDATE `games`
 SET `Game_Duration_Minutes` = (
     SELECT `settings`.INT_VALUE
     FROM `settings`
-    WHERE `settings`.name = 'GAME_DURATION_MINUTES_DEFAULT'
-)
+    WHERE `settings`.name = 'GAME_DURATION_MINUTES_MAX'
+), `Start_Time` = NOW()
 WHERE `Game_Duration_Minutes` IS NULL;
-
-ALTER TABLE `games`
-ALTER Start_Time
-SET DEFAULT (CURRENT_TIMESTAMP());  -- creation time. Will be reset at game start.
