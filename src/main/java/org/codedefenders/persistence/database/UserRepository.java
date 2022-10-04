@@ -35,8 +35,8 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.transaction.Transactional;
 import org.codedefenders.service.MetricsService;
+import org.codedefenders.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
