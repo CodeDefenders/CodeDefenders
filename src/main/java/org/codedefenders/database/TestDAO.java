@@ -415,7 +415,7 @@ public class TestDAO {
     /**
      * Returns the id of the first Test (from the same game) that killed the mutant with the provided ID.
      */
-    public static int getKillingTestIdForMutantInSameGame(int mutantId) {
+    public static int getKillingTestIdForMutant(int mutantId) {
         String query = "SELECT te.* "
                 + "FROM targetexecutions te "
                 + "JOIN mutants m on m.Mutant_ID = te.Mutant_ID "
@@ -423,7 +423,8 @@ public class TestDAO {
                 + "WHERE te.Target = ? "
                 + "  AND te.Status != ? "
                 + "  AND t.Game_ID = m.Game_ID"
-                + "  AND te.Mutant_ID = ?;";
+                + "  AND te.Mutant_ID = ? "
+                + "ORDER BY te.TargetExecution_ID LIMIT 1;";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
@@ -437,8 +438,8 @@ public class TestDAO {
     /**
      * Returns the first Test (from the same game) that killed the mutant with the provided ID.
      */
-    public static Test getKillingTestForMutantIdInSameGame(int mutantId) {
-        int testId = getKillingTestIdForMutantInSameGame(mutantId);
+    public static Test getKillingTestForMutantId(int mutantId) {
+        int testId = getKillingTestIdForMutant(mutantId);
         if (testId == -1) {
             return null;
         } else {
@@ -449,7 +450,7 @@ public class TestDAO {
     /**
      * Returns the Mutants (from the same game) that got killed by the Test with the provided ID.
      */
-    public static Set<Mutant> getKilledMutantsForTestIdInSameGame(int testId) {
+    public static Set<Mutant> getKilledMutantsForTestId(int testId) {
         String query = "SELECT * FROM (SELECT TargetExecution_ID, "
                 + "                      te.Test_ID, "
                 + "                      m.*, "
@@ -465,7 +466,7 @@ public class TestDAO {
                 + "                                  WHERE Test_ID = ?) "
                 + "               ORDER BY Mutant_ID, TargetExecution_ID) tmp "
                 + "WHERE Test_ID = ? AND ranks = 1;";
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
                 DatabaseValue.of(testId),
