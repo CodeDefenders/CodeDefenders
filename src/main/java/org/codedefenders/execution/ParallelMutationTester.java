@@ -161,8 +161,10 @@ public class ParallelMutationTester extends MutationTester {
         // test.update();
         test.incrementScore(Scorer.score(game, test, killedMutants));
 
-        int finalKilled = killed; // Effective final variable for lambda
-        return getTestOnMutantResultString(mutants, killed, () -> insertDefenderKilledMutantEvent(game.getId(), u.get(), finalKilled));
+        if (killed > 0) {
+            insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
+        }
+        return getTestOnMutantResultString(mutants, killed);
     }
 
     /*

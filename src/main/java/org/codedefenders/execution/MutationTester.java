@@ -92,7 +92,7 @@ public class MutationTester implements IMutationTester {
             killed += testVsMutant(test, mutant) ? 1 : 0;
         }
 
-        return getTestOnMutantResultString(mutants, killed, null);
+        return getTestOnMutantResultString(mutants, killed);
     }
 
     @Override
@@ -150,8 +150,10 @@ public class MutationTester implements IMutationTester {
         // test.update();
         test.incrementScore(Scorer.score(game, test, killedMutants));
 
-        int finalKilled = killed; // Effective final variable for lambda
-        return getTestOnMutantResultString(mutants, killed, () -> insertDefenderKilledMutantEvent(game.getId(), u.get(), finalKilled));
+        if (killed > 0) {
+            insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
+        }
+        return getTestOnMutantResultString(mutants, killed);
     }
 
     @Override
@@ -216,8 +218,10 @@ public class MutationTester implements IMutationTester {
             }
         }
 
-        int finalKilled = killed; // Effective final variable for lambda
-        return getTestOnMutantResultString(mutants, killed, () -> insertDefenderKilledMutantEvent(game.getId(), u.get(), finalKilled));
+        if (killed > 0) {
+            insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
+        }
+        return getTestOnMutantResultString(mutants, killed);
     }
 
     protected void insertDefenderKilledMutantEvent(int gameId, @Nonnull UserEntity user, int killedMutantCount) {
@@ -228,8 +232,7 @@ public class MutationTester implements IMutationTester {
     }
 
     @Nonnull
-    protected static String getTestOnMutantResultString(@Nonnull List<Mutant> mutants, int killed,
-            @Nullable Runnable onKill) {
+    protected static String getTestOnMutantResultString(@Nonnull List<Mutant> mutants, int killed) {
         if (killed == 0) {
             if (mutants.size() == 0) {
                 return TEST_SUBMITTED_MESSAGE;
@@ -237,10 +240,6 @@ public class MutationTester implements IMutationTester {
                 return TEST_KILLED_ZERO_MESSAGE;
             }
         } else {
-            if (onKill != null) {
-                onKill.run();
-            }
-
             if (killed == 1) {
                 if (mutants.size() == 1) {
                     return TEST_KILLED_LAST_MESSAGE;
