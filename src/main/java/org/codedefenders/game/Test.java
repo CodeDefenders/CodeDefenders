@@ -212,7 +212,7 @@ public class Test {
 
     public Set<Mutant> getCoveredMutants(List<Mutant> mutants) {
         List<Integer> coverage = lineCoverage.getLinesCovered();
-        Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
+        Set<Mutant> coveredMutants = new TreeSet<>(Comparator.comparing(Mutant::getId));
 
         for (Mutant m : mutants) {
             if (CollectionUtils.containsAny(coverage, m.getLines())) {
@@ -308,16 +308,6 @@ public class Test {
 
     public void setLineCoverage(LineCoverage lineCoverage) {
         this.lineCoverage = lineCoverage;
-    }
-
-    // First created appears first
-    public static Comparator<Test> orderByIdAscending() {
-        return Comparator.comparingInt(o -> o.id);
-    }
-
-    // Last created appears first
-    public static Comparator<Test> orderByIdDescending() {
-        return (o1, o2) -> o2.id - o1.id;
     }
 
     @Override

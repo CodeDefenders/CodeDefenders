@@ -1,5 +1,6 @@
 package org.codedefenders.game.tcs.impl;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,10 +46,7 @@ public class KillCountTestCaseSelector extends PrioritizedTestCaseSelector {
                 }
             }
 
-            allTests.sort((o1, o2) -> {
-                // Reverse
-                return -1 * (o1.getScore() - o2.getScore());
-            });
+            allTests.sort(Comparator.comparing(Test::getScore).reversed());
         } catch (Exception e) {
             logger.error("Cannot compute killmap:", e);
         }

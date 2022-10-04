@@ -38,8 +38,7 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleChapterEntry
  */
-// TODO(Alex): This should prob. be only comparable with another PuzzleEntry?!!
-public class PuzzleEntry implements Comparable<Object> {
+public class PuzzleEntry implements Comparable<PuzzleEntry> {
     public enum Type {
         PUZZLE,
         GAME
@@ -127,13 +126,9 @@ public class PuzzleEntry implements Comparable<Object> {
     }
 
     @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof PuzzleEntry)) {
-            return -1;
-        }
-        final PuzzleEntry obj = (PuzzleEntry) o;
+    public int compareTo(PuzzleEntry other) {
         final Integer pos1 = this.getPuzzle().getPosition();
-        final Integer pos2 = obj.getPuzzle().getPosition();
+        final Integer pos2 = other.getPuzzle().getPosition();
         if (pos1 == null) {
             return 1;
         }

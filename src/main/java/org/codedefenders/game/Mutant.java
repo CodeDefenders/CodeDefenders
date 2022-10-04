@@ -578,39 +578,6 @@ public class Mutant implements Serializable {
                 .toHashCode();
     }
 
-    /**
-     * This comparators place first mutants that modify lines at the top of the file.
-     */
-    public static Comparator<Mutant> sortByLineNumberAscending() {
-        return (o1, o2) -> {
-            List<Integer> lines1 = o1.getLines();
-            List<Integer> lines2 = o2.getLines();
-
-            if (lines1.isEmpty()) {
-                if (lines2.isEmpty()) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            } else if (lines2.isEmpty()) {
-                return 1;
-            }
-
-            return Collections.min(lines1) - Collections.min(lines2);
-        };
-    }
-
-    // TODO Ideally this should have a timestamp ... we use the ID instead
-    // First created appears first
-    public static Comparator<Mutant> orderByIdAscending() {
-        return Comparator.comparingInt(o -> o.id);
-    }
-
-    // Last created appears first
-    public static Comparator<Mutant> orderByIdDescending() {
-        return (o1, o2) -> o2.id - o1.id;
-    }
-
     public void setLines(List<Integer> mutatedLines) {
         this.lines = mutatedLines;
     }

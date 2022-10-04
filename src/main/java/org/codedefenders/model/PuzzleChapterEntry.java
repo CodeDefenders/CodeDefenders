@@ -36,8 +36,7 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleEntry
  */
-// TODO(Alex): This should prob. be only comparable with another PuzzleChapterEntry?!!
-public class PuzzleChapterEntry implements Comparable<Object> {
+public class PuzzleChapterEntry implements Comparable<PuzzleChapterEntry> {
     private PuzzleChapter chapter;
     private SortedSet<PuzzleEntry> puzzleEntries;
 
@@ -58,13 +57,9 @@ public class PuzzleChapterEntry implements Comparable<Object> {
     }
 
     @Override
-    public int compareTo(Object o) {
-        if (!(o instanceof PuzzleChapterEntry)) {
-            return -1;
-        }
-        final PuzzleChapterEntry obj = (PuzzleChapterEntry) o;
+    public int compareTo(PuzzleChapterEntry other) {
         final Integer pos1 = this.chapter.getPosition();
-        final Integer pos2 = obj.chapter.getPosition();
+        final Integer pos2 = other.chapter.getPosition();
         if (pos1 == null) {
             return 1;
         }
