@@ -66,7 +66,6 @@ public class UserService {
                 .build(
                         new CacheLoader<Integer, SimpleUser>() {
                             @Override
-                            @Nonnull
                             public SimpleUser load(@Nonnull Integer userId) throws Exception {
                                 return getSimpleUserByIdInternal(userId)
                                         .orElseThrow(() -> new Exception("No user found for given userId"));
@@ -186,6 +185,10 @@ public class UserService {
         }
 
         return Optional.ofNullable(result);
+    }
+
+    public void updateUsername(int userId, @Nonnull String newUsername) {
+        simpleUserForUserIdCache.invalidate(userId);
     }
 
 

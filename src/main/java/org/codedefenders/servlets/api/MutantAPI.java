@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.service.game.GameService;
@@ -56,7 +56,7 @@ public class MutantAPI extends HttpServlet {
     GameService gameService;
 
     @Inject
-    LoginBean login;
+    CodeDefendersAuth login;
 
     @Override
     protected void doGet(HttpServletRequest request,

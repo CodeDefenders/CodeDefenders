@@ -165,10 +165,6 @@ public class UserEntity implements Serializable {
         return new BCryptPasswordEncoder().encode(password);
     }
 
-    public static boolean passwordMatches(String rawPassword, String encodedPassword) {
-        return new BCryptPasswordEncoder().matches(rawPassword, encodedPassword);
-    }
-
     @Override
     public boolean equals(Object other) {
         if (this == other) {

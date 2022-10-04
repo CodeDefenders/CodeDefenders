@@ -100,6 +100,8 @@ public class Configuration {
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
 
+    protected String authAdminRole;
+
     /**
      * Validates the currently configured Configuration.
      *
@@ -387,6 +389,14 @@ public class Configuration {
 
     public int getNumberOfKillmapThreads() {
         return 40;
+    }
+
+    public String getAuthAdminRole() {
+        if (authAdminRole == null || authAdminRole.trim().isEmpty()) {
+            return null;
+        } else {
+            return authAdminRole;
+        }
     }
 
     private int getJavaMajorVersion() {

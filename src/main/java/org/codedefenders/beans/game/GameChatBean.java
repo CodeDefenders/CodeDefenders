@@ -5,7 +5,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -25,11 +25,11 @@ public class GameChatBean {
      */
     public static final int MESSAGE_LIMIT = 1000;
 
-    private final LoginBean login;
+    private final CodeDefendersAuth login;
     private final AbstractGame game;
 
     @Inject
-    public GameChatBean(GameProducer gameProducer, LoginBean login) {
+    public GameChatBean(GameProducer gameProducer, CodeDefendersAuth login) {
         this.login = login;
         this.game = gameProducer.getGame();
     }

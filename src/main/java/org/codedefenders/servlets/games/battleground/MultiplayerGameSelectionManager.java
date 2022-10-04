@@ -29,8 +29,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -88,7 +88,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private MessagesBean messages;
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Inject
     private INotificationService notificationService;

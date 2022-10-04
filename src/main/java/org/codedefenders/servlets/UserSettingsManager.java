@@ -29,8 +29,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
@@ -68,7 +68,7 @@ public class UserSettingsManager extends HttpServlet {
     private UserRepository userRepo;
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     private static final String DELETED_USER_NAME = "DELETED";
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";

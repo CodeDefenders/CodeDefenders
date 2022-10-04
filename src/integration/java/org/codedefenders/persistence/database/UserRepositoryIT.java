@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import org.codedefenders.DatabaseRule;
 import org.codedefenders.DatabaseTest;
+import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.UserEntity;
 import org.junit.Before;
@@ -72,7 +73,7 @@ public class UserRepositoryIT {
 
     private static void assertSanePassword(String rawPassword, UserEntity actual) {
         assertNotEquals("Password should not be stored in plain text", rawPassword, actual.getEncodedPassword());
-        assertTrue(UserEntity.passwordMatches(rawPassword, actual.getEncodedPassword()));
+        assertTrue(CodeDefendersRealm.passwordMatches(rawPassword, actual.getEncodedPassword()));
     }
 
     @Test

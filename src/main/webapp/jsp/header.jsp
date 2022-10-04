@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+
+
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 <%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
@@ -61,10 +64,17 @@
                     </ul>
                 </li>
                 <% if (puzzleEnabled) { %>
-                <li class="nav-item nav-item-highlight">
+                <li class="nav-item nav-item-highlight me-3">
                     <a class="nav-link" id="header-puzzle" href="${pageContext.request.contextPath}${Paths.PUZZLE_OVERVIEW}">Puzzles</a>
                 </li>
                 <% } %>
+                <!-- TODO(Alex): Replace this with own Abstraction (prob.  {@link CodeDefendersAuth}) -->
+                <!-- TODO(Alex): Other alternative: Use shiro tags -->
+                <shiro:hasRole name="admin">
+                    <li class="nav-item nav-item-highlight me-3">
+                        <a class="nav-link" id="header-admin" href="${pageContext.request.contextPath}/admin">Admin</a>
+                    </li>
+                </shiro:hasRole>
             </ul>
 
             <ul class="navbar-nav">

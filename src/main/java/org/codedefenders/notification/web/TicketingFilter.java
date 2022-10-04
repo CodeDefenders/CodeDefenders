@@ -30,7 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.notification.ITicketingService;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ public class TicketingFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(TicketingFilter.class);
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     public static final String TICKET_REQUEST_ATTRIBUTE_NAME = "notification-ticket";
 

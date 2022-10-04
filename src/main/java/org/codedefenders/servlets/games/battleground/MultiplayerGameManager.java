@@ -43,9 +43,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
@@ -151,7 +151,7 @@ public class MultiplayerGameManager extends HttpServlet {
     private MessagesBean messages;
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Inject
     private PreviousSubmissionBean previousSubmission;

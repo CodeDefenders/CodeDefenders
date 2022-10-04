@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.GameChatDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
@@ -62,7 +62,7 @@ public class GameChatAPI extends HttpServlet {
     private static final int DEFAULT_LIMIT = 1000;
 
     @Inject
-    LoginBean login;
+    CodeDefendersAuth login;
 
     @Inject
     GameChatDAO gameChatDAO;

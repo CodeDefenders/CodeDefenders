@@ -13,7 +13,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -53,7 +53,7 @@ public class TestAccordionBean {
     private final Map<Integer, TestDTO> tests;
 
     @Inject
-    public TestAccordionBean(LoginBean login, GameService gameService, GameProducer gameProducer) {
+    public TestAccordionBean(CodeDefendersAuth login, GameService gameService, GameProducer gameProducer) {
         AbstractGame game = gameProducer.getGame();
 
         GameClass cut = game.getCUT();

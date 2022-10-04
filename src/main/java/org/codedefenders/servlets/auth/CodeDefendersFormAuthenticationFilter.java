@@ -20,7 +20,10 @@
 package org.codedefenders.servlets.auth;
 
 import java.io.IOException;
+import java.util.stream.Stream;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -32,9 +35,8 @@ import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
@@ -46,21 +48,27 @@ import com.google.common.net.InetAddresses;
  * This filter performs the login with the form data submitted via a HTTP POST request to the {@code /login} url.
  *
  * <p>The whole authentication logic is handled silently by the parent class {@link FormAuthenticationFilter} which
- * performs a login against the {@link org.codedefenders.auth.CodeDefendersAuthenticatingRealm} with the credentials
+ * performs a login against the {@link org.codedefenders.auth.CodeDefendersRealm} with the credentials
  * found in the {@code username} and {@code password} HTML parameters of the POST request.
  */
+@Singleton
 public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
 
-    private final LoginBean login;
     private final MessagesBean messages;
     private final UserService userService;
 
-    public CodeDefendersFormAuthenticationFilter(LoginBean login, MessagesBean messages,
-            UserService userService) {
-        this.login = login;
+    @Inject
+    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService) {
+        super();
+
         this.messages = messages;
         this.userService = userService;
+
+        // org.codedefenders.util.Paths.LOGIN = "/login";
+        this.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
+        // Go to game overview page after successful login
+        this.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
     }
 
     @Override
@@ -70,14 +78,12 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        final int userId = ((UserEntity) subject.getPrincipal()).getId();
+        final int userId = subject.getPrincipals().oneByType(CodeDefendersRealm.UserId.class).getUserId();
         final String ipAddress = getClientIpAddress(httpRequest);
 
         // Log user activity including the timestamp
         userService.recordSession(userId, ipAddress);
         logger.info("Successful login for username '{}' from ip {}", token.getPrincipal(), ipAddress);
-
-        login.loginUser((UserEntity) subject.getPrincipal());
 
         // Call the super method, as this is the one doing the redirect after a successful login.
         return super.onLoginSuccess(token, subject, request, response);
@@ -117,9 +123,11 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
     @Override
     protected void saveRequest(ServletRequest request) {
         if (request instanceof HttpServletRequest) {
-            HttpServletRequest httpRequest = (HttpServletRequest) request;
-            // Don't save request in this case because otherwise user is redirected to an API url on successful login
-            if (httpRequest.getRequestURI().startsWith("/api/")) {
+            String httpRequestURI = ((HttpServletRequest) request).getRequestURI();
+            // Don't save request in this case because otherwise user is redirected to an API or asset url on successful
+            // login
+            if (httpRequestURI.startsWith("/api/")
+                    || Stream.of(".ico", ".css", ".js").anyMatch(httpRequestURI::endsWith)) {
                 return;
             }
         }

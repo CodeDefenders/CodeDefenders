@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.puzzle.Puzzle;
@@ -63,7 +63,7 @@ public class PuzzleOverview extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleOverview.class);
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Override
     protected void doGet(HttpServletRequest request,

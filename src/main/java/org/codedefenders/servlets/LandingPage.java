@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -59,7 +59,7 @@ import static org.codedefenders.servlets.util.ServletUtils.ctx;
 public class LandingPage extends HttpServlet {
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Inject
     private UserService userService;
