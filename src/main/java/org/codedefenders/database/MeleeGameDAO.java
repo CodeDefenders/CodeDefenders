@@ -71,6 +71,7 @@ public class MeleeGameDAO {
         int defenderValue = rs.getInt("Defender_Value");
         int attackerValue = rs.getInt("Attacker_Value");
 
+        int gameDuration = rs.getInt("Game_Duration_Minutes");
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
         return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest)
@@ -84,6 +85,7 @@ public class MeleeGameDAO {
                 .requiresValidation(requiresValidation)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
+                .gameDurationMinutes(gameDuration)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .build();
     }

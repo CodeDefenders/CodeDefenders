@@ -70,7 +70,7 @@ public class MultiplayerGameDAO {
         float mutantCoverage = rs.getFloat("Mutant_Goal");
         int defenderValue = rs.getInt("Defender_Value");
         int attackerValue = rs.getInt("Attacker_Value");
-
+        int gameDuration = rs.getInt("Game_Duration_Minutes");
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
         return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
@@ -86,6 +86,7 @@ public class MultiplayerGameDAO {
                 .requiresValidation(requiresValidation)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
+                .gameDurationMinutes(gameDuration)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .build();
     }
