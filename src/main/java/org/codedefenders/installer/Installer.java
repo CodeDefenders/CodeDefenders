@@ -74,14 +74,10 @@ import org.slf4j.LoggerFactory;
  * {@link Test tests}, {@link PuzzleChapter puzzle chapters} and {@link Puzzle puzzles}
  * programmatically.
  *
- * <p>Using {@link #installPuzzles(Path) installPuzzles()}, the
- * installer can be called programmatically inside code defenders.
- *
  * @author gambi
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class Installer {
-
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
     private final BackendExecutorService backend;
