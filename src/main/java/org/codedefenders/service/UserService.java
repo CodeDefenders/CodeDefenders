@@ -26,7 +26,10 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
@@ -154,6 +157,10 @@ public class UserService {
 
     /**
      * Perform a registration with the provided parameters.
+     *
+     * <p>Note: This method is mainly for self-registration. For the creation of (multiple) accounts with sth. like
+     * {@link org.codedefenders.servlets.admin.AdminUserManagement#createUserAccounts(HttpServletRequest, String)}
+     * may be required.
      */
     @Nonnull
     public Optional<String> registerUser(String username, String password, String email) {
@@ -190,8 +197,62 @@ public class UserService {
         return Optional.ofNullable(result);
     }
 
-    public void updateUsername(int userId, @Nonnull String newUsername) {
+    /**
+     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
+     */
+    public void changeUsername(int userId, @Nonnull String newUsername) {
         simpleUserForUserIdCache.invalidate(userId);
+    }
+
+    /**
+     * See {@link org.codedefenders.servlets.UserSettingsManager#changeUserPassword(UserEntity, String)} and
+     * {@link org.codedefenders.servlets.admin.AdminUserManagement#resetUserPW(int)}
+     */
+    public void changePassword() {
+        throw new NotImplementedException();
+    }
+
+    /**
+     * See {@link org.codedefenders.servlets.UserSettingsManager#updateUserInformation(UserEntity, Optional, boolean)}
+     * and {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
+     */
+    public void changeEmail() {
+        throw new NotImplementedException();
+    }
+
+
+    /**
+     * For {@link org.codedefenders.servlets.registration.PasswordServlet#doPost(HttpServletRequest, HttpServletResponse)}
+     * {@code case "resetPassword"}.
+     */
+    public void requestPasswordReset() {
+        throw new NotImplementedException();
+    }
+
+    /**
+     * For {@link org.codedefenders.servlets.registration.PasswordServlet#doPost(HttpServletRequest, HttpServletResponse)}
+     * {@code case "changePassword"}.
+     */
+    public void resetPassword() {
+        throw new NotImplementedException();
+    }
+
+    // TODO(Alex): How does this differ from {@link #deactivateAccount} ?!
+    public void setAccountInactive() {
+        throw new NotImplementedException();
+    }
+
+    public void setAccountActive() {
+        throw new NotImplementedException();
+    }
+
+
+    /**
+     * See {@link org.codedefenders.servlets.UserSettingsManager#removeUserInformation(UserEntity)} and
+     * {@link org.codedefenders.servlets.admin.AdminUserManagement#deleteUser(int)}.
+     */
+    public void deactivateAccount() {
+        throw new NotImplementedException();
     }
 
 
