@@ -130,7 +130,7 @@ public class UserProfileManager extends HttpServlet {
          */
 
         // load stats
-        final UserEntity user = urlParamUser.orElseGet(login::getUser);
+        final UserEntity user = urlParamUser.orElseGet(login::getUserEntity);
         final UserStats stats = userStatsService.getStatsByUserId(user.getId());
 
         // Pass values to JSP page

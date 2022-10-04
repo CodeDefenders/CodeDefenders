@@ -19,13 +19,27 @@
 
 package org.codedefenders.auth;
 
+import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
 
 public interface CodeDefendersAuth {
 
     boolean isLoggedIn();
 
-    UserEntity getUser();
+    boolean isAdmin();
 
     int getUserId();
+
+    SimpleUser getSimpleUser();
+
+    // TODO(Alex): This is simply a convenience method for .getSimpleUser().getName()
+    @Deprecated
+    String getUsername();
+
+    User getUser();
+
+    // TODO(Alex): Do not expose UserEntity!
+    @Deprecated
+    UserEntity getUserEntity();
 }

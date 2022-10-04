@@ -237,7 +237,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 GameJoinedEvent gje = new GameJoinedEvent();
                 gje.setGameId(game.getId());
                 gje.setUserId(login.getUserId());
-                gje.setUserName(login.getUser().getUsername());
+                gje.setUserName(login.getSimpleUser().getName());
                 notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -255,7 +255,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 GameJoinedEvent gje = new GameJoinedEvent();
                 gje.setGameId(game.getId());
                 gje.setUserId(login.getUserId());
-                gje.setUserName(login.getUser().getUsername());
+                gje.setUserName(login.getSimpleUser().getName());
                 notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -299,7 +299,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         GameLeftEvent gle = new GameLeftEvent();
         gle.setGameId(game.getId());
         gle.setUserId(login.getUserId());
-        gle.setUserName(login.getUser().getUsername());
+        gle.setUserName(login.getSimpleUser().getName());
         notificationService.post(gle);
 
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);

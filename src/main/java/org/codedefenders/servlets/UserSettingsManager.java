@@ -118,8 +118,8 @@ public class UserSettingsManager extends HttpServlet {
             case "updateKeyMap": {
                 final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
                 final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
-                if (updateUserKeyMap(login.getUser(), editorKeyMap)) {
-                    login.getUser().setKeyMap(editorKeyMap);
+                if (updateUserKeyMap(login.getUserEntity(), editorKeyMap)) {
+                    login.getUserEntity().setKeyMap(editorKeyMap);
                     messages.add("Successfully updated editor preference.");
                 } else {
                     logger.info("Failed to update editor preference for user {}.", login.getUserId());
@@ -132,7 +132,7 @@ public class UserSettingsManager extends HttpServlet {
             case "updateProfile": {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
                 boolean allowContact = ServletUtils.parameterThenOrOther(request, "allowContact", true, false);
-                final boolean success = updateUserInformation(login.getUser(), email, allowContact);
+                final boolean success = updateUserInformation(login.getUserEntity(), email, allowContact);
                 if (success) {
                     messages.add("Successfully updated profile information.");
                 } else {
@@ -147,7 +147,7 @@ public class UserSettingsManager extends HttpServlet {
                 final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
 
                 if (isPasswordValid(password)) {
-                    final boolean success = changeUserPassword(login.getUser(), password.get());
+                    final boolean success = changeUserPassword(login.getUserEntity(), password.get());
                     if (success) {
                         messages.add("Successfully changed password.");
                     } else {
@@ -164,7 +164,7 @@ public class UserSettingsManager extends HttpServlet {
 
             case "deleteAccount": {
                 // Does not actually delete the account but pseudomizes it
-                final boolean success = removeUserInformation(login.getUser());
+                final boolean success = removeUserInformation(login.getUserEntity());
                 if (success) {
                     logger.info("User {} successfully set themselves as inactive.", login.getUserId());
                     /*

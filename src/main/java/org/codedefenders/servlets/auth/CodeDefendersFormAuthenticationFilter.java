@@ -78,7 +78,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
 
-        final int userId = subject.getPrincipals().oneByType(CodeDefendersRealm.UserId.class).getUserId();
+        final int userId = subject.getPrincipals().oneByType(CodeDefendersRealm.LocalUserId.class).getUserId();
         final String ipAddress = getClientIpAddress(httpRequest);
 
         // Log user activity including the timestamp
@@ -127,6 +127,9 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             // Don't save request in this case because otherwise user is redirected to an API or asset url on successful
             // login
             if (httpRequestURI.startsWith("/api/")
+                    // TODO(Alex): Do we have more here?
+                    // TODO(Alex): Filtering for asset URLs should not be necessary, because those URLs are not
+                    //    authenticated?!
                     || Stream.of(".ico", ".css", ".js").anyMatch(httpRequestURI::endsWith)) {
                 return;
             }

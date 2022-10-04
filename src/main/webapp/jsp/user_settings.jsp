@@ -52,7 +52,7 @@
 
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
-                        <%=login.getUser().getAllowContact() ? "checked" : ""%>>
+                        <%=login.getUser().isContactingAllowed() ? "checked" : ""%>>
                     <label class="form-check-label" for="allowContact">
                         Allow us to contact your email address.
                     </label>

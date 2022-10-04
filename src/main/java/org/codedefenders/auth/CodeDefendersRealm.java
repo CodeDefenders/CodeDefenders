@@ -126,7 +126,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     protected Account getAccount(UserEntity userEntity) {
 
         Collection<Object> principals = new ArrayList<>();
-        principals.add(new UserId(userEntity.getId()));
+        principals.add(new LocalUserId(userEntity.getId()));
 
         Set<String> roles = new java.util.HashSet<>();
         roles.add("user");
@@ -151,12 +151,12 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
     @Override
     protected Object getAuthenticationCacheKey(PrincipalCollection principals) {
-        return principals.oneByType(UserId.class).getUserId();
+        return principals.oneByType(LocalUserId.class).getUserId();
     }
 
     @Override
     protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
-        return principals.oneByType(UserId.class).getUserId();
+        return principals.oneByType(LocalUserId.class).getUserId();
     }
 
     @Override
@@ -204,7 +204,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     public void invalidate(int userId) {
 
         Set<Object> principals = new HashSet<>();
-        principals.add(new UserId(userId));
+        principals.add(new LocalUserId(userId));
 
         clearCache(new SimplePrincipalCollection(principals, getName()));
     }
@@ -219,7 +219,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
      */
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
-        Optional<UserEntity> user = userRepo.getUserById(principalCollection.oneByType(UserId.class).getUserId());
+        Optional<UserEntity> user = userRepo.getUserById(principalCollection.oneByType(LocalUserId.class).getUserId());
 
         if (user.isPresent()) {
             return getAccount(user.get());
@@ -230,10 +230,10 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         }
     }
 
-    public static class UserId {
+    public static class LocalUserId {
         private final int userId;
 
-        public UserId(int userId) {
+        public LocalUserId(int userId) {
             this.userId = userId;
         }
 

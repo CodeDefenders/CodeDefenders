@@ -476,7 +476,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // Include Test Smells in the messages back to user
         includeDetectTestSmellsInMessages(newTest);
 
-        final String message = login.getUser().getUsername() + " created a test";
+        final String message = login.getSimpleUser().getName() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         final Event notif = new Event(-1, gameId, login.getUserId(), message, EventType.DEFENDER_TEST_CREATED,
                 EventStatus.GAME, timestamp);
@@ -681,7 +681,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
 
         messages.add(MUTANT_COMPILED_MESSAGE);
-        final String notificationMsg = login.getUser().getUsername() + " created a mutant.";
+        final String notificationMsg = login.getSimpleUser().getName() + " created a mutant.";
         Event notif = new Event(-1, gameId, login.getUserId(), notificationMsg, EventType.ATTACKER_MUTANT_CREATED,
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
@@ -751,7 +751,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
                     String notification = String.format("%s accepts that their mutant %d is equivalent",
-                            login.getUser().getUsername(), m.getId());
+                            login.getSimpleUser().getName(), m.getId());
                     if (isMutantKillable) {
                         logger.warn("Mutant {} was accepted as equivalence but it is killable", m);
                         message = message + " " + " However, the mutant was killable!";
@@ -777,7 +777,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     if (isMutantKillable) {
                         int defenderId = MutantDAO.getEquivalentDefenderId(m);
                         Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
-                        notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
+                        notification = login.getSimpleUser().getName() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
                         Event notifDefenderEquiv = new Event(-1, game.getId(), userId.orElse(0), notification,
                                 EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
@@ -905,7 +905,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 if (mutPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent",
                             newTest.getId(), mutPending.getId());
-                    final String message = login.getUser().getUsername() + " killed mutant "
+                    final String message = login.getSimpleUser().getName() + " killed mutant "
                             + mutPending.getId() + " in an equivalence duel.";
                     Event notif = new Event(-1, gameId, login.getUserId(), message,
                             EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT,EventStatus.GAME,
@@ -922,7 +922,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     if (mutPending.getId() == mutantId) {
                         // Here we check if the accepted equivalence is "possibly" equivalent
                         isMutantKillable = isMutantKillableByOtherTests(mutPending);
-                        String notification = login.getUser().getUsername()
+                        String notification = login.getSimpleUser().getName()
                                 + " lost an equivalence duel. Mutant " + mutPending.getId()
                                 + " is assumed equivalent.";
 
@@ -1045,7 +1045,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         int numClaimed = claimedMutants.get();
         if (numClaimed > 0) {
-            String flaggingChatMessage = login.getUser().getUsername() + " flagged "
+            String flaggingChatMessage = login.getSimpleUser().getName() + " flagged "
                     + numClaimed + " mutant" + (numClaimed == 1 ? "" : "s") + " as equivalent.";
             Event event = new Event(-1, gameId, login.getUserId(), flaggingChatMessage,
                     EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,

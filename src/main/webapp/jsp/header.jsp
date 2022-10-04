@@ -18,13 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 <%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
 <%@ page import="org.codedefenders.servlets.UserSettingsManager" %>
+
+<%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
@@ -68,19 +69,17 @@
                     <a class="nav-link" id="header-puzzle" href="${pageContext.request.contextPath}${Paths.PUZZLE_OVERVIEW}">Puzzles</a>
                 </li>
                 <% } %>
-                <!-- TODO(Alex): Replace this with own Abstraction (prob.  {@link CodeDefendersAuth}) -->
-                <!-- TODO(Alex): Other alternative: Use shiro tags -->
-                <shiro:hasRole name="admin">
+                <c:if test="${auth.admin}">
                     <li class="nav-item nav-item-highlight me-3">
                         <a class="nav-link" id="header-admin" href="${pageContext.request.contextPath}/admin">Admin</a>
                     </li>
-                </shiro:hasRole>
+                </c:if>
             </ul>
 
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="header-user" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        ${login.user.username}
+                        ${auth.simpleUser.name}
                     </a>
                     <ul class="dropdown-menu" id="user-dropdown" aria-labelledby="header-user"
                         <%-- Align dropdown menu to the right, so it doesn't get cut off. --%>
