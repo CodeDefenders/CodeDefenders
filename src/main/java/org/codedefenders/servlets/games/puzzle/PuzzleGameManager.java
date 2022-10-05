@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.Message;
 import org.codedefenders.beans.message.MessagesBean;
@@ -449,7 +450,15 @@ public class PuzzleGameManager extends HttpServlet {
         final TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, COMPILE_TEST);
         if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
-            messages.add(compileTestTarget.message).fadeOut(false);
+            // We escape the content of the message for new tests since user can embed there anything
+            String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
+            // Extract the line numbers of the errors
+            List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
+            // Store them in the session so they can be picked up later
+            previousSubmission.setErrorLines(errorLines);
+            // We introduce our decoration
+            String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
+            messages.add(decorate).escape(false).fadeOut(false);
             previousSubmission.setTestCode(testText);
             Redirect.redirectBack(request, response);
             return;
@@ -601,7 +610,16 @@ public class PuzzleGameManager extends HttpServlet {
                     TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, COMPILE_MUTANT);
             if (existingMutantTarget != null && !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
-                messages.add(existingMutantTarget.message);
+                // We escape the content of the message for new tests since user can embed there
+                // anything
+                String escapedHtml = StringEscapeUtils.escapeHtml4(existingMutantTarget.message);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(existingMutantTarget.message);
+                // Store them in the session so they can be picked up later
+                previousSubmission.setErrorLines(errorLines);
+                // We introduce our decoration
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+                messages.add(decorate).escape(false);
             }
             previousSubmission.setMutantCode(mutantText);
             Redirect.redirectBack(request, response);
@@ -639,7 +657,15 @@ public class PuzzleGameManager extends HttpServlet {
         if (!compileSuccess) {
             messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
             if (errorMessage != null) {
-                messages.add(errorMessage);
+                // We escape the content of the message for new tests since user can embed there anything
+                String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
+                // Store them in the session so they can be picked up later
+                previousSubmission.setErrorLines(errorLines);
+                // We introduce our decoration
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+                messages.add(decorate).escape(false).fadeOut(false);
             }
             previousSubmission.setMutantCode(mutantText);
             Redirect.redirectBack(request, response);
