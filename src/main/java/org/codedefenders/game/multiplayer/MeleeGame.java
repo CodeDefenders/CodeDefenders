@@ -306,6 +306,10 @@ public class MeleeGame extends AbstractGame {
         return gameDurationMinutes;
     }
 
+    public void setGameDurationMinutes(int gameDurationMinutes) {
+        this.gameDurationMinutes = gameDurationMinutes;
+    }
+
     // TODO Those methods should be removed? The scoring bean should take the game
     // as input and then compute the score
     public Map<Integer, PlayerScore> getMutantScores() {

@@ -235,6 +235,7 @@ public class MeleeGameDAO {
         int defenderValue = 0;
         int attackerValue = 0;
 
+        int duration = game.getGameDurationMinutes();
         float lineCoverage = game.getLineCoverage();
         float mutantCoverage = game.getMutantCoverage();
         int id = game.getId();
@@ -249,9 +250,10 @@ public class MeleeGameDAO {
                 "    Attacker_Value = ?,",
                 "    Coverage_Goal = ?,",
                 "    Mutant_Goal = ?,",
-                "    State = ?",
+                "    State = ?,",
+                "    Game_Duration_Minutes = ?",
                 "WHERE ID = ?");
-        DatabaseValue<?>[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[] {
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
                 DatabaseValue.of(prize),
@@ -260,7 +262,9 @@ public class MeleeGameDAO {
                 DatabaseValue.of(lineCoverage),
                 DatabaseValue.of(mutantCoverage),
                 DatabaseValue.of(state.name()),
-                DatabaseValue.of(id)};
+                DatabaseValue.of(duration),
+                DatabaseValue.of(id)
+        };
 
         return DB.executeUpdateQuery(query, values);
     }

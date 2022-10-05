@@ -231,6 +231,7 @@ public class MultiplayerGameDAO {
         int attackerValue = game.getAttackerValue();
         float lineCoverage = game.getLineCoverage();
         float mutantCoverage = game.getMutantCoverage();
+        int duration = game.getGameDurationMinutes();
         int id = game.getId();
         GameState state = game.getState();
 
@@ -243,10 +244,11 @@ public class MultiplayerGameDAO {
                 "    Attacker_Value = ?,",
                 "    Coverage_Goal = ?,",
                 "    Mutant_Goal = ?,",
-                "    State = ?",
+                "    State = ?,",
+                "    Game_Duration_Minutes = ?",
                 "WHERE ID = ?"
         );
-        DatabaseValue<?>[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[] {
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
                 DatabaseValue.of(prize),
@@ -255,7 +257,9 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(lineCoverage),
                 DatabaseValue.of(mutantCoverage),
                 DatabaseValue.of(state.name()),
-                DatabaseValue.of(id)};
+                DatabaseValue.of(duration),
+                DatabaseValue.of(id)
+        };
 
         return DB.executeUpdateQuery(query, values);
     }

@@ -21,6 +21,7 @@ package org.codedefenders.servlets.games.battleground;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -144,6 +145,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 return;
             case "rematch":
                 rematch(request, response);
+                return;
+            case "durationChange":
+                changeDuration(request, response);
                 return;
             default:
                 logger.info("Action not recognised: {}", action);
@@ -443,5 +447,18 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + newGame.getId());
+    }
+
+    private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Optional<Integer> newDuration = getIntParameter(request, "newDuration");
+        if (newDuration.isPresent()) {
+            MultiplayerGame game = gameProducer.getGame();
+            game.setGameDurationMinutes(newDuration.get());
+            game.update();
+            Redirect.redirectBack(request, response);
+        } else {
+            logger.debug("No duration value supplied.");
+            Redirect.redirectBack(request, response);
+        }
     }
 }

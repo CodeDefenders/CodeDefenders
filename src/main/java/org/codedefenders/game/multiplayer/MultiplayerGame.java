@@ -226,6 +226,10 @@ public class MultiplayerGame extends AbstractGame {
         return gameDurationMinutes;
     }
 
+    public void setGameDurationMinutes(int gameDurationMinutes) {
+        this.gameDurationMinutes = gameDurationMinutes;
+    }
+
     public int getDefenderValue() {
         return defenderValue;
     }

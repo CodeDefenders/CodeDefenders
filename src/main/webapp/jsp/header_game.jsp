@@ -26,6 +26,8 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.AbstractGame" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
 
@@ -67,7 +69,36 @@
                             End Game
                         </button>
                     </form>
+
             <%
+                        int duration = -1;
+                        if (game instanceof MultiplayerGame) {
+                            duration = ((MultiplayerGame) game).getGameDurationMinutes();
+                        } else if (game instanceof MeleeGame) {
+                            duration = ((MeleeGame) game).getGameDurationMinutes();
+                        }
+
+                        if (duration != -1) {
+            %>
+                    <form id="adminDurationChange" action="<%=selectionManagerUrl%>" method="post">
+                        <input type="hidden" name="formType" value="durationChange">
+                        <input type="hidden" name="gameId" value="<%=game.getId()%>">
+
+                        <button type="button" class="btn btn-sm btn-default" id="durationChangeOpen" form="adminDurationChange">
+                            <%=duration%> min
+                        </button>
+
+                        <div class="durationChangeModal">
+                            <label for="newDuration">The new duration of this game.</label>
+                            <input type="number" name="newDuration" id="newDuration" value="<%=duration%>" required min="1"
+                                   max="<%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue() %>">
+                            <button type="submit" class="btn btn-sm btn-default" id="durationChange" form="adminDurationChange">
+                                Change Game Duration
+                            </button>
+                        </div>
+                    </form>
+            <%
+                        }
                     }
 
                     if (game.getState() == GameState.CREATED) {
