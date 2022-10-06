@@ -95,6 +95,9 @@
                             <button type="submit" class="btn btn-sm btn-default" id="durationChange" form="adminDurationChange">
                                 Change Game Duration
                             </button>
+                            <button type="reset" class="btn" id="closeDurationChangeModal" form="adminDurationChange">
+                                Cancel
+                            </button>
                         </div>
                     </form>
             <%
