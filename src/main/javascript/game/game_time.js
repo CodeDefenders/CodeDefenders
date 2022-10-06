@@ -1,0 +1,50 @@
+class GameTimeManager {
+
+    /**
+     *
+     * @param {String} selector the selector of the element holding the start time and duration data. The remaining time
+     *                          will be rendered in this element.
+     * @param {Number} updateInterval the time in seconds between each render
+     */
+    constructor(selector, updateInterval) {
+        this._renderer = [...document.querySelectorAll(selector)];
+        this._interval = setInterval(this.render.bind(this), updateInterval * 1e3);
+        this.render();
+    }
+
+    /**
+     * Updates the remaining time in all elements
+     */
+    render() {
+        this._renderer.forEach(this.renderElement.bind(this));
+    }
+
+    /**
+     * Renders the remaining time in the given element
+     *
+     * @param element the element to render the remaining time in. Has to contain the start time and duration data
+     */
+    renderElement(element) {
+        const start = Number(element.dataset.startTime);
+        const duration = Number(element.dataset.totalMin);
+        element.innerText = this.calculateRemainingTime(start, duration);
+    }
+
+    /**
+     * Calculates the remaining time in minutes
+     *
+     * @param start the start time in seconds since epoch (Unix timestamp)
+     * @param duration the games duration in minutes
+     * @returns {number} the remaining time in minutes (rounded and always >= 0)
+     */
+    calculateRemainingTime(start, duration) {
+        console.log(start, duration);
+        const currentSeconds = Date.now() / 1e3;
+        const deltaSeconds = currentSeconds - start;
+        const remainingSeconds = (duration * 60) - deltaSeconds;
+        const remainingMinutes = Math.round(remainingSeconds / 60);
+        return remainingMinutes < 0 ? 0 : remainingMinutes;
+    }
+}
+
+export default GameTimeManager;

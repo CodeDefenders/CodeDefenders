@@ -114,6 +114,10 @@
                             </button>
                         </div>
                     </form>
+                    <script type="module">
+                        import {GameTimeManager} from './js/codedefenders_game.mjs';
+                        const gameTimeManager = new GameTimeManager(".time-left", 10);
+                    </script>
             <%
                         }
                     }
