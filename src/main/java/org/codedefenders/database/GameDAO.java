@@ -256,4 +256,18 @@ public class GameDAO {
         DatabaseValue[] values = {DatabaseValue.of(gameId)};
         return DB.executeUpdateQuery(query, values);
     }
+
+    public static long getStartTimeInUnixSeconds(int gameId) {
+        String query = String.join("\n",
+                "SELECT UNIX_TIMESTAMP(Start_Time) AS timestamp",
+                "FROM games",
+                "WHERE ID = ?"
+        );
+        DatabaseValue[] values = {DatabaseValue.of(gameId)};
+        return DB.executeQueryReturnValue(
+                query,
+                rs -> rs.getLong("timestamp"),
+                values
+        );
+    }
 }

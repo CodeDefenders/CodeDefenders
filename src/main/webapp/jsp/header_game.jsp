@@ -28,6 +28,12 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.service.game.AbstractGameService" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
+<%@ page import="org.codedefenders.service.game.MeleeGameService" %>
+<%@ page import="org.codedefenders.service.game.MultiplayerGameService" %>
+<%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
+<%@ page import="org.codedefenders.service.game.PuzzleGameService" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
 
@@ -35,14 +41,19 @@
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     int gameId = game.getId();
 
+    AbstractGameService gameService = null;
     Role role = null;
     String selectionManagerUrl = null;
     if (game instanceof MeleeGame) {
         selectionManagerUrl = request.getContextPath() + Paths.MELEE_SELECTION;
         role = ((MeleeGame) game).getRole(login.getUserId());
+        gameService = CDIUtil.getBeanFromCDI(MeleeGameService.class);
     } else if (game instanceof MultiplayerGame) {
         selectionManagerUrl = request.getContextPath() + Paths.BATTLEGROUND_SELECTION;
         role = ((MultiplayerGame) game).getRole(login.getUserId());
+        gameService = CDIUtil.getBeanFromCDI(MultiplayerGameService.class);
+    } else if (game instanceof PuzzleGame) {
+        gameService = CDIUtil.getBeanFromCDI(PuzzleGameService.class);
     }
 %>
 
@@ -85,7 +96,10 @@
                         <input type="hidden" name="gameId" value="<%=game.getId()%>">
 
                         <button type="button" class="btn btn-sm btn-default" id="durationChangeOpen" form="adminDurationChange">
-                            <%=duration%> min
+                            <span class="time-left"
+                                  data-total-min="<%=duration%>"
+                                  data-start-time="<%= gameService.getStartTimeInUnixSeconds(gameId) %>">
+                            </span> min
                         </button>
 
                         <div class="durationChangeModal">
