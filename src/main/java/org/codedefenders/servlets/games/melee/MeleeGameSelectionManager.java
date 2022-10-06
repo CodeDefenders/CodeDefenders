@@ -435,9 +435,16 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final MeleeGame game = gameProducer.getGame();
+
+        if (login.getUser().getId() != game.getCreatorId()) {
+            messages.add("Only the creator of this game can change its duration.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         Optional<Integer> newDuration = getIntParameter(request, "newDuration");
         if (newDuration.isPresent()) {
-            MeleeGame game = gameProducer.getGame();
             game.setGameDurationMinutes(newDuration.get());
             game.update();
             Redirect.redirectBack(request, response);
