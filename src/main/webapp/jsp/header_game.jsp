@@ -98,8 +98,8 @@
                         <button type="button" class="btn btn-sm btn-default" id="durationChangeOpen" form="adminDurationChange">
                             <span class="time-left"
                                   data-total-min="<%=duration%>"
-                                  data-start-time="<%= gameService.getStartTimeInUnixSeconds(gameId) %>">
-                            </span> min
+                                  data-start-time="<%= gameService.getStartTimeInUnixSeconds(gameId) %>"
+                            ></span>
                         </button>
 
                         <div class="durationChangeModal">
