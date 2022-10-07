@@ -11,7 +11,7 @@ public class AnalysisUtils {
         JavaParser parser = new JavaParser();
         parser.getParserConfiguration()
                 .setCharacterEncoding(StandardCharsets.UTF_8)
-                .setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17)
+                .setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_16)
                 .setAttributeComments(false); // this one is important
         return parser;
     }

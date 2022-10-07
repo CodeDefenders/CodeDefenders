@@ -31,6 +31,7 @@ import testsmell.AbstractSmell;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
 import testsmell.smell.UnknownTest;
+import thresholds.DefaultThresholds;
 
 public class TestSmellDetectorTest {
 
@@ -61,7 +62,7 @@ public class TestSmellDetectorTest {
         String productionFilePath = "src/test/resources/itests/sources/Lift/Lift.java";
 
 
-        TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();
+        TestSmellDetector testSmellDetector = new TestSmellDetector(new DefaultThresholds());
         TestFile testSmellFile = new TestFile("", testFilePath, productionFilePath);
         testSmellDetector.detectSmells(testSmellFile);
 
@@ -90,13 +91,13 @@ public class TestSmellDetectorTest {
         String productionFilePath = "src/test/resources/itests/sources/Lift/Lift.java";
 
 
-        TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();
+        TestSmellDetector testSmellDetector = new TestSmellDetector(new DefaultThresholds());
         TestFile testSmellFile = new TestFile("", testFilePath, productionFilePath);
         testSmellDetector.detectSmells(testSmellFile);
 
         for (AbstractSmell smell : testSmellFile.getTestSmells()) {
             if (smell instanceof UnknownTest) {
-                Assert.assertTrue(smell.getHasSmell());
+                Assert.assertTrue(smell.hasSmell());
             }
 
         }

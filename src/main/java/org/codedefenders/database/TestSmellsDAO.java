@@ -60,7 +60,7 @@ public class TestSmellsDAO {
     public void storeSmell(final Test test, final TestFile testFile) throws UncheckedSQLException {
         final List<AbstractSmell> testSmells = testFile.getTestSmells()
                 .stream()
-                .filter(AbstractSmell::getHasSmell)
+                .filter(AbstractSmell::hasSmell)
                 .collect(Collectors.toList());
 
         DB.executeBatchQueryReturnKeys(INSERT_SMELL_QUERY, testSmells, smell -> new DatabaseValue[]{
