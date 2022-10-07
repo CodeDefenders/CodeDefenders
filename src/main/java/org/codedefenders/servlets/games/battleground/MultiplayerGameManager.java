@@ -359,7 +359,7 @@ public class MultiplayerGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.getBridge().addAll(validationMessage);
+            messages.addAll(validationMessage);
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -478,7 +478,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 EventStatus.GAME, timestamp);
         eventDAO.insert(notif);
 
-        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages.getBridge());
+        messages.add(mutationTester.runTestOnAllMultiplayerMutants(game, newTest));
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -641,7 +641,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
+        messages.add(mutationTester.runAllTestsOnMutant(game, newMutant));
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -783,7 +783,7 @@ public class MultiplayerGameManager extends HttpServlet {
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.getBridge().addAll(validationMessage);
+                messages.addAll(validationMessage);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;

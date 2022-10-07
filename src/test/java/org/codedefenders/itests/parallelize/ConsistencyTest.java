@@ -303,7 +303,7 @@ public class ConsistencyTest {
                 @Override
                 public void run() {
                     System.out.println("Submit test " + newTest.getId());
-                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
+                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest);
                     activeGame.update();
                 }
             });
