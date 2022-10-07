@@ -293,7 +293,7 @@ public class ConsistencyTest {
         for (final org.codedefenders.game.Test newTest : tests) {
             executorService.submit(() -> {
                 System.out.println("Submit test " + newTest.getId());
-                mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
+                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest);
                 activeGame.update();
             });
         }

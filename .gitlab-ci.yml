@@ -23,8 +23,8 @@ default:
       - .m2/repository/
     when: always
   artifacts:
-    # Expire all artifacts already after 14 days. (Default is around 30 days/4 weeks)
-    expire_in: 14 days
+    # Expire all artifacts already after 36 hours. (Default is around 30 days/4 weeks)
+    expire_in: 36 hours
 
 variables:
   # Arguments passed to maven before CLI arguments, only used from Maven 4 onward
