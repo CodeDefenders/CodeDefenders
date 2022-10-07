@@ -185,7 +185,7 @@ public class MultiplayerGameDAO {
                 "EquivalenceThreshold)",
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
                 DatabaseValue.of(prize),
@@ -242,7 +242,7 @@ public class MultiplayerGameDAO {
                 "    State = ?",
                 "WHERE ID = ?"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
                 DatabaseValue.of(prize),
@@ -269,7 +269,7 @@ public class MultiplayerGameDAO {
                 "FROM view_battleground_games",
                 "WHERE ID=?;");
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId)
         };
 
@@ -286,7 +286,7 @@ public class MultiplayerGameDAO {
                 "SELECT *",
                 "FROM view_battleground_games",
                 "WHERE State != ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(GameState.FINISHED.name())
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
@@ -366,7 +366,7 @@ public class MultiplayerGameDAO {
                 "  ON p.Game_ID = m.ID \n",
                 "WHERE (p.User_ID = ?);");
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(userId)
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
@@ -414,7 +414,7 @@ public class MultiplayerGameDAO {
                 "WHERE (State = ?",
                 "    OR State = ?)",
                 "  AND Creator_ID = ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(GameState.ACTIVE.name()),
                 DatabaseValue.of(GameState.CREATED.name()),
                 DatabaseValue.of(creatorId)
@@ -435,7 +435,7 @@ public class MultiplayerGameDAO {
                 "  ON p.Game_ID = m.ID \n",
                 "WHERE (p.ID = ?);");
 
-        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
+        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
         return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
     }
 }

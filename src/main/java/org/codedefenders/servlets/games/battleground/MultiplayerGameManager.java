@@ -194,7 +194,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 .findFirst()
                 .ifPresent(mutant -> {
                     int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
-                    Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);;
+                    Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
 
                     // TODO
                     request.setAttribute("equivDefender", defender.orElse(null));

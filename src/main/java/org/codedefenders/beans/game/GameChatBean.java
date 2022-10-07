@@ -10,7 +10,6 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.games.GameProducer;
-import org.codedefenders.util.Paths;
 
 @ManagedBean
 @RequestScoped

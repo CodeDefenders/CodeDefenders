@@ -6,7 +6,6 @@ import javax.annotation.ManagedBean;
 import javax.enterprise.context.SessionScoped;
 
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

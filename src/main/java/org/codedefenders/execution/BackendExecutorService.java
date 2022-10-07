@@ -58,10 +58,6 @@ public interface BackendExecutorService {
      */
     TargetExecution testMutant(Mutant m, Test t);
 
-    /**
-     * @param mutant
-     * @return
-     */
     boolean potentialEquivalent(Mutant mutant);
 
     /**

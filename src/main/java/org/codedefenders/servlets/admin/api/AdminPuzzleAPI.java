@@ -282,15 +282,14 @@ public class AdminPuzzleAPI extends HttpServlet {
 
         // Sadly I haven't found a way around the parser and creating the json array by hand.
         // The 'normal' way (gson.toJson(puzzles)) somehow didn't work.
-        JsonParser parser = new JsonParser();
 
         JsonArray puzzleArray = new JsonArray();
         for (Puzzle puzzle : puzzles) {
-            puzzleArray.add(parser.parse(gson.toJson(puzzle)));
+            puzzleArray.add(JsonParser.parseString(gson.toJson(puzzle)));
         }
         JsonArray puzzleChapterArray = new JsonArray();
         for (PuzzleChapter chapter : puzzleChapters) {
-            puzzleChapterArray.add(parser.parse(gson.toJson(chapter)));
+            puzzleChapterArray.add(JsonParser.parseString(gson.toJson(chapter)));
         }
 
         JsonObject json = new JsonObject();
@@ -443,8 +442,7 @@ public class AdminPuzzleAPI extends HttpServlet {
 
         JsonObject obj;
         try {
-            obj = new JsonParser()
-                .parse(json)
+            obj = JsonParser.parseString(json)
                 .getAsJsonObject();
         } catch (JsonSyntaxException e) {
             obj = null;
@@ -460,23 +458,22 @@ public class AdminPuzzleAPI extends HttpServlet {
         @Override
         public void write(JsonWriter out, Puzzle puzzle) throws IOException {
             out.beginObject()
-                .name("id").value(puzzle.getPuzzleId())
-                .name("position").value(puzzle.getPosition())
-                .name("title").value(puzzle.getTitle())
-                .name("description").value(puzzle.getDescription())
-                .name("maxAssertionsPerTest").value(puzzle.getMaxAssertionsPerTest())
-                .name("editableLinesStart").value(puzzle.getEditableLinesStart())
-                .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
-                .name("chapterId").value(puzzle.getChapterId())
-                .name("classId").value(puzzle.getClassId())
-                .endObject();
+                    .name("id").value(puzzle.getPuzzleId())
+                    .name("position").value(puzzle.getPosition())
+                    .name("title").value(puzzle.getTitle())
+                    .name("description").value(puzzle.getDescription())
+                    .name("maxAssertionsPerTest").value(puzzle.getMaxAssertionsPerTest())
+                    .name("editableLinesStart").value(puzzle.getEditableLinesStart())
+                    .name("editableLinesEnd").value(puzzle.getEditableLinesEnd())
+                    .name("chapterId").value(puzzle.getChapterId())
+                    .name("classId").value(puzzle.getClassId())
+                    .endObject();
             out.close();
         }
 
         @Override
         public Puzzle read(JsonReader in) throws IOException {
-            JsonObject json = new JsonParser()
-                    .parse(in)
+            JsonObject json = JsonParser.parseReader(in)
                     .getAsJsonObject();
 
             int puzzleId = json.get("id").getAsInt();
@@ -503,18 +500,17 @@ public class AdminPuzzleAPI extends HttpServlet {
         @Override
         public void write(JsonWriter out, PuzzleChapter chapter) throws IOException {
             out.beginObject()
-                .name("id").value(chapter.getChapterId())
-                .name("position").value(chapter.getPosition())
-                .name("title").value(chapter.getTitle())
-                .name("description").value(chapter.getDescription())
-                .endObject();
+                    .name("id").value(chapter.getChapterId())
+                    .name("position").value(chapter.getPosition())
+                    .name("title").value(chapter.getTitle())
+                    .name("description").value(chapter.getDescription())
+                    .endObject();
             out.close();
         }
 
         @Override
         public PuzzleChapter read(JsonReader in) throws IOException {
-            JsonObject json = new JsonParser()
-                    .parse(in)
+            JsonObject json = JsonParser.parseReader(in)
                     .getAsJsonObject();
 
             int chapterId = json.get("id").getAsInt();

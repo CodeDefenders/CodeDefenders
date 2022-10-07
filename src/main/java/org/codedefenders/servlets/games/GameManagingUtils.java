@@ -337,7 +337,7 @@ public class GameManagingUtils implements IGameManagingUtils {
      */
     public static List<Integer> extractErrorLines(String compilerOutput) {
         Set<Integer> errorLines = new TreeSet<>(); // Use TreeSet for the ordering
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
+        Pattern p = Pattern.compile("\\[javac].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
@@ -363,7 +363,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         }
 
         StringBuilder decorated = new StringBuilder();
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
+        Pattern p = Pattern.compile("\\[javac].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {

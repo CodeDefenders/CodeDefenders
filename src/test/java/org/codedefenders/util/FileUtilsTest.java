@@ -85,7 +85,7 @@ public class FileUtilsTest {
         File nextSubDir = FileUtils.getNextSubDir(dummyDirectory);
 
         String expected = dir.toString();
-        Assert.assertNotEquals(expected, nextSubDir.toPath());
+        Assert.assertNotEquals(expected, nextSubDir.toString());
         expected = expected.replaceAll("000000021", "00000022");
         Assert.assertEquals(expected, nextSubDir.toString());
 

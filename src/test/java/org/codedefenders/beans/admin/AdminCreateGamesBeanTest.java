@@ -31,7 +31,6 @@ import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -50,6 +49,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
@@ -229,9 +231,9 @@ public class AdminCreateGamesBeanTest {
         stagedGames.add(stagedGame2);
         stagedGames.add(stagedGame3);
 
-        PowerMockito.when(MultiplayerGameDAO.storeMultiplayerGame(Matchers.any(MultiplayerGame.class))).thenReturn(0);
-        PowerMockito.when(GameDAO.addPlayerToGame(Matchers.anyInt(), Matchers.anyInt(), Matchers.any(Role.class))).thenReturn(true);
-        PowerMockito.when(userRepo.getUserById(Matchers.anyInt())).thenReturn(Optional.of(new UserEntity("")));
+        PowerMockito.when(MultiplayerGameDAO.storeMultiplayerGame(any(MultiplayerGame.class))).thenReturn(0);
+        PowerMockito.when(GameDAO.addPlayerToGame(anyInt(), anyInt(), any(Role.class))).thenReturn(true);
+        PowerMockito.when(userRepo.getUserById(anyInt())).thenReturn(Optional.of(new UserEntity("")));
         adminCreateGamesBean = PowerMockito.spy(adminCreateGamesBean);
 
         adminCreateGamesBean.createStagedGames(stagedGames);
@@ -284,9 +286,9 @@ public class AdminCreateGamesBeanTest {
     public void testAddPlayerToExistingGame() {
         AbstractGame game = PowerMockito.mock(AbstractGame.class);
 
-        Mockito.when(game.addPlayer(Matchers.eq(1), Matchers.any(Role.class))).thenReturn(false);
-        Mockito.when(game.addPlayer(Matchers.eq(2), Matchers.eq(Role.DEFENDER))).thenReturn(true);
-        Mockito.when(game.addPlayer(Matchers.eq(3), Matchers.eq(Role.PLAYER))).thenReturn(true);
+        Mockito.when(game.addPlayer(eq(1), any(Role.class))).thenReturn(false);
+        Mockito.when(game.addPlayer(eq(2), eq(Role.DEFENDER))).thenReturn(true);
+        Mockito.when(game.addPlayer(eq(3), eq(Role.PLAYER))).thenReturn(true);
 
         assertThat(adminCreateGamesBean.addPlayerToExistingGame(game, userInfos.get(1).getUser(), Role.ATTACKER), is(false));
         assertThat(adminCreateGamesBean.addPlayerToExistingGame(game, userInfos.get(2).getUser(), Role.DEFENDER), is(true));

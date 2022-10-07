@@ -35,7 +35,7 @@ public class AntTest {
     public void testAntPath() {
         ProcessBuilder pb = new ProcessBuilder();
 
-        Map env = pb.environment();
+        Map<String, String> env = pb.environment();
 
         String antHome = (String) env.get("ANT_HOME");
 
