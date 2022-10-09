@@ -105,7 +105,7 @@
                                 data-total-min="${duration}" data-start-time="${startTime}"
                                 data-inner-text-suffix="remaining"
                                 data-title-prefix="Click to change the game's duration."
-                        ></button>
+                        >Game Duration Settings</button>
 
                         <t:modal title="Change the Games Duration" id="duration-change-modal" closeButtonText="Cancel">
                             <jsp:attribute name="content">
@@ -117,7 +117,7 @@
                                 <small>
                                     The current duration is ${duration} minutes of which are
                                     <span class="time-left" data-total-min="${duration}" data-start-time="${startTime}"
-                                          data-show-mixed-units="false"></span> minutes left.
+                                          data-show-mixed-units="false">&hellip;</span> minutes left.
                                 </small>
                             </jsp:attribute>
                             <jsp:attribute name="footer">
@@ -127,10 +127,6 @@
                             </jsp:attribute>
                         </t:modal>
                     </form>
-                    <script type="module">
-                        import {GameTimeManager} from './js/codedefenders_game.mjs';
-                        const gameTimeManager = new GameTimeManager(".time-left", 10);
-                    </script>
             <%
                         }
                     }
@@ -175,6 +171,40 @@
                 }
             %>
 
+            <%
+                int duration = -1;
+                if (game instanceof MultiplayerGame) {
+                    duration = ((MultiplayerGame) game).getGameDurationMinutes();
+                } else if (game instanceof MeleeGame) {
+                    duration = ((MeleeGame) game).getGameDurationMinutes();
+                }
+
+                if (duration != -1) {
+                    // make duration and start time available in jsp:attributes by using EL
+                    request.setAttribute("duration", duration);
+                    request.setAttribute("startTime", gameService.getStartTimeInUnixSeconds(gameId));
+            %>
+                <button type="button" class="btn btn-sm btn-outline-secondary time-left"
+                        data-bs-toggle="modal" data-bs-target="#duration-info-modal"
+                        data-total-min="${duration}" data-start-time="${startTime}"
+                        data-inner-text-suffix="remaining" title="Game Duration Details"
+                >Game Duration Details</button>
+
+                <t:modal title="Game Duration Details" id="duration-info-modal" closeButtonText="Close">
+                    <jsp:attribute name="content">
+                        <p>
+                            <span class="time-left" data-total-min="${duration}" data-start-time="${startTime}"
+                                  data-show-mixed-units="false" data-show-title="false">&hellip;</span>
+                            of the games total ${duration} minutes are left.
+                        </p>
+                        <p>The game will end at
+                            <span class="time-left" data-total-min="${duration}" data-start-time="${startTime}"
+                                  data-render-only-end-time="true" data-show-title="false">&hellip;</span>.
+                        </p>
+                    </jsp:attribute>
+                </t:modal>
+            <% } %>
+
             <div class="btn-group">
                 <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
                         data-bs-toggle="modal" data-bs-target="#scoreboard">
@@ -216,3 +246,8 @@
             <t:game_chat/>
         </div>
     </div>
+
+    <script type="module">
+        import {GameTimeManager} from './js/codedefenders_game.mjs';
+        const gameTimeManager = new GameTimeManager(".time-left", 10);
+    </script>

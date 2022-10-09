@@ -18,12 +18,23 @@ class GameTimeManager {
      */
     addToolTip() {
         this._renderer.forEach((element) => {
-            const start = Number(element.dataset.startTime);
-            const duration = Number(element.dataset.totalMin) * 60;
-            const end = new Date((start + duration) * 1e3);
+            if (element.dataset.showTitle === 'false') return;
+            const end = this.calculateEndDate(element).toLocaleString();
             const prefix = element.dataset.titlePrefix || '';
-            element.title = `${prefix} Game ends at ${end.toLocaleString()}`.trim();
+            element.title = `${prefix} Game ends at ${end}`.trim();
         });
+    }
+
+    /**
+     * Calculates the end date of the game using the data attributes of the given element
+     *
+     * @param element {HTMLElement} the element to get the data attributes from
+     * @returns {Date} the end date of the game
+     */
+    calculateEndDate(element) {
+        const start = Number(element.dataset.startTime);
+        const duration = Number(element.dataset.totalMin) * 60;
+        return new Date((start + duration) * 1e3);
     }
 
     /**
@@ -39,13 +50,19 @@ class GameTimeManager {
      * @param element {HTMLElement} the element to render the remaining time in. Has to contain the start time and duration data
      */
     renderElement(element) {
-        const start = Number(element.dataset.startTime);
-        const duration = Number(element.dataset.totalMin);
-        const remainingMinutes = this.calculateRemainingTime(start, duration);
-        const showMixedUnits = element.dataset.showMixedUnits !== 'false';
+        let renderedTime;
+        if (element.dataset.renderOnlyEndTime === 'true') {
+            renderedTime = this.calculateEndDate(element).toLocaleString();
+        } else {
+            const start = Number(element.dataset.startTime);
+            const duration = Number(element.dataset.totalMin);
+            const remainingMinutes = this.calculateRemainingTime(start, duration);
+            const showMixedUnits = element.dataset.showMixedUnits !== 'false';
+            renderedTime = showMixedUnits ? this.toMixedUnitString(remainingMinutes) : remainingMinutes;
+        }
+
         const prefix = element.dataset.innerTextPrefix || '';
         const suffix = element.dataset.innerTextSuffix || '';
-        const renderedTime = showMixedUnits ? this.toMixedUnitString(remainingMinutes) : remainingMinutes;
         element.innerText = `${prefix} ${renderedTime} ${suffix}`.trim();
     }
 
