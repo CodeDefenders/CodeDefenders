@@ -21,7 +21,8 @@ class GameTimeManager {
             const start = Number(element.dataset.startTime);
             const duration = Number(element.dataset.totalMin) * 60;
             const end = new Date((start + duration) * 1e3);
-            element.title = `Game ends at ${end.toLocaleString()}`;
+            const prefix = element.dataset.titlePrefix || '';
+            element.title = `${prefix} Game ends at ${end.toLocaleString()}`.trim();
         });
     }
 
@@ -41,7 +42,11 @@ class GameTimeManager {
         const start = Number(element.dataset.startTime);
         const duration = Number(element.dataset.totalMin);
         const remainingMinutes = this.calculateRemainingTime(start, duration);
-        element.innerText = this.toMixedUnitString(remainingMinutes);
+        const showMixedUnits = element.dataset.showMixedUnits !== 'false';
+        const prefix = element.dataset.innerTextPrefix || '';
+        const suffix = element.dataset.innerTextSuffix || '';
+        const renderedTime = showMixedUnits ? this.toMixedUnitString(remainingMinutes) : remainingMinutes;
+        element.innerText = `${prefix} ${renderedTime} ${suffix}`.trim();
     }
 
     /**
