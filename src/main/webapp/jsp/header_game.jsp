@@ -44,14 +44,17 @@
     AbstractGameService gameService = null;
     Role role = null;
     String selectionManagerUrl = null;
+    int duration = -1;
     if (game instanceof MeleeGame) {
         selectionManagerUrl = request.getContextPath() + Paths.MELEE_SELECTION;
         role = ((MeleeGame) game).getRole(login.getUserId());
         gameService = CDIUtil.getBeanFromCDI(MeleeGameService.class);
+        duration = ((MeleeGame) game).getGameDurationMinutes();
     } else if (game instanceof MultiplayerGame) {
         selectionManagerUrl = request.getContextPath() + Paths.BATTLEGROUND_SELECTION;
         role = ((MultiplayerGame) game).getRole(login.getUserId());
         gameService = CDIUtil.getBeanFromCDI(MultiplayerGameService.class);
+        duration = ((MultiplayerGame) game).getGameDurationMinutes();
     } else if (game instanceof PuzzleGame) {
         gameService = CDIUtil.getBeanFromCDI(PuzzleGameService.class);
     }
@@ -82,13 +85,6 @@
                     </form>
 
             <%
-                        int duration = -1;
-                        if (game instanceof MultiplayerGame) {
-                            duration = ((MultiplayerGame) game).getGameDurationMinutes();
-                        } else if (game instanceof MeleeGame) {
-                            duration = ((MeleeGame) game).getGameDurationMinutes();
-                        }
-
                         if (duration != -1) {
                             // make duration, max duration and start time available in jsp:attributes by using EL
                             request.setAttribute("duration", duration);
@@ -172,13 +168,6 @@
             %>
 
             <%
-                int duration = -1;
-                if (game instanceof MultiplayerGame) {
-                    duration = ((MultiplayerGame) game).getGameDurationMinutes();
-                } else if (game instanceof MeleeGame) {
-                    duration = ((MeleeGame) game).getGameDurationMinutes();
-                }
-
                 if (duration != -1) {
                     // make duration and start time available in jsp:attributes by using EL
                     request.setAttribute("duration", duration);
