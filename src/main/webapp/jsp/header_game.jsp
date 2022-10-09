@@ -109,9 +109,9 @@
 
                         <t:modal title="Change the Games Duration" id="duration-change-modal" closeButtonText="Cancel">
                             <jsp:attribute name="content">
-                                <div>
+                                <div class="align-items-center d-flex gap-2">
                                     <label for="newDuration">The new duration of this game:</label>
-                                    <input type="number" name="newDuration" id="newDuration"
+                                    <input type="number" name="newDuration" id="newDuration" class="form-control w-auto"
                                            value="${duration}" required min="1" max="${maxDuration}">
                                 </div>
                                 <small>
