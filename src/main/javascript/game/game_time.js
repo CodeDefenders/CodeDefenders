@@ -10,6 +10,19 @@ class GameTimeManager {
         this._renderer = [...document.querySelectorAll(selector)];
         this._interval = setInterval(this.render.bind(this), updateInterval * 1e3);
         this.render();
+        this.addToolTip();
+    }
+
+    /**
+     * Adds the end time as a tooltip to the elements.
+     */
+    addToolTip() {
+        this._renderer.forEach((element) => {
+            const start = Number(element.dataset.startTime);
+            const duration = Number(element.dataset.totalMin) * 60;
+            const end = new Date((start + duration) * 1e3);
+            element.title = `Game ends at ${end.toLocaleString()}`;
+        });
     }
 
     /**
@@ -22,7 +35,7 @@ class GameTimeManager {
     /**
      * Renders the remaining time in the given element
      *
-     * @param element the element to render the remaining time in. Has to contain the start time and duration data
+     * @param element {HTMLElement} the element to render the remaining time in. Has to contain the start time and duration data
      */
     renderElement(element) {
         const start = Number(element.dataset.startTime);
@@ -34,8 +47,8 @@ class GameTimeManager {
     /**
      * Calculates the remaining time in minutes
      *
-     * @param start the start time in seconds since epoch (Unix timestamp)
-     * @param duration the games duration in minutes
+     * @param start {Number} the start time in seconds since epoch (Unix timestamp)
+     * @param duration {Number} the games duration in minutes
      * @returns {number} the remaining time in minutes (rounded and always >= 0)
      */
     calculateRemainingTime(start, duration) {
@@ -49,7 +62,7 @@ class GameTimeManager {
     /**
      * Converts the given duration in minutes to a string with the format "Xd Yh Zm" or "Yh Zm" or "Zm".
      *
-     * @param pMinutes the duration in minutes
+     * @param pMinutes {Number} the duration in minutes
      * @returns {string} the string representation
      */
     toMixedUnitString(pMinutes) {
