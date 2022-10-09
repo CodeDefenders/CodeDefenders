@@ -32,8 +32,6 @@
 <%@ page import="org.codedefenders.util.CDIUtil" %>
 <%@ page import="org.codedefenders.service.game.MeleeGameService" %>
 <%@ page import="org.codedefenders.service.game.MultiplayerGameService" %>
-<%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
-<%@ page import="org.codedefenders.service.game.PuzzleGameService" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
 
@@ -55,8 +53,6 @@
         role = ((MultiplayerGame) game).getRole(login.getUserId());
         gameService = CDIUtil.getBeanFromCDI(MultiplayerGameService.class);
         duration = ((MultiplayerGame) game).getGameDurationMinutes();
-    } else if (game instanceof PuzzleGame) {
-        gameService = CDIUtil.getBeanFromCDI(PuzzleGameService.class);
     }
 %>
 
