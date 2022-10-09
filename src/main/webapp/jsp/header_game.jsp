@@ -164,7 +164,8 @@
             %>
 
             <%
-                if (duration != -1) {
+                // show duration for normal users without the ability to modify it:
+                if (game.getCreatorId() != login.getUserId() && duration != -1) {
                     // make duration and start time available in jsp:attributes by using EL
                     request.setAttribute("duration", duration);
                     request.setAttribute("startTime", gameService.getStartTimeInUnixSeconds(gameId));
