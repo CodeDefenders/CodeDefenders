@@ -95,9 +95,11 @@
                         <button type="button" class="btn btn-sm btn-outline-danger time-left" form="adminDurationChange"
                                 data-bs-toggle="modal" data-bs-target="#duration-change-modal"
                                 data-total-min="${duration}" data-start-time="${startTime}"
-                                data-inner-text-suffix="remaining"
                                 data-title-prefix="Click to change the game's duration."
-                        >Game Duration Settings</button>
+                                data-renderer=".time-left-renderer">
+                            <i class="fa fa-hourglass-start"></i>
+                            <span class="time-left-renderer">Game Duration Settings</span>
+                        </button>
 
                         <t:modal title="Change the Games Duration" id="duration-change-modal" closeButtonText="Cancel">
                             <jsp:attribute name="content">
@@ -172,9 +174,11 @@
             %>
                 <button type="button" class="btn btn-sm btn-outline-secondary time-left"
                         data-bs-toggle="modal" data-bs-target="#duration-info-modal"
-                        data-total-min="${duration}" data-start-time="${startTime}"
-                        data-inner-text-suffix="remaining" title="Game Duration Details"
-                >Game Duration Details</button>
+                        data-total-min="${duration}" data-start-time="${startTime}" title="Game Duration Details"
+                        data-renderer=".time-left-renderer">
+                    <i class="fa fa-hourglass-start"></i>
+                    <span class="time-left-renderer">Game Duration Settings</span>
+                </button>
 
                 <t:modal title="Game Duration Details" id="duration-info-modal" closeButtonText="Close">
                     <jsp:attribute name="content">

@@ -50,20 +50,19 @@ class GameTimeManager {
      * @param element {HTMLElement} the element to render the remaining time in. Has to contain the start time and duration data
      */
     renderElement(element) {
-        let renderedTime;
+        let formattedTime;
         if (element.dataset.renderOnlyEndTime === 'true') {
-            renderedTime = this.calculateEndDate(element).toLocaleString();
+            formattedTime = this.calculateEndDate(element).toLocaleString();
         } else {
             const start = Number(element.dataset.startTime);
             const duration = Number(element.dataset.totalMin);
             const remainingMinutes = this.calculateRemainingTime(start, duration);
             const showMixedUnits = element.dataset.showMixedUnits !== 'false';
-            renderedTime = showMixedUnits ? this.toMixedUnitString(remainingMinutes) : remainingMinutes;
+            formattedTime = showMixedUnits ? this.toMixedUnitString(remainingMinutes) : remainingMinutes;
         }
 
-        const prefix = element.dataset.innerTextPrefix || '';
-        const suffix = element.dataset.innerTextSuffix || '';
-        element.innerText = `${prefix} ${renderedTime} ${suffix}`.trim();
+        const renderer = element.dataset.renderer ? element.querySelector(element.dataset.renderer) : element;
+        renderer.innerText = formattedTime;
     }
 
     /**
