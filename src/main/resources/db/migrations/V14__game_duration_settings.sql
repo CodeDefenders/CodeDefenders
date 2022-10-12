@@ -3,7 +3,7 @@ VALUES ('GAME_DURATION_MINUTES_MAX',     'INT_VALUE', NULL,         10080,     N
        ('GAME_DURATION_MINUTES_DEFAULT', 'INT_VALUE', NULL,            60,     NULL      );
 
 ALTER TABLE `games`
-ADD COLUMN IF NOT EXISTS `Game_Duration_Minutes` int(11) DEFAULT NULL;
+ADD `Game_Duration_Minutes` int(11) DEFAULT NULL;
 
 # Migrate existing games by letting them stay open for the maximum duration from now on.
 UPDATE `games`
