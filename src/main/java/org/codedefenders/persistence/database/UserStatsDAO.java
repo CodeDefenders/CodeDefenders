@@ -52,10 +52,13 @@ public class UserStatsDAO {
     }
 
     private int getNumMutantsByUser(int userId, boolean alive) {
-        final String query = "SELECT count(Mutant_ID) AS mutants "
-                + "FROM view_valid_mutants "
-                + "WHERE User_ID = ? "
-                + "AND Alive = ?;";
+        final String query = String.join("\n",
+                "SELECT count(Mutant_ID) AS mutants",
+                "FROM view_valid_mutants",
+                "WHERE User_ID = ?",
+                "AND Alive = ?;"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -90,10 +93,13 @@ public class UserStatsDAO {
     }
 
     private int getNumTestsByUser(int userId, boolean killingTest) {
-        final String query = "SELECT count(Test_ID) AS tests "
-                + "FROM view_valid_tests "
-                + "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?) "
-                + "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;";
+        final String query = String.join("\n",
+                "SELECT count(Test_ID) AS tests",
+                "FROM view_valid_tests",
+                "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?)",
+                "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -128,9 +134,12 @@ public class UserStatsDAO {
 
     private double getPointsTestByUser(int userId, boolean avg) {
         final String acc = avg ? "avg" : "sum";
-        final String query = "SELECT " + acc + "(Points) AS points "
-                + "FROM view_valid_tests "
-                + "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?);";
+        final String query = String.join("\n",
+                "SELECT " + acc + "(Points) AS points",
+                "FROM view_valid_tests",
+                "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?);"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -165,9 +174,12 @@ public class UserStatsDAO {
 
     private double getPointsMutantByUser(int userId, boolean avg) {
         final String acc = avg ? "avg" : "sum";
-        final String query = "SELECT " + acc + "(Points) AS points "
-                + "FROM view_valid_mutants "
-                + "WHERE User_ID = ?;";
+        final String query = String.join("\n",
+                "SELECT " + acc + "(Points) AS points",
+                "FROM view_valid_mutants",
+                "WHERE User_ID = ?;"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -202,10 +214,13 @@ public class UserStatsDAO {
 
     private int getGamesOfRoleByUser(int userId, boolean defender) {
         final Role role = defender ? Role.DEFENDER : Role.ATTACKER;
-        final String query = "SELECT count(ID) AS games "
-                + "FROM view_players "
-                + "WHERE User_ID = ? "
-                + "AND Role = ?";
+        final String query = String.join("\n",
+                "SELECT count(ID) AS games",
+                "FROM view_players ",
+                "WHERE User_ID = ? ",
+                "AND Role = ?"
+        );
+
         try {
             return queryRunner.query(
                     query,
