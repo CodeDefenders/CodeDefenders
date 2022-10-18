@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%@ page import="org.codedefenders.game.GameState"%>
@@ -30,6 +31,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%
     AbstractGame game = (AbstractGame) request.getAttribute("game");
@@ -160,34 +162,26 @@
             %>
 
             <%
-                // show duration for normal users without the ability to modify it:
-                if (game.getCreatorId() != login.getUserId() && game.getState() == GameState.ACTIVE) {
-                    // make duration and start time available in jsp:attributes by using EL
+                if (game.getState() == GameState.ACTIVE) {
+                    request.setAttribute("selectionManagerUrl", selectionManagerUrl);
+                    request.setAttribute("canSetDuration", game.getCreatorId() == login.getUserId());
+
+                    // make duration, max duration and start time available in jsp:attributes by using EL
                     request.setAttribute("duration", duration);
+                    request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
+                            AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
                     request.setAttribute("startTime", startTime);
             %>
-                <button type="button" class="btn btn-sm btn-outline-secondary time-left"
-                        data-bs-toggle="modal" data-bs-target="#duration-info-modal"
-                        data-total-min="${duration}" data-start-time="${startTime}" title="Game Duration Details"
-                        data-renderer=".time-left-renderer">
-                    <i class="fa fa-hourglass-start"></i>
-                    <span class="time-left-renderer">Game Duration Settings</span>
-                </button>
-
-                <t:modal title="Game Duration Details" id="duration-info-modal" closeButtonText="Close">
-                    <jsp:attribute name="content">
-                        <p>
-                            <span class="time-left" data-total-min="${duration}" data-start-time="${startTime}"
-                                  data-show-mixed-units="false" data-show-title="false">&hellip;</span>
-                            of the games total ${duration} minutes are left.
-                        </p>
-                        <p>The game will end at
-                            <span class="time-left" data-total-min="${duration}" data-start-time="${startTime}"
-                                  data-render-only-end-time="true" data-show-title="false">&hellip;</span>.
-                        </p>
-                    </jsp:attribute>
-                </t:modal>
-            <% } %>
+            <t:game_time
+                    gameId="${gameProducer.game.id}"
+                    selectionManagerUrl="${selectionManagerUrl}"
+                    duration="${duration}"
+                    maxDuration="${maxDuration}"
+                    startTime="${startTime}"
+                    canSetDuration="${canSetDuration}"/>
+            <%
+                }
+            %>
 
             <div class="btn-group">
                 <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
