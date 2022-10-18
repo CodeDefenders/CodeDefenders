@@ -15,16 +15,26 @@
     <input type="hidden" name="newDuration" id="duration-total">
 
     <%-- Button with remaining duration. --%>
-    <button type="button" class="btn btn-sm btn-outline-danger" form="adminDurationChange"
-            data-bs-toggle="modal" data-bs-target="#duration-change-modal">
-        <i class="fa fa-hourglass-start"></i>
-        <span class="time-left"
-              data-type="remaining"
-              data-duration="${duration}"
-              data-start="${startTime}">
+
+    <div data-bs-toggle="tooltip"
+         <c:if test="${canSetDuration}">
+             title="Change the game duration."
+         </c:if>
+         <c:if test="${!canSetDuration}">
+             title="View the game duration."
+         </c:if>
+    >
+        <button type="button" class="btn btn-sm btn-outline-danger" form="adminDurationChange"
+                data-bs-toggle="modal" data-bs-target="#duration-change-modal">
+            <i class="fa fa-hourglass-start"></i>
+            <span class="time-left"
+                  data-type="remaining"
+                  data-duration="${duration}"
+                  data-start="${startTime}">
             Game Duration
         </span>
-    </button>
+        </button>
+    </div>
 
     <t:modal title="Game Duration" id="duration-change-modal" closeButtonText="Cancel">
         <jsp:attribute name="content">
