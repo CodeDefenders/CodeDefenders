@@ -21,7 +21,7 @@ Codedefenders can be deployed to the VM e.g. via the [maven deployment steps](#a
 
 ### Software Requirements
 
-- Java (Version 8) <!-- 9 Doesn't count as it is EOL-->
+- Java (Version 1.8 or later)
 - Tomcat Server (Version 9)
 - Apache Maven
 - Apache Ant
