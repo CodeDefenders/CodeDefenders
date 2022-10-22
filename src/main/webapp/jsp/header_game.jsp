@@ -77,47 +77,6 @@
                             End Game
                         </button>
                     </form>
-
-            <%
-                        // make duration, max duration and start time available in jsp:attributes by using EL
-                        request.setAttribute("duration", duration);
-                        request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
-                            AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
-                        request.setAttribute("startTime", startTime);
-            %>
-                    <form id="adminDurationChange" action="<%=selectionManagerUrl%>" method="post">
-                        <input type="hidden" name="formType" value="durationChange">
-                        <input type="hidden" name="gameId" value="<%=game.getId()%>">
-
-                        <button type="button" class="btn btn-sm btn-outline-danger time-left" form="adminDurationChange"
-                                data-bs-toggle="modal" data-bs-target="#duration-change-modal"
-                                data-total-min="${duration}" data-start-time="${startTime}"
-                                data-title-prefix="Click to change the game's duration."
-                                data-renderer=".time-left-renderer">
-                            <i class="fa fa-hourglass-start"></i>
-                            <span class="time-left-renderer">Game Duration Settings</span>
-                        </button>
-
-                        <t:modal title="Change the Games Duration" id="duration-change-modal" closeButtonText="Cancel">
-                            <jsp:attribute name="content">
-                                <div class="align-items-center d-flex gap-2">
-                                    <label for="newDuration">The new duration of this game:</label>
-                                    <input type="number" name="newDuration" id="newDuration" class="form-control w-auto"
-                                           value="${duration}" required min="1" max="${maxDuration}">
-                                </div>
-                                <small>
-                                    The current duration is ${duration} minutes of which are
-                                    <span class="time-left" data-total-min="${duration}" data-start-time="${startTime}"
-                                          data-show-mixed-units="false">&hellip;</span> minutes left.
-                                </small>
-                            </jsp:attribute>
-                            <jsp:attribute name="footer">
-                                <button type="submit" form="adminDurationChange" class="btn btn-primary" id="durationChange">
-                                    Change Game Duration
-                                </button>
-                            </jsp:attribute>
-                        </t:modal>
-                    </form>
             <%
                     }
 
