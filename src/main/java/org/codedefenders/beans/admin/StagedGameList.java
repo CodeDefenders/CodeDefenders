@@ -417,7 +417,7 @@ public class StagedGameList implements Serializable {
             this.creatorRole = creatorRole;
         }
 
-        public Integer getGameDurationMinutes() {
+        public int getGameDurationMinutes() {
             return gameDurationMinutes;
         }
 
