@@ -28,10 +28,6 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.service.game.AbstractGameService" %>
-<%@ page import="org.codedefenders.util.CDIUtil" %>
-<%@ page import="org.codedefenders.service.game.MeleeGameService" %>
-<%@ page import="org.codedefenders.service.game.MultiplayerGameService" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
 
@@ -39,7 +35,6 @@
     AbstractGame game = (AbstractGame) request.getAttribute("game");
     int gameId = game.getId();
 
-    AbstractGameService gameService = null;
     Role role = null;
     String selectionManagerUrl = null;
     int duration = -1;
@@ -47,13 +42,11 @@
     if (game instanceof MeleeGame) {
         selectionManagerUrl = request.getContextPath() + Paths.MELEE_SELECTION;
         role = ((MeleeGame) game).getRole(login.getUserId());
-        gameService = CDIUtil.getBeanFromCDI(MeleeGameService.class);
         duration = ((MeleeGame) game).getGameDurationMinutes();
         startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
     } else if (game instanceof MultiplayerGame) {
         selectionManagerUrl = request.getContextPath() + Paths.BATTLEGROUND_SELECTION;
         role = ((MultiplayerGame) game).getRole(login.getUserId());
-        gameService = CDIUtil.getBeanFromCDI(MultiplayerGameService.class);
         duration = ((MultiplayerGame) game).getGameDurationMinutes();
         startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
     }
