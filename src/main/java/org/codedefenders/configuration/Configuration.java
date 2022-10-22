@@ -156,7 +156,7 @@ public class Configuration {
             if (antJavaHome != null) {
                 File javaExecutable = new File(antJavaHome, "/bin/java");
                 if (!javaExecutable.exists() || !javaExecutable.isFile()) {
-                    validationErrors.add(resolveAttributeName("javaHome") + " doesn't contain the java executable "
+                    validationErrors.add(resolveAttributeName("antJavaHome") + " doesn't contain the java executable "
                             + javaExecutable);
                 }
             }
