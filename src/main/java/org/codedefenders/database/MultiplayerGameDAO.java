@@ -446,8 +446,7 @@ public class MultiplayerGameDAO {
                 "WHERE (p.ID = ?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
-        // why do we return melee games here?
-        return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
+        return DB.executeQueryReturnValue(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
 
     /**
