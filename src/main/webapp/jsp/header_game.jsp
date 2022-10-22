@@ -43,16 +43,19 @@
     Role role = null;
     String selectionManagerUrl = null;
     int duration = -1;
+    long startTime = -1;
     if (game instanceof MeleeGame) {
         selectionManagerUrl = request.getContextPath() + Paths.MELEE_SELECTION;
         role = ((MeleeGame) game).getRole(login.getUserId());
         gameService = CDIUtil.getBeanFromCDI(MeleeGameService.class);
         duration = ((MeleeGame) game).getGameDurationMinutes();
+        startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
     } else if (game instanceof MultiplayerGame) {
         selectionManagerUrl = request.getContextPath() + Paths.BATTLEGROUND_SELECTION;
         role = ((MultiplayerGame) game).getRole(login.getUserId());
         gameService = CDIUtil.getBeanFromCDI(MultiplayerGameService.class);
         duration = ((MultiplayerGame) game).getGameDurationMinutes();
+        startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
     }
 %>
 
@@ -86,7 +89,7 @@
                             request.setAttribute("duration", duration);
                             request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
                                     AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
-                            request.setAttribute("startTime", gameService.getStartTimeInUnixSeconds(gameId));
+                            request.setAttribute("startTime", startTime);
             %>
                     <form id="adminDurationChange" action="<%=selectionManagerUrl%>" method="post">
                         <input type="hidden" name="formType" value="durationChange">
@@ -170,7 +173,7 @@
                 if (game.getCreatorId() != login.getUserId() && duration != -1) {
                     // make duration and start time available in jsp:attributes by using EL
                     request.setAttribute("duration", duration);
-                    request.setAttribute("startTime", gameService.getStartTimeInUnixSeconds(gameId));
+                    request.setAttribute("startTime", startTime);
             %>
                 <button type="button" class="btn btn-sm btn-outline-secondary time-left"
                         data-bs-toggle="modal" data-bs-target="#duration-info-modal"

@@ -245,8 +245,4 @@ public abstract class AbstractGameService implements IGameService {
 
         return true;
     }
-
-    public long getStartTimeInUnixSeconds(int gameId) {
-        return GameDAO.getStartTimeInUnixSeconds(gameId);
-    }
 }
