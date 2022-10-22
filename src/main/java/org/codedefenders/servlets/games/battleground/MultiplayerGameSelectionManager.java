@@ -32,9 +32,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameLevel;
@@ -44,6 +44,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
@@ -111,8 +112,17 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
         final String action = formType(request);
+
+        if (!action.equals("createGame")) {
+            MultiplayerGame game = gameProducer.getGame();
+            if (game == null) {
+                logger.error("No game or wrong type of game found. Aborting request.");
+                Redirect.redirectBack(request, response);
+                return;
+            }
+        }
+
         switch (action) {
             case "createGame":
                 createGame(request, response);
@@ -129,6 +139,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             case "endGame":
                 endGame(request, response);
                 return;
+            case "rematch":
+                rematch(request, response);
+                return;
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
@@ -137,20 +150,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
-        if (!canCreateGames) {
-            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.", login.getUserId());
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        String contextPath = request.getContextPath();
-
         int classId;
         int maxAssertionsPerTest;
         int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
-        Role selectedRole;
+        Role creatorRole;
 
         try {
             classId = getIntParameter(request, "class").get();
@@ -159,7 +163,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel")
                     .map(CodeValidatorLevel::valueOrNull)
                     .get();
-            selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
+            creatorRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
         } catch (NoSuchElementException e) {
             logger.error("At least one request parameter was missing or was no valid integer value.", e);
             Redirect.redirectBack(request, response);
@@ -182,48 +186,24 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .build();
 
-        newGame.setEventDAO(eventDAO);
-        newGame.setUserRepository(userRepo);
-
-        if (newGame.insert()) {
-            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event event = new Event(-1, newGame.getId(), login.getUserId(), "Game Created",
-                    EventType.GAME_CREATED, EventStatus.GAME, timestamp);
-            eventDAO.insert(event);
-        } else {
-            // TODO Missing error handling
-            logger.warn("Cannot create game!");
-        }
-
-        // Always add system player to send mutants and tests at runtime!
-        newGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
-        newGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
-
-        // Add selected role to game if the creator participates as attacker/defender
-        if (selectedRole.equals(Role.ATTACKER) || selectedRole.equals(Role.DEFENDER)) {
-            newGame.addPlayer(login.getUserId(), selectedRole);
-        }
-
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
         boolean withMutants = parameterThenOrOther(request, "withMutants", true, false);
-        gameManagingUtils.addPredefinedMutantsAndTests(newGame, withMutants, withTests);
 
-        /*
-         * Publish the event that a new game started
-         */
-        GameCreatedEvent gce = new GameCreatedEvent();
-        gce.setGameId(newGame.getId());
-        notificationService.post(gce);
+        boolean success = handleCreateGame(newGame, withMutants, withTests, creatorRole);
 
+        if (!success) {
+            Redirect.redirectBack(request, response);
+            return;
+        }
 
         // Redirect to admin interface
         if (request.getParameter("fromAdmin").equals("true")) {
-            response.sendRedirect(contextPath + "/admin");
+            response.sendRedirect(request.getContextPath() + "/admin");
             return;
         }
 
         // Redirect to the game selection menu.
-        response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
+        response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
     }
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -236,14 +216,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         int gameId = game.getId();
-
         Role role = game.getRole(login.getUserId());
 
         if (role != Role.NONE) {
@@ -299,17 +272,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contextPath = request.getContextPath();
         final MultiplayerGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
@@ -320,7 +282,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
 
         messages.add("Game " + gameId + " left");
-        DatabaseAccess.removePlayerEventsForGame(gameId, login.getUserId());
+        eventDAO.removePlayerEventsForGame(gameId, login.getUserId());
 
         final EventType notifType = EventType.GAME_PLAYER_LEFT;
         final String message = "You successfully left the game.";
@@ -345,16 +307,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MultiplayerGame game = gameProducer.getGame();
-
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -383,16 +335,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final MultiplayerGame game = gameProducer.getGame();
 
-        if (game == null) {
-            logger.error("No game found. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        } else if (!(game instanceof MultiplayerGame)) {
-            logger.error("Game found is no MultiplayerGame. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can end the game.");
             Redirect.redirectBack(request, response);
@@ -420,5 +362,91 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         } else {
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_HISTORY + "?gameId=" + gameId);
         }
+    }
+
+    private boolean handleCreateGame(MultiplayerGame game, boolean withMutants, boolean withTests, Role creatorRole) {
+        final boolean canCreateGames = AdminDAO.getSystemSetting(GAME_CREATION).getBoolValue();
+        if (!canCreateGames) {
+            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.",
+                    login.getUserId());
+            messages.add("Creating games is currently not enabled.");
+            return false;
+        }
+
+        game.setEventDAO(eventDAO);
+        game.setUserRepository(userRepo);
+
+        int newGameId = MultiplayerGameDAO.storeMultiplayerGame(game);
+        game.setId(newGameId);
+
+        Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created",
+                EventType.GAME_CREATED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+        eventDAO.insert(event);
+
+        // Always add system player to send mutants and tests at runtime!
+        game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
+        game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
+
+
+        // Add selected role to game if the creator participates as attacker/defender
+        if (creatorRole.equals(Role.ATTACKER) || creatorRole.equals(Role.DEFENDER)) {
+            game.addPlayer(login.getUserId(), creatorRole);
+        }
+
+        gameManagingUtils.addPredefinedMutantsAndTests(game, withMutants, withTests);
+
+        /* Publish the event that a new game started */
+        GameCreatedEvent gce = new GameCreatedEvent();
+        gce.setGameId(game.getId());
+        notificationService.post(gce);
+
+        return true;
+    }
+
+    private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        MultiplayerGame oldGame = gameProducer.getGame();
+
+        if (login.getUser().getId() != oldGame.getCreatorId()) {
+            messages.add("Only the creator of this game can call a rematch.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        MultiplayerGame newGame = new MultiplayerGame.Builder(
+                oldGame.getClassId(),
+                login.getUserId(),
+                oldGame.getMaxAssertionsPerTest())
+                .level(oldGame.getLevel())
+                .chatEnabled(oldGame.isChatEnabled())
+                .capturePlayersIntention(oldGame.isCapturePlayersIntention())
+                .lineCoverage(oldGame.getLineCoverage())
+                .mutantCoverage(oldGame.getMutantCoverage())
+                .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
+                .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
+                .build();
+
+        boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);
+        boolean withTests = gameManagingUtils.hasPredefinedTests(oldGame);
+        Role creatorRole = oldGame.getRole(oldGame.getCreatorId());
+
+        boolean success = handleCreateGame(newGame, withMutants, withTests, creatorRole);
+
+        if (!success) {
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        for (Player player : oldGame.getAttackerPlayers()) {
+            if (player.getUser().getId() != oldGame.getCreatorId()) {
+                newGame.addPlayer(player.getUser().getId(), Role.DEFENDER);
+            }
+        }
+        for (Player player : oldGame.getDefenderPlayers()) {
+            if (player.getUser().getId() != oldGame.getCreatorId()) {
+                newGame.addPlayer(player.getUser().getId(), Role.ATTACKER);
+            }
+        }
+
+        response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + newGame.getId());
     }
 }

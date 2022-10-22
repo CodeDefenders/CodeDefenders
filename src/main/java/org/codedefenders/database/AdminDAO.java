@@ -232,7 +232,7 @@ public class AdminDAO {
 
     public static boolean setUserPassword(int uid, String password) {
         String query = "UPDATE users SET Password = ? WHERE User_ID = ?;";
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(password),
                 DatabaseValue.of(uid)
         };
@@ -248,7 +248,7 @@ public class AdminDAO {
     public static boolean updateSystemSetting(AdminSystemSettings.SettingsDTO setting) {
         String valueToSet = setting.getType().name();
 
-        DatabaseValue value = null;
+        DatabaseValue<?> value = null;
         switch (setting.getType()) {
             case STRING_VALUE:
                 value = DatabaseValue.of(setting.getStringValue());

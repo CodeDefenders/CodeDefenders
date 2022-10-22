@@ -71,12 +71,12 @@ public class DB {
         }
     }
 
-    public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue... values) {
+    public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue<?>... values) {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int count = 1;
-            for (DatabaseValue value : values) {
+            for (DatabaseValue<?> value : values) {
                 assignDatabaseValue(stmt, value, count);
                 count++;
             }
@@ -88,7 +88,7 @@ public class DB {
         return stmt;
     }
 
-    private static void assignDatabaseValue(PreparedStatement stmt, DatabaseValue value, int position)
+    private static void assignDatabaseValue(PreparedStatement stmt, DatabaseValue<?> value, int position)
             throws SQLException {
         final DatabaseValue.Type type = value.getType();
         switch (type) {
@@ -122,7 +122,7 @@ public class DB {
         return false;
     }
 
-    static boolean executeUpdateQuery(String query, DatabaseValue... params) {
+    static boolean executeUpdateQuery(String query, DatabaseValue<?>... params) {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
 
@@ -145,7 +145,7 @@ public class DB {
         return -1;
     }
 
-    static int executeUpdateQueryGetKeys(String query, DatabaseValue... params) {
+    static int executeUpdateQueryGetKeys(String query, DatabaseValue<?>... params) {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
 
@@ -181,7 +181,7 @@ public class DB {
      *                               not properly be extracted from it.
      * @see RSMapper
      */
-    static <T> T executeQueryReturnValue(String query, RSMapper<T> mapper, DatabaseValue... params)
+    static <T> T executeQueryReturnValue(String query, RSMapper<T> mapper, DatabaseValue<?>... params)
             throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();
@@ -246,7 +246,7 @@ public class DB {
      *                               not properly be extracted from it.
      * @see RSMapper
      */
-    static <T> List<T> executeQueryReturnList(String query, RSMapper<T> mapper, DatabaseValue... params)
+    static <T> List<T> executeQueryReturnList(String query, RSMapper<T> mapper, DatabaseValue<?>... params)
             throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();
@@ -275,7 +275,7 @@ public class DB {
     static <T> List<T> executeQueryReturnListWithFetchSize(String query,
                                                            int fetchSize,
                                                            RSMapper<T> mapper,
-                                                           DatabaseValue... params)
+                                                           DatabaseValue<?>... params)
             throws UncheckedSQLException, SQLMappingException {
 
         Connection conn = DB.getConnection();
@@ -347,7 +347,7 @@ public class DB {
     @FunctionalInterface
     interface DBVExtractor<T> {
         @NotNull
-        DatabaseValue[] extractValues(@NotNull T element);
+        DatabaseValue<?>[] extractValues(@NotNull T element);
     }
 
     /**
@@ -371,10 +371,10 @@ public class DB {
         try {
             stmt = DB.createPreparedStatement(conn, query);
             for (T element : elements) {
-                final DatabaseValue[] values = valueExtractor.extractValues(element);
+                final DatabaseValue<?>[] values = valueExtractor.extractValues(element);
 
                 for (int position = 0; position < values.length; position++) {
-                    final DatabaseValue value = values[position];
+                    final DatabaseValue<?> value = values[position];
                     assignDatabaseValue(stmt, value, position + 1); // parameter index starts at 1
                 }
 

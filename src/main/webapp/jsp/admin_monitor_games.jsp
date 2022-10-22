@@ -250,9 +250,9 @@
                                                     <td class="<%=color%>"><%=totalScore%></td>
                                                     <td class="<%=color%>">
                                                         <button class="btn btn-sm btn-danger" value="<%=playerId + "-" + gid + "-" + role%>"
-                                                                onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
-                                                                    'This will also delete ALL of his tests, mutants and claimed equivalences ' +
-                                                                    'and might create inconsistencies in the Game.');"
+                                                                onclick="return confirm('Are you sure you want to change the role of this player? \n' +
+                                                                    'This will keep the score, but deletes ALL of his tests, mutants and claimed equivalences ' +
+                                                                    'and might create inconsistencies in the game.');"
                                                                 id="<%="switch_player_"+playerId+"_game_"+gid%>"
                                                                 name="activeGameUserSwitchButton">
                                                             <i class="fa fa-exchange"></i>

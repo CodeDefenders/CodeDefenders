@@ -220,7 +220,7 @@ public class MutantDAO {
                         "Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)",
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(relativeJavaFile),
                 DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(gameId),
@@ -267,7 +267,7 @@ public class MutantDAO {
                 "  Points=?",
                 "WHERE Mutant_ID=? AND Alive=1;"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
             DatabaseValue.of(equivalent.name()),
             DatabaseValue.of(alive),
             DatabaseValue.of(roundKilled),
@@ -289,7 +289,7 @@ public class MutantDAO {
                 "  Points=?",
                 "WHERE Mutant_ID=?;"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(score),
                 DatabaseValue.of(mutantId)
         };
@@ -315,7 +315,7 @@ public class MutantDAO {
                 "SET KillMessage=?",
                 "WHERE Mutant_ID=?;"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
             DatabaseValue.of(killMessage),
             DatabaseValue.of(mutantId)
         };
@@ -335,7 +335,7 @@ public class MutantDAO {
                 "INSERT INTO mutant_uploaded_with_class (Mutant_ID, Class_ID)",
                 "VALUES (?, ?);"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(mutantId),
                 DatabaseValue.of(classId)
         };
@@ -354,7 +354,7 @@ public class MutantDAO {
                 "DELETE FROM mutants WHERE Mutant_ID = ?;",
                 "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?"
         );
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(id),
                 DatabaseValue.of(id)
         };
@@ -387,7 +387,7 @@ public class MutantDAO {
         );
         // Hack to make sure all values are listed in both 'ranges'.
         mutants.addAll(new LinkedList<>(mutants));
-        DatabaseValue[] values = mutants.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
+        DatabaseValue<?>[] values = mutants.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
     }
@@ -420,5 +420,25 @@ public class MutantDAO {
         final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"),
                 DatabaseValue.of(mutantId));
         return Optional.ofNullable(kills).orElse(0);
+    }
+
+    public static int getEquivalentDefenderId(Mutant m) {
+        String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
+        final Integer id = DB.executeQueryReturnValue(query,
+                rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
+        return Optional.ofNullable(id).orElse(-1);
+    }
+
+    public static boolean insertEquivalence(Mutant mutant, int defender) {
+        String query = String.join("\n",
+                "INSERT INTO equivalences (Mutant_ID, Defender_ID, Mutant_Points)",
+                "VALUES (?, ?, ?)"
+        );
+        DatabaseValue<?>[] values = new DatabaseValue[]{
+                DatabaseValue.of(mutant.getId()),
+                DatabaseValue.of(defender),
+                DatabaseValue.of(mutant.getScore())
+        };
+        return DB.executeUpdateQuery(query, values);
     }
 }

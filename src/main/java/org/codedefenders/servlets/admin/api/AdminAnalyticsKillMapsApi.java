@@ -122,7 +122,7 @@ public class AdminAnalyticsKillMapsApi extends HttpServlet {
         };
 
         PrintWriter out = response.getWriter();
-        CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(columns));
+        CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.builder().setHeader(columns).build());
 
         for (KillmapDataDTO k : killmapData) {
             for (String column : columns) {

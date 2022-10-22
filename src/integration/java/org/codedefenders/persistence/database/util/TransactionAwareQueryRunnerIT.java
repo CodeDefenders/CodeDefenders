@@ -278,16 +278,14 @@ public class TransactionAwareQueryRunnerIT {
         assertTrue(actual.isPresent());
         assertEquals(1, actual.get());
 
-        assertThrows(SQLException.class, () -> {
-            transactionManager.executeInTransaction(tx -> {
-                //noinspection SqlResolve
-                queryRunner.insert("INSERT INTO test (name, number) VALUES (?, ?)",
-                        resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
-                        "test2", 1);
-                tx.commit();
-                return true;
-            });
-        });
+        assertThrows(SQLException.class, () -> transactionManager.executeInTransaction(tx -> {
+            //noinspection SqlResolve
+            queryRunner.insert("INSERT INTO test (name, number) VALUES (?, ?)",
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt(1)),
+                    "test2", 1);
+            tx.commit();
+            return true;
+        }));
         assertTrue(connection.isClosed());
 
         //noinspection SqlResolve

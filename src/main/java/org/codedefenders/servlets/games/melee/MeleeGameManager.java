@@ -20,18 +20,14 @@ package org.codedefenders.servlets.games.melee;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -49,9 +45,9 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.configuration.Configuration;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -208,7 +204,7 @@ public class MeleeGameManager extends HttpServlet {
         game.getMutantsMarkedEquivalentPending().stream().filter(m -> m.getPlayerId() == playerId).findFirst()
                 .ifPresent(mutant -> {
                     // TODO Check if this is really based on role...
-                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
+                    int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
                     Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
                     // TODO This should be a better name
                     request.setAttribute("equivDefender", defender.orElse(null));
@@ -343,7 +339,7 @@ public class MeleeGameManager extends HttpServlet {
                 /*
                  * Register the event to DB
                  */
-                DatabaseAccess.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
@@ -399,7 +395,7 @@ public class MeleeGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.getBridge().addAll(validationMessages);
+            messages.addAll(validationMessages);
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
             return;
@@ -472,11 +468,11 @@ public class MeleeGameManager extends HttpServlet {
             // anything
             String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
             // Extract the line numbers of the errors
-            List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+            List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+            String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
             messages.add(decorate).escape(false).fadeOut(false);
 
             previousSubmission.setTestCode(testText);
@@ -496,7 +492,7 @@ public class MeleeGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
         // Include Test Smells in the messages back to user
-        includeDetectTestSmellsInMessages(newTest, messages.getBridge());
+        includeDetectTestSmellsInMessages(newTest);
 
         final String message = user.getName() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -504,7 +500,7 @@ public class MeleeGameManager extends HttpServlet {
                 EventStatus.GAME, timestamp);
         eventDAO.insert(notif);
 
-        mutationTester.runTestOnAllMeleeMutants(game, newTest, messages.getBridge());
+        messages.add(mutationTester.runTestOnAllMeleeMutants(game, newTest));
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -516,56 +512,6 @@ public class MeleeGameManager extends HttpServlet {
         // Clean up the session
         previousSubmission.clear();
         response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
-    }
-
-    /**
-     * Returns the line numbers mentioned in the error message of the compiler.
-     *
-     * @param compilerOutput The compiler output.
-     * @return A list of (1-indexed) line numbers.
-     */
-    List<Integer> extractErrorLines(String compilerOutput) {
-        Set<Integer> errorLines = new TreeSet<>(); // Use TreeSet for the ordering
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
-        for (String line : compilerOutput.split("\n")) {
-            Matcher m = p.matcher(line);
-            if (m.find()) {
-                // TODO may be not robust
-                errorLines.add(Integer.parseInt(m.group(1)));
-            }
-        }
-        return new ArrayList<>(errorLines);
-    }
-
-    /**
-     * Add links that points to line for errors. Not sure that invoking a JS
-     * function suing a link in this way is 100% safe ! XXX Consider to move the
-     * decoration utility, and possibly the sanitize methods to some other
-     * components.
-     */
-    String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
-        String editor = "";
-        if (forTest) {
-            editor = "testEditor";
-        } else if (forMutant) {
-            editor = "mutantEditor";
-        }
-
-        StringBuilder decorated = new StringBuilder();
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
-        for (String line : compilerOutput.split("\n")) {
-            Matcher m = p.matcher(line);
-            if (m.find()) {
-                // Replace the entire line with a link to the source code
-                String replacedLine = String.format(
-                        "<a onclick=\"import('./js/codedefenders_main.mjs').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
-                        editor, m.group(1), line);
-                decorated.append(replacedLine).append("\n");
-            } else {
-                decorated.append(line).append("\n");
-            }
-        }
-        return decorated.toString();
     }
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game,
@@ -647,7 +593,16 @@ public class MeleeGameManager extends HttpServlet {
                     TargetExecution.Target.COMPILE_MUTANT);
             if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
-                messages.add(existingMutantTarget.message);
+                // We escape the content of the message for new tests since user can embed there
+                // anything
+                String escapedHtml = StringEscapeUtils.escapeHtml4(existingMutantTarget.message);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(existingMutantTarget.message);
+                // Store them in the session so they can be picked up later
+                previousSubmission.setErrorLines(errorLines);
+                // We introduce our decoration
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+                messages.add(decorate).escape(false);
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
@@ -678,11 +633,11 @@ public class MeleeGameManager extends HttpServlet {
                 // anything
                 String escapedHtml = StringEscapeUtils.escapeHtml4(compileMutantTarget.message);
                 // Extract the line numbers of the errors
-                List<Integer> errorLines = extractErrorLines(compileMutantTarget.message);
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileMutantTarget.message);
                 // Store them in the session so they can be picked up later
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
-                String decorate = decorateWithLinksToCode(escapedHtml, false, true);
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate).escape(false);
 
             }
@@ -698,7 +653,7 @@ public class MeleeGameManager extends HttpServlet {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        mutationTester.runAllTestsOnMeleeMutant(game, newMutant, messages.getBridge());
+        messages.add(mutationTester.runAllTestsOnMeleeMutant(game, newMutant));
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -814,7 +769,7 @@ public class MeleeGameManager extends HttpServlet {
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.getBridge().addAll(validationMessage);
+                messages.addAll(validationMessage);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
                 return;
@@ -852,11 +807,11 @@ public class MeleeGameManager extends HttpServlet {
                 if (compileTestTarget != null) {
                     String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
                     // Extract the line numbers of the errors
-                    List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+                    List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
                     // Store them in the session so they can be picked up later
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
-                    String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+                    String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
                     messages.add(decorate).escape(false).fadeOut(false);
                 }
 
@@ -1038,7 +993,7 @@ public class MeleeGameManager extends HttpServlet {
 
 
                                 // Register this user in the Role.DEFENDER as the one claiming the equivalence
-                                DatabaseAccess.insertEquivalence(m, playerId);
+                                MutantDAO.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });
@@ -1082,7 +1037,7 @@ public class MeleeGameManager extends HttpServlet {
         }
     }
 
-    private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
+    private void includeDetectTestSmellsInMessages(Test newTest) {
         List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {

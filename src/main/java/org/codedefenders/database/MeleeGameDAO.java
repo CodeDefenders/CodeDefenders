@@ -186,7 +186,7 @@ public class MeleeGameDAO {
                 "EquivalenceThreshold)",
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
                 DatabaseValue.of(prize),
@@ -246,7 +246,7 @@ public class MeleeGameDAO {
                 "    Mutant_Goal = ?,",
                 "    State = ?",
                 "WHERE ID = ?");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
                 DatabaseValue.of(prize),
@@ -366,7 +366,7 @@ public class MeleeGameDAO {
                 "  ON p.Game_ID = m.ID \n",
                 "WHERE (p.User_ID = ?);");
 
-        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(userId)};
+        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(userId)};
         return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS, values);
     }
 
@@ -412,7 +412,7 @@ public class MeleeGameDAO {
                 "WHERE (State = ?",
                 "    OR State = ?)",
                 "  AND Creator_ID = ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(GameState.ACTIVE.name()),
                 DatabaseValue.of(GameState.CREATED.name()),
                 DatabaseValue.of(creatorId)
@@ -433,7 +433,7 @@ public class MeleeGameDAO {
                 "  ON p.Game_ID = m.ID \n",
                 "WHERE (p.ID = ?);");
 
-        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
+        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
         return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
     }
 }

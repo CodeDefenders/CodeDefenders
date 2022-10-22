@@ -87,7 +87,7 @@ public class UserService {
      *
      * @param userId The id of the user to retrieve
      * @return An {@code Optional} containing the user for the provided {@code userId} or an empty {@code Optional} if
-     * there exists no user for the given {@code userId}
+     *         there exists no user for the given {@code userId}
      */
     @Nonnull
     public Optional<User> getUserById(int userId) {
@@ -95,13 +95,13 @@ public class UserService {
     }
 
     /**
-     * Retrieve a {@link SimpleUser} by the given {@code userId}
+     * Retrieve a {@link SimpleUser} by the given {@code userId}.
      *
-     * @param userId The Id of the user for which to lookup a simple representation.
+     * @param userId The Id of the user for which to look up a simple representation.
      * @return An {@code Optional} containing a simple representation of the user for the provided {@code userId} or an
-     * empty {@code Optional} if there exists no user for the given {@code userId}
+     *         empty {@code Optional} if there exists no user for the given {@code userId}
      * @implNote Since {@link SimpleUser} objects only contain limited information, they are cached, so calling this
-     * method multiple times is no big deal.
+     *         method multiple times is no big deal.
      */
     @Nonnull
     public Optional<SimpleUser> getSimpleUserById(int userId) {
@@ -123,9 +123,9 @@ public class UserService {
      *
      * @param playerId The Id of the player for which to query a {@link SimpleUser} object.
      * @return An {@code Optional} containing the user for the provided {@code playerId} or an empty {@code Optional} if
-     * there exists no user for the given {@code playerId}
+     *         there exists no user for the given {@code playerId}
      * @apiNote This method will probably be moved from this class to a class which is more involved in game handling/
-     * managing like the {@code GameService} classes.
+     *         managing like the {@code GameService} classes.
      * @see #getSimpleUserById(int)
      */
     // TODO: Relocate into sth like `PlayerService` or the `GameService`s

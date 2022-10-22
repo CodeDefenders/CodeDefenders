@@ -6,6 +6,6 @@ import org.codedefenders.game.Test;
 
 public interface ITestCaseSelector {
 
-    public List<Test> select(List<Test> allTests, int maxTests);
+    List<Test> select(List<Test> allTests, int maxTests);
 
 }

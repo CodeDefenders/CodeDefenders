@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.util.Constants;
 
 import com.google.gson.annotations.Expose;

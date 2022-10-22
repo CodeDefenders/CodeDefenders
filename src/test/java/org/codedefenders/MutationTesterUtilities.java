@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -43,7 +42,7 @@ import org.slf4j.Logger;
 public class MutationTesterUtilities {
 
     public static Runnable attack(MultiplayerGame activeGame, String mutantFile, UserEntity attacker,
-            ArrayList<String> messages, Logger logger) throws IOException {
+            Logger logger) throws IOException {
         return new Runnable() {
 
             @Inject
@@ -61,10 +60,10 @@ public class MutationTesterUtilities {
                             attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
                             + mutant.getId());
-                    mutationTester.runAllTestsOnMutant(activeGame, mutant, messages);
+                    String message = mutationTester.runAllTestsOnMutant(activeGame, mutant);
                     activeGame.update();
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + ": "
-                            + messages.get(messages.size() - 1));
+                            + message);
                 } catch (IOException e) {
                     logger.error(e.getMessage());
                 }
@@ -74,7 +73,7 @@ public class MutationTesterUtilities {
     }
 
     public static Runnable defend(MultiplayerGame activeGame, String testFile, UserEntity defender,
-            ArrayList<String> messages, Logger logger) {
+            Logger logger) {
         return new Runnable() {
 
             @Inject
@@ -94,10 +93,10 @@ public class MutationTesterUtilities {
 
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + " with "
                             + newTest.getId());
-                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
+                    String message = mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest);
                     activeGame.update();
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
-                            + messages.get(messages.size() - 1));
+                            + message);
                 } catch (IOException e) {
                     logger.error(e.getMessage());
                 }

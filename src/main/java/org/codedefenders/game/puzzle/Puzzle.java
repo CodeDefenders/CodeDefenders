@@ -19,7 +19,6 @@
 package org.codedefenders.game.puzzle;
 
 import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
 import org.codedefenders.validation.code.CodeValidatorLevel;

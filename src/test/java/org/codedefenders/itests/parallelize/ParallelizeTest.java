@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -69,7 +68,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -117,12 +115,9 @@ public class ParallelizeTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -304,9 +299,8 @@ public class ParallelizeTest {
     public void testTestExecutionOrder() {
         MultiplayerGame battlegroundGame = setupTestBattlegroundUsing("Lift");
 
-        int defenderID = battlegroundGame.getDefenderPlayers().get(0).getUser().getId();
-        int attackerID = battlegroundGame.getAttackerPlayers().get(0).getUser().getId();
-        ArrayList<String> messages = new ArrayList<>();
+        int defenderId = battlegroundGame.getDefenderPlayers().get(0).getUser().getId();
+        int attackerId = battlegroundGame.getAttackerPlayers().get(0).getUser().getId();
 
         List<org.codedefenders.game.Test> submittedTests = new ArrayList<>();
         try {
@@ -327,8 +321,8 @@ public class ParallelizeTest {
                     + "    }" + "\n"
                     + "}";
 
-            org.codedefenders.game.Test newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
-            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+            org.codedefenders.game.Test newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderId, Constants.MODE_BATTLEGROUND_DIR);
+            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest);
             assumeThat(battlegroundGame.getTests(true).size(), is(1));
             // Append this for oracles and mocks
             submittedTests.add(newTest);
@@ -350,8 +344,8 @@ public class ParallelizeTest {
                     + "" + "\n"
                     + "    }" + "\n"
                     + "}";
-            newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
-            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+            newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderId, Constants.MODE_BATTLEGROUND_DIR);
+            mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest);
             assumeThat(battlegroundGame.getTests(true).size(), is(2));
             // Append this for oracles and mocks
             submittedTests.add(newTest);
@@ -379,7 +373,7 @@ public class ParallelizeTest {
             String mutantText = String.join("\n", mutantCode);
 
             Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
-                    mutantText, attackerID, Constants.MODE_BATTLEGROUND_DIR);
+                    mutantText, attackerId, Constants.MODE_BATTLEGROUND_DIR);
 
             // Mock the scheduler to return a random but known test distribution:
             TestScheduler mockedTestScheduler = Mockito.mock(TestScheduler.class);
@@ -388,10 +382,10 @@ public class ParallelizeTest {
                     .scheduleTests(org.mockito.Matchers.anyList());
 
             // Do the execution
-            mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages, mockedTestScheduler);
+            mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, mockedTestScheduler);
 
             // Check that the test execution logged in the DB are in the same order
-            List<TargetExecution> executedTargets = new ArrayList<TargetExecution>();
+            List<TargetExecution> executedTargets = new ArrayList<>();
             for (org.codedefenders.game.Test submittedTest : randomSchedule) {
                 executedTargets.add(TargetExecutionDAO.getTargetExecutionForPair(submittedTest.getId(), mutant.getId()));
             }
@@ -438,8 +432,8 @@ public class ParallelizeTest {
     public void testRunAllTestsOnMutant() throws IOException {
 
         MultiplayerGame battlegroundGame = setupTestBattlegroundUsing("Lift");
-        int defenderID = battlegroundGame.getDefenderPlayers().get(0).getId();
-        int attackerID = battlegroundGame.getAttackerPlayers().get(0).getId();
+        int defenderId = battlegroundGame.getDefenderPlayers().get(0).getId();
+        int attackerId = battlegroundGame.getAttackerPlayers().get(0).getId();
 
         // Read and submit some test- This will call AntRunner
         // Are those saved to DB ?!
@@ -448,29 +442,28 @@ public class ParallelizeTest {
                     Files.readAllBytes(
                             new File("src/test/resources/itests/tests/PassingTestLift" + i + ".java").toPath()),
                     Charset.defaultCharset());
-            gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+            gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderId, Constants.MODE_BATTLEGROUND_DIR);
         }
 
         // Schedule a test which kills the mutant - Where ? in the middle ?
         String testText = new String(
                 Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
                 Charset.defaultCharset());
-        gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+        gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderId, Constants.MODE_BATTLEGROUND_DIR);
 
         // Read and Submit the mutants - No tests so far
         String mutantText = new String(
                 Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
                 Charset.defaultCharset());
         Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
-                attackerID, Constants.MODE_BATTLEGROUND_DIR);
+                attackerId, Constants.MODE_BATTLEGROUND_DIR);
 
         assertNotNull("Invalid mutant", mutant.getClassFile());
 
-        ArrayList<String> messages = new ArrayList<>();
         // TODO Mock the AntRunner... an interface would make things a lot
         // easier!
         // Finally invoke the method.... For the moment this invokes AntRunner
-        mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages);
+        mutationTester.runAllTestsOnMutant(battlegroundGame, mutant);
 
         // assertMutant is killed!
         assertFalse("Mutant not killed", mutant.isAlive());

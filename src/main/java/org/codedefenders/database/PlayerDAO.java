@@ -86,7 +86,7 @@ public class PlayerDAO {
      */
     public static int getPlayerIdForUserAndGame(int userId, int gameId) {
         String query = String.join("\n", "SELECT players.ID", "FROM players", "WHERE User_ID = ?", "  AND Game_ID = ?");
-        DatabaseValue[] values = new DatabaseValue[] { DatabaseValue.of(userId), DatabaseValue.of(gameId) };
+        DatabaseValue<?>[] values = new DatabaseValue[] { DatabaseValue.of(userId), DatabaseValue.of(gameId) };
         final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
         return Optional.ofNullable(id).orElse(-1);
     }
@@ -122,7 +122,7 @@ public class PlayerDAO {
 
     public static void setPlayerPoints(int points, int player) {
         String query = "UPDATE players SET Points=? WHERE ID=?";
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(points),
                 DatabaseValue.of(player)
         };
@@ -131,7 +131,7 @@ public class PlayerDAO {
 
     public static void increasePlayerPoints(int points, int player) {
         String query = "UPDATE players SET Points=Points+? WHERE ID=?";
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(points),
                 DatabaseValue.of(player)
         };

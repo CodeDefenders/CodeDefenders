@@ -23,9 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
@@ -335,11 +335,11 @@ public class MultiplayerGame extends AbstractGame {
     public HashMap<Integer, PlayerScore> getMutantScores() {
         final HashMap<Integer, PlayerScore> mutantScores = new HashMap<>();
 
-        final HashMap<Integer, Integer> mutantsAlive = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> mutantsChallenged = new HashMap<Integer, Integer>();
-        final HashMap<Integer, Integer> duelsWon = new HashMap<Integer, Integer>();
+        final HashMap<Integer, Integer> mutantsAlive = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsEquiv = new HashMap<>();
+        final HashMap<Integer, Integer> mutantsChallenged = new HashMap<>();
+        final HashMap<Integer, Integer> duelsWon = new HashMap<>();
 
         // TODO why not getMutants()
         List<Mutant> allMutants = getAliveMutants();
@@ -484,21 +484,21 @@ public class MultiplayerGame extends AbstractGame {
                 continue;
             }
 
-            int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+            int defenderId = MutantDAO.getEquivalentDefenderId(m);
             challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
             }
         }
         for (Mutant m : getMutantsMarkedEquivalent()) {
-            int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+            int defenderId = MutantDAO.getEquivalentDefenderId(m);
             challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
             }
         }
         for (Mutant m : getMutantsMarkedEquivalentPending()) {
-            int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+            int defenderId = MutantDAO.getEquivalentDefenderId(m);
             challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
             if (defenderId != defendersTeamId) {
                 challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);

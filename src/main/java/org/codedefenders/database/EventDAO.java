@@ -20,11 +20,27 @@ import org.codedefenders.model.EventType;
 @ManagedBean
 public class EventDAO {
 
+    /**
+     * @param gameId The gameId for which to remove the events.
+     * @param userId The userId of the events to remove.
+     *
+     * @implNote Even if the database table column is called {@code Player_ID} it stores User_IDs!
+     */
+    public void removePlayerEventsForGame(int gameId, int userId) {
+        String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=? "
+                + "AND Event_Type NOT IN ('GAME_CREATED', 'GAME_STARTED', 'GAME_FINISHED', 'GAME_GRACE_ONE', 'GAME_GRACE_TWO');";
+        DatabaseValue<?>[] values = new DatabaseValue[]{
+                DatabaseValue.of(EventStatus.DELETED.toString()),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId)};
+        DB.executeUpdateQuery(query, values);
+    }
+
     // Split this is possibly different calls, maybe there no need to expose Event
     // class to callers
     public boolean insert(Event event) {
         String query;
-        DatabaseValue[] valueList;
+        DatabaseValue<?>[] valueList;
 
         EventType eventType = event.getEventType();
 
@@ -71,7 +87,7 @@ public class EventDAO {
         String query = String.join("\n", "UPDATE events",
                 "SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?)",
                 "WHERE Event_ID=?");
-        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
+        DatabaseValue<?>[] valueList = new DatabaseValue[]{DatabaseValue.of(event.gameId()),
                 DatabaseValue.of(event.getUserId()), DatabaseValue.of(eventType.toString()),
                 DatabaseValue.of(event.getEventStatus().toString()), DatabaseValue.of((Long) event.getTimestamp()),
                 DatabaseValue.of(event.getId())};
@@ -99,7 +115,7 @@ public class EventDAO {
     public List<Event> getEventsForGame(Integer gameId) {
         // TODO Use SOME VIEW INSTEAD OF EVENT TABLE?
         String query = String.join("\n", "SELECT * from events", "WHERE Game_ID=?");
-        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(gameId)};
+        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(gameId)};
         return DB.executeQueryReturnList(query, EventDAO::eventFromRS, values);
     }
 
@@ -117,7 +133,7 @@ public class EventDAO {
             query += " AND events.Event_Type!='ATTACKER_MESSAGE'";
         }
 
-        DatabaseValue[] values = new DatabaseValue[]{DatabaseValue.of(gameId),
+        DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(gameId),
                 DatabaseValue.of(EventStatus.GAME.toString()), DatabaseValue.of(timestamp)};
 
         return DB.executeQueryReturnList(query, EventDAO::eventFromRS, values);

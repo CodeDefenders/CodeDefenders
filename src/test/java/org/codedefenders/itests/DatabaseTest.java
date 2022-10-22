@@ -20,12 +20,9 @@
 package org.codedefenders.itests;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
 
 import org.codedefenders.DatabaseRule;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -57,13 +54,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -120,12 +117,9 @@ public class DatabaseTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -247,13 +241,13 @@ public class DatabaseTest {
 
         assertTrue(multiplayerGame.insert());
         assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
-        int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-        assertTrue(playerID > 0);
-        assertEquals(userRepo.getUserIdForPlayerId(playerID).get().intValue(), user1.getId());
+        int playerId = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
+        assertTrue(playerId > 0);
+        assertEquals(userRepo.getUserIdForPlayerId(playerId).get().intValue(), user1.getId());
         assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
-        assertEquals(PlayerDAO.getPlayerPoints(playerID), 0);
-        PlayerDAO.increasePlayerPoints(13, playerID);
-        assertEquals(PlayerDAO.getPlayerPoints(playerID), 13);
+        assertEquals(PlayerDAO.getPlayerPoints(playerId), 0);
+        PlayerDAO.increasePlayerPoints(13, playerId);
+        assertEquals(PlayerDAO.getPlayerPoints(playerId), 13);
     }
 
     //FIXME
@@ -276,16 +270,16 @@ public class DatabaseTest {
 
         int gid = multiplayerGame.getId();
         int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), gid);
-        int cutID = cut2.getId();
-        mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+        int cutId = cut2.getId();
+        mutant1 = new Mutant(99, cutId, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
                 Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
-        Mutant mutant2 = new Mutant(100, cutID, gid, "TEST_J_FILE2", "TEST_C_FILE2", false,
+        Mutant mutant2 = new Mutant(100, cutId, gid, "TEST_J_FILE2", "TEST_C_FILE2", false,
                 Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
         assertTrue(mutant1.insert());
         assertTrue(mutant2.insert());
         Mutant[] ml = {mutant1, mutant2};
-        assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
-        assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml));
+        assertArrayEquals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml);
+        assertArrayEquals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml);
     }
 
     //FIXME
@@ -307,8 +301,8 @@ public class DatabaseTest {
         assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
         int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-        int cutID = cut2.getId();
-        Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+        int cutId = cut2.getId();
+        Mutant mutant1 = new Mutant(99, cutId, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
                 Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
         assertTrue(mutant1.insert());
@@ -349,8 +343,8 @@ public class DatabaseTest {
         assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
         int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-        int cutID = cut2.getId();
-        Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+        int cutId = cut2.getId();
+        Mutant mutant1 = new Mutant(99, cutId, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
                 Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
         assertTrue(mutant1.insert());
@@ -414,8 +408,8 @@ public class DatabaseTest {
         assumeTrue(multiplayerGame.addPlayer(user2.getId(), Role.DEFENDER));
 
         int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
-        assertTrue(DatabaseAccess.insertEquivalence(mutant1, pid));
-        assertEquals(DatabaseAccess.getEquivalentDefenderId(mutant1), pid);
+        assertTrue(MutantDAO.insertEquivalence(mutant1, pid));
+        assertEquals(MutantDAO.getEquivalentDefenderId(mutant1), pid);
     }
 
     //FIXME
@@ -448,9 +442,9 @@ public class DatabaseTest {
 
         //
         int pidAttacker = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-        int cutID = cut1.getId();
+        int cutId = cut1.getId();
 
-        Mutant mutant1 = new Mutant(999, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+        Mutant mutant1 = new Mutant(999, cutId, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
                 Mutant.Equivalence.ASSUMED_NO, 1, 99, pidAttacker);
         assertTrue(mutant1.insert());
 

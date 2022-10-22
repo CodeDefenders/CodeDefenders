@@ -20,18 +20,13 @@ package org.codedefenders.servlets.games.battleground;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -49,9 +44,9 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.IntentionDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
@@ -72,7 +67,6 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.UserEntity;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
 import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
@@ -199,8 +193,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
-                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
-                    Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);;
+                    int defenderId = MutantDAO.getEquivalentDefenderId(mutant);
+                    Optional<SimpleUser> defender = userService.getSimpleUserByPlayerId(defenderId);
 
                     // TODO
                     request.setAttribute("equivDefender", defender.orElse(null));
@@ -304,7 +298,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 /*
                  * Register the event to DB
                  */
-                DatabaseAccess.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
@@ -365,7 +359,7 @@ public class MultiplayerGameManager extends HttpServlet {
         notificationService.post(tve);
 
         if (!validationSuccess) {
-            messages.getBridge().addAll(validationMessage);
+            messages.addAll(validationMessage);
             previousSubmission.setTestCode(testText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -451,11 +445,11 @@ public class MultiplayerGameManager extends HttpServlet {
             // We escape the content of the message for new tests since user can embed there anything
             String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
             // Extract the line numbers of the errors
-            List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+            List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
             // Store them in the session so they can be picked up later
             previousSubmission.setErrorLines(errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+            String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
             messages.add(decorate).escape(false).fadeOut(false);
             //
             previousSubmission.setTestCode(testText);
@@ -484,7 +478,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 EventStatus.GAME, timestamp);
         eventDAO.insert(notif);
 
-        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages.getBridge());
+        messages.add(mutationTester.runTestOnAllMultiplayerMutants(game, newTest));
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -496,56 +490,6 @@ public class MultiplayerGameManager extends HttpServlet {
         // Clean up the session
         previousSubmission.clear();
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-    }
-
-    /**
-     * Returns the line numbers mentioned in the error message of the compiler.
-     *
-     * @param compilerOutput The compiler output.
-     * @return A list of (1-indexed) line numbers.
-     */
-    List<Integer> extractErrorLines(String compilerOutput) {
-        Set<Integer> errorLines = new TreeSet<>(); // Use TreeSet for the ordering
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
-        for (String line : compilerOutput.split("\n")) {
-            Matcher m = p.matcher(line);
-            if (m.find()) {
-                // TODO may be not robust
-                errorLines.add(Integer.parseInt(m.group(1)));
-            }
-        }
-        return new ArrayList<>(errorLines);
-    }
-
-    /**
-     * Add links that points to line for errors. Not sure that invoking a JS
-     * function suing a link in this way is 100% safe ! XXX Consider to move the
-     * decoration utility, and possibly the sanitize methods to some other
-     * components.
-     */
-    String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
-        String editor = "";
-        if (forTest) {
-            editor = "testEditor";
-        } else if (forMutant) {
-            editor = "mutantEditor";
-        }
-
-        StringBuilder decorated = new StringBuilder();
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
-        for (String line : compilerOutput.split("\n")) {
-            Matcher m = p.matcher(line);
-            if (m.find()) {
-                // Replace the entire line with a link to the source code
-                String replacedLine = String.format(
-                        "<a onclick=\"import('./js/codedefenders_main.mjs').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
-                        editor, m.group(1), line);
-                decorated.append(replacedLine).append("\n");
-            } else {
-                decorated.append(line).append("\n");
-            }
-        }
-        return decorated.toString();
     }
 
     private void createMutant(HttpServletRequest request,
@@ -628,7 +572,16 @@ public class MultiplayerGameManager extends HttpServlet {
                     TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, COMPILE_MUTANT);
             if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
-                messages.add(existingMutantTarget.message);
+                // We escape the content of the message for new tests since user can embed there
+                // anything
+                String escapedHtml = StringEscapeUtils.escapeHtml4(existingMutantTarget.message);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(existingMutantTarget.message);
+                // Store them in the session so they can be picked up later
+                previousSubmission.setErrorLines(errorLines);
+                // We introduce our decoration
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
+                messages.add(decorate).escape(false);
             }
             previousSubmission.setMutantCode(mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -670,11 +623,11 @@ public class MultiplayerGameManager extends HttpServlet {
                 // We escape the content of the message for new tests since user can embed there anything
                 String escapedHtml = StringEscapeUtils.escapeHtml4(errorMessage);
                 // Extract the line numbers of the errors
-                List<Integer> errorLines = extractErrorLines(errorMessage);
+                List<Integer> errorLines = GameManagingUtils.extractErrorLines(errorMessage);
                 // Store them in the session so they can be picked up later
                 previousSubmission.setErrorLines(errorLines);
                 // We introduce our decoration
-                String decorate = decorateWithLinksToCode(escapedHtml, false, true);
+                String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, false, true);
                 messages.add(decorate).escape(false).fadeOut(false);
             }
             previousSubmission.setMutantCode(mutantText);
@@ -688,7 +641,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 EventStatus.GAME, new Timestamp(System.currentTimeMillis() - 1000));
         eventDAO.insert(notif);
 
-        mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
+        messages.add(mutationTester.runAllTestsOnMutant(game, newMutant));
         game.update();
 
         MutantTestedEvent mte = new MutantTestedEvent();
@@ -764,7 +717,7 @@ public class MultiplayerGameManager extends HttpServlet {
                     // tests on the same class from different games
                     m.kill(Mutant.Equivalence.DECLARED_YES);
 
-                    PlayerDAO.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
+                    PlayerDAO.increasePlayerPoints(1, MutantDAO.getEquivalentDefenderId(m));
                     messages.add(message);
 
                     // Notify the attacker
@@ -777,7 +730,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // Notify the defender which triggered the duel about it !
                     if (isMutantKillable) {
-                        int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+                        int defenderId = MutantDAO.getEquivalentDefenderId(m);
                         Optional<Integer> userId = userRepo.getUserIdForPlayerId(defenderId);
                         notification = login.getUser().getUsername() + " accepts that the mutant " + m.getId()
                                 + "that you claimed equivalent is equivalent, but that mutant was killable.";
@@ -830,7 +783,7 @@ public class MultiplayerGameManager extends HttpServlet {
             notificationService.post(tve);
 
             if (!validationSuccess) {
-                messages.getBridge().addAll(validationMessage);
+                messages.addAll(validationMessage);
                 previousSubmission.setTestCode(testText);
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
@@ -868,11 +821,11 @@ public class MultiplayerGameManager extends HttpServlet {
                 if (compileTestTarget != null) {
                     String escapedHtml = StringEscapeUtils.escapeHtml4(compileTestTarget.message);
                     // Extract the line numbers of the errors
-                    List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+                    List<Integer> errorLines = GameManagingUtils.extractErrorLines(compileTestTarget.message);
                     // Store them in the session so they can be picked up later
                     previousSubmission.setErrorLines(errorLines);
                     // We introduce our decoration
-                    String decorate = decorateWithLinksToCode(escapedHtml, true, false);
+                    String decorate = GameManagingUtils.decorateWithLinksToCode(escapedHtml, true, false);
                     messages.add(decorate).escape(false).fadeOut(false);
                 }
 
@@ -1034,7 +987,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                         new Timestamp(System.currentTimeMillis()));
                                 eventDAO.insert(event);
 
-                                DatabaseAccess.insertEquivalence(m, playerId);
+                                MutantDAO.insertEquivalence(m, playerId);
                                 claimedMutants.incrementAndGet();
                             });
                 });

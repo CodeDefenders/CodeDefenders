@@ -20,6 +20,7 @@ package org.codedefenders.database;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
@@ -49,7 +50,7 @@ public class GameDAO {
         if (gameMode == null) {
             return null;
         }
-        
+
         switch (gameMode) {
             case PARTY:
                 return MultiplayerGameDAO.getMultiplayerGame(gameId);
@@ -100,7 +101,7 @@ public class GameDAO {
                 "ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;"
         );
 
-        DatabaseValue[] values = {
+        DatabaseValue<?>[] values = {
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId),
                 DatabaseValue.of(role.toString()),
@@ -124,7 +125,7 @@ public class GameDAO {
                 "WHERE Game_ID = ?",
                 "  AND Role = ?",
                 "  AND Active=TRUE;");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(role.toString())
         };
@@ -161,7 +162,7 @@ public class GameDAO {
                 "SET Active = FALSE",
                 "WHERE Game_ID = ?",
                 "  AND User_ID = ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId)
         };
@@ -203,5 +204,34 @@ public class GameDAO {
         String query = "SELECT Mode FROM games WHERE ID = ?";
         return DB.executeQueryReturnValue(query, rs -> GameMode.valueOf(rs.getString("Mode")),
                 DatabaseValue.of(gameId));
+    }
+
+    public static Role getRole(int userId, int gameId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM games AS m ",
+                "LEFT JOIN players AS p",
+                "  ON p.Game_ID = m.ID",
+                "  AND p.Active=TRUE ",
+                "WHERE m.ID = ?",
+                "  AND (p.User_ID=?",
+                "      AND p.Game_ID=?)");
+        DatabaseValue<?>[] values = new DatabaseValue[]{
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(gameId)};
+
+        DB.RSMapper<Role> mapper = rs -> Role.valueOrNull(rs.getString("Role"));
+
+        final Role role = DB.executeQueryReturnValue(query, mapper, values);
+
+        if (role == null) {
+            AbstractGame game = getGame(gameId);
+            if (game != null && game.getCreatorId() == userId) {
+                return Role.OBSERVER;
+            }
+        }
+
+        return Optional.ofNullable(role).orElse(Role.NONE);
     }
 }

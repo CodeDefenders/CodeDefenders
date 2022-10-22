@@ -5,7 +5,9 @@
 		 version="3.1">
 
 	<servlet>
+		<!--suppress ServletWithoutMappingInspection -->
 		<servlet-name>jsp</servlet-name>
+		<!--suppress WebProperties -->
 		<servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
 		<init-param>
 			<param-name>compiler</param-name>

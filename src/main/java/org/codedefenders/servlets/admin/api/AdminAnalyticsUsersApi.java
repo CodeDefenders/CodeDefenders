@@ -127,7 +127,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         };
 
         PrintWriter out = response.getWriter();
-        CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(columns));
+        CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.builder().setHeader(columns).build());
 
         for (UserDataDTO user : userData) {
             for (String column : columns) {

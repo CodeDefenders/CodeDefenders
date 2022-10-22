@@ -131,7 +131,7 @@ public class Configuration {
                     // TODO: Replace this with something which can resolve the dependencies.
                     try (Stream<Path> entries = Files.list(getLibraryDir().toPath())) {
                         if (!entries.findFirst().isPresent()) {
-                            validationErrors.add("The library directory " + getLibraryDir().toPath().toString()
+                            validationErrors.add("The library directory " + getLibraryDir().toPath()
                                     + " is empty! Please download the dependencies via the installation-pom.xml!");
                         }
                     } catch (IOException ignored) {
@@ -175,7 +175,7 @@ public class Configuration {
             if (dbPort == null) {
                 validationErrors.add("Property " + resolveAttributeName("dbPort") + " is missing");
                 dbvalid = false;
-            } else if (dbPort <= 0 | dbPort > 65535) {
+            } else if (dbPort <= 0 || dbPort > 65535) {
                 validationErrors.add(resolveAttributeName("dbPort") + ": " + dbPort + " is not a valid port number");
                 dbvalid = false;
             }
@@ -237,16 +237,16 @@ public class Configuration {
         File file = new File(directory, filename);
         try {
             Files.copy(produceFile.get(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            logger.info("Created/Overwrote file " + file.toPath().toAbsolutePath().toString());
+            logger.info("Created/Overwrote file " + file.toPath().toAbsolutePath());
             return null;
         } catch (AccessDeniedException e) {
-            return "Can't write to " + file.toPath().toString() + ". Please check the permissions on the "
-                    + directory.toPath().toString() + " directory!";
+            return "Can't write to " + file.toPath() + ". Please check the permissions on the "
+                    + directory.toPath() + " directory!";
         } catch (DirectoryNotEmptyException e) {
-            return "Can't overwrite " + file.toPath().toString() + " because it is a non empty directory! "
+            return "Can't overwrite " + file.toPath() + " because it is a non empty directory! "
                     + "Please remove this directory!";
         } catch (FileSystemException e) {
-            return "The file " + file.toPath().toString() + " doesn't exist, and we can't create it!";
+            return "The file " + file.toPath() + " doesn't exist, and we can't create it!";
         } catch (IOException e) {
             logger.debug("IOException when trying to write file", e);
             return "Other error when trying to write file!";
@@ -255,16 +255,16 @@ public class Configuration {
 
     private String setupDirectory(File directory) {
         if (directory.exists() && directory.isDirectory() && !directory.canWrite()) {
-            return "Can't write to directory " + directory.toPath().toString()
+            return "Can't write to directory " + directory.toPath()
                     + ". Please check the directory permissions";
         }
         try {
             Files.createDirectories(directory.toPath());
             return null;
         } catch (FileAlreadyExistsException e) {
-            return "The path " + directory.toPath().toString() + " already exists, but is no directory!";
+            return "The path " + directory.toPath() + " already exists, but is no directory!";
         } catch (FileSystemException e) {
-            String message = "The directory " + directory.toPath().toString() + " doesn't exist, and we can't create ";
+            String message = "The directory " + directory.toPath() + " doesn't exist, and we can't create ";
             if (e.getFile().equals(directory.toPath().toAbsolutePath().toString())) {
                 message += "it";
             } else {

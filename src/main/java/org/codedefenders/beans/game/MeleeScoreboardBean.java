@@ -1,8 +1,6 @@
 package org.codedefenders.beans.game;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,9 +57,9 @@ public class MeleeScoreboardBean {
     // Load data
     public void setGameId(int gameId) {
         this.gameId = gameId;
-        this.mutantsScores = new HashMap<Integer, PlayerScore>();
-        this.testsScores = new HashMap<Integer, PlayerScore>();
-        this.duelsScores = new HashMap<Integer, PlayerScore>();
+        this.mutantsScores = new HashMap<>();
+        this.testsScores = new HashMap<>();
+        this.duelsScores = new HashMap<>();
     }
 
     public void setScores(Map<Integer, PlayerScore> mutantsScores, Map<Integer, PlayerScore> testsScores,
@@ -90,7 +88,7 @@ public class MeleeScoreboardBean {
     }
 
     public void setPlayers(List<Player> players) {
-        this.players = new HashSet<Player>(players);
+        this.players = new HashSet<>(players);
     }
 
     // --------------------------------------------------------------------------------
@@ -106,19 +104,15 @@ public class MeleeScoreboardBean {
      */
     public List<ScoreItem> getSortedScoreItems() {
         List<ScoreItem> scoreItems = getScoreItems();
-        Collections.sort(scoreItems, new Comparator<ScoreItem>() {
+        scoreItems.sort((o1, o2) -> {
+            // We need to reverse the sorting, the higher number is above
+            int diff = (o2.getAttackScore().getTotalScore() + o2.getDefenseScore().getTotalScore() + o2.getDuelScore().getTotalScore())
+                    - (o1.getAttackScore().getTotalScore() + o1.getDefenseScore().getTotalScore() + o1.getDuelScore().getTotalScore());
 
-            @Override
-            public int compare(ScoreItem o1, ScoreItem o2) {
-                // We need to reverse the sorting, the higher number is above
-                int diff = (o2.getAttackScore().getTotalScore() + o2.getDefenseScore().getTotalScore() + o2.getDuelScore().getTotalScore())
-                        - (o1.getAttackScore().getTotalScore() + o1.getDefenseScore().getTotalScore() + o1.getDuelScore().getTotalScore());
-
-                if (diff == 0) {
-                    return o1.getUser().getName().compareTo(o2.getUser().getName());
-                } else {
-                    return diff;
-                }
+            if (diff == 0) {
+                return o1.getUser().getName().compareTo(o2.getUser().getName());
+            } else {
+                return diff;
             }
         });
         return scoreItems;
@@ -126,7 +120,7 @@ public class MeleeScoreboardBean {
     }
 
     public List<ScoreItem> getScoreItems() {
-        List<ScoreItem> currentScore = new ArrayList<ScoreItem>();
+        List<ScoreItem> currentScore = new ArrayList<>();
 
         for (Player player : this.players) {
             // We need user id because User is not Hashable (maybe it does not redefine

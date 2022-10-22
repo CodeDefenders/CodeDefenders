@@ -19,16 +19,10 @@
 
 package org.codedefenders.configuration.configfileresolver;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.inject.Produces;
-
-import org.codedefenders.installer.Installer;
 
 public class ConfigFileResolverProducer {
 
@@ -45,20 +39,6 @@ public class ConfigFileResolverProducer {
             EnvironmentVariableConfigFileResolver environmentVarCfr,
             SystemPropertyConfigFileResolver systemPropertyCfr,
             ContextConfigFileResolver contextCfr) {
-        // If this attribute is set we run in standalone mode (when the Installer is called)
-        if (Installer.configFile == null) {
-            return Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr);
-        } else {
-            return Arrays.asList(classpathCfr, new ConfigFileResolver() {
-                @Override
-                public Reader getConfigFile(String filename) {
-                    try {
-                        return new InputStreamReader(new FileInputStream(Installer.configFile));
-                    } catch (FileNotFoundException e) {
-                        return null;
-                    }
-                }
-            }, environmentVarCfr, systemPropertyCfr, contextCfr);
-        }
+        return Arrays.asList(classpathCfr, tomcatCfr, environmentVarCfr, systemPropertyCfr, contextCfr);
     }
 }
