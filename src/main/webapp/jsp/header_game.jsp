@@ -84,12 +84,11 @@
                     </form>
 
             <%
-                        if (duration != -1) {
-                            // make duration, max duration and start time available in jsp:attributes by using EL
-                            request.setAttribute("duration", duration);
-                            request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
-                                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
-                            request.setAttribute("startTime", startTime);
+                        // make duration, max duration and start time available in jsp:attributes by using EL
+                        request.setAttribute("duration", duration);
+                        request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
+                            AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
+                        request.setAttribute("startTime", startTime);
             %>
                     <form id="adminDurationChange" action="<%=selectionManagerUrl%>" method="post">
                         <input type="hidden" name="formType" value="durationChange">
@@ -125,7 +124,6 @@
                         </t:modal>
                     </form>
             <%
-                        }
                     }
 
                     if (game.getState() == GameState.CREATED) {
@@ -170,7 +168,7 @@
 
             <%
                 // show duration for normal users without the ability to modify it:
-                if (game.getCreatorId() != login.getUserId() && duration != -1) {
+                if (game.getCreatorId() != login.getUserId()) {
                     // make duration and start time available in jsp:attributes by using EL
                     request.setAttribute("duration", duration);
                     request.setAttribute("startTime", startTime);
