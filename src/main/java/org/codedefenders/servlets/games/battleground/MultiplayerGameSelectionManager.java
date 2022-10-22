@@ -53,6 +53,7 @@ import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
@@ -460,7 +461,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         Optional<Integer> newDuration = getIntParameter(request, "newDuration");
         if (newDuration.isPresent()) {
-            game.setGameDurationMinutes(newDuration.get());
+            final int duration = newDuration.get();
+            final int maxDuration = AdminDAO.getSystemSetting(
+                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
+            final int minDuration = 1;
+
+            // clamp duration
+            game.setGameDurationMinutes(Math.max(minDuration, Math.min(duration, maxDuration)));
             game.update();
             Redirect.redirectBack(request, response);
         } else {

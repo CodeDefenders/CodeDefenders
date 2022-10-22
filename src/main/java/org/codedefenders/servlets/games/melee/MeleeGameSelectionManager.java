@@ -445,7 +445,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         Optional<Integer> newDuration = getIntParameter(request, "newDuration");
         if (newDuration.isPresent()) {
-            game.setGameDurationMinutes(newDuration.get());
+            final int duration = newDuration.get();
+            final int maxDuration = AdminDAO.getSystemSetting(
+                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
+            final int minDuration = 1;
+
+            // clamp duration
+            game.setGameDurationMinutes(Math.max(minDuration, Math.min(duration, maxDuration)));
             game.update();
             Redirect.redirectBack(request, response);
         } else {
