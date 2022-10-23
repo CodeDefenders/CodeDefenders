@@ -10,7 +10,7 @@ gen_tomcat_users() {
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://tomcat.apache.org/xml tomcat-users.xsd"
               version="1.0">' >> "$FILE"
-    if [ ! -z "$ADMIN_USERNAME" ] && [ ! -z "$ADMIN_PASSWORD" ]
+    if [ -n "$ADMIN_USERNAME" ] && [ -n "$ADMIN_PASSWORD" ]
     then
         echo '<role rolename="manager-gui"/>' >> "$FILE"
         echo "<user username=\"$ADMIN_USERNAME\" password=\"$ADMIN_PASSWORD\" roles=\"manager-gui\"/>" >> "$FILE"
@@ -24,16 +24,14 @@ download_dependencies() {
 
     mkdir -vp "$DATA_DIR/lib"
 
-    echo "data.dir=$DATA_DIR" > /tmp/config.properties
-
-    mvn -f installation-pom.xml clean validate package -Dconfig.properties=/tmp/config.properties
+    mvn --no-transfer-progress -f /installation-pom.xml clean package -Dconfig.properties=<(echo "data.dir=$DATA_DIR")
 }
 
 main() {
-    gen_tomcat_users "/usr/local/tomcat/conf/tomcat-users.xml" "$CODEDEFENDERS_ADMIN_USERNAME" "$CODEDEFENDERS_ADMIN_PASSWORD"
+    gen_tomcat_users "/etc/tomcat9/tomcat-users.xml" "$CODEDEFENDERS_ADMIN_USERNAME" "$CODEDEFENDERS_ADMIN_PASSWORD"
     download_dependencies "/srv/codedefenders"
 }
 
 main
 
-JAVA_OPTS="-Dorg.apache.catalina.startup.EXIT_ON_INIT_FAILURE=true" catalina.sh run
+JAVA_OPTS="-Djava.awt.headless=true -Dorg.apache.catalina.startup.EXIT_ON_INIT_FAILURE=true" exec "$CATALINA_HOME/bin/catalina.sh" run

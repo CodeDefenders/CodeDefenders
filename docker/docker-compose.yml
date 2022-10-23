@@ -1,4 +1,3 @@
-version: '2.1'
 services:
   database:
     image: "mariadb:10.5"
@@ -8,33 +7,41 @@ services:
       - MYSQL_USER=${CODEDEFENDERS_DB_USERNAME:-defender}
       - MYSQL_PASSWORD=${CODEDEFENDERS_DB_PASSWORD:-defender}
       - MYSQL_DATABASE=${CODEDEFENDERS_DB_NAME:-defender}
+    networks:
+      - network
     volumes:
       - dbvolume:/var/lib/mysql
   codedefenders:
     image: "codedefenders/codedefenders:${CODEDEFENDERS_VERSION:?Please set a Codedefenders version via the .env file. Also see docs/Docker.md for more information.}"
     environment:
-      # These three are hardcoded because they are part of the container setup
+      # These two are already hardcoded in the image because they are determined by the image build layout, but we want to prevent them being overwritten by the .env file
       - CODEDEFENDERS_DATA_DIR=/srv/codedefenders
-      - CODEDEFENDERS_DB_HOST=database
       - CODEDEFENDERS_ANT_HOME=/usr/share/ant
+      # This one is hardcoded, because it is specific to this docker-compose file
+      - CODEDEFENDERS_DB_HOST=database
       # These three are the only required variables as they are also passed to the database container
       - CODEDEFENDERS_DB_USERNAME=${CODEDEFENDERS_DB_USERNAME:-defender}
       - CODEDEFENDERS_DB_PASSWORD=${CODEDEFENDERS_DB_PASSWORD:-defender}
       - CODEDEFENDERS_DB_NAME=${CODEDEFENDERS_DB_NAME:-defender}
-      # These two are for configuring the basic auth credentials for the /admin/* url
-      - CODEDEFENDERS_ADMIN_USERNAME
-      - CODEDEFENDERS_ADMIN_PASSWORD
-      # These are the other relevant variables to pass if they exist
-      - CODEDEFENDERS_PARALLELIZE
-      - CODEDEFENDERS_MUTANT_COVERAGE
-      - CODEDEFENDERS_BLOCK_ATTACKER
+      # Other variables (like the *_ADMIN_* variables for configuring the basic auth for /admin/* urls) can be directly
+      # set from the .env file
+    env_file: .env
     ports:
       - "127.0.0.1:${CODEDEFENDERS_PORT:-8080}:8080"
-    links:
-      - database
+    networks:
+      - network
     volumes:
       - datavolume:/srv/codedefenders
+    healthcheck:
+      test: "curl --silent --fail localhost:8080/ >/dev/null || exit 1"
+      start_period: '1m'
+      interval: '15s'
+      timeout: '10s'
+      retries: 3
 
 volumes:
   datavolume:
   dbvolume:
+
+networks:
+  network:

@@ -329,7 +329,7 @@
 						</goals>
 						<phase>generate-resources</phase>
 						<configuration>
-							<nodeVersion>v16.14.2</nodeVersion>
+							<nodeVersion>v16.17.1</nodeVersion>
 						</configuration>
 					</execution>
 
