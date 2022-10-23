@@ -15,6 +15,8 @@ RUN mvn --no-transfer-progress package -DskipTests -DskipCheckstyle
 
 FROM docker.io/library/debian:11 AS tomcat
 
+ENV LANG="C.UTF-8"
+
 RUN mkdir /srv/codedefenders
 
 # Install TOMCAT, ANT, MAVEN and CURL (for the health check)
