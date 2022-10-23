@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.service.AuthService;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +55,8 @@ public class CacheControlFilter implements Filter {
         final HttpServletResponse httpRes = (HttpServletResponse) response;
 
         /* All resources are public and can be always cached, independent of the login status. */
-        final boolean isResource = Stream
-                .of("images", "webjars", "css", "js", "favicon.ico")
-                .anyMatch(uri -> httpReq.getServletPath().startsWith("/" + uri));
+        final boolean isResource = Stream.of(Paths.STATIC_RESOURCE_PREFIXES)
+                .anyMatch(uri -> httpReq.getServletPath().startsWith(uri));
 
         // TODO(Alex): Do we need the second (.isActive()) check here?
         final boolean isLoggedIn = login.isLoggedIn() && login.getUser().isActive();

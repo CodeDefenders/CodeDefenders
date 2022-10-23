@@ -25,7 +25,7 @@
 <%-- Attributes set in the servlet --%>
 
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
-<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="leaderboardService" type="org.codedefenders.service.LeaderboardService"--%>
 
 <c:choose>

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -41,6 +40,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.cache.AbstractCacheManager;
@@ -74,34 +74,49 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
     private final String adminRole;
 
-    private final SettingsRepository settingsRepository;
+    private final SettingsRepository settingsRepo;
     private final UserRepository userRepo;
 
     private final UserDatabase userDatabase;
 
+    public static class CodeDefendersCacheManager extends AbstractCacheManager {
+        private final MetricsService metricsService;
+
+        @Inject
+        public CodeDefendersCacheManager(MetricsService metricsService) {
+            this.metricsService = metricsService;
+        }
+
+        @Override
+        protected Cache<Object, Object> createCache(String s) throws CacheException {
+            com.google.common.cache.Cache<Object, Object> cache = CacheBuilder.newBuilder()
+                    .recordStats()
+                    .build();
+
+            metricsService.registerGuavaCache("shiroCache_" + s, cache);
+
+            return new GuavaCache(cache);
+        }
+    }
+
+    public static class CodeDefendersCredentialsMatcher implements CredentialsMatcher {
+        @Override
+        public boolean doCredentialsMatch(AuthenticationToken authenticationToken,
+                AuthenticationInfo authenticationInfo) {
+            return passwordMatches(
+                    // authenticationToken.getCredentials returns char array so convert to String
+                    new String((char[]) authenticationToken.getCredentials()),
+                    (String) authenticationInfo.getCredentials()
+            );
+        }
+    }
+
     @Inject
-    public CodeDefendersRealm(SettingsRepository settingsRepository, UserRepository userRepo, Configuration config,
-            MetricsService metricsService) {
-        super(
-                new AbstractCacheManager() {
-                    @Override
-                    protected Cache<Object, Object> createCache(String s) throws CacheException {
-                        com.google.common.cache.Cache<Object, Object> cache = CacheBuilder.newBuilder()
-                                .recordStats()
-                                .build();
-
-                        metricsService.registerGuavaCache("shiroCache_" + s, cache);
-
-                        return new GuavaCache(cache);
-                    }
-                },
-                (authenticationToken, authenticationInfo) -> passwordMatches(
-                        // authenticationToken.getCredentials returns char array so convert to String
-                        new String((char[]) authenticationToken.getCredentials()),
-                        (String) authenticationInfo.getCredentials()
-                )
-        );
-        this.settingsRepository = settingsRepository;
+    public CodeDefendersRealm(CodeDefendersCacheManager codeDefendersCacheManager,
+            CodeDefendersCredentialsMatcher codeDefendersCredentialsMatcher, SettingsRepository settingsRepo,
+            UserRepository userRepo, @SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+        super(codeDefendersCacheManager, codeDefendersCredentialsMatcher);
+        this.settingsRepo = settingsRepo;
         this.userRepo = userRepo;
 
         UserDatabase userDatabase;
@@ -141,7 +156,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
     @Override
     protected Object getAuthenticationCacheKey(AuthenticationToken token) {
-        Optional<UserEntity> user =  userRepo.getUserByName((String) token.getPrincipal());
+        Optional<UserEntity> user = userRepo.getUserByName((String) token.getPrincipal());
         if (user.isPresent()) {
             return user.get().getId();
         } else {
@@ -171,7 +186,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
             if (activeUser.isPresent()) {
                 UserEntity user = activeUser.get();
 
-                if (settingsRepository.isMailValidationRequired() && !user.isValidated()) {
+                if (settingsRepo.isMailValidationRequired() && !user.isValidated()) {
                     usernamePasswordToken.clear();
                     throw new LockedAccountException("Account email is not validated.");
                 }
@@ -182,18 +197,12 @@ public class CodeDefendersRealm extends AuthorizingRealm {
                             "Your account is inactive, login is only possible with an active account.");
                 }
 
-                // TODO(Alex): We do not need to do this check here. We instead provide a custom CredentialMatcher
-                //   in the constructor
-                //if (!passwordMatches(new String(usernamePasswordToken.getPassword()), user.getEncodedPassword())) {
-                //    usernamePasswordToken.clear();
-                //    throw new IncorrectCredentialsException("Username not found or password incorrect.");
-                //} else {
+                // Note: The password matching is done by our custom CredentialsMatcher
+                // {@link CodeDefendersCredentialsMatcher} setup in the constructor.
                 return getAccount(user);
-                //}
             } else {
                 usernamePasswordToken.clear();
                 return null;
-                //throw new UnknownAccountException("Username not found or password incorrect.");
             }
         } else {
             // TODO(Alex): Why not a Runtime exception? This case shouldn't happen!!
@@ -211,8 +220,9 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * TODO(Alex): Implement Cache invalidation (If roles are tracked in the Database);
+     *
+     * <p>TODO(Alex): Implement Cache invalidation (If roles are tracked in the Database);
+     *
      * See: {@link #getAuthorizationInfo(PrincipalCollection)}
      * See: {@link #clearCachedAuthorizationInfo(PrincipalCollection)}
      * See: {@link #clearCache(PrincipalCollection)}
@@ -261,14 +271,11 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         public synchronized Object put(Object o, Object o2) throws CacheException {
             Object previous;
 
-            try {
-                previous = backingCache.get(o, () -> o2);
-            } catch (ExecutionException e) {
-                throw new CacheException(e);
-            }
+            previous = backingCache.getIfPresent(o);
             if (previous == o2) {
                 return null;
             } else {
+                backingCache.put(o, o2);
                 return previous;
             }
         }

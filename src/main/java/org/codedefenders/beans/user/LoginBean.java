@@ -68,12 +68,6 @@ public class LoginBean implements Serializable, CodeDefendersAuth {
         return CDIUtil.getBeanFromCDI(UserService.class).getSimpleUserById(getUserId()).orElse(null);
     }
 
-    @Deprecated
-    @Override
-    public String getUsername() {
-        return getSimpleUser().getName();
-    }
-
     @Override
     public User getUser() {
         return CDIUtil.getBeanFromCDI(UserService.class).getUserById(getUserId()).orElse(null);

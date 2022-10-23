@@ -152,7 +152,7 @@ public class AdminUserManagement extends HttpServlet {
 
                     String msg;
 
-                    if (password.equals(confirmPassword)) {
+                    if (!password.equals(confirmPassword)) {
                         msg = "Passwords don't match";
                     } else {
                         String newPassword = null;

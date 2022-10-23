@@ -21,6 +21,7 @@ package org.codedefenders.util;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.configuration.Configuration;
 
+import com.google.common.base.Functions;
 import io.prometheus.client.filter.MetricsFilter;
 
 @WebFilter(filterName = "metricsFilter")
@@ -53,10 +55,13 @@ public class CodeDefendersMetricsFilter extends MetricsFilter {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-        // We do not need metrics for the static resources and the notification endpoint has to high cardinality.
-        Pattern pattern = Pattern.compile("(/(js|images|webjars|css|notifications)/.*|/favicon.ico)");
+
         if (!config.isMetricsCollectionEnabled()
-                || pattern.matcher(((HttpServletRequest) servletRequest).getServletPath()).matches()) {
+                // We do not need metrics for the static resources and the notification endpoint has to high cardinality.
+                || Stream.of(Stream.of(Paths.STATIC_RESOURCE_PREFIXES), Stream.of("/notifications/"))
+                .flatMap(Functions.identity())
+                .anyMatch(uri -> ((HttpServletRequest) servletRequest).getServletPath().startsWith(uri))
+        ) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             super.doFilter(servletRequest, servletResponse, filterChain);

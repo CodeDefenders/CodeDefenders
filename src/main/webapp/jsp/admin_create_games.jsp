@@ -32,9 +32,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
-<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
-
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Games"); %>

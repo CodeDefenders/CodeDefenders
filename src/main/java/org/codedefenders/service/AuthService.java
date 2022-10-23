@@ -67,12 +67,6 @@ public class AuthService implements CodeDefendersAuth {
         return userService.getSimpleUserById(getUserId()).orElse(null);
     }
 
-    @Deprecated
-    @Override
-    public String getUsername() {
-        return getSimpleUser().getName();
-    }
-
     @Override
     public User getUser() {
         return userService.getUserById(getUserId()).orElse(null);

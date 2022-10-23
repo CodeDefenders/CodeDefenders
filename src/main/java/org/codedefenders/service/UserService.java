@@ -203,6 +203,7 @@ public class UserService {
      */
     public void changeUsername(int userId, @Nonnull String newUsername) {
         simpleUserForUserIdCache.invalidate(userId);
+        throw new NotImplementedException();
     }
 
     /**

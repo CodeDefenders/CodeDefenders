@@ -33,10 +33,6 @@ public interface CodeDefendersAuth {
 
     SimpleUser getSimpleUser();
 
-    // TODO(Alex): This is simply a convenience method for .getSimpleUser().getName()
-    @Deprecated
-    String getUsername();
-
     User getUser();
 
     // TODO(Alex): Do not expose UserEntity!

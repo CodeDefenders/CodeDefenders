@@ -26,7 +26,6 @@
     @param MutliplayerGame game
         The game to be displayed.
 --%>
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <%
 	MeleeGame game = (MeleeGame) request.getAttribute("game");
 %>
