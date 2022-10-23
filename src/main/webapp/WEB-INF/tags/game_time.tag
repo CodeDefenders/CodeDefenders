@@ -2,14 +2,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%@ attribute name="gameId" required="true" %>
-<%@ attribute name="selectionManagerUrl" required="true" %>
-<%@ attribute name="duration" required="true" %>
-<%@ attribute name="maxDuration" required="true" %>
-<%@ attribute name="startTime" required="true" %>
-<%@ attribute name="canSetDuration" required="true" %>
+<%@ attribute name="gameId" required="true" type="java.lang.Integer" %>
+<%@ attribute name="selectionManagerUrl" required="true" type="java.lang.String" %>
+<%@ attribute name="duration" required="true" type="java.lang.Integer" %>
+<%@ attribute name="maxDuration" required="true" type="java.lang.Integer" %>
+<%@ attribute name="startTime" required="true" type="java.lang.Long" %>
+<%@ attribute name="canSetDuration" required="true" type="java.lang.Boolean" %>
 
-<form id="adminDurationChange" action="${selectionManagerUrl}" method="post" class="needs-validation">
+<form id="durationModalForm" action="${selectionManagerUrl}" method="post" class="needs-validation">
     <input type="hidden" name="formType" value="durationChange">
     <input type="hidden" name="gameId" value="${gameId}">
     <input type="hidden" name="newDuration" id="duration-total">
@@ -17,15 +17,20 @@
     <%-- Button with remaining duration. --%>
 
     <div data-bs-toggle="tooltip"
-         <c:if test="${canSetDuration}">
-             title="Change the game duration."
-         </c:if>
-         <c:if test="${!canSetDuration}">
-             title="View the game duration."
-         </c:if>
+    <c:choose>
+        <c:when test="${canSetDuration}">
+            title="Change the game duration."
+        </c:when>
+        <c:otherwise>
+            title="View the game duration."
+        </c:otherwise>
+    </c:choose>
     >
-        <button type="button" class="btn btn-sm btn-outline-danger" form="adminDurationChange"
-                data-bs-toggle="modal" data-bs-target="#duration-change-modal">
+        <button type="button"
+                class="btn btn-sm btn-outline-${canSetDuration ? 'danger' : 'secondary'}"
+                form="durationModalForm"
+                data-bs-toggle="modal"
+                data-bs-target="#duration-change-modal">
             <i class="fa fa-hourglass-start"></i>
             <span class="time-left"
                   data-type="remaining"
@@ -36,16 +41,18 @@
         </button>
     </div>
 
-    <t:modal title="Game Duration" id="duration-change-modal" closeButtonText="Cancel">
+    <t:modal title="Game Duration" id="duration-change-modal"
+             closeButtonText="${canSetDuration ? 'Cancel' : 'Close'}">
         <jsp:attribute name="content">
 
             <%-- Progress Bar --%>
-            <div class="progress mb-2" style="height: 1em;">
-                <div class="progress-bar time-left"
+            <div class="progress mb-3" style="height: 1em;">
+                <div class="progress-bar progress-bar-animated progress-bar-striped time-left"
                      data-type="progress"
                      data-duration="${duration}"
                      data-start="${startTime}"
-                     style="width: 0;">
+                     style="width: 0; animation-duration: 2s;"
+                     role="progressbar">
                 </div>
             </div>
 
@@ -67,7 +74,7 @@
                     </span>
                 </div>
                 <div class="col-4 d-flex flex-column align-items-center">
-                    <small>End Time</small>
+                    <small>This game will end at</small>
                     <span class="time-left"
                           data-type="end"
                           data-duration="${duration}"
@@ -79,16 +86,22 @@
             <%-- Duration Controls --%>
             <c:if test="${canSetDuration}">
                 <div class="mt-3">
-                    <label class="form-label">Set the remaining duration:</label>
+                    <label class="form-label">Set the games new total duration:</label>
                     <div class="input-group input-group-sm has-validation">
                         <input type="number" name="days" class="form-control" id="days-input" min="0">
-                        <span class="input-group-text">days</span>
+                        <label for="days-input" class="input-group-text">days</label>
                         <input type="number" name="hours" class="form-control" id="hours-input" min="0">
-                        <span class="input-group-text">hours</span>
+                        <label for="hours-input" class="input-group-text">hours</label>
                         <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
-                        <span class="input-group-text">minutes</span>
+                        <label for="minutes-input" class="input-group-text">minutes</label>
                         <div class="invalid-feedback">
                             Please input a valid duration.
+                            Minimum duration:
+                            <span class="time-left"
+                                  data-type="elapsed"
+                                  data-duration="${duration}"
+                                  data-start="${startTime}">
+                            </span>,
                             Maximum duration:
                             <span class="time-left"
                                   data-type="total"
@@ -102,7 +115,7 @@
 
         <jsp:attribute name="footer">
             <c:if test="${canSetDuration}">
-                <button type="submit" form="adminDurationChange" class="btn btn-primary" id="durationChange">
+                <button type="submit" form="durationModalForm" class="btn btn-primary" id="durationChange">
                     Change Game Duration
                 </button>
             </c:if>
@@ -113,46 +126,45 @@
     <c:if test="${canSetDuration}">
         <script>
             const MAX_DURATION_MINUTES = Number(${maxDuration});
-
-            const daysInput = document.getElementById('days-input');
-            const hoursInput = document.getElementById('hours-input');
-            const minutesInput = document.getElementById('minutes-input');
+            const units = ['days', 'hours', 'minutes'];
+            const inputs = {};
+            units.forEach(unit => inputs[unit] = document.getElementById(unit + '-input'));
             const totalInput = document.getElementById('duration-total');
 
             const setValidity = function (customValidity) {
-                daysInput.setCustomValidity(customValidity);
-                hoursInput.setCustomValidity(customValidity);
-                minutesInput.setCustomValidity(customValidity);
+                units.forEach(u => inputs[u].setCustomValidity(customValidity));
             };
 
             const validateAndSetDuration = function () {
-                if (daysInput.value.length === 0
-                        && hoursInput.value.length === 0
-                        && minutesInput.value.length === 0) {
-                    setValidity('missing-value')
+                const hasValue = units.some(u => inputs[u].value.length > 0);
+                if (!hasValue) {
+                    setValidity('missing-value');
                     return;
                 }
 
-                const days = Number(daysInput.value);
-                const hours = Number(hoursInput.value);
-                const minutes = Number(minutesInput.value);
+                const days = Number(inputs.days.value);
+                const hours = Number(inputs.hours.value);
+                const minutes = Number(inputs.minutes.value);
                 const total = ((days * 24) + hours) * 60 + minutes;
 
                 totalInput.value = total;
 
-                if (total < 0 || total > MAX_DURATION_MINUTES) {
-                    setValidity('invalid-value')
-                    return
+                const elapsedMinutes = Math.floor((Date.now() / 1e3 - ${startTime}) / 60);
+                if (total < elapsedMinutes || total > MAX_DURATION_MINUTES) {
+                    setValidity('invalid-value');
+                    return;
                 }
 
                 setValidity('');
             };
 
-            daysInput.addEventListener('input', validateAndSetDuration);
-            hoursInput.addEventListener('input', validateAndSetDuration);
-            minutesInput.addEventListener('input', validateAndSetDuration);
-
+            units.forEach(u => inputs[u].addEventListener('input', validateAndSetDuration));
             validateAndSetDuration();
         </script>
     </c:if>
 </form>
+
+<script type="module">
+    import {GameTimeManager} from './js/codedefenders_game.mjs';
+    const gameTimeManager = new GameTimeManager(".time-left", 10);
+</script>

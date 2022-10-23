@@ -121,11 +121,10 @@
             %>
 
             <%
-                if (game.getState() == GameState.ACTIVE) {
+                final boolean isCreator = game.getCreatorId() == login.getUserId();
+                if (game.getState() == GameState.ACTIVE || (game.getState() == GameState.CREATED && isCreator)) {
                     request.setAttribute("selectionManagerUrl", selectionManagerUrl);
-                    request.setAttribute("canSetDuration", game.getCreatorId() == login.getUserId());
-
-                    // make duration, max duration and start time available in jsp:attributes by using EL
+                    request.setAttribute("canSetDuration", isCreator);
                     request.setAttribute("duration", duration);
                     request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
                             AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
@@ -183,8 +182,3 @@
             <t:game_chat/>
         </div>
     </div>
-
-    <script type="module">
-        import {GameTimeManager} from './js/codedefenders_game.mjs';
-        const gameTimeManager = new GameTimeManager(".time-left", 10);
-    </script>

@@ -7,7 +7,7 @@ class GameTimeManager {
      */
     constructor(selector, updateInterval) {
         const elements = [...document.querySelectorAll(selector)];
-        elements.forEach(this.renderElement.bind(this));
+        elements.forEach(this.renderElement.bind(this)); // initial render
         this._renderer = elements.filter(this.needsUpdating.bind(this));
         this._interval = setInterval(this.render.bind(this), updateInterval * 1e3);
     }
@@ -49,6 +49,9 @@ class GameTimeManager {
             case 'end':
                 this.renderEnd(element, start, duration);
                 break;
+            case 'elapsed':
+                this.renderElapsed(element, start);
+                break;
             case 'progress':
                 this.renderProgress(element, start, duration);
                 break;
@@ -79,11 +82,20 @@ class GameTimeManager {
     }
 
     /**
+     * Renders the elapsed duration in the target element.
+     */
+    renderElapsed(element, start) {
+        const elapsedMinutes = this.calculateElapsedMinutes(start);
+        element.innerText = this.toMixedUnitString(elapsedMinutes);
+    }
+
+    /**
      * Sets the width of the target element according to the percentage of the game duration that has passed.
      */
     renderProgress(element, start, duration) {
-        const percentage = this.calculateElapsedPercentage(start, duration);
-        element.style.width = `${percentage * 100}%`;
+        const percentage = this.calculateElapsedPercentage(start, duration) * 100;
+        element.style.width = `${percentage}%`;
+        element.ariaValueNow = percentage;
     }
 
     /**
@@ -91,7 +103,7 @@ class GameTimeManager {
      *
      * @param start {Number} the start time in seconds since epoch (Unix timestamp)
      * @param duration {Number} the games duration in minutes
-     * @returns {number} the remaining time in seconds (rounded and always >= 0)
+     * @returns {number} the remaining time in minutes (rounded and always >= 0)
      */
     calculateRemainingTime(start, duration) {
         const currentSeconds = Date.now() / 1e3;
@@ -117,14 +129,23 @@ class GameTimeManager {
      * Calculates how much of the time has passed.
      *
      * @param start {Number} the start time in seconds since epoch (Unix timestamp)
+     * @returns {number} how much of the time has passed in minutes
+     */
+    calculateElapsedMinutes(start) {
+        const currentSeconds = Date.now() / 1e3;
+        const elapsedSeconds = currentSeconds - start;
+        return elapsedSeconds / 60;
+    }
+
+    /**
+     * Calculates how much of the time has passed.
+     *
+     * @param start {Number} the start time in seconds since epoch (Unix timestamp)
      * @param duration {Number} the games duration in minutes
      * @returns {number} how much of the time has passed, as a percentage between 0.0 and 1.0
      */
     calculateElapsedPercentage(start, duration) {
-        const currentSeconds = Date.now() / 1e3;
-        const elapsedSeconds = currentSeconds - start;
-        const totalSeconds = duration * 60;
-        const percentage = elapsedSeconds / totalSeconds;
+        const percentage = this.calculateElapsedMinutes(start) / duration;
         return Math.min(1.0, Math.max(0.0, percentage));
     }
 
@@ -155,7 +176,7 @@ class GameTimeManager {
 
         const daysString = days > 0 ? `${days}d ` : '';
         const hoursString = hours > 0 ? `${hours}h ` : '';
-        const minutesString = minutes > 0 ? `${minutes}min` : '';
+        const minutesString = minutes > 0 ? `${Math.round(minutes)}min` : '';
         return `${daysString}${hoursString}${minutesString}`;
     }
 
