@@ -21,7 +21,7 @@ RUN mkdir /srv/codedefenders
 
 # Install TOMCAT, ANT, MAVEN and CURL (for the health check)
 RUN apt-get update &&  \
-    apt-get install -y tomcat9 &&  \
+    DEBIAN_FRONTEND='noninteractive' apt-get install -y tomcat9 &&  \
     apt-get install -y --no-install-recommends curl ant ant-optional maven && \
     rm -rf /var/lib/apt/lists/*
 
