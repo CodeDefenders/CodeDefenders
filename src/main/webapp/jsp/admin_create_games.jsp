@@ -261,7 +261,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-12" title="The duration in minutes for how long the games will be open.">
+                            <div class="col-12" title="The duration for how long the games will be open.">
                                 <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
                                 <%
                                     request.setAttribute("defaultDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue());

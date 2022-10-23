@@ -227,19 +227,114 @@
                     </div>
                 </div>
 
-                <div class="row mb-3" title="The duration in minutes for how long the games will be open.">
-                    <label class="col-4 col-form-label" for="game-duration">
-                        Game Duration in Minutes
-                    </label>
-                    <div class="col-8">
-                        <input id="game-duration" name="gameDurationMinutes" class="form-control"
-                                type="number" required min="1"
-                               value="<%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue() %>"
-                               max="<%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue() %>">
+                <div class="row mb-3" title="The duration for how long the games will be open.">
+                    <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
+                    <%
+                        request.setAttribute("defaultDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue());
+                        request.setAttribute("maximumDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
+                    %>
+
+                    <label class="col-4 col-form-label">Set the games duration:</label>
+                    <div class="col-8 input-group input-group-sm has-validation"
+                         style="width: 66.6666666667%;"><!-- col-8 is overridden by input-group -->
+                        <input type="number" name="days" class="form-control" id="days-input" min="0">
+                        <label for="days-input" class="input-group-text">days</label>
+                        <input type="number" name="hours" class="form-control" id="hours-input" min="0">
+                        <label for="hours-input" class="input-group-text">hours</label>
+                        <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
+                        <label for="minutes-input" class="input-group-text">minutes</label>
                         <div class="invalid-feedback">
-                            Please provide a valid number. Must be less than <%= AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue() %>.
+                            Please input a valid duration.
+                            Maximum duration: <span id="displayMaxDuration">&hellip;</span>
                         </div>
                     </div>
+
+                    <script>
+                        const MAXIMUM_DURATION_MINUTES = Number(${maximumDuration});
+                        const DEFAULT_DURATION_MINUTES = Number(${defaultDuration});
+                        const units = ['days', 'hours', 'minutes'];
+                        const inputs = {};
+                        units.forEach(unit => inputs[unit] = document.getElementById(unit + '-input'));
+                        const totalInput = document.getElementById('gameDurationMinutes');
+
+                        const setDefaults = function() {
+                            let minutes = DEFAULT_DURATION_MINUTES;
+                            let hours = 0;
+                            let days = 0;
+
+                            if (minutes >= 60) {
+                                hours = Math.floor(minutes / 60);
+                                minutes %= 60;
+                            }
+
+                            if (hours >= 24) {
+                                days = Math.floor(hours / 24);
+                                hours %= 24;
+                            }
+
+                            if (days > 0) inputs.days.value = days;
+                            if (hours > 0) inputs.hours.value = hours;
+                            if (minutes > 0) inputs.minutes.value = minutes;
+                        };
+
+                        const toMixedUnitString = function(pMinutes) {
+                            let minutes = pMinutes;
+                            if (minutes <= 0) {
+                                return '0min';
+                            }
+
+                            let hours = 0;
+                            let days = 0;
+
+                            if (minutes >= 60) {
+                                hours = Math.floor(minutes / 60);
+                                minutes %= 60;
+                            }
+
+                            if (hours >= 24) {
+                                days = Math.floor(hours / 24);
+                                hours %= 24;
+                            }
+
+                            let result = '';
+                            if (days > 0) result += days + 'd ';
+                            if (hours > 0) result += hours + 'h ';
+                            if (minutes > 0) result += Math.round(minutes) + 'min';
+                            return result;
+                        };
+
+                        document.getElementById('displayMaxDuration').innerText = toMixedUnitString(MAXIMUM_DURATION_MINUTES);
+                        setDefaults();
+
+                        const setValidity = function (customValidity) {
+                            units.forEach(u => inputs[u].setCustomValidity(customValidity));
+                        };
+
+                        const validateAndSetDuration = function () {
+                            const hasValue = units.some(u => inputs[u].value.length > 0);
+                            if (!hasValue) {
+                                setValidity('missing-value');
+                                return;
+                            }
+
+                            const days = Number(inputs.days.value);
+                            const hours = Number(inputs.hours.value);
+                            const minutes = Number(inputs.minutes.value);
+                            const total = ((days * 24) + hours) * 60 + minutes;
+
+                            totalInput.value = total;
+
+                            if (total < 0 || total > MAXIMUM_DURATION_MINUTES) {
+                                setValidity('invalid-value');
+                                return;
+                            }
+
+                            setValidity('');
+                        };
+
+                        units.forEach(u => inputs[u].addEventListener('input', validateAndSetDuration));
+                        validateAndSetDuration();
+                    </script>
                 </div>
 
                 <c:choose>
