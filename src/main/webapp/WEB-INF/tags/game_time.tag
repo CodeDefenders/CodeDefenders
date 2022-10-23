@@ -86,7 +86,7 @@
             <%-- Duration Controls --%>
             <c:if test="${canSetDuration}">
                 <div class="mt-3">
-                    <label class="form-label">Set the games new total duration:</label>
+                    <label class="form-label">Set the games new remaining duration:</label>
                     <div class="input-group input-group-sm has-validation">
                         <input type="number" name="days" class="form-control" id="days-input" min="0">
                         <label for="days-input" class="input-group-text">days</label>
@@ -96,16 +96,11 @@
                         <label for="minutes-input" class="input-group-text">minutes</label>
                         <div class="invalid-feedback">
                             Please input a valid duration.
-                            Minimum duration:
-                            <span class="time-left"
-                                  data-type="elapsed"
-                                  data-duration="${duration}"
-                                  data-start="${startTime}">
-                            </span>,
                             Maximum duration:
                             <span class="time-left"
-                                  data-type="total"
-                                  data-duration="${maxDuration}">
+                                  data-type="remaining"
+                                  data-duration="${maxDuration}"
+                                  data-start="${startTime}">
                             </span>
                         </div>
                     </div>
@@ -145,12 +140,12 @@
                 const days = Number(inputs.days.value);
                 const hours = Number(inputs.hours.value);
                 const minutes = Number(inputs.minutes.value);
-                const total = ((days * 24) + hours) * 60 + minutes;
+                const elapsedMinutes = Math.round((Date.now() / 1e3 - ${startTime}) / 60);
+                const total = ((days * 24) + hours) * 60 + minutes + elapsedMinutes;
 
                 totalInput.value = total;
 
-                const elapsedMinutes = Math.floor((Date.now() / 1e3 - ${startTime}) / 60);
-                if (total < elapsedMinutes || total > MAX_DURATION_MINUTES) {
+                if (total < 0 || total > MAX_DURATION_MINUTES) {
                     setValidity('invalid-value');
                     return;
                 }
