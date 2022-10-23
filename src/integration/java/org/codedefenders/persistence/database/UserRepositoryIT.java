@@ -132,9 +132,7 @@ public class UserRepositoryIT {
         Integer userId = userRepo.insert(user).orElse(null);
         assumeTrue(userId != null);
 
-        assertThrows(UncheckedSQLException.class, () -> {
-            userRepo.insert(user);
-        });
+        assertThrows(UncheckedSQLException.class, () -> userRepo.insert(user));
     }
 
     @Test

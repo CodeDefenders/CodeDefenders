@@ -41,7 +41,7 @@ public class TestSmellDetectorProducer {
 
     // See https://stackoverflow.com/questions/2264758/resolution-of-external-3rd-party-beans-in-weld
     public @Produces @RequestScoped TestSmellDetector createTestSmellDetector() {
-        List<AbstractSmell> testSmells = new ArrayList<AbstractSmell>();
+        List<AbstractSmell> testSmells = new ArrayList<>();
         testSmells.add(new AssertionRoulette());
         testSmells.add(new DuplicateAssert());
         testSmells.add(new RedundantAssertion());

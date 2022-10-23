@@ -37,12 +37,10 @@ import org.junit.After;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.gargoylesoftware.htmlunit.AlertHandler;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.InteractivePage;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WaitingRefreshHandler;
@@ -61,7 +59,7 @@ public class UnkillableMutant {
     private static int TIMEOUT = 10000;
 
     static class WebClientFactory {
-        private static Collection<WebClient> clients = new ArrayList<WebClient>();
+        private static Collection<WebClient> clients = new ArrayList<>();
 
         public static WebClient getNewWebClient() {
             java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
@@ -87,13 +85,7 @@ public class UnkillableMutant {
             webClient.getOptions().setTimeout(TIMEOUT);
             webClient.getOptions().setPrintContentOnFailingStatusCode(false);
             webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-            webClient.setAlertHandler(new AlertHandler() {
-
-                public void handleAlert(Page page, String message) {
-                    System.err.println("[alert] " + message);
-                }
-
-            });
+            webClient.setAlertHandler((page, message) -> System.err.println("[alert] " + message));
             // Shut down HtmlUnit
             // webClient.setIncorrectnessListener(new IncorrectnessListener() {
             //
@@ -158,12 +150,12 @@ public class UnkillableMutant {
         System.out.println("Creator Login");
 
         // Upload the class
-        int classID = creator.uploadClass(new File("src/test/resources/itests/sources/XmlElement/XmlElement.java"));
+        int classId = creator.uploadClass(new File("src/test/resources/itests/sources/XmlElement/XmlElement.java"));
 
-        System.out.println("UnkillableMutant.testUnkillableMutant() Class ID = " + classID);
+        System.out.println("UnkillableMutant.testUnkillableMutant() Class ID = " + classId);
 
         //
-        int newGameId = creator.createNewGame(classID);
+        int newGameId = creator.createNewGame(classId);
         System.out.println("Creator Create new Game: " + newGameId);
         //
         creator.startGame(newGameId);

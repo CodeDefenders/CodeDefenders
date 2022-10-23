@@ -70,7 +70,7 @@ public class KillmapDAO {
      * Helper method to retrieve killmap entries from the database.
      */
     private static List<KillMapEntry> getKillMapEntries(List<Test> tests, List<Mutant> mutants,
-                                                        String query, DatabaseValue... values)
+                                                        String query, DatabaseValue<?>... values)
             throws UncheckedSQLException, SQLMappingException {
         /* Set up mapping from test id to test / mutant id to mutant. */
         Map<Integer, Test> testMap = tests.stream().collect(Collectors.toMap(Test::getId, t -> t));
@@ -126,7 +126,7 @@ public class KillmapDAO {
         int testGameId = entry.test.getGameId();
         int mutantGameId = entry.mutant.getGameId();
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(testGameId == mutantGameId ? testGameId : null),
                 DatabaseValue.of(entry.test.getId()),

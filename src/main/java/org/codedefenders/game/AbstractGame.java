@@ -147,6 +147,10 @@ public abstract class AbstractGame {
         this.mode = newMode;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public List<Test> getTests() {
         return getTests(false);
     }

@@ -37,14 +37,14 @@ public abstract class Scorer {
     protected abstract int scoreMutant(MultiplayerGame game, Mutant mutant, List<Test> passedTests);
 
     /**
-     * Calls {@link SizeScorer#score(MultiplayerGame, Test, List)} for a new {@link SizeScorer} instance.
+     * Calls {@link SizeScorer#scoreTest(MultiplayerGame, Test, List)} for a new {@link SizeScorer} instance.
      */
     public static int score(MultiplayerGame game, Test test, List<Mutant> killedMutants) {
         return new SizeScorer().scoreTest(game, test, killedMutants);
     }
 
     /**
-     * Calls {@link SizeScorer#score(MultiplayerGame, Mutant, List)} for a new {@link SizeScorer} instance.
+     * Calls {@link SizeScorer#scoreMutant(MultiplayerGame, Mutant, List)} for a new {@link SizeScorer} instance.
      */
     public static int score(MultiplayerGame game, Mutant mutant, List<Test> passedTests) {
         return new SizeScorer().scoreMutant(game, mutant, passedTests);

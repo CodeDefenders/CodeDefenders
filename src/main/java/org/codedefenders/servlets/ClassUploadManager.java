@@ -19,7 +19,7 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -300,7 +300,7 @@ public class ClassUploadManager extends HttpServlet {
 
         final List<JavaFileObject> dependencies = new ArrayList<>();
         final String fileName = cutFile.fileName;
-        final String fileContent = new String(cutFile.fileContent, Charset.forName("UTF-8")).trim();
+        final String fileContent = new String(cutFile.fileContent, StandardCharsets.UTF_8).trim();
         if (!fileName.endsWith(".java")) {
             logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
             messages.add("Class upload failed. The class under test must be a .java file.");

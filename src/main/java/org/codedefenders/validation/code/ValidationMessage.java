@@ -63,7 +63,7 @@ public enum ValidationMessage {
     MUTATION_DO_STATEMENT("Invalid mutation contains a DoStmt statement"),
     MUTATION_SWITCH_STATEMENT("Invalid mutation contains a SwitchStmt statement");
 
-    private String message;
+    private final String message;
 
     ValidationMessage(String message) {
         this.message = message;

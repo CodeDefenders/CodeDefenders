@@ -36,5 +36,5 @@ public enum GameMode {
     PARTY,
     MELEE,
     UTESTING,
-    PUZZLE;
+    PUZZLE
 }

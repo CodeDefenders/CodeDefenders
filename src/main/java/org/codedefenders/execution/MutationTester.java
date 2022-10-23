@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MutantDAO;
@@ -82,36 +85,18 @@ public class MutationTester implements IMutationTester {
     }
 
     @Override
-    public void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages) {
+    public String runTestOnAllMutants(AbstractGame game, Test test) {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         for (Mutant mutant : mutants) {
             killed += testVsMutant(test, mutant) ? 1 : 0;
         }
 
-        // TODO: move the message logic out of this class
-        if (killed == 0) {
-            if (mutants.size() == 0) {
-                messages.add(TEST_SUBMITTED_MESSAGE);
-            } else {
-                messages.add(TEST_KILLED_ZERO_MESSAGE);
-            }
-        } else {
-            if (killed == 1) {
-                if (mutants.size() == 1) {
-                    messages.add(TEST_KILLED_LAST_MESSAGE);
-                } else {
-                    messages.add(TEST_KILLED_ONE_MESSAGE);
-                }
-            } else {
-                messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
-            }
-
-        }
+        return getTestOnMutantResultString(mutants, killed);
     }
 
     @Override
-    public void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
+    public String runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test) {
         int killed = 0;
         List<Mutant> mutants = game.getAliveMutants();
         mutants.addAll(game.getMutantsMarkedEquivalentPending());
@@ -165,34 +150,14 @@ public class MutationTester implements IMutationTester {
         // test.update();
         test.incrementScore(Scorer.score(game, test, killedMutants));
 
-        if (killed == 0) {
-            if (mutants.size() == 0) {
-                messages.add(TEST_SUBMITTED_MESSAGE);
-            } else {
-                messages.add(TEST_KILLED_ZERO_MESSAGE);
-            }
-        } else {
-            Event notif = new Event(-1, game.getId(), u.get().getId(),
-                    u.get().getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
-                    EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-
-            eventDAO.insert(notif);
-
-            if (killed == 1) {
-                if (mutants.size() == 1) {
-                    messages.add(TEST_KILLED_LAST_MESSAGE);
-                } else {
-                    messages.add(TEST_KILLED_ONE_MESSAGE);
-                }
-            } else {
-                messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
-            }
-
+        if (killed > 0) {
+            insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
         }
+        return getTestOnMutantResultString(mutants, killed);
     }
 
     @Override
-    public void runTestOnAllMeleeMutants(MeleeGame game, Test test, ArrayList<String> messages) {
+    public String runTestOnAllMeleeMutants(MeleeGame game, Test test) {
 
         int testOwnerPlayerId = test.getPlayerId();
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(testOwnerPlayerId).flatMap(userId -> userRepo.getUserById(userId));
@@ -253,41 +218,49 @@ public class MutationTester implements IMutationTester {
             }
         }
 
+        if (killed > 0) {
+            insertDefenderKilledMutantEvent(game.getId(), u.get(), killed);
+        }
+        return getTestOnMutantResultString(mutants, killed);
+    }
+
+    protected void insertDefenderKilledMutantEvent(int gameId, @Nonnull UserEntity user, int killedMutantCount) {
+        Event notif = new Event(-1, gameId, user.getId(),
+                user.getUsername() + "&#39;s test kills " + killedMutantCount + " " + "mutants.",
+                EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+        eventDAO.insert(notif);
+    }
+
+    @Nonnull
+    protected static String getTestOnMutantResultString(@Nonnull List<Mutant> mutants, int killed) {
         if (killed == 0) {
             if (mutants.size() == 0) {
-                messages.add(TEST_SUBMITTED_MESSAGE);
+                return TEST_SUBMITTED_MESSAGE;
             } else {
-                messages.add(TEST_KILLED_ZERO_MESSAGE);
+                return TEST_KILLED_ZERO_MESSAGE;
             }
         } else {
-            Event notif = new Event(-1, game.getId(), u.get().getId(),
-                    u.get().getUsername() + "&#39;s test kills " + killed + " " + "mutants.",
-                    EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-
-            eventDAO.insert(notif);
-
             if (killed == 1) {
                 if (mutants.size() == 1) {
-                    messages.add(TEST_KILLED_LAST_MESSAGE);
+                    return TEST_KILLED_LAST_MESSAGE;
                 } else {
-                    messages.add(TEST_KILLED_ONE_MESSAGE);
+                    return TEST_KILLED_ONE_MESSAGE;
                 }
             } else {
-                messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
+                return String.format(TEST_KILLED_N_MESSAGE, killed);
             }
         }
     }
 
     @Override
-    public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
-        runAllTestsOnMutant(game, mutant, messages, new RandomTestScheduler());
+    public String runAllTestsOnMutant(AbstractGame game, Mutant mutant) {
+        return runAllTestsOnMutant(game, mutant, new RandomTestScheduler());
     }
 
     // TODO This clashes with our abstraction as for melee games we need to double
     // check tests and mutants do not belong to the same user
     @Override
-    public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages,
-            TestScheduler scheduler) {
+    public String runAllTestsOnMutant(AbstractGame game, Mutant mutant, TestScheduler scheduler) {
         // Schedule the executable tests submitted by the defenders only (true)
         List<Test> tests = scheduler.scheduleTests(game.getTests(true));
 
@@ -305,7 +278,6 @@ public class MutationTester implements IMutationTester {
 
             if (testVsMutant(test, mutant)) {
                 logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
-                messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
                 if (game instanceof MultiplayerGame) {
                     ArrayList<Mutant> mlist = new ArrayList<>();
                     mlist.add(mutant);
@@ -320,7 +292,8 @@ public class MutationTester implements IMutationTester {
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(notif);
 
-                return; // return as soon as the first test kills the mutant we return
+                // return as soon as the first test kills the mutant we return
+                return String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId());
             }
         }
 
@@ -340,18 +313,19 @@ public class MutationTester implements IMutationTester {
             mutant.incrementScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
         }
 
-        int nbRelevantTests = missedTests.size();
-        // Mutant survived
-        if (nbRelevantTests == 0) {
-            messages.add(MUTANT_SUBMITTED_MESSAGE);
-        } else if (nbRelevantTests <= 1) {
-            messages.add(MUTANT_ALIVE_1_MESSAGE);
-        } else {
-            messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests));
-        }
         Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
+
+        int nbRelevantTests = missedTests.size();
+        // Mutant survived
+        if (nbRelevantTests == 0) {
+            return MUTANT_SUBMITTED_MESSAGE;
+        } else if (nbRelevantTests <= 1) {
+            return MUTANT_ALIVE_1_MESSAGE;
+        } else {
+            return String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests);
+        }
     }
 
     /**
@@ -435,12 +409,11 @@ public class MutationTester implements IMutationTester {
     }
 
     @Override
-    public void runAllTestsOnMeleeMutant(MeleeGame game, Mutant mutant, ArrayList<String> messages) {
-        runAllTestsOnMeleeMutant(game, mutant, messages, new RandomTestScheduler());
+    public String runAllTestsOnMeleeMutant(MeleeGame game, Mutant mutant) {
+        return runAllTestsOnMeleeMutant(game, mutant, new RandomTestScheduler());
     }
 
-    private void runAllTestsOnMeleeMutant(MeleeGame game, Mutant mutant, ArrayList<String> messages,
-            TestScheduler scheduler) {
+    private String runAllTestsOnMeleeMutant(MeleeGame game, Mutant mutant, TestScheduler scheduler) {
 
         int mutantOwnerPlayerId = mutant.getPlayerId();
         Optional<UserEntity> u = userRepo.getUserIdForPlayerId(mutantOwnerPlayerId).flatMap(userId -> userRepo.getUserById(userId));
@@ -465,7 +438,6 @@ public class MutationTester implements IMutationTester {
 
             if (testVsMutant(test, mutant)) {
                 logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
-                messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
                 ArrayList<Mutant> mlist = new ArrayList<>();
                 mlist.add(mutant);
                 // TODO Scoring MeleeGames is still open
@@ -481,7 +453,8 @@ public class MutationTester implements IMutationTester {
                         EventType.PLAYER_KILLED_MUTANT, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(scoreEvent);
 
-                return; // return as soon as the first test kills the mutant
+                // return as soon as the first test kills the mutant
+                return String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId());
             } else {
                 // Notify mutant survived for each test !
                 Event scoreEvent = new Event(-1, game.getId(), Constants.DUMMY_CREATOR_USER_ID,
@@ -501,20 +474,18 @@ public class MutationTester implements IMutationTester {
                 missedTests.add(t);
             }
         }
-
-        int nbRelevantTests = missedTests.size();
-        // Mutant survived
-        if (nbRelevantTests == 0) {
-            messages.add(MUTANT_SUBMITTED_MESSAGE);
-        } else if (nbRelevantTests <= 1) {
-            messages.add(MUTANT_ALIVE_1_MESSAGE);
-        } else {
-            messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests));
-        }
         Event notif = new Event(-1, game.getId(), u.get().getId(), u.get().getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.PLAYER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(notif);
 
+        int nbRelevantTests = missedTests.size();
+        // Mutant survived
+        if (nbRelevantTests == 0) {
+            return MUTANT_SUBMITTED_MESSAGE;
+        } else if (nbRelevantTests <= 1) {
+            return MUTANT_ALIVE_1_MESSAGE;
+        } else {
+            return String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests);
+        }
     }
-
 }

@@ -12,7 +12,7 @@ import javax.inject.Named;
 /**
  * <p>Implements a container for messages that are displayed to the user on page load.</p>
  * <p>
- * This bean is session-scoped so messages can be kept over multiple request when PGR (post redirect get) is applied.
+ * This bean is session-scoped so messages can be kept over multiple request when PRG (post redirect get) is applied.
  * The messages are cleared whenever they are rendered in the JSP (see messages.jsp).
  * </p>
  */
@@ -22,7 +22,7 @@ import javax.inject.Named;
 @Named("messages")
 public class MessagesBean implements Serializable {
     private long currentId;
-    private List<Message> messages;
+    private final List<Message> messages;
 
     public MessagesBean() {
         currentId = 0;
@@ -58,35 +58,16 @@ public class MessagesBean implements Serializable {
         return message;
     }
 
+    public void addAll(Collection<? extends String> texts) {
+        for (String text : texts) {
+            add(text);
+        }
+    }
+
     /**
      * Clears the messages.
      */
     public synchronized void clear() {
         messages.clear();
-    }
-
-    /**
-     * Ugly bridge that enables us to treat the bean as a list of strings for compatibility with the backend.
-     * @return A object that inherits from {@link ArrayList}, but forwards the calls for {@code add} and
-     *         {@code addAll} to the bean.
-     */
-    public ArrayList<String> getBridge() {
-        return new MessageBridge();
-    }
-
-    private class MessageBridge extends ArrayList<String> {
-        @Override
-        public boolean add(String text) {
-            MessagesBean.this.add(text);
-            return true;
-        }
-
-        @Override
-        public boolean addAll(Collection<? extends String> texts) {
-            for (String text : texts) {
-                MessagesBean.this.add(text);
-            }
-            return true;
-        }
     }
 }

@@ -2,7 +2,6 @@ package org.codedefenders.beans.user;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
 
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.model.UserEntity;

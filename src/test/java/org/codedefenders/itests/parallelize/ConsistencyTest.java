@@ -45,7 +45,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -83,7 +82,6 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -121,12 +119,9 @@ public class ConsistencyTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -211,9 +206,6 @@ public class ConsistencyTest {
     /**
      * Setup a game with an attacker and multiple defendes and check that a
      * mutant can be killed only once and points are reported correctly.
-     *
-     * @throws IOException
-     * @throws InterruptedException
      */
     @Test
     public void testRunAllTestsOnMutant() throws IOException, InterruptedException {
@@ -299,13 +291,10 @@ public class ConsistencyTest {
         ExecutorService executorService = Executors.newFixedThreadPool(defenders.length);
 
         for (final org.codedefenders.game.Test newTest : tests) {
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("Submit test " + newTest.getId());
-                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
-                    activeGame.update();
-                }
+            executorService.submit(() -> {
+                System.out.println("Submit test " + newTest.getId());
+                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest);
+                activeGame.update();
             });
         }
         executorService.shutdown();

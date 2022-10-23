@@ -25,8 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import javax.inject.Inject;
@@ -58,7 +56,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -129,12 +126,9 @@ public class ExecutionTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -183,8 +177,6 @@ public class ExecutionTest {
      */
     @Test
     public void testMutant9559() throws IOException {
-        // MOVE THIS CODE TO BEFORE OF FACTORY METHOD
-        ArrayList<String> messages = new ArrayList<String>();
         // Create the users
         UserEntity observer = new UserEntity("observer", UserEntity.encodePassword("password"), "demo@observer.com");
         observer.insert();
@@ -195,18 +187,18 @@ public class ExecutionTest {
         // CUT
         File cutFolder = new File(Constants.CUTS_DIR, "XmlElement");
         cutFolder.mkdirs();
-        File jFile = new File(cutFolder, "XmlElement.java");
-        File cFile = new File(cutFolder, "XmlElement.class");
+        File javaFile = new File(cutFolder, "XmlElement.java");
+        File classFile = new File(cutFolder, "XmlElement.class");
         Files.copy(Paths.get("src/test/resources/itests/sources/XmlElement/XmlElement.java"),
-                new FileOutputStream(jFile));
+                new FileOutputStream(javaFile));
         Files.copy(Paths.get("src/test/resources/itests/sources/XmlElement/XmlElement.class"),
-                new FileOutputStream(cFile));
+                new FileOutputStream(classFile));
 
         GameClass cut = GameClass.build()
                 .name("XmlElement")
                 .alias("XmlElement")
-                .javaFile(jFile.getAbsolutePath())
-                .classFile(cFile.getAbsolutePath())
+                .javaFile(javaFile.getAbsolutePath())
+                .classFile(classFile.getAbsolutePath())
                 .create();
         cut.insert();
 
@@ -235,7 +227,7 @@ public class ExecutionTest {
         Mutant mutant = gameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(),
                 mutantText, attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
-        mutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
+        mutationTester.runAllTestsOnMutant(multiplayerGame, mutant);
 
     }
 }
