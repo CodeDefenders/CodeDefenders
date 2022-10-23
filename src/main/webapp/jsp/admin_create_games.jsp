@@ -276,10 +276,10 @@
                                     <label for="hours-input" class="input-group-text">hours</label>
                                     <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
                                     <label for="minutes-input" class="input-group-text">minutes</label>
-                                    <small id="maxDurationInfo" class="mt-1">
-                                        Maximum duration: <span id="displayMaxDuration">&hellip;</span>
-                                    </small>
                                 </div>
+                                <small id="maxDurationInfo" class="mt-1">
+                                    Maximum duration: <span id="displayMaxDuration">&hellip;</span>
+                                </small>
 
                                 <script>
                                     const MAXIMUM_DURATION_MINUTES = Number(${maximumDuration});
