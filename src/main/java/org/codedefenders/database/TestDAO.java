@@ -412,14 +412,19 @@ public class TestDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
+    /**
+     * Returns the id of the first Test (from the same game) that killed the mutant with the provided ID.
+     */
     public static int getKillingTestIdForMutant(int mutantId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM targetexecutions",
-                "WHERE Target = ?",
-                "  AND Status != ?",
-                "  AND Mutant_ID = ?;"
-        );
+        String query = "SELECT te.* "
+                + "FROM targetexecutions te "
+                + "JOIN mutants m on m.Mutant_ID = te.Mutant_ID "
+                + "JOIN tests t on te.Test_ID = t.Test_ID "
+                + "WHERE te.Target = ? "
+                + "  AND te.Status != ? "
+                + "  AND t.Game_ID = m.Game_ID"
+                + "  AND te.Mutant_ID = ? "
+                + "ORDER BY te.TargetExecution_ID LIMIT 1;";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
@@ -430,6 +435,9 @@ public class TestDAO {
         return Optional.ofNullable(targ).map(t -> t.testId).orElse(-1);
     }
 
+    /**
+     * Returns the first Test (from the same game) that killed the mutant with the provided ID.
+     */
     public static Test getKillingTestForMutantId(int mutantId) {
         int testId = getKillingTestIdForMutant(mutantId);
         if (testId == -1) {
@@ -439,18 +447,29 @@ public class TestDAO {
         }
     }
 
+    /**
+     * Returns the Mutants (from the same game) that got killed by the Test with the provided ID.
+     */
     public static Set<Mutant> getKilledMutantsForTestId(int testId) {
-        String query = String.join("\n",
-                "SELECT DISTINCT m.*",
-                "FROM targetexecutions te, mutants m",
-                "WHERE te.Target = ?",
-                "  AND te.Status != ?",
-                "  AND te.Test_ID = ?",
-                "  AND te.Mutant_ID = m.Mutant_ID",
-                "ORDER BY m.Mutant_ID ASC");
+        String query = "SELECT * FROM (SELECT TargetExecution_ID, "
+                + "                      te.Test_ID, "
+                + "                      m.*, "
+                + "                      RANK() over (PARTITION BY te.Mutant_ID ORDER BY TargetExecution_ID) AS ranks "
+                + "               FROM targetexecutions te "
+                + "                        JOIN mutants m on m.Mutant_ID = te.Mutant_ID "
+                + "                        JOIN tests t on te.Test_ID = t.Test_ID "
+                + "               WHERE te.Target = ? "
+                + "                 AND te.Status != ? "
+                + "                 AND t.Game_ID = m.Game_ID "
+                + "                 AND t.Game_ID = (SELECT Game_ID "
+                + "                                  FROM tests "
+                + "                                  WHERE Test_ID = ?) "
+                + "               ORDER BY Mutant_ID, TargetExecution_ID) tmp "
+                + "WHERE Test_ID = ? AND ranks = 1;";
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
                 DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
+                DatabaseValue.of(testId),
                 DatabaseValue.of(testId)
         };
         final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
