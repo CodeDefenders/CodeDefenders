@@ -22,10 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.codedefenders.game.GameClass;
@@ -114,6 +112,7 @@ public class LineCoverageGenerator {
             }
         }
 
+        /*
         final Set<Integer> linesToAdd = new HashSet<>();
         // If there's at least one line covered, then static field initializer and compile time constants are covered
         if (!linesCovered.isEmpty()) {
@@ -137,6 +136,7 @@ public class LineCoverageGenerator {
 
         linesCovered.addAll(linesToAdd);
         linesUncovered.removeAll(linesToAdd);
+         */
 
         return new LineCoverage(linesCovered, linesUncovered);
     }
