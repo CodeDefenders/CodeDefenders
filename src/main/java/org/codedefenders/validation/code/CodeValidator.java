@@ -43,7 +43,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.util.AnalysisUtils;
+import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,6 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -333,8 +332,8 @@ public class CodeValidator {
         for (int i = 0; i < originalComments.length; i++) {
             // Somehow the mutated comments contain char(13) '\r' in addition to '\n'
             // TODO Where those come from? CodeMirror?
-            if (!originalComments[i].toString().replaceAll("\\r", "")
-                    .equals(mutatedComments[i].toString().replaceAll("\\r", ""))) {
+            if (!originalComments[i].getContent().replaceAll("\\r", "")
+                    .equals(mutatedComments[i].getContent().replaceAll("\\r", ""))) {
                 return true;
             }
         }
@@ -447,7 +446,7 @@ public class CodeValidator {
     private static Set<String> extractImportStatements(CompilationUnit cu) {
         return cu.getImports()
                 .stream()
-                .map(Node::toString)
+                .map(JavaParserUtils::unparse)
                 .collect(Collectors.toSet());
     }
 
@@ -512,7 +511,7 @@ public class CodeValidator {
     private static ValidationMessage validInsertion(String diff, CodeValidatorLevel level) {
         String stmtString = String.format("{ %s }", diff);
         final ParseResult<BlockStmt> parseResult =
-                AnalysisUtils.getDefaultParser().parseBlock(stmtString);
+                JavaParserUtils.getDefaultParser().parseBlock(stmtString);
 
         if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
             BlockStmt blockStmt = parseResult.getResult().get();
@@ -585,7 +584,7 @@ public class CodeValidator {
 
     private static CompilationUnit getCompilationUnitFromText(String code) throws ParseException, IOException {
         final ParseResult<CompilationUnit> parseResult =
-                AnalysisUtils.getDefaultParser().parse(code);
+                JavaParserUtils.getDefaultParser().parse(code);
 
         if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
             return parseResult.getResult().get();

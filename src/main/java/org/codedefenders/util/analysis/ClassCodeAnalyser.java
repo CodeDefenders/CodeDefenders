@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.Range;
-import org.codedefenders.util.AnalysisUtils;
+import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,7 @@ public class ClassCodeAnalyser {
         final CodeAnalysisResult result = new CodeAnalysisResult();
 
         final ParseResult<CompilationUnit> parseResult =
-                AnalysisUtils.getDefaultParser().parse(sourceCode);
+                JavaParserUtils.getDefaultParser().parse(sourceCode);
 
         if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
             resultVisitor.visit(parseResult.getResult().get(), result);
@@ -197,7 +197,7 @@ public class ClassCodeAnalyser {
         @Override
         public void visit(ImportDeclaration n, CodeAnalysisResult arg) {
             super.visit(n, arg);
-            String importStatement = n.toString();
+            String importStatement = JavaParserUtils.unparse(n);
             arg.imported(importStatement);
         }
 
@@ -240,7 +240,7 @@ public class ClassCodeAnalyser {
             for (VariableDeclarator v : f.getVariables()) {
                 for (int line = v.getBegin().get().line; line <= v.getEnd().get().line; line++) {
                     if (compileTimeConstant) {
-                        logger.debug("Found compile-time constant " + v);
+                        logger.debug("Found compile-time constant " + JavaParserUtils.unparse(v));
                         // compile time targets are non coverable, too
                         result.compileTimeConstant(line);
                         result.nonCoverableCode(line);

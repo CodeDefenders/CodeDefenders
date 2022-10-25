@@ -18,6 +18,7 @@
  */
 package org.codedefenders.validation.code;
 
+import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,7 +191,7 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (stmt.toString().startsWith("System.")) {
+        if (stmt.getNameAsString().startsWith("System.")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_CALL;
             isValid = false;
         }
@@ -202,7 +203,9 @@ class MutationVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
-        if (stmt.getInitializer().isPresent() && stmt.getInitializer().get().toString().startsWith("System.*")) {
+        // TODO(Marvin): what is this even checking for? an expression cannot start with "System.*"
+        if (stmt.getInitializer().isPresent()
+                && JavaParserUtils.unparse(stmt.getInitializer().get()).startsWith("System.*")) {
             this.message = ValidationMessage.MUTATION_SYSTEM_DECLARATION;
             isValid = false;
         }
