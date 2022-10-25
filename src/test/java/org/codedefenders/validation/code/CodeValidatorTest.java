@@ -144,7 +144,7 @@ public class CodeValidatorTest {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "[{index}] Validating test {0} with max {1} assertions and assertion library {2} is successful")
     @ArgumentsSource(ValidTestArgumentSource.class)
     public void testValidateTestCodeGetMessageContainsNoValidationErrors(String test, int maxNumberOfAssertions,
             AssertionLibrary assertionLibrary) {
@@ -213,7 +213,7 @@ public class CodeValidatorTest {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "[{index}] Validating test {0} with max {1} assertions and assertion library {2} results in one of {3}")
     @ArgumentsSource(InvalidTestArgumentSource.class)
     public void testValidateTestCodeGetMessageContainsValidationError(String test, int maxNumberOfAssertions,
             AssertionLibrary assertionLibrary, List<String> expectedValidationMessages) {
@@ -443,7 +443,7 @@ public class CodeValidatorTest {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "[{index}] Validating mutant {0} on level {1} results in one of {2}")
     @ArgumentsSource(MutantsArgumentSource.class)
     public void testValidateMutantGetMessage(String mutant, CodeValidatorLevel codeValidatorLevel,
             Iterable<ValidationMessage> expectedValidationMessages) {
