@@ -389,7 +389,7 @@ public class DatabaseTest {
         assertEquals(testFromDB.getGameId(), test.getGameId());
         assertEquals(testFromDB.getPlayerId(), test.getPlayerId());
 
-        LineCoverage lc = new LineCoverage();
+        LineCoverage lc = LineCoverage.empty();
         test.setLineCoverage(lc);
         test.setScore(17);
         assertTrue(test.update());
@@ -437,7 +437,7 @@ public class DatabaseTest {
                 pidDefender);
         test.setPlayerId(pidDefender);
         assumeTrue(test.insert());
-        LineCoverage lc = new LineCoverage();
+        LineCoverage lc = LineCoverage.empty();
         test.setLineCoverage(lc);
         test.setScore(17);
         assumeTrue(test.update());

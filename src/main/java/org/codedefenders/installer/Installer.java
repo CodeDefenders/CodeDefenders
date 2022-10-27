@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
@@ -49,7 +50,6 @@ import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -319,7 +319,7 @@ public class Installer {
         // This adds a jacoco.exec file to the testDir
         backend.testOriginal(cut, testDir, qualifiedName);
 
-        LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, javaFilePath);
+        LineCoverage lineCoverage = CoverageGenerator.generateOrEmpty(cut, javaFilePath);
         Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);
 
         int testId = TestDAO.storeTest(test);

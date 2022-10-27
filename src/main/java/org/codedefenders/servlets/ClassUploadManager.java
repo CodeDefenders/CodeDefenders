@@ -46,6 +46,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
@@ -58,7 +59,6 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -806,7 +806,7 @@ public class ClassUploadManager extends HttpServlet {
             }
 
             int testId;
-            final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, Paths.get(javaFilePath));
+            final LineCoverage lineCoverage = CoverageGenerator.generateOrEmpty(cut, Paths.get(javaFilePath));
             final Test test = new Test(javaFilePath, classFilePath, cutId, lineCoverage);
             try {
                 testId = TestDAO.storeTest(test);

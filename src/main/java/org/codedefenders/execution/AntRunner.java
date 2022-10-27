@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -201,7 +202,7 @@ public class AntRunner implements //
                 cut, t.getFullyQualifiedClassName(), config.isForceLocalExecution());
 
         // add coverage information
-        final LineCoverage coverage = LineCoverageGenerator.generate(cut, Paths.get(t.getJavaFile()));
+        final LineCoverage coverage = CoverageGenerator.generateOrEmpty(cut, Paths.get(t.getJavaFile()));
         t.setLineCoverage(coverage);
         t.update();
 
