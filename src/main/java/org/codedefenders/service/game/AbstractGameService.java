@@ -244,4 +244,14 @@ public abstract class AbstractGameService implements IGameService {
 
         return updated;
     }
+
+    @Override
+    public boolean startGame(AbstractGame game) {
+        if (game.getState() == GameState.CREATED) {
+            game.setState(GameState.ACTIVE);
+            return game.update();
+        } else {
+            return false;
+        }
+    }
 }

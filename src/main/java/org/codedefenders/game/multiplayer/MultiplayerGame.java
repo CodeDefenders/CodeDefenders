@@ -340,14 +340,6 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     @Override
-    public void startGame() {
-        if (getState() == GameState.CREATED) {
-            setState(GameState.ACTIVE);
-            GameDAO.storeStartTime(this.id);
-        }
-    }
-
-    @Override
     public boolean insert() {
         try {
             this.id = MultiplayerGameDAO.storeMultiplayerGame(this);

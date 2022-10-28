@@ -27,6 +27,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.Before;
@@ -97,8 +98,9 @@ public class AdminCreateGamesBeanTest {
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);
         EventDAO eventDAO = PowerMockito.mock(EventDAO.class);
         userRepo = PowerMockito.mock(UserRepository.class);
+        GameService gameService = PowerMockito.mock(GameService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo);
+        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 

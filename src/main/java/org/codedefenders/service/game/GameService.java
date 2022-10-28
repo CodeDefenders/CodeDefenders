@@ -154,6 +154,16 @@ public class GameService implements IGameService {
         return false;
     }
 
+    @Override
+    public boolean startGame(AbstractGame game) {
+        IGameService gameService = getGameServiceForGame(game);
+        if (gameService != null) {
+            return gameService.startGame(game);
+        } else {
+            return false;
+        }
+    }
+
     /**
      * Fetches and closes all expired multiplayer and melee games.
      *

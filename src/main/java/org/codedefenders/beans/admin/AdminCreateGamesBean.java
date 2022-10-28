@@ -36,6 +36,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
@@ -73,13 +74,17 @@ public class AdminCreateGamesBean implements Serializable {
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
 
+    private final GameService gameService;
+
     @Inject
-    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils, EventDAO eventDAO, UserRepository userRepo) {
+    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils,
+                                EventDAO eventDAO, UserRepository userRepo, GameService gameService) {
         this.login = login;
         this.messages = messages;
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
+        this.gameService = gameService;
     }
 
     public Object getSynchronizer() {
@@ -716,8 +721,7 @@ public class AdminCreateGamesBean implements Serializable {
 
         /* Start game if configured to. */
         if (gameSettings.isStartGame()) {
-            game.startGame();
-            game.update();
+            gameService.startGame(game);
         }
 
         return true;

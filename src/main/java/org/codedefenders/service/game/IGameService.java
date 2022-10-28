@@ -56,4 +56,13 @@ public interface IGameService {
      * @return {@code true} if the game was successfully closed, {@code false} otherwise.
      */
     boolean closeGame(AbstractGame game);
+
+    /**
+     * Starts a game.
+     * Note that this method may persist the games other attributes in the database.
+     *
+     * @param game The game to start.
+     * @return {@code true} if the game was successfully started, {@code false} otherwise.
+     */
+    boolean startGame(AbstractGame game);
 }

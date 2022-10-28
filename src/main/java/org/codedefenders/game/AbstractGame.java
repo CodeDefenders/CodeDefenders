@@ -125,12 +125,6 @@ public abstract class AbstractGame {
         state = s;
     }
 
-    public void startGame() {
-        if (getState() == GameState.CREATED) {
-            setState(GameState.ACTIVE);
-        }
-    }
-
     public GameLevel getLevel() {
         return this.level;
     }

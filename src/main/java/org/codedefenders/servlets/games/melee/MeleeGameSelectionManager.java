@@ -317,8 +317,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         if (game.getState() == GameState.CREATED) {
             logger.info("Starting melee game {} (Setting state to ACTIVE)", gameId);
-            game.startGame();
-            game.update();
+            gameService.startGame(game);
         }
 
         /*
