@@ -44,9 +44,9 @@ public class MeleeGameService extends AbstractGameService {
     private final ScoreCalculator scoreCalculator;
 
     @Inject
-    public MeleeGameService(EventDAO eventDAO) {
+    public MeleeGameService(ScoreCalculator scoreCalculator) {
         // create new instance instead of using injection, as games can be closed outside a request context
-        this.scoreCalculator = createNewScoreCalculator(eventDAO);
+        this.scoreCalculator = scoreCalculator;
     }
 
     @Override
@@ -101,10 +101,5 @@ public class MeleeGameService extends AbstractGameService {
             scoreCalculator.storeScoresToDB(game.getId());
         }
         return closed;
-    }
-
-    private ScoreCalculator createNewScoreCalculator(EventDAO eventDAO) {
-        ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
-        return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO));
     }
 }

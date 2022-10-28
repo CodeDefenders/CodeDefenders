@@ -235,14 +235,12 @@ public abstract class AbstractGameService implements IGameService {
         game.setState(GameState.FINISHED);
         boolean updated = game.update();
 
-        if (!updated) {
-            return false;
+        if (updated) {
+            GameStoppedEvent gse = new GameStoppedEvent();
+            gse.setGameId(game.getId());
+            notificationService.post(gse);
         }
 
-        GameStoppedEvent gse = new GameStoppedEvent();
-        gse.setGameId(game.getId());
-        notificationService.post(gse);
-
-        return true;
+        return updated;
     }
 }

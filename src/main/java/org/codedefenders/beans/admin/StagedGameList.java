@@ -428,7 +428,7 @@ public class StagedGameList implements Serializable {
          * @param duration The game duration in minutes
          * @return Info about the boundaries of the duration if clamping was necessary.
          */
-        public Optional<String> setGameDurationMinutes(final Integer duration) {
+        public Optional<String> setGameDurationMinutes(final int duration) {
             final int maxDuration = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
             final int minDuration = 1;
