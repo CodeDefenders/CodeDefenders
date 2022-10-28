@@ -230,6 +230,7 @@ public abstract class AbstractGameService implements IGameService {
         return result;
     }
 
+    // Todo: only receive the game-Id as parameter and do not update the whole game
     @Override
     public boolean closeGame(AbstractGame game) {
         game.setState(GameState.FINISHED);
