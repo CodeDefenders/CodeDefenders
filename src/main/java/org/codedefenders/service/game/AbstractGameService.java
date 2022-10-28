@@ -43,6 +43,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
@@ -245,11 +246,20 @@ public abstract class AbstractGameService implements IGameService {
         return updated;
     }
 
+    // Todo: only receive the game-Id as parameter and do not update the whole game
     @Override
     public boolean startGame(AbstractGame game) {
         if (game.getState() == GameState.CREATED) {
             game.setState(GameState.ACTIVE);
-            return game.update();
+            boolean updated = game.update();
+
+            if (updated) {
+                GameStartedEvent gse = new GameStartedEvent();
+                gse.setGameId(game.getId());
+                notificationService.post(gse);
+            }
+
+            return updated;
         } else {
             return false;
         }
