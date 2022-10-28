@@ -620,26 +620,32 @@ public class AdminCreateGamesBean implements Serializable {
         /* Create the game. */
         AbstractGame game;
         if (gameSettings.getGameType() == MULTIPLAYER) {
-            game = new MultiplayerGame.Builder(gameSettings.getCut().getId(),
-                    login.getUserId(),
-                    gameSettings.getMaxAssertionsPerTest())
+            game = new MultiplayerGame.Builder(
+                        gameSettings.getCut().getId(),
+                        login.getUserId(),
+                        gameSettings.getMaxAssertionsPerTest()
+                    )
                     .cut(gameSettings.getCut())
                     .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
                     .chatEnabled(gameSettings.isChatEnabled())
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
+                    .gameDurationMinutes(gameSettings.getGameDurationMinutes())
                     .build();
         } else if (gameSettings.getGameType() == MELEE) {
-            game = new MeleeGame.Builder(gameSettings.getCut().getId(),
-                    login.getUserId(),
-                    gameSettings.getMaxAssertionsPerTest())
+            game = new MeleeGame.Builder(
+                        gameSettings.getCut().getId(),
+                        login.getUserId(),
+                        gameSettings.getMaxAssertionsPerTest()
+                    )
                     .cut(gameSettings.getCut())
                     .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
                     .chatEnabled(gameSettings.isChatEnabled())
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
+                    .gameDurationMinutes(gameSettings.getGameDurationMinutes())
                     .build();
         } else {
             messages.add(format("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",
