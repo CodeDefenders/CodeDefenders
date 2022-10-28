@@ -30,7 +30,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
-import org.codedefenders.execution.GameCronJobManager;
+import org.codedefenders.cron.GameCronJobManager;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

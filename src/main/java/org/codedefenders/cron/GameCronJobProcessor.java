@@ -1,4 +1,4 @@
-package org.codedefenders.execution;
+package org.codedefenders.cron;
 
 import org.codedefenders.service.game.GameService;
 import org.slf4j.Logger;
