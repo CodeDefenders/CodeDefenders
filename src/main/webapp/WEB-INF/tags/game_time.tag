@@ -57,12 +57,13 @@
             </div>
 
             <%-- Duration Info --%>
-            <div class="row">
+            <div class="row text-center">
                 <div class="col-4 d-flex flex-column align-items-center">
                     <small>Total Duration</small>
                     <span class="time-left"
                           data-type="total"
                           data-duration="${duration}">
+                        &hellip;
                     </span>
                 </div>
                 <div class="col-4 d-flex flex-column align-items-center">
@@ -71,14 +72,16 @@
                           data-type="remaining"
                           data-duration="${duration}"
                           data-start="${startTime}">
+                        &hellip;
                     </span>
                 </div>
                 <div class="col-4 d-flex flex-column align-items-center">
-                    <small>This game will end at</small>
+                    <small>This game ${startTime == -1 ? 'would' : 'will'} end at</small>
                     <span class="time-left"
                           data-type="end"
                           data-duration="${duration}"
                           data-start="${startTime}">
+                        &hellip;
                     </span>
                 </div>
             </div>
@@ -101,6 +104,7 @@
                                   data-type="remaining"
                                   data-duration="${maxDuration}"
                                   data-start="${startTime}">
+                                &hellip;
                             </span>
                         </div>
                     </div>
@@ -140,7 +144,11 @@
                 const days = Number(inputs.days.value);
                 const hours = Number(inputs.hours.value);
                 const minutes = Number(inputs.minutes.value);
-                const elapsedMinutes = Math.round((Date.now() / 1e3 - ${startTime}) / 60);
+                const elapsedMinutes = <%-- No dynamic calculation needed if the game isn't started yet. --%>
+                    <c:choose>
+                        <c:when test="${startTime == -1}">0</c:when>
+                        <c:otherwise>Math.round((Date.now() / 1e3 - ${startTime}) / 60)</c:otherwise>
+                    </c:choose>;
                 const total = ((days * 24) + hours) * 60 + minutes + elapsedMinutes;
 
                 totalInput.value = total;

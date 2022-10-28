@@ -19,7 +19,8 @@ class GameTimeManager {
      * @returns {boolean} whether the elements needs to be updated periodically
      */
     needsUpdating(element) {
-         return element.dataset.type === 'remaining' || element.dataset.type === 'progress';
+         return element.dataset.type === 'remaining' || element.dataset.type === 'progress'
+             || element.dataset.type === 'end' && element.dataset.start === '-1';
     }
 
     /**
@@ -35,9 +36,13 @@ class GameTimeManager {
      * @param element {HTMLElement} the element to render. Has to contain the necessary data
      */
     renderElement(element) {
-        const start = Number(element.dataset.start);
         const duration = Number(element.dataset.duration);
         const type = element.dataset.type;
+
+        let start = Number(element.dataset.start);
+        if (start === -1) {
+            start = Date.now() / 1e3;
+        }
 
         switch (type) {
             case 'total':
