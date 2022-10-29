@@ -49,7 +49,7 @@ public class EnvironmentVariableConfigurationTest {
     }
 
     /**
-     * This is taken from: https://stackoverflow.com/a/7201825/13653257
+     * This is taken from: <a href="https://stackoverflow.com/a/7201825/13653257">Stackoverflow</a>
      * TODO: Maybe instead of this bad hack we simply don't test environment variable configuration?
      *
      * @param newenv The environment variables to add to
@@ -67,9 +67,9 @@ public class EnvironmentVariableConfigurationTest {
             Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
             cienv.putAll(newenv);
         } catch (NoSuchFieldException e) {
-            Class[] classes = Collections.class.getDeclaredClasses();
+            Class<?>[] classes = Collections.class.getDeclaredClasses();
             Map<String, String> env = System.getenv();
-            for (Class cl : classes) {
+            for (Class<?> cl : classes) {
                 if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
                     Field field = cl.getDeclaredField("m");
                     field.setAccessible(true);

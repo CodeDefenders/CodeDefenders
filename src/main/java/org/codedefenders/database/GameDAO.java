@@ -101,7 +101,7 @@ public class GameDAO {
                 "ON DUPLICATE KEY UPDATE Role = ?, Active = TRUE;"
         );
 
-        DatabaseValue[] values = {
+        DatabaseValue<?>[] values = {
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId),
                 DatabaseValue.of(role.toString()),
@@ -125,7 +125,7 @@ public class GameDAO {
                 "WHERE Game_ID = ?",
                 "  AND Role = ?",
                 "  AND Active=TRUE;");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(role.toString())
         };
@@ -162,7 +162,7 @@ public class GameDAO {
                 "SET Active = FALSE",
                 "WHERE Game_ID = ?",
                 "  AND User_ID = ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId)
         };
@@ -216,7 +216,7 @@ public class GameDAO {
                 "WHERE m.ID = ?",
                 "  AND (p.User_ID=?",
                 "      AND p.Game_ID=?)");
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId),
                 DatabaseValue.of(gameId)};

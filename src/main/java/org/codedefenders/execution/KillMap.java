@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -138,8 +139,8 @@ public class KillMap {
         this.tests = new ArrayList<>(tests);
         this.mutants = new ArrayList<>(mutants);
         this.classId = classId;
-        this.indexOfTest = new TreeMap<>(Test.orderByIdDescending());
-        this.indexOfMutant = new TreeMap<>(Mutant.orderByIdDescending());
+        this.indexOfTest = new TreeMap<>(Comparator.comparing(Test::getId).reversed());
+        this.indexOfMutant = new TreeMap<>(Comparator.comparing(Mutant::getId).reversed());
 
         this.entries = entries;
         this.matrix = new KillMapEntry[tests.size()][mutants.size()];
@@ -325,7 +326,7 @@ public class KillMap {
      *
      * <p>The tests and mutants must belong to the same class (with the same class id).
      *
-     * <bf>This operation is blocking and may take a long time</bf>
+     * <p><bf>This operation is blocking and may take a long time</bf>
      *
      * @param tests   The tests used for the validation.
      * @param mutant  The mutant to validate.

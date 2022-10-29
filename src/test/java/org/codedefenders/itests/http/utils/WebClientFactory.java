@@ -24,11 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.logging.Level;
 
-import com.gargoylesoftware.htmlunit.AlertHandler;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.InteractivePage;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WaitingRefreshHandler;
@@ -39,7 +37,7 @@ public class WebClientFactory {
 
     private static int TIMEOUT = 60000;
 
-    private static Collection<WebClient> clients = new ArrayList<WebClient>();
+    private static Collection<WebClient> clients = new ArrayList<>();
 
     public static WebClient getNewWebClient() {
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
@@ -65,13 +63,7 @@ public class WebClientFactory {
         webClient.getOptions().setTimeout(TIMEOUT);
         webClient.getOptions().setPrintContentOnFailingStatusCode(false);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-        webClient.setAlertHandler(new AlertHandler() {
-
-            public void handleAlert(Page page, String message) {
-                System.err.println("[alert] " + message);
-            }
-
-        });
+        webClient.setAlertHandler((page, message) -> System.err.println("[alert] " + message));
         // Shut down HtmlUnit
         // webClient.setIncorrectnessListener(new IncorrectnessListener() {
         //

@@ -21,7 +21,6 @@ package org.codedefenders;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +44,6 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
@@ -139,11 +137,9 @@ public class AdminUserManagementIT {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -167,11 +163,7 @@ public class AdminUserManagementIT {
 
         PowerMockito.mockStatic(EmailUtils.class);
         PowerMockito.when(EmailUtils.class, "sendEmail", Mockito.anyString(), Mockito.anyString(), Mockito.anyString())
-                .thenAnswer(new Answer<Boolean>() {
-                    public Boolean answer(InvocationOnMock invocation) throws Throwable {
-                        return true;
-                    }
-                });
+                .thenAnswer((Answer<Boolean>) invocation -> true);
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);

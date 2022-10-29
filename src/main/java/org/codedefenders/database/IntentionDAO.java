@@ -58,7 +58,7 @@ public class IntentionDAO {
                 "VALUES (?,?,?);"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(testId),
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(targetLines),
@@ -89,7 +89,7 @@ public class IntentionDAO {
                 "VALUES (?,?,?);"
         );
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(mutant.getId()),
                 DatabaseValue.of(mutant.getGameId()),
                 DatabaseValue.of(intention.toString()),

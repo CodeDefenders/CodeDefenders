@@ -272,13 +272,13 @@ public class MutationTesterTest {
         int speedup = 10;
 
         scheduledExecutors.schedule(
-                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7851", defenders[0], messages, logger),
+                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7851", defenders[0], logger),
                 (0 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 2/10) Defend defenders[1]using
         // src/test/resources/replay/game232/test.7853
         scheduledExecutors.schedule(
-                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7853", defenders[1], messages, logger),
+                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7853", defenders[1], logger),
                 (45000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 3/10) Attack attackers[0]using
@@ -287,103 +287,103 @@ public class MutationTesterTest {
                 MutationTesterUtilities.attack(
                         activeGame,
                         "src/test/resources/replay/game232/mutant.12924",
-                        attackers[0], messages, logger),
+                        attackers[0], logger),
                 (46000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 4/10) Attack attackers[1]using
         // src/test/resources/replay/game232/mutant.12925
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12925", attackers[1], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12925", attackers[1], logger),
                 (50000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 5/10) Defend defenders[0]using
         // src/test/resources/replay/game232/test.7854
         scheduledExecutors.schedule(
-                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7854", defenders[0], messages, logger),
+                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7854", defenders[0], logger),
                 (58000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 6/10) Attack attackers[2] using
         // src/test/resources/replay/game232/mutant.12933
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12933", attackers[2], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12933", attackers[2], logger),
                 (66000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 7/10) Defend defenders[1]using
         // src/test/resources/replay/game232/test.7859
         scheduledExecutors.schedule(
-                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7859", defenders[1], messages, logger),
+                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7859", defenders[1], logger),
                 (82000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 8/10) Attack attackers[1]using
         // src/test/resources/replay/game232/mutant.12958
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12958", attackers[1], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12958", attackers[1], logger),
                 (119000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 9/10) Defend defenders[0]using
         // src/test/resources/replay/game232/test.7866
         scheduledExecutors.schedule(
-                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7866", defenders[0], messages, logger),
+                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7866", defenders[0], logger),
                 (157000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 10/10) Defend defenders[2]using
         // src/test/resources/replay/game232/test.7869
         scheduledExecutors.schedule(
-                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7869", defenders[2], messages, logger),
+                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7869", defenders[2], logger),
                 (192000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 11/19) Attack attackers[1] using
         // src/test/resources/replay/game232/mutant.12987
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12987", attackers[1], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12987", attackers[1], logger),
                 (198000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 12/19) Attack attackers[0] using
         // src/test/resources/replay/game232/mutant.12989
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12989", attackers[0], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12989", attackers[0], logger),
                 (202000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 13/19) Attack attackers[1] using
         // src/test/resources/replay/game232/mutant.12995
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12995", attackers[1], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12995", attackers[1], logger),
                 (214000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 14/19) Attack attackers[0] using
         // src/test/resources/replay/game232/mutant.12999
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12999", attackers[0], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.12999", attackers[0], logger),
                 (231000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 15/19) Defend defenders[0] using
         // src/test/resources/replay/game232/test.7872
         scheduledExecutors.schedule(
-                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7872", defenders[0], messages, logger),
+                MutationTesterUtilities.defend(activeGame, "src/test/resources/replay/game232/test.7872", defenders[0], logger),
                 (231000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 16/19) Attack attackers[1] using
         // src/test/resources/replay/game232/mutant.13007
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13007", attackers[1], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13007", attackers[1], logger),
                 (246000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 17/19) Attack attackers[1] using
         // src/test/resources/replay/game232/mutant.13014
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13014", attackers[1], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13014", attackers[1], logger),
                 (266000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 18/19) Attack attackers[0] using
         // src/test/resources/replay/game232/mutant.13022
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13022", attackers[0], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13022", attackers[0], logger),
                 (289000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         // 19/19) Attack attackers[1] using
         // src/test/resources/replay/game232/mutant.13025
         scheduledExecutors.schedule(
-                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13025", attackers[1], messages, logger),
+                MutationTesterUtilities.attack(activeGame, "src/test/resources/replay/game232/mutant.13025", attackers[1], logger),
                 (296000 + initialDelay) / speedup, TimeUnit.MILLISECONDS);
 
         scheduledExecutors.shutdown();

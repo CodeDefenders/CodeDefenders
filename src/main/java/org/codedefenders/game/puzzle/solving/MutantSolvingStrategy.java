@@ -18,6 +18,8 @@
  */
 package org.codedefenders.game.puzzle.solving;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.puzzle.PuzzleGame;
 
@@ -38,8 +40,9 @@ public interface MutantSolvingStrategy {
             return null;
         }
         try {
-            return ((MutantSolvingStrategy) Types.valueOf(name).clazz.newInstance());
-        } catch (IllegalArgumentException | IllegalAccessException | InstantiationException ignored) {
+            return ((MutantSolvingStrategy) Types.valueOf(name).clazz.getDeclaredConstructor().newInstance());
+        } catch (IllegalArgumentException | IllegalAccessException | InstantiationException | NoSuchMethodException
+                 | InvocationTargetException ignored) {
             // ignored
         }
         return null;
@@ -48,10 +51,10 @@ public interface MutantSolvingStrategy {
     enum Types {
         SURVIVED_ALL_MUTANTS(SurvivedAllTestsSolvingStrategy.class, "Mutant survived all tests.");
 
-        Class clazz;
-        String description;
+        final Class<?> clazz;
+        final String description;
 
-        Types(Class clazz, String description) {
+        Types(Class<?> clazz, String description) {
             this.clazz = clazz;
             this.description = description;
         }

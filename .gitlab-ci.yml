@@ -173,8 +173,6 @@ spotbugs-sast:
   needs:
     - build
   variables:
-    # Pin Spotbugs Analyzer version, to work around https://gitlab.com/gitlab-org/gitlab/-/issues/341057
-    SAST_ANALYZER_IMAGE: 'registry.gitlab.com/gitlab-org/security-products/analyzers/spotbugs:2.28.4'
     # We target Java 11 (non default)
     SAST_JAVA_VERSION: 11
     # We already have a compiled version of the project, no need to recompile it
@@ -212,7 +210,7 @@ secret_detection:
     # Overwrite rules so job is executed even if $SAST_DISABLED is set
     - when: always
 
-eslint-sast:
+semgrep-sast:
   stage: test
   needs: [ ]
   cache: [ ]

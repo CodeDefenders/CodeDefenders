@@ -280,7 +280,7 @@ public class Mutant implements Serializable {
         String query = "UPDATE mutants SET Points = Points + ? WHERE Mutant_ID=? AND Alive=1;";
         Connection conn = DB.getConnection();
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
+        DatabaseValue<?>[] valueList = new DatabaseValue[]{
                 DatabaseValue.of(score), DatabaseValue.of(id)
         };
 
@@ -314,7 +314,7 @@ public class Mutant implements Serializable {
             query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
         }
 
-        DatabaseValue[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(equivalent.name()),
                 DatabaseValue.of(alive),
                 DatabaseValue.of(roundKilled),
@@ -382,13 +382,9 @@ public class Mutant implements Serializable {
         List<String> sutLines = FileUtils.readLines(sourceFile.toPath());
         List<String> mutantLines = FileUtils.readLines(mutantFile.toPath());
 
-        for (int l = 0; l < sutLines.size(); l++) {
-            sutLines.set(l, sutLines.get(l).replaceAll(regex, ""));
-        }
+        sutLines.replaceAll(s -> s.replaceAll(regex, ""));
 
-        for (int l = 0; l < mutantLines.size(); l++) {
-            mutantLines.set(l, mutantLines.get(l).replaceAll(regex, ""));
-        }
+        mutantLines.replaceAll(s -> s.replaceAll(regex, ""));
 
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
@@ -580,39 +576,6 @@ public class Mutant implements Serializable {
                 .append(getMd5())
                 .append(classFile)
                 .toHashCode();
-    }
-
-    /**
-     * This comparators place first mutants that modify lines at the top of the file.
-     */
-    public static Comparator<Mutant> sortByLineNumberAscending() {
-        return (o1, o2) -> {
-            List<Integer> lines1 = o1.getLines();
-            List<Integer> lines2 = o2.getLines();
-
-            if (lines1.isEmpty()) {
-                if (lines2.isEmpty()) {
-                    return 0;
-                } else {
-                    return -1;
-                }
-            } else if (lines2.isEmpty()) {
-                return 1;
-            }
-
-            return Collections.min(lines1) - Collections.min(lines2);
-        };
-    }
-
-    // TODO Ideally this should have a timestamp ... we use the ID instead
-    // First created appears first
-    public static Comparator<Mutant> orderByIdAscending() {
-        return (o1, o2) -> o1.id - o2.id;
-    }
-
-    // Last created appears first
-    public static Comparator<Mutant> orderByIdDescending() {
-        return (o1, o2) -> o2.id - o1.id;
     }
 
     public void setLines(List<Integer> mutatedLines) {

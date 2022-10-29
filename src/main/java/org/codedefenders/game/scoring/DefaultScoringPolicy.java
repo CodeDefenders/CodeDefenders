@@ -18,7 +18,6 @@
  */
 package org.codedefenders.game.scoring;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -52,13 +51,13 @@ public class DefaultScoringPolicy implements IScoringPolicy {
     // TODO Convert this to PlayerScore so we can keep track of won/lost equivalence
     // duels !
     // TestID, Score
-    private Map<Integer, Integer> testsScore = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> testsScore = new HashMap<>();
     // MutantID, Score
-    private Map<Integer, Integer> mutantsScore = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> mutantsScore = new HashMap<>();
     // PlayerID, PointsForWinningDuels
-    private Map<Integer, Integer> duelsScore = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> duelsScore = new HashMap<>();
     // MutantID, PlayerClaimingEquivalence
-    private Map<Integer, Integer> flaggedMutants = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> flaggedMutants = new HashMap<>();
 
     public DefaultScoringPolicy(EventDAO eventDAO) {
         this.eventDAO = eventDAO;
@@ -69,12 +68,7 @@ public class DefaultScoringPolicy implements IScoringPolicy {
         // Retrieve the event log
         List<Event> eventLog = eventDAO.getEventsForGame(gameId);
         // Sort by Timestamp
-        Collections.sort(eventLog, new Comparator<Event>() {
-            @Override
-            public int compare(Event o1, Event o2) {
-                return o1.getTimestamp().compareTo(o2.getTimestamp());
-            }
-        });
+        eventLog.sort(Comparator.comparing(Event::getTimestamp));
         // Reset Old State
         testsScore.clear();
         mutantsScore.clear();
@@ -156,6 +150,8 @@ public class DefaultScoringPolicy implements IScoringPolicy {
                         mutantScore = mutantScore + 1;
                         mutantsScore.put(mutantId, mutantScore);
                         break;
+                    default:
+                        // Ignore other events
 
                 }
             }

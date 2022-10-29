@@ -154,7 +154,6 @@ public class ConnectionFactory {
     }
 
     /**
-     * @param maxTotalConnections
      * @deprecated Set this via the configuration
      */
     @Deprecated
@@ -162,7 +161,6 @@ public class ConnectionFactory {
     }
 
     /**
-     * @param parseInt
      * @deprecated Set this via the configuration
      */
     @Deprecated

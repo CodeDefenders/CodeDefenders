@@ -26,7 +26,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -59,7 +58,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -130,12 +128,9 @@ public class CoverageTest {
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
-        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-            @Override
-            public Connection answer(InvocationOnMock invocation) throws SQLException {
-                // Return a new connection from the rule instead
-                return db.getConnection();
-            }
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
+            // Return a new connection from the rule instead
+            return db.getConnection();
         });
     }
 
@@ -169,7 +164,7 @@ public class CoverageTest {
     @Test
     public void testTestCoverInnerStaticClass() throws FileNotFoundException, IOException {
         // MOVE THIS CODE TO BEFORE OF FACTORY METHOD
-        ArrayList<String> messages = new ArrayList<String>();
+        ArrayList<String> messages = new ArrayList<>();
         // Create the users
         UserEntity observer = new UserEntity("observer", UserEntity.encodePassword("password"), "demo@observer.com");
         observer.insert();
@@ -227,7 +222,7 @@ public class CoverageTest {
         Mutant mutant = gameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
                 attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
-        mutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
+        mutationTester.runAllTestsOnMutant(multiplayerGame, mutant);
         // Probably I need to store the mutant ?
         multiplayerGame.update();
 
@@ -237,11 +232,11 @@ public class CoverageTest {
         String testText = new String(Files.readAllBytes(new File("src/test/resources/itests/tests/ClassWithPrivateInnerClass/TestClassWithPrivateInnerClass.java").toPath()), Charset.defaultCharset());
         org.codedefenders.game.Test newTest = gameManagingUtils.createTest(multiplayerGame.getId(), multiplayerGame.getClassId(),
                 testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
-        mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest, messages);
+        String message = mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest);
         multiplayerGame.update();
         //
-        System.out.println("MutationTesterTest.defend() " + defender.getId() + ": " + messages.get(messages.size() - 1));
-        Assert.assertEquals(Constants.TEST_KILLED_LAST_MESSAGE, messages.get(messages.size() - 1));
+        System.out.println("MutationTesterTest.defend() " + defender.getId() + ": " + message);
+        Assert.assertEquals(Constants.TEST_KILLED_LAST_MESSAGE, message);
 
     }
 }

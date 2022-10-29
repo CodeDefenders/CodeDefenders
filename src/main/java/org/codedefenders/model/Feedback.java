@@ -63,8 +63,8 @@ public class Feedback {
                 Type.GAME_ENGAGING
         );
 
-        String displayName;
-        String description;
+        final String displayName;
+        final String description;
 
         Type(String displayName, String description) {
             this.displayName = displayName;

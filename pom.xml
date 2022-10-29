@@ -330,7 +330,7 @@
 						</goals>
 						<phase>generate-resources</phase>
 						<configuration>
-							<nodeVersion>v16.14.2</nodeVersion>
+							<nodeVersion>v16.17.1</nodeVersion>
 						</configuration>
 					</execution>
 
@@ -369,12 +369,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
-			</plugin>
-
-			<!-- Execute the installer within maven without the need of packaging a jar for it -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
 			</plugin>
 
 			<plugin>
@@ -542,15 +536,6 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 					<version>3.2.0</version>
-				</plugin>
-
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>exec-maven-plugin</artifactId>
-					<version>3.0.0</version>
-					<configuration>
-						<mainClass>org.codedefenders.installer.Installer</mainClass>
-					</configuration>
 				</plugin>
 
 				<plugin>
@@ -827,12 +812,6 @@
 			<artifactId>weld-servlet-core</artifactId>
 			<version>3.1.8.Final</version>
 		</dependency>
-		<!-- Not sure if this creates a conflict -->
-		<dependency>
-			<groupId>org.jboss.weld.se</groupId>
-			<artifactId>weld-se-core</artifactId>
-			<version>3.1.8.Final</version>
-		</dependency>
 
 		<!-- Logging -->
 		<dependency>
@@ -882,13 +861,6 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.29</version>
-		</dependency>
-
-		<!-- Installer -->
-		<dependency>
-			<groupId>com.lexicalscope.jewelcli</groupId>
-			<artifactId>jewelcli</artifactId>
-			<version>0.8.9</version>
 		</dependency>
 
 		<!-- Server side validation -->

@@ -90,7 +90,7 @@ public class CreatePreparedStatementIT {
                     "AND User_ID IN (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" // 19 ?'s in this line
             );
 
-            final DatabaseValue[] databaseValues = new DatabaseValue[4 + 19];
+            final DatabaseValue<?>[] databaseValues = new DatabaseValue[4 + 19];
             final String name = null;
             databaseValues[0] = DatabaseValue.of(name);
             databaseValues[1] = DatabaseValue.of("number1");

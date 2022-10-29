@@ -142,13 +142,13 @@ public class Test {
         String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
         Connection conn = DB.getConnection();
 
-        DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
+        DatabaseValue<?>[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
 
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         boolean incremented = DB.executeUpdate(stmt, conn);
 
-        logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
+        logger.info("Increment score for {} by {}. Update? {} ", this, score, incremented);
     }
 
     @Deprecated
@@ -194,7 +194,7 @@ public class Test {
         String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
         Connection conn = DB.getConnection();
 
-        DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
+        DatabaseValue<?>[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
 
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
@@ -203,7 +203,7 @@ public class Test {
         // Eventually update the kill count from the DB
         mutantsKilled = TestDAO.getTestById(getId()).getMutantsKilled();
 
-        logger.info("Test {} new killcount is {}. Was updated ? {} ", toString(), mutantsKilled, updated);
+        logger.info("Test {} new killcount is {}. Was updated ? {} ", this, mutantsKilled, updated);
     }
 
     public boolean isMutantCovered(Mutant mutant) {
@@ -212,7 +212,7 @@ public class Test {
 
     public Set<Mutant> getCoveredMutants(List<Mutant> mutants) {
         List<Integer> coverage = lineCoverage.getLinesCovered();
-        Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
+        Set<Mutant> coveredMutants = new TreeSet<>(Comparator.comparing(Mutant::getId));
 
         for (Mutant m : mutants) {
             if (CollectionUtils.containsAny(coverage, m.getLines())) {
@@ -308,16 +308,6 @@ public class Test {
 
     public void setLineCoverage(LineCoverage lineCoverage) {
         this.lineCoverage = lineCoverage;
-    }
-
-    // First created appears first
-    public static Comparator<Test> orderByIdAscending() {
-        return (o1, o2) -> o1.id - o2.id;
-    }
-
-    // Last created appears first
-    public static Comparator<Test> orderByIdDescending() {
-        return (o1, o2) -> o2.id - o1.id;
     }
 
     @Override

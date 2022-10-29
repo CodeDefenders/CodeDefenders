@@ -23,9 +23,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -72,6 +77,7 @@ import static org.codedefenders.util.Constants.TESTS_DIR;
 // TODO Probably a better name for those class and interface would not harm..
 @RequestScoped
 public class GameManagingUtils implements IGameManagingUtils {
+    private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
     @Inject
     private ClassCompilerService classCompiler;
@@ -87,8 +93,6 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     @Inject
     private INotificationService notificationService;
-
-    private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
     /**
      * {@inheritDoc}
@@ -323,5 +327,55 @@ public class GameManagingUtils implements IGameManagingUtils {
         int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.getId());
         return game.getMutants().stream()
                 .anyMatch(mutant -> mutant.getPlayerId() == dummyDefenderPlayerId);
+    }
+
+    /**
+     * Returns the line numbers mentioned in the error message of the compiler.
+     *
+     * @param compilerOutput The compiler output.
+     * @return A list of (1-indexed) line numbers.
+     */
+    public static List<Integer> extractErrorLines(String compilerOutput) {
+        Set<Integer> errorLines = new TreeSet<>(); // Use TreeSet for the ordering
+        Pattern p = Pattern.compile("\\[javac].*\\.java:([0-9]+): error:.*");
+        for (String line : compilerOutput.split("\n")) {
+            Matcher m = p.matcher(line);
+            if (m.find()) {
+                // TODO may be not robust
+                errorLines.add(Integer.parseInt(m.group(1)));
+            }
+        }
+        return new ArrayList<>(errorLines);
+    }
+
+    /**
+     * Add links that points to line for errors. Not sure that invoking a JS
+     * function suing a link in this way is 100% safe ! XXX Consider to move the
+     * decoration utility, and possibly the sanitize methods to some other
+     * components.
+     */
+    public static String decorateWithLinksToCode(String compilerOutput, boolean forTest, boolean forMutant) {
+        String editor = "";
+        if (forTest) {
+            editor = "testEditor";
+        } else if (forMutant) {
+            editor = "mutantEditor";
+        }
+
+        StringBuilder decorated = new StringBuilder();
+        Pattern p = Pattern.compile("\\[javac].*\\.java:([0-9]+): error:.*");
+        for (String line : compilerOutput.split("\n")) {
+            Matcher m = p.matcher(line);
+            if (m.find()) {
+                // Replace the entire line with a link to the source code
+                String replacedLine = String.format(
+                        "<a onclick=\"import('./js/codedefenders_main.mjs').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
+                        editor, m.group(1), line);
+                decorated.append(replacedLine).append("\n");
+            } else {
+                decorated.append(line).append("\n");
+            }
+        }
+        return decorated.toString();
     }
 }

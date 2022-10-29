@@ -41,13 +41,11 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.gargoylesoftware.htmlunit.AlertHandler;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.HttpMethod;
 import com.gargoylesoftware.htmlunit.InteractivePage;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.SilentCssErrorHandler;
 import com.gargoylesoftware.htmlunit.WaitingRefreshHandler;
@@ -94,7 +92,7 @@ public class DoubleEquivalenceSubmissionTest {
     private static int TIMEOUT = 10000;
 
     static class WebClientFactory {
-        private static Collection<WebClient> clients = new ArrayList<WebClient>();
+        private static Collection<WebClient> clients = new ArrayList<>();
 
         public static WebClient getNewWebClient() {
             java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
@@ -120,13 +118,7 @@ public class DoubleEquivalenceSubmissionTest {
             webClient.getOptions().setTimeout(TIMEOUT);
             webClient.getOptions().setPrintContentOnFailingStatusCode(false);
             webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-            webClient.setAlertHandler(new AlertHandler() {
-
-                public void handleAlert(Page page, String message) {
-                    System.err.println("[alert] " + message);
-                }
-
-            });
+            webClient.setAlertHandler((page, message) -> System.err.println("[alert] " + message));
             // Shut down HtmlUnit
             // webClient.setIncorrectnessListener(new IncorrectnessListener() {
             //
@@ -198,7 +190,7 @@ public class DoubleEquivalenceSubmissionTest {
 
         public int createNewGame() throws FailingHttpStatusCodeException, IOException {
             // List the games already there
-            Set<String> myGames = new HashSet<String>();
+            Set<String> myGames = new HashSet<>();
             //
             HtmlPage gameUsers = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
             for (HtmlAnchor a : gameUsers.getAnchors()) {
@@ -232,32 +224,32 @@ public class DoubleEquivalenceSubmissionTest {
             // There's should be only one
 
             //
-            return Integer.parseInt(newGameLink.replaceAll("multiplayer\\/games\\?gameId=", ""));
+            return Integer.parseInt(newGameLink.replaceAll("multiplayer/games\\?gameId=", ""));
 
         }
 
-        public void startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
+        public void startGame(int gameId) throws FailingHttpStatusCodeException, IOException {
 
             WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
                     HttpMethod.POST);
             // // Then we set the request parameters
             startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[]{
-                    new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameID)}));
+                    new NameValuePair("formType", "startGame"), new NameValuePair("gameId", "" + gameId)}));
             // Finally, we can get the page
             // Not sure why this returns TextPage and not HtmlPage
             browser.getPage(startGameRequest);
 
         }
 
-        public void joinOpenGame(int gameID, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
+        public void joinOpenGame(int gameId, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
             HtmlPage openGames = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
 
-            // Really we can simply click on that link once we know the gameID,
+            // Really we can simply click on that link once we know the gameId,
             // no need to go to openGame page
             HtmlAnchor joinLink = null;
             for (HtmlAnchor a : openGames.getAnchors()) {
                 if (a.getHrefAttribute().contains(
-                        Paths.BATTLEGROUND_GAME + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&gameId=" + gameID)) {
+                        Paths.BATTLEGROUND_GAME + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&gameId=" + gameId)) {
                     joinLink = a;
                     break;
                 }
@@ -435,27 +427,20 @@ public class DoubleEquivalenceSubmissionTest {
         //
         // Claim the equivalence "at the same time" using threads/runnables
         ExecutorService executorService = Executors.newFixedThreadPool(2);
-        executorService.submit(new Runnable() {
-
-            @Override
-            public void run() {
-                try {
-                    defender.claimEquivalenceOnLine(newGameId, 9);
-                    System.out.println("Defender claim equivalence in game " + newGameId);
-                } catch (FailingHttpStatusCodeException | IOException e) {
-                    e.printStackTrace();
-                }
+        executorService.submit(() -> {
+            try {
+                defender.claimEquivalenceOnLine(newGameId, 9);
+                System.out.println("Defender claim equivalence in game " + newGameId);
+            } catch (FailingHttpStatusCodeException | IOException e) {
+                e.printStackTrace();
             }
         });
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    defender2.claimEquivalenceOnLine(newGameId, 9);
-                    System.out.println("Defender 2 claim equivalence in game " + newGameId);
-                } catch (FailingHttpStatusCodeException | IOException e) {
-                    e.printStackTrace();
-                }
+        executorService.submit(() -> {
+            try {
+                defender2.claimEquivalenceOnLine(newGameId, 9);
+                System.out.println("Defender 2 claim equivalence in game " + newGameId);
+            } catch (FailingHttpStatusCodeException | IOException e) {
+                e.printStackTrace();
             }
         });
         executorService.shutdown();
