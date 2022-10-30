@@ -14,6 +14,7 @@
 	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
 	<property name="ai.cuts.dir" value="${codedef.home}/ai/cuts"/>
 	<property name="cuts.deps" value="${codedef.home}/deps"/>
+	<property name="lib.dir" value="${codedef.home}/lib"/>
 	<property name="java.target.version" value="1.8"/>
 
 	<!-- JaCoCo -->
@@ -39,22 +40,22 @@
 
 	<path id="nocut.cp">
 		<!-- JUnit -->
-		<pathelement path="${codedef.home}/lib/junit-${junit4.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/junit-jupiter-api-${junit5.version}.jar"/>
+		<pathelement path="${lib.dir}/junit-${junit4.version}.jar"/>
+		<pathelement path="${lib.dir}/junit-jupiter-api-${junit5.version}.jar"/>
 
 		<!-- Mockito -->
-		<pathelement path="${codedef.home}/lib/mockito-core-${mockito.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/objenesis-${objenesis.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/byte-buddy-${bytebuddy.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/byte-buddy-agent-${bytebuddy.version}.jar"/>
+		<pathelement path="${lib.dir}/mockito-core-${mockito.version}.jar"/>
+		<pathelement path="${lib.dir}/objenesis-${objenesis.version}.jar"/>
+		<pathelement path="${lib.dir}/byte-buddy-${bytebuddy.version}.jar"/>
+		<pathelement path="${lib.dir}/byte-buddy-agent-${bytebuddy.version}.jar"/>
 
 		<!-- Hamcrest -->
-		<pathelement path="${codedef.home}/lib/hamcrest-${hamcrest.version}.jar"/>
+		<pathelement path="${lib.dir}/hamcrest-${hamcrest.version}.jar"/>
 
 		<!-- Google Truth -->
-		<pathelement path="${codedef.home}/lib/truth-${truth.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/truth-java8-extension-${truth.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/guava-${guava.version}.jar"/>
+		<pathelement path="${lib.dir}/truth-${truth.version}.jar"/>
+		<pathelement path="${lib.dir}/truth-java8-extension-${truth.version}.jar"/>
+		<pathelement path="${lib.dir}/guava-${guava.version}.jar"/>
 
 		<!-- CUT and deps -->
 		<pathelement path="${cuts.deps}"/>
@@ -62,28 +63,28 @@
 
 	<path id="test.cp">
 		<!-- JaCoCo -->
-		<pathelement path="${codedef.home}/lib/org.jacoco.core-${jacoco.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.agent-${jacoco.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.report-${jacoco.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.ant-${jacoco.version}.jar"/>
+		<pathelement path="${lib.dir}/org.jacoco.core-${jacoco.version}.jar"/>
+		<pathelement path="${lib.dir}/org.jacoco.agent-${jacoco.version}.jar"/>
+		<pathelement path="${lib.dir}/org.jacoco.report-${jacoco.version}.jar"/>
+		<pathelement path="${lib.dir}/org.jacoco.ant-${jacoco.version}.jar"/>
 
 		<!-- JUnit -->
-		<pathelement path="${codedef.home}/lib/junit-${junit4.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/junit-jupiter-api-${junit5.version}.jar"/>
+		<pathelement path="${lib.dir}/junit-${junit4.version}.jar"/>
+		<pathelement path="${lib.dir}/junit-jupiter-api-${junit5.version}.jar"/>
 
 		<!-- Mockito -->
-		<pathelement path="${codedef.home}/lib/mockito-core-${mockito.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/objenesis-${objenesis.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/byte-buddy-${bytebuddy.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/byte-buddy-agent-${bytebuddy.version}.jar"/>
+		<pathelement path="${lib.dir}/mockito-core-${mockito.version}.jar"/>
+		<pathelement path="${lib.dir}/objenesis-${objenesis.version}.jar"/>
+		<pathelement path="${lib.dir}/byte-buddy-${bytebuddy.version}.jar"/>
+		<pathelement path="${lib.dir}/byte-buddy-agent-${bytebuddy.version}.jar"/>
 
 		<!-- Hamcrest -->
-		<pathelement path="${codedef.home}/lib/hamcrest-${hamcrest.version}.jar"/>
+		<pathelement path="${lib.dir}/hamcrest-${hamcrest.version}.jar"/>
 
 		<!-- Google Truth -->
-		<pathelement path="${codedef.home}/lib/truth-${truth.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/truth-java8-extension-${truth.version}.jar"/>
-		<pathelement path="${codedef.home}/lib/guava-${guava.version}.jar"/>
+		<pathelement path="${lib.dir}/truth-${truth.version}.jar"/>
+		<pathelement path="${lib.dir}/truth-java8-extension-${truth.version}.jar"/>
+		<pathelement path="${lib.dir}/guava-${guava.version}.jar"/>
 
 		<!-- CUT and deps -->
 		<pathelement path="${cut.dir}"/>
@@ -91,7 +92,7 @@
 	</path>
 
 	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml"
-			 classpath="${codedef.home}/lib/org.jacoco.ant-0.8.6.jar">
+			 classpath="${lib.dir}/org.jacoco.ant-${jacoco.version}.jar">
 		<classpath refid="test.cp"/>
 	</taskdef>
 
