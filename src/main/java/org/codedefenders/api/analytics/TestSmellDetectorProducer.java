@@ -24,15 +24,16 @@ import java.util.List;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 
-import org.codedefenders.testsmells.ConfigurableEagerTest;
-
-import testsmell.AbstractSmell;
+import testsmell.SmellFactory;
 import testsmell.TestSmellDetector;
 import testsmell.smell.AssertionRoulette;
 import testsmell.smell.DuplicateAssert;
+import testsmell.smell.EagerTest;
 import testsmell.smell.RedundantAssertion;
 import testsmell.smell.SensitiveEquality;
 import testsmell.smell.UnknownTest;
+import thresholds.DefaultThresholds;
+import thresholds.Thresholds;
 
 public class TestSmellDetectorProducer {
 
@@ -41,17 +42,25 @@ public class TestSmellDetectorProducer {
 
     // See https://stackoverflow.com/questions/2264758/resolution-of-external-3rd-party-beans-in-weld
     public @Produces @RequestScoped TestSmellDetector createTestSmellDetector() {
-        List<AbstractSmell> testSmells = new ArrayList<>();
-        testSmells.add(new AssertionRoulette());
-        testSmells.add(new DuplicateAssert());
-        testSmells.add(new RedundantAssertion());
-        testSmells.add(new SensitiveEquality());
-        testSmells.add(new UnknownTest());
+        Thresholds thresholds = new DefaultThresholds() {
+            @Override
+            public int getEagerTest() {
+                return EAGER_TEST_THRESHOLD;
+            }
+        };
+
+
+        List<SmellFactory> testSmells = new ArrayList<>();
+        testSmells.add(AssertionRoulette::new);
+        testSmells.add(DuplicateAssert::new);
+        testSmells.add(RedundantAssertion::new);
+        testSmells.add(SensitiveEquality::new);
+        testSmells.add(UnknownTest::new);
         // Those two might require some love according to #426.
         // testSmells.add(new ExceptionCatchingThrowing());
         // Disabled as per #426, waiting for #500
         // testSmells.add(new MagicNumberTest());
-        testSmells.add(new ConfigurableEagerTest(EAGER_TEST_THRESHOLD));
+        testSmells.add(EagerTest::new);
         /*
          * Those two are not mentioned on:
          * https://testsmells.github.io/pages/testsmells.html but might become
@@ -59,6 +68,8 @@ public class TestSmellDetectorProducer {
          */
         // testSmells.add(new VerboseTest());
         // testSmells.add(new DependentTest());
-        return new TestSmellDetector(testSmells);
+        TestSmellDetector detector = new TestSmellDetector(thresholds);
+        detector.setTestSmells(testSmells);
+        return detector;
     }
 }

@@ -18,9 +18,7 @@
  */
 package org.codedefenders.validation.code;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +27,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,16 +43,19 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Chunk;
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
-import com.github.javaparser.ParseProblemException;
+import com.github.javaparser.ParseResult;
+import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -68,7 +68,6 @@ import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 /**
  * This class offers static methods to validate code, primarily checking validity of tests and mutants.
@@ -250,8 +249,8 @@ public class CodeValidator {
         return !originalCU.getPackageDeclaration().equals(mutatedCU.getPackageDeclaration());
     }
 
-    private static Map<String, EnumSet<?>> extractTypeDeclaration(TypeDeclaration<?> td) {
-        Map<String, EnumSet<?>> typeData = new HashMap<>();
+    private static Map<String, NodeList<Modifier>> extractTypeDeclaration(TypeDeclaration<?> td) {
+        Map<String, NodeList<Modifier>> typeData = new HashMap<>();
         typeData.put(td.getNameAsString(), td.getModifiers());
         // Inspect if this type declares inner classes
         for (Object bd : td.getMembers()) {
@@ -267,16 +266,16 @@ public class CodeValidator {
      * Check if the mutation introduce a change to a class declaration in the mutant.
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
-        Map<String, EnumSet<?>> originalTypes = new HashMap<>();
+        Map<String, NodeList<Modifier>> originalTypes = new HashMap<>();
         for (TypeDeclaration<?> type : originalCU.getTypes()) {
             originalTypes.putAll(extractTypeDeclaration(type));
         }
-        //
-        Map<String, EnumSet<?>> mutatedTypes = new HashMap<>();
+
+        Map<String, NodeList<Modifier>> mutatedTypes = new HashMap<>();
         for (TypeDeclaration<?> type : mutatedCU.getTypes()) {
             mutatedTypes.putAll(extractTypeDeclaration(type));
         }
-        //
+
         return !originalTypes.equals(mutatedTypes);
     }
 
@@ -333,8 +332,8 @@ public class CodeValidator {
         for (int i = 0; i < originalComments.length; i++) {
             // Somehow the mutated comments contain char(13) '\r' in addition to '\n'
             // TODO Where those come from? CodeMirror?
-            if (!originalComments[i].toString().replaceAll("\\r", "")
-                    .equals(mutatedComments[i].toString().replaceAll("\\r", ""))) {
+            if (!originalComments[i].getContent().replaceAll("\\r", "")
+                    .equals(mutatedComments[i].getContent().replaceAll("\\r", ""))) {
                 return true;
             }
         }
@@ -445,10 +444,9 @@ public class CodeValidator {
     }
 
     private static Set<String> extractImportStatements(CompilationUnit cu) {
-        final PrettyPrinterConfiguration p = new PrettyPrinterConfiguration().setPrintComments(false);
         return cu.getImports()
                 .stream()
-                .map(dec -> dec.toString(p))
+                .map(JavaParserUtils::unparse)
                 .collect(Collectors.toSet());
     }
 
@@ -511,18 +509,22 @@ public class CodeValidator {
     }
 
     private static ValidationMessage validInsertion(String diff, CodeValidatorLevel level) {
-        try {
-            BlockStmt blockStmt = JavaParser.parseBlock("{ " + diff + " }");
+        String stmtString = String.format("{ %s }", diff);
+        final ParseResult<BlockStmt> parseResult =
+                JavaParserUtils.getDefaultParser().parseBlock(stmtString);
+
+        if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
+            BlockStmt blockStmt = parseResult.getResult().get();
             // TODO Should this called always and not only for checking if there's validInsertion ?
             MutationVisitor visitor = new MutationVisitor(level);
             visitor.visit(blockStmt, null);
             if (!visitor.isValid()) {
                 return visitor.getMessage();
             }
-        } catch (ParseProblemException ignored) {
-            // TODO: Why is ignoring this acceptable?
-            // Phil: I don't know, but otherwise some tests would fail, since they cannot be parsed.
+        } else {
+            // Ignore if we can't parse the diff. It shouldn't compile, so it will fail in the next step.
         }
+
         // remove whitespaces
         String diff2 = diff.replaceAll("\\s+", "");
 
@@ -581,12 +583,17 @@ public class CodeValidator {
 
 
     private static CompilationUnit getCompilationUnitFromText(String code) throws ParseException, IOException {
-        try (InputStream inputStream = new ByteArrayInputStream(code.getBytes())) {
-            try {
-                return JavaParser.parse(inputStream);
-            } catch (ParseProblemException error) {
-                throw new ParseException(error.getMessage());
-            }
+        final ParseResult<CompilationUnit> parseResult =
+                JavaParserUtils.getDefaultParser().parse(code);
+
+        if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
+            return parseResult.getResult().get();
+        } else {
+            String message = parseResult.getProblems().stream()
+                    .map(Problem::getMessage)
+                    .findFirst()
+                    .orElse(null);
+            throw new ParseException(message);
         }
     }
 

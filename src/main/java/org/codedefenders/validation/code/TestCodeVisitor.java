@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.util.JavaParserUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,13 +43,12 @@ import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import static org.codedefenders.game.AssertionLibrary.GOOGLE_TRUTH;
 import static org.codedefenders.game.AssertionLibrary.HAMCREST;
@@ -156,10 +156,10 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         stmtCount++;
-        String stringStmt = stmt.toString(new PrettyPrinterConfiguration().setPrintComments(false));
+        String stmtString = JavaParserUtils.unparse(stmt);
         for (String prohibited : CodeValidator.PROHIBITED_CALLS) {
             // This might be a bit too strict... We shall use typeSolver otherwise.
-            if (stringStmt.contains(prohibited)) {
+            if (stmtString.contains(prohibited)) {
                 messages.add("Test contains a prohibited call to " + prohibited);
                 isValid = false;
                 return;
@@ -183,11 +183,11 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ForeachStmt stmt, Void args) {
+    public void visit(ForEachStmt stmt, Void args) {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -196,7 +196,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -205,7 +205,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -214,7 +214,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -223,7 +223,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -232,7 +232,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -241,7 +241,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -250,7 +250,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + stmt.toString());
+        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
         isValid = false;
     }
 
@@ -260,8 +260,9 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         stmtCount++;
-        if (stmt.toString().startsWith("System.") || stmt.toString().startsWith("Random.")) {
-            messages.add("Test contains an invalid statement: " + stmt.toString());
+        String stmtString = JavaParserUtils.unparse(stmt);
+        if (stmtString.startsWith("System.") || stmtString.startsWith("Random.")) {
+            messages.add("Test contains an invalid statement: " + stmtString);
             isValid = false;
             return;
         }
@@ -289,7 +290,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
          * TODO What if there's no assertions at all?
          */
         if ((assertionLibrary == HAMCREST || assertionLibrary == GOOGLE_TRUTH) && anyJunitAssertionMatch) {
-            messages.add("Test contains a JUnit assertion: " + stmt.toString());
+            messages.add("Test contains a JUnit assertion: " + JavaParserUtils.unparse(stmt));
             isValid = false;
             return;
         }
@@ -311,7 +312,8 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
         Optional<Expression> initializer = stmt.getInitializer();
         if (initializer.isPresent()) {
-            String initString = initializer.get().toString();
+            String initString = JavaParserUtils.unparse(initializer.get());
+            // TODO(Marvin): what is this even checking for? an expression cannot start with "System.*"
             if (initString.startsWith("System.*") || initString.startsWith("Random.*")
                     || initString.contains("Thread")) {
                 messages.add("Test contains an invalid variable declaration: " + initString);
@@ -329,7 +331,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         }
         final BinaryExpr.Operator operator = stmt.getOperator();
         if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
-            messages.add("Test contains an invalid statement: " + stmt.toString());
+            messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
             isValid = false;
             return;
         }
@@ -342,8 +344,13 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         final AssignExpr.Operator operator = stmt.getOperator();
-        if (operator != null && (Stream.of(AssignExpr.Operator.AND, AssignExpr.Operator.OR, AssignExpr.Operator.XOR)
-                .anyMatch(op -> operator == op))) {
+
+        boolean isIllegal = Stream.of(
+                    AssignExpr.Operator.BINARY_AND,
+                    AssignExpr.Operator.BINARY_OR,
+                    AssignExpr.Operator.XOR)
+                .anyMatch(op -> operator == op);
+        if (isIllegal) {
             isValid = false;
             return;
         }

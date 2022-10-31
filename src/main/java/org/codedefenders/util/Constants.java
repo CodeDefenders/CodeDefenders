@@ -19,7 +19,10 @@
 package org.codedefenders.util;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.codedefenders.configuration.Configuration;
 
@@ -88,20 +91,24 @@ public class Constants {
     @Deprecated
     public static final String AI_DIR = Paths.get(DATA_DIR, "ai").toString();
 
-    public static final String LIB_JUNIT = Paths.get(DATA_DIR, "lib", "junit-4.13.1.jar").toString();
-    public static final String LIB_HAMCREST = Paths.get(DATA_DIR, "lib", "hamcrest-all-1.3.jar").toString();
-    public static final String LIB_MOCKITO = Paths.get(DATA_DIR, "lib", "mockito-all-1.10.19.jar").toString();
-    public static final String LIB_GOOGLE_TRUTH = Paths.get(DATA_DIR, "lib", "truth-1.1.2.jar").toString();
-    public static final String LIB_GOOGLE_TRUTH_EXTENSION =
-            Paths.get(DATA_DIR, "lib", "truth-java8-extension-1.1.2.jar").toString();
-    public static final String LIB_GUAVA_ANDROID = Paths.get(DATA_DIR, "lib", "guava-29.0-android.jar").toString();
-
-    // TODO Is this really necessary since we set the CP using build.xml?
-    public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST
-            + File.pathSeparatorChar + Constants.LIB_MOCKITO //
-            + File.pathSeparatorChar + Constants.LIB_GOOGLE_TRUTH //
-            + File.pathSeparatorChar + Constants.LIB_GOOGLE_TRUTH_EXTENSION //
-            + File.pathSeparatorChar + Constants.LIB_GUAVA_ANDROID;
+    public static final String TEST_CLASSPATH = Stream.of(
+                    "byte-buddy-1.12.14.jar",
+                    "byte-buddy-agent-1.12.14.jar",
+                    "guava-31.1-jre.jar",
+                    "hamcrest-2.2.jar",
+                    "junit-4.13.2.jar",
+                    "junit-jupiter-api-5.9.0.jar",
+                    "mockito-core-4.8.0.jar",
+                    "objenesis-3.2.jar",
+                    "org.jacoco.agent-0.8.8.jar",
+                    "org.jacoco.ant-0.8.8.jar",
+                    "org.jacoco.core-0.8.8.jar",
+                    "org.jacoco.report-0.8.8.jar",
+                    "truth-1.1.3.jar",
+                    "truth-java8-extension-1.1.3.jar"
+            ).map(jarName -> Paths.get(DATA_DIR, "lib", jarName))
+            .map(Path::toString)
+            .collect(Collectors.joining(Character.toString(File.pathSeparatorChar)));
 
     public static final String TEST_PREFIX = "Test";
     public static final String JAVA_SOURCE_EXT = ".java";

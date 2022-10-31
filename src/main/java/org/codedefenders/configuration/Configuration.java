@@ -156,7 +156,7 @@ public class Configuration {
             if (antJavaHome != null) {
                 File javaExecutable = new File(antJavaHome, "/bin/java");
                 if (!javaExecutable.exists() || !javaExecutable.isFile()) {
-                    validationErrors.add(resolveAttributeName("javaHome") + " doesn't contain the java executable "
+                    validationErrors.add(resolveAttributeName("antJavaHome") + " doesn't contain the java executable "
                             + javaExecutable);
                 }
             }
@@ -203,10 +203,6 @@ public class Configuration {
                 } catch (ClassNotFoundException e) {
                     validationErrors.add("Could not load the MySQL driver");
                 }
-            }
-
-            if (getJavaMajorVersion() > 11) {
-                validationErrors.add("Unsupported java version! CodeDefenders needs at most Java 11");
             }
 
             /*

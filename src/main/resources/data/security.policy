@@ -85,4 +85,6 @@ grant {
   permission java.io.FilePermission "${codedef.home}/-", "write";
   permission java.util.PropertyPermission "*", "read,write";
 
+  // required for Mockito to work
+  permission java.lang.RuntimePermission "net.bytebuddy.createJavaDispatcher";
 };

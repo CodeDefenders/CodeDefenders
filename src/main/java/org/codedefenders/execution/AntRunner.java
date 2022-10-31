@@ -401,8 +401,6 @@ public class AntRunner implements //
                 env.put("JAVA_HOME", config.getClusterJavaHome());
             }
 
-            env.put("CLASSPATH", Constants.TEST_CLASSPATH);
-
             command.add("srun");
 
             // Select reservation cluster
@@ -420,8 +418,6 @@ public class AntRunner implements //
             command.add("ant");
         } else {
             logger.debug("Local Execution");
-            env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar" + File.pathSeparator + "lib/junit-4.13.1.jar"
-                    + File.pathSeparator + "lib/mockito-all-1.10.19.jar");
 
             String command_ = config.getAntHome() + "/bin/ant";
 

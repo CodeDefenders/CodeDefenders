@@ -169,7 +169,7 @@ public class GameManagingUtilsTest {
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {
-            if (smell.getHasSmell()) {
+            if (smell.hasSmell()) {
                 actualSmells.add(smell.getSmellName());
             }
         }
@@ -207,7 +207,7 @@ public class GameManagingUtilsTest {
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {
-            if (smell.getHasSmell()) {
+            if (smell.hasSmell()) {
                 actualSmells.add(smell.getSmellName());
             }
         }
@@ -249,7 +249,7 @@ public class GameManagingUtilsTest {
         // Collect smells
         Set<String> actualSmells = new HashSet<>();
         for (AbstractSmell smell : argument.getValue().getTestSmells()) {
-            if (smell.getHasSmell()) {
+            if (smell.hasSmell()) {
                 actualSmells.add(smell.getSmellName());
             }
         }
