@@ -847,6 +847,12 @@
 			<artifactId>simpleclient_guava</artifactId>
 			<version>${prometheus-client.version}</version>
 		</dependency>
+		<!-- javamelody-core -->
+		<dependency>
+			<groupId>net.bull.javamelody</groupId>
+			<artifactId>javamelody-core</artifactId>
+			<version>1.91.0</version>
+		</dependency>
 
 		<!-- Annotations -->
 		<dependency>

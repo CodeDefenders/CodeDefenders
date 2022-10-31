@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
 import io.prometheus.client.exporter.MetricsServlet;
+import net.bull.javamelody.ReportServlet;
 
 @WebListener
 public class SystemStartStop implements ServletContextListener {
@@ -70,6 +71,9 @@ public class SystemStartStop implements ServletContextListener {
         if (config.isMetricsCollectionEnabled()) {
             metricsService.registerDefaultCollectors();
             sce.getServletContext().addServlet("prom", new MetricsServlet()).addMapping("/metrics");
+        }
+        if (config.isJavaMelodyEnabled()) {
+            sce.getServletContext().addServlet("javamelody", new ReportServlet()).addMapping("/monitoring");
         }
     }
 

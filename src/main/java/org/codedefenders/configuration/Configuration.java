@@ -106,6 +106,8 @@ public class Configuration {
 
     protected Boolean metrics;
 
+    protected Boolean javamelody;
+
     /**
      * Validates the currently configured Configuration.
      *
@@ -397,6 +399,10 @@ public class Configuration {
 
     public boolean isMetricsCollectionEnabled() {
         return metrics != null ? metrics : false;
+    }
+
+    public boolean isJavaMelodyEnabled() {
+        return javamelody != null ? javamelody : false;
     }
 
     @Nullable
