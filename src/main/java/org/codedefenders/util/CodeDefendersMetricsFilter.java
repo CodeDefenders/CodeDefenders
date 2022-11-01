@@ -20,7 +20,6 @@
 package org.codedefenders.util;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.inject.Inject;
@@ -34,11 +33,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.configuration.Configuration;
 
-import com.google.common.base.Functions;
+import io.prometheus.client.Counter;
 import io.prometheus.client.filter.MetricsFilter;
 
 @WebFilter(filterName = "metricsFilter")
 public class CodeDefendersMetricsFilter extends MetricsFilter {
+    private static final Counter jsessionidIgnoredRequestsCounter = Counter.build()
+            .name("codedefenders_metricsfilter_jsessionid_ignored_requests")
+            .help("The amount of requests our MetricsFilter did not sample because it contained a 'jsessionid' in the URL")
+            .register();
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
@@ -56,12 +59,17 @@ public class CodeDefendersMetricsFilter extends MetricsFilter {
             return;
         }
 
+        String servletPath = ((HttpServletRequest) servletRequest).getServletPath();
         if (!config.isMetricsCollectionEnabled()
                 // We do not need metrics for the static resources and the notification endpoint has to high cardinality.
-                || Stream.of(Stream.of(Paths.STATIC_RESOURCE_PREFIXES), Stream.of("/notifications/"))
-                .flatMap(Functions.identity())
-                .anyMatch(uri -> ((HttpServletRequest) servletRequest).getServletPath().startsWith(uri))
+                || Stream.of(Paths.STATIC_RESOURCE_PREFIXES).anyMatch(servletPath::startsWith)
+                || servletPath.startsWith("/notifications/")
         ) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            // Normally this should not happen (esp. not with setting session-config.tracking-mode=COOKIE in web.xml)
+            // In the case it occurs anyway, we do not want it to show up in the metrics, but we track the number of times it happens.
+        } else if (((HttpServletRequest) servletRequest).getRequestURI().matches(".*;?(jsessionid|JSESSIONID)=[0-9A-Fa-f]*")) {
+            jsessionidIgnoredRequestsCounter.inc();
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
             super.doFilter(servletRequest, servletResponse, filterChain);

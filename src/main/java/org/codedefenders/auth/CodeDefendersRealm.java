@@ -132,6 +132,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         this.adminRole = config.getAuthAdminRole();
 
         this.setCachingEnabled(true);
+        this.setAuthenticationCachingEnabled(true);
     }
 
     public static boolean passwordMatches(CharSequence rawPassword, String encodedPassword) {
