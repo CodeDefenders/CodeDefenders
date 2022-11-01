@@ -456,11 +456,11 @@ public class MeleeGameDAO {
      */
     public static List<MeleeGame> getExpiredGames() {
         final String sql = String.join("\n",
-                "SELECT mg.*",
-                "FROM view_melee_games mg, games g",
-                "WHERE g.ID = mg.ID",
-                "AND g.State = ?",
-                "AND TIMESTAMPADD(MINUTE, g.Game_Duration_Minutes, g.Start_Time) <= NOW();"
+                "SELECT *",
+                "FROM view_melee_games",
+                "WHERE State = ?",
+                "AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();"
+                // do not use TIMESTAMPADD here to avoid errors with daylight saving
         );
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());

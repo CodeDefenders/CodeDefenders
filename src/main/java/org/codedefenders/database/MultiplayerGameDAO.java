@@ -456,11 +456,11 @@ public class MultiplayerGameDAO {
      */
     public static List<MultiplayerGame> getExpiredGames() {
         final String sql = String.join("\n",
-                "SELECT bg.*",
-                "FROM view_battleground_games bg, games g",
-                "WHERE g.ID = bg.ID",
-                "AND g.State = ?",
-                "AND TIMESTAMPADD(MINUTE, g.Game_Duration_Minutes, g.Start_Time) <= NOW();"
+                "SELECT *",
+                "FROM view_battleground_games",
+                "WHERE State = ?",
+                "AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();"
+                // do not use TIMESTAMPADD here to avoid errors with daylight saving
         );
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
