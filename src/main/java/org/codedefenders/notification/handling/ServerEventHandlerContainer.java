@@ -3,7 +3,6 @@ package org.codedefenders.notification.handling;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.Role;
@@ -13,7 +12,9 @@ import org.codedefenders.notification.events.client.registration.GameLifecycleRe
 import org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.RegistrationEvent;
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
+import org.codedefenders.notification.events.server.game.GameLifecycleEvent;
 import org.codedefenders.notification.handling.server.GameChatEventHandler;
+import org.codedefenders.notification.handling.server.GameLifecycleEventHandler;
 import org.codedefenders.notification.handling.server.MutantProgressBarEventHandler;
 import org.codedefenders.notification.handling.server.ServerEventHandler;
 import org.codedefenders.notification.handling.server.TestProgressBarEventHandler;
@@ -127,7 +128,18 @@ public class ServerEventHandlerContainer {
     }
 
     public void handleRegistrationEvent(GameLifecycleRegistrationEvent event) {
-        // TODO: Not sure how game lifecycle events are going to be handled yet
-        throw new NotImplementedException("TODO: Not sure how game lifecycle events are going to be handled yet");
+        Role role = GameDAO.getRole(user.getId(), event.getGameId());
+        if (role == null) {
+            logger.warn("User {} tried to register/unregister {} for game {}, which they are not playing in.",
+                    user.getId(), GameLifecycleEventHandler.class.getSimpleName(), event.getGameId());
+            return;
+        }
+
+        if (event.getAction() == RegistrationEvent.Action.REGISTER) {
+            addHandler(new GameLifecycleEventHandler(socket, event.getGameId(), user.getId()));
+
+        } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
+            removeHandler(new GameLifecycleEventHandler(socket, event.getGameId(), user.getId()));
+        }
     }
 }
