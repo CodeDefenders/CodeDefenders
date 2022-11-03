@@ -18,7 +18,27 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.game.AbstractGame" %>
+<%@ page import="org.codedefenders.beans.user.LoginBean" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 
 </div> <%-- closes #game-container --%>
+
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+
+    (async function () {
+        /** @type {PushSocket} */
+        const socket = await objects.await('pushSocket');
+        socket.subscribe('registration.GameLifecycleRegistrationEvent', {
+            gameId: <%=((AbstractGame) request.getAttribute("game")).getId()%>,
+            userId: <%=CDIUtil.getBeanFromCDI(LoginBean.class).getUserId()%>
+        });
+        socket.register('game.GameStoppedEvent', (event) => {
+            console.log('Game stopped', event);
+            // window.location.reload();
+        });
+    })();
+</script>
 
 <%@ include file="/jsp/footer.jsp" %>
