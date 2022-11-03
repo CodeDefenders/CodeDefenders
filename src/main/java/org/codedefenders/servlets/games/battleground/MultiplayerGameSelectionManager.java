@@ -422,6 +422,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantCoverage(oldGame.getMutantCoverage())
                 .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
                 .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
+                .gameDurationMinutes(oldGame.getGameDurationMinutes())
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);
