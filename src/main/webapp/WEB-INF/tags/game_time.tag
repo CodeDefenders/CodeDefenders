@@ -51,7 +51,7 @@
                      data-type="progress"
                      data-duration="${duration}"
                      data-start="${startTime}"
-                     style="width: 0; animation-duration: 2s;"
+                     style="width: 0; animation-duration: 2s; transition-duration: 10s;"
                      role="progressbar">
                 </div>
             </div>
