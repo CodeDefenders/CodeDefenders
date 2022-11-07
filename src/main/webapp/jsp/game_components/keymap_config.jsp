@@ -21,6 +21,8 @@
 <%@ page import="org.codedefenders.model.KeyMap" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 
@@ -39,7 +41,7 @@
                     if (km != login.getUser().getKeyMap()) {
             %>
                     <li>
-                        <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post">
+                        <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post">
                             <input type="hidden" class="form-control" name="formType" value="updateKeyMap">
                             <input type="hidden" class="form-control" name="editorKeyMap" value="<%=km.name()%>">
                             <button class="dropdown-item" type="submit">

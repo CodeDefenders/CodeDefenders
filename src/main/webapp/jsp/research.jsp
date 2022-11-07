@@ -18,14 +18,15 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
-<link href="${pageContext.request.contextPath}/css/specific/research.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/research.css")}" rel="stylesheet">
 
 <div id="research" class="paper-list">
     <ul class="papercite_bibliography">
         <li>
             <a href="https://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title="Download PDF" class="pdf_link">
-                <img src='images/pdf.png' alt="[PDF]"/>
+                <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
             </a>
             Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
             <span class="paper_title">&#8220;Gamifying a Software Testing Course with Code Defenders,&#8221;</span>
@@ -45,7 +46,7 @@
         </li>
         <li>
             <a href="https://study.code-defenders.org/papers/ECSEE18_Course.pdf" title="Download PDF" class="pdf_link">
-                <img src='images/pdf.png' alt="[PDF]"/>
+                <img src='${url.forPath("/images/pdf.png")}' alt="[PDF]"/>
             </a>
             Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
             <span class="paper_title">&#8220;A Preliminary Report on Gamifying a Software Testing Course with the Code Defenders Testing Game,&#8221;</span>
@@ -66,7 +67,7 @@
         </li>
         <li>
             <a href="https://study.code-defenders.org/papers/ICSE17_Education.pdf" title="Download PDF" class="pdf_link">
-                <img src='images/pdf.png' alt="[PDF]"/>
+                <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Benjamin Clegg, Jos&eacute; Miguel Rojas, Gordon Fraser.
             <span class="paper_title">&#8220;Teaching Software Testing Concepts Using a Mutation Testing Game,&#8221;</span>
@@ -87,7 +88,7 @@
         </li>
         <li>
             <a href="https://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf" title="Download PDF" class="pdf_link">
-                <img src='images/pdf.png' alt="[PDF]"/>
+                <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
             <span class="paper_title">&#8220;Code Defenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game,&#8221;</span>
@@ -107,7 +108,7 @@
         </li>
         <li>
             <a href="https://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf" title="Download PDF" class="pdf_link">
-                <img src='images/pdf.png' alt="[PDF]"/>
+                <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
             <span class="paper_title">&#8220;Teaching Software Testing with a Mutation Testing Game,&#8221;</span>
@@ -125,7 +126,7 @@
         </li>
         <li>
             <a href="https://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf" title="Download PDF" class="pdf_link">
-                <img src='images/pdf.png' alt="[PDF]"/>
+                <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
             <span class="paper_title">&#8220;Teaching Mutation Testing using Gamification,&#8221;</span>
@@ -145,7 +146,7 @@
         </li>
         <li>
             <a href="https://study.code-defenders.org/papers/Mutation16_CodeDefenders.pdf" title="Download PDF" class="pdf_link">
-                <img src='images/pdf.png' alt="[PDF]"/>
+                <img src='${url.forPath("images/pdf.png")}' alt="[PDF]"/>
             </a>
             Jos&eacute; Miguel Rojas and Gordon Fraser.
             <span class="paper_title">&#8220;Code Defenders: A Mutation Testing Game,&#8221;</span>

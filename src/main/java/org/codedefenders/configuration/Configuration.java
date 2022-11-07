@@ -22,6 +22,8 @@ package org.codedefenders.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
@@ -83,6 +85,8 @@ public class Configuration {
     private ConfigurationValidationException _configurationValidationException;
 
     // All the attributes need to be initialized with a null value and therefore need to be objects
+    protected String appUrl;
+    protected Optional<URL> _appUrl;
     protected String dataDir;
     protected String antHome;
     protected String antJavaHome;
@@ -116,6 +120,22 @@ public class Configuration {
     public final void validate() throws ConfigurationValidationException {
         if (!_validated) {
             List<String> validationErrors = new ArrayList<>();
+
+            if (appUrl != null) {
+                Optional<URL> realAppUrlOpt = getApplicationURL();
+                if (!realAppUrlOpt.isPresent()) {
+                    validationErrors.add("Property " + resolveAttributeName("appUrl") + " has invalid format");
+                } else {
+                    URL realAppUrl = realAppUrlOpt.get();
+                    if (realAppUrl.getProtocol() == null
+                            || realAppUrl.getHost() == null
+                            || realAppUrl.getUserInfo() != null
+                            || realAppUrl.getQuery() != null
+                            || realAppUrl.getRef() != null) {
+                        validationErrors.add("App url invalid");
+                    }
+                }
+            }
 
             if (dataDir == null || dataDir.equals("")) {
                 validationErrors.add("Property " + resolveAttributeName("dataDir") + " is missing");
@@ -293,6 +313,26 @@ public class Configuration {
             return false;
         }
         return true;
+    }
+
+
+    /**
+     * @return A URL that has a protocol, host, path, and optional a port.
+     */
+    public Optional<URL> getApplicationURL() {
+        //noinspection OptionalAssignedToNull
+        if (_appUrl == null) {
+            _appUrl = Optional.ofNullable(appUrl)
+                    .filter(s -> !s.trim().isEmpty())
+                    .map(s -> {
+                        try {
+                            return new URL(s);
+                        } catch (MalformedURLException ignored) {
+                            return null;
+                        }
+                    });
+        }
+        return _appUrl;
     }
 
     public File getDataDir() {

@@ -39,6 +39,7 @@ import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +58,15 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
     private final MessagesBean messages;
     private final UserService userService;
+    private final URLUtils url;
 
     @Inject
-    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService) {
+    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService, URLUtils urlUtils) {
         super();
 
         this.messages = messages;
         this.userService = userService;
+        this.url = urlUtils;
 
         // org.codedefenders.util.Paths.LOGIN = "/login";
         this.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
@@ -111,7 +114,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             }
 
             try {
-                httpResponse.sendRedirect(httpRequest.getContextPath() + Paths.LOGIN);
+                httpResponse.sendRedirect(url.forPath(Paths.LOGIN));
             } catch (IOException ioException) {
                 logger.error("TODO", e);
             }

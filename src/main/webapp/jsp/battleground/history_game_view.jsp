@@ -27,6 +27,8 @@
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
+<%@ page import="org.codedefenders.util.URLUtils" %>
 
 <%--
     @param Integer gameId
@@ -43,13 +45,15 @@
     {
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
         if (!gameIdOpt.isPresent()) {
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
+            // TODO(Alex): Do not redirect from JSP!!
+            response.sendRedirect(CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.GAMES_HISTORY));
             return;
         }
         game = MultiplayerGameDAO.getMultiplayerGame(gameIdOpt.get());
 
         if (game == null || game.getState() != GameState.FINISHED) {
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            // TODO(Alex): Do not redirect from JSP!!
+            response.sendRedirect(CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 

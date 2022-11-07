@@ -20,6 +20,7 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="testAccordion" type="org.codedefenders.beans.game.TestAccordionBean"--%>
 
 <%--
@@ -29,7 +30,7 @@
     generated through JavaScript.
 --%>
 
-<link href="${pageContext.request.contextPath}/css/specific/test_accordion.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/test_accordion.css")}" rel="stylesheet">
 
 <div class="accordion loading loading-border-card loading-bg-gray" id="tests-accordion">
     <c:forEach items="${testAccordion.categories}" var="category">
@@ -60,8 +61,8 @@
 </div>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {TestAccordion} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {TestAccordion} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const categories = JSON.parse('${testAccordion.categoriesAsJSON}');

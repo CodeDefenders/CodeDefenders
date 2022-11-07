@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="java.util.Arrays" %>
@@ -34,7 +36,7 @@
 
     <form id="changeSettings" name="changeSettings"
           class="needs-validation"
-          action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" method="post"
+          action="${url.forPath(Paths.ADMIN_SETTINGS)}" method="post"
           autocomplete="off">
         <input type="hidden" name="formType" value="saveSettings">
 
@@ -140,7 +142,7 @@
     </form>
 
     <script type="module">
-        import $ from './js/jquery.mjs';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
         $(document).ready(() => {

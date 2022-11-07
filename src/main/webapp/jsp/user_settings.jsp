@@ -19,6 +19,7 @@
 
 --%>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <%@ page import="org.codedefenders.database.AdminDAO" %>
@@ -39,7 +40,7 @@
     <section class="mt-5" aria-labelledby="email-settings">
         <h2 class="mb-3" id="email-settings">Email Settings</h2>
 
-        <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post"
+        <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post"
               class="row g-3 needs-validation"
               autocomplete="off">
             <input type="hidden" class="form-control" name="formType" value="updateProfile">
@@ -69,7 +70,7 @@
     <section class="mt-5" aria-labelledby="password-settings">
         <h2 class="mb-3" id="password-settings">Update Password</h2>
 
-        <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post"
+        <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post"
               class="row g-3 needs-validation"
               autocomplete="off">
             <input type="hidden" class="form-control" name="formType" value="changePassword">
@@ -134,7 +135,7 @@
         <div class="modal" id="account-deletion-modal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post">
+                    <form action="${url.forPath(Paths.USER_SETTINGS)}" method="post">
                         <input type="hidden" class="form-control" name="formType" value="deleteAccount">
 
                         <div class="modal-header">

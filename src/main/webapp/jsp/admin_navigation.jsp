@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.util.Paths" %>
 
 <%
@@ -41,36 +43,36 @@
 
 <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-        <a class="nav-link <%=active(activePage,"adminCreateGames")%>" id="adminCreateGames" href="<%=request.getContextPath() + Paths.ADMIN_GAMES%>">Create Games</a>
+        <a class="nav-link <%=active(activePage,"adminCreateGames")%>" id="adminCreateGames" href="${url.forPath(Paths.ADMIN_GAMES)}">Create Games</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link <%=active(activePage,"adminMonitorGames")%>" id="adminMonitorGames" href="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>">Monitor Games</a>
+        <a class="nav-link <%=active(activePage,"adminMonitorGames")%>" id="adminMonitorGames" href="${url.forPath(Paths.ADMIN_MONITOR)}">Monitor Games</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link <%=active(activePage,"adminUserMgmt")%>" id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Users</a>
+        <a class="nav-link <%=active(activePage,"adminUserMgmt")%>" id="adminUserMgmt" href="${url.forPath(Paths.ADMIN_USERS)}">Users</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link <%=active(activePage,"adminClasses")%>" id="adminClasses" href="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>">Classes</a>
+        <a class="nav-link <%=active(activePage,"adminClasses")%>" id="adminClasses" href="${url.forPath(Paths.ADMIN_CLASSES)}">Classes</a>
     </li>
     <li class="nav-item dropdown">
         <a class="nav-link <%=active(activePage,"adminPuzzles")%> dropdown-toggle" id="adminPuzzles" data-bs-toggle="dropdown" href="#">Puzzles</a>
         <ul class="dropdown-menu">
-            <li><a class="dropdown-item" id="adminPuzzleManagement" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_MANAGEMENT%>">Manage</a></li>
-            <li><a class="dropdown-item" id="adminPuzzleUpload" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_UPLOAD%>">Upload</a></li>
+            <li><a class="dropdown-item" id="adminPuzzleManagement" href="${url.forPath(Paths.ADMIN_PUZZLE_MANAGEMENT)}">Manage</a></li>
+            <li><a class="dropdown-item" id="adminPuzzleUpload" href="${url.forPath(Paths.ADMIN_PUZZLE_UPLOAD)}">Upload</a></li>
         </ul>
     </li>
     <li class="nav-item">
-        <a class="nav-link <%=active(activePage,"adminKillMaps")%>" id="adminKillMaps" href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">Analysis</a>
+        <a class="nav-link <%=active(activePage,"adminKillMaps")%>" id="adminKillMaps" href="${url.forPath(Paths.ADMIN_KILLMAPS)}/manual">Analysis</a>
     </li>
     <li class="nav-item dropdown">
         <a class="nav-link <%=active(activePage,"adminAnalytics")%> dropdown-toggle" id="adminAnalytics" data-bs-toggle="dropdown" href="#">Analytics</a>
         <ul class="dropdown-menu">
-            <li><a class="dropdown-item" id="adminAnalyticsUsers" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_USERS%>">Users</a></li>
-            <li><a class="dropdown-item" id="adminAnalyticsClasses" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
-            <li><a class="dropdown-item" id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
+            <li><a class="dropdown-item" id="adminAnalyticsUsers" href="${url.forPath(Paths.ADMIN_ANALYTICS_USERS)}">Users</a></li>
+            <li><a class="dropdown-item" id="adminAnalyticsClasses" href="${url.forPath(Paths.ADMIN_ANALYTICS_CLASSES)}">Classes</a></li>
+            <li><a class="dropdown-item" id="adminAnalyticsKillmaps" href="${url.forPath(Paths.ADMIN_ANALYTICS_KILLMAPS)}">KillMaps</a></li>
         </ul>
     </li>
     <li class="nav-item">
-        <a class="nav-link <%=active(activePage,"adminSystemSettings")%>" id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
+        <a class="nav-link <%=active(activePage,"adminSystemSettings")%>" id="adminSystemSettings" href="${url.forPath(Paths.ADMIN_SETTINGS)}">System Settings</a>
     </li>
 </ul>

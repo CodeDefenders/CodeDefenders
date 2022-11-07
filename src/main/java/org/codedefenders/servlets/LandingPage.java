@@ -42,8 +42,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
-
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import org.codedefenders.util.URLUtils;
 
 /**
  * This {@link HttpServlet} handles to the landing page under "/".
@@ -64,13 +63,16 @@ public class LandingPage extends HttpServlet {
     @Inject
     private UserService userService;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
 
         if (login.isLoggedIn()) {
             // User logged in? Send him to the games overview.
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
         } else {
             // User logged not in? Show him the landing page.
             List<MultiplayerGame> availableMultiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();

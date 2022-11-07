@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.util.Paths" %>
 
 </div> <%-- closes #content --%>
@@ -27,16 +29,16 @@
         <div id="footer-navbar-controls">
             <ul class="navbar-nav mx-auto">
                 <li class="nav-item mx-2">
-                    <a class="nav-link" id="footer-about" href="<%=request.getContextPath() + Paths.ABOUT_PAGE%>">About CodeDefenders</a>
+                    <a class="nav-link" id="footer-about" href="${url.forPath(Paths.ABOUT_PAGE)}">About CodeDefenders</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link" id="footer-contact" href="<%=request.getContextPath() + Paths.CONTACT_PAGE%>">Contact Us</a>
+                    <a class="nav-link" id="footer-contact" href="${url.forPath(Paths.CONTACT_PAGE)}">Contact Us</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link" id="footer-help" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a>
+                    <a class="nav-link" id="footer-help" href="${url.forPath(Paths.HELP_PAGE)}">Help</a>
                 </li>
                 <li class="nav-item mx-2">
-                    <a class="nav-link" id="footer-imprint" href="<%=request.getContextPath() + Paths.IMPRINT_PAGE%>">Imprint and Privacy Policy</a>
+                    <a class="nav-link" id="footer-imprint" href="${url.forPath(Paths.IMPRINT_PAGE)}">Imprint and Privacy Policy</a>
                 </li>
             </ul>
         </div>

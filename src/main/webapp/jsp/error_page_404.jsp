@@ -20,20 +20,22 @@
 --%>
 <%@ page pageEncoding="UTF-8" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <!DOCTYPE html>
 <html>
 
 <head>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
     <title>The page you're looking for could not be found (404)</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link href="${pageContext.request.contextPath}/css/specific/error_page.css" rel="stylesheet">
+    <link rel="icon" href="${url.forPath("/favicon.ico")}" type="image/x-icon">
+    <link href="${url.forPath("/css/specific/error_page.css")}" rel="stylesheet">
 </head>
 
 <body>
     <div class="content">
-        <a href="${pageContext.request.contextPath}/" class="branding">
-            <img src="${pageContext.request.contextPath}/images/logo.png"
+        <a href="${url.forPath("/")}" class="branding">
+            <img src="${url.forPath("/images/logo.png")}"
                  alt="Code Defenders Logo"
                  width="58">
             <h1>Code Defenders</h1>
