@@ -26,7 +26,7 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
 public class PlayerFeedbackBean {
     private Integer gameId;
     private Integer creatorId;
-    private UserEntity user;
+    private int userId;
     private Role role;
 
     private Boolean showFeedbackEnabled;
@@ -52,8 +52,8 @@ public class PlayerFeedbackBean {
         this.creatorId = creatorId;
     }
 
-    public void setPlayerInfo(UserEntity user, Role role) {
-        this.user = user;
+    public void setPlayerInfo(int userId, Role role) {
+        this.userId = userId;
         this.role = role;
     }
 
@@ -72,12 +72,12 @@ public class PlayerFeedbackBean {
             showFeedbackEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SHOW_PLAYER_FEEDBACK)
                     .getBoolValue();
         }
-        return user.getId() == creatorId || showFeedbackEnabled;
+        return userId == creatorId || showFeedbackEnabled;
     }
 
     public Map<Feedback.Type, Integer> getOwnRatings() {
         if (ownRatings == null) {
-            ownRatings = FeedbackDAO.getFeedbackValues(gameId, user.getId());
+            ownRatings = FeedbackDAO.getFeedbackValues(gameId, userId);
         }
         return ownRatings;
     }

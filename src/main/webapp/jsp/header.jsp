@@ -18,10 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 <%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
 <%@ page import="org.codedefenders.servlets.UserSettingsManager" %>
+
+<%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
@@ -55,34 +59,39 @@
                         Multiplayer
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="header-multiplayer">
-                        <li><a class="dropdown-item" id="header-games" href="<%=request.getContextPath()  + Paths.GAMES_OVERVIEW%>">Games</a></li>
-                        <li><a class="dropdown-item" id="header-games-history" href="<%=request.getContextPath() + Paths.GAMES_HISTORY %>">History</a></li>
-                        <li><a class="dropdown-item" id="header-leaderboard" href="<%= request.getContextPath() + Paths.LEADERBOARD_PAGE%>">Leaderboard</a></li>
+                        <li><a class="dropdown-item" id="header-games" href="${pageContext.request.contextPath}${Paths.GAMES_OVERVIEW}">Games</a></li>
+                        <li><a class="dropdown-item" id="header-games-history" href="${pageContext.request.contextPath}${Paths.GAMES_HISTORY}">History</a></li>
+                        <li><a class="dropdown-item" id="header-leaderboard" href="${pageContext.request.contextPath}${Paths.LEADERBOARD_PAGE}">Leaderboard</a></li>
                     </ul>
                 </li>
                 <% if (puzzleEnabled) { %>
-                <li class="nav-item nav-item-highlight">
-                    <a class="nav-link" id="header-puzzle" href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>">Puzzles</a>
+                <li class="nav-item nav-item-highlight me-3">
+                    <a class="nav-link" id="header-puzzle" href="${pageContext.request.contextPath}${Paths.PUZZLE_OVERVIEW}">Puzzles</a>
                 </li>
                 <% } %>
+                <c:if test="${auth.admin}">
+                    <li class="nav-item nav-item-highlight me-3">
+                        <a class="nav-link" id="header-admin" href="${pageContext.request.contextPath}/admin">Admin</a>
+                    </li>
+                </c:if>
             </ul>
 
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" id="header-user" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        ${login.user.username}
+                        ${auth.simpleUser.name}
                     </a>
                     <ul class="dropdown-menu" id="user-dropdown" aria-labelledby="header-user"
                         <%-- Align dropdown menu to the right, so it doesn't get cut off. --%>
                         style="left: auto; right: 0;">
                         <% if (profileEnabled) { %>
-                            <li><a class="dropdown-item" id="header-profile" href="<%=request.getContextPath() + Paths.USER_PROFILE%>">Profile</a></li>
+                            <li><a class="dropdown-item" id="header-profile" href="${pageContext.request.contextPath}${Paths.USER_PROFILE}">Profile</a></li>
                         <% } %>
                         <% if (accountEnabled) { %>
-                            <li><a class="dropdown-item" id="header-account" href="<%=request.getContextPath() + Paths.USER_SETTINGS%>">Account</a></li>
+                            <li><a class="dropdown-item" id="header-account" href="${pageContext.request.contextPath}${Paths.USER_SETTINGS}">Account</a></li>
                         <% } %>
-                        <li><a class="dropdown-item" id="header-help" href="<%=request.getContextPath() + Paths.HELP_PAGE%>">Help</a></li>
-                        <li><a class="dropdown-item" id="header-logout" href="<%=request.getContextPath() + Paths.LOGOUT%>">Logout</a></li>
+                        <li><a class="dropdown-item" id="header-help" href="${pageContext.request.contextPath}${Paths.HELP_PAGE}">Help</a></li>
+                        <li><a class="dropdown-item" id="header-logout" href="${pageContext.request.contextPath}${Paths.LOGOUT}">Logout</a></li>
                     </ul>
                 </li>
             </ul>

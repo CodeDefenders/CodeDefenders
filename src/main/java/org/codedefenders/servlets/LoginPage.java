@@ -28,15 +28,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.page.PageInfoBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.util.Paths;
 
 @WebServlet("/login")
 public class LoginPage extends HttpServlet {
 
     @Inject
-    LoginBean login;
+    CodeDefendersAuth login;
 
     @Inject
     PageInfoBean pageInfo;

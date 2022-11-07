@@ -31,6 +31,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.MetricsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminUserManagement;
 import org.codedefenders.util.EmailUtils;
@@ -186,7 +187,7 @@ public class AdminUserManagementIT {
 
             Field fieldUserRepo = AdminUserManagement.class.getDeclaredField("userRepo");
             fieldUserRepo.setAccessible(true);
-            UserRepository userRepo = new UserRepository(db.getQueryRunner());
+            UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsService.class));
             fieldUserRepo.set(adminUserManagement, userRepo);
 
             Field fieldMessages = AdminUserManagement.class.getDeclaredField("messages");

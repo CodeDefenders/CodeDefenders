@@ -160,12 +160,9 @@ public class UserEntity implements Serializable {
         this.keyMap = keyMap;
     }
 
+    @Deprecated // TODO(Alex): Where to put this method?
     public static String encodePassword(String password) {
         return new BCryptPasswordEncoder().encode(password);
-    }
-
-    public static boolean passwordMatches(String rawPassword, String encodedPassword) {
-        return new BCryptPasswordEncoder().matches(rawPassword, encodedPassword);
     }
 
     @Override

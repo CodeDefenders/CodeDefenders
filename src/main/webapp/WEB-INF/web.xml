@@ -43,29 +43,10 @@
 
 	<session-config>
 		<session-timeout>0</session-timeout>
+		<tracking-mode>COOKIE</tracking-mode>
 	</session-config>
 
 	<!-- Security Configuration -->
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>SecuredBookSite</web-resource-name>
-			<url-pattern>/admin</url-pattern>
-			<url-pattern>/admin/*</url-pattern>
-			<url-pattern>/admin/games</url-pattern>
-			<url-pattern>/admin/manage</url-pattern>
-			<url-pattern>/admin/monitor</url-pattern>
-			<url-pattern>/admin/users</url-pattern>
-			<url-pattern>/admin/settings</url-pattern>
-			<url-pattern>/admin/api/*</url-pattern>
-			<http-method>GET</http-method>
-			<http-method>POST</http-method>
-		</web-resource-collection>
-
-		<auth-constraint>
-			<role-name>manager-gui</role-name>
-		</auth-constraint>
-	</security-constraint>
-
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>no_access</web-resource-name>
@@ -73,14 +54,6 @@
 		</web-resource-collection>
 		<auth-constraint/>
 	</security-constraint>
-
-	<security-role>
-		<role-name>manager-gui</role-name>
-	</security-role>
-
-	<login-config>
-		<auth-method>BASIC</auth-method>
-	</login-config>
 
 	<!-- Shiro -->
 	<listener>
@@ -94,7 +67,7 @@
 
 	<!-- Begin WebFilter Section -->
 	<!-- Begin Filter Declarations -->
-	<filter> <!-- Set character encoding -->
+	<filter><!-- Set character encoding -->
 		<filter-name>RequestCharacterEncoding</filter-name>
 		<filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
 		<init-param>
@@ -107,9 +80,38 @@
 		<filter-name>ShiroFilter</filter-name>
 		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
 	</filter>
+
+	<filter>
+		<filter-name>javamelody</filter-name>
+		<filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
+		<init-param>
+			<!-- Disables serving the monitoring page via the filter. A/The Servlet is explicitly registered in
+			SystemStartStop if monitoring/metrics are enabled -->
+			<param-name>monitoring-path</param-name>
+			<param-value>???</param-value>
+		</init-param>
+		<init-param>
+			<!-- Do not allow any system actions by default! -->
+			<param-name>system-actions-enabled</param-name>
+			<param-value>false</param-value>
+		</init-param>
+	</filter>
 	<!-- End Filter Declarations -->
 
 	<!-- Begin Filter Mapping/Ordering -->
+	<!-- You will most likely want this to be the first filter in the chain
+	(therefore the first <filter-mapping> in the web.xml file), so that you can get
+	the most accurate measurement of latency. -->
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
+		<filter-name>metricsFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>javamelody</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>TransactionCleanupFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -117,6 +119,11 @@
 
 	<filter-mapping> <!-- See: Filter Declarations above -->
 		<filter-name>RequestCharacterEncoding</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
+		<filter-name>ResponseCharacterEncoding</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
@@ -136,11 +143,6 @@
 
 	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>BeanFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-
-	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
-		<filter-name>ResponseCharacterEncoding</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 	<!-- End Filter Mapping/Ordering -->

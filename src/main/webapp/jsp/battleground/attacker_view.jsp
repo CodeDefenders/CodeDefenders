@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
+
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
@@ -31,8 +33,6 @@
         The game to be displayed.
 --%>
 
-<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
@@ -126,12 +126,12 @@
             <h3>Create a mutant here</h3>
             <div>
 
-                <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
+                <form id="reset" action="${pageContext.request.contextPath}${Paths.BATTLEGROUND_GAME}" method="post">
                     <button class="btn btn-warning" id="btnReset">
                         Reset
                     </button>
                     <input type="hidden" name="formType" value="reset">
-                    <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
+                    <input type="hidden" name="gameId" value="${gameProducer.game.id}"/>
                 </form>
 
                 <t:submit_mutant_button gameActive="${gameProducer.game.state == GameState.ACTIVE}"
@@ -139,9 +139,9 @@
             </div>
         </div>
 
-        <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
+        <form id="atk" action="${pageContext.request.contextPath}${Paths.BATTLEGROUND_GAME}" method="post">
             <input type="hidden" name="formType" value="createMutant">
-            <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
+            <input type="hidden" name="gameId" value="${gameProducer.game.id}"/>
             <input type="hidden" id="attacker_intention" name="attacker_intention" value="">
 
             <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>

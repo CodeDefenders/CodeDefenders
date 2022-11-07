@@ -89,7 +89,7 @@ public class AdminCreateGamesBeanTest {
         /* Mock bean dependencies of AdminCreateGamesBean. */
         LoginBean loginBean = PowerMockito.mock(LoginBean.class);
         PowerMockito.when(loginBean.getUserId()).thenReturn(0);
-        PowerMockito.when(loginBean.getUser()).thenReturn(new UserEntity(0, "creator", "", ""));
+        PowerMockito.when(loginBean.getUserEntity()).thenReturn(new UserEntity(0, "creator", "", ""));
 
         MessagesBean messagesBean = PowerMockito.mock(MessagesBean.class);
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);

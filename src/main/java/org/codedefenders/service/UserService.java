@@ -24,9 +24,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
 import org.codedefenders.model.UserEntity;
@@ -53,7 +57,7 @@ public class UserService {
     private final UserRepository userRepo;
 
     @Inject
-    public UserService(UserRepository userRepo) {
+    public UserService(UserRepository userRepo, MetricsService metricsService) {
         this.userRepo = userRepo;
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
@@ -62,17 +66,19 @@ public class UserService {
                 // places where SimpleUser objects are used.
                 .expireAfterWrite(30, TimeUnit.SECONDS)
                 .maximumSize(200)
-                //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
+                .recordStats()
                 .build(
                         new CacheLoader<Integer, SimpleUser>() {
-                            @Override
                             @Nonnull
+                            @Override
                             public SimpleUser load(@Nonnull Integer userId) throws Exception {
                                 return getSimpleUserByIdInternal(userId)
                                         .orElseThrow(() -> new Exception("No user found for given userId"));
                             }
                         }
                 );
+
+        metricsService.registerGuavaCache("simpleUserForUserId", simpleUserForUserIdCache);
     }
 
 
@@ -152,6 +158,10 @@ public class UserService {
 
     /**
      * Perform a registration with the provided parameters.
+     *
+     * <p>Note: This method is mainly for self-registration. For the creation of (multiple) accounts with sth. like
+     * {@link org.codedefenders.servlets.admin.AdminUserManagement#createUserAccounts(HttpServletRequest, String)}
+     * may be required.
      */
     @Nonnull
     public Optional<String> registerUser(String username, String password, String email) {
@@ -186,6 +196,111 @@ public class UserService {
         }
 
         return Optional.ofNullable(result);
+    }
+
+    /**
+     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
+     */
+    public void changeUsername(int userId, @Nonnull String newUsername) {
+        simpleUserForUserIdCache.invalidate(userId);
+        throw new NotImplementedException();
+    }
+
+    /**
+     * See {@link org.codedefenders.servlets.UserSettingsManager#changeUserPassword(UserEntity, String)} and
+     * {@link org.codedefenders.servlets.admin.AdminUserManagement#resetUserPW(int)}
+     */
+    public void changePassword(@Nonnull String newPassword) {
+        throw new NotImplementedException();
+    }
+
+    /**
+     * See {@link org.codedefenders.servlets.UserSettingsManager#updateUserInformation(UserEntity, Optional, boolean)}
+     * and {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}
+     */
+    public void changeEmail(@Nonnull String newEmail) {
+        throw new NotImplementedException();
+    }
+
+
+    /**
+     * See {@link org.codedefenders.servlets.admin.AdminUserManagement#editUser(int, HttpServletRequest, String)}.
+     * Admin only method!
+     */
+    @Nonnull
+    public Optional<String> updateUser(int userId, @Nonnull String newUsername, @Nonnull String newEmail,
+            @Nullable String newPassword) {
+        CodeDefendersValidator validator = new CodeDefendersValidator();
+
+        Optional<UserEntity> u = userRepo.getUserById(userId);
+        if (!u.isPresent()) {
+            return Optional.of("Error. User " + userId + " cannot be retrieved from database.");
+        }
+        UserEntity user = u.get();
+
+        if (!newUsername.equals(user.getUsername()) && userRepo.getUserByName(newUsername).isPresent()) {
+            return Optional.of("Username " + newUsername + " is already taken");
+        }
+
+        if (!newEmail.equals(user.getEmail()) && userRepo.getUserByEmail(newEmail).isPresent()) {
+            return Optional.of("Email " + newEmail + " is already in use");
+        }
+
+        if (!validator.validEmailAddress(newEmail)) {
+            return Optional.of("Email Address is not valid");
+        }
+
+        if (newPassword != null) {
+            if (!validator.validPassword(newPassword)) {
+                return Optional.of("Password is not valid");
+            }
+            user.setEncodedPassword(UserEntity.encodePassword(newPassword));
+        }
+        user.setUsername(newUsername);
+        user.setEmail(newEmail);
+
+        if (!userRepo.update(user)) {
+            return Optional.of("Error trying to update info for user " + userId + "!");
+        }
+
+        simpleUserForUserIdCache.invalidate(userId);
+        return Optional.empty();
+    }
+
+
+    /**
+     * For {@link org.codedefenders.servlets.registration.PasswordServlet#doPost(HttpServletRequest, HttpServletResponse)}
+     * {@code case "resetPassword"}.
+     */
+    public void requestPasswordReset() {
+        throw new NotImplementedException();
+    }
+
+    /**
+     * For {@link org.codedefenders.servlets.registration.PasswordServlet#doPost(HttpServletRequest, HttpServletResponse)}
+     * {@code case "changePassword"}.
+     */
+    public void resetPassword() {
+        throw new NotImplementedException();
+    }
+
+
+    // TODO(Alex): How does this differ from {@link #deactivateAccount} ?!
+    public void setAccountInactive() {
+        throw new NotImplementedException();
+    }
+
+    public void setAccountActive() {
+        throw new NotImplementedException();
+    }
+
+
+    /**
+     * See {@link org.codedefenders.servlets.UserSettingsManager#removeUserInformation(UserEntity)} and
+     * {@link org.codedefenders.servlets.admin.AdminUserManagement#deleteUser(int)}.
+     */
+    public void deactivateAccount() {
+        throw new NotImplementedException();
     }
 
 

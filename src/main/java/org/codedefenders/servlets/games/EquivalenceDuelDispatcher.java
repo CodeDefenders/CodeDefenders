@@ -3,7 +3,6 @@ package org.codedefenders.servlets.games;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -12,15 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.game.PreviousSubmissionBean;
-import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.game.GameMode;
-import org.codedefenders.game.tcs.ITestCaseSelector;
-import org.codedefenders.notification.INotificationService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -42,29 +34,6 @@ public class EquivalenceDuelDispatcher extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(EquivalenceDuelDispatcher.class);
 
-    @Inject
-    private GameManagingUtils gameManagingUtils;
-
-    @Inject
-    private IMutationTester mutationTester;
-
-    @Inject
-    private TestSmellsDAO testSmellsDAO;
-
-    @Inject
-    private ITestCaseSelector regressionTestCaseSelector;
-
-    @Inject
-    private INotificationService notificationService;
-
-    @Inject
-    private MessagesBean messages;
-
-    @Inject
-    private LoginBean login;
-
-    @Inject
-    private PreviousSubmissionBean previousSubmission;
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

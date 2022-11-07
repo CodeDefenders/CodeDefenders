@@ -39,6 +39,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import javax.annotation.Nullable;
 import javax.enterprise.inject.Alternative;
 import javax.inject.Singleton;
 
@@ -77,6 +78,7 @@ import com.google.common.net.InternetDomainName;
 @Singleton
 public class Configuration {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
+
     private boolean $validated;
     private ConfigurationValidationException $configurationValidationException;
 
@@ -99,6 +101,12 @@ public class Configuration {
     protected Boolean parallelize;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
+
+    protected String authAdminRole;
+
+    protected Boolean metrics;
+
+    protected Boolean javamelody;
 
     /**
      * Validates the currently configured Configuration.
@@ -385,6 +393,23 @@ public class Configuration {
         return 40;
     }
 
+    public boolean isMetricsCollectionEnabled() {
+        return metrics != null ? metrics : false;
+    }
+
+    public boolean isJavaMelodyEnabled() {
+        return javamelody != null ? javamelody : false;
+    }
+
+    @Nullable
+    public String getAuthAdminRole() {
+        if (authAdminRole == null || authAdminRole.trim().isEmpty()) {
+            return null;
+        } else {
+            return authAdminRole;
+        }
+    }
+
     private int getJavaMajorVersion() {
         String version = System.getProperty("java.version");
         if (version.startsWith("1.")) {
@@ -398,6 +423,7 @@ public class Configuration {
          */
         int dotPos = version.indexOf('.');
         int dashPos = version.indexOf('-');
+        // TODO(Alex): Does this break with two digit version numbers?!
         return Integer.parseInt(version.substring(0,
                 dotPos > -1 ? dotPos : dashPos > -1 ? dashPos : 1));
     }

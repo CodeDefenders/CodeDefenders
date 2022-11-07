@@ -20,6 +20,7 @@
 package org.codedefenders.service.game;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
@@ -27,9 +28,16 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 
 @ApplicationScoped
 public class PuzzleGameService extends AbstractGameService {
+
+    @Inject
+    public PuzzleGameService(UserService userService, UserRepository userRepository) {
+        super(userService, userRepository);
+    }
 
     @Override
     protected boolean isMutantCovered(Mutant mutant, AbstractGame game, Player player) {

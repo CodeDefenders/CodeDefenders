@@ -42,8 +42,6 @@ import org.flywaydb.core.api.migration.JavaMigration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mysql.cj.jdbc.Driver;
-
 
 @ThreadSafe // Probably
 @Singleton
@@ -56,12 +54,8 @@ public class ConnectionFactory {
     public ConnectionFactory(@SuppressWarnings("CdiInjectionPointsInspection") final Configuration config) {
         if (config.isValid()) {
             dataSource = new BasicDataSource();
-            try {
-                dataSource.setDriver(new Driver());
-            } catch (SQLException e) { // TODO(Alex): This doesn't look right?!
-                logger.error("Couldn't setup connection to database", e);
-            }
-            dataSource.setUrl(config.getDbUrl());
+            dataSource.setDriverClassName("net.bull.javamelody.JdbcDriver");
+            dataSource.setUrl(config.getDbUrl() + "?driver=com.mysql.cj.jdbc.Driver");
             dataSource.setUsername(config.getDbUsername());
             dataSource.setPassword(config.getDbPassword());
             dataSource.setMaxTotal(config.getMaximumTotalDatabaseConnections());

@@ -45,8 +45,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -97,7 +97,7 @@ public class ClassUploadManager extends HttpServlet {
     private MessagesBean messages;
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Inject
     private BackendExecutorService backend;

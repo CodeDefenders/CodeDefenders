@@ -102,11 +102,14 @@ public class AdminUserManagement extends HttpServlet {
         final String formType = ServletUtils.formType(request);
         switch (formType) {
             case "manageUsers": {
+                // TODO(Alex): "resetPasswordButton" is not set anywhere?!
+                /*
                 final Optional<Integer> userToReset = ServletUtils.getIntParameter(request, "resetPasswordButton");
                 if (userToReset.isPresent()) {
                     messages.add(resetUserPW(userToReset.get()));
                     break;
                 }
+                 */
                 final Optional<Integer> userId = ServletUtils.getIntParameter(request, "setUserInactive");
                 if (userId.isPresent()) {
                     final boolean success = setUserInactive(userId.get());
@@ -140,15 +143,35 @@ public class AdminUserManagement extends HttpServlet {
                 //  'userid' from the session attributes
                 final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
                 if (!userId.isPresent()) {
-                    logger.error("Creating users failed. Missing request parameter 'uid'");
+                    logger.error("Editing user failed. Missing request parameter 'uid'");
                 } else {
-                    String successMsg = "Successfully updated info for User " + userId.get();
-                    String msg = editUser(userId.get(), request, successMsg);
-                    messages.add(msg);
-                    if (!msg.equals(successMsg)) {
-                        responsePath = request.getContextPath() + Paths.ADMIN_USERS
-                                + "?editUser=" + userId.get();
+                    String newUsername = request.getParameter("name");
+                    String newEmail = request.getParameter("email");
+                    String password = request.getParameter("password");
+                    String confirmPassword = request.getParameter("confirm_password");
+
+                    String msg;
+
+                    if (!password.equals(confirmPassword)) {
+                        msg = "Passwords don't match";
+                    } else {
+                        String newPassword = null;
+                        if (!password.equals("")) {
+                            newPassword = password;
+                        }
+
+                        Optional<String> result = userService.updateUser(userId.get(), newUsername, newEmail, newPassword);
+
+                        if (result.isPresent()) { // There was an error
+                            responsePath = request.getContextPath() + Paths.ADMIN_USERS
+                                    + "?editUser=" + userId.get();
+                            msg = result.get();
+                        } else {
+                            msg = "Successfully updated info for User " + userId.get();
+                        }
                     }
+
+                    messages.add(msg);
                 }
                 break;
             }
@@ -168,53 +191,6 @@ public class AdminUserManagement extends HttpServlet {
         user.get().setActive(false);
         return user.get().update();
 
-    }
-
-    private String editUser(int userId, HttpServletRequest request, String successMsg) {
-
-        CodeDefendersValidator validator = new CodeDefendersValidator();
-
-        Optional<UserEntity> user = userRepo.getUserById(userId);
-        if (!user.isPresent()) {
-            return "Error. User " + userId + " cannot be retrieved from database.";
-        }
-        UserEntity u = user.get();
-
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-        String confirmPassword = request.getParameter("confirm_password");
-
-        if (!password.equals(confirmPassword)) {
-            return "Passwords don't match";
-        }
-
-        if (!name.equals(u.getUsername()) && userRepo.getUserByName(name).isPresent()) {
-            return "Username " + name + " is already taken";
-        }
-
-        if (!email.equals(u.getEmail()) && userRepo.getUserByEmail(email).isPresent()) {
-            return "Email " + email + " is already in use";
-        }
-
-        if (!validator.validEmailAddress(email)) {
-            return "Email Address is not valid";
-        }
-
-        if (!password.equals("")) {
-            // we don't want to encode the already encoded password from the DB
-            if (!validator.validPassword(password)) {
-                return "Password is not valid";
-            }
-            u.setEncodedPassword(UserEntity.encodePassword(password));
-        }
-        u.setUsername(name);
-        u.setEmail(email);
-
-        if (!u.update()) {
-            return "Error trying to update info for user " + userId + "!";
-        }
-        return successMsg;
     }
 
     private void createUserAccounts(HttpServletRequest request, String userNameListString) {
@@ -239,7 +215,7 @@ public class AdminUserManagement extends HttpServlet {
      */
     private void createUserAccount(String userCredentials, boolean sendMail, String hostAddress) {
         CodeDefendersValidator validator = new CodeDefendersValidator();
-        // credentials have following form: username, password, email (optional)
+        // credentials have the following form: username, password, email (optional)
         final String[] credentials = userCredentials.split("[,;]+");
         if (credentials.length < 2) {
             logger.info("Failed to create user due to not enough arguments:" + credentials.length);
@@ -317,6 +293,7 @@ public class AdminUserManagement extends HttpServlet {
         return EmailUtils.sendEmail(email, "Your Code Defenders Account", message);
     }
 
+    /*
     private String deleteUser(int uid) {
         return "Currently disabled!";
         // return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error
@@ -362,4 +339,5 @@ public class AdminUserManagement extends HttpServlet {
 
         return new String(resultChars);
     }
+     */
 }

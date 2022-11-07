@@ -18,14 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
-<%@ page import="org.codedefenders.util.LinkUtils" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%@ page import="org.codedefenders.util.LinkUtils" %>
 
 <%-- Attributes set in the servlet --%>
 
 <%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
-<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="leaderboardService" type="org.codedefenders.service.LeaderboardService"--%>
 
 <c:choose>

@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <jsp:useBean id="profile" class="org.codedefenders.beans.user.UserProfileBean" scope="request"/>
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
@@ -129,28 +130,28 @@
         </dl>
     </section>
 
-    <% if (profile.isSelf()) { %>
-    <section class="mt-5" aria-labelledby="played-games">
-        <h2 class="mb-3" id="played-games">Played games</h2>
-        <p>
-            You can find a list of your past games in the
-            <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
-        </p>
-    </section>
+    <c:if test="${profile.self}">
+        <section class="mt-5" aria-labelledby="played-games">
+            <h2 class="mb-3" id="played-games">Played games</h2>
+            <p>
+                You can find a list of your past games in the
+                <a href="${pageContext.request.contextPath}${Paths.GAMES_HISTORY}">games history</a>.
+            </p>
+        </section>
 
-    <section class="mt-5" aria-labelledby="account-information">
-        <h2 class="mb-3" id="account-information">Account Information</h2>
-        <p>
-            Your current email:
-            <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
-        </p>
-        <p>
-            Change your account information, password or delete your account in the
-            <a href="<%=request.getContextPath() + Paths.USER_SETTINGS%>"
-               title="Edit or delete your CodeDefenders account.">account settings</a>.
-        </p>
-    </section>
-    <% } %>
+        <section class="mt-5" aria-labelledby="account-information">
+            <h2 class="mb-3" id="account-information">Account Information</h2>
+            <p>
+                Your current email:
+                <span class="d-inline-block px-2 ms-2 border">${profile.user.email}</span>
+            </p>
+            <p>
+                Change your account information, password or delete your account in the
+                <a href="${pageContext.request.contextPath}${Paths.USER_SETTINGS}"
+                   title="Edit or delete your CodeDefenders account.">account settings</a>.
+            </p>
+        </section>
+    </c:if>
 
 </div>
 
