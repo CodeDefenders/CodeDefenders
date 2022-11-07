@@ -45,6 +45,8 @@ import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.Histogram;
+
 import static org.codedefenders.util.Constants.AI_DIR;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
@@ -60,8 +62,14 @@ public class AntRunner implements //
         ClassCompilerService, //
         TestGeneratorService, //
         MutantGeneratorService {
-
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
+
+    private static final Histogram antProcessDuration = Histogram.build()
+            .name("codedefenders_antProcess_duration")
+            .unit("seconds")
+            .help("Duration of executing various ant processes")
+            .labelNames("antTarget")
+            .register();
 
     private final Configuration config;
 
@@ -473,7 +481,9 @@ public class AntRunner implements //
         logger.info("Executing Ant Command {} from directory {}", pb.command().toString(),
                 config.getDataDir().getAbsolutePath());
 
-        return runAntProcess(pb);
+        try (Histogram.Timer ignored = antProcessDuration.labels(target).startTimer()) {
+            return runAntProcess(pb);
+        }
     }
 
     private static AntProcessResult runAntProcess(ProcessBuilder pb) {

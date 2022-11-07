@@ -88,6 +88,9 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Histogram;
+
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
@@ -121,8 +124,15 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  */
 @WebServlet(Paths.MELEE_GAME)
 public class MeleeGameManager extends HttpServlet {
-
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameManager.class);
+
+    private static final Histogram.Child automaticEquivalenceDuelTrigger =
+            GameManagingUtils.automaticEquivalenceDuelTrigger
+                    .labels("melee");
+
+    private static final Counter.Child automaticEquivalenceDuelsTriggered =
+            GameManagingUtils.automaticEquivalenceDuelsTriggered
+                    .labels("melee");
 
     @Inject
     private GameManagingUtils gameManagingUtils;
@@ -316,39 +326,42 @@ public class MeleeGameManager extends HttpServlet {
             // No need to check as this feature is disabled
             return;
         }
-        // Get all the live mutants in the game
-        for (Mutant aliveMutant : game.getAliveMutants()) {
-            /*
-             * If the mutant is covered by enough tests trigger the automatic equivalence
-             * duel
-             */
-            int coveringTests = aliveMutant.getCoveringTests().size();
-            if (coveringTests >= threshold) {
-                // Flag the mutant as possibly equivalent
-                aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                aliveMutant.update();
-                // Send the notification about the flagged mutant to attacker
-                int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
-                Event event = new Event(-1, game.getId(), mutantOwnerId,
-                        "One of your mutants survived "
-                                + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
-                                + "tests so it was automatically claimed as equivalent.",
-                        EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
-                        new Timestamp(System.currentTimeMillis()));
-                eventDAO.insert(event);
+        try (Histogram.Timer ignored = automaticEquivalenceDuelTrigger.startTimer()) {
+            // Get all the live mutants in the game
+            for (Mutant aliveMutant : game.getAliveMutants()) {
                 /*
-                 * Register the event to DB
+                 * If the mutant is covered by enough tests trigger the automatic equivalence
+                 * duel
                  */
-                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
-                /*
-                 * Send the notification about the flagged mutant to the game channel
-                 */
-                String flaggingChatMessage = "Code Defenders automatically flagged mutant " + aliveMutant.getId()
-                        + " as equivalent.";
-                Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
-                        EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
-                        new Timestamp(System.currentTimeMillis()));
-                eventDAO.insert(gameEvent);
+                int coveringTests = aliveMutant.getCoveringTests().size();
+                if (coveringTests >= threshold) {
+                    automaticEquivalenceDuelsTriggered.inc();
+                    // Flag the mutant as possibly equivalent
+                    aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                    aliveMutant.update();
+                    // Send the notification about the flagged mutant to attacker
+                    int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
+                    Event event = new Event(-1, game.getId(), mutantOwnerId,
+                            "One of your mutants survived "
+                                    + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
+                                    + "tests so it was automatically claimed as equivalent.",
+                            EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
+                            new Timestamp(System.currentTimeMillis()));
+                    eventDAO.insert(event);
+                    /*
+                     * Register the event to DB
+                     */
+                    MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                    /*
+                     * Send the notification about the flagged mutant to the game channel
+                     */
+                    String flaggingChatMessage = "Code Defenders automatically flagged mutant " + aliveMutant.getId()
+                            + " as equivalent.";
+                    Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
+                            EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                            new Timestamp(System.currentTimeMillis()));
+                    eventDAO.insert(gameEvent);
+                }
             }
         }
     }
