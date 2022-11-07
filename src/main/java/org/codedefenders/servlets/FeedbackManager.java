@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
@@ -49,7 +49,7 @@ public class FeedbackManager extends HttpServlet {
     private MessagesBean messages;
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 

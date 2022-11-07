@@ -53,11 +53,14 @@ public abstract class AbstractGameService implements IGameService {
     // @Inject
     // MutantDAO mutantDAO;
 
-    @Inject
     protected UserRepository userRepository;
+    protected UserService userService;
 
     @Inject
-    protected UserService userService;
+    public AbstractGameService(UserService userService, UserRepository userRepository) {
+        this.userService = userService;
+        this.userRepository = userRepository;
+    }
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {

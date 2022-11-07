@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# Build a (reproducible) codedefenders container image
+#
+# Uses as default image name: 'docker.io/codedefenders/codedefenders' an alternative can be given as first CLI argument.
+# This uses podman for building the image, because of its '--timestamp' argument necessary for reproducible builds.
+# It will tag the image as ':git-<current-commit-short-ref>[-dirty]' appending the '-dirty' if the git repo is not in
+# absolutely clean state (including if ignored files exist)
+#
+
+set -eu
+umask 022
+IFS=$'\n\t'
+
+export LC_ALL=C.UTF-8
+DIR="$(dirname "$(readlink -f "$0" || true)")"
+readonly DIR
+GIT_ROOT="$(cd "${DIR}"; git rev-parse --show-toplevel)"
+readonly GIT_ROOT
+
+
+GIT_COMMIT_REV_SHORT="$(cd "${GIT_ROOT}"; git rev-parse --short HEAD)"
+readonly GIT_COMMIT_REV_SHORT
+GIT_COMMIT_TIMESTAMP="$(cd "${GIT_ROOT}"; git show -s --format="%ct" "${GIT_COMMIT_REV_SHORT}")"
+readonly GIT_COMMIT_TIMESTAMP
+GIT_STATUS="$(cd "${GIT_ROOT}"; git status --porcelain=v2 --ignored | grep -v -e '^#')"
+readonly GIT_STATUS
+
+readonly CONTAINER_IMAGE_NAME=${1:-"docker.io/codedefenders/codedefenders"}
+
+CONTAINER_IMAGE_TAG="${CONTAINER_IMAGE_NAME}:git-${GIT_COMMIT_REV_SHORT}"
+if [[ -n "${GIT_STATUS}" ]]; then
+    printf 'Working directory is dirty!\n\n' >&2
+    CONTAINER_IMAGE_TAG="${CONTAINER_IMAGE_TAG}-dirty"
+fi
+readonly CONTAINER_IMAGE_TAG
+
+
+
+podman build --file "${GIT_ROOT}/docker/Dockerfile" --timestamp="${GIT_COMMIT_TIMESTAMP}" --tag="${CONTAINER_IMAGE_TAG}" "${GIT_ROOT}"

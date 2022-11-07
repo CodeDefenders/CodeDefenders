@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -58,7 +58,7 @@ import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.
 public class GamesOverview extends HttpServlet {
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Override
     protected void doGet(HttpServletRequest request,

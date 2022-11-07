@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.model.Event;
@@ -33,7 +33,7 @@ public class HistoryBean {
     UserService userService = CDIUtil.getBeanFromCDI(UserService.class);
 
     private Integer gameId;
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     private List<HistoryBeanEventDTO> events;
 
@@ -44,7 +44,7 @@ public class HistoryBean {
         gameId = null;
     }
 
-    public void setLogin(LoginBean login) {
+    public void setLogin(CodeDefendersAuth login) {
         this.login = login;
     }
 

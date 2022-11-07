@@ -35,6 +35,7 @@ import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.service.MetricsService;
 import org.codedefenders.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,12 +61,12 @@ public class UserRepository {
     private final QueryRunner queryRunner;
 
     @Inject
-    public UserRepository(QueryRunner queryRunner) {
+    public UserRepository(QueryRunner queryRunner, MetricsService metricsService) {
         this.queryRunner = queryRunner;
 
         userIdForPlayerIdCache = CacheBuilder.newBuilder()
                 .maximumSize(400)
-                //.recordStats() // Nice to have for dev, unnecessary for production  without properly exposing it
+                .recordStats()
                 .build(
                         new CacheLoader<Integer, Integer>() {
                             @Override
@@ -76,6 +77,8 @@ public class UserRepository {
                             }
                         }
                 );
+
+        metricsService.registerGuavaCache("userIdForPlayerId", userIdForPlayerIdCache);
     }
 
     /**
@@ -106,7 +109,7 @@ public class UserRepository {
      * @param userEntity The new {@code UserEntity} to store in the database.
      * @return The id of the inserted {@code UserEntity} wrapped in an {@code Optional} or an empty optional if
      *         inserting the {@code userEntity} failed.
-     * @throws IllegalArgumentException if {@code userEntity.id} is greater then 0.
+     * @throws IllegalArgumentException if {@code userEntity.id} is greater than 0.
      */
     // TODO: This gives no information why we couldn't insert the UserEntity into the database
     @Nonnull
@@ -148,7 +151,7 @@ public class UserRepository {
                 + "  Validated = ?, "
                 + "  Active = ?, "
                 + "  AllowContact = ?, "
-                + "  KeyMap = ?"
+                + "  KeyMap = ? "
                 + "WHERE User_ID = ?;";
         try {
             return queryRunner.update(query,

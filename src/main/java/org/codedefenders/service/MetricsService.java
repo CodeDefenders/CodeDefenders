@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Code Defenders contributors
+ * Copyright (C) 2022 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,33 +16,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.codedefenders.service;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
 
-import org.codedefenders.persistence.database.LeaderboardRepository;
-import org.codedefenders.persistence.entity.LeaderboardEntryEntity;
+import com.google.common.cache.Cache;
+import io.prometheus.client.guava.cache.CacheMetricsCollector;
+import io.prometheus.client.hotspot.DefaultExports;
 
-@SuppressWarnings("unused") // Used in leaderboards.jsp
-@Named
+/**
+ * Provides additional functionality for Metrics collection.
+ */
 @ApplicationScoped
-public class LeaderboardService {
+public class MetricsService {
 
-    private final LeaderboardRepository leaderboardRepo;
+    private CacheMetricsCollector cacheMetrics;
 
-    @Inject
-    public LeaderboardService(LeaderboardRepository leaderboardRepo) {
-        this.leaderboardRepo = leaderboardRepo;
+    public MetricsService() {
     }
 
-    @Nonnull
-    public List<LeaderboardEntryEntity> getAll() {
-        return leaderboardRepo.getLeaderboard();
+    synchronized public void registerGuavaCache(String name, Cache<?, ?> cache) {
+        if (cacheMetrics == null) {
+            cacheMetrics = new CacheMetricsCollector().register();
+        }
+        cacheMetrics.addCache(name, cache);
     }
 
+    public void registerDefaultCollectors() {
+        DefaultExports.initialize();
+    }
 }

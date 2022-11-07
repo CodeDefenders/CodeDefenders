@@ -39,7 +39,7 @@
                     if (km != login.getUser().getKeyMap()) {
             %>
                     <li>
-                        <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post">
+                        <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post">
                             <input type="hidden" class="form-control" name="formType" value="updateKeyMap">
                             <input type="hidden" class="form-control" name="editorKeyMap" value="<%=km.name()%>">
                             <button class="dropdown-item" type="submit">

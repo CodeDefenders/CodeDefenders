@@ -26,7 +26,6 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.model.Feedback.Type" %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 
 <link href="${pageContext.request.contextPath}/css/specific/player_feedback.css" rel="stylesheet">

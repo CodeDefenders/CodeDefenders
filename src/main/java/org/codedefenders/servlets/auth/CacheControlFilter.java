@@ -32,7 +32,8 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.service.AuthService;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ public class CacheControlFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(CacheControlFilter.class);
 
     @Inject
-    private LoginBean login;
+    private AuthService login;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -54,10 +55,10 @@ public class CacheControlFilter implements Filter {
         final HttpServletResponse httpRes = (HttpServletResponse) response;
 
         /* All resources are public and can be always cached, independent of the login status. */
-        final boolean isResource = Stream
-                .of("images", "webjars", "css", "js")
-                .anyMatch(uri -> httpReq.getServletPath().startsWith("/" + uri));
+        final boolean isResource = Stream.of(Paths.STATIC_RESOURCE_PREFIXES)
+                .anyMatch(uri -> httpReq.getServletPath().startsWith(uri));
 
+        // TODO(Alex): Do we need the second (.isActive()) check here?
         final boolean isLoggedIn = login.isLoggedIn() && login.getUser().isActive();
 
         if (!isResource && isLoggedIn) {
@@ -73,7 +74,11 @@ public class CacheControlFilter implements Filter {
          * Disable caching in the HTTP header.
          * (https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for-php-site)
          */
+        // Pragma is deprecated. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Pragma
         httpResponse.setHeader("Pragma", "No-cache");
+        // Those headers conflict with each other. https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#preventing_storing
+        // So we could directly use 'no-store'
+        // Mozilla recommends: 'no-cache, private'. See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching#dealing_with_outdated_implementations
         httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         httpResponse.setDateHeader("Expires", -1);
     }

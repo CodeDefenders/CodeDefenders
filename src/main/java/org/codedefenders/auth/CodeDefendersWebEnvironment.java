@@ -27,8 +27,8 @@ import org.codedefenders.util.CDIUtil;
 /**
  * Initializes the WebEnvironment for Shiro.
  *
- * @implNote  This class is directly instantiated by Shiro.
- *     Shiro bypasses the CDI, so CDI managed beans can only be accessed through {@link CDIUtil#getBeanFromCDI(Class)}
+ * @implNote This class is directly instantiated by Shiro.
+ *         Shiro bypasses the CDI, so CDI managed beans can only be accessed through {@link CDIUtil#getBeanFromCDI(Class)}
  */
 public class CodeDefendersWebEnvironment extends DefaultWebEnvironment {
 

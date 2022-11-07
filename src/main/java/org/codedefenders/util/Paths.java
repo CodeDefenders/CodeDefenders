@@ -26,8 +26,7 @@ package org.codedefenders.util;
  */
 public class Paths {
 
-    private Paths() {
-    }
+    public static final String[] STATIC_RESOURCE_PREFIXES = {"/js", "/css", "/images", "/webjars", "/favicon.ico"};
 
     // URL Paths
     public static final String LANDING_PAGE = "/";

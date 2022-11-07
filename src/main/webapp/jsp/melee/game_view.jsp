@@ -39,7 +39,7 @@
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 <%
     playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
-    playerFeedback.setPlayerInfo(login.getUser(), role);
+    playerFeedback.setPlayerInfo(login.getUserId(), role);
 %>
 
 

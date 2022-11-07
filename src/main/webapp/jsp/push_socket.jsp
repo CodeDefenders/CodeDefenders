@@ -28,7 +28,7 @@
 
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <script type="module">
     import {objects, PushSocket} from './js/codedefenders_main.mjs';

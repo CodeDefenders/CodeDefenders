@@ -75,14 +75,18 @@ If any installation step fails, the installation process aborts and prints an er
 
 
 #### Set up Code Defenders admin users
-Code Defenders relies on the Tomcat authentication system to identify admin users, who can access protected pages and customize Code Defenders settings.
-Access control is enforced through Tomcat using Basic Authentication in the browser.
-Adding a tomcat admin can be done by applying the `manager-gui` role to a user. 
-This ```tomcat-users.xml``` file is per default located in ```$CATALINA_HOME/conf```.
+
+Code Defenders currently relies on the Tomcat authentication system for providing a `username`-`role` mapping that can be used to assign admin privileges.
+
+Assigning admin privileges to a Code Defenders users can be done by setting up a mapping between the username (`<CODEDEFENDERS_USERNAME>`) and the configured `auth.admin.role` (`codedefenders-admin` by default) in the `tomcat-users.xml` file.  
+This file is per default located in `${CATALINA_HOME}/conf`.
+
 ```xml
-<role rolename="manager-gui"/>
-<user username="<MY_ADMIN_USER>" password="<MY_ADMIN_PWD>" roles="manager-gui"/>
+  <role rolename="codedefenders-admin"/>
+  <user username="<CODEDEFENDERS_USERNAME>" roles="codedefenders-admin"/>
 ```
+
+Care should be taken, so the chosen `CODEDEFENDERS_USERNAME` can not be simply registered by anyone.
 
 All system configuration and privileged features are accessible for admin users under the `/admin` page. Configurations are organized in three groups:
 

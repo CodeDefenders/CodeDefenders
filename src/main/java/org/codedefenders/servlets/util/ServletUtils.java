@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class offers static methods, which offer functionality useful for {@link HttpServlet} implementations.
  *
- * @author <a href=https://github.com/werli>Phil Werli</a>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public final class ServletUtils {
     private static final Logger logger = LoggerFactory.getLogger(ServletUtils.class);
