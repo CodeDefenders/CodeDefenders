@@ -30,13 +30,20 @@
     (async function () {
         /** @type {PushSocket} */
         const socket = await objects.await('pushSocket');
+
         socket.subscribe('registration.GameLifecycleRegistrationEvent', {
             gameId: <%=((AbstractGame) request.getAttribute("game")).getId()%>,
             userId: <%=CDIUtil.getBeanFromCDI(LoginBean.class).getUserId()%>
         });
-        socket.register('game.GameStoppedEvent', (event) => {
-            console.log('Game stopped', event);
-            // window.location.reload();
+
+        socket.register('game.GameStoppedEvent', event => {
+            console.log('Game with Id ' + event.gameId + ' was stopped.');
+            window.location.reload();
+        });
+
+        socket.register('game.GameStartedEvent', event => {
+            console.log('Game with Id ' + event.gameId + ' was started.');
+            window.location.reload();
         });
     })();
 </script>
