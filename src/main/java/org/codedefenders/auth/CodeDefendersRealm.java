@@ -265,14 +265,18 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
         @Override
         public Object get(Object o) throws CacheException {
-            return backingCache.getIfPresent(o);
+            if (o == null) {
+                return null;
+            } else {
+                return backingCache.getIfPresent(o);
+            }
         }
 
         @Override
         public synchronized Object put(Object o, Object o2) throws CacheException {
             Object previous;
 
-            previous = backingCache.getIfPresent(o);
+            previous = get(o);
             if (previous == o2) {
                 return null;
             } else {
@@ -283,7 +287,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
         @Override
         public synchronized Object remove(Object o) throws CacheException {
-            Object value = backingCache.getIfPresent(o);
+            Object value = get(o);
             backingCache.invalidate(o);
             return value;
         }
