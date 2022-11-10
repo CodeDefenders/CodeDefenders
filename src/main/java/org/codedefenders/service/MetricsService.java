@@ -19,9 +19,20 @@
 
 package org.codedefenders.service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ThreadPoolExecutor;
+
 import javax.enterprise.context.ApplicationScoped;
 
 import com.google.common.cache.Cache;
+import io.prometheus.client.Collector;
+import io.prometheus.client.CounterMetricFamily;
+import io.prometheus.client.Gauge;
+import io.prometheus.client.GaugeMetricFamily;
 import io.prometheus.client.guava.cache.CacheMetricsCollector;
 import io.prometheus.client.hotspot.DefaultExports;
 
@@ -31,19 +42,69 @@ import io.prometheus.client.hotspot.DefaultExports;
 @ApplicationScoped
 public class MetricsService {
 
-    private CacheMetricsCollector cacheMetrics;
+    private static final CacheMetricsCollector cacheMetrics = new CacheMetricsCollector().register();
+    private static final ThreadPoolExecutorMetricsCollector threadPoolExecutorMetrics = new ThreadPoolExecutorMetricsCollector().register();
 
-    public MetricsService() {
-    }
-
-    synchronized public void registerGuavaCache(String name, Cache<?, ?> cache) {
-        if (cacheMetrics == null) {
-            cacheMetrics = new CacheMetricsCollector().register();
-        }
-        cacheMetrics.addCache(name, cache);
-    }
 
     public void registerDefaultCollectors() {
         DefaultExports.initialize();
+    }
+
+    public void registerGuavaCache(String name, Cache<?, ?> cache) {
+        cacheMetrics.addCache(name, cache);
+    }
+
+    public void registerThreadPoolExecutor(String name, ThreadPoolExecutor executor) {
+        threadPoolExecutorMetrics.addThreadPoolExecutor(name, executor);
+    }
+
+
+    static class ThreadPoolExecutorMetricsCollector extends Collector {
+        private static final Gauge.Child collectDuration = new Gauge.Builder()
+                .name("codedefenders_collector_duration")
+                .unit("seconds")
+                .help("How long it took to collect metrics")
+                .labelNames("collector")
+                .register()
+                .labels("threadPoolExecutor");
+
+        protected final ConcurrentMap<String, ThreadPoolExecutor> children = new ConcurrentHashMap<>();
+
+
+        public void addThreadPoolExecutor(String executorName, ThreadPoolExecutor executor) {
+            this.children.put(executorName, executor);
+        }
+
+        public ThreadPoolExecutor removeThreadPoolExecutor(String executorName) {
+            return this.children.remove(executorName);
+        }
+
+
+        public List<MetricFamilySamples> collect() {
+            try (Gauge.Timer ignored = collectDuration.startTimer()) {
+                List<String> labelNames = Arrays.asList("threadPool");
+
+                GaugeMetricFamily poolSize = new GaugeMetricFamily("codedefenders_threadPoolExecutor_active_threads", "Number of currently active threads", labelNames);
+                GaugeMetricFamily tasksActive = new GaugeMetricFamily("codedefenders_threadPoolExecutor_tasks_active", "Number of currently executing tasks", labelNames);
+                CounterMetricFamily tasksSubmitted = new CounterMetricFamily("codedefenders_threadPoolExecutor_tasks_submitted_total", "Total number of submitted tasks", labelNames);
+                CounterMetricFamily tasksCompleted = new CounterMetricFamily("codedefenders_threadPoolExecutor_tasks_completed_total", "Total number of completed tasks", labelNames);
+                GaugeMetricFamily tasksQueued = new GaugeMetricFamily("codedefenders_threadPoolExecutor_queue_size", "Number of queued tasks", labelNames);
+
+                List<MetricFamilySamples> mfs = Arrays.asList(poolSize, tasksActive, tasksSubmitted, tasksCompleted, tasksQueued);
+
+                for (Map.Entry<String, ThreadPoolExecutor> entry : children.entrySet()) {
+                    List<String> labelValues = Arrays.asList(entry.getKey());
+                    ThreadPoolExecutor executor = entry.getValue();
+
+                    poolSize.addMetric(labelValues, executor.getPoolSize());
+                    tasksActive.addMetric(labelValues, executor.getActiveCount());
+                    tasksSubmitted.addMetric(labelValues, executor.getTaskCount());
+                    tasksCompleted.addMetric(labelValues, executor.getCompletedTaskCount());
+                    tasksQueued.addMetric(labelValues, executor.getQueue().size());
+                }
+
+                return mfs;
+            }
+        }
     }
 }
