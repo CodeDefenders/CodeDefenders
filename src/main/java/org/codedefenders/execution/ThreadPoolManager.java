@@ -40,6 +40,7 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
+import org.codedefenders.service.MetricsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,9 @@ public class ThreadPoolManager {
     private final AtomicBoolean running = new AtomicBoolean();
     private final Map<String, ThreadPoolModel> models = new HashMap<>();
     private final ConcurrentMap<String, ThreadPoolExecutor> pools = new ConcurrentHashMap<>();
+
+    @Inject
+    private MetricsService metricsService;
 
     @Inject
     private Event<ThreadPoolManager> registrationEvent;
@@ -81,7 +85,11 @@ public class ThreadPoolManager {
         }
         return pools.computeIfAbsent(ip.getAnnotated().getAnnotation(ThreadPool.class).value(), name ->
             ofNullable(models.get(name))
-                    .map(ThreadPoolModel::create)
+                    .map(threadPoolModel -> {
+                        ThreadPoolExecutor result = threadPoolModel.create();
+                        metricsService.registerThreadPoolExecutor(name, result);
+                        return result;
+                    })
                     .orElseThrow(() -> new IllegalArgumentException("No pool '" + name + "' defined.")));
     }
 
