@@ -6,10 +6,10 @@ vagrant_file_dir = File.expand_path(File.dirname(__FILE__))
 settings = YAML.load_file("#{vagrant_file_dir}/vagrant.yml") rescue puts("INFO: Could not read vagrant.yml"); Hash.new
 
 # Load settings with default fallback values
-vm_memory = (settings['vm']['memory'] rescue puts("INFO: Could not load 'vm.settings' from vagrant.yml. Using default value."); nil) || "2048"
-ports_tomcat = (settings['ports']['tomcat'] rescue puts("INFO: Could not load 'ports.tomcat' from vagrant.yml. Using default value."); nil) || 8080
-ports_debugging = (settings['ports']['debugging'] rescue puts("INFO: Could not load 'ports.debugging' from vagrant.yml. Using default value."); nil) || 8000
-ports_database = (settings['ports']['database'] rescue puts("INFO: Could not load 'ports.database' from vagrant.yml. Using default value."); nil)|| 3306
+vm_memory = (settings['vm']['memory'] rescue puts("INFO: Could not load 'vm.settings' from vagrant.yml. Using default value.")) || "2048"
+ports_tomcat = (settings['ports']['tomcat'] rescue puts("INFO: Could not load 'ports.tomcat' from vagrant.yml. Using default value.")) || 8080
+ports_debugging = (settings['ports']['debugging'] rescue puts("INFO: Could not load 'ports.debugging' from vagrant.yml. Using default value.")) || 8000
+ports_database = (settings['ports']['database'] rescue puts("INFO: Could not load 'ports.database' from vagrant.yml. Using default value."))|| 3306
 
 Vagrant.configure("2") do |config|
 
