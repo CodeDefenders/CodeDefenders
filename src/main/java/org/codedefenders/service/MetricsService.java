@@ -84,18 +84,20 @@ public class MetricsService {
             try (Gauge.Timer ignored = collectDuration.startTimer()) {
                 List<String> labelNames = Arrays.asList("threadPool");
 
-                GaugeMetricFamily poolSize = new GaugeMetricFamily("codedefenders_threadPoolExecutor_active_threads", "Number of currently active threads", labelNames);
+                GaugeMetricFamily corePoolSize = new GaugeMetricFamily("codedefenders_threadPoolExecutor_threads_core", "Maximum amount of threads", labelNames);
+                GaugeMetricFamily poolSize = new GaugeMetricFamily("codedefenders_threadPoolExecutor_threads_active", "Number of currently active threads", labelNames);
                 GaugeMetricFamily tasksActive = new GaugeMetricFamily("codedefenders_threadPoolExecutor_tasks_active", "Number of currently executing tasks", labelNames);
                 CounterMetricFamily tasksSubmitted = new CounterMetricFamily("codedefenders_threadPoolExecutor_tasks_submitted_total", "Total number of submitted tasks", labelNames);
                 CounterMetricFamily tasksCompleted = new CounterMetricFamily("codedefenders_threadPoolExecutor_tasks_completed_total", "Total number of completed tasks", labelNames);
                 GaugeMetricFamily tasksQueued = new GaugeMetricFamily("codedefenders_threadPoolExecutor_queue_size", "Number of queued tasks", labelNames);
 
-                List<MetricFamilySamples> mfs = Arrays.asList(poolSize, tasksActive, tasksSubmitted, tasksCompleted, tasksQueued);
+                List<MetricFamilySamples> mfs = Arrays.asList(corePoolSize, poolSize, tasksActive, tasksSubmitted, tasksCompleted, tasksQueued);
 
                 for (Map.Entry<String, ThreadPoolExecutor> entry : children.entrySet()) {
                     List<String> labelValues = Arrays.asList(entry.getKey());
                     ThreadPoolExecutor executor = entry.getValue();
 
+                    corePoolSize.addMetric(labelValues, executor.getCorePoolSize());
                     poolSize.addMetric(labelValues, executor.getPoolSize());
                     tasksActive.addMetric(labelValues, executor.getActiveCount());
                     tasksSubmitted.addMetric(labelValues, executor.getTaskCount());
