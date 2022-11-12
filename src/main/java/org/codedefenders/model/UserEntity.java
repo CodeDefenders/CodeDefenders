@@ -46,6 +46,7 @@ public class UserEntity implements Serializable {
     private boolean active;
     private boolean allowContact;
     private KeyMap keyMap;
+    private String token;
 
     public UserEntity(String username) {
         this(username, UserEntity.encodePassword(""));
@@ -60,11 +61,11 @@ public class UserEntity implements Serializable {
     }
 
     public UserEntity(int id, String username, String encodedPassword, String email) {
-        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT);
+        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT, null);
     }
 
     public UserEntity(int id, String username, String encodedPassword, String email, boolean validated,
-            boolean active, boolean allowContact, KeyMap keyMap) {
+            boolean active, boolean allowContact, KeyMap keyMap, String token) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -73,6 +74,7 @@ public class UserEntity implements Serializable {
         this.active = active;
         this.allowContact = allowContact;
         this.keyMap = keyMap;
+        this.token = token;
     }
 
     /**
@@ -180,5 +182,13 @@ public class UserEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
