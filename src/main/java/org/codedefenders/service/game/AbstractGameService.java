@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 
 import org.codedefenders.database.GameDAO;
@@ -40,7 +39,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
@@ -254,6 +252,8 @@ public abstract class AbstractGameService implements IGameService {
             boolean updated = game.update();
 
             if (updated) {
+                GameDAO.storeStartTime(game.getId());
+
                 GameStartedEvent gse = new GameStartedEvent();
                 gse.setGameId(game.getId());
                 notificationService.post(gse);
