@@ -99,7 +99,7 @@
                         <label for="minutes-input" class="input-group-text">minutes</label>
                         <div class="invalid-feedback">
                             Please input a valid duration.
-                            Maximum duration:
+                            Maximum remaining duration:
                             <span class="time-left"
                                   data-type="remaining"
                                   data-duration="${maxDuration}"
