@@ -20,6 +20,7 @@
 package org.codedefenders.servlets.auth;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +49,7 @@ import com.google.common.net.InetAddresses;
  * performs a login against the {@link CodeDefendersRealm} with the credentials
  * found in the {@code username} and {@code password} HTML parameters of the POST request.
  */
+@Singleton
 public class CodeDefendersBearerHttpAuthenticationFilter extends BearerHttpAuthenticationFilter {
     private static final Logger logger = LoggerFactory.getLogger(CodeDefendersBearerHttpAuthenticationFilter.class);
 
@@ -144,8 +146,8 @@ public class CodeDefendersBearerHttpAuthenticationFilter extends BearerHttpAuthe
 
     private boolean invalidIP(String ip) {
         //noinspection UnstableApiUsage
-        return (ip==null)
-                || (ip.length()==0)
+        return (ip == null)
+                || (ip.length() == 0)
                 || ("unknown".equalsIgnoreCase(ip))
                 || ("0:0:0:0:0:0:0:1".equals(ip))
                 || !InetAddresses.isInetAddress(ip);

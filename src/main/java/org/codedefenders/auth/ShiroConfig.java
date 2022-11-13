@@ -36,6 +36,7 @@ import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.codedefenders.servlets.auth.CodeDefendersBearerHttpAuthenticationFilter;
+import org.codedefenders.servlets.auth.CodeDefendersFakeBearerHttpAuthenticationFilter;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 
 /**
@@ -65,14 +66,14 @@ public class ShiroConfig {
      */
     @Produces
     @Singleton
-    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc, CodeDefendersBearerHttpAuthenticationFilter authcBearer) {
+    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc, CodeDefendersBearerHttpAuthenticationFilter authcBearer, CodeDefendersFakeBearerHttpAuthenticationFilter authcBearerFake) {
         /*
          * This filter uses the form data to check the user given the configured realms
          */
-        final String AUTHENTICATION = "authcBearer[permissive], authc";
-        final String AUTHENTICATION_INVERTED = "authc[permissive], authcBearer";
+        final String AUTHENTICATION = "authc";
+        final String AUTHENTICATION_API = "authc[permissive], authcBearer";
         final String AUTHENTICATION_ADMIN = AUTHENTICATION + ", roles[admin]";
-        final String AUTHENTICATION_INVERTED_ADMIN = AUTHENTICATION_INVERTED + ", roles[admin]";
+        final String AUTHENTICATION_API_ADMIN = AUTHENTICATION_API + ", roles[admin]";
 
         LogoutFilter logout = new LogoutFilter();
         // org.codedefenders.util.Paths.LOGOUT = "/logout";
@@ -81,6 +82,7 @@ public class ShiroConfig {
         FilterChainManager fcMan = new DefaultFilterChainManager();
         fcMan.addFilter("logout", logout);
         fcMan.addFilter("authcBearer", authcBearer);
+        fcMan.addFilter("authcBearerFake", authcBearerFake);
         fcMan.addFilter("authc", authc);
         // Additional 'default' filter e.g. `roles[…]` are also available
 
@@ -92,7 +94,7 @@ public class ShiroConfig {
          * Note: this is necessary to make sure authc is applied also to login page,
          * otherwise the Authentication filter will not be invoked
          */
-        fcMan.createChain("/login", AUTHENTICATION);
+        fcMan.createChain("/login", "authcBearerFake[permissive], authc");
         /*
          * TODO This list might be incomplete.
          */
@@ -153,7 +155,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_CLASS = "/api/class";
         // org.codedefenders.util.Paths.API_TEST = "/api/test";
         // org.codedefenders.util.Paths.API_MUTANT = "/api/mutant";
-        fcMan.createChain("/api/**", AUTHENTICATION_INVERTED);
+        fcMan.createChain("/api/**", AUTHENTICATION_API);
 
         // Admin URLS. This does not necessary require authentication as we handle that
         // using tomcat. But for completeness, we force it now.
@@ -181,7 +183,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_ADMIN_PUZZLES_ALL = "/admin/api/puzzles";
         // org.codedefenders.util.Paths.API_ADMIN_PUZZLE = "/admin/api/puzzles/puzzle";
         // org.codedefenders.util.Paths.API_ADMIN_PUZZLECHAPTER = "/admin/api/puzzles/chapter";
-        fcMan.createChain("/admin/api/**", AUTHENTICATION_INVERTED_ADMIN);
+        fcMan.createChain("/admin/api/**", AUTHENTICATION_API_ADMIN);
         fcMan.createChain("/admin/**", AUTHENTICATION_ADMIN);
 
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
