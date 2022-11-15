@@ -123,46 +123,23 @@
 
     <%-- Validate input and update hidden field containing duration as minutes. --%>
     <c:if test="${canSetDuration}">
-        <script>
-            const MAX_DURATION_MINUTES = Number(${maxDuration});
-            const units = ['days', 'hours', 'minutes'];
-            const inputs = {};
-            units.forEach(unit => inputs[unit] = document.getElementById(unit + '-input'));
-            const totalInput = document.getElementById('duration-total');
+        <script type="module">
+            import {GameTimeValidator} from './js/codedefenders_game.mjs';
 
-            const setValidity = function (customValidity) {
-                units.forEach(u => inputs[u].setCustomValidity(customValidity));
-            };
+            const calculateElapsedMinutes = () =>
+                <%-- No dynamic calculation needed if the game isn't started yet. --%>
+                <c:choose>
+                    <c:when test="${startTime == -1}">0</c:when>
+                    <c:otherwise>Math.round((Date.now() / 1e3 - ${startTime}) / 60)</c:otherwise>
+                </c:choose>;
 
-            const validateAndSetDuration = function () {
-                const hasValue = units.some(u => inputs[u].value.length > 0);
-                if (!hasValue) {
-                    setValidity('missing-value');
-                    return;
-                }
-
-                const days = Number(inputs.days.value);
-                const hours = Number(inputs.hours.value);
-                const minutes = Number(inputs.minutes.value);
-                const elapsedMinutes = <%-- No dynamic calculation needed if the game isn't started yet. --%>
-                    <c:choose>
-                        <c:when test="${startTime == -1}">0</c:when>
-                        <c:otherwise>Math.round((Date.now() / 1e3 - ${startTime}) / 60)</c:otherwise>
-                    </c:choose>;
-                const total = ((days * 24) + hours) * 60 + minutes + elapsedMinutes;
-
-                totalInput.value = total;
-
-                if (total < 0 || total > MAX_DURATION_MINUTES) {
-                    setValidity('invalid-value');
-                    return;
-                }
-
-                setValidity('');
-            };
-
-            units.forEach(u => inputs[u].addEventListener('input', validateAndSetDuration));
-            validateAndSetDuration();
+            const gameTimeValidator = new GameTimeValidator(
+                Number(${maxDuration}), 0,
+                ['days', 'hours', 'minutes'],
+                unit => '#' + unit + '-input',
+                '#duration-total', false,
+                calculateElapsedMinutes
+            );
         </script>
     </c:if>
 </form>

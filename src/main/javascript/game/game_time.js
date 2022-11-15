@@ -185,26 +185,40 @@ class GameTimeValidator {
      */
 
     /**
+     * Calculate the elapsed minutes for the current game
+     * @callback calculateElapsedMinutes
+     * @return {Number}
+     */
+
+    /**
      *
      * @param {Number} MAXIMUM_DURATION_MINUTES
-     * @param {Number} DEFAULT_DURATION_MINUTES
+     * @param {Number | false} DEFAULT_DURATION_MINUTES
      * @param {Array<string>=} units
      * @param {inputSelector=} inputSelector
      * @param {string=} totalInputSelector
-     * @param {string=} maxDurationOutputSelector
+     * @param {false | string=} maxDurationOutputSelector
+     * @param {calculateElapsedMinutes=} calculateElapsedMinutes
      */
     constructor(MAXIMUM_DURATION_MINUTES, DEFAULT_DURATION_MINUTES, units = ['days', 'hours', 'minutes'],
                 inputSelector = unit => `#${unit}-input`, totalInputSelector = '#gameDurationMinutes',
-                maxDurationOutputSelector = '#displayMaxDuration') {
+                maxDurationOutputSelector = '#displayMaxDuration', calculateElapsedMinutes = () => 0) {
         this.MAXIMUM_DURATION_MINUTES = MAXIMUM_DURATION_MINUTES;
         this.DEFAULT_DURATION_MINUTES = DEFAULT_DURATION_MINUTES;
-        /** @type Array<string> */
+        this.calculateElapsedMinutes = calculateElapsedMinutes;
         this.units = units;
         this.inputs = {};
         this.units.forEach(unit => this.inputs[unit] = document.querySelector(inputSelector(unit)));
         this.totalInput = document.querySelector(totalInputSelector);
-        document.querySelector(maxDurationOutputSelector).innerText = toMixedUnitString(this.MAXIMUM_DURATION_MINUTES);
-        this.setDefaults();
+
+        if (maxDurationOutputSelector) {
+            document.querySelector(maxDurationOutputSelector).innerText = toMixedUnitString(this.MAXIMUM_DURATION_MINUTES);
+        }
+
+        if (this.DEFAULT_DURATION_MINUTES !== false) {
+            this.setDefaults();
+        }
+
         this.units.forEach(u => this.inputs[u].addEventListener('input', this.validateAndSetDuration.bind(this)));
         this.validateAndSetDuration();
     }
@@ -243,7 +257,7 @@ class GameTimeValidator {
         const days = Number(this.inputs.days.value);
         const hours = Number(this.inputs.hours.value);
         const minutes = Number(this.inputs.minutes.value);
-        const total = ((days * 24) + hours) * 60 + minutes;
+        const total = ((days * 24) + hours) * 60 + minutes + this.calculateElapsedMinutes();
 
         this.totalInput.value = total;
 
