@@ -67,7 +67,7 @@ class GameTimeManager {
      * Renders the total duration in the target element.
      */
     renderTotal(element, duration) {
-        element.innerText = this.toMixedUnitString(duration);
+        element.innerText = toMixedUnitString(duration);
     }
 
     /**
@@ -75,7 +75,7 @@ class GameTimeManager {
      */
     renderRemaining(element, start, duration) {
         const remainingMinutes = this.calculateRemainingTime(start, duration);
-        element.innerText = this.toMixedUnitString(remainingMinutes);
+        element.innerText = toMixedUnitString(remainingMinutes);
     }
 
     /**
@@ -91,7 +91,7 @@ class GameTimeManager {
      */
     renderElapsed(element, start) {
         const elapsedMinutes = this.calculateElapsedMinutes(start);
-        element.innerText = this.toMixedUnitString(elapsedMinutes);
+        element.innerText = toMixedUnitString(elapsedMinutes);
     }
 
     /**
@@ -155,38 +155,6 @@ class GameTimeManager {
     }
 
     /**
-     * Converts the given duration in minutes to a string with the format "Xd Yh Zm" or "Yh Zm" or "Zm".
-     *
-     * @param pMinutes {Number} the duration in minutes
-     * @returns {string} the string representation
-     */
-    toMixedUnitString(pMinutes) {
-        let minutes = pMinutes;
-        if (minutes <= 0) {
-            return '0min';
-        }
-
-        let hours = 0;
-        let days = 0;
-
-        if (minutes >= 60) {
-            hours = Math.floor(minutes / 60);
-            minutes %= 60;
-        }
-
-        if (hours >= 24) {
-            days = Math.floor(hours / 24);
-            hours %= 24;
-        }
-
-        let result = '';
-        if (days > 0) result += days + 'd ';
-        if (hours > 0) result += hours + 'h ';
-        if (minutes > 0) result += Math.round(minutes) + 'min';
-        return result;
-    }
-
-    /**
      * Renders the given date. If the date is today, only the time is rendered. Otherwise, the whole
      * date is rendered.
      *
@@ -237,7 +205,7 @@ class GameTimeValidator {
         this.totalInput = document.querySelector(totalInputSelector);
         document.querySelector(maxDurationOutputSelector).innerText = toMixedUnitString(this.MAXIMUM_DURATION_MINUTES);
         this.setDefaults();
-        this.units.forEach(u => this.inputs[u].addEventListener('input', this.validateAndSetDuration));
+        this.units.forEach(u => this.inputs[u].addEventListener('input', this.validateAndSetDuration.bind(this)));
         this.validateAndSetDuration();
     }
 
@@ -272,14 +240,14 @@ class GameTimeValidator {
             return;
         }
 
-        const days = Number(inputs.days.value);
-        const hours = Number(inputs.hours.value);
-        const minutes = Number(inputs.minutes.value);
+        const days = Number(this.inputs.days.value);
+        const hours = Number(this.inputs.hours.value);
+        const minutes = Number(this.inputs.minutes.value);
         const total = ((days * 24) + hours) * 60 + minutes;
 
         this.totalInput.value = total;
 
-        if (total < 0 || total > this.MAXIMUM_DURATION_MINUTES) {
+        if (total <= 0 || total > this.MAXIMUM_DURATION_MINUTES) {
             this.setValidity('invalid-value');
             return;
         }
@@ -289,4 +257,36 @@ class GameTimeValidator {
 
 }
 
-export default {GameTimeManager, GameTimeValidator};
+/**
+ * Converts the given duration in minutes to a string with the format "Xd Yh Zm" or "Yh Zm" or "Zm".
+ *
+ * @param pMinutes {Number} the duration in minutes
+ * @returns {string} the string representation
+ */
+function toMixedUnitString(pMinutes) {
+    let minutes = pMinutes;
+    if (minutes <= 0) {
+        return '0min';
+    }
+
+    let hours = 0;
+    let days = 0;
+
+    if (minutes >= 60) {
+        hours = Math.floor(minutes / 60);
+        minutes %= 60;
+    }
+
+    if (hours >= 24) {
+        days = Math.floor(hours / 24);
+        hours %= 24;
+    }
+
+    let result = '';
+    if (days > 0) result += days + 'd ';
+    if (hours > 0) result += hours + 'h ';
+    if (minutes > 0) result += Math.round(minutes) + 'min';
+    return result;
+}
+
+export {GameTimeManager, GameTimeValidator};
