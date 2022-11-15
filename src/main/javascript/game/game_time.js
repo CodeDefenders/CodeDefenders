@@ -211,6 +211,11 @@ class GameTimeValidator {
         this.units.forEach(unit => this.inputs[unit] = document.querySelector(inputSelector(unit)));
         this.totalInput = document.querySelector(totalInputSelector);
 
+        // init hooks
+        const doNothing = () => {};
+        this._onInvalidDuration = doNothing;
+        this._onValidDuration = doNothing;
+
         if (maxDurationOutputSelector) {
             document.querySelector(maxDurationOutputSelector).innerText = toMixedUnitString(this.MAXIMUM_DURATION_MINUTES);
         }
@@ -263,12 +268,21 @@ class GameTimeValidator {
 
         if (total <= 0 || total > this.MAXIMUM_DURATION_MINUTES) {
             this.setValidity('invalid-value');
+            this._onInvalidDuration();
             return;
         }
 
         this.setValidity('');
+        this._onValidDuration();
     }
 
+    set onInvalidDuration(callback) {
+        this._onInvalidDuration = callback;
+    }
+
+    set onValidDuration(callback) {
+        this._onValidDuration = callback;
+    }
 }
 
 /**
