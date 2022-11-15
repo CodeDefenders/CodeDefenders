@@ -89,7 +89,7 @@
             <%-- Duration Controls --%>
             <c:if test="${canSetDuration}">
                 <div class="mt-3">
-                    <label class="form-label">Set the games new remaining duration:</label>
+                    <label class="form-label">Set the game's new remaining duration:</label>
                     <div class="input-group input-group-sm has-validation">
                         <input type="number" name="days" class="form-control" id="days-input" min="0">
                         <label for="days-input" class="input-group-text">days</label>

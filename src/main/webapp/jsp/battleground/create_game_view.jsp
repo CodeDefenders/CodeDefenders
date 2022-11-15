@@ -234,7 +234,7 @@
                         request.setAttribute("maximumDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
                     %>
 
-                    <label class="col-4 col-form-label">Set the games duration:</label>
+                    <label class="col-4 col-form-label">Set the game's duration:</label>
                     <div class="col-8 input-group input-group-sm has-validation"
                          style="width: 66.6666666667%;"><!-- col-8 is overridden by input-group -->
                         <input type="number" name="days" class="form-control" id="days-input" min="0">
