@@ -51,6 +51,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.LabeledStmt;
 import com.github.javaparser.ast.stmt.LocalClassDeclarationStmt;
 import com.github.javaparser.ast.stmt.LocalRecordDeclarationStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
@@ -67,8 +68,10 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 // TODO: add asserts to make sure nodes have the right coverage? (e.g. method should never be EMPTY)
 // TODO: remove COVERED and use END_COVERED instead?
 // TODO: flow coverage up expressions?
-// TODO: update e.g. body of empty method if method is COVERED_END?
+// TODO: update e.g. body of empty method if method is COVERED_END? (same with loops, ifs, switch, try-catch)
 // TODO: merge methods with similar handling
+// TODO: function declarations of anonymous classes can be optimized out if they can't be used from the outside
+// TODO: exception in method chain -> outermost MethodCallExpr not covered -> wrong coverage
 
 /**
  * Extracts line coverage onto a {@link JavaParser} AST.
@@ -257,6 +260,10 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ClassOrInterfaceDeclaration decl, Void arg) {
         super.visit(decl, arg);
 
+        if (decl.isInterface()) {
+            return;
+        }
+
         List<ConstructorDeclaration> constructors = decl.getConstructors();
 
         // check if any constructors are covered -> INITIALIZED
@@ -427,7 +434,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         finalizers.add(() -> {
 
             // search for parent class/enum/record/annotation declaration
-            Optional<TypeDeclaration<?>> optParentClass = findParentClass(decl);
+            Optional<TypeDeclaration> optParentClass = decl.findAncestor(TypeDeclaration.class);
             if (!optParentClass.isPresent()) {
                 return;
             }
@@ -493,7 +500,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         finalizers.add(() -> {
 
             // check if the parent class has been initialized for non-static empty blocks
-            Optional<TypeDeclaration<?>> optParentClass = findParentClass(decl);
+            Optional<TypeDeclaration> optParentClass = decl.findAncestor(TypeDeclaration.class);
             if (!optParentClass.isPresent()) {
                 return;
             }
@@ -1292,6 +1299,22 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     /**
+     * A labeled statement can be
+     * <ul>
+     *     <li>{@link AstCoverageStatus#EMPTY}</li>
+     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     * </ul>
+     */
+    @Override
+    public void visit(LabeledStmt stmt, Void arg) {
+        super.visit(stmt, arg);
+        astCoverage.put(stmt, astCoverage.get(stmt.getStatement()));
+    }
+
+    /**
      * A return statement can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
@@ -1652,6 +1675,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      */
     @Override
     public void visit(VariableDeclarationExpr expr, Void arg) {
+        super.visit(expr, arg);
         AstCoverageStatus varStatus = expr.getVariables().stream()
                 .map(astCoverage::get)
                 .reduce(AstCoverageStatus.EMPTY, AstCoverageStatus::upgrade);

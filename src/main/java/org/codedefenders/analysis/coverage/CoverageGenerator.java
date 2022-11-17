@@ -36,8 +36,9 @@ import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
 import org.codedefenders.analysis.coverage.line.LineCoverageMapping;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
-import org.codedefenders.analysis.coverage.line.LineTokenTree;
+import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
 import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
+import org.codedefenders.analysis.coverage.line.LineTokens;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.util.JavaParserUtils;
@@ -93,9 +94,13 @@ public class CoverageGenerator {
                     .sorted(Comparator.comparing(entry -> entry.getKey().getBegin().get()))
                     .collect(Collectors.toList());
 
-            LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astMapping, lineMapping);
+            LineTokens lineTokens = LineTokens.fromJaCoCo(lineMapping);
+            LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astMapping, lineTokens);
             lineTokenVisitor.visit(compilationUnit, null);
-            LineTokenTree lineTokenTree = lineTokenVisitor.getTree();
+
+            LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
+            LineCoverageMapping extendedMapping = lineTokenAnalyser.analyse(lineTokens);
+            return extendedMapping.toLineCoverage();
         } catch (Exception e) {
             logger.error("COVERAGE ERROR", e);
         }
@@ -176,6 +181,10 @@ public class CoverageGenerator {
 
                 for (int line = classCoverage.getFirstLine(); line <= classCoverage.getLastLine(); line++) {
                     final ILine lineCoverage = classCoverage.getLine(line);
+                    int totalIns = lineCoverage.getInstructionCounter().getTotalCount();
+                    int missedIns = lineCoverage.getInstructionCounter().getMissedCount();
+                    int totalBr = lineCoverage.getBranchCounter().getTotalCount();
+                    int missedBr = lineCoverage.getBranchCounter().getMissedCount();
                     final int status = lineCoverage.getInstructionCounter().getStatus();
                     lineMapping.put(line, LineCoverageStatus.fromJacoco(status));
                 }

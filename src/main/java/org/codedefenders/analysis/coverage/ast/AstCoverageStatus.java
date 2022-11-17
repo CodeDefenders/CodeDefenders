@@ -1,6 +1,8 @@
 package org.codedefenders.analysis.coverage.ast;
 
 
+import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
+
 public enum AstCoverageStatus {
     EMPTY(false, false, 0),
     NOT_COVERED(false, false, 1),
@@ -8,6 +10,9 @@ public enum AstCoverageStatus {
     END_COVERED(true, true, 3),
     COVERED(true, true, 3),
     INITIALIZED(true, true, 3);
+
+    // TODO: remove COVERED
+    // TODO: track coverage of child nodes when NOT_COVERED
 
     final private boolean covered;
     final private boolean endCovered;
@@ -60,6 +65,22 @@ public enum AstCoverageStatus {
             return this;
         } else {
             return other;
+        }
+    }
+
+    public LineCoverageStatus toLineCoverage() {
+        switch (this) {
+            case EMPTY:
+                return LineCoverageStatus.EMPTY;
+            case NOT_COVERED:
+                return LineCoverageStatus.NOT_COVERED;
+            case BEGIN_COVERED:
+            case END_COVERED:
+            case COVERED:
+            case INITIALIZED:
+                return LineCoverageStatus.FULLY_COVERED;
+            default:
+                throw new IllegalStateException("Unknown AST coverage status.");
         }
     }
 }

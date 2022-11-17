@@ -27,16 +27,6 @@ public class LineCoverageMapping {
         return Collections.unmodifiableMap(statusPerLine);
     }
 
-    @Deprecated
-    public boolean isRangeCoverd(int beginLine, int endLine) {
-        for (int line = beginLine; line <= endLine; line++) {
-            if (get(line).isCovered()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public LineCoverage toLineCoverage() {
         int startLine = statusPerLine.keySet().stream()
                 .mapToInt(Integer::intValue)
