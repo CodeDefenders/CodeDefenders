@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.GameClass;
@@ -71,7 +71,7 @@ public class ProjectExportManager extends HttpServlet {
     };
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Override
     protected void doGet(HttpServletRequest request,

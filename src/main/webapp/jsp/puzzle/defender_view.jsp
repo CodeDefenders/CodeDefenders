@@ -48,7 +48,6 @@
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Puzzle: " + puzzle.getChapter().getTitle() + " - " + puzzle.getTitle()); %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 
@@ -90,16 +89,6 @@
         testErrorHighlighting.setErrorLines(previousSubmission.getErrorLines());
     }
 %>
-
-<%--
-<jsp:useBean id="mutantAccordion" class="org.codedefenders.beans.game.MutantAccordionBean" scope="request"/>
-<%
-    mutantAccordion.setMutantAccordionData(cut, login.getUser(), game.getMutants());
-    mutantAccordion.setFlaggingData(game.getMode(), game.getId());
-    mutantAccordion.setEnableFlagging(false);
-    mutantAccordion.setViewDiff(true);
-%>
---%>
 
 <%--
 <jsp:useBean id="testAccordion" class="org.codedefenders.beans.game.TestAccordionBean" scope="request"/>

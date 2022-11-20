@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2022 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,20 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.game.puzzle.solving;
 
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.puzzle.PuzzleGame;
+package org.codedefenders.auth;
 
-/**
- * This {@link MutantSolvingStrategy} implementation marks a puzzle as solved, when
- * the mutant submitted by the user survives all system tests.
- *
- * @author <a href="https://github.com/werli">Phil Werli</a>
- */
-public final class SurvivedAllTestsSolvingStrategy implements MutantSolvingStrategy {
-    @Override
-    public boolean solve(PuzzleGame game, Mutant mutant) {
-        return mutant.isAlive();
-    }
+import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.dto.User;
+import org.codedefenders.model.UserEntity;
+
+public interface CodeDefendersAuth {
+
+    boolean isLoggedIn();
+
+    boolean isAdmin();
+
+    int getUserId();
+
+    SimpleUser getSimpleUser();
+
+    User getUser();
+
+    // TODO(Alex): Do not expose UserEntity!
+    @Deprecated
+    UserEntity getUserEntity();
 }

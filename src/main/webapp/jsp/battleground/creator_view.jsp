@@ -27,8 +27,6 @@
         The game to be displayed.
 --%>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 %>

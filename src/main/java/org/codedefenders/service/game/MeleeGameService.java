@@ -36,6 +36,8 @@ import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.game.scoring.ScoringPolicyProducer;
 import org.codedefenders.model.Player;
+import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.UserService;
 import org.codedefenders.util.Constants;
 
 @ApplicationScoped
@@ -44,8 +46,8 @@ public class MeleeGameService extends AbstractGameService {
     private final ScoreCalculator scoreCalculator;
 
     @Inject
-    public MeleeGameService(ScoreCalculator scoreCalculator) {
-        // create new instance instead of using injection, as games can be closed outside a request context
+    public MeleeGameService(UserService userService, UserRepository userRepository, ScoreCalculator scoreCalculator) {
+        super(userService, userRepository);
         this.scoreCalculator = scoreCalculator;
     }
 

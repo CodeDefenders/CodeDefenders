@@ -32,10 +32,13 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.GameCronJobManager;
 import org.codedefenders.execution.ThreadPoolManager;
+import org.codedefenders.service.MetricsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mysql.cj.jdbc.AbandonedConnectionCleanupThread;
+import io.prometheus.client.exporter.MetricsServlet;
+import net.bull.javamelody.ReportServlet;
 
 @WebListener
 public class SystemStartStop implements ServletContextListener {
@@ -51,6 +54,9 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     GameCronJobManager gameCronJobManager;
 
+    @Inject
+    private MetricsService metricsService;
+
     /**
      * This method is called when the servlet context is initialized(when
      * the Web application is deployed). You can initialize servlet context
@@ -65,6 +71,14 @@ public class SystemStartStop implements ServletContextListener {
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
         mgr.register("test-executor").withMax(4).withCore(2).add();
+
+        if (config.isMetricsCollectionEnabled()) {
+            metricsService.registerDefaultCollectors();
+            sce.getServletContext().addServlet("prom", new MetricsServlet()).addMapping("/metrics");
+        }
+        if (config.isJavaMelodyEnabled()) {
+            sce.getServletContext().addServlet("javamelody", new ReportServlet()).addMapping("/monitoring");
+        }
 
         gameCronJobManager.startup();
     }

@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 
@@ -25,8 +28,6 @@
 <% pageInfo.setPageTitle("Account Settings"); %>
 
 <jsp:include page="/jsp/header.jsp"/>
-
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
     int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
@@ -38,7 +39,7 @@
     <section class="mt-5" aria-labelledby="email-settings">
         <h2 class="mb-3" id="email-settings">Email Settings</h2>
 
-        <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post"
+        <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post"
               class="row g-3 needs-validation"
               autocomplete="off">
             <input type="hidden" class="form-control" name="formType" value="updateProfile">
@@ -47,12 +48,12 @@
                 <div class="mb-2">
                     <label for="updatedEmail" class="form-label">Email</label>
                     <input type="email" class="form-control" id="updatedEmail" name="updatedEmail"
-                           value="<%=login.getUser().getEmail()%>" placeholder="Email" required>
+                           value="${login.user.email}" placeholder="Email" required>
                 </div>
 
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="allowContact" name="allowContact"
-                        <%=login.getUser().getAllowContact() ? "checked" : ""%>>
+                           ${login.user.isContactingAllowed() ? "checked" : ""}>
                     <label class="form-check-label" for="allowContact">
                         Allow us to contact your email address.
                     </label>
@@ -68,7 +69,7 @@
     <section class="mt-5" aria-labelledby="password-settings">
         <h2 class="mb-3" id="password-settings">Update Password</h2>
 
-        <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post"
+        <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post"
               class="row g-3 needs-validation"
               autocomplete="off">
             <input type="hidden" class="form-control" name="formType" value="changePassword">
@@ -133,7 +134,7 @@
         <div class="modal" id="account-deletion-modal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="<%=request.getContextPath() + Paths.USER_SETTINGS%>" method="post">
+                    <form action="${pageContext.request.contextPath}${Paths.USER_SETTINGS}" method="post">
                         <input type="hidden" class="form-control" name="formType" value="deleteAccount">
 
                         <div class="modal-header">

@@ -32,21 +32,21 @@ public class User extends SimpleUser {
 
     private final String email;
     private final Boolean emailValidated;
-    private final Boolean allowContact;
+    private final Boolean contactingAllowed;
 
     private final KeyMap keyMap;
 
     public User(int id, String name, Boolean active, String email, Boolean emailValidated,
-            Boolean allowContact, KeyMap keyMap) {
+            Boolean contactingAllowed, KeyMap keyMap) {
         super(id, name);
         this.active = active;
         this.email = email;
         this.emailValidated = emailValidated;
-        this.allowContact = allowContact;
+        this.contactingAllowed = contactingAllowed;
         this.keyMap = keyMap;
     }
 
-    public Boolean getActive() {
+    public Boolean isActive() {
         return active;
     }
 
@@ -54,12 +54,12 @@ public class User extends SimpleUser {
         return email;
     }
 
-    public Boolean getEmailValidated() {
+    public Boolean isEmailValidated() {
         return emailValidated;
     }
 
-    public Boolean getAllowContact() {
-        return allowContact;
+    public Boolean isContactingAllowed() {
+        return contactingAllowed;
     }
 
     public KeyMap getKeyMap() {

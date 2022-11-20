@@ -23,7 +23,8 @@
     Displays the test code in a CodeMirror textarea.
 --%>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
 
 <div class="card game-component-resize loading">

@@ -15,7 +15,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
@@ -48,7 +48,7 @@ public class MutantAccordionBean {
     private final List<MutantAccordionCategory> categories;
 
     @Inject
-    public MutantAccordionBean(GameService gameService, LoginBean login, GameProducer gameProducer) {
+    public MutantAccordionBean(GameService gameService, CodeDefendersAuth login, GameProducer gameProducer) {
         this.game = gameProducer.getGame();
 
         mutantList = gameService.getMutants(login.getUserId(), game.getId());

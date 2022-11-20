@@ -19,10 +19,10 @@ import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.admin.StagedGameList.GameSettings;
 import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.MeleeGameDAO;
@@ -68,16 +68,15 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 public class AdminCreateGamesBean implements Serializable {
 
     private final Object synchronizer = new Object();
-    private final LoginBean login;
+    private final CodeDefendersAuth login;
     private final MessagesBean messages;
     private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
-
     private final GameService gameService;
 
     @Inject
-    public AdminCreateGamesBean(LoginBean login, MessagesBean messages, GameManagingUtils gameManagingUtils,
+    public AdminCreateGamesBean(CodeDefendersAuth login, MessagesBean messages, GameManagingUtils gameManagingUtils,
                                 EventDAO eventDAO, UserRepository userRepo, GameService gameService) {
         this.login = login;
         this.messages = messages;

@@ -7,9 +7,10 @@
 
 		<powermock.version>2.0.9</powermock.version>
 		<tomcat.version>9.0.35</tomcat.version>
-		<slf4j.version>1.7.32</slf4j.version>
+		<slf4j.version>1.7.36</slf4j.version>
 		<junit5.version>5.8.2</junit5.version>
 		<junit4.version>4.13.2</junit4.version>
+		<prometheus-client.version>0.16.0</prometheus-client.version>
 
 		<config.properties>config.properties</config.properties>
 
@@ -174,6 +175,43 @@
 				</executions>
 			</plugin>
 
+			<!-- Builds and bundles JavaScript -->
+			<plugin>
+				<groupId>com.github.eirslett</groupId>
+				<artifactId>frontend-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>install node and npm</id>
+						<goals>
+							<goal>install-node-and-npm</goal>
+						</goals>
+						<phase>generate-resources</phase>
+					</execution>
+
+					<execution>
+						<id>npm install</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>install</arguments>
+						</configuration>
+						<phase>generate-resources</phase>
+					</execution>
+
+					<execution>
+						<id>npm run bundle</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>run bundle</arguments>
+						</configuration>
+						<phase>compile</phase>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -314,45 +352,6 @@
 						<goals>
 							<goal>deploy-only</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>com.github.eirslett</groupId>
-				<artifactId>frontend-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>install node and npm</id>
-						<goals>
-							<goal>install-node-and-npm</goal>
-						</goals>
-						<phase>generate-resources</phase>
-						<configuration>
-							<nodeVersion>v16.17.1</nodeVersion>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>npm install</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<configuration>
-							<arguments>install</arguments>
-						</configuration>
-						<phase>generate-resources</phase>
-					</execution>
-
-					<execution>
-						<id>npm run bundle</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<configuration>
-							<arguments>run bundle</arguments>
-						</configuration>
-						<phase>compile</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -559,6 +558,9 @@
 					<groupId>com.github.eirslett</groupId>
 					<artifactId>frontend-maven-plugin</artifactId>
 					<version>1.12.1</version>
+					<configuration>
+						<nodeVersion>v16.17.1</nodeVersion>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -823,6 +825,34 @@
 			<artifactId>slf4j-simple</artifactId>
 			<version>${slf4j.version}</version>
 			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Metrics -->
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_hotspot</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_servlet</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.prometheus</groupId>
+			<artifactId>simpleclient_guava</artifactId>
+			<version>${prometheus-client.version}</version>
+		</dependency>
+		<!-- javamelody-core -->
+		<dependency>
+			<groupId>net.bull.javamelody</groupId>
+			<artifactId>javamelody-core</artifactId>
+			<version>1.91.0</version>
 		</dependency>
 
 		<!-- Annotations -->

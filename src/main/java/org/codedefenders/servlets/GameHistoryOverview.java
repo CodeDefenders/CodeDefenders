@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.model.UserMeleeGameInfo;
@@ -26,7 +26,7 @@ import org.codedefenders.util.Constants;
 public class GameHistoryOverview extends HttpServlet {
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

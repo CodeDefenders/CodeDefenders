@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -91,7 +91,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private MessagesBean messages;
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Inject
     private INotificationService notificationService;
@@ -238,7 +238,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             GameJoinedEvent gje = new GameJoinedEvent();
             gje.setGameId(game.getId());
             gje.setUserId(login.getUserId());
-            gje.setUserName(login.getUser().getUsername());
+            gje.setUserName(login.getSimpleUser().getName());
             notificationService.post(gje);
 
             // TODO The following notification is duplicated as MeleeGame.addPlayer also
@@ -297,7 +297,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         GameLeftEvent gle = new GameLeftEvent();
         gle.setGameId(game.getId());
         gle.setUserId(login.getUserId());
-        gle.setUserName(login.getUser().getUsername());
+        gle.setUserName(login.getSimpleUser().getName());
 
         notificationService.post(gle);
 

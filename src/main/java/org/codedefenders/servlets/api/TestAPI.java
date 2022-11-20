@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.Test;
 import org.codedefenders.service.game.GameService;
@@ -53,7 +53,7 @@ import com.google.gson.JsonObject;
 public class TestAPI extends HttpServlet {
 
     @Inject
-    LoginBean login;
+    CodeDefendersAuth login;
 
     @Inject
     GameService gameService;

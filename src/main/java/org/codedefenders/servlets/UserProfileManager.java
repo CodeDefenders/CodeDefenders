@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.user.LoginBean;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.user.UserProfileBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.UserStats;
@@ -56,7 +56,7 @@ public class UserProfileManager extends HttpServlet {
     private UserRepository userRepo;
 
     @Inject
-    private LoginBean login;
+    private CodeDefendersAuth login;
 
     @Inject
     private UserStatsService userStatsService;
@@ -129,7 +129,7 @@ public class UserProfileManager extends HttpServlet {
          */
 
         // load stats
-        final UserEntity user = urlParamUser.orElseGet(login::getUser);
+        final UserEntity user = urlParamUser.orElseGet(login::getUserEntity);
         final UserStats stats = userStatsService.getStatsByUserId(user.getId());
 
         // Pass values to JSP page
