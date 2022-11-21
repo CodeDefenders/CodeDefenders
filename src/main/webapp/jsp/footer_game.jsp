@@ -18,9 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.AbstractGame" %>
-<%@ page import="org.codedefenders.beans.user.LoginBean" %>
-<%@ page import="org.codedefenders.util.CDIUtil" %>
+
+<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 </div> <%-- closes #game-container --%>
 
@@ -32,8 +32,8 @@
         const socket = await objects.await('pushSocket');
 
         socket.subscribe('registration.GameLifecycleRegistrationEvent', {
-            gameId: <%=((AbstractGame) request.getAttribute("game")).getId()%>,
-            userId: <%=CDIUtil.getBeanFromCDI(LoginBean.class).getUserId()%>
+            gameId: ${gameProducer.game.id},
+            userId: ${login.userId}
         });
 
         socket.register('game.GameStoppedEvent', event => {
