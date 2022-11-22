@@ -24,11 +24,13 @@
 <%@ page import="org.codedefenders.execution.KillMapProcessor.KillMapJob" %>
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="killMapProcessor" type="org.codedefenders.execution.KillMapProcessor"--%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("KillMap Management"); %>
@@ -44,11 +46,8 @@
     KillmapPage currentPage = (KillmapPage) request.getAttribute("page");
 
     String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.toString();
-    ServletContext context = pageContext.getServletContext();
-    KillMapProcessor processor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
 
-    boolean processorEnabled = processor.isEnabled();
-    KillMapJob currentJob = processor.getCurrentJob();
+    KillMapJob currentJob = CDIUtil.getBeanFromCDI(KillMapProcessor.class).getCurrentJob();
 
     int numClassesQueued = KillmapDAO.getNumClassKillmapJobsQueued();
     int numGamesQueued = KillmapDAO.getNumGameKillmapJobsQueued();
@@ -68,11 +67,14 @@
             </p>
 
             <p class="m-0">
-                <% if (processorEnabled) { %>
-                    Killmap Processing is <span class="text-success">enabled</span>.
-                <% } else { %>
-                    Killmap Processing is <span class="text-danger">disabled</span>.
-                <% } %>
+                <c:choose>
+                    <c:when test="${killMapProcessor.enabled}">
+                        Killmap Processing is <span class="text-success">enabled</span>.
+                    </c:when>
+                    <c:otherwise>
+                        Killmap Processing is <span class="text-danger">disabled</span>.
+                    </c:otherwise>
+                </c:choose>
             </p>
 
             <%
@@ -92,15 +94,18 @@
             <form id="killmap-processor-settings" class="mt-3" name="killmap-processor-settings" title="<%=processorExplanation%>"
                   method="post">
                 <input type="hidden" name="formType" value="toggleKillMapProcessing">
-                <% if (processorEnabled) { %>
-                    <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
-                        Disable KillMap Processing
-                    </button>
-                <% } else { %>
-                    <button type="submit" name="enable" value="true" id="toggle-killmap-processing" class="btn btn-success">
-                        Enable KillMap Processing
-                    </button>
-                <% } %>
+                <c:choose>
+                    <c:when test="${killMapProcessor.enabled}">
+                        <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
+                            Disable KillMap Processing
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <button type="submit" name="enable" value="true" id="toggle-killmap-processing" class="btn btn-success">
+                            Enable KillMap Processing
+                        </button>
+                    </c:otherwise>
+                </c:choose>
             </form>
         </div>
     </div>
