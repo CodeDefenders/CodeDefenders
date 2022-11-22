@@ -233,6 +233,12 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
         return withConnection(conn -> queryRunner.insert(conn, sql, mapper, params));
     }
 
+    @Override
+    public <T> T insertBatch(@Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
+            @Nonnull Object[][] params) throws SQLException {
+        return withConnection(conn -> queryRunner.insertBatch(conn, sql, mapper, params));
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -268,6 +274,12 @@ public class TransactionAwareQueryRunner implements TransactionManager, QueryRun
             @Nonnull Object... params) throws SQLException {
         return withConnection(conn -> queryRunner.execute(conn, sql, mapper, params));
     }
+
+    @Override
+    public int[] batch(@Nonnull String sql, @Nonnull Object[][] params) throws SQLException {
+        return withConnection(conn -> queryRunner.batch(conn, sql, params));
+    }
+
 
     private void removeCurrentTransaction() {
         transaction.remove();
