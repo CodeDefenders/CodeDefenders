@@ -32,7 +32,6 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.GameCronJobManager;
 import org.codedefenders.execution.KillMapProcessor;
-import org.codedefenders.execution.ThreadPoolManager;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +43,6 @@ import net.bull.javamelody.ReportServlet;
 @WebListener
 public class SystemStartStop implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(SystemStartStop.class);
-
-    @Inject
-    private ThreadPoolManager mgr;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
@@ -74,8 +70,6 @@ public class SystemStartStop implements ServletContextListener {
             logger.error(e.getMessage());
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
-
-        mgr.register("test-executor").withCore(config.getNumberOfParallelAntExecutions()).add();
 
         if (config.isMetricsCollectionEnabled()) {
             metricsRegistry.registerDefaultCollectors();
@@ -116,6 +110,6 @@ public class SystemStartStop implements ServletContextListener {
             }
         }
 
-        // The ThreadPoolManager should be able to automatically stop the instances
+        // The ExecutorServiceProvider should be able to automatically stop the instances
     }
 }

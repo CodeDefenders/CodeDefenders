@@ -18,42 +18,26 @@
  */
 package org.codedefenders.execution;
 
-import java.util.concurrent.ExecutorService;
-
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
-import javax.inject.Inject;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 
 public class MutationTesterProducer {
 
-    private final Configuration config;
-    private final BackendExecutorService backend;
-    private final ExecutorService testExecutorThreadPool;
-    private final EventDAO eventDAO;
-
-    @Inject
-    public MutationTesterProducer(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config, BackendExecutorService backend, @ThreadPool("test-executor") ExecutorService testExecutorThreadPool, EventDAO eventDAO) {
-        this.config = config;
-        this.backend = backend;
-        this.testExecutorThreadPool = testExecutorThreadPool;
-        this.eventDAO = eventDAO;
-    }
-
-    @Inject
-    private UserRepository userRepo;
-
     @Produces
-    @RequestScoped
-    public IMutationTester getMutationTester() {
+    @ApplicationScoped
+    public IMutationTester getMutationTester(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+            BackendExecutorService backend, EventDAO eventDAO, UserRepository userRepo,
+                                             ExecutorServiceProvider executorServiceProvider) {
         if (config.isParallelize()) {
-            return new ParallelMutationTester(backend, userRepo, eventDAO, config.isMutantCoverage(), testExecutorThreadPool);
+            return new ParallelMutationTester(backend, userRepo, eventDAO, config.isMutantCoverage(),
+                    executorServiceProvider.createExecutorService("test-executor-parallel", config.getNumberOfParallelAntExecutions()));
         } else {
             return new MutationTester(backend, userRepo, eventDAO, config.isMutantCoverage());
         }
     }
-
 }

@@ -19,7 +19,6 @@
 package org.codedefenders.execution;
 
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +31,7 @@ import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +47,9 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class KillMapProcessor {
     private static final Logger logger = LoggerFactory.getLogger(KillMapProcessor.class);
+
+    @Inject
+    private ExecutorServiceProvider executorServiceProvider;
 
     @Inject
     private KillMapService killMapService;
@@ -170,7 +173,7 @@ public class KillMapProcessor {
             }
         }
 
-        executor = Executors.newScheduledThreadPool(1);
+        executor = executorServiceProvider.createScheduledExecutorService("killmapProcessor", 1);
         logger.debug("KillMapProcessor Started ");
         executor.scheduleWithFixedDelay(new Processor(), INITIAL_DELAY_VALUE, EXECUTION_DELAY_VALUE,
                 EXECUTION_DELAY_UNIT);
@@ -180,6 +183,7 @@ public class KillMapProcessor {
     public void shutdown() {
         try {
             logger.info("KillMapProcessor Shutting down");
+            // TODO(Alex): Isn't this already handled by ThreadPoolManager?!
             // Cancel pending jobs
             executor.shutdownNow();
             executor.awaitTermination(20, TimeUnit.SECONDS);
