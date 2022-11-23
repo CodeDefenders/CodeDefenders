@@ -127,6 +127,8 @@ public class MeleeGame extends AbstractGame {
 
         private int automaticMutantEquivalenceThreshold = 0;
 
+        private String returnUrl;
+
         public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
             this.classId = classId;
             this.creatorId = creatorId;
@@ -218,6 +220,12 @@ public class MeleeGame extends AbstractGame {
             return this;
         }
 
+        public Builder returnUrl(String returnUrl)
+        {
+            this.returnUrl = returnUrl;
+            return this;
+        }
+
         public MeleeGame build() {
             return new MeleeGame(this);
         }
@@ -247,7 +255,9 @@ public class MeleeGame extends AbstractGame {
         this.withTests = builder.withTests;
 
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
+        this.returnUrl = builder.returnUrl;
     }
+
 
     public boolean hasSystemTests() {
         return this.withTests;

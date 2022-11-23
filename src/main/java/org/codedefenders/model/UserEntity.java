@@ -47,6 +47,7 @@ public class UserEntity implements Serializable {
     private boolean allowContact;
     private KeyMap keyMap;
     private String token;
+    private boolean external;
 
     public UserEntity(String username) {
         this(username, UserEntity.encodePassword(""));
@@ -57,15 +58,22 @@ public class UserEntity implements Serializable {
     }
 
     public UserEntity(String username, String encodedPassword, String email) {
-        this(0, username, encodedPassword, email);
+        this(username, encodedPassword, email, false);
+    }
+
+    public UserEntity(String username, String encodedPassword, String email, boolean external) {
+        this(0, username, encodedPassword, email, external);
     }
 
     public UserEntity(int id, String username, String encodedPassword, String email) {
-        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT, null);
+        this(id, username, encodedPassword, email, false);
     }
 
+    public UserEntity(int id, String username, String encodedPassword, String email, boolean external) {
+        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT, null, external);
+    }
     public UserEntity(int id, String username, String encodedPassword, String email, boolean validated,
-            boolean active, boolean allowContact, KeyMap keyMap, String token) {
+            boolean active, boolean allowContact, KeyMap keyMap, String token, boolean external) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -75,6 +83,7 @@ public class UserEntity implements Serializable {
         this.allowContact = allowContact;
         this.keyMap = keyMap;
         this.token = token;
+        this.external = external;
     }
 
     /**
@@ -162,6 +171,18 @@ public class UserEntity implements Serializable {
         this.keyMap = keyMap;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public boolean isExternal() {
+        return external;
+    }
+
     @Deprecated // TODO(Alex): Where to put this method?
     public static String encodePassword(String password) {
         return new BCryptPasswordEncoder().encode(password);
@@ -182,13 +203,5 @@ public class UserEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getId());
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 }

@@ -100,8 +100,9 @@ public class UserRepository {
         boolean allowContact = rs.getBoolean("AllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("KeyMap"));
         String token = rs.getString("Token");
+        boolean external = rs.getBoolean("External");
 
-        return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap, token);
+        return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap, token, external);
     }
 
     /**
@@ -122,8 +123,8 @@ public class UserRepository {
             throw new IllegalArgumentException("Can't insert user with id > 0");
         }
         String query = "INSERT INTO users "
-                + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap, Token) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+                + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap, Token, External) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try {
             return queryRunner
                     .insert(query, resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
@@ -134,7 +135,8 @@ public class UserRepository {
                             userEntity.isActive(),
                             userEntity.getAllowContact(),
                             userEntity.getKeyMap().name(),
-                            userEntity.getToken());
+                            userEntity.getToken(),
+                            userEntity.isExternal());
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);

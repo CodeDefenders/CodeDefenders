@@ -72,6 +72,7 @@ public class MultiplayerGameDAO {
         int attackerValue = rs.getInt("Attacker_Value");
 
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
+        String returnUrl = rs.getString("External");
 
         return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
@@ -87,6 +88,7 @@ public class MultiplayerGameDAO {
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
+                .returnUrl(returnUrl)
                 .build();
     }
 
@@ -165,6 +167,7 @@ public class MultiplayerGameDAO {
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
+        String returnUrl=game.getReturnUrl();
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -182,8 +185,9 @@ public class MultiplayerGameDAO {
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention,",
-                "EquivalenceThreshold)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "EquivalenceThreshold,",
+                "External)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -200,7 +204,8 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
                 DatabaseValue.of(capturePlayersIntention),
-                DatabaseValue.of(automaticMutantEquivalenceThreshold)
+                DatabaseValue.of(automaticMutantEquivalenceThreshold),
+                DatabaseValue.of(returnUrl)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -311,6 +316,7 @@ public class MultiplayerGameDAO {
                 "WHERE u.User_ID = ?",
                 "  AND (g.State = 'CREATED' OR g.State = 'ACTIVE')",
                 "  AND g.Creator_ID != u.User_ID",
+                "  AND g.External IS NULL",
                 "  AND g.ID NOT IN (SELECT ig.ID",
                 "    FROM games ig",
                 "    INNER JOIN players p ON ig.ID = p.Game_ID",

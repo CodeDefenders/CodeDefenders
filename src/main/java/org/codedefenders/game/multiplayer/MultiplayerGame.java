@@ -95,6 +95,7 @@ public class MultiplayerGame extends AbstractGame {
         private GameState state = GameState.CREATED;
         private GameLevel level = GameLevel.HARD;
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
+        private String returnUrl;
 
         private int automaticMutantEquivalenceThreshold = 0;
 
@@ -184,12 +185,18 @@ public class MultiplayerGame extends AbstractGame {
             return this;
         }
 
+        public Builder returnUrl(String returnUrl) {
+            this.returnUrl = returnUrl;
+            return this;
+        }
+
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
         }
     }
 
     private MultiplayerGame(Builder builder) {
+        super();
         this.mode = GameMode.PARTY;
 
         this.cut = builder.cut;
@@ -211,6 +218,7 @@ public class MultiplayerGame extends AbstractGame {
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
+        this.returnUrl = builder.returnUrl;
     }
 
     public int getDefenderValue() {

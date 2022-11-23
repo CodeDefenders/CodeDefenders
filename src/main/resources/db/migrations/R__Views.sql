@@ -77,7 +77,8 @@ SELECT p.*,
        u.Active       AS usersActive,
        u.AllowContact AS usersAllowContact,
        u.KeyMap       AS usersKeyMap,
-       u.Token        AS usersToken
+       u.Token        AS usersToken,
+       u.External     AS usersExternal
 FROM players AS p,
      view_valid_users AS u
 WHERE p.User_ID = u.User_ID;
