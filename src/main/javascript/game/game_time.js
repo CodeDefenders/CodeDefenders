@@ -262,11 +262,11 @@ class GameTimeValidator {
         const days = Number(this.inputs.days.value);
         const hours = Number(this.inputs.hours.value);
         const minutes = Number(this.inputs.minutes.value);
-        const total = ((days * 24) + hours) * 60 + minutes + this.calculateElapsedMinutes();
+        const newRemainingDuration = ((days * 24) + hours) * 60 + minutes;
 
-        this.totalInput.value = total;
+        this.totalInput.value = newRemainingDuration + this.calculateElapsedMinutes();
 
-        if (total <= 0 || total > this.MAXIMUM_DURATION_MINUTES) {
+        if (newRemainingDuration < 0 || newRemainingDuration > this.MAXIMUM_DURATION_MINUTES) {
             this.setValidity('invalid-value');
             this._onInvalidDuration();
             return;

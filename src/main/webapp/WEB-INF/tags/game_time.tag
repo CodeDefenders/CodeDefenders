@@ -101,9 +101,8 @@
                             Please input a valid duration.
                             Maximum remaining duration:
                             <span class="time-left"
-                                  data-type="remaining"
-                                  data-duration="${maxDuration}"
-                                  data-start="${startTime}">
+                                  data-type="total"
+                                  data-duration="${maxDuration}">
                                 &hellip;
                             </span>
                         </div>

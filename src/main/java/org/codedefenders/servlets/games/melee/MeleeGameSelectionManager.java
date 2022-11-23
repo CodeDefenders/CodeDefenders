@@ -34,10 +34,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
@@ -445,13 +442,23 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         Optional<Integer> newDuration = getIntParameter(request, "newDuration");
         if (newDuration.isPresent()) {
-            final int duration = newDuration.get();
-            final int maxDuration = AdminDAO.getSystemSetting(
+            final int maxDurationChange = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
             final int minDuration = 1;
+            final int deltaDuration = newDuration.get() - game.getGameDurationMinutes();
 
-            // clamp duration
-            game.setGameDurationMinutes(Math.max(minDuration, Math.min(duration, maxDuration)));
+            /*
+             * Clamp the new duration. Unlike the original implementation not the whole duration is clamped and
+             * enforced to be less than GAME_DURATION_MINUTES_MAX, but only the duration difference. The clamped delta
+             * duration is then added to the current duration of the game. This allows to increase the duration of a
+             * game beyond GAME_DURATION_MINUTES_MAX.
+             *
+             * Only negative values of the total duration are checked here. NewRemainingDuration >= 0 is only enforced
+             * on the frontend. The clamping here allows to set the duration to values where the remaining duration is
+             * negative. This will show 0 min on the frontend and close the game.
+             */
+            final int clampedDuration = Math.min(deltaDuration, maxDurationChange);
+            game.setGameDurationMinutes(Math.max(minDuration, game.getGameDurationMinutes() + clampedDuration));
             game.update();
             Redirect.redirectBack(request, response);
         } else {

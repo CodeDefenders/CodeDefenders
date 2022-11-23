@@ -193,7 +193,7 @@ public class AdminSystemSettings extends HttpServlet {
         GAME_DURATION_MINUTES_MAX {
             @Override
             public String toString() {
-                return "The maximum duration a multiplayer/melee game can be open (in minutes).";
+                return "The maximum duration that can be set for multiplayer/melee games (in minutes).";
             }
         },
         GAME_DURATION_MINUTES_DEFAULT {
