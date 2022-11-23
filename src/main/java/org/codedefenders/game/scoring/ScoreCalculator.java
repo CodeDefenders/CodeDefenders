@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.ManagedBean;
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -26,7 +26,7 @@ import org.codedefenders.model.Player;
  * @author gambi
  */
 @ManagedBean
-@ApplicationScoped
+@RequestScoped
 public class ScoreCalculator {
 
     private final IScoringPolicy scoringPolicy;

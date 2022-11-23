@@ -23,8 +23,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -32,7 +30,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.game.scoring.ScoringPolicyProducer;
 import org.codedefenders.model.Player;
@@ -46,9 +43,9 @@ public class MeleeGameService extends AbstractGameService {
     private final ScoreCalculator scoreCalculator;
 
     @Inject
-    public MeleeGameService(UserService userService, UserRepository userRepository, ScoreCalculator scoreCalculator) {
+    public MeleeGameService(UserService userService, UserRepository userRepository, EventDAO eventDAO) {
         super(userService, userRepository);
-        this.scoreCalculator = scoreCalculator;
+        this.scoreCalculator = getScoreCalculator(eventDAO);
     }
 
     @Override
@@ -103,5 +100,10 @@ public class MeleeGameService extends AbstractGameService {
             scoreCalculator.storeScoresToDB(game.getId());
         }
         return closed;
+    }
+
+    private ScoreCalculator getScoreCalculator(EventDAO eventDAO) {
+        ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
+        return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO));
     }
 }
