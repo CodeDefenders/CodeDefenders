@@ -24,6 +24,7 @@ RUN ls
 COPY --from=node_modules /Codedefenders .
 
 COPY ./.git ./.git/
+# these copys probably dont even matter
 COPY jenkins_pom.xml ./pom.xml
 COPY ./local-repo ./local-repo/
 COPY checkstyle-codedefenders.xml .

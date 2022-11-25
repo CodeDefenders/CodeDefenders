@@ -36,8 +36,7 @@ pipeline {
                 }
             }
             steps {
-                sh 'ls'
-                sh 'mvn test'
+                sh 'mvn -f jenkins_pom.xml test'
             }
         }
         stage('Docker build') {
