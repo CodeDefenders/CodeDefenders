@@ -36,6 +36,7 @@ pipeline {
                 }
             }
             steps {
+                sh 'ls'
                 sh 'mvn test'
             }
         }
