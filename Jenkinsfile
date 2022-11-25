@@ -42,9 +42,10 @@ pipeline {
         stage('Docker build') {
             when {
                 anyOf {
-                    changeset "docker/**"
-                    changeset "Dockerfile.*"
+                    changeset "docker/**/*"
                     changeset "Jenkinsfile"
+                    changeset "src/**/*"
+                    changeset "pom.xml"
                 }
             }
             agent any
