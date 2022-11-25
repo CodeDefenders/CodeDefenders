@@ -1,3 +1,5 @@
+def image_tag = ""
+
 pipeline {
     agent any
     environment {
@@ -55,6 +57,9 @@ pipeline {
             steps {
                 sh "docker build --file ./docker/Dockerfile.deploy --tag codebenders/codedefenders:${env.GIT_COMMIT} ."
                 sh "docker push codebenders/codedefenders:${env.GIT_COMMIT}"
+                script{
+                    image_tag = "${env.GIT_COMMIT}"
+                }
             }
         }
         
@@ -63,7 +68,7 @@ pipeline {
         success{
                 discordSend (
                     description: "Hey ${env.CHANGE_AUTHOR}, job is successful on branch ${env.GIT_BRANCH}", 
-                    footer: "Your image: codebenders/codedefenders:${env.GIT_COMMIT}, ${env.CHANGE_AUTHOR}", 
+                    footer: "Your image: codebenders/codedefenders:${image_tag}, ${env.CHANGE_AUTHOR}", 
                     link: env.BUILD_URL, 
                     result: currentBuild.currentResult, 
                     title: JOB_NAME, 
