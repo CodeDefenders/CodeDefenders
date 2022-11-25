@@ -1,0 +1,59 @@
+
+FROM node:16.17.1-alpine3.15 as node_modules
+
+RUN mkdir /Codedefenders/
+WORKDIR /Codedefenders/
+COPY package.json .
+COPY rollup.config.js .
+COPY ./src ./src/
+
+RUN npm install
+RUN npm run bundle
+
+FROM maven:3.8-openjdk-11 AS build
+
+WORKDIR /Codedefenders/
+
+COPY --from=node_modules /Codedefenders .
+RUN ls
+
+COPY ./.git ./.git/
+COPY jenkins_pom.xml ./pom.xml
+COPY ./local-repo ./local-repo/
+COPY checkstyle-codedefenders.xml .
+
+# Download dependencies before copying the source code as the dependencies don't change that often
+#RUN mvn --no-transfer-progress dependency:go-offline
+
+#COPY package-lock.json .
+#RUN mvn --no-transfer-progress package -DskipTests -DskipCheckstyle
+RUN mvn package -DskipTests -DskipCheckstyle
+
+
+FROM docker.io/library/debian:11 AS tomcat
+
+ENV LANG="C.UTF-8"
+
+RUN mkdir /srv/codedefenders
+
+# Install TOMCAT, ANT, MAVEN and CURL (for the health check)
+RUN apt-get update &&  \
+    DEBIAN_FRONTEND='noninteractive' apt-get install -y tomcat9 &&  \
+    apt-get install -y --no-install-recommends curl ant ant-optional maven && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY ./installation/installation-pom.xml /
+COPY ./docker/docker-entrypoint.sh /usr/local/bin/
+
+COPY --from=build /Codedefenders/target/codedefenders /var/lib/tomcat9/webapps/ROOT/
+
+ENV CATALINA_HOME="/usr/share/tomcat9"
+ENV CATALINA_BASE="/var/lib/tomcat9"
+ENV CATALINA_TMPDIR="/tmp"
+WORKDIR "${CATALINA_BASE}"
+ENV CODEDEFENDERS_DATA_DIR="/srv/codedefenders"
+ENV CODEDEFENDERS_ANT_HOME="/usr/share/ant"
+
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]

@@ -1,0 +1,31 @@
+
+FROM node:16.17.1-alpine3.15 as node_modules
+
+RUN mkdir /Codedefenders/
+WORKDIR /Codedefenders/
+COPY package.json .
+COPY rollup.config.js .
+COPY ./src ./src/
+
+RUN npm install
+RUN npm run bundle
+RUN ls
+RUN pwd -P
+
+
+FROM maven:3.8-openjdk-11 AS build
+RUN pwd -P 
+
+RUN ls
+WORKDIR /Codedefenders/
+RUN pwd -P 
+RUN ls
+
+COPY --from=node_modules /Codedefenders .
+
+COPY ./.git ./.git/
+COPY jenkins_pom.xml ./pom.xml
+COPY ./local-repo ./local-repo/
+COPY checkstyle-codedefenders.xml .
+
+#trying to trigger pipeline 1
