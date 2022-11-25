@@ -21,12 +21,12 @@ pipeline {
             }
         }
         stage('Run tests') { 
-            when {
+            /*when {
                 anyOf {
                     changeset "src/**"
                     changeset "pom.xml"
                 }
-            }
+            }*/
             agent {
                 // Equivalent to "docker build -f Dockerfile.build --build-arg version=1.0.2 ./build/
                 dockerfile {
@@ -40,14 +40,14 @@ pipeline {
             }
         }
         stage('Docker build') {
-            when {
+            /*when {
                 anyOf {
                     changeset "docker/*"
                     changeset "Jenkinsfile"
-                    changeset "src/**/*"
+                    changeset "**\/src/**\/*"
                     changeset "pom.xml"
                 }
-            }
+            }*/
             agent any
             environment {
 		        DOCKERHUB_CREDENTIALS = credentials('dockerhub_access')
