@@ -174,11 +174,15 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<!-- trigger jenky 1-->
 			<!-- Builds and bundles JavaScript -->
-			<plugin>
+			<!--<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
+				<configuration>
+                        <nodeVersion>v16.17.1</nodeVersion>
+                        <npmVersion>8.15.0</npmVersion>
+                    </configuration>
 				<executions>
 					<execution>
 						<id>install node and npm</id>
@@ -210,7 +214,7 @@
 						<phase>compile</phase>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -560,6 +564,7 @@
 					<version>1.12.1</version>
 					<configuration>
 						<nodeVersion>v16.17.1</nodeVersion>
+    					<npmVersion>8.15.0</npmVersion>
 					</configuration>
 				</plugin>
 
