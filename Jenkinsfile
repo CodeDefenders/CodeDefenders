@@ -9,6 +9,13 @@ pipeline {
     
     stages {
         stage('Discord notify'){
+            when {
+                anyOf{
+                    branch 'master'
+                    branch 'development'
+                    branch pattern: "PR-\\d+", comparator: "REGEXP"
+                }
+            }
             agent any
             steps {
                 discordSend (
@@ -29,6 +36,13 @@ pipeline {
                     changeset "pom.xml"
                 }
             }*/
+            when {
+                anyOf{
+                    branch 'master'
+                    branch 'development'
+                    branch pattern: "PR-\\d+", comparator: "REGEXP"
+                }
+            }
             agent {
                 // Equivalent to "docker build -f Dockerfile.build --build-arg version=1.0.2 ./build/
                 dockerfile {
@@ -50,6 +64,13 @@ pipeline {
                     changeset "pom.xml"
                 }
             }*/
+            when {
+                anyOf{
+                    branch 'master'
+                    branch 'development'
+                    branch pattern: "PR-\\d+", comparator: "REGEXP"
+                }
+            }
             agent any
             environment {
 		        DOCKERHUB_CREDENTIALS = credentials('dockerhub_access')
@@ -60,12 +81,6 @@ pipeline {
                 script{
                     image_tag = "${env.GIT_COMMIT}"
                 }
-            }
-        }
-        
-    }
-    post{
-        success{
                 discordSend (
                     description: "Hey ${env.CHANGE_AUTHOR}, job is successful on branch ${env.GIT_BRANCH}", 
                     footer: "Your image: codebenders/codedefenders:${image_tag}, ${env.CHANGE_AUTHOR}", 
@@ -74,7 +89,14 @@ pipeline {
                     title: JOB_NAME, 
                     webhookURL: DISCORD_WEBHOOK
                 )
-        } 
+            }
+        }
+        
+    }
+    post{
+        /*success{
+                
+        } */
         unsuccessful {
                 discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
