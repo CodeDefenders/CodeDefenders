@@ -69,6 +69,7 @@ pipeline {
                     branch 'master'
                     //branch 'development'
                     branch pattern: "PR-\\d+", comparator: "REGEXP"
+                    branch 'jenkinsing'
                 }
             }
             agent any
