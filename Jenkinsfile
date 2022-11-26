@@ -91,6 +91,20 @@ pipeline {
                 )
             }
         }
+        stage('Mark as latest'){
+            /*when {
+                anyOf{
+                    branch 'master'
+                }
+            }*/
+            agent any
+            steps {
+                sh 'docker image ls'
+                sh "docker tag codebenders/codedefenders:${image_tag} codebenders/codedefenders:latest"
+                sh 'docker push codebenders/codedefenders:latest'
+                sh 'printenv'
+            }
+        }
         
     }
     post{
