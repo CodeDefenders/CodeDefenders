@@ -12,7 +12,6 @@ pipeline {
             when {
                 anyOf{
                     branch 'master'
-                    //branch 'development'
                     branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
@@ -26,14 +25,10 @@ pipeline {
                     title: JOB_NAME, 
                     webhookURL: DISCORD_WEBHOOK
                 )
-                sh 'printenv'
             }
             post{
-        /*success{
-                
-        } */
-        unsuccessful {
-                discordSend (
+                unsuccessful {
+                    discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
                         footer: currentBuild.currentResult, 
                         link: env.BUILD_URL, 
@@ -41,20 +36,13 @@ pipeline {
                         title: JOB_NAME, 
                         webhookURL: DISCORD_WEBHOOK
                     )
-        }
-    }
-        }
-        stage('Run tests') { 
-            /*when {
-                anyOf {
-                    changeset "src/**"
-                    changeset "pom.xml"
                 }
-            }*/
+            }
+        }
+        stage('Run tests') {
             when {
                 anyOf{
                     branch 'master'
-                    //branch 'development'
                     branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
@@ -70,11 +58,8 @@ pipeline {
                 sh 'mvn -f jenkins_pom.xml test'
             }
             post{
-        /*success{
-                
-        } */
-        unsuccessful {
-                discordSend (
+                unsuccessful {
+                    discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
                         footer: currentBuild.currentResult, 
                         link: env.BUILD_URL, 
@@ -82,22 +67,12 @@ pipeline {
                         title: JOB_NAME, 
                         webhookURL: DISCORD_WEBHOOK
                     )
-        }
-    }
-        }
-        stage('Docker build') {
-            /*when {
-                anyOf {
-                    changeset "docker/*"
-                    changeset "Jenkinsfile"
-                    changeset "**\/src/**\/*"
-                    changeset "pom.xml"
                 }
-            }*/
+            }
+        }
+        stage('Docker build dev') {
             when {
                 anyOf{
-                    branch 'master'
-                    //branch 'development'
                     branch pattern: "PR-\\d+", comparator: "REGEXP"
                     branch 'jenkinsing'
                 }
@@ -112,21 +87,20 @@ pipeline {
                 script{
                     image_tag = "${env.GIT_COMMIT}"
                 }
-                discordSend (
-                    description: "Hey ${env.CHANGE_AUTHOR}, job is successful on branch ${env.GIT_BRANCH}", 
-                    footer: "Your image: codebenders/codedefenders:${image_tag}, ${env.CHANGE_AUTHOR}", 
-                    link: env.BUILD_URL, 
-                    result: currentBuild.currentResult, 
-                    title: JOB_NAME, 
-                    webhookURL: DISCORD_WEBHOOK
-                )
             }
             post{
-        /*success{
-                
-        } */
-        unsuccessful {
-                discordSend (
+                success{
+                    discordSend (
+                        description: "Hey ${env.CHANGE_AUTHOR}, job is successful on branch ${env.GIT_BRANCH}", 
+                        footer: "Your image: codebenders/codedefenders:${image_tag}, ${env.CHANGE_AUTHOR}", 
+                        link: env.BUILD_URL, 
+                        result: currentBuild.currentResult, 
+                        title: JOB_NAME, 
+                        webhookURL: DISCORD_WEBHOOK
+                    )
+                }
+                unsuccessful {
+                    discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
                         footer: currentBuild.currentResult, 
                         link: env.BUILD_URL, 
@@ -134,28 +108,37 @@ pipeline {
                         title: JOB_NAME, 
                         webhookURL: DISCORD_WEBHOOK
                     )
+                }
+            }
         }
-    }
-        }
-        stage('Mark as latest'){
-            /*when {
+        stage('Docker build release'){
+            when {
                 anyOf{
                     branch 'master'
                 }
-            }*/
+            }
             agent any
+            environment {
+		        DOCKERHUB_CREDENTIALS = credentials('dockerhub_access')
+	        }
             steps {
-                sh 'docker image ls'
-                sh "docker tag codebenders/codedefenders:${image_tag} codebenders/codedefenders:latest"
+                sh "docker build --file ./docker/Dockerfile.deploy --tag codebenders/codedefenders:${env.GIT_COMMIT} ."
+                sh "docker tag codebenders/codedefenders:${env.GIT_COMMIT} codebenders/codedefenders:latest"
                 sh 'docker push codebenders/codedefenders:latest'
-                sh 'printenv'
             }
             post{
-        /*success{
-                
-        } */
-        unsuccessful {
-                discordSend (
+                success {
+                    discordSend (
+                        description: "Hey ${env.CHANGE_AUTHOR}, job is successful on branch ${env.GIT_BRANCH}", 
+                        footer: "Latest release image: codebenders/codedefenders:${image_tag}", 
+                        link: env.BUILD_URL, 
+                        result: currentBuild.currentResult, 
+                        title: JOB_NAME, 
+                        webhookURL: DISCORD_WEBHOOK
+                    )
+                }
+                unsuccessful {
+                    discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
                         footer: currentBuild.currentResult, 
                         link: env.BUILD_URL, 
@@ -163,24 +146,8 @@ pipeline {
                         title: JOB_NAME, 
                         webhookURL: DISCORD_WEBHOOK
                     )
+                }
+            }
         }
-    }
-        }
-        
-    }
-    post{
-        /*success{
-                
-        } */
-        /*unsuccessful {
-                discordSend (
-                        description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
-                        footer: currentBuild.currentResult, 
-                        link: env.BUILD_URL, 
-                        result: currentBuild.currentResult, 
-                        title: JOB_NAME, 
-                        webhookURL: DISCORD_WEBHOOK
-                    )
-        }*/
     }
 }
