@@ -68,7 +68,7 @@ pipeline {
                 anyOf{
                     branch 'master'
                     branch 'development'
-                    branch pattern: "PR-\d+", comparator: "REGEXP"
+                    branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
             agent any
