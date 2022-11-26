@@ -94,9 +94,9 @@ pipeline {
         
     }
     post{
-        success{
+        /*success{
                 
-        } 
+        } */
         unsuccessful {
                 discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
