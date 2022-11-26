@@ -81,7 +81,6 @@ pipeline {
                 script{
                     image_tag = "${env.GIT_COMMIT}"
                 }
-                success{
                 discordSend (
                     description: "Hey ${env.CHANGE_AUTHOR}, job is successful on branch ${env.GIT_BRANCH}", 
                     footer: "Your image: codebenders/codedefenders:${image_tag}, ${env.CHANGE_AUTHOR}", 
@@ -90,12 +89,14 @@ pipeline {
                     title: JOB_NAME, 
                     webhookURL: DISCORD_WEBHOOK
                 )
-        } 
             }
         }
         
     }
     post{
+        success{
+                
+        } 
         unsuccessful {
                 discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is not successful on branch ${env.GIT_BRANCH}", 
