@@ -12,7 +12,7 @@ pipeline {
             when {
                 anyOf{
                     branch 'master'
-                    branch 'development'
+                    //branch 'development'
                     branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
@@ -39,7 +39,7 @@ pipeline {
             when {
                 anyOf{
                     branch 'master'
-                    branch 'development'
+                    //branch 'development'
                     branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
@@ -67,7 +67,7 @@ pipeline {
             when {
                 anyOf{
                     branch 'master'
-                    branch 'development'
+                    //branch 'development'
                     branch pattern: "PR-\\d+", comparator: "REGEXP"
                 }
             }
