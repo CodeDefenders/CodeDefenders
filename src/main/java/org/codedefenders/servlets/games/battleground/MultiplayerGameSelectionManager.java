@@ -20,8 +20,10 @@ package org.codedefenders.servlets.games.battleground;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -458,28 +460,27 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         Optional<Integer> newDuration = getIntParameter(request, "newDuration");
         if (newDuration.isPresent()) {
-            final int maxDurationChange = AdminDAO.getSystemSetting(
+            final int maxOpenDuration = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
-            final int minDuration = 1;
-            final int deltaDuration = newDuration.get() - game.getGameDurationMinutes();
+            final int minDuration = 0;
 
-            /*
-             * Clamp the new duration. Unlike the original implementation not the whole duration is clamped and
-             * enforced to be less than GAME_DURATION_MINUTES_MAX, but only the duration difference. The clamped delta
-             * duration is then added to the current duration of the game. This allows to increase the duration of a
-             * game beyond GAME_DURATION_MINUTES_MAX.
-             *
-             * Only negative values of the total duration are checked here. NewRemainingDuration >= 0 is only enforced
-             * on the frontend. The clamping here allows to set the duration to values where the remaining duration is
-             * negative. This will show 0 min on the frontend and close the game.
-             */
-            final int clampedDuration = Math.min(deltaDuration, maxDurationChange);
-            game.setGameDurationMinutes(Math.max(minDuration, game.getGameDurationMinutes() + clampedDuration));
-            game.update();
-            Redirect.redirectBack(request, response);
+            final long startTime = game.getStartTimeUnixSeconds();
+            final long now = Instant.now().getEpochSecond();
+            final int elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
+            final int remainingMinutes = newDuration.get() - elapsedTimeMinutes;
+
+            if (remainingMinutes < minDuration) {
+                messages.add("The remaining time cannot be below " + minDuration + " minutes.");
+            } else if (remainingMinutes > maxOpenDuration) {
+                messages.add("The new remaining duration must be at most " + maxOpenDuration + " minutes.");
+            } else {
+                game.setGameDurationMinutes(newDuration.get());
+                game.update();
+            }
         } else {
             logger.debug("No duration value supplied.");
-            Redirect.redirectBack(request, response);
         }
+
+        Redirect.redirectBack(request, response);
     }
 }
