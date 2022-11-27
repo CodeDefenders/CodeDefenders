@@ -93,7 +93,7 @@ pipeline {
                 success{
                     discordSend (
                         description: "Hey ${env.CHANGE_AUTHOR}, job is successful on branch ${env.GIT_BRANCH} :D", 
-                        footer: "Your image: codebenders/codedefenders:${env.GIT_BRANCH}", 
+                        footer: "Your image: codebenders/codedefenders:${env.GIT_COMMIT}", 
                         link: env.BUILD_URL, 
                         result: currentBuild.currentResult, 
                         title: JOB_NAME, 
@@ -136,7 +136,7 @@ pipeline {
                 success{
                     discordSend (
                         description: "Hey team, job is successful on branch ${env.GIT_BRANCH} :D", 
-                        footer: "New development image: codebenders/codedefenders:dev", 
+                        footer: "New development image: codebenders/codedefenders:dev, also codebenders/codedefenders:${env.GIT_COMMIT}", 
                         link: env.BUILD_URL, 
                         result: currentBuild.currentResult, 
                         title: JOB_NAME, 
@@ -176,7 +176,7 @@ pipeline {
                 success {
                     discordSend (
                         description: "Hey team, job is successful on branch ${env.GIT_BRANCH} :D", 
-                        footer: "Latest release image: codebenders/codedefenders:latest or codebenders/codedefenders:${env.GIT_COMMIT}", 
+                        footer: "Latest release image: codebenders/codedefenders:latest, also codebenders/codedefenders:${env.GIT_COMMIT}", 
                         link: env.BUILD_URL, 
                         result: currentBuild.currentResult, 
                         title: JOB_NAME, 
