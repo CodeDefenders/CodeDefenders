@@ -196,4 +196,16 @@ pipeline {
             }
         }
     }
+    post {
+        aborted {
+            discordSend (
+                        description: "Hey team, pipeline was aborted on branch ${env.GIT_BRANCH} :(", 
+                        footer: currentBuild.currentResult, 
+                        link: env.BUILD_URL, 
+                        result: currentBuild.currentResult, 
+                        title: JOB_NAME, 
+                        webhookURL: DISCORD_WEBHOOK
+                    )
+        }
+    }
 }
