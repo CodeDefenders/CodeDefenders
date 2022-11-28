@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2019 Code Defenders contributors
+ * Copyright (C) 2016-2019,2022 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -16,16 +16,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.database;
+package org.codedefenders.persistence.database;
 
+import java.sql.SQLException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
+import org.codedefenders.persistence.database.util.QueryRunner;
+
+import static org.codedefenders.persistence.database.util.ResultSetUtils.nextFromRS;
 
 /**
  * This class handles the database logic for player intentions.
@@ -34,7 +41,14 @@ import org.codedefenders.model.DefenderIntention;
  * @see DefenderIntention
  */
 @ApplicationScoped
-public class IntentionDAO {
+public class IntentionRepository {
+
+    private final QueryRunner queryRunner;
+
+    @Inject
+    public IntentionRepository(QueryRunner queryRunner) {
+        this.queryRunner = queryRunner;
+    }
 
     /**
      * Stores a given {@link DefenderIntention} in the database.
@@ -47,28 +61,20 @@ public class IntentionDAO {
      * @return the generated identifier of the intention as an {@code int}.
      * @throws Exception If storing the intention was not successful.
      */
-    public int storeIntentionForTest(Test test, DefenderIntention intention) throws Exception {
+    public Optional<Integer> storeIntentionForTest(Test test, DefenderIntention intention) {
         int testId = test.getId();
         int gameId = test.getGameId();
 
         final String targetLines = intention.getLines().stream().map(String::valueOf).collect(Collectors.joining(","));
 
-        final String query = String.join("\n",
-                "INSERT INTO intention (Test_ID, Game_ID, Target_Lines)",
-                "VALUES (?,?,?);"
-        );
+        final String query = "INSERT INTO intention (Test_ID, Game_ID, Target_Lines) VALUES (?,?,?);";
 
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(testId),
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(targetLines),
-        };
-
-        final int result = DB.executeUpdateQueryGetKeys(query, values);
-        if (result != -1) {
-            return result;
-        } else {
-            throw new Exception("Could not store defender intention to database.");
+        try {
+            return queryRunner.insert(query,
+                    resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
+                    testId, gameId, targetLines);
+        } catch (SQLException e) {
+            throw new UncheckedSQLException(e);
         }
     }
 
@@ -78,28 +84,20 @@ public class IntentionDAO {
      * <p>For context information, the associated {@link Mutant} of the intention
      * is provided as well.
      *
-     * @param mutant      the given mutant as a {@link Mutant}.
+     * @param mutant    the given mutant as a {@link Mutant}.
      * @param intention the given intention as an {@link AttackerIntention}.
      * @return the generated identifier of the intention as an {@code int}.
      * @throws Exception If storing the intention was not successful.
      */
-    public int storeIntentionForMutant(Mutant mutant, AttackerIntention intention) throws Exception {
-        final String query = String.join("\n",
-                "INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type)",
-                "VALUES (?,?,?);"
-        );
+    public Optional<Integer> storeIntentionForMutant(Mutant mutant, AttackerIntention intention) {
+        final String query = "INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type) VALUES (?,?,?);";
 
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(mutant.getId()),
-                DatabaseValue.of(mutant.getGameId()),
-                DatabaseValue.of(intention.toString()),
-        };
-
-        final int result = DB.executeUpdateQueryGetKeys(query, values);
-        if (result != -1) {
-            return result;
-        } else {
-            throw new Exception("Could not store attacker intention to database.");
+        try {
+            return queryRunner.insert(query,
+                    resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
+                    mutant.getId(), mutant.getGameId(), intention.toString());
+        } catch (SQLException e) {
+            throw new UncheckedSQLException(e);
         }
     }
 }
