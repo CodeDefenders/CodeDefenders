@@ -40,12 +40,12 @@ import org.codedefenders.util.Constants;
 @ApplicationScoped
 public class MeleeGameService extends AbstractGameService {
 
-    private final ScoreCalculator scoreCalculator;
+    private final EventDAO eventDAO;
 
     @Inject
     public MeleeGameService(UserService userService, UserRepository userRepository, EventDAO eventDAO) {
         super(userService, userRepository);
-        this.scoreCalculator = getScoreCalculator(eventDAO);
+        this.eventDAO = eventDAO;
     }
 
     @Override
@@ -97,12 +97,12 @@ public class MeleeGameService extends AbstractGameService {
     public boolean closeGame(AbstractGame game) {
         boolean closed = super.closeGame(game);
         if (closed) {
-            scoreCalculator.storeScoresToDB(game.getId());
+            createScoreCalculator().storeScoresToDB(game.getId());
         }
         return closed;
     }
 
-    private ScoreCalculator getScoreCalculator(EventDAO eventDAO) {
+    private ScoreCalculator createScoreCalculator() {
         ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
         return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO));
     }
