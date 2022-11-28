@@ -72,6 +72,15 @@ public abstract class AbstractGame {
     // This tells us that AbstractGame is not the right place for any logic!!!
     protected EventDAO eventDAO;
     protected UserRepository userRepository;
+    protected String returnUrl;
+
+    public boolean isExternal() {
+        return returnUrl != null && !returnUrl.isEmpty();
+    }
+
+    public String getReturnUrl() {
+        return returnUrl;
+    }
 
     public abstract boolean addPlayer(int userId, Role role);
 

@@ -19,8 +19,10 @@
 
 package org.codedefenders.persistence.database;
 
+import java.security.SecureRandom;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -97,8 +99,10 @@ public class UserRepository {
         boolean active = rs.getBoolean("Active");
         boolean allowContact = rs.getBoolean("AllowContact");
         KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("KeyMap"));
+        String token = rs.getString("Token");
+        boolean external = rs.getBoolean("External");
 
-        return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap);
+        return new UserEntity(userId, userName, password, email, validated, active, allowContact, keyMap, token, external);
     }
 
     /**
@@ -119,8 +123,8 @@ public class UserRepository {
             throw new IllegalArgumentException("Can't insert user with id > 0");
         }
         String query = "INSERT INTO users "
-                + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?);";
+                + "(Username, Password, Email, Validated, Active, AllowContact, KeyMap, Token, External) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         try {
             return queryRunner
                     .insert(query, resultSet -> nextFromRS(resultSet, rs -> rs.getInt(1)),
@@ -130,7 +134,9 @@ public class UserRepository {
                             userEntity.isValidated(),
                             userEntity.isActive(),
                             userEntity.getAllowContact(),
-                            userEntity.getKeyMap().name());
+                            userEntity.getKeyMap().name(),
+                            userEntity.getToken(),
+                            userEntity.isExternal());
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -151,7 +157,8 @@ public class UserRepository {
                 + "  Validated = ?, "
                 + "  Active = ?, "
                 + "  AllowContact = ?, "
-                + "  KeyMap = ? "
+                + "  KeyMap = ?, "
+                + "  Token = ? "
                 + "WHERE User_ID = ?;";
         try {
             return queryRunner.update(query,
@@ -162,6 +169,7 @@ public class UserRepository {
                     userEntity.isActive(),
                     userEntity.getAllowContact(),
                     userEntity.getKeyMap().name(),
+                    userEntity.getToken(),
                     userEntity.getId()) == 1;
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -214,6 +222,20 @@ public class UserRepository {
         try {
             return queryRunner
                     .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), email);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    @Nonnull
+    public Optional<UserEntity> getUserByToken(@Nonnull String token) {
+        String query = "SELECT * "
+                + "FROM  users "
+                + "WHERE Token = ?;";
+        try {
+            return queryRunner
+                    .query(query, resultSet -> oneFromRS(resultSet, UserRepository::userFromRS), token);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -294,6 +316,22 @@ public class UserRepository {
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
+    public String generateNewUserToken() {
+        String token;
+        do {
+            token=generateToken();
+        } while(getUserByToken(token).isPresent());
+        return token;
+    }
+
+    private static String generateToken()
+    {
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] randomBytes = new byte[24];
+        secureRandom.nextBytes(randomBytes);
+        return Base64.getUrlEncoder().encodeToString(randomBytes);
+    }
+
 
     public boolean insertSession(int userId, String ipAddress) {
         String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";

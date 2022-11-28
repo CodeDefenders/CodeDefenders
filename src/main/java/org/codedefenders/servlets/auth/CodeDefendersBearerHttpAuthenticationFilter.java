@@ -19,8 +19,6 @@
 
 package org.codedefenders.servlets.auth;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.ServletRequest;
@@ -33,10 +31,12 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.filter.authc.BearerHttpAuthenticationFilter;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.service.UserService;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,27 +46,27 @@ import com.google.common.net.InetAddresses;
  * This filter performs the login with the form data submitted via a HTTP POST request to the {@code /login} url.
  *
  * <p>The whole authentication logic is handled silently by the parent class {@link FormAuthenticationFilter} which
- * performs a login against the {@link org.codedefenders.auth.CodeDefendersRealm} with the credentials
+ * performs a login against the {@link CodeDefendersRealm} with the credentials
  * found in the {@code username} and {@code password} HTML parameters of the POST request.
  */
 @Singleton
-public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFilter {
-    private static final Logger logger = LoggerFactory.getLogger(CodeDefendersFormAuthenticationFilter.class);
+public class CodeDefendersBearerHttpAuthenticationFilter extends BearerHttpAuthenticationFilter {
+    private static final Logger logger = LoggerFactory.getLogger(CodeDefendersBearerHttpAuthenticationFilter.class);
 
     private final MessagesBean messages;
     private final UserService userService;
 
     @Inject
-    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService) {
+    public CodeDefendersBearerHttpAuthenticationFilter(MessagesBean messages, UserService userService) {
         super();
 
         this.messages = messages;
         this.userService = userService;
 
         // org.codedefenders.util.Paths.LOGIN = "/login";
-        this.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
+        this.setLoginUrl(Paths.LOGIN);
         // Go to game overview page after successful login
-        this.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
+        this.setSuccessUrl(Paths.GAMES_OVERVIEW);
     }
 
     @Override
@@ -81,7 +81,6 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
         // Log user activity including the timestamp
         userService.recordSession(userId, ipAddress);
-        userService.createTokenIfNotExist(userId);
         logger.info("Successful login for username '{}' from ip {}", token.getPrincipal(), ipAddress);
 
         // Call the super method, as this is the one doing the redirect after a successful login.
@@ -109,11 +108,7 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
                 logger.warn("Failed login for username '{}' from ip {}", token.getPrincipal(), ipAddress);
             }
         }
-        try {
-            saveRequestAndRedirectToLogin(request, response);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+
         return false;
     }
 
@@ -127,10 +122,6 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             }
         }
         super.saveRequest(request);
-    }
-
-    public void requireLogin(ServletRequest request, ServletResponse response) throws IOException {
-        saveRequestAndRedirectToLogin(request, response);
     }
 
     private String getClientIpAddress(HttpServletRequest request) {
@@ -155,8 +146,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
     private boolean invalidIP(String ip) {
         //noinspection UnstableApiUsage
-        return (ip==null)
-                || (ip.length()==0)
+        return (ip == null)
+                || (ip.length() == 0)
                 || ("unknown".equalsIgnoreCase(ip))
                 || ("0:0:0:0:0:0:0:1".equals(ip))
                 || !InetAddresses.isInetAddress(ip);

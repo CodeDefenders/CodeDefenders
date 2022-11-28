@@ -20,6 +20,7 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -44,7 +45,8 @@ public class LoginPage extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (login.isLoggedIn()) {
-            resp.sendRedirect(req.getContextPath() + Paths.GAMES_OVERVIEW);
+            resp.sendRedirect(!Objects.isNull(req.getParameter("nextUrl")) ? req.getParameter("nextUrl") :
+                    req.getContextPath() + Paths.GAMES_OVERVIEW);
         } else {
             pageInfo.setPageTitle("Login");
 

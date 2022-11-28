@@ -19,10 +19,15 @@
 
 package org.codedefenders.auth;
 
+import java.util.Arrays;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
 
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.web.filter.authc.LogoutFilter;
 import org.apache.shiro.web.filter.mgt.DefaultFilterChainManager;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
@@ -30,6 +35,8 @@ import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
+import org.codedefenders.servlets.auth.CodeDefendersBearerHttpAuthenticationFilter;
+import org.codedefenders.servlets.auth.CodeDefendersFakeBearerHttpAuthenticationFilter;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 
 /**
@@ -42,8 +49,14 @@ public class ShiroConfig {
 
     @Produces
     @Singleton
-    public WebSecurityManager getSecurityManager(CodeDefendersRealm authenticatingRealm) {
-        return new DefaultWebSecurityManager(authenticatingRealm);
+    public WebSecurityManager getSecurityManager(CodeDefendersRealm formAuthenticatingRealm, CodeDefendersBearerHttpAuthenticatingRealm bearerHttpAuthenticatingRealm) {
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        ModularRealmAuthenticator authenticator=new ModularRealmAuthenticator();
+        authenticator.setAuthenticationStrategy(new FirstSuccessfulStrategy());
+        securityManager.setAuthenticator(authenticator);
+        securityManager.setRealms(Arrays.asList(formAuthenticatingRealm,bearerHttpAuthenticatingRealm));
+        securityManager.setCacheManager(new MemoryConstrainedCacheManager());
+        return securityManager;
     }
 
     /**
@@ -53,10 +66,14 @@ public class ShiroConfig {
      */
     @Produces
     @Singleton
-    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc) {
+    public FilterChainResolver getFilterChainResolver(CodeDefendersFormAuthenticationFilter authc, CodeDefendersBearerHttpAuthenticationFilter authcBearer, CodeDefendersFakeBearerHttpAuthenticationFilter authcBearerFake) {
         /*
          * This filter uses the form data to check the user given the configured realms
          */
+        final String AUTHENTICATION = "authc";
+        final String AUTHENTICATION_API = "authc[permissive], authcBearer";
+        final String AUTHENTICATION_ADMIN = AUTHENTICATION + ", roles[admin]";
+        final String AUTHENTICATION_API_ADMIN = AUTHENTICATION_API + ", roles[admin]";
 
         LogoutFilter logout = new LogoutFilter();
         // org.codedefenders.util.Paths.LOGOUT = "/logout";
@@ -64,6 +81,8 @@ public class ShiroConfig {
 
         FilterChainManager fcMan = new DefaultFilterChainManager();
         fcMan.addFilter("logout", logout);
+        fcMan.addFilter("authcBearer", authcBearer);
+        fcMan.addFilter("authcBearerFake", authcBearerFake);
         fcMan.addFilter("authc", authc);
         // Additional 'default' filter e.g. `roles[…]` are also available
 
@@ -75,7 +94,7 @@ public class ShiroConfig {
          * Note: this is necessary to make sure authc is applied also to login page,
          * otherwise the Authentication filter will not be invoked
          */
-        fcMan.createChain("/login", "authc");
+        fcMan.createChain("/login", "authcBearerFake[permissive], authc");
         /*
          * TODO This list might be incomplete.
          */
@@ -93,40 +112,40 @@ public class ShiroConfig {
 
         // URLs that require authentication
 
-        fcMan.createChain(org.codedefenders.util.Paths.USER_SETTINGS, "authc");
+        fcMan.createChain(org.codedefenders.util.Paths.USER_SETTINGS, AUTHENTICATION);
 
         // org.codedefenders.util.Paths.GAMES_OVERVIEW = "/games/overview";
         // org.codedefenders.util.Paths.GAMES_HISTORY = "/games/history";
-        fcMan.createChain("/games/**", "authc"); // Not refactory safe
+        fcMan.createChain("/games/**", AUTHENTICATION); // Not refactory safe
 
         // org.codedefenders.util.Paths.CLASS_UPLOAD = "/class-upload";
-        fcMan.createChain(org.codedefenders.util.Paths.CLASS_UPLOAD, "authc");
+        fcMan.createChain(org.codedefenders.util.Paths.CLASS_UPLOAD, AUTHENTICATION);
 
         // org.codedefenders.util.Paths.PROJECT_EXPORT = "/project-export";
-        fcMan.createChain(org.codedefenders.util.Paths.PROJECT_EXPORT, "authc");
+        fcMan.createChain(org.codedefenders.util.Paths.PROJECT_EXPORT, AUTHENTICATION);
 
         // org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME = "/equivalence-duels";
-        fcMan.createChain(org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME, "authc");
+        fcMan.createChain(org.codedefenders.util.Paths.EQUIVALENCE_DUELS_GAME, AUTHENTICATION);
 
         // org.codedefenders.util.Paths.BATTLEGROUND_GAME = "/multiplayergame";
         // org.codedefenders.util.Paths.BATTLEGROUND_HISTORY = "/multiplayer/history";
         // org.codedefenders.util.Paths.BATTLEGROUND_SELECTION = "/multiplayer/games";
         // org.codedefenders.util.Paths.BATTLEGROUND_CREATE = "/multiplayer/create";
-        fcMan.createChain("/multiplayergame/**", "authc");
-        fcMan.createChain("/multiplayer/**", "authc");
+        fcMan.createChain("/multiplayergame/**", AUTHENTICATION);
+        fcMan.createChain("/multiplayer/**", AUTHENTICATION);
 
         // org.codedefenders.util.Paths.MELEE_GAME = "/meleegame";
         // org.codedefenders.util.Paths.MELEE_HISTORY = "/meleegame/history";
         // org.codedefenders.util.Paths.MELEE_SELECTION = "/melee/games";
         // org.codedefenders.util.Paths.MELEE_CREATE = "/melee/create";
-        fcMan.createChain("/meleegame/**", "authc");
-        fcMan.createChain("/melee/**", "authc");
+        fcMan.createChain("/meleegame/**", AUTHENTICATION);
+        fcMan.createChain("/melee/**", AUTHENTICATION);
 
         // TODO Refactor URL as games/puzzle/** or at least "/puzzle/**"
         // org.codedefenders.util.Paths.PUZZLE_OVERVIEW = "/puzzles";
         // org.codedefenders.util.Paths.PUZZLE_GAME = "/puzzlegame";
         // org.codedefenders.util.Paths.PUZZLE_GAME_SELECTION = "/puzzle/games";
-        fcMan.createChain("/puzzle**", "authc");
+        fcMan.createChain("/puzzle**", AUTHENTICATION);
 
         // API URLs. I assume they require authentication, but I might be wrong. Maybe
         // they require a different type of authentication, e.g., if the are REST
@@ -136,7 +155,7 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_CLASS = "/api/class";
         // org.codedefenders.util.Paths.API_TEST = "/api/test";
         // org.codedefenders.util.Paths.API_MUTANT = "/api/mutant";
-        fcMan.createChain("/api/**", "authc");
+        fcMan.createChain("/api/**", AUTHENTICATION_API);
 
         // Admin URLS. This does not necessary require authentication as we handle that
         // using tomcat. But for completeness, we force it now.
@@ -164,7 +183,8 @@ public class ShiroConfig {
         // org.codedefenders.util.Paths.API_ADMIN_PUZZLES_ALL = "/admin/api/puzzles";
         // org.codedefenders.util.Paths.API_ADMIN_PUZZLE = "/admin/api/puzzles/puzzle";
         // org.codedefenders.util.Paths.API_ADMIN_PUZZLECHAPTER = "/admin/api/puzzles/chapter";
-        fcMan.createChain("/admin/**", "authc, roles[admin]");
+        fcMan.createChain("/admin/api/**", AUTHENTICATION_API_ADMIN);
+        fcMan.createChain("/admin/**", AUTHENTICATION_ADMIN);
 
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
         resolver.setFilterChainManager(fcMan);

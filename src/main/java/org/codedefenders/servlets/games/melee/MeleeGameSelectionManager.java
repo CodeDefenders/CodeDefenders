@@ -218,6 +218,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
         MeleeGame game = gameProducer.getGame();
         int gameId = game.getId();
 
+        if (game.isExternal()) {
+            logger.warn("User {} tried to join an external melee game, but joining external games is not permitted.", login.getUserId());
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         if (game.hasUserJoined(login.getUserId())) {
             logger.info("User {} already in the requested game.", login.getUserId());
             response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
@@ -258,11 +264,19 @@ public class MeleeGameSelectionManager extends HttpServlet {
         String contextPath = request.getContextPath();
         MeleeGame game = gameProducer.getGame();
 
+        if (game.isExternal()) {
+            logger.warn("User {} tried to leave an external melee game, but leaving external games is not permitted.", login.getUserId());
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        /* From original code - bug?
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
             Redirect.redirectBack(request, response);
             return;
         }
+         */
 
         int gameId = game.getId();
 

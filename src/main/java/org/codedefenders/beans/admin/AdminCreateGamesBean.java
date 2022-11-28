@@ -610,6 +610,9 @@ public class AdminCreateGamesBean implements Serializable {
      * @return {@code true} if the game was successfully created, {@code false} if not.
      */
     public boolean insertStagedGame(StagedGame stagedGame) {
+        return insertStagedGame(stagedGame,null);
+    }
+    public boolean insertStagedGame(StagedGame stagedGame, String returnUrl) {
         GameSettings gameSettings = stagedGame.getGameSettings();
 
         /* Create the game. */
@@ -624,6 +627,7 @@ public class AdminCreateGamesBean implements Serializable {
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
+                    .returnUrl(returnUrl)
                     .build();
         } else if (gameSettings.getGameType() == MELEE) {
             game = new MeleeGame.Builder(gameSettings.getCut().getId(),
@@ -635,6 +639,7 @@ public class AdminCreateGamesBean implements Serializable {
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
+                    .returnUrl(returnUrl)
                     .build();
         } else {
             messages.add(format("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",

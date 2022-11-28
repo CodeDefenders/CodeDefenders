@@ -216,6 +216,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
+        if (game.isExternal()) {
+            logger.warn("User {} tried to join an external battleground game, but joining external games is not permitted.", login.getUserId());
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         int gameId = game.getId();
         Role role = game.getRole(login.getUserId());
 
@@ -273,6 +279,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         String contextPath = request.getContextPath();
         final MultiplayerGame game = gameProducer.getGame();
         int gameId = game.getId();
+
+        if (game.isExternal()) {
+            logger.warn("User {} tried to leave an external battleground game, but leaving external games is not permitted.", login.getUserId());
+            Redirect.redirectBack(request, response);
+            return;
+        }
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
