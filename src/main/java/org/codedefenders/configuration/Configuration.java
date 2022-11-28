@@ -104,6 +104,7 @@ public class Configuration {
     protected Boolean forceLocalExecution;
     protected Boolean parallelize;
     protected Integer parallelizeCount;
+    protected Integer parallelizeKillmapCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
 
@@ -435,7 +436,11 @@ public class Configuration {
     }
 
     public int getNumberOfKillmapThreads() {
-        return 40;
+        if (parallelizeKillmapCount == null) {
+            return Runtime.getRuntime().availableProcessors();
+        } else {
+            return parallelizeKillmapCount;
+        }
     }
 
     public boolean isMetricsCollectionEnabled() {
