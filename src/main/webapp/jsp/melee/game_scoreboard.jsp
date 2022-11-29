@@ -18,64 +18,35 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.beans.game.ScoreItem"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<!-- Instance is created manually in MeleeGame(History)Manager so we use 'type=' instead of 'class=' so nothing
-complains about the missing no-args constructor (this is simply a type hint for an existing attribute and will not try
-to create it if it is missing -->
-<jsp:useBean id="meleeScoreboardBean" type="org.codedefenders.beans.game.MeleeScoreboardBean" scope="request" />
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="meleeScoreboard" type="org.codedefenders.beans.game.MeleeScoreboardBean"--%>
 
-
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
-
-<div id="scoreboard" class="modal fade" role="dialog">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Scoreboard</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-			</div>
-			<div class="modal-body">
-				<table class="table">
-					<thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Attack</th>
-                            <th>Defense</th>
-                            <th>Duels</th>
-                            <th>Total Points</th>
-                        </tr>
-					</thead>
-                    <tbody>
-                        <!--  Use the tag library to go over the players instead of using java snippets -->
-                        <%
-                            for (ScoreItem scoreItem : meleeScoreboardBean.getSortedScoreItems()) {
-                                // Highlight the row of the current player. Apparently, embedding the rendering in the class tag breaks it ?
-                                if (login.getUserId() == scoreItem.getUser().getId()) {
-                        %>
-                            <tr class="bg-warning bg-gradient">
-                        <%
-                                } else {
-                        %>
-                            <tr>
-                        <%
-                                }
-                        %>
-                                <td><%=scoreItem.getUser().getName()%></td>
-                                <td><%=scoreItem.getAttackScore().getTotalScore()%></td>
-                                <td><%=scoreItem.getDefenseScore().getTotalScore()%></td>
-                                <td><%=scoreItem.getDuelScore().getTotalScore()%></td>
-                                <td><%=scoreItem.getAttackScore().getTotalScore() + scoreItem.getDefenseScore().getTotalScore() + scoreItem.getDuelScore().getTotalScore()%></td>
-                            </tr>
-                        <%
-                            }
-                        %>
-                    </tbody>
-				</table>
-			</div>
-			<div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-			</div>
-		</div>
-	</div>
-</div>
+<t:modal id="scoreboard" title="Scoreboard">
+    <jsp:attribute name="content">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>User</th>
+                <th>Attack</th>
+                <th>Defense</th>
+                <th>Duels</th>
+                <th>Total Points</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:forEach items="${meleeScoreboard.scoreItems}" var="scoreItem">
+                <tr class="${login.userId eq scoreItem.user.id ? "bg-warning bg-gradient" : ""}">
+                    <td>${scoreItem.user.name}</td>
+                    <td>${scoreItem.attackScore.totalScore}</td>
+                    <td>${scoreItem.defenseScore.totalScore}</td>
+                    <td>${scoreItem.duelScore.totalScore}</td>
+                    <td>${scoreItem.attackScore.totalScore + scoreItem.defenseScore.totalScore + scoreItem.duelScore.totalScore}</td>
+                </tr>
+            </c:forEach>
+            </tbody>
+        </table>
+    </jsp:attribute>
+</t:modal>
