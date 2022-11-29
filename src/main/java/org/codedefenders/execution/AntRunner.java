@@ -57,11 +57,7 @@ import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
  * @author Alessio Gambi (last edit)
  */
 @ManagedBean
-public class AntRunner implements //
-        BackendExecutorService, //
-        ClassCompilerService, //
-        TestGeneratorService, //
-        MutantGeneratorService {
+public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
     private static final Histogram antProcessDuration = Histogram.build()
@@ -128,34 +124,6 @@ public class AntRunner implements //
         } else {
             // The test passed, i.e., it did not detect the mutant
             newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT,
-                    TargetExecution.Status.SUCCESS, null);
-        }
-        newExec.insert();
-        return newExec;
-    }
-
-    @SuppressWarnings("Duplicates")
-    public TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
-        logger.info("Running test {} on mutant {}", t.getId(), m.getId());
-        GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
-
-        AntProcessResult result = runAntTarget("recompile-test-mutant", m.getDirectory(),
-                t.getDirectory(), cut, t.getFullyQualifiedClassName());
-
-        TargetExecution newExec;
-
-        if (result.hasFailure()) {
-            // The test failed, i.e., it detected the mutant
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
-                    TargetExecution.Status.FAIL, null);
-        } else if (result.hasError()) {
-            // The test is in error, interpreted also as detecting the mutant
-            String message = result.getErrorMessage();
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
-                    TargetExecution.Status.ERROR, message);
-        } else {
-            // The test passed, i.e., it did not detect the mutant
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
                     TargetExecution.Status.SUCCESS, null);
         }
         newExec.insert();
@@ -344,31 +312,6 @@ public class AntRunner implements //
             newExec.insert();
             return newTest;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void generateMutantsFromCUT(final GameClass cut) {
-        runAntTarget("mutant-gen-cut", null, null, cut, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void generateTestsFromCUT(final GameClass cut) {
-        runAntTarget("test-gen-cut", null, null, cut, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean compileGenTestSuite(final GameClass cut) {
-        AntProcessResult result = runAntTarget("compile-gen-tests", null, null, cut,
-                cut.getName() + Constants.SUITE_EXT);
-
-        // Return true iff compilation succeeds
-        return result.compiled();
     }
 
     /**
