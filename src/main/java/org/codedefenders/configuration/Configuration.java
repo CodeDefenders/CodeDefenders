@@ -152,7 +152,6 @@ public class Configuration {
                     validationErrors.add(setupFile(dataDir, "security.policy",
                             () -> this.getClass().getResourceAsStream("/data/security.policy")));
 
-                    validationErrors.add(setupDirectory(getAiDir()));
                     validationErrors.add(setupDirectory(getMutantDir()));
                     validationErrors.add(setupDirectory(getTestsDir()));
                     validationErrors.add(setupDirectory(getSourcesDir()));
@@ -355,10 +354,6 @@ public class Configuration {
 
     public File getLibraryDir() {
         return new File(getDataDir(), "lib");
-    }
-
-    public File getAiDir() {
-        return new File(getDataDir(), "ai");
     }
 
     public File getAntHome() {

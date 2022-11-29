@@ -47,7 +47,6 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Histogram;
 
-import static org.codedefenders.util.Constants.AI_DIR;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
@@ -72,19 +71,6 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
     @Inject
     public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
         this.config = config;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean testKillsMutant(Mutant mutant, Test test) {
-        GameClass cut = GameClassDAO.getClassForGameId(mutant.getGameId());
-
-        AntProcessResult result = runAntTarget("test-mutant", mutant.getDirectory(), test.getDirectory(),
-                cut, test.getFullyQualifiedClassName());
-
-        // Return true iff test failed
-        return result.hasFailure();
     }
 
     /**
@@ -128,22 +114,6 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         }
         newExec.insert();
         return newExec;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean potentialEquivalent(Mutant m) {
-        logger.info("Checking if mutant {} is potentially equivalent.", m.getId());
-        GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
-        String suiteDir = Paths.get(AI_DIR, "tests", cut.getAlias()).toString();
-
-        // TODO: is this actually executing a whole test suite?
-        AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), suiteDir,
-                cut, cut.getName() + Constants.SUITE_EXT);
-
-        // return true if tests pass without failures or errors
-        return !(result.hasError() || result.hasFailure());
     }
 
     /**
