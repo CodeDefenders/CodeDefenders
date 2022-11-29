@@ -145,7 +145,7 @@ public class ExecutionTest {
         boolean isCreated = false;
         isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-        isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/sources").mkdirs()) || (new File(codedefendersHome + "/sources").exists());
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
         isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
@@ -185,7 +185,7 @@ public class ExecutionTest {
         UserEntity defender = new UserEntity("demodefender", UserEntity.encodePassword("password"), "demo@defender.com");
         defender.insert();
         // CUT
-        File cutFolder = new File(Constants.CUTS_DIR, "XmlElement");
+        File cutFolder = new File(codedefendersHome + "/sources", "XmlElement");
         cutFolder.mkdirs();
         File javaFile = new File(cutFolder, "XmlElement.java");
         File classFile = new File(cutFolder, "XmlElement.class");

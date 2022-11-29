@@ -178,7 +178,7 @@ public class ParallelizeTest {
         boolean isCreated = false;
         isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-        isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/sources")).mkdirs() || (new File(codedefendersHome + "/sources")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
         isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
@@ -207,7 +207,7 @@ public class ParallelizeTest {
         try {
             // Upload the Class Under test - Maybe better use Classloader
             // Where is this store eventually?
-            File cutFolder = new File(Constants.CUTS_DIR, name);
+            File cutFolder = new File(codedefendersHome + "/sources", name);
             cutFolder.mkdirs();
             File jFile = new File(cutFolder, name + ".java");
             File cFile = new File(cutFolder, name + ".class");

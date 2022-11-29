@@ -49,6 +49,7 @@ import org.codedefenders.analysis.coverage.CoverageGenerator;
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -80,7 +81,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
-import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 
@@ -94,6 +94,9 @@ import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 @WebServlet(org.codedefenders.util.Paths.CLASS_UPLOAD)
 public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
+
+    @Inject
+    private Configuration config;
 
     @Inject
     private MessagesBean messages;
@@ -344,7 +347,7 @@ public class ClassUploadManager extends HttpServlet {
             return;
         }
 
-        cutDir = Paths.get(CUTS_DIR, classAlias);
+        cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
         if (Files.exists(cutDir)) {
             logger.warn("Attempting to store new class directory under '" + cutDir + "', but file/directory with the same path already exists. Deleting it.");
             try {

@@ -154,10 +154,10 @@ public class ClassUploadManagerTest {
         System.setProperty("java.naming.factory.initial", this.getClass().getCanonicalName() + "$MyContextFactory");
         //
         // Recreate codedefenders' folders
-        boolean isCreated = false;
-        isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
-        isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
-        isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
+        //boolean isCreated = false;
+        //isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
+        //isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+        //isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
         //
         // Setup the environment
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),

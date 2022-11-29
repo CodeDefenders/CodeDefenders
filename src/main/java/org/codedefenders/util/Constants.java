@@ -50,13 +50,6 @@ public class Constants {
     public static final int DUMMY_ATTACKER_USER_ID = 3;
     public static final int DUMMY_DEFENDER_USER_ID = 4;
 
-    /**
-     * Deprecated.
-     *
-     * @deprecated Use {@link Configuration#getSourcesDir()} instead.
-     */
-    @Deprecated
-    public static final String CUTS_DIR = Paths.get(DATA_DIR, "sources").toString();
     // dependencies, mutants and tests subdirectories for CUTs
     public static final String CUTS_DEPENDENCY_DIR = "dependencies";
     public static final String CUTS_MUTANTS_DIR = "mutants";
