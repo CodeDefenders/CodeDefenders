@@ -46,6 +46,7 @@ import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
 import org.jacoco.core.analysis.ILine;
+import org.jacoco.core.analysis.ISourceFileCoverage;
 import org.jacoco.core.data.ExecutionDataStore;
 import org.jacoco.core.tools.ExecFileLoader;
 import org.slf4j.Logger;
@@ -85,30 +86,21 @@ public class CoverageGenerator {
         CompilationUnit compilationUnit = JavaParserUtils.parse(gameClass.getSourceCode())
                 .orElseThrow(() -> new CoverageGeneratorException("Could not parse java file: " + gameClass.getJavaFile()));
 
-        try {
-            AstCoverageVisitor astVisitor = new AstCoverageVisitor(lineMapping);
-            astVisitor.visit(compilationUnit, null);
-            AstCoverageMapping astMapping = astVisitor.finish();
+        return generate(lineMapping, compilationUnit);
+    }
 
-            List<Map.Entry<Node, AstCoverageStatus>> allSorted = astMapping.getMap().entrySet().stream()
-                    .sorted(Comparator.comparing(entry -> entry.getKey().getBegin().get()))
-                    .collect(Collectors.toList());
+    public static LineCoverage generate(LineCoverageMapping originalCoverage, CompilationUnit compilationUnit) {
+        AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
+        astVisitor.visit(compilationUnit, null);
+        AstCoverageMapping astMapping = astVisitor.finish();
 
-            LineTokens lineTokens = LineTokens.fromJaCoCo(lineMapping);
-            LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astMapping, lineTokens);
-            lineTokenVisitor.visit(compilationUnit, null);
+        LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
+        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astMapping, lineTokens);
+        lineTokenVisitor.visit(compilationUnit, null);
 
-            LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
-            LineCoverageMapping extendedMapping = lineTokenAnalyser.analyse(lineTokens);
-            return extendedMapping.toLineCoverage();
-        } catch (Exception e) {
-            logger.error("COVERAGE ERROR", e);
-        }
-
-        // LineCoverageMapping finalCoverage = LineTokenAnalyser.computeCoverage(lineTokenTree);
-        // return finalCoverage.toLineCoverage();
-
-        return lineMapping.toLineCoverage();
+        LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
+        LineCoverageMapping extendedMapping = lineTokenAnalyser.analyse(lineTokens);
+        return extendedMapping.toLineCoverage();
     }
 
     // TODO: this replicates the old behavior. replace this with better error handling
@@ -174,20 +166,19 @@ public class CoverageGenerator {
     public static LineCoverageMapping extractLineCoverageMapping(CoverageBuilder coverageBuilder, GameClass gameClass) {
         LineCoverageMapping lineMapping = new LineCoverageMapping();
 
-        String cutName = gameClass.getName();
-        for (IClassCoverage classCoverage : coverageBuilder.getClasses()) {
-            final String fullyQualifiedName = classCoverage.getName().replace("/", ".");
-            if (fullyQualifiedName.startsWith(cutName)) {
+        for (ISourceFileCoverage coverage : coverageBuilder.getSourceFiles()) {
+            if (!gameClass.getJavaFile().endsWith(coverage.getName())) {
+                continue;
+            }
 
-                for (int line = classCoverage.getFirstLine(); line <= classCoverage.getLastLine(); line++) {
-                    final ILine lineCoverage = classCoverage.getLine(line);
-                    int totalIns = lineCoverage.getInstructionCounter().getTotalCount();
-                    int missedIns = lineCoverage.getInstructionCounter().getMissedCount();
-                    int totalBr = lineCoverage.getBranchCounter().getTotalCount();
-                    int missedBr = lineCoverage.getBranchCounter().getMissedCount();
-                    final int status = lineCoverage.getInstructionCounter().getStatus();
-                    lineMapping.put(line, LineCoverageStatus.fromJacoco(status));
-                }
+            for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
+                final ILine lineCoverage = coverage.getLine(line);
+                int totalIns = lineCoverage.getInstructionCounter().getTotalCount();
+                int missedIns = lineCoverage.getInstructionCounter().getMissedCount();
+                int totalBr = lineCoverage.getBranchCounter().getTotalCount();
+                int missedBr = lineCoverage.getBranchCounter().getMissedCount();
+                final int status = lineCoverage.getInstructionCounter().getStatus();
+                lineMapping.put(line, LineCoverageStatus.fromJacoco(status));
             }
         }
 
