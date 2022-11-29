@@ -69,17 +69,12 @@ public class PasswordServlet extends HttpServlet {
 
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String email = request.getParameter("email");
         String formType = request.getParameter("formType");
-
-        String confirm = request.getParameter("confirm");
 
         switch (formType) {
             case "resetPassword":
-                email = request.getParameter("accountEmail");
-                username = request.getParameter("accountUsername");
+                String email = request.getParameter("accountEmail");
+                String username = request.getParameter("accountUsername");
                 Optional<UserEntity> u = userRepo.getUserByEmail(email);
                 if (!u.isPresent() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
                     messages.add("No user was found for this username and email. Please check if the username and email match.");
@@ -101,8 +96,8 @@ public class PasswordServlet extends HttpServlet {
 
             case "changePassword":
                 String resetPwSecret = request.getParameter("resetPwSecret");
-                confirm = request.getParameter("inputConfirmPasswordChange");
-                password = request.getParameter("inputPasswordChange");
+                String confirm = request.getParameter("inputConfirmPasswordChange");
+                String password = request.getParameter("inputPasswordChange");
 
                 String responseURL = url.forPath(Paths.LOGIN) + "?resetPW=" + resetPwSecret;
                 Optional<Integer> userId = userRepo.getUserIdForPasswordResetSecret(resetPwSecret);

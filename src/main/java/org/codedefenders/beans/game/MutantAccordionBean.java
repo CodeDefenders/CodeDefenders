@@ -39,7 +39,6 @@ import com.google.gson.annotations.Expose;
 @Named(value = "mutantAccordion")
 @RequestScoped
 public class MutantAccordionBean {
-
     private static final Logger logger = LoggerFactory.getLogger(MutantAccordionBean.class);
 
     private final AbstractGame game;
