@@ -40,7 +40,7 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
-import org.codedefenders.service.MetricsService;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,7 @@ public class ThreadPoolManager {
     private final ConcurrentMap<String, ThreadPoolExecutor> pools = new ConcurrentHashMap<>();
 
     @Inject
-    private MetricsService metricsService;
+    private MetricsRegistry metricsRegistry;
 
     @Inject
     private Event<ThreadPoolManager> registrationEvent;
@@ -87,7 +87,7 @@ public class ThreadPoolManager {
             ofNullable(models.get(name))
                     .map(threadPoolModel -> {
                         ThreadPoolExecutor result = threadPoolModel.create();
-                        metricsService.registerThreadPoolExecutor(name, result);
+                        metricsRegistry.registerThreadPoolExecutor(name, result);
                         return result;
                     })
                     .orElseThrow(() -> new IllegalArgumentException("No pool '" + name + "' defined.")));

@@ -17,7 +17,7 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.service;
+package org.codedefenders.instrumentation;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +40,7 @@ import io.prometheus.client.hotspot.DefaultExports;
  * Provides additional functionality for Metrics collection.
  */
 @ApplicationScoped
-public class MetricsService {
+public class MetricsRegistry {
 
     private static final CacheMetricsCollector cacheMetrics = new CacheMetricsCollector().register();
     private static final ThreadPoolExecutorMetricsCollector threadPoolExecutorMetrics = new ThreadPoolExecutorMetricsCollector().register();
