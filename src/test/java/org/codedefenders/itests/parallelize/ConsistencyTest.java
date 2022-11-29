@@ -184,11 +184,11 @@ public class ConsistencyTest {
         //
         // Recreate codedefenders' folders
         boolean isCreated = false;
-        isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/mutants")).mkdirs() || (new File(codedefendersHome + "/mutants")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
         isCreated = (new File(codedefendersHome + "/sources")).mkdirs() || (new File(codedefendersHome + "/sources")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-        isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/tests")).mkdirs() || (new File(codedefendersHome + "/tests")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
         //
         // Setup the environment

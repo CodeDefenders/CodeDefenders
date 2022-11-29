@@ -60,22 +60,6 @@ public class Constants {
     public static final String MODE_BATTLEGROUND_DIR = "mp";
 
 
-    /**
-     * Deprecated.
-     *
-     * @deprecated Use {@link Configuration#getMutantDir()} instead.
-     */
-    @Deprecated
-    public static final String MUTANTS_DIR = Paths.get(DATA_DIR, "mutants").toString();
-
-    /**
-     * Deprecated.
-     *
-     * @deprecated Use {@link Configuration#getTestsDir()} instead.
-     */
-    @Deprecated
-    public static final String TESTS_DIR = Paths.get(DATA_DIR, "tests").toString();
-
     public static final String JACOCO_CLASSPATH = Stream.of(
                     "org.jacoco.core-0.8.8.jar",
                     "org.jacoco.report-0.8.8.jar",
