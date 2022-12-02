@@ -4,5 +4,5 @@
 
 	<ResourceLink name="auth/UserDatabase" global="UserDatabase"
 				  type="org.apache.catalina.UserDatabase"/>
-
+	<CookieProcessor sameSiteCookies="none" />
 </Context>
