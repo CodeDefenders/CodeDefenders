@@ -31,12 +31,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -80,9 +78,7 @@ public class UserSettingsManager extends HttpServlet {
      * @return {@code true} when users can access their profile, {@code false} otherwise.
      */
     public static boolean checkEnabled() {
-        // TODO: add ALLOW_USER_SETTINGS to DB and use it instead of ALLOW_USER_PROFILE.
-        // return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_SETTINGS).getBoolValue();
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
+        return true; // User settings are always enabled.
     }
 
     @Override
