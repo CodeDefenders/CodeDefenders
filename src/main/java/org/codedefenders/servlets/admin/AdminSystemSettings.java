@@ -164,20 +164,12 @@ public class AdminSystemSettings extends HttpServlet {
                 return "Turn on the automatic killmaps computation";
             }
         },
-        ALLOW_USER_PROFILE {
+        PUBLIC_USER_PROFILE {
             @Override
             public String toString() {
-                return "Let users manage their account and view their own profile and the profile pages of others.";
+                return "Let users visit the profile pages of others.";
             }
         },
-        /*
-        ALLOW_USER_SETTINGS {
-            @Override
-            public String toString() {
-                return "Let users manage their account.";
-            }
-        },
-        */
         ALLOW_PUZZLE_SECTION {
             @Override
             public String toString() {

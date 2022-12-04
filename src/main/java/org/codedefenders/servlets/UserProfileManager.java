@@ -42,8 +42,8 @@ import org.codedefenders.util.Constants;
 
 /**
  * This {@link HttpServlet} handles requests for viewing the currently logged
- * in {@link UserEntity}. This functionality may be disabled, e.g. in a class room
- * setting. See {@link #checkEnabled()}.
+ * in {@link UserEntity}. This functionality may be private only, see
+ * {@link #isProfilePublic()}.
  *
  * <p>Serves on path: {@code /profile}.
  *
@@ -68,12 +68,21 @@ public class UserProfileManager extends HttpServlet {
     private CodeDefendersFormAuthenticationFilter codedefendersFormAuthenticationFilter;
 
     /**
-     * Checks whether users can view and update their profile information.
+     * Checks whether users can view their own profile information.
      *
-     * @return {@code true} when users can access their profile, {@code false} otherwise.
+     * @return {@code true} if users can access their profile, {@code false} otherwise.
      */
     public static boolean checkEnabled() {
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
+        return true; // The user profile is always enabled.
+    }
+
+    /**
+     * Checks whether users can view the profile of others.
+     *
+     * @return {@code true} if the profile page of someone can be visited, {@code false} otherwise.
+     */
+    public static boolean isProfilePublic() {
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PUBLIC_USER_PROFILE).getBoolValue();
     }
 
     /**
@@ -94,12 +103,6 @@ public class UserProfileManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkEnabled()) {
-            // Send users to the home page
-            response.sendRedirect(ServletUtils.getBaseURL(request));
-            return;
-        }
-
         final Optional<UserEntity> loggedInUser = login.isLoggedIn()
                 ? userRepo.getUserById(login.getUserId()) : Optional.empty();
         final Optional<String> urlParam = userParameter(request);
@@ -109,6 +112,12 @@ public class UserProfileManager extends HttpServlet {
         final boolean isLoggedIn = loggedInUser.isPresent();
         final boolean isSelf = (!explicitUserGiven // no URL-parameter given -> logged in user is used
                 || isLoggedIn && loggedInUser.get().equals(urlParamUser.get())); // explicit user is self
+
+        if (!isSelf && !isProfilePublic()) {
+            // Someone tries to access a profile of someone else, but profiles are not public. Send user to homepage.
+            response.sendRedirect(ServletUtils.getBaseURL(request));
+            return;
+        }
 
         if (urlParam.isPresent() && !explicitUserGiven) {
             // Invalid URL parameter or user not found.
