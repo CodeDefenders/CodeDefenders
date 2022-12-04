@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -130,36 +129,12 @@ public class UploadClassAPI extends HttpServlet {
         }
 
         String prefix = login.getUser().getName();
-        String fileName;
-        Random random = new Random();
-        String classAlias;
-        Path cutDir;
-        //Generate new name in format prefix_name_NNNN
-        do {
-            String num = String.format("%1$4s", random.nextInt(9999)).replace(' ', '0');
-            classAlias = prefix + "_" + name.replace(".java", "") + "_" + num;
-            fileName = classAlias + ".java";
-            cutDir = Paths.get(CUTS_DIR, classAlias);
-        } while (GameClassDAO.classExistsForAlias(classAlias) || Files.exists(cutDir));
-        source = source.replace("public class " + name.replace(".java", ""), "public class " + classAlias);
-//TODO handle with regex
-/*
-        Pattern p = Pattern.compile("cat", Pattern.DOTALL);
-        Matcher m = p.matcher("ct cat. cat, cat| cat+ +cat cattie cat"); // get a matcher object
-\((?:[^)(]*(?R)?)*+\)|\[(?:[^][]*(?R)?)*+\]|{(?:[^}{]*(?R)?)*+}|(\/\*)(?:[^(\*\/)(\*\/)]*(?R)?)*+(\*\/)
-        int count = 0;
-
-        while (m.find()) {
-            count++;
-
-            System.out.println("----------------------------");
-            //System.out.println("LookingAt:" + m.lookingAt());
-            System.out.println("Match number:" + count);
-            System.out.println("start(): " + m.start());
-            System.out.println("end(): " + m.end());
-            System.out.println("Matched:" + m.group());
+        String classAlias = prefix + "_" + name.replace(".java", "");
+        Path cutDir = Paths.get(CUTS_DIR, classAlias);
+        if (GameClassDAO.classExistsForAlias(classAlias) || Files.exists(cutDir)) {
+            APIUtils.respondJsonError(response, "The class name or file already exist", HttpServletResponse.SC_CONFLICT);
+            return;
         }
-*/
 
         TestingFramework testingFramework = TestingFramework.JUNIT4;
         AssertionLibrary assertionLibrary = AssertionLibrary.JUNIT4_HAMCREST;
@@ -172,7 +147,7 @@ public class UploadClassAPI extends HttpServlet {
 
         final String cutJavaFilePath;
         try {
-            cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
+            cutJavaFilePath = FileUtils.storeFile(cutDir, name, fileContent).toString();
         } catch (IOException e) {
             APIUtils.respondJsonError(response, "Class upload failed. Could not store java file\n" + e, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             abortRequestAndCleanUp(cutDir);
@@ -183,7 +158,7 @@ public class UploadClassAPI extends HttpServlet {
         try {
             cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
         } catch (CompileException e) {
-            APIUtils.respondJsonError(response, cutJavaFilePath + " " + fileContent + "Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
+            APIUtils.respondJsonError(response, cutJavaFilePath + " " + fileContent + "Class upload failed. Could not compile " + name + "!\n" + e.getMessage());
             abortRequestAndCleanUp(cutDir);
             return;
         } catch (IllegalStateException e) {
@@ -197,7 +172,7 @@ public class UploadClassAPI extends HttpServlet {
         try {
             classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
         } catch (IOException e) {
-            APIUtils.respondJsonError(response, "Class upload failed. Could not get fully qualified name for " + fileName + "\n" + e, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            APIUtils.respondJsonError(response, "Class upload failed. Could not get fully qualified name for " + name + "\n" + e, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             abortRequestAndCleanUp(cutDir);
             return;
         }
@@ -226,8 +201,8 @@ public class UploadClassAPI extends HttpServlet {
     }
 
     private static class SimpleFile {
-        private String fileName;
-        private byte[] fileContent;
+        private final String fileName;
+        private final byte[] fileContent;
 
         SimpleFile(String fileName, byte[] fileContent) {
             this.fileName = fileName;
@@ -236,8 +211,8 @@ public class UploadClassAPI extends HttpServlet {
     }
 
     private static class CompiledClass {
-        private CompileClassType type;
-        private Integer id;
+        private final CompileClassType type;
+        private final Integer id;
 
         CompiledClass(CompileClassType type, Integer id) {
             this.type = type;
