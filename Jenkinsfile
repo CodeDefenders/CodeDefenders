@@ -84,6 +84,8 @@ pipeline {
 	        }
             steps {
                 sh "docker build --file ./docker/Dockerfile.deploy --tag codebenders/codedefenders:${env.GIT_COMMIT} ."
+
+        		sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                 sh "docker push codebenders/codedefenders:${env.GIT_COMMIT}"
                 /*script{
                     image_tag = "${env.GIT_COMMIT}"
@@ -126,6 +128,7 @@ pipeline {
                 sh "docker build --file ./docker/Dockerfile.deploy --tag codebenders/codedefenders:${env.GIT_COMMIT} ."
                 sh "docker tag codebenders/codedefenders:${env.GIT_COMMIT} codebenders/codedefenders:dev"
                 
+        		sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                 sh "docker push codebenders/codedefenders:${env.GIT_COMMIT}"
                 sh "docker push codebenders/codedefenders:dev"
                 /*script{
@@ -169,6 +172,7 @@ pipeline {
                 sh "docker build --file ./docker/Dockerfile.deploy --tag codebenders/codedefenders:${env.GIT_COMMIT} ."
                 sh "docker tag codebenders/codedefenders:${env.GIT_COMMIT} codebenders/codedefenders:latest"
 
+        		sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
                 sh "docker push codebenders/codedefenders:${env.GIT_COMMIT}"
                 sh 'docker push codebenders/codedefenders:latest'
             }
@@ -194,6 +198,21 @@ pipeline {
                     )
                 }
             }
+        }
+    }
+    post {
+        always{
+        	sh 'docker logout'
+        }
+        aborted {
+            discordSend (
+                        description: "Hey team, pipeline was aborted on branch ${env.GIT_BRANCH} :(", 
+                        footer: currentBuild.currentResult, 
+                        link: env.BUILD_URL, 
+                        result: currentBuild.currentResult, 
+                        title: JOB_NAME, 
+                        webhookURL: DISCORD_WEBHOOK
+                    )
         }
     }
 }
