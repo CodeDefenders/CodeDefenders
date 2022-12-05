@@ -33,6 +33,7 @@ import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
+import org.codedefenders.servlets.ClassUploadManager;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,7 +165,7 @@ public class GameClassDAO {
     public static List<GameClass> getAllPlayableClasses() {
         String query = "SELECT * FROM view_playable_classes;";
 
-        return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
+        return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS).stream().filter(c -> c.getAlias().matches("^[a-zA-Z0-9]*$")).collect(Collectors.toList());
     }
 
     /**
