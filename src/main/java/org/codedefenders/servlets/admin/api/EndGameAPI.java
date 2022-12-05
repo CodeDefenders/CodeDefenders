@@ -54,10 +54,10 @@ import com.google.gson.JsonParseException;
  *
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
-@WebServlet("/admin/api/game/start")
-public class StartGameAPI extends HttpServlet {
+@WebServlet("/admin/api/game/end")
+public class EndGameAPI extends HttpServlet {
 
-    private static final Logger logger = LoggerFactory.getLogger(StartGameAPI.class);
+    private static final Logger logger = LoggerFactory.getLogger(EndGameAPI.class);
     @Inject
     CodeDefendersAuth login;
     @Inject
@@ -83,12 +83,12 @@ public class StartGameAPI extends HttpServlet {
         if (game == null) {
             APIUtils.respondJsonError(response, "Game with ID " + gameId.getGameId() + " not found", HttpServletResponse.SC_NOT_FOUND);
         } else if (login.getUserId() != game.getCreatorId()) {
-            APIUtils.respondJsonError(response, "Only the game's creator can start the game", HttpServletResponse.SC_BAD_REQUEST);
-        } else if (game.getState() != GameState.CREATED) {
-            APIUtils.respondJsonError(response, "Game cannot be started since it has state " + game.getState(), HttpServletResponse.SC_BAD_REQUEST);
+            APIUtils.respondJsonError(response, "Only the game's creator can end the game", HttpServletResponse.SC_BAD_REQUEST);
+        } else if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE && game.getState() != GameState.GRACE_TWO) {
+            APIUtils.respondJsonError(response, "Game cannot be ended since it has state " + game.getState(), HttpServletResponse.SC_BAD_REQUEST);
         } else {
-            logger.info("Starting game {} (Setting state to ACTIVE)", gameId);
-            game.setState(GameState.ACTIVE);
+            logger.info("Ending game {} (Setting state to FINISHED)", gameId);
+            game.setState(GameState.FINISHED);
             game.update();
         }
     }
