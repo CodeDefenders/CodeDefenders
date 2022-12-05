@@ -136,7 +136,7 @@ public class NewGameAPI extends HttpServlet {
                     List<Integer> oldGameIds = availableGames.get().stream().map(AbstractGame::getId).collect(Collectors.toList());
                     adminCreateGamesBean.insertStagedGame(stagedGame, game.getReturnUrl());
                     List<Integer> newGameIds = availableGames.get().stream().map(AbstractGame::getId).collect(Collectors.toList());
-                    List<Integer> newGameId = newGameIds.stream().filter(id->!oldGameIds.contains(id)).collect(Collectors.toList());
+                    List<Integer> newGameId = newGameIds.stream().filter(id -> !oldGameIds.contains(id)).collect(Collectors.toList());
                     if (newGameId.size() == 1) {
                         response.setContentType("application/json");
                         PrintWriter out = response.getWriter();
@@ -149,20 +149,6 @@ public class NewGameAPI extends HttpServlet {
                     APIUtils.respondJsonError(response, e.getMessage(), HttpServletResponse.SC_NOT_FOUND);
                 }
             }
-/*
-            Optional<UserEntity> user = userRepository.getUserById(userId);
-            PrintWriter out = response.getWriter();
-            if (user.isPresent()) {
-                response.setContentType("application/json");
-                Gson gson = new Gson();
-                JsonObject root = new JsonObject();
-                root.add("token", gson.toJsonTree(user.get().getToken(), String.class));
-                out.print(new Gson().toJson(root));
-                out.flush();
-            } else {
-                ServletUtils.respondJsonError(response, "User " + userId + " not found", HttpStatus.SC_NOT_FOUND);
-            }
-*/
         }
     }
 }
