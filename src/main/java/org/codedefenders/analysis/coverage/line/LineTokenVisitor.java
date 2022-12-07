@@ -135,6 +135,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                     return;
                 }
 
+                // TODO: change this after saving covered/missed instructions in line coverage status
                 // cover from the last covered statement up
                 for (int j = statements.size() - 1; j >= 0; j--) {
                     Statement stmt = statements.get(j);

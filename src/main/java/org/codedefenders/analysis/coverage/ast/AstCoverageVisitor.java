@@ -133,6 +133,19 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
  *         But this is probably an edge case we can safely ignore.
  *     </li>
  * </ul>
+ *
+ * <p>Note about terminology:
+ * <ul>
+ *     <li>
+ *         coverable: An AST node is coverable if it produces a non-EMPTY line coverage status without relying on a
+ *         parent node. A coverable node should never be {@link AstCoverageStatus#EMPTY}.
+ *         // TODO did I always use coverable with this meaning?
+ *     </li>
+ *     <li>
+ *         not-covered: A not-covered AST node has the status {@link AstCoverageStatus#NOT_COVERED}.
+ *         An EMPTY node is considered neither covered nor not-covered.
+ *     </li>
+ * </ul>
  */
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
@@ -432,7 +445,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if no variables have an initializer, i.e. all are EMPTY, get the coverage from the parent class later
         finalizers.add(() -> {
-
             // search for parent class/enum/record/annotation declaration
             Optional<TypeDeclaration> optParentClass = decl.findAncestor(TypeDeclaration.class);
             if (!optParentClass.isPresent()) {
@@ -442,6 +454,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             // check if parent class has been initialized -> COVERED
             AstCoverageStatus classStatus = astCoverage.get(optParentClass.get());
             if (classStatus.isCovered()) {
+                // TODO: check if any field before this one is not-covered
                 astCoverage.put(decl, AstCoverageStatus.COVERED);
                 return;
             }
