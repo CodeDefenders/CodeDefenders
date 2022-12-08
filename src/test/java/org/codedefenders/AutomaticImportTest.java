@@ -18,9 +18,14 @@
  */
 package org.codedefenders;
 
+import javax.enterprise.context.ApplicationScoped;
+
+import org.codedefenders.analysis.ClassCodeAnalyser;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
+import org.jboss.weld.junit4.WeldInitiator;
+import org.junit.Rule;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
@@ -29,6 +34,13 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 
 public class AutomaticImportTest {
+
+    @Rule
+    public WeldInitiator weld = WeldInitiator
+            .from(ClassCodeAnalyser.class)
+            .inject(this)
+            .activate(ApplicationScoped.class)
+            .build();
 
     @org.junit.Test
     public void testAutomaticImportOfMockitoIfEnabled() {

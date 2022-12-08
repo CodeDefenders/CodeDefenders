@@ -18,9 +18,14 @@
  */
 package org.codedefenders.coverage;
 
+import javax.enterprise.context.ApplicationScoped;
+
+import org.codedefenders.analysis.ClassCodeAnalyser;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
+import org.jboss.weld.junit4.WeldInitiator;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -29,6 +34,13 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
 public class TestTemplateTest {
+
+    @Rule
+    public WeldInitiator weld = WeldInitiator
+            .from(ClassCodeAnalyser.class)
+            .inject(this)
+            .activate(ApplicationScoped.class)
+            .build();
 
     private void assertEditableLineCorrect(GameClass gc) {
         int editableLineNr = gc.getTestTemplateFirstEditLine();
