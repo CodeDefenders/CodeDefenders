@@ -81,10 +81,12 @@ public class Installer {
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
     private final BackendExecutorService backend;
+    private final CoverageGenerator coverageGenerator;
 
     @Inject
-    public Installer(BackendExecutorService backend) {
+    public Installer(BackendExecutorService backend, CoverageGenerator coverageGenerator) {
         this.backend = backend;
+        this.coverageGenerator = coverageGenerator;
     }
 
     /**
@@ -319,7 +321,7 @@ public class Installer {
         // This adds a jacoco.exec file to the testDir
         backend.testOriginal(cut, testDir, qualifiedName);
 
-        LineCoverage lineCoverage = CoverageGenerator.generateOrEmpty(cut, javaFilePath);
+        LineCoverage lineCoverage = coverageGenerator.generateOrEmpty(cut, javaFilePath);
         Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);
 
         int testId = TestDAO.storeTest(test);

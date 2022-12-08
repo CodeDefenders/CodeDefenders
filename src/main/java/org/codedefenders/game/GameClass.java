@@ -33,6 +33,7 @@ import org.codedefenders.analysis.ClassCodeAnalyser.ClassAnalysisResult;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +138,8 @@ public class GameClass {
 
     private void analyzeCode() {
         if (!this.visitedCode) {
-            Optional<ClassAnalysisResult> analysisResult = ClassCodeAnalyser.analyze(this.getSourceCode());
+            ClassCodeAnalyser analyser = CDIUtil.getBeanFromCDI(ClassCodeAnalyser.class);
+            Optional<ClassAnalysisResult> analysisResult = analyser.analyze(this.getSourceCode());
             if (analysisResult.isPresent()) {
                 ClassAnalysisResult analysisResult_ = analysisResult.get();
                 this.additionalImports.addAll(analysisResult_.getAdditionalImports());

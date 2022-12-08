@@ -43,8 +43,10 @@ public class LineCoverageMapping {
                 case PARTLY_COVERED:
                 case FULLY_COVERED:
                     coveredLines.add(line);
+                    break;
                 case NOT_COVERED:
                     uncoveredLines.add(line);
+                    break;
                 case EMPTY:
                     break;
             }

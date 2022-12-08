@@ -65,10 +65,13 @@ public class AntRunner implements //
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
     private final Configuration config;
+    private final CoverageGenerator coverageGenerator;
 
     @Inject
-    public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
+    public AntRunner(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config,
+                     CoverageGenerator coverageGenerator) {
         this.config = config;
+        this.coverageGenerator = coverageGenerator;
     }
 
     /**
@@ -202,7 +205,7 @@ public class AntRunner implements //
                 cut, t.getFullyQualifiedClassName(), config.isForceLocalExecution());
 
         // add coverage information
-        final LineCoverage coverage = CoverageGenerator.generateOrEmpty(cut, Paths.get(t.getJavaFile()));
+        final LineCoverage coverage = coverageGenerator.generateOrEmpty(cut, Paths.get(t.getJavaFile()));
         t.setLineCoverage(coverage);
         t.update();
 

@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.analysis.coverage.ast.AstCoverageMapping;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
@@ -46,6 +48,7 @@ import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
 import org.jacoco.core.analysis.ILine;
+import org.jacoco.core.analysis.IMethodCoverage;
 import org.jacoco.core.analysis.ISourceFileCoverage;
 import org.jacoco.core.data.ExecutionDataStore;
 import org.jacoco.core.tools.ExecFileLoader;
@@ -59,6 +62,7 @@ import com.github.javaparser.ast.Node;
  * This class offers a static method {@link #generate(GameClass, Path) generate()}, which
  * allows generation of line coverage for a given {@link GameClass} and {@link Path paht to a java test file}.
  */
+@ApplicationScoped
 public class CoverageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(CoverageGenerator.class);
     private static final String JACOCO_REPORT_FILE = "jacoco.exec";
@@ -75,7 +79,7 @@ public class CoverageGenerator {
      * @return a {@link LineCoverage} instance with covered and uncovered lines if successful,
      *     empty lists for covered and uncovered lines if failed.
      */
-    public static LineCoverage generate(GameClass gameClass, Path testJavaFile)
+    public LineCoverage generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
         final File execFile = findJacocoExecFile(testJavaFile);
         final Collection<File> relevantClassFiles = findRelevantClassFiles(gameClass);
@@ -89,7 +93,7 @@ public class CoverageGenerator {
         return generate(lineMapping, compilationUnit);
     }
 
-    public static LineCoverage generate(LineCoverageMapping originalCoverage, CompilationUnit compilationUnit) {
+    public LineCoverage generate(LineCoverageMapping originalCoverage, CompilationUnit compilationUnit) {
         AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
         astVisitor.visit(compilationUnit, null);
         AstCoverageMapping astMapping = astVisitor.finish();
@@ -104,7 +108,7 @@ public class CoverageGenerator {
     }
 
     // TODO: this replicates the old behavior. replace this with better error handling
-    public static LineCoverage generateOrEmpty(GameClass gameClass, Path testJavaFile) {
+    public LineCoverage generateOrEmpty(GameClass gameClass, Path testJavaFile) {
         try {
             return generate(gameClass, testJavaFile);
         } catch (CoverageGeneratorException e) {
@@ -113,7 +117,7 @@ public class CoverageGenerator {
         }
     }
 
-    public static CoverageBuilder readJacocoCoverage(File execFile, Collection<File> relevantClassFiles)
+    public CoverageBuilder readJacocoCoverage(File execFile, Collection<File> relevantClassFiles)
             throws CoverageGeneratorException {
         final ExecFileLoader execFileLoader = new ExecFileLoader();
         try {
@@ -137,7 +141,7 @@ public class CoverageGenerator {
         return coverageBuilder;
     }
 
-    public static File findJacocoExecFile(Path testJavaFile)
+    public File findJacocoExecFile(Path testJavaFile)
             throws CoverageGeneratorException {
         final File reportDirectory = testJavaFile.getParent().toFile();
         final File execFile = new File(reportDirectory, JACOCO_REPORT_FILE);
@@ -147,7 +151,7 @@ public class CoverageGenerator {
         return execFile;
     }
 
-    public static Collection<File> findRelevantClassFiles(GameClass gameClass)
+    public Collection<File> findRelevantClassFiles(GameClass gameClass)
             throws CoverageGeneratorException {
         final File classFileFolder = new File(gameClass.getClassFile()).getParentFile();
 
@@ -163,7 +167,7 @@ public class CoverageGenerator {
         return Arrays.asList(relevantFiles);
     }
 
-    public static LineCoverageMapping extractLineCoverageMapping(CoverageBuilder coverageBuilder, GameClass gameClass) {
+    public LineCoverageMapping extractLineCoverageMapping(CoverageBuilder coverageBuilder, GameClass gameClass) {
         LineCoverageMapping lineMapping = new LineCoverageMapping();
 
         for (ISourceFileCoverage coverage : coverageBuilder.getSourceFiles()) {

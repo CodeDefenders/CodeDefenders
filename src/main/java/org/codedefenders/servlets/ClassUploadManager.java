@@ -102,6 +102,9 @@ public class ClassUploadManager extends HttpServlet {
     @Inject
     private BackendExecutorService backend;
 
+    @Inject
+    private CoverageGenerator coverageGenerator;
+
     private static List<String> reservedClassNames = Arrays.asList(
             "Test.java"
     );
@@ -806,7 +809,7 @@ public class ClassUploadManager extends HttpServlet {
             }
 
             int testId;
-            final LineCoverage lineCoverage = CoverageGenerator.generateOrEmpty(cut, Paths.get(javaFilePath));
+            final LineCoverage lineCoverage = coverageGenerator.generateOrEmpty(cut, Paths.get(javaFilePath));
             final Test test = new Test(javaFilePath, classFilePath, cutId, lineCoverage);
             try {
                 testId = TestDAO.storeTest(test);

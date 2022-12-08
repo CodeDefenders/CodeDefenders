@@ -25,6 +25,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.game.GameClass;
 import org.codedefenders.util.JavaParserUtils;
 
@@ -45,6 +47,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
  * </ul>
  */
 @SuppressWarnings("OptionalGetWithoutIsPresent")
+@ApplicationScoped
 public class ClassCodeAnalyser {
 
     /**
@@ -53,7 +56,7 @@ public class ClassCodeAnalyser {
      * @param compilationUnit The parsed source code of the CUT.
      * @return The result of the analysis.
      */
-    public static ClassAnalysisResult analyze(CompilationUnit compilationUnit) {
+    public ClassAnalysisResult analyze(CompilationUnit compilationUnit) {
         ClassAnalysisResult analysisResult = new ClassAnalysisResult();
         new ClassCodeVisitor().visit(compilationUnit, analysisResult);
         return analysisResult;
@@ -65,9 +68,9 @@ public class ClassCodeAnalyser {
      * @param code The source code of the CUT.
      * @return The result of the analysis.
      */
-    public static Optional<ClassAnalysisResult> analyze(String code) {
+    public Optional<ClassAnalysisResult> analyze(String code) {
         Optional<CompilationUnit> parseResult = JavaParserUtils.parse(code);
-        return parseResult.map(ClassCodeAnalyser::analyze);
+        return parseResult.map(this::analyze);
     }
 
     private static class ClassCodeVisitor extends VoidVisitorAdapter<ClassAnalysisResult> {
