@@ -714,7 +714,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 conditionStartLine, conditionEndLine);
         switch (conditionStatus) {
             case FULLY_COVERED:
-                if (!stmt.hasElseBranch()) {
+                AstCoverageStatus thenStatus = astCoverage.get(stmt.getElseStmt().get());
+                AstCoverageStatus elseStatus = stmt.getElseStmt().map(astCoverage::get).orElse(AstCoverageStatus.EMPTY);
+                if (thenStatus.isEmpty() || elseStatus.isEmpty()) {
                     // control flow jumped past the if stmt
                     astCoverage.put(stmt, AstCoverageStatus.END_COVERED);
                 } else {
