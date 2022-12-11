@@ -1,14 +1,12 @@
 # Docker
 
-We provide a `docker-compose` file for running Codedefenders.  
-Beginning with version 1.8, we publish docker images for released versions at the [dockerhub codedefenders repository](https://hub.docker.com/repository/docker/codedefenders/codedefenders).
+We provide a `docker-compose` file for running a modified version of Codedefenders which includes APIs for managing games and let bots play CodeDefenders.
+Images for that custom version are on our [Docker Hub repository](https://hub.docker.com/r/codebenders/codedefenders).
 
 ## Quick Start
 
 To get a working CodeDefenders instance you first need to define the version you want to use.  
-For this simply copy over the `docker/example.env` file to `docker/.env` and update the `CODEDEFENDERS_VERSION` to an appropriate value.  
-E.g. if you want to deploy CodeDefenders v1.8.1 you would set this to 1.8.1.  
-Additionally, it is a good idea to checkout the corresponding git tag (in this example `v1.8.1`), as it is possible that the docker-compose setup from two versions ago does not work with the docker image from the current version.
+For this simply update the `CODEDEFENDERS_VERSION` in `docker/.env` file to an appropriate value.  
 
 Afterwards you can simply 
 
@@ -23,7 +21,7 @@ By default, it will be available at http://localhost:8080/ in your browser.
 ## Configuration
 
 Configuring the `docker-compose` setup is possible via environment variables.  
-You can find all available docker compose specific variables with their default values in the `example.env` file.
+You can find all available docker compose specific variables with their default values in the `.env` file.
 
 For environment variables which are available by default see  [the configuration documentation](./Configuration.md).
 
@@ -41,8 +39,8 @@ We build from the git repository root, so we can simply copy the source code for
 
 ```sh
 cd <path to codedefenders repository>
-docker build --file ./docker/Dockerfile --tag codedefenders/codedefenders:<Codedefenders version> --label "maintainer=$(git config --get user.email)" .
-docker push codedefenders/codedefenders:<codedefenders version>
+docker build --file ./docker/Dockerfile --tag codebenders/codedefenders:<Codedefenders version> --label "maintainer=$(git config --get user.email)" .
+docker push codebenders/codedefenders:<codedefenders version>
 ```
 
 ## Using docker for testing a not published state
@@ -53,7 +51,7 @@ So building new images and deploying them will still get the old data.
 
 ```sh
 cd <path to codedefenders repository>
-docker build --file ./docker/Dockerfile --tag codedefenders/codedefenders:dev .
+docker build --file ./docker/Dockerfile --tag codebenders/codedefenders:dev .
 cd docker
 nano .env # Set CODEDEFENDERS_VERSION=dev
 docker-compose up
