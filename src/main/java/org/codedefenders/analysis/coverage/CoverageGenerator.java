@@ -76,10 +76,9 @@ public class CoverageGenerator {
      *
      * @param gameClass    the class that is tested.
      * @param testJavaFile the test java file in which parent folder the 'jacoco.exe' file exists as a {@link Path}.
-     * @return a {@link LineCoverage} instance with covered and uncovered lines if successful,
-     *     empty lists for covered and uncovered lines if failed.
+     * @return             the extended line coverage
      */
-    public LineCoverage generate(GameClass gameClass, Path testJavaFile)
+    public LineCoverageMapping generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
         final File execFile = findJacocoExecFile(testJavaFile);
         final Collection<File> relevantClassFiles = findRelevantClassFiles(gameClass);
@@ -93,7 +92,7 @@ public class CoverageGenerator {
         return generate(lineMapping, compilationUnit);
     }
 
-    public LineCoverage generate(LineCoverageMapping originalCoverage, CompilationUnit compilationUnit) {
+    public LineCoverageMapping generate(LineCoverageMapping originalCoverage, CompilationUnit compilationUnit) {
         AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
         astVisitor.visit(compilationUnit, null);
         AstCoverageMapping astMapping = astVisitor.finish();
@@ -103,14 +102,14 @@ public class CoverageGenerator {
         lineTokenVisitor.visit(compilationUnit, null);
 
         LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
-        LineCoverageMapping extendedMapping = lineTokenAnalyser.analyse(lineTokens);
-        return extendedMapping.toLineCoverage();
+        return lineTokenAnalyser.analyse(lineTokens);
     }
 
     // TODO: this replicates the old behavior. replace this with better error handling
     public LineCoverage generateOrEmpty(GameClass gameClass, Path testJavaFile) {
         try {
-            return generate(gameClass, testJavaFile);
+            LineCoverageMapping coverageMapping = generate(gameClass, testJavaFile);
+            return coverageMapping.toLineCoverage();
         } catch (CoverageGeneratorException e) {
             logger.error(e.getMessage(), e.getCause());
             return LineCoverage.empty();
