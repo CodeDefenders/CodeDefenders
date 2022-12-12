@@ -11,7 +11,7 @@ import java.util.function.BinaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.codedefenders.analysis.coverage.line.LineCoverageMapping;
+import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 
 import com.github.javaparser.JavaParser;
@@ -150,11 +150,11 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
-    private final LineCoverageMapping lineCoverage;
+    private final DetailedLineCoverage lineCoverage;
     private final AstCoverageMapping astCoverage;
     private final List<Runnable> finalizers;
 
-    public AstCoverageVisitor(LineCoverageMapping lineCoverage) {
+    public AstCoverageVisitor(DetailedLineCoverage lineCoverage) {
         this.lineCoverage = lineCoverage;
         this.astCoverage = new AstCoverageMapping();
         this.finalizers = new ArrayList<>();

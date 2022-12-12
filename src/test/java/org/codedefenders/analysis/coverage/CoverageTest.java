@@ -22,8 +22,10 @@ import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.analysis.coverage.line.LineCoverageMapping;
+import org.codedefenders.analysis.coverage.line.DetailedLine;
+import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
+import org.codedefenders.analysis.coverage.line.NewLineCoverage;
 import org.codedefenders.analysis.coverage.util.InMemoryClassLoader;
 import org.codedefenders.analysis.coverage.util.InMemoryJavaFileManager;
 import org.codedefenders.analysis.coverage.util.InMemorySourceFile;
@@ -104,12 +106,12 @@ public class CoverageTest {
             analyzer.analyzeClass(byteCode, DEMO_CLASS_NAME);
         }
 
-        LineCoverageMapping originalCoverage = extractLineCoverageMapping(coverageBuilder);
+        DetailedLineCoverage originalCoverage = extractLineCoverageMapping(coverageBuilder);
         CompilationUnit compilationUnit = JavaParserUtils.parse(demoSourceCode)
                 .orElseThrow(() -> new Exception("Could not parse demo source code."));
 
         CoverageGenerator coverageGenerator = new CoverageGenerator();
-        LineCoverageMapping extendedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
+        NewLineCoverage extendedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
 
         if (OUTPUT_HTML) {
             try (PrintWriter writer = new PrintWriter(HTML_PATH)) {
@@ -170,29 +172,26 @@ public class CoverageTest {
         return instrumentedClassFiles;
     }
 
-    public LineCoverageMapping extractLineCoverageMapping(CoverageBuilder coverageBuilder) {
-        LineCoverageMapping lineMapping = new LineCoverageMapping();
+    public DetailedLineCoverage extractLineCoverageMapping(CoverageBuilder coverageBuilder) {
+        DetailedLineCoverage coverage = new DetailedLineCoverage();
 
-        for (ISourceFileCoverage coverage : coverageBuilder.getSourceFiles()) {
-            if (!DEMO_CLASS_PATH.endsWith(coverage.getName())) {
+        for (ISourceFileCoverage sourceCoverage : coverageBuilder.getSourceFiles()) {
+            if (!DEMO_CLASS_PATH.endsWith(sourceCoverage.getName())) {
                 continue;
             }
 
-            for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
-                final ILine lineCoverage = coverage.getLine(line);
-                int totalIns = lineCoverage.getInstructionCounter().getTotalCount();
-                int missedIns = lineCoverage.getInstructionCounter().getMissedCount();
-                int totalBr = lineCoverage.getBranchCounter().getTotalCount();
-                int missedBr = lineCoverage.getBranchCounter().getMissedCount();
-                final int status = lineCoverage.getInstructionCounter().getStatus();
-                lineMapping.put(line, LineCoverageStatus.fromJacoco(status));
+            for (int line = sourceCoverage.getFirstLine(); line <= sourceCoverage.getLastLine(); line++) {
+                final ILine lineCoverage = sourceCoverage.getLine(line);
+                coverage.set(line, DetailedLine.fromJaCoCo(lineCoverage));
             }
         }
 
-        return lineMapping;
+        return coverage;
     }
 
-    public String generateHtml(String sourceCode, LineCoverageMapping originalCoverage, LineCoverageMapping extendedCoverage) {
+    public String generateHtml(String sourceCode,
+                               DetailedLineCoverage originalCoverage,
+                               NewLineCoverage extendedCoverage) {
         String template = String.join("\n",
                 "<!DOCTYPE html>",
                 "<html>",
@@ -256,8 +255,8 @@ public class CoverageTest {
                     .replace("{line_num}", Integer.toString(lineNum))
                     .replace("{code}", escapedLine);
 
-            LineCoverageStatus originalStatus = originalCoverage.get(lineNum);
-            LineCoverageStatus extendedStatus = extendedCoverage.get(lineNum);
+            LineCoverageStatus originalStatus = originalCoverage.getStatus(lineNum);
+            LineCoverageStatus extendedStatus = extendedCoverage.getStatus(lineNum);
 
             originalLines.add(htmlLine.replace("{coverage_status}", originalStatus.name()));
             extendedLines.add(htmlLine.replace("{coverage_status}", extendedStatus.name()));

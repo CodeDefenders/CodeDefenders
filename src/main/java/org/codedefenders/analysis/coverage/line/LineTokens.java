@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import javax.enterprise.inject.New;
+
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 
 import com.github.javaparser.ast.Node;
@@ -20,12 +22,13 @@ public class LineTokens {
         stacks = new HashMap<>();
     }
 
-    public static LineTokens fromJaCoCo(LineCoverageMapping coverage) {
+    public static LineTokens fromJaCoCo(NewLineCoverage coverage) {
         LineTokens lineTokens = new LineTokens();
-        for (Map.Entry<Integer, LineCoverageStatus> entry : coverage.getMap().entrySet()) {
-            if (entry.getValue() != LineCoverageStatus.EMPTY) {
-                lineTokens.pushToken(lineTokens.getStack(entry.getKey()),
-                        new Token(null, Type.OVERRIDE, entry.getValue()));
+        for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
+            LineCoverageStatus status = coverage.getStatus(line);
+            if (status != LineCoverageStatus.EMPTY) {
+                lineTokens.pushToken(lineTokens.getStack(line),
+                        new Token(null, Type.OVERRIDE, status));
             }
         }
         return lineTokens;

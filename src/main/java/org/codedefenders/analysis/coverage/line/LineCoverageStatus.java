@@ -23,7 +23,7 @@ public enum LineCoverageStatus {
         this.mergePriority = mergePriority;
     }
 
-    public static LineCoverageStatus fromJacoco(int status) {
+    public static LineCoverageStatus fromJacocoStatus(int status) {
         switch (status) {
             case ICounter.EMPTY:
                 return EMPTY;

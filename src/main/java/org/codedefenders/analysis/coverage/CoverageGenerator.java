@@ -25,30 +25,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.analysis.coverage.ast.AstCoverageMapping;
-import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
-import org.codedefenders.analysis.coverage.line.LineCoverageMapping;
-import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
+import org.codedefenders.analysis.coverage.line.DetailedLine;
+import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
 import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
 import org.codedefenders.analysis.coverage.line.LineTokens;
+import org.codedefenders.analysis.coverage.line.NewLineCoverage;
+import org.codedefenders.analysis.coverage.line.SimpleLineCoverage;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.util.JavaParserUtils;
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
-import org.jacoco.core.analysis.IClassCoverage;
 import org.jacoco.core.analysis.ILine;
-import org.jacoco.core.analysis.IMethodCoverage;
 import org.jacoco.core.analysis.ISourceFileCoverage;
 import org.jacoco.core.data.ExecutionDataStore;
 import org.jacoco.core.tools.ExecFileLoader;
@@ -56,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
 
 /**
  * This class offers a static method {@link #generate(GameClass, Path) generate()}, which
@@ -78,21 +72,21 @@ public class CoverageGenerator {
      * @param testJavaFile the test java file in which parent folder the 'jacoco.exe' file exists as a {@link Path}.
      * @return             the extended line coverage
      */
-    public LineCoverageMapping generate(GameClass gameClass, Path testJavaFile)
+    public NewLineCoverage generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
         final File execFile = findJacocoExecFile(testJavaFile);
         final Collection<File> relevantClassFiles = findRelevantClassFiles(gameClass);
 
         CoverageBuilder coverageBuilder = readJacocoCoverage(execFile, relevantClassFiles);
-        LineCoverageMapping lineMapping = extractLineCoverageMapping(coverageBuilder, gameClass);
+        DetailedLineCoverage originalCoverage = extractLineCoverageMapping(coverageBuilder, gameClass);
 
         CompilationUnit compilationUnit = JavaParserUtils.parse(gameClass.getSourceCode())
                 .orElseThrow(() -> new CoverageGeneratorException("Could not parse java file: " + gameClass.getJavaFile()));
 
-        return generate(lineMapping, compilationUnit);
+        return generate(originalCoverage, compilationUnit);
     }
 
-    public LineCoverageMapping generate(LineCoverageMapping originalCoverage, CompilationUnit compilationUnit) {
+    public NewLineCoverage generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
         AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
         astVisitor.visit(compilationUnit, null);
         AstCoverageMapping astMapping = astVisitor.finish();
@@ -108,8 +102,8 @@ public class CoverageGenerator {
     // TODO: this replicates the old behavior. replace this with better error handling
     public LineCoverage generateOrEmpty(GameClass gameClass, Path testJavaFile) {
         try {
-            LineCoverageMapping coverageMapping = generate(gameClass, testJavaFile);
-            return coverageMapping.toLineCoverage();
+            NewLineCoverage coverage = generate(gameClass, testJavaFile);
+            return ((SimpleLineCoverage) coverage).toLineCoverage(); // see todo in toLineCoverage()
         } catch (CoverageGeneratorException e) {
             logger.error(e.getMessage(), e.getCause());
             return LineCoverage.empty();
@@ -166,26 +160,20 @@ public class CoverageGenerator {
         return Arrays.asList(relevantFiles);
     }
 
-    public LineCoverageMapping extractLineCoverageMapping(CoverageBuilder coverageBuilder, GameClass gameClass) {
-        LineCoverageMapping lineMapping = new LineCoverageMapping();
+    public DetailedLineCoverage extractLineCoverageMapping(CoverageBuilder coverageBuilder, GameClass gameClass) {
+        DetailedLineCoverage coverage = new DetailedLineCoverage();
 
-        for (ISourceFileCoverage coverage : coverageBuilder.getSourceFiles()) {
-            if (!gameClass.getJavaFile().endsWith(coverage.getName())) {
+        for (ISourceFileCoverage sourceCoverage : coverageBuilder.getSourceFiles()) {
+            if (!gameClass.getJavaFile().endsWith(sourceCoverage.getName())) {
                 continue;
             }
-
-            for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
-                final ILine lineCoverage = coverage.getLine(line);
-                int totalIns = lineCoverage.getInstructionCounter().getTotalCount();
-                int missedIns = lineCoverage.getInstructionCounter().getMissedCount();
-                int totalBr = lineCoverage.getBranchCounter().getTotalCount();
-                int missedBr = lineCoverage.getBranchCounter().getMissedCount();
-                final int status = lineCoverage.getInstructionCounter().getStatus();
-                lineMapping.put(line, LineCoverageStatus.fromJacoco(status));
+            for (int line = sourceCoverage.getFirstLine(); line <= sourceCoverage.getLastLine(); line++) {
+                final ILine lineCoverage = sourceCoverage.getLine(line);
+                coverage.set(line, DetailedLine.fromJaCoCo(lineCoverage));
             }
         }
 
-        return lineMapping;
+        return coverage;
     }
 
     public static class CoverageGeneratorException extends Exception {

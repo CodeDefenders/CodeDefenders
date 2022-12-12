@@ -7,12 +7,12 @@ import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.line.LineTokens.Token;
 
 public class LineTokenAnalyser {
-    public LineCoverageMapping analyse(LineTokens lineTokens) {
-        LineCoverageMapping mapping = new LineCoverageMapping();
+    public NewLineCoverage analyse(LineTokens lineTokens) {
+        SimpleLineCoverage coverage = new SimpleLineCoverage();
         for (Map.Entry<Integer, Token> entry : lineTokens.getResults().entrySet()) {
-            mapping.put(entry.getKey(), analyse(entry.getValue()));
+            coverage.set(entry.getKey(), analyse(entry.getValue()));
         }
-        return mapping;
+        return coverage;
     }
 
     public LineCoverageStatus analyse(Token token) {
