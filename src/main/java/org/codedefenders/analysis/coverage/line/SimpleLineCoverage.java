@@ -12,11 +12,21 @@ public class SimpleLineCoverage extends LineMapping<LineCoverageStatus> implemen
     }
 
     @Override
+    public LineCoverageStatus get(int line) {
+        return super.get(line);
+    }
+
+    @Override
+    public void set(int line, LineCoverageStatus elem) {
+        super.set(line, elem);
+    }
+
+    @Override
     public LineCoverageStatus getStatus(int line) {
         return get(line);
     }
 
-    // TODO: either make this a interface default method on NewLineCoverage, or (better) replace LineCoverage with
+    // TODO: either make this an interface default method on NewLineCoverage, or (better) replace LineCoverage with
     //       NewLineCoverage and extend the interface
     public LineCoverage toLineCoverage() {
         List<Integer> coveredLines = new ArrayList<>();

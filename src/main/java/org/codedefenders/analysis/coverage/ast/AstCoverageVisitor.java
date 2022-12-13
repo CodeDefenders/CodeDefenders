@@ -7,10 +7,10 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BinaryOperator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 
@@ -173,24 +173,21 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * Merges the line coverage values of a line range (end inclusive).
      */
-    private LineCoverageStatus mergeLineCoverage(
-            BinaryOperator<LineCoverageStatus> merger,
-            int beginLine, int endLine) {
+    private DetailedLine mergeLineCoverage(int beginLine, int endLine) {
         return IntStream.range(beginLine, endLine + 1)
                 .boxed()
                 .map(lineCoverage::get)
-                .reduce(LineCoverageStatus.EMPTY, merger);
+                .reduce(DetailedLine::merge)
+                .orElseGet(DetailedLine::empty);
     }
 
     /**
      * Merges the line coverage values of the lines encompassing the given node.
      */
-    private LineCoverageStatus mergeLineCoverage(
-            BinaryOperator<LineCoverageStatus> merger,
-            Node node) {
+    private DetailedLine mergeLineCoverage(Node node) {
         int beginLine = node.getBegin().get().line;
         int endLine = node.getEnd().get().line;
-        return mergeLineCoverage(merger, beginLine, endLine);
+        return mergeLineCoverage(beginLine, endLine);
     }
 
     /**
@@ -207,8 +204,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *         -> return {@link AstCoverageStatus#EMPTY}
      *     </li>
      *     <li>
-     *         last non-empty statement {@link AstCoverageStatus#COVERED} or
-     *         {@link AstCoverageStatus#END_COVERED}<br>
+     *         last non-empty statement {@link AstCoverageStatus#END_COVERED}<br>
      *         -> return {@link AstCoverageStatus#END_COVERED}
      *     </li>
      *     <li>
@@ -236,7 +232,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             case BEGIN_COVERED:
                 return AstCoverageStatus.BEGIN_COVERED;
             case END_COVERED:
-            case COVERED:
             case INITIALIZED: // local class initialized -> control flow must have passed through
                 return AstCoverageStatus.END_COVERED;
             default:
@@ -244,18 +239,13 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-    private Optional<TypeDeclaration<?>> findParentClass(Node node) {
-        Node currentNode = node;
-        while (true) {
-            Optional<Node> nextNode = currentNode.getParentNode();
-            if (nextNode.isPresent()) {
-                currentNode = nextNode.get();
-                if (currentNode instanceof TypeDeclaration) {
-                    return Optional.of((TypeDeclaration<?>) currentNode);
-                }
-            } else {
-                return Optional.empty();
-            }
+    private AstCoverageStatus fromInsCoverage(DetailedLine coverage) {
+        if (coverage.totalInstructions() == 0) {
+            return AstCoverageStatus.EMPTY;
+        } else if (coverage.coveredInstructions() == 0) {
+            return AstCoverageStatus.NOT_COVERED;
+        } else {
+            return AstCoverageStatus.END_COVERED;
         }
     }
 
@@ -293,9 +283,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (constructors.isEmpty()) {
             int beginLine = decl.getBegin().get().line;
             int endLine = decl.getName().getEnd().get().line;
-            LineCoverageStatus keywordStatus = mergeLineCoverage(LineCoverageStatus::preferFull,
-                    beginLine, endLine);
-            if (keywordStatus.isCovered()) {
+            DetailedLine keywordStatus = mergeLineCoverage(beginLine, endLine);
+            if (keywordStatus.coveredInstructions() > 0) {
                 astCoverage.put(decl, AstCoverageStatus.INITIALIZED);
                 return;
             }
@@ -331,9 +320,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (constants.isEmpty()) {
             int beginLine = decl.getBegin().get().line;
             int endLine = decl.getName().getEnd().get().line;
-            LineCoverageStatus signatureStatus = mergeLineCoverage(LineCoverageStatus::preferFull,
-                    beginLine, endLine);
-            if (signatureStatus.isCovered()) {
+            DetailedLine signatureStatus = mergeLineCoverage(beginLine, endLine);
+            if (signatureStatus.coveredInstructions() > 0) {
                 astCoverage.put(decl, AstCoverageStatus.INITIALIZED);
                 return;
             }
@@ -380,9 +368,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (constructors.isEmpty()) {
             int beginLine = decl.getBegin().get().line;
             int endLine = decl.getName().getEnd().get().line;
-            LineCoverageStatus signatureStatus = mergeLineCoverage(LineCoverageStatus::preferFull,
-                    beginLine, endLine);
-            if (signatureStatus.isCovered()) {
+            DetailedLine signatureStatus = mergeLineCoverage(beginLine, endLine);
+            // TODO: are there branches?
+            if (signatureStatus.coveredInstructions() > 0) {
                 astCoverage.put(decl, AstCoverageStatus.INITIALIZED);
                 return;
             }
@@ -396,7 +384,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * An enum constant can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
@@ -405,15 +393,15 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check line of name keyword -> COVERED or NOT_COVERED
         int nameLine = decl.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(nameLine);
-        astCoverage.put(decl, status.toAstCoverage());
+        DetailedLine status = lineCoverage.get(nameLine);
+        astCoverage.put(decl, fromInsCoverage(status));
     }
 
     /**
      * A field declaration can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
@@ -437,9 +425,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         //     private
         //     int x = 3;
         // see visit(VariableDeclarator, Void)
-        LineCoverageStatus firstLineStatus = lineCoverage.get(decl.getBegin().get().line);
-        if (firstLineStatus != LineCoverageStatus.EMPTY) {
-            astCoverage.put(decl, firstLineStatus.toAstCoverage().toStmtCoverage());
+        DetailedLine firstLineStatus = lineCoverage.get(decl.getBegin().get().line);
+        if (firstLineStatus.totalInstructions() > 0) {
+            astCoverage.put(decl, fromInsCoverage(firstLineStatus));
             return;
         }
 
@@ -455,7 +443,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus classStatus = astCoverage.get(optParentClass.get());
             if (classStatus.isCovered()) {
                 // TODO: check if any field before this one is not-covered
-                astCoverage.put(decl, AstCoverageStatus.COVERED);
+                astCoverage.put(decl, AstCoverageStatus.END_COVERED);
                 return;
             }
 
@@ -467,7 +455,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                         .map(astCoverage::get)
                         .anyMatch(AstCoverageStatus::isCovered);
                 if (membersCovered) {
-                    astCoverage.put(decl, AstCoverageStatus.COVERED);
+                    astCoverage.put(decl, AstCoverageStatus.END_COVERED);
                     return;
                 }
             }
@@ -499,8 +487,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         // if the empty block is static, check the closing brace line -> END_COVERED or NOT_COVERED
         if (decl.isStatic()) {
             int endBlockLine = decl.getBody().getEnd().get().line;
-            LineCoverageStatus beginBlockStatus = lineCoverage.get(endBlockLine);
-            if (beginBlockStatus.isCovered()) {
+            DetailedLine beginBlockStatus = lineCoverage.get(endBlockLine);
+            if (beginBlockStatus.coveredInstructions() > 0) {
                 // body is empty, so BEGIN_COVERED == END_COVERED
                 astCoverage.put(decl, AstCoverageStatus.END_COVERED);
             } else {
@@ -521,7 +509,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             // check if class was initialized -> COVERED or NOT_COVERED
             AstCoverageStatus classStatus = astCoverage.get(optParentClass.get());
             if (classStatus.isCovered()) {
-                astCoverage.put(decl, AstCoverageStatus.COVERED);
+                astCoverage.put(decl, AstCoverageStatus.END_COVERED);
                 return;
             }
 
@@ -562,7 +550,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if method is empty, check coverage of closing brace line -> END_COVERED or NOT_COVERED
         int closingBraceLine = optBody.get().getEnd().get().line;
-        if (lineCoverage.get(closingBraceLine).isCovered()) {
+        if (lineCoverage.get(closingBraceLine).coveredInstructions() > 0) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
         } else {
@@ -591,8 +579,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if method is empty, check if opening brace line is covered -> END_COVERED
         int openingBraceLine = decl.getBody().getBegin().get().line;
-        LineCoverageStatus beginBlockStatus = lineCoverage.get(openingBraceLine);
-        if (beginBlockStatus.isCovered()) {
+        DetailedLine beginBlockStatus = lineCoverage.get(openingBraceLine);
+        if (beginBlockStatus.hasCoveredIns()) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
             return;
@@ -600,8 +588,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if method is empty, check if closing brace line is covered -> END_COVERED
         int closingBraceLine = decl.getBody().getEnd().get().line;
-        LineCoverageStatus closingBraceStatus = lineCoverage.get(closingBraceLine);
-        if (closingBraceStatus.isCovered()) {
+        DetailedLine closingBraceStatus = lineCoverage.get(closingBraceLine);
+        if (closingBraceStatus.hasCoveredIns()) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
             return;
@@ -632,8 +620,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if method is empty, check if the opening brace line is covered -> END_COVERED
         int openingBraceLine = decl.getBody().getBegin().get().line;
-        LineCoverageStatus openingBraceStatus = lineCoverage.get(openingBraceLine);
-        if (openingBraceStatus.isCovered()) {
+        DetailedLine openingBraceStatus = lineCoverage.get(openingBraceLine);
+        if (openingBraceStatus.hasCoveredIns()) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
             return;
@@ -641,8 +629,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if method is empty, check if the closing brace line is covered -> END_COVERED
         int closingBraceLine = decl.getBody().getEnd().get().line;
-        LineCoverageStatus closingBraceStatus = lineCoverage.get(closingBraceLine);
-        if (closingBraceStatus.isCovered()) {
+        DetailedLine closingBraceStatus = lineCoverage.get(closingBraceLine);
+        if (closingBraceStatus.hasCoveredIns()) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
             return;
@@ -710,9 +698,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         //     doThrow();
         int conditionStartLine = stmt.getBegin().get().line;
         int conditionEndLine = stmt.getThenStmt().getBegin().get().line;
-        LineCoverageStatus conditionStatus = mergeLineCoverage(LineCoverageStatus::preferPartial,
-                conditionStartLine, conditionEndLine);
-        switch (conditionStatus) {
+        DetailedLine conditionStatus = mergeLineCoverage(conditionStartLine, conditionEndLine);
+        switch (conditionStatus.branchStatus()) {
             case FULLY_COVERED:
                 AstCoverageStatus thenStatus = astCoverage.get(stmt.getElseStmt().get());
                 AstCoverageStatus elseStatus = stmt.getElseStmt().map(astCoverage::get).orElse(AstCoverageStatus.EMPTY);
@@ -734,7 +721,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             case NOT_COVERED:
             case EMPTY:
                 // merge condition and block coverage -> NOT_COVERED, EMPTY
-                AstCoverageStatus status = blocksStatus.upgrade(conditionStatus.toAstCoverage()).toBlockCoverage();
+                AstCoverageStatus status = blocksStatus.upgrade(fromInsCoverage(conditionStatus));
                 astCoverage.put(stmt, status);
                 break;
         }
@@ -763,9 +750,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         // if body is empty, check line coverage of condition -> BEGIN_COVERED, END_COVERED or NOT_COVERED
         int conditionStartLine = stmt.getBody().getEnd().get().line;
         int conditionEndLine = stmt.getEnd().get().line;
-        LineCoverageStatus conditionStatus = mergeLineCoverage(LineCoverageStatus::preferPartial,
-                conditionStartLine, conditionEndLine);
-        switch (conditionStatus) {
+        DetailedLine conditionStatus = mergeLineCoverage(conditionStartLine, conditionEndLine);
+        switch (conditionStatus.branchStatus()) {
             case NOT_COVERED:
                 astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
                 return;
@@ -799,10 +785,10 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // if the loop has a compare expression, check its coverage -> BEGIN_COVERED or END_COVERED
-        LineCoverageStatus compareStatus = null;
+        DetailedLine compareStatus = null;
         if (stmt.getCompare().isPresent()) {
-            compareStatus = mergeLineCoverage(LineCoverageStatus::preferPartial, stmt.getCompare().get());
-            switch (compareStatus) {
+            compareStatus = mergeLineCoverage(stmt.getCompare().get());
+            switch (compareStatus.branchStatus()) {
                 case FULLY_COVERED:
                     // both branches covered means control flow jumped past the loop
                     astCoverage.put(stmt, AstCoverageStatus.END_COVERED);
@@ -842,7 +828,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         // inherit NOT_COVERED from body, header or compare expression -> NOT_COVERED
         if (bodyStatus.isNotCovered()
                 || headerStatus.isNotCovered()
-                || compareStatus == LineCoverageStatus.NOT_COVERED) {
+                || compareStatus.coveredBranches() == 0) {
             astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
             return;
         }
@@ -872,9 +858,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // check line coverage of iterable -> BEGIN_COVERED, END_COVERED or NOT_COVERED
-        LineCoverageStatus conditionStatus = mergeLineCoverage(LineCoverageStatus::preferPartial,
-                stmt.getIterable());
-        switch (conditionStatus) {
+        DetailedLine conditionStatus = mergeLineCoverage(stmt.getIterable());
+        // TODO: instruction or branch coverage?
+        switch (conditionStatus.branchStatus()) {
             case NOT_COVERED:
                 // if the body's status is covered, use that. otherwise, set NOT_COVERED
                 AstCoverageStatus status = bodyStatus.upgrade(AstCoverageStatus.NOT_COVERED);
@@ -916,9 +902,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         // check line coverage of condition -> BEGIN_COVERED, END_COVERED or NOT_COVERED
         int conditionStartLine = stmt.getBegin().get().line;
         int conditionEndLine = stmt.getCondition().getEnd().get().line;
-        LineCoverageStatus conditionStatus = mergeLineCoverage(LineCoverageStatus::preferPartial,
-                conditionStartLine, conditionEndLine);
-        switch (conditionStatus) {
+        DetailedLine conditionStatus = mergeLineCoverage(conditionStartLine, conditionEndLine);
+        switch (conditionStatus.branchStatus()) {
             case NOT_COVERED:
                 // if the body's status is covered, use that. otherwise, set NOT_COVERED
                 AstCoverageStatus status = bodyStatus.upgrade(AstCoverageStatus.NOT_COVERED);
@@ -1021,8 +1006,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if body is not covered, check coverage of catch keyword -> END_COVERED or NOT_COVERED
         int catchKeywordLine = node.getBegin().get().line;
-        LineCoverageStatus catchKeywordStatus = lineCoverage.get(catchKeywordLine);
-        if (catchKeywordStatus.isCovered()) {
+        DetailedLine catchKeywordStatus = lineCoverage.get(catchKeywordLine);
+        if (catchKeywordStatus.hasCoveredIns()) {
             if (bodyStatus == AstCoverageStatus.EMPTY) {
                 astCoverage.put(node, AstCoverageStatus.END_COVERED);
             } else {
@@ -1057,8 +1042,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // check line coverage of expression -> END_COVERED or BEGIN_COVERED
-        LineCoverageStatus exprStatus = mergeLineCoverage(LineCoverageStatus::preferPartial, stmt.getSelector());
-        switch (exprStatus) {
+        DetailedLine exprStatus = mergeLineCoverage(stmt.getSelector());
+        switch (exprStatus.branchStatus()) {
             case FULLY_COVERED:
                 boolean hasDefaultCase = stmt.getEntries().stream()
                         .anyMatch(entry -> entry.getLabels().isEmpty());
@@ -1121,8 +1106,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             case EXPRESSION:
                 // get line coverage for expression -> COVERED or NOT_COVERED
                 Statement expr = entry.getStatement(0);
-                LineCoverageStatus exprStatus = mergeLineCoverage(LineCoverageStatus::preferPartial, expr);
-                astCoverage.put(entry, exprStatus.toAstCoverage());
+                DetailedLine exprStatus = mergeLineCoverage(expr);
+                astCoverage.put(entry, fromInsCoverage(exprStatus));
                 break;
             case BLOCK:
             case THROWS_STATEMENT:
@@ -1157,8 +1142,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if body is not covered, check coverage of synchronized keyword -> BEGIN_COVERED or END_COVERED
         int keywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus keywordStatus = lineCoverage.get(keywordLine);
-        if (keywordStatus.isCovered()) {
+        DetailedLine keywordStatus = lineCoverage.get(keywordLine);
+        if (keywordStatus.hasCoveredIns()) {
             if (bodyStatus.isEmpty()) {
                 astCoverage.put(stmt, AstCoverageStatus.END_COVERED);
             } else {
@@ -1178,7 +1163,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * An assertion can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * <p>We execute test code with assertions disabled, so the coverage might be misleading.
@@ -1189,8 +1174,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check coverage of assert keyword -> COVERED or NOT_COVERED
         int assertKeywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(assertKeywordLine);
-        astCoverage.put(stmt, status.toAstCoverage());
+        DetailedLine status = lineCoverage.get(assertKeywordLine);
+        astCoverage.put(stmt, fromInsCoverage(status));
     }
 
     /**
@@ -1201,7 +1186,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *          e.g. if it appears as the last statement in a loop body
      *     </li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
@@ -1210,15 +1195,15 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check coverage of continue keyword -> COVERED, NOT_COVERED or EMPTY
         int continueKeywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(continueKeywordLine);
-        astCoverage.put(stmt, status.toAstCoverage());
+        DetailedLine status = lineCoverage.get(continueKeywordLine);
+        astCoverage.put(stmt, fromInsCoverage(status));
     }
 
     /**
      * A {@code super} or {@code this} call can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
@@ -1227,8 +1212,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check super/this keyword line -> COVERED or NOT_COVERED
         int keywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(keywordLine);
-        astCoverage.put(stmt, status.toAstCoverage());
+        DetailedLine status = lineCoverage.get(keywordLine);
+        astCoverage.put(stmt, fromInsCoverage(status));
     }
 
     /**
@@ -1236,7 +1221,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
@@ -1245,7 +1230,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // inherit coverage from the expression -> EMPTY, NOT_COVERED, COVERED
         AstCoverageStatus status = astCoverage.get(stmt.getExpression());
-        astCoverage.put(stmt, status.toStmtCoverage());
+        astCoverage.put(stmt, status);
     }
 
 
@@ -1296,7 +1281,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *          or as the only statement in a loop
      *     </li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
@@ -1305,11 +1290,11 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check coverage of break keyword -> BEGIN_COVERED, NOT_COVERED or EMPTY
         int breakKeywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(breakKeywordLine);
-        if (status.isCovered()) {
+        DetailedLine status = lineCoverage.get(breakKeywordLine);
+        if (status.hasCoveredIns()) {
             astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
         } else {
-            astCoverage.put(stmt, status.toAstCoverage());
+            astCoverage.put(stmt, fromInsCoverage(status));
         }
     }
 
@@ -1320,7 +1305,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
      * </ul>
      */
     @Override
@@ -1345,8 +1329,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check line of return keyword -> BEGIN_COVERED or NOT_COVERED
         int returnKeywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(returnKeywordLine);
-        if (status.isCovered()) {
+        DetailedLine status = lineCoverage.get(returnKeywordLine);
+        if (status.hasCoveredIns()) {
             astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
         } else {
             astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
@@ -1366,8 +1350,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check line of throw keyword -> BEGIN_COVERED or NOT_COVERED
         int throwKeywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(throwKeywordLine);
-        if (status.isCovered()) {
+        DetailedLine status = lineCoverage.get(throwKeywordLine);
+        if (status.hasCoveredIns()) {
             astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
         } else {
             astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
@@ -1387,8 +1371,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // check line of yield keyword -> BEGIN_COVERED or NOT_COVERED
         int yieldKeywordLine = stmt.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(yieldKeywordLine);
-        if (status.isCovered()) {
+        DetailedLine status = lineCoverage.get(yieldKeywordLine);
+        if (status.hasCoveredIns()) {
             astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
         } else {
             astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
@@ -1404,7 +1388,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *         or if it is a field declaration with a non-coverable expression as value)
      *     </li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * <p>The coverage of variable declarators can vary quite a bit:
@@ -1430,10 +1414,10 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // merge line coverage from target and expression -> EMPTY, NOT_COVERED, COVERED
-        LineCoverageStatus targetStatus = mergeLineCoverage(LineCoverageStatus::preferFull, decl.getName());
-        LineCoverageStatus exprStatus = mergeLineCoverage(LineCoverageStatus::preferFull, decl.getName());
-        LineCoverageStatus status = targetStatus.preferFull(exprStatus);
-        astCoverage.put(decl, status.toAstCoverage().toStmtCoverage());
+        DetailedLine targetStatus = mergeLineCoverage(decl.getName());
+        DetailedLine exprStatus = mergeLineCoverage(decl.getInitializer().get());
+        DetailedLine status = targetStatus.merge(exprStatus);
+        astCoverage.put(decl, fromInsCoverage(status));
     }
 
     // endregion =======================================================================================================
@@ -1444,7 +1428,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * <p>An assign expression can be EMPTY if it's nested in another expression. E.g.
@@ -1460,11 +1444,11 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         // merge line coverage from target and expression -> COVERED, NOT_COVERED
         // usually the coverable part of an assign expression is its target, but the coverable part can also be part of
         // the value. the only case I found is pattern expressions, e.g. boolean b = something instanceof Integer i;
-        LineCoverageStatus valueLineStatus = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getValue());
-        LineCoverageStatus targetLineStatus = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getTarget());
-        LineCoverageStatus status = valueLineStatus.preferFull(targetLineStatus);
+        DetailedLine valueLineStatus = mergeLineCoverage(expr.getValue());
+        DetailedLine targetLineStatus = mergeLineCoverage(expr.getTarget());
+        DetailedLine status = valueLineStatus.merge(targetLineStatus);
 
-        astCoverage.put(expr, status.toAstCoverage().toStmtCoverage());
+        astCoverage.put(expr, fromInsCoverage(status));
     }
 
     /**
@@ -1487,7 +1471,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A conditional expression can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * <p>Conditional expressions are covered according to the lines of the
@@ -1503,19 +1487,23 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(expr, arg);
 
         // check if condition is covered -> NOT_COVERED, COVERED
-        LineCoverageStatus conditionStatus = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getCondition());
-        astCoverage.put(expr, conditionStatus.toAstCoverage());
+        DetailedLine conditionStatus = mergeLineCoverage(expr.getCondition());
+        astCoverage.put(expr, conditionStatus.hasCoveredBranches()
+                ? AstCoverageStatus.END_COVERED
+                : AstCoverageStatus.NOT_COVERED);
 
         // set the coverage of the then-expression by its lines if it's not already set
+        // TODO: branch or instruction coverage?
         if (astCoverage.get(expr.getElseExpr()).isEmpty()) {
-            LineCoverageStatus thenStatus = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getThenExpr());
-            astCoverage.put(expr.getThenExpr(), thenStatus.toAstCoverage());
+            DetailedLine thenStatus = mergeLineCoverage(expr.getThenExpr());
+            astCoverage.put(expr.getThenExpr(), fromInsCoverage(thenStatus));
         }
 
         // set the coverage of the else-expression by its lines if it's not already set
+        // TODO: branch or instruction coverage?
         if (astCoverage.get(expr.getElseExpr()).isEmpty()) {
-            LineCoverageStatus elseStatus = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getElseExpr());
-            astCoverage.put(expr.getElseExpr(), elseStatus.toAstCoverage());
+            DetailedLine elseStatus = mergeLineCoverage(expr.getElseExpr());
+            astCoverage.put(expr.getElseExpr(), fromInsCoverage(elseStatus));
         }
     }
 
@@ -1525,7 +1513,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
      * </ul>
      */
     @Override
@@ -1541,15 +1528,15 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if the body is empty, check if any line of the body has been covered -> NOT_COVERED, COVERED
         // we don't cover all expressions, so this is e.g. necessary for () -> 2, or () -> {}
-        LineCoverageStatus bodyLineStatus = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getBody());
-        astCoverage.put(expr, bodyLineStatus.toAstCoverage()); // shouldn't be empty
+        DetailedLine bodyLineStatus = mergeLineCoverage(expr.getBody());
+        astCoverage.put(expr, fromInsCoverage(bodyLineStatus)); // shouldn't be empty
     }
 
     /**
      * A method call can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * <p>A method call is covered if the opening parenthesis is covered.
@@ -1573,8 +1560,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             endLine = firstArg.getBegin().get().line;
         }
 
-        LineCoverageStatus status = mergeLineCoverage(LineCoverageStatus::preferFull, beginLine, endLine);
-        astCoverage.put(expr, status.toAstCoverage().toStmtCoverage());
+        DetailedLine status = mergeLineCoverage(beginLine, endLine);
+        astCoverage.put(expr, fromInsCoverage(status));
     }
 
     /**
@@ -1582,7 +1569,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * Object creation is covered if the {@code new} keyword is covered.
@@ -1597,8 +1584,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(expr, arg);
 
         int newKeywordLine = expr.getBegin().get().line;
-        LineCoverageStatus status = lineCoverage.get(newKeywordLine);
-        astCoverage.put(expr, status.toAstCoverage());
+        DetailedLine status = lineCoverage.get(newKeywordLine);
+        astCoverage.put(expr, fromInsCoverage(status));
     }
 
     /**
@@ -1606,15 +1593,15 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
     public void visit(PatternExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        LineCoverageStatus status = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getType());
-        astCoverage.put(expr, status.toAstCoverage());
+        DetailedLine status = mergeLineCoverage(expr.getType());
+        astCoverage.put(expr, fromInsCoverage(status));
     }
 
     /**
@@ -1622,7 +1609,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * <p>A unary expression is coverable if it's a pre- or postfix increment
@@ -1644,9 +1631,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // check if the first line is covered -> NOT_COVERED, COVERED
-        LineCoverageStatus status = mergeLineCoverage(LineCoverageStatus::preferFull, expr.getExpression());
-        if (status != LineCoverageStatus.EMPTY) {
-            astCoverage.put(expr, status.toAstCoverage().toStmtCoverage());
+        DetailedLine status = mergeLineCoverage(expr.getExpression());
+        if (status.totalInstructions() > 0) {
+            astCoverage.put(expr, fromInsCoverage(status));
             return;
         }
 
@@ -1666,7 +1653,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
             AstCoverageStatus currentStatus = astCoverage.get(currentNode);
             if (!currentStatus.isEmpty()) {
-                astCoverage.put(expr, currentStatus.toStmtCoverage());
+                astCoverage.put(expr, currentStatus.toBlockCoverage());
                 return;
             }
 
@@ -1682,7 +1669,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
      * A variable declaration expression inherits the coverage from its variable declarators.
@@ -1701,7 +1688,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A switch expression can be
      * <ul>
      *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
-     *     <li>{@link AstCoverageStatus#COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
     @Override
@@ -1711,8 +1698,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         // merge coverage from the entries -> NOT_COVERED or COVERED
         AstCoverageStatus status = expr.getEntries().stream()
                 .map(astCoverage::get)
-                .reduce(AstCoverageStatus.EMPTY, AstCoverageStatus::upgrade)
-                .toStmtCoverage();
+                .reduce(AstCoverageStatus.EMPTY, AstCoverageStatus::upgrade);
         astCoverage.put(expr, status);
     }
 

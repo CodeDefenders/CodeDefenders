@@ -4,45 +4,72 @@ import org.jacoco.core.analysis.ILine;
 
 public class DetailedLine {
     private final int totalInstructions;
-    private final int missedInstructions;
+    private final int coveredInstructions;
     private final int totalBranches;
-    private final int missedBranches;
+    private final int coveredBranches;
 
-    public DetailedLine(int totalInstructions, int missedInstructions, int totalBranches, int missedBranches) {
+    public DetailedLine(int totalInstructions, int coveredInstructions, int totalBranches, int coveredBranches) {
         this.totalInstructions = totalInstructions;
-        this.missedInstructions = missedInstructions;
+        this.coveredInstructions = coveredInstructions;
         this.totalBranches = totalBranches;
-        this.missedBranches = missedBranches;
+        this.coveredBranches = coveredBranches;
     }
 
-    public int getTotalInstructions() {
+    public int totalInstructions() {
         return totalInstructions;
     }
 
-    public int getMissedInstructions() {
-        return missedInstructions;
+    public int coveredInstructions() {
+        return coveredInstructions;
     }
 
-    public int getTotalBranches() {
+    public int totalBranches() {
         return totalBranches;
     }
 
-    public int getMissedBranches() {
-        return missedBranches;
+    public int coveredBranches() {
+        return coveredBranches;
     }
 
-    public LineCoverageStatus getStatus() {
-        int totalCount = totalInstructions + totalBranches;
-        int missedCount = missedInstructions + missedBranches;
-        if (totalCount == 0) {
+    public boolean hasCoveredIns() {
+        return coveredInstructions > 0;
+    }
+
+    public boolean hasCoveredBranches() {
+        return coveredBranches > 0;
+    }
+
+    public LineCoverageStatus instructionStatus() {
+        return computeStatus(totalInstructions, coveredInstructions);
+    }
+
+    public LineCoverageStatus branchStatus() {
+        return computeStatus(totalBranches, coveredBranches);
+    }
+
+    public LineCoverageStatus computeStatus() {
+        return computeStatus(totalInstructions + totalBranches, coveredInstructions + coveredBranches);
+    }
+
+    private LineCoverageStatus computeStatus(int total, int covered) {
+        if (total == 0) {
             return LineCoverageStatus.EMPTY;
-        } else if (missedCount == 0) {
-            return LineCoverageStatus.FULLY_COVERED;
-        } else if (missedCount == totalCount) {
+        } else if (covered == 0) {
             return LineCoverageStatus.NOT_COVERED;
+        } else if (covered == total) {
+            return LineCoverageStatus.FULLY_COVERED;
         } else {
             return LineCoverageStatus.PARTLY_COVERED;
         }
+    }
+
+    public DetailedLine merge(DetailedLine other) {
+        return new DetailedLine(
+                totalInstructions + other.totalInstructions,
+                coveredInstructions + other.coveredInstructions,
+                totalBranches + other.totalBranches,
+                coveredBranches + other.coveredBranches
+        );
     }
 
     public static DetailedLine empty() {
@@ -52,9 +79,9 @@ public class DetailedLine {
     public static DetailedLine fromJaCoCo(ILine line) {
         return new DetailedLine(
                 line.getInstructionCounter().getTotalCount(),
-                line.getInstructionCounter().getMissedCount(),
-                line.getBranchCounter().getMissedCount(),
-                line.getBranchCounter().getMissedCount()
+                line.getInstructionCounter().getCoveredCount(),
+                line.getBranchCounter().getTotalCount(),
+                line.getBranchCounter().getCoveredCount()
         );
     }
 }

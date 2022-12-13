@@ -3,61 +3,57 @@ package org.codedefenders.analysis.coverage.line;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import javax.enterprise.inject.New;
 
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 
 import com.github.javaparser.ast.Node;
 
-public class LineTokens {
-    Map<Integer, Deque<Token>> stacks;
+public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
+    @Override
+    public Deque<Token> getEmpty() {
+        Deque<Token> stack = new ArrayDeque<>();
+        stack.push(new Token(null, Type.ROOT, null));
+        return stack;
+    }
 
-    public LineTokens() {
-        stacks = new HashMap<>();
+    @Override
+    protected void set(int line, Deque<Token> stack) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected Deque<Token> get(int line) {
+        super.updateBounds(line);
+        return super.get(line);
+    }
+
+    public Token getRoot(int line) {
+        return get(line).peekLast();
     }
 
     public static LineTokens fromJaCoCo(NewLineCoverage coverage) {
         LineTokens lineTokens = new LineTokens();
         for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
             LineCoverageStatus status = coverage.getStatus(line);
+            // TODO: push empty too and check in analyse method
             if (status != LineCoverageStatus.EMPTY) {
-                lineTokens.pushToken(lineTokens.getStack(line),
-                        new Token(null, Type.OVERRIDE, status));
+                lineTokens.pushToken(line, new Token(null, Type.OVERRIDE, status));
             }
         }
         return lineTokens;
     }
 
-    public Map<Integer, Token> getResults() {
-        return stacks.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().peekLast()));
-    }
-
-    private Deque<Token> getStack(int line) {
-        return stacks.computeIfAbsent(line, l -> {
-            Deque<Token> stack = new ArrayDeque<>();
-            stack.push(new Token(null, Type.ROOT, null));
-            return stack;
-        });
-    }
-
-    private void pushToken(Deque<Token> stack, Token newToken) {
+    private void pushToken(int line, Token newToken) {
+        Deque<Token> stack = get(line);
         Token top = stack.peek();
-        assert top != null;
         top.children.add(newToken);
         stack.push(newToken);
     }
 
-    private void popToken(Deque<Token> stack) {
-        stack.pop();
+    private void popToken(int line) {
+        get(line).pop();
     }
 
     public TokenInserter forNode(Node originNode) {
@@ -66,11 +62,11 @@ public class LineTokens {
 
     public class TokenInserter implements AutoCloseable {
         private final Node originNode;
-        private final Deque<Deque<Token>> stacksToPop;
+        private final Deque<Integer> linesToPop;
 
         public TokenInserter(Node originNode) {
             this.originNode = originNode;
-            this.stacksToPop = new ArrayDeque<>();
+            this.linesToPop = new ArrayDeque<>();
         }
 
         public TokenInserterForPosition lines(int beginLine, int endLine) {
@@ -92,24 +88,23 @@ public class LineTokens {
 
         @Override
         public void close() {
-            for (Deque<Token> stack : stacksToPop) {
-                popToken(stack);
-            }
+            linesToPop.forEach(LineTokens.this::popToken);
+            linesToPop.clear();
         }
 
         public class TokenInserterForPosition {
-            private final List<Deque<Token>> stacksForPos;
+            private final List<Integer> lines;
 
             public TokenInserterForPosition(int beginLine, int endLine) {
-                stacksForPos = new ArrayList<>();
+                lines = new ArrayList<>();
                 for (int line = beginLine; line <= endLine; line++) {
-                    stacksForPos.add(getStack(line));
+                    lines.add(line);
                 }
             }
 
             private void insert(Supplier<Token> tokenSup) {
-                stacksForPos.forEach(stack -> pushToken(stack, tokenSup.get()));
-                stacksToPop.addAll(stacksForPos);
+                lines.forEach(line -> pushToken(line, tokenSup.get()));
+                linesToPop.addAll(lines);
             }
 
             public void cover(LineCoverageStatus status) {

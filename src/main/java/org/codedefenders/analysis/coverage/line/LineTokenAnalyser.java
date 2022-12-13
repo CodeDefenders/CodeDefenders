@@ -1,16 +1,13 @@
 package org.codedefenders.analysis.coverage.line;
 
-
-import java.util.Map;
-
-import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.line.LineTokens.Token;
 
 public class LineTokenAnalyser {
     public NewLineCoverage analyse(LineTokens lineTokens) {
         SimpleLineCoverage coverage = new SimpleLineCoverage();
-        for (Map.Entry<Integer, Token> entry : lineTokens.getResults().entrySet()) {
-            coverage.set(entry.getKey(), analyse(entry.getValue()));
+        for (int line = lineTokens.getFirstLine(); line <= lineTokens.getLastLine(); line++) {
+            Token root = lineTokens.getRoot(line);
+            coverage.set(line, analyse(root));
         }
         return coverage;
     }
@@ -28,7 +25,9 @@ public class LineTokenAnalyser {
             case EMPTY:
                 break;
             case COVERABLE:
-                currentStatus = currentStatus.merge(token.status);
+                if (token.status != LineCoverageStatus.EMPTY) {
+                    currentStatus = token.status;
+                }
                 break;
             case RESET:
                 currentStatus = LineCoverageStatus.EMPTY;
@@ -46,11 +45,33 @@ public class LineTokenAnalyser {
 
         LineCoverageStatus childrenStatus = LineCoverageStatus.EMPTY;
         for (Token child : token.children) {
-            childrenStatus = childrenStatus.merge(analyse(child, currentStatus));
+            childrenStatus = mergeForChildren(childrenStatus, analyse(child, currentStatus));
         }
         return childrenStatus;
     }
 
+    private LineCoverageStatus mergeForChildren(LineCoverageStatus acc, LineCoverageStatus next) {
+        switch (next) {
+            case EMPTY:
+                return acc;
+            case NOT_COVERED:
+                if (acc == LineCoverageStatus.EMPTY) {
+                    return LineCoverageStatus.NOT_COVERED;
+                } else {
+                    return acc;
+                }
+            case PARTLY_COVERED:
+                if (acc == LineCoverageStatus.FULLY_COVERED) {
+                    return LineCoverageStatus.FULLY_COVERED;
+                } else {
+                    return LineCoverageStatus.PARTLY_COVERED;
+                }
+            case FULLY_COVERED:
+                return LineCoverageStatus.FULLY_COVERED;
+            default:
+                throw new IllegalArgumentException("Unknown line coverage status: " + next);
+        }
+    }
+
     // TODO: are the merge functions correct?
-    // TODO: always take the child value?
 }

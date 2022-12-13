@@ -3,7 +3,7 @@ package org.codedefenders.analysis.coverage.line;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class LineMapping<T> {
+public class LineMapping<T> {
     private final List<T> lines;
     private int firstLine; // inclusive
     private int lastLine; // inclusive
@@ -22,15 +22,20 @@ public abstract class LineMapping<T> {
         return lastLine;
     }
 
-    public T get(int line) {
-        if (line >= firstLine || line <= lastLine) {
+    protected T get(int line) {
+        if (line >= firstLine && line <= lastLine) {
             return lines.get(line - 1);
         } else {
             return getEmpty();
         }
     }
 
-    public void set(int line, T elem) {
+    protected void set(int line, T elem) {
+        updateBounds(line);
+        lines.set(line - 1, elem);
+    }
+
+    protected void updateBounds(int line) {
         if (line < firstLine) {
             firstLine = line;
         }
@@ -40,8 +45,9 @@ public abstract class LineMapping<T> {
                 lines.add(getEmpty());
             }
         }
-        lines.set(line - 1, elem);
     }
 
-    public abstract T getEmpty();
+    public T getEmpty() {
+        return null;
+    }
 }
