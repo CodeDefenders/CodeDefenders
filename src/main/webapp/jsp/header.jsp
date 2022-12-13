@@ -21,16 +21,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 <%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
-<%@ page import="org.codedefenders.servlets.UserSettingsManager" %>
 
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <jsp:include page="/jsp/header_base.jsp"/>
-
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-<% boolean puzzleEnabled = PuzzleGameManager.checkEnabled(); %>
 
 <nav class="navbar navbar-expand-md navbar-cd" id="header">
     <div class="container-fluid">
@@ -60,11 +55,11 @@
                         <li><a class="dropdown-item" id="header-leaderboard" href="${pageContext.request.contextPath}${Paths.LEADERBOARD_PAGE}">Leaderboard</a></li>
                     </ul>
                 </li>
-                <% if (puzzleEnabled) { %>
-                <li class="nav-item nav-item-highlight me-3">
+                <c:if test="${PuzzleGameManager.checkEnabled()}">
+                    <li class="nav-item nav-item-highlight me-3">
                     <a class="nav-link" id="header-puzzle" href="${pageContext.request.contextPath}${Paths.PUZZLE_OVERVIEW}">Puzzles</a>
-                </li>
-                <% } %>
+                    </li>
+                </c:if>
                 <c:if test="${auth.admin}">
                     <li class="nav-item nav-item-highlight me-3">
                         <a class="nav-link" id="header-admin" href="${pageContext.request.contextPath}/admin">Admin</a>
