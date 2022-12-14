@@ -151,16 +151,16 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
     private final DetailedLineCoverage lineCoverage;
-    private final AstCoverageMapping astCoverage;
+    private final AstCoverage astCoverage;
     private final List<Runnable> finalizers;
 
     public AstCoverageVisitor(DetailedLineCoverage lineCoverage) {
         this.lineCoverage = lineCoverage;
-        this.astCoverage = new AstCoverageMapping();
+        this.astCoverage = new AstCoverage();
         this.finalizers = new ArrayList<>();
     }
 
-    public AstCoverageMapping finish() {
+    public AstCoverage finish() {
         for (Runnable finalizer : finalizers) {
             finalizer.run();
         }

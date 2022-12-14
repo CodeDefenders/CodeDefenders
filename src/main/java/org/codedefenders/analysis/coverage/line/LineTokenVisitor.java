@@ -3,7 +3,7 @@ package org.codedefenders.analysis.coverage.line;
 import java.util.Iterator;
 import java.util.Optional;
 
-import org.codedefenders.analysis.coverage.ast.AstCoverageMapping;
+import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.line.LineTokens.TokenInserter;
 
@@ -59,7 +59,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
 
-    AstCoverageMapping astCoverage;
+    AstCoverage astCoverage;
     LineTokens lineTokens;
 
     private Optional<SwitchEntry> findFallthrough(SwitchEntry entry) {
@@ -90,7 +90,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         return it.hasNext() ? Optional.of(it.next()) : Optional.empty();
     }
 
-    public LineTokenVisitor(AstCoverageMapping astCoverage, LineTokens lineTokens) {
+    public LineTokenVisitor(AstCoverage astCoverage, LineTokens lineTokens) {
         this.astCoverage = astCoverage;
         this.lineTokens = lineTokens;
     }

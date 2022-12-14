@@ -6,10 +6,10 @@ import java.util.Map;
 
 import com.github.javaparser.ast.Node;
 
-public class AstCoverageMapping {
+public class AstCoverage {
     private final Map<Node, AstCoverageStatus> statusPerNode;
 
-    public AstCoverageMapping() {
+    public AstCoverage() {
         statusPerNode = new IdentityHashMap<>();
     }
 

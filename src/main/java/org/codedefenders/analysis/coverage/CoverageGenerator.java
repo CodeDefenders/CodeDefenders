@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.codedefenders.analysis.coverage.ast.AstCoverageMapping;
+import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
@@ -52,25 +52,19 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.ast.CompilationUnit;
 
-/**
- * This class offers a static method {@link #generate(GameClass, Path) generate()}, which
- * allows generation of line coverage for a given {@link GameClass} and {@link Path paht to a java test file}.
- */
 @ApplicationScoped
 public class CoverageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(CoverageGenerator.class);
     private static final String JACOCO_REPORT_FILE = "jacoco.exec";
 
     /**
-     * Generates and returns line coverage for a given {@link GameClass} and {@link Path path to a java test file}.
+     * Reads the coverage data for a test execution and extends it.
      *
-     * <p>The method requires the file 'jacoco.exec' to be present in the
-     * folder the test lies in, otherwise the generation fails and an
-     * empty {@link LineCoverage} instance is returned.
+     * <p>The method requires the 'jacoco.exec' file to be present in the test folder.
      *
-     * @param gameClass    the class that is tested.
-     * @param testJavaFile the test java file in which parent folder the 'jacoco.exe' file exists as a {@link Path}.
-     * @return             the extended line coverage
+     * @param gameClass the CUT
+     * @param testJavaFile the path to the test Java file (the 'jacoco.exe' file must exist in the same directory)
+     * @return the extended line coverage
      */
     public NewLineCoverage generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
@@ -78,7 +72,7 @@ public class CoverageGenerator {
         final Collection<File> relevantClassFiles = findRelevantClassFiles(gameClass);
 
         CoverageBuilder coverageBuilder = readJacocoCoverage(execFile, relevantClassFiles);
-        DetailedLineCoverage originalCoverage = extractLineCoverageMapping(coverageBuilder, gameClass);
+        DetailedLineCoverage originalCoverage = extractLineCoverage(coverageBuilder, gameClass);
 
         CompilationUnit compilationUnit = JavaParserUtils.parse(gameClass.getSourceCode())
                 .orElseThrow(() -> new CoverageGeneratorException("Could not parse java file: " + gameClass.getJavaFile()));
@@ -89,10 +83,10 @@ public class CoverageGenerator {
     public NewLineCoverage generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
         AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
         astVisitor.visit(compilationUnit, null);
-        AstCoverageMapping astMapping = astVisitor.finish();
+        AstCoverage astCoverage = astVisitor.finish();
 
         LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
-        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astMapping, lineTokens);
+        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens);
         lineTokenVisitor.visit(compilationUnit, null);
 
         LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
@@ -160,7 +154,7 @@ public class CoverageGenerator {
         return Arrays.asList(relevantFiles);
     }
 
-    public DetailedLineCoverage extractLineCoverageMapping(CoverageBuilder coverageBuilder, GameClass gameClass) {
+    public DetailedLineCoverage extractLineCoverage(CoverageBuilder coverageBuilder, GameClass gameClass) {
         DetailedLineCoverage coverage = new DetailedLineCoverage();
 
         for (ISourceFileCoverage sourceCoverage : coverageBuilder.getSourceFiles()) {
