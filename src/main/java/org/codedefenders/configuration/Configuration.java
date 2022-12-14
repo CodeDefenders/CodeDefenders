@@ -79,8 +79,8 @@ import com.google.common.net.InternetDomainName;
 public class Configuration {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
-    private boolean $validated;
-    private ConfigurationValidationException $configurationValidationException;
+    private boolean _validated;
+    private ConfigurationValidationException _configurationValidationException;
 
     // All the attributes need to be initialized with a null value and therefore need to be objects
     protected String dataDir;
@@ -114,7 +114,7 @@ public class Configuration {
      * @throws ConfigurationValidationException This lists all the reasons why the validation failed.
      */
     public final void validate() throws ConfigurationValidationException {
-        if (!$validated) {
+        if (!_validated) {
             List<String> validationErrors = new ArrayList<>();
 
             if (dataDir == null || dataDir.equals("")) {
@@ -220,14 +220,14 @@ public class Configuration {
              */
 
             validationErrors.removeIf(Objects::isNull);
-            $validated = true;
+            _validated = true;
             if (!validationErrors.isEmpty()) {
-                $configurationValidationException = new ConfigurationValidationException(validationErrors);
-                throw $configurationValidationException;
+                _configurationValidationException = new ConfigurationValidationException(validationErrors);
+                throw _configurationValidationException;
             }
         } else {
-            if ($configurationValidationException != null) {
-                throw $configurationValidationException;
+            if (_configurationValidationException != null) {
+                throw _configurationValidationException;
             }
         }
     }
