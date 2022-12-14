@@ -1,34 +1,24 @@
 package org.codedefenders.analysis.coverage;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringJoiner;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
-import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
+import org.codedefenders.analysis.coverage.util.HTMLWriter;
 import org.codedefenders.analysis.coverage.util.InMemoryClassLoader;
 import org.codedefenders.analysis.coverage.util.InMemoryJavaFileManager;
-import org.codedefenders.analysis.coverage.util.InMemorySourceFile;
 import org.codedefenders.util.JavaParserUtils;
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
@@ -41,21 +31,20 @@ import org.jacoco.core.runtime.IRuntime;
 import org.jacoco.core.runtime.LoggerRuntime;
 import org.jacoco.core.runtime.RuntimeData;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import com.github.javaparser.ast.CompilationUnit;
 
 import static com.google.common.truth.TruthJUnit.assume;
 
-// Adapted from the JaCoCo "CoreTutorial.java" API example.
-// See https://www.jacoco.org/jacoco/trunk/doc/api.html
+/**
+ * <p>Adapted from the JaCoCo "CoreTutorial" API example.
+ * See https://www.jacoco.org/jacoco/trunk/doc/api.html
+ *
+ * <p>HTML output for easier debugging can be enabled in {@link HTMLWriter}.
+ */
 public class CoverageTest {
-    private final static String DEMO_CLASS_NAME = "CoverageDemo";
-    private final static String DEMO_CLASS_PATH = "analysis/CoverageDemo.java";
-
-    // output HTML with original and extended coverage for easier comparison
-    private final static String HTML_PATH = "/tmp/coverage.html";
-    private final static boolean OUTPUT_HTML = true;
 
     // TODO: extract getJavaMajorVersion into a util class and use it in Configuration as well?
     // TODO: put the InMemory* JavaCompiler into a src package and use it in Compiler as well?
@@ -71,75 +60,65 @@ public class CoverageTest {
         int dashPos = javaVersion.indexOf('-');
         int javaMajorVersion = Integer.parseInt(javaVersion.substring(0,
                 dotPos > -1 ? dotPos : dashPos > -1 ? dashPos : 1));
-        assume()
-                .withMessage("This test only works with Java versions greater >= 16")
+        assume().withMessage("Coverage tests only work with Java version >= 16")
                 .that(javaMajorVersion).isAtLeast(16);
     }
 
-    @Test
-    public void test() throws Exception {
+    @ParameterizedTest(name = "[{index}] Coverage of {1} on {0}")
+    @ArgumentsSource(CoverageTestParameters.class)
+     public void test(String className,
+                      String testName,
+                      List<JavaFileObject> sourceFiles,
+                      String classCode,
+                      NewLineCoverage expectedCoverage) throws Exception {
+        // compile and instrument code
         final IRuntime runtime = new LoggerRuntime();
-        final String demoSourceCode = getDemoSourceCode();
-        final List<JavaFileObject> demoSourceFiles = getDemoSourceFiles();
-        final Map<String, byte[]> originals = compileCode(demoSourceFiles);
+        final Map<String, byte[]> originals = compileCode(sourceFiles);
         final Map<String, byte[]> instrumented = instrumentCode(runtime, originals);
 
+        // start up JaCoCo runtime
         final RuntimeData data = new RuntimeData();
         runtime.startup(data);
 
+        // load instrumented code
         final InMemoryClassLoader memoryClassLoader = new InMemoryClassLoader(instrumented);
-        final Class<?> targetClass = memoryClassLoader.loadClass(DEMO_CLASS_NAME);
+        final Class<?> targetClass = memoryClassLoader.loadClass(testName);
 
-        // run the code
-        // TODO: extract multiple test methods/files
+        // run the test
         Method main = targetClass.getMethod("main", String[].class);
-        main.invoke(null, (Object) null);
+        main.invoke(null, new Object[]{new String[0]});
 
+        // collect JaCoCo data
         final ExecutionDataStore executionData = new ExecutionDataStore();
         final SessionInfoStore sessionInfos = new SessionInfoStore();
         data.collect(executionData, sessionInfos, false);
         runtime.shutdown();
-
         final CoverageBuilder coverageBuilder = new CoverageBuilder();
         final Analyzer analyzer = new Analyzer(executionData, coverageBuilder);
-        for (byte[] byteCode : originals.values()) {
-            analyzer.analyzeClass(byteCode, DEMO_CLASS_NAME);
+        for (Map.Entry<String, byte[]> entry : originals.entrySet()) {
+            analyzer.analyzeClass(entry.getValue(), entry.getKey());
         }
 
-        DetailedLineCoverage originalCoverage = extractLineCoverageMapping(coverageBuilder);
-        CompilationUnit compilationUnit = JavaParserUtils.parse(demoSourceCode)
-                .orElseThrow(() -> new Exception("Could not parse demo source code."));
+        // get coverage data and AST
+        DetailedLineCoverage originalCoverage = extractLineCoverage(coverageBuilder, className);
+        CompilationUnit compilationUnit = JavaParserUtils.parse(classCode)
+                .orElseThrow(() -> new Exception("Could not parse fixture source code."));
 
+        // transform the coverage
         CoverageGenerator coverageGenerator = new CoverageGenerator();
-        NewLineCoverage extendedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
+        NewLineCoverage transformedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
 
-        if (OUTPUT_HTML) {
-            try (PrintWriter writer = new PrintWriter(HTML_PATH)) {
-                writer.write(generateHtml(demoSourceCode, originalCoverage, extendedCoverage));
-            }
-        }
+        // TODO assert
+
+        // write HTML report if enabled
+        new HTMLWriter().write(className, testName, classCode, originalCoverage, transformedCoverage, expectedCoverage);
     }
 
-    private static String getDemoSourceCode() throws Exception {
-        URL url = Thread.currentThread().getContextClassLoader().getResource(DEMO_CLASS_PATH);
-        return new String(Files.readAllBytes(Paths.get(url.getPath())), StandardCharsets.UTF_8);
-    }
-
-    private static List<JavaFileObject> getDemoSourceFiles() throws Exception {
-        URL url = Thread.currentThread().getContextClassLoader().getResource(DEMO_CLASS_PATH);
-        String code = new String(Files.readAllBytes(Paths.get(url.getPath())), StandardCharsets.UTF_8);
-        JavaFileObject sourceFile = new InMemorySourceFile(DEMO_CLASS_NAME, code);
-        return Collections.singletonList(sourceFile);
-    }
-
-    public Map<String, byte[]> compileCode(List<JavaFileObject> sourceFiles) throws Exception {
-        // set up compiler
+    public Map<String, byte[]> compileCode(List<JavaFileObject> sourceFiles) {
+        // set up compiler and options
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        if (compiler == null) {
-            throw new Exception("Platform provided no java compiler.");
-        }
-
-        // set up compiler options
+        assume().withMessage("Platform provided no java compiler.")
+                .that(compiler).isNotNull();
         List<String> options = Arrays.asList(
                 "-encoding", "UTF-8",
                 "-source", "16",
@@ -155,28 +134,30 @@ public class CoverageTest {
         final JavaCompiler.CompilationTask task =
                 compiler.getTask(null, fileManager, null, options, null, sourceFiles);
         final Boolean success = task.call();
-        if (!success) {
-            throw new Exception("Compilation failed.");
-        }
+        assume().withMessage("Failed to compile fixture code.")
+                .that(success).isTrue();
         return fileManager.getClassFiles();
     }
 
     public Map<String, byte[]> instrumentCode(IRuntime runtime, Map<String, byte[]> classFiles) throws IOException {
         final Instrumenter instr = new Instrumenter(runtime);
+
+        // iterate through class files and construct a new map with instrumented code
         Map<String, byte[]> instrumentedClassFiles = new HashMap<>();
         for (Map.Entry<String, byte[]> entry : classFiles.entrySet()) {
             String name = entry.getKey();
             byte[] bytecode = entry.getValue();
             instrumentedClassFiles.put(name, instr.instrument(bytecode, name));
         }
+
         return instrumentedClassFiles;
     }
 
-    public DetailedLineCoverage extractLineCoverageMapping(CoverageBuilder coverageBuilder) {
+    public DetailedLineCoverage extractLineCoverage(CoverageBuilder coverageBuilder, String className) {
         DetailedLineCoverage coverage = new DetailedLineCoverage();
 
         for (ISourceFileCoverage sourceCoverage : coverageBuilder.getSourceFiles()) {
-            if (!DEMO_CLASS_PATH.endsWith(sourceCoverage.getName())) {
+            if (!sourceCoverage.getName().endsWith(className + ".java")) {
                 continue;
             }
 
@@ -187,89 +168,5 @@ public class CoverageTest {
         }
 
         return coverage;
-    }
-
-    public String generateHtml(String sourceCode,
-                               DetailedLineCoverage originalCoverage,
-                               NewLineCoverage extendedCoverage) {
-        String template = String.join("\n",
-                "<!DOCTYPE html>",
-                "<html>",
-                "    <head>",
-                "        <meta charset=\"utf-8\">",
-                "        <title>{title}</title>",
-                "        <style>",
-                "            .line {",
-                "                font-family: monospace;",
-                "                width: 100%;",
-                "                white-space: nowrap;",
-                "                overflow: hidden;",
-                "                text-overflow: ellipsis;",
-                "            }",
-                "            .line::before {",
-                "                font-family: monospace;",
-                "                content: attr(line-num);",
-                "                display: inline-block;",
-                "                width: 3em;",
-                "            }",
-                "            .EMPTY {",
-                "                background: transparent;",
-                "            }",
-                "            .FULLY_COVERED {",
-                "                background: #73ff73;",
-                "            }",
-                "            .PARTLY_COVERED {",
-                "                background: #fff673;",
-                "            }",
-                "            .NOT_COVERED {",
-                "                background: #ff7373;",
-                "            }",
-                "        </style>",
-                "    </head>",
-                "    <body>",
-                "        <div style=\"display: flex; flex-direction: row; gap: .5em;\">",
-                "            <div style=\"width: calc(50% - .25em);\">",
-                "                {code_original}",
-                "            </div>",
-                "            <div style=\"width: calc(50% - .25em);\">",
-                "                {code_extended}",
-                "            </div>",
-                "    </body>",
-                "</html>"
-        );
-        String lineTemplate = String.join("\n",
-                "<div class=\"line {coverage_status}\" line-num=\"{line_num}\">",
-                "    {code}",
-                "</div>"
-        );
-
-        StringJoiner originalLines = new StringJoiner("\n");
-        StringJoiner extendedLines = new StringJoiner("\n");
-
-        int lineNum = 1;
-        for (String line : sourceCode.split("\r?\n")) {
-            String escapedLine = StringEscapeUtils.escapeHtml4(line)
-                    .replaceAll(" ", "&nbsp");
-
-            String htmlLine = lineTemplate
-                    .replace("{line_num}", Integer.toString(lineNum))
-                    .replace("{code}", escapedLine);
-
-            LineCoverageStatus originalStatus = originalCoverage.getStatus(lineNum);
-            LineCoverageStatus extendedStatus = extendedCoverage.getStatus(lineNum);
-
-            originalLines.add(htmlLine.replace("{coverage_status}", originalStatus.name()));
-            extendedLines.add(htmlLine.replace("{coverage_status}", extendedStatus.name()));
-
-            lineNum++;
-        }
-
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-
-        return template
-                .replace("{title}", timeFormatter.format(now))
-                .replace("{code_original}", originalLines.toString())
-                .replace("{code_extended}", extendedLines.toString());
     }
 }

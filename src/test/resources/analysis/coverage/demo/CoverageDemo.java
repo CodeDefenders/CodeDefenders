@@ -1,3 +1,6 @@
+import static utils.Utils.doGet;
+import static utils.Utils.doThrow;
+
 /**
  * <p>Code for testing extended coverage.
  *
@@ -8,92 +11,6 @@
  * Challenging formatting that could lead to issues for coverage is tested in CoverageDemoFormat.
  */
 public class CoverageDemo {
-
-    public static void main(String[] args) {
-        // Classes
-        new ClassWithoutConstructor();
-        new ClassWithConstructor();
-
-        // Interfaces
-        new InterfaceWithDefaultMethod(){}.method();
-        new Interface(){
-            @Override
-            public void method() {
-
-            }
-        }.method();
-
-        // Records
-        new EmptyRecordWithoutConstructor();
-        new EmptyRecordWithConstructor();
-        new RecordWithoutConstructor(0);
-        new RecordWithConstructor(0);
-
-        // Fields
-        doCatch(Fields::new);
-        StaticFieldWithoutInitializer.method();
-
-        // Constructors
-        new Constructors();
-        new Constructors(0);
-        doCatch(() -> new Constructors(0, 0));
-        new CompactConstructorsEmpty();
-        new CompactConstructors(0);
-
-        // Methods
-        Methods.empty();
-        Methods.explicitReturn();
-        doCatch(Methods::throwsException);
-        new InterfaceDefaultMethods(){}.empty();
-        new InterfaceDefaultMethods(){}.explicitReturn();
-        doCatch(new InterfaceDefaultMethods(){}::throwsException);
-
-
-        // Local Variables
-        doCatch(CoverageDemo::localVariables);
-
-        // Blocks
-        Blocks.coveredToEnd();
-        Blocks.earlyReturn();
-        doCatch(Blocks::earlyException);
-        doCatch(Blocks::earlyIndirectException);
-        Blocks.independentNodes(true);
-        Blocks.nestedBlocks();
-
-        // Ifs
-        Ifs.normalIf(true);
-        Ifs.returnFromIf(true);
-        doCatch(() -> Ifs.exceptionFromIf(true));
-    }
-
-    // region Helpers
-
-    static int doGet() {
-        return 4;
-    }
-
-    static int doThrow() {
-        throw new RuntimeException();
-    }
-
-    static void doCatch(Runnable r) {
-       try {
-            r.run();
-       } catch (RuntimeException ignored) {
-
-       }
-    }
-
-    public static class MethodChain {
-        public MethodChain doNotThrow() {
-            return this;
-        }
-        public MethodChain doThrow() {
-            throw new RuntimeException();
-        }
-    }
-
-    // endregion
     // region Classes
 
     /**

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{title}</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+            }
+            .column {
+                width: 33.3%;
+                padding: .25em;
+            }
+            .header {
+                width: fit-content;
+                position: sticky;
+                top: .5em;
+                margin-bottom: 1em;
+
+                background: white;
+                padding: .25em 2em;
+                border: 2px solid;
+                border-radius: 1em;
+                box-shadow: 2px 2px black;
+
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+            }
+            .line {
+                font-family: monospace;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .line::before {
+                font-family: monospace;
+                content: attr(data-line-num);
+                display: inline-block;
+                width: 3em;
+            }
+            .EMPTY {
+                background: transparent;
+            }
+            .FULLY_COVERED {
+                background: #73ff73;
+            }
+            .PARTLY_COVERED {
+                background: #fff673;
+            }
+            .NOT_COVERED {
+                background: #ff7373;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="column">
+                <div class="header">JaCoCo Coverage</div>
+                {code_original}
+            </div>
+            <div class="column">
+                <div class="header">Transformed Coverage</div>
+                {code_transformed}
+            </div>
+            <div class="column">
+                <div class="header">Expected Coverage</div>
+                {code_expected}
+            </div>
+        </div>
+    </body>
+</html>
