@@ -142,7 +142,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
  *         // TODO did I always use coverable with this meaning?
  *     </li>
  *     <li>
- *         not-covered: A not-covered AST node has the status {@link AstCoverageStatus#NOT_COVERED}.
+ *         not-covered: A not-covered AST node has the status {@link AstCoverageStatus#END_NOT_COVERED}.
  *         An EMPTY node is considered neither covered nor not-covered.
  *     </li>
  * </ul>
@@ -217,7 +217,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *     </li>
      *     <li>
      *         otherwise<br>
-     *         return -> {@link AstCoverageStatus#NOT_COVERED}
+     *         return -> {@link AstCoverageStatus#END_NOT_COVERED}
      *     </li>
      * </ol>
      */
@@ -225,10 +225,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         switch (next) {
             case EMPTY:
                 return acc;
-            case NOT_COVERED:
+            case BEGIN_NOT_COVERED:
                 return acc.isCovered()
                         ? AstCoverageStatus.BEGIN_COVERED
-                        : AstCoverageStatus.NOT_COVERED;
+                        : AstCoverageStatus.BEGIN_NOT_COVERED;
+            case END_NOT_COVERED:
+                return acc.isCovered()
+                        ? AstCoverageStatus.BEGIN_COVERED
+                        : AstCoverageStatus.END_NOT_COVERED;
             case BEGIN_COVERED:
                 return AstCoverageStatus.BEGIN_COVERED;
             case END_COVERED:
@@ -243,7 +247,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (coverage.totalInstructions() == 0) {
             return AstCoverageStatus.EMPTY;
         } else if (coverage.coveredInstructions() == 0) {
-            return AstCoverageStatus.NOT_COVERED;
+            return AstCoverageStatus.END_NOT_COVERED;
         } else {
             return AstCoverageStatus.END_COVERED;
         }
@@ -255,7 +259,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A class declaration can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#INITIALIZED}</li>
      * </ul>
      */
@@ -291,13 +295,13 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
     }
 
     /**
      * An enum declaration can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#INITIALIZED}</li>
      * </ul>
      */
@@ -328,13 +332,13 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
     }
 
     /**
      * A record declaration can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#INITIALIZED}</li>
      * </ul>
      *
@@ -377,13 +381,13 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
     }
 
     /**
      * An enum constant can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
@@ -400,7 +404,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A field declaration can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
@@ -439,8 +443,22 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 return;
             }
 
+            // check if any field before this one is not-covered -> NOT_COVERED
+            TypeDeclaration<?> parentClass = optParentClass.get();
+            if (!decl.isStatic()) {
+                for (FieldDeclaration field : parentClass.getFields()) {
+                    if (field == decl) {
+                        break;
+                    }
+                    if (!field.isStatic() && astCoverage.get(field).isNotCovered()) {
+                        astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
+                        return;
+                    }
+                }
+            }
+
             // check if parent class has been initialized -> COVERED
-            AstCoverageStatus classStatus = astCoverage.get(optParentClass.get());
+            AstCoverageStatus classStatus = astCoverage.get(parentClass);
             if (classStatus.isCovered()) {
                 // TODO: check if any field before this one is not-covered
                 astCoverage.put(decl, AstCoverageStatus.END_COVERED);
@@ -449,7 +467,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
             // if the field is static, check if the parent class has *any* coverage -> COVERED
             if (decl.isStatic()) {
-                boolean membersCovered = optParentClass.get()
+                boolean membersCovered = parentClass
                         .getChildNodes()
                         .stream()
                         .map(astCoverage::get)
@@ -461,14 +479,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             }
 
             // otherwise -> NOT_COVERED
-            astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
         });
     }
 
     /**
      * An initializer block can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -492,7 +510,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 // body is empty, so BEGIN_COVERED == END_COVERED
                 astCoverage.put(decl, AstCoverageStatus.END_COVERED);
             } else {
-                astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+                astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
             }
             return;
         }
@@ -514,7 +532,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             }
 
             // otherwise -> NOT_COVERED
-            astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
         });
     }
 
@@ -525,7 +543,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A method can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY} (if abstract or interface method without body)</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -553,15 +571,17 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (lineCoverage.get(closingBraceLine).coveredInstructions() > 0) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
+            astCoverage.put(decl.getBody().get(), AstCoverageStatus.END_COVERED);
         } else {
-            astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
+            astCoverage.put(decl.getBody().get(), AstCoverageStatus.END_NOT_COVERED);
         }
     }
 
     /**
      * A constructor can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -570,9 +590,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ConstructorDeclaration decl, Void arg) {
         super.visit(decl, arg);
 
-        // inherit coverage from body if not EMPTY -> BEGIN_COVERED, END_COVERED or NOT_COVERED
+        // inherit coverage from body if covered -> BEGIN_COVERED, END_COVERED
         AstCoverageStatus bodyStatus = astCoverage.get(decl.getBody());
-        if (bodyStatus != AstCoverageStatus.EMPTY) {
+        if (bodyStatus.isCovered()) {
             astCoverage.put(decl, bodyStatus);
             return;
         }
@@ -581,8 +601,15 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         int openingBraceLine = decl.getBody().getBegin().get().line;
         DetailedLine beginBlockStatus = lineCoverage.get(openingBraceLine);
         if (beginBlockStatus.hasCoveredIns()) {
-            // the body is empty, so BEGIN_COVERED == END_COVERED
-            astCoverage.put(decl, AstCoverageStatus.END_COVERED);
+            if (bodyStatus.isEmpty()) {
+                // the body is empty, so BEGIN_COVERED == END_COVERED
+                astCoverage.put(decl, AstCoverageStatus.END_COVERED);
+                astCoverage.put(decl.getBody(), AstCoverageStatus.END_COVERED);
+            } else {
+                // the body is currently not-covered, so it must actually be BEGIN_COVERED
+                astCoverage.put(decl, AstCoverageStatus.BEGIN_COVERED);
+                astCoverage.put(decl.getBody(), AstCoverageStatus.BEGIN_COVERED);
+            }
             return;
         }
 
@@ -590,19 +617,32 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         int closingBraceLine = decl.getBody().getEnd().get().line;
         DetailedLine closingBraceStatus = lineCoverage.get(closingBraceLine);
         if (closingBraceStatus.hasCoveredIns()) {
-            // the body is empty, so BEGIN_COVERED == END_COVERED
-            astCoverage.put(decl, AstCoverageStatus.END_COVERED);
+            if (bodyStatus.isEmpty()) {
+                // the body is empty, so BEGIN_COVERED == END_COVERED
+                astCoverage.put(decl, AstCoverageStatus.END_COVERED);
+                astCoverage.put(decl.getBody(), AstCoverageStatus.END_COVERED);
+            } else {
+                // the body is currently not-covered, so it must actually be BEGIN_COVERED
+                astCoverage.put(decl, AstCoverageStatus.BEGIN_COVERED);
+                astCoverage.put(decl.getBody(), AstCoverageStatus.BEGIN_COVERED);
+            }
             return;
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+        if (bodyStatus.isBreak()) {
+            astCoverage.put(decl, AstCoverageStatus.BEGIN_NOT_COVERED);
+            astCoverage.put(decl.getBody(), AstCoverageStatus.BEGIN_NOT_COVERED);
+        } else {
+            astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
+            astCoverage.put(decl.getBody(), AstCoverageStatus.END_NOT_COVERED);
+        }
     }
 
     /**
      * A compact constructor can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -624,6 +664,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (openingBraceStatus.hasCoveredIns()) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
+            astCoverage.put(decl.getBody(), AstCoverageStatus.END_COVERED);
             return;
         }
 
@@ -633,11 +674,13 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (closingBraceStatus.hasCoveredIns()) {
             // the body is empty, so BEGIN_COVERED == END_COVERED
             astCoverage.put(decl, AstCoverageStatus.END_COVERED);
+            astCoverage.put(decl.getBody(), AstCoverageStatus.END_COVERED);
             return;
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(decl, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(decl, AstCoverageStatus.END_NOT_COVERED);
+        astCoverage.put(decl.getBody(), AstCoverageStatus.END_NOT_COVERED);
     }
 
     // endregion
@@ -647,7 +690,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A block can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -670,7 +713,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * An if condition can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY} (e.g. if (true);)</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -730,7 +773,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A do-while loop can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -753,7 +796,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine conditionStatus = mergeLineCoverage(conditionStartLine, conditionEndLine);
         switch (conditionStatus.branchStatus()) {
             case NOT_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+                astCoverage.put(stmt, AstCoverageStatus.END_NOT_COVERED);
                 return;
             case PARTLY_COVERED:
                 astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
@@ -768,7 +811,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A for loop can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY} (e.g. for(;;) break;)</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -829,7 +872,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (bodyStatus.isNotCovered()
                 || headerStatus.isNotCovered()
                 || compareStatus.coveredBranches() == 0) {
-            astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(stmt, AstCoverageStatus.END_NOT_COVERED);
             return;
         }
 
@@ -841,7 +884,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A for-each loop can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -863,7 +906,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         switch (conditionStatus.branchStatus()) {
             case NOT_COVERED:
                 // if the body's status is covered, use that. otherwise, set NOT_COVERED
-                AstCoverageStatus status = bodyStatus.upgrade(AstCoverageStatus.NOT_COVERED);
+                AstCoverageStatus status = bodyStatus.upgrade(AstCoverageStatus.END_NOT_COVERED);
                 astCoverage.put(stmt, status.toBlockCoverage());
                 return;
             case PARTLY_COVERED:
@@ -883,7 +926,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A while loop can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -906,7 +949,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         switch (conditionStatus.branchStatus()) {
             case NOT_COVERED:
                 // if the body's status is covered, use that. otherwise, set NOT_COVERED
-                AstCoverageStatus status = bodyStatus.upgrade(AstCoverageStatus.NOT_COVERED);
+                AstCoverageStatus status = bodyStatus.upgrade(AstCoverageStatus.END_NOT_COVERED);
                 astCoverage.put(stmt, status.toBlockCoverage());
                 return;
             case PARTLY_COVERED:
@@ -979,7 +1022,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (resourcesStatus.isNotCovered()
                 || tryAndCatchStatus.isNotCovered()
                 || finallyStatus.isNotCovered()) {
-            astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(stmt, AstCoverageStatus.END_NOT_COVERED);
         } else {
             astCoverage.put(stmt, AstCoverageStatus.EMPTY);
         }
@@ -988,7 +1031,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A catch clause can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -1017,13 +1060,13 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(node, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(node, AstCoverageStatus.END_NOT_COVERED);
     }
 
     /**
      * A switch statement can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      * </ul>
      */
@@ -1068,7 +1111,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(stmt, AstCoverageStatus.END_NOT_COVERED);
     }
 
     /**
@@ -1078,7 +1121,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *         {@link AstCoverageStatus#EMPTY}<br>
      *         if STATEMENT_GROUP type
      *     </li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>
      *         {@link AstCoverageStatus#BEGIN_COVERED}<br>
      *         if STATEMENT_GROUP, BLOCK or THROWS_STATEMENT type
@@ -1124,7 +1167,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * Synchronized block can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -1153,7 +1196,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(stmt, AstCoverageStatus.END_NOT_COVERED);
     }
 
     // endregion
@@ -1162,7 +1205,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * An assertion can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1185,7 +1228,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *         {@link AstCoverageStatus#EMPTY}<br>
      *          e.g. if it appears as the last statement in a loop body
      *     </li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
@@ -1202,7 +1245,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A {@code super} or {@code this} call can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
@@ -1220,7 +1263,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * An expression statement can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
@@ -1280,7 +1323,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *          e.g. if it appears as the last statement in the last switch branch
      *          or as the only statement in a loop
      *     </li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
@@ -1302,7 +1345,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A labeled statement can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -1316,7 +1359,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A return statement can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      * </ul>
      *
@@ -1333,14 +1376,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (status.hasCoveredIns()) {
             astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
         } else {
-            astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(stmt, AstCoverageStatus.BEGIN_NOT_COVERED);
         }
     }
 
     /**
      * A throw statement can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      * </ul>
      */
@@ -1354,14 +1397,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (status.hasCoveredIns()) {
             astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
         } else {
-            astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(stmt, AstCoverageStatus.BEGIN_NOT_COVERED);
         }
     }
 
     /**
      * A yield statement can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      * </ul>
      */
@@ -1375,7 +1418,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (status.hasCoveredIns()) {
             astCoverage.put(stmt, AstCoverageStatus.BEGIN_COVERED);
         } else {
-            astCoverage.put(stmt, AstCoverageStatus.NOT_COVERED);
+            astCoverage.put(stmt, AstCoverageStatus.END_NOT_COVERED);
         }
     }
 
@@ -1387,7 +1430,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *         (if it doesn't have an initializer,
      *         or if it is a field declaration with a non-coverable expression as value)
      *     </li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1427,7 +1470,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * An assign expression can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1470,7 +1513,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A conditional expression can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1490,7 +1533,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine conditionStatus = mergeLineCoverage(expr.getCondition());
         astCoverage.put(expr, conditionStatus.hasCoveredBranches()
                 ? AstCoverageStatus.END_COVERED
-                : AstCoverageStatus.NOT_COVERED);
+                : AstCoverageStatus.END_NOT_COVERED);
 
         // set the coverage of the then-expression by its lines if it's not already set
         // TODO: branch or instruction coverage?
@@ -1510,7 +1553,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A lambda expression can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#BEGIN_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
@@ -1535,7 +1578,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A method call can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1568,7 +1611,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * An object creation expression can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1592,7 +1635,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A pattern expression can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */
@@ -1608,7 +1651,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * A unary expression can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1661,14 +1704,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // otherwise -> NOT_COVERED
-        astCoverage.put(expr, AstCoverageStatus.NOT_COVERED);
+        astCoverage.put(expr, AstCoverageStatus.END_NOT_COVERED);
     }
 
     /**
      * A variable declarator can be
      * <ul>
      *     <li>{@link AstCoverageStatus#EMPTY}</li>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      *
@@ -1687,7 +1730,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     /**
      * A switch expression can be
      * <ul>
-     *     <li>{@link AstCoverageStatus#NOT_COVERED}</li>
+     *     <li>{@link AstCoverageStatus#END_NOT_COVERED}</li>
      *     <li>{@link AstCoverageStatus#END_COVERED}</li>
      * </ul>
      */

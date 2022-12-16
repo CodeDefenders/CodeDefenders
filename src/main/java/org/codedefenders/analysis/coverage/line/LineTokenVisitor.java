@@ -124,30 +124,41 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = lineTokens.forNode(block)) {
             AstCoverageStatus blockStatus = astCoverage.get(block);
 
-            if (blockStatus != AstCoverageStatus.BEGIN_COVERED) {
+            if (!blockStatus.isBreak()) {
                 i.node(block).block(blockStatus);
+                super.visit(block, arg);
+                return;
+            }
 
-            } else {
+            // block is BEGIN_COVERED or BEGIN_NOT_COVERED
 
-                NodeList<Statement> statements = block.getStatements();
-                if (statements.isEmpty()) {
-                    i.node(block).block(LineCoverageStatus.FULLY_COVERED);
-                    return;
-                }
+            NodeList<Statement> statements = block.getStatements();
+            if (statements.isEmpty()) {
+                i.node(block).block(blockStatus.toLineCoverage());
+                return;
+            }
 
-                // TODO: change this after saving covered/missed instructions in line coverage status
-                // cover from the last covered statement up
-                for (int j = statements.size() - 1; j >= 0; j--) {
-                    Statement stmt = statements.get(j);
-                    if (astCoverage.get(stmt).isCovered()) {
-                        int beginLine = block.getBegin().get().line;
-                        int endLine = stmt.getEnd().get().line;
-                        i.lines(beginLine, endLine).block(LineCoverageStatus.FULLY_COVERED);
+            int lastCoverableLine = block.getEnd().get().line;
+            Statement lastStmt = statements.getLast().get();
+            if (astCoverage.get(lastStmt).isBreak()) {
+                lastCoverableLine = lastStmt.getEnd().get().line;
+            }
+
+            if (blockStatus.isCovered()) {
+                int lastCoveredLine = block.getBegin().get().line;
+                for (Statement stmt : statements) {
+                    if (astCoverage.get(stmt).isNotCovered()) {
+                        lastCoveredLine = stmt.getBegin().get().line - 1;
                         break;
                     }
                 }
+                i.lines(block.getBegin().get().line, lastCoveredLine).cover(LineCoverageStatus.FULLY_COVERED);
+                i.lines(lastCoveredLine + 1, lastCoverableLine).cover(LineCoverageStatus.NOT_COVERED);
+                super.visit(block, arg);
+                return;
             }
 
+            i.lines(block.getBegin().get().line, lastCoverableLine).cover(LineCoverageStatus.NOT_COVERED);
             super.visit(block, arg);
         }
     }

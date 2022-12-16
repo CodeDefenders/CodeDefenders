@@ -1,39 +1,48 @@
 package org.codedefenders.analysis.coverage.ast;
 
-
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 
 public enum AstCoverageStatus {
     EMPTY(false, false, 0),
-    NOT_COVERED(false, false, 1),
-    BEGIN_COVERED(true, false, 2),
-    END_COVERED(true, true, 3),
-    INITIALIZED(true, true, 3);
+    BEGIN_NOT_COVERED(false, true, 1),
+    // TODO: use this in AstCoverageVisitor correctly
+    END_NOT_COVERED(false, false, 2),
+    BEGIN_COVERED(true, true, 3),
+    INITIALIZED(true, false, 4),
+    END_COVERED(true, false, 5);
 
-    final private boolean covered;
-    final private boolean endCovered;
+    final private boolean isCovered;
+    final private boolean isBreak;
     final private int upgradePriority;
 
-    AstCoverageStatus(boolean covered, boolean endCovered, int upgradePriority) {
-        this.covered = covered;
-        this.endCovered = endCovered;
+    AstCoverageStatus(boolean isCovered, boolean isBreak, int upgradePriority) {
+        this.isCovered = isCovered;
+        this.isBreak = isBreak;
         this.upgradePriority = upgradePriority;
     }
 
     public boolean isEmpty() {
-        return this == AstCoverageStatus.EMPTY;
-    }
-
-    public boolean isNotCovered() {
-        return this == AstCoverageStatus.NOT_COVERED;
+        return this == EMPTY;
     }
 
     public boolean isCovered() {
-        return covered;
+        return isCovered;
     }
 
     public boolean isEndCovered() {
-        return endCovered;
+        return isCovered && !isBreak;
+    }
+
+    public boolean isNotCovered() {
+        return !isCovered && this != EMPTY;
+    }
+
+    public boolean isEndNotCovered() {
+        return !isCovered && this != EMPTY && !isBreak;
+    }
+
+    public boolean isBreak() {
+        return isBreak;
     }
 
     public AstCoverageStatus toBlockCoverage() {
@@ -55,7 +64,8 @@ public enum AstCoverageStatus {
         switch (this) {
             case EMPTY:
                 return LineCoverageStatus.EMPTY;
-            case NOT_COVERED:
+            case BEGIN_NOT_COVERED:
+            case END_NOT_COVERED:
                 return LineCoverageStatus.NOT_COVERED;
             case BEGIN_COVERED:
             case END_COVERED:

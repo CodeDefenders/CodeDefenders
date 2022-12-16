@@ -22,7 +22,7 @@ import static org.codedefenders.util.ResourceUtils.loadResource;
 
 class CoverageTestParameters implements ArgumentsProvider {
     private final static String RESOURCE_DIR = "analysis/coverage";
-    private final static Pattern NAME_REGEX = Pattern.compile("([A-Za-z]+)\\.java");
+    private final static Pattern NAME_REGEX = Pattern.compile("([A-Za-z][A-Za-z1-9]*)\\.java");
 
     private String getClassNameFromPath(String path) {
         Matcher matcher = NAME_REGEX.matcher(path);
@@ -37,7 +37,9 @@ class CoverageTestParameters implements ArgumentsProvider {
         String[] lines = text.split("\r?\n");
         for (int lineNum = 1; lineNum <= lines.length; lineNum++) {
             String line = lines[lineNum - 1].trim();
-            expectedCoverage.set(lineNum, LineCoverageStatus.valueOf(line));
+            if (!line.isEmpty()) {
+                expectedCoverage.set(lineNum, LineCoverageStatus.valueOf(line));
+            }
         }
         return expectedCoverage;
     }
@@ -68,9 +70,73 @@ class CoverageTestParameters implements ArgumentsProvider {
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
         return Stream.of(
                 testCase(
-                        "demo/CoverageDemo.java",
-                        "demo/CoverageDemoTest.java",
-                        "demo/CoverageDemo.coverage",
+                        "classes/Classes.java",
+                        "classes/ClassesTest.java",
+                        "classes/ClassesTest.coverage"
+                ),
+                testCase(
+                        "classes/Classes.java",
+                        "EmptyTest.java",
+                        "classes/EmptyTest.coverage"
+                ),
+                testCase(
+                        "fields/Fields.java",
+                        "fields/FieldsTest.java",
+                        "fields/FieldsTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "fields/Fields.java",
+                        "EmptyTest.java",
+                        "fields/EmptyTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "constructors/Constructors.java",
+                        "constructors/ConstructorsTest.java",
+                        "constructors/ConstructorsTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "constructors/Constructors.java",
+                        "EmptyTest.java",
+                        "constructors/EmptyTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "methods/Methods.java",
+                        "methods/MethodsTest.java",
+                        "methods/MethodsTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "methods/Methods.java",
+                        "EmptyTest.java",
+                        "methods/EmptyTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "localvariables/LocalVariables.java",
+                        "localvariables/LocalVariablesTest.java",
+                        "localvariables/LocalVariablesTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "localvariables/LocalVariables.java",
+                        "EmptyTest.java",
+                        "localvariables/EmptyTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "blocks/Blocks.java",
+                        "blocks/BlocksTest.java",
+                        "blocks/BlocksTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "blocks/Blocks.java",
+                        "EmptyTest.java",
+                        "blocks/EmptyTest.coverage",
                         "Utils.java"
                 )
         );

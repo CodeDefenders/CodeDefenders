@@ -39,7 +39,7 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
             LineCoverageStatus status = coverage.getStatus(line);
             // TODO: push empty too and check in analyse method
             if (status != LineCoverageStatus.EMPTY) {
-                lineTokens.pushToken(line, new Token(null, Type.OVERRIDE, status));
+                // lineTokens.pushToken(line, new Token(null, Type.OVERRIDE, status));
             }
         }
         return lineTokens;
