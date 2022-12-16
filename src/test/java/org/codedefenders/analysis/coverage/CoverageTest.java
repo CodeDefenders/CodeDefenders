@@ -3,6 +3,7 @@ package org.codedefenders.analysis.coverage;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,12 +32,15 @@ import org.jacoco.core.runtime.IRuntime;
 import org.jacoco.core.runtime.LoggerRuntime;
 import org.jacoco.core.runtime.RuntimeData;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import com.github.javaparser.ast.CompilationUnit;
 
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 /**
  * <p>Adapted from the JaCoCo "CoreTutorial" API example.
@@ -108,10 +112,11 @@ public class CoverageTest {
         CoverageGenerator coverageGenerator = new CoverageGenerator();
         NewLineCoverage transformedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
 
-        // TODO assert
-
         // write HTML report if enabled
         new HTMLWriter().write(className, testName, classCode, originalCoverage, transformedCoverage, expectedCoverage);
+
+        // assertions
+        assertSameCoverage(transformedCoverage, expectedCoverage);
     }
 
     public Map<String, byte[]> compileCode(List<JavaFileObject> sourceFiles) {
@@ -168,5 +173,22 @@ public class CoverageTest {
         }
 
         return coverage;
+    }
+
+    public void assertSameCoverage(NewLineCoverage actual, NewLineCoverage expected) {
+        int firstLine = Math.min(actual.getFirstLine(), expected.getFirstLine());
+        int lastLine = Math.max(actual.getLastLine(), expected.getLastLine());
+
+        List<Executable> assertions = new ArrayList<>();
+        for (int line = firstLine; line <= lastLine; line++) {
+            final int finalLine = line;
+            assertions.add(() -> {
+                assert_()
+                        .withMessage("Coverage on line %s", finalLine)
+                        .that(actual.getStatus(finalLine))
+                        .isEqualTo(expected.getStatus(finalLine));
+            });
+        }
+        assertAll(assertions);
     }
 }
