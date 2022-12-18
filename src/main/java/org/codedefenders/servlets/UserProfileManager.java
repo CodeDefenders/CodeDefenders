@@ -68,15 +68,6 @@ public class UserProfileManager extends HttpServlet {
     private CodeDefendersFormAuthenticationFilter codedefendersFormAuthenticationFilter;
 
     /**
-     * Checks whether users can view their own profile information.
-     *
-     * @return {@code true} if users can access their profile, {@code false} otherwise.
-     */
-    public static boolean checkEnabled() {
-        return true; // The user profile is always enabled.
-    }
-
-    /**
      * Checks whether users can view the profile of others.
      *
      * @return {@code true} if the profile page of someone can be visited, {@code false} otherwise.
