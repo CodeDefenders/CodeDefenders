@@ -99,7 +99,7 @@
                         <label for="minutes-input" class="input-group-text">minutes</label>
                         <div class="invalid-feedback">
                             Please input a valid duration.
-                            Maximum remaining duration:
+                            Maximum duration:
                             <span class="time-left"
                                   data-type="total"
                                   data-duration="${maxDuration}">
@@ -125,19 +125,12 @@
         <script type="module">
             import {GameTimeValidator} from './js/codedefenders_game.mjs';
 
-            const calculateElapsedMinutes = () =>
-                <%-- No dynamic calculation needed if the game isn't started yet. --%>
-                <c:choose>
-                    <c:when test="${startTime == -1}">0</c:when>
-                    <c:otherwise>Math.round((Date.now() / 1e3 - ${startTime}) / 60)</c:otherwise>
-                </c:choose>;
-
             const gameTimeValidator = new GameTimeValidator(
-                Number(${maxDuration}), 0,
-                ['days', 'hours', 'minutes'],
-                unit => '#' + unit + '-input',
-                '#duration-total', false,
-                calculateElapsedMinutes
+                    Number(${maxDuration}), 0,
+                    document.getElementById('minutes-input'),
+                    document.getElementById('hours-input'),
+                    document.getElementById('days-input'),
+                    document.getElementById('duration-total')
             );
         </script>
     </c:if>

@@ -246,91 +246,20 @@
                         </div>
                     </div>
 
-                    <script>
-                        const MAXIMUM_DURATION_MINUTES = Number(${maximumDuration});
-                        const DEFAULT_DURATION_MINUTES = Number(${defaultDuration});
-                        const units = ['days', 'hours', 'minutes'];
-                        const inputs = {};
-                        units.forEach(unit => inputs[unit] = document.getElementById(unit + '-input'));
-                        const totalInput = document.getElementById('gameDurationMinutes');
+                    <script type="module">
+                        import {GameTimeValidator, formatTime} from './js/codedefenders_game.mjs';
 
-                        const setDefaults = function() {
-                            let minutes = DEFAULT_DURATION_MINUTES;
-                            let hours = 0;
-                            let days = 0;
+                        const gameTimeValidator = new GameTimeValidator(
+                                Number(${maximumDuration}),
+                                Number(${defaultDuration}),
+                                document.getElementById('minutes-input'),
+                                document.getElementById('hours-input'),
+                                document.getElementById('days-input'),
+                                document.getElementById('gameDurationMinutes')
+                        );
 
-                            if (minutes >= 60) {
-                                hours = Math.floor(minutes / 60);
-                                minutes %= 60;
-                            }
-
-                            if (hours >= 24) {
-                                days = Math.floor(hours / 24);
-                                hours %= 24;
-                            }
-
-                            if (days > 0) inputs.days.value = days;
-                            if (hours > 0) inputs.hours.value = hours;
-                            if (minutes > 0) inputs.minutes.value = minutes;
-                        };
-
-                        const toMixedUnitString = function(pMinutes) {
-                            let minutes = pMinutes;
-                            if (minutes <= 0) {
-                                return '0min';
-                            }
-
-                            let hours = 0;
-                            let days = 0;
-
-                            if (minutes >= 60) {
-                                hours = Math.floor(minutes / 60);
-                                minutes %= 60;
-                            }
-
-                            if (hours >= 24) {
-                                days = Math.floor(hours / 24);
-                                hours %= 24;
-                            }
-
-                            let result = '';
-                            if (days > 0) result += days + 'd ';
-                            if (hours > 0) result += hours + 'h ';
-                            if (minutes > 0) result += Math.round(minutes) + 'min';
-                            return result;
-                        };
-
-                        document.getElementById('displayMaxDuration').innerText = toMixedUnitString(MAXIMUM_DURATION_MINUTES);
-                        setDefaults();
-
-                        const setValidity = function (customValidity) {
-                            units.forEach(u => inputs[u].setCustomValidity(customValidity));
-                        };
-
-                        const validateAndSetDuration = function () {
-                            const hasValue = units.some(u => inputs[u].value.length > 0);
-                            if (!hasValue) {
-                                setValidity('missing-value');
-                                return;
-                            }
-
-                            const days = Number(inputs.days.value);
-                            const hours = Number(inputs.hours.value);
-                            const minutes = Number(inputs.minutes.value);
-                            const total = ((days * 24) + hours) * 60 + minutes;
-
-                            totalInput.value = total;
-
-                            if (total < 0 || total > MAXIMUM_DURATION_MINUTES) {
-                                setValidity('invalid-value');
-                                return;
-                            }
-
-                            setValidity('');
-                        };
-
-                        units.forEach(u => inputs[u].addEventListener('input', validateAndSetDuration));
-                        validateAndSetDuration();
+                        document.getElementById('displayMaxDuration').innerText =
+                                formatTime(${maximumDuration});
                     </script>
                 </div>
 

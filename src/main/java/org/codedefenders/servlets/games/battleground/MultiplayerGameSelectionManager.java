@@ -459,28 +459,35 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
 
         Optional<Integer> newDuration = getIntParameter(request, "newDuration");
-        if (newDuration.isPresent()) {
-            final int maxOpenDuration = AdminDAO.getSystemSetting(
-                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
-            final int minDuration = 0;
-
-            final long startTime = game.getStartTimeUnixSeconds();
-            final long now = Instant.now().getEpochSecond();
-            final int elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
-            final int remainingMinutes = newDuration.get() - elapsedTimeMinutes;
-
-            if (remainingMinutes < minDuration) {
-                messages.add("The remaining time cannot be below " + minDuration + " minutes.");
-            } else if (remainingMinutes > maxOpenDuration) {
-                messages.add("The new remaining duration must be at most " + maxOpenDuration + " minutes.");
-            } else {
-                game.setGameDurationMinutes(newDuration.get());
-                game.update();
-            }
-        } else {
+        if (!newDuration.isPresent()) {
             logger.debug("No duration value supplied.");
+            Redirect.redirectBack(request, response);
+            return;
         }
 
+        final int maxDuration = AdminDAO.getSystemSetting(
+                AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
+        final int minDuration = 0;
+        final int remainingMinutes = newDuration.get();
+
+        if (remainingMinutes < minDuration) {
+            messages.add("The remaining time cannot be below " + minDuration + " minutes.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        if (remainingMinutes > maxDuration) {
+            messages.add("The new remaining duration must be at most " + maxDuration + " minutes.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        final long startTime = game.getStartTimeUnixSeconds();
+        final long now = Instant.now().getEpochSecond();
+        final int elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
+
+        game.setGameDurationMinutes(remainingMinutes + elapsedTimeMinutes);
+        game.update();
         Redirect.redirectBack(request, response);
     }
 }

@@ -192,44 +192,41 @@ class GameTimeValidator {
 
     /**
      *
-     * @param {Number} MAXIMUM_DURATION_MINUTES
-     * @param {Number | false} DEFAULT_DURATION_MINUTES
-     * @param {Array<string>=} units
-     * @param {inputSelector=} inputSelector
-     * @param {string=} totalInputSelector
-     * @param {false | string=} maxDurationOutputSelector
-     * @param {calculateElapsedMinutes=} calculateElapsedMinutes
+     * @param {Number} maxDurationMinutes
+     * @param {?Number} defaultDurationMinutes
+     * @param {HTMLInputElement} minutesInput
+     * @param {HTMLInputElement} hoursInput
+     * @param {HTMLInputElement} daysInput
+     * @param {HTMLInputElement} totalField
      */
-    constructor(MAXIMUM_DURATION_MINUTES, DEFAULT_DURATION_MINUTES, units = ['days', 'hours', 'minutes'],
-                inputSelector = unit => `#${unit}-input`, totalInputSelector = '#gameDurationMinutes',
-                maxDurationOutputSelector = '#displayMaxDuration', calculateElapsedMinutes = () => 0) {
-        this.MAXIMUM_DURATION_MINUTES = MAXIMUM_DURATION_MINUTES;
-        this.DEFAULT_DURATION_MINUTES = DEFAULT_DURATION_MINUTES;
-        this.calculateElapsedMinutes = calculateElapsedMinutes;
-        this.units = units;
-        this.inputs = {};
-        this.units.forEach(unit => this.inputs[unit] = document.querySelector(inputSelector(unit)));
-        this.totalInput = document.querySelector(totalInputSelector);
+    constructor(maxDurationMinutes, defaultDurationMinutes,
+                minutesInput, hoursInput, daysInput, totalField) {
+        this.maxDurationMinutes = maxDurationMinutes;
+        this.defaultDurationMinutes = defaultDurationMinutes;
+
+        this.minutesInput = minutesInput;
+        this.hoursInput = hoursInput;
+        this.daysInput = daysInput;
+        this.inputs = [minutesInput, hoursInput, daysInput];
+
+        this.totalField = totalField;
 
         // init hooks
         const doNothing = () => {};
         this._onInvalidDuration = doNothing;
         this._onValidDuration = doNothing;
 
-        if (maxDurationOutputSelector) {
-            document.querySelector(maxDurationOutputSelector).innerText = toMixedUnitString(this.MAXIMUM_DURATION_MINUTES);
-        }
-
-        if (this.DEFAULT_DURATION_MINUTES !== false) {
+        if (this.defaultDurationMinutes !== null) {
             this.setDefaults();
         }
 
-        this.units.forEach(u => this.inputs[u].addEventListener('input', this.validateAndSetDuration.bind(this)));
-        this.validateAndSetDuration();
+        for (const input of this.inputs) {
+            input.addEventListener('input', this.validateAndSetDuration.bind(this));
+        }
     }
 
     setDefaults() {
-        let minutes = this.DEFAULT_DURATION_MINUTES;
+        let minutes = this.defaultDurationMinutes;
         let hours = 0;
         let days = 0;
 
@@ -243,30 +240,32 @@ class GameTimeValidator {
             hours %= 24;
         }
 
-        if (days > 0) this.inputs.days.value = days;
-        if (hours > 0) this.inputs.hours.value = hours;
-        if (minutes > 0) this.inputs.minutes.value = minutes;
+        if (days > 0) this.daysInput.value = days;
+        if (hours > 0) this.hoursInput.value = hours;
+        if (minutes > 0) this.minutesInput.value = minutes;
     }
 
     setValidity(customValidity) {
-        this.units.forEach(u => this.inputs[u].setCustomValidity(customValidity));
+        this.minutesInput.setCustomValidity(customValidity);
+        this.hoursInput.setCustomValidity(customValidity);
+        this.daysInput.setCustomValidity(customValidity);
     }
 
     validateAndSetDuration() {
-        const hasValue = this.units.some(u => this.inputs[u].value.length > 0);
+        const hasValue = this.inputs.some(input => input.value.length > 0);
         if (!hasValue) {
             this.setValidity('missing-value');
             return;
         }
 
-        const days = Number(this.inputs.days.value);
-        const hours = Number(this.inputs.hours.value);
-        const minutes = Number(this.inputs.minutes.value);
+        const days = Number(this.daysInput.value);
+        const hours = Number(this.hoursInput.value);
+        const minutes = Number(this.minutesInput.value);
+
         const newRemainingDuration = ((days * 24) + hours) * 60 + minutes;
+        this.totalField.value = String(newRemainingDuration);
 
-        this.totalInput.value = newRemainingDuration + this.calculateElapsedMinutes();
-
-        if (newRemainingDuration < 0 || newRemainingDuration > this.MAXIMUM_DURATION_MINUTES) {
+        if (newRemainingDuration < 0 || newRemainingDuration > this.maxDurationMinutes) {
             this.setValidity('invalid-value');
             this._onInvalidDuration();
             return;
@@ -310,11 +309,11 @@ function toMixedUnitString(pMinutes) {
         hours %= 24;
     }
 
-    let result = '';
-    if (days > 0) result += days + 'd ';
-    if (hours > 0) result += hours + 'h ';
-    if (minutes > 0) result += Math.round(minutes) + 'min';
-    return result;
+    let result = [];
+    if (days > 0) result.push(days + 'd');
+    if (hours > 0) result.push(hours + 'h');
+    if (minutes > 0) result.push(Math.round(minutes) + 'min');
+    return result.join(' ');
 }
 
-export {GameTimeManager, GameTimeValidator};
+export {GameTimeManager, GameTimeValidator, toMixedUnitString as formatTime};

@@ -281,12 +281,20 @@
                                 </small>
 
                                 <script type="module">
-                                    import {GameTimeValidator} from './js/codedefenders_game.mjs';
+                                    import {GameTimeValidator, formatTime} from './js/codedefenders_game.mjs';
 
                                     const gameTimeValidator = new GameTimeValidator(
-                                        Number(${maximumDuration}),
-                                        Number(${defaultDuration})
+                                            Number(${maximumDuration}),
+                                            Number(${defaultDuration}),
+                                            document.getElementById('minutes-input'),
+                                            document.getElementById('hours-input'),
+                                            document.getElementById('days-input'),
+                                            document.getElementById('gameDurationMinutes')
                                     );
+
+
+                                    document.getElementById('displayMaxDuration').innerText =
+                                            formatTime(${maximumDuration});
 
                                     // show the max duration limit in red if an invalid duration was given
                                     const maxDurationInfo = document.getElementById('maxDurationInfo');
@@ -522,6 +530,7 @@
         import {Popover} from './js/bootstrap.mjs';
         import DataTable from './js/datatables.mjs';
         import $ from './js/jquery.mjs';
+        import {formatTime} from "./js/codedefenders_game.mjs";
 
         const loggedInUserId = ${login.userId};
 
@@ -1092,7 +1101,7 @@
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Game Duration';
-            tr.insertCell().textContent = gameSettings.gameDurationMinutes;
+            tr.insertCell().textContent = formatTime(gameSettings.gameDurationMinutes);
 
             return table;
         };
