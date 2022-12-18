@@ -19,6 +19,33 @@
 
 --%>
 
+<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
+
 </div> <%-- closes #game-container --%>
+
+<script type="module">
+    import {objects} from './js/codedefenders_main.mjs';
+
+    (async function () {
+        /** @type {PushSocket} */
+        const socket = await objects.await('pushSocket');
+
+        socket.subscribe('registration.GameLifecycleRegistrationEvent', {
+            gameId: ${gameProducer.game.id},
+            userId: ${login.userId}
+        });
+
+        socket.register('game.GameStoppedEvent', event => {
+            console.log('Game with Id ' + event.gameId + ' was stopped.');
+            window.location.reload();
+        });
+
+        socket.register('game.GameStartedEvent', event => {
+            console.log('Game with Id ' + event.gameId + ' was started.');
+            window.location.reload();
+        });
+    })();
+</script>
 
 <%@ include file="/jsp/footer.jsp" %>
