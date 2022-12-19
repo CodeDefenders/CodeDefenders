@@ -19,10 +19,10 @@ public class LineTokenAnalyser {
     private LineCoverageStatus analyse(Token token, LineCoverageStatus currentStatus) {
         switch (token.type) {
             case ROOT:
+            case EMPTY:
                 break;
             case OVERRIDE:
-                return token.status;
-            case EMPTY:
+                currentStatus = token.status;
                 break;
             case COVERABLE:
                 if (token.status != LineCoverageStatus.EMPTY) {
@@ -32,11 +32,12 @@ public class LineTokenAnalyser {
             case RESET:
                 currentStatus = LineCoverageStatus.EMPTY;
                 break;
-            case BLOCK:
-                if (currentStatus == LineCoverageStatus.EMPTY) {
-                    currentStatus = token.status;
-                }
-                break;
+        }
+
+        token.analyserStatus = currentStatus;
+
+        if (token.type == LineTokens.Type.OVERRIDE) {
+            return currentStatus;
         }
 
         if (token.children.isEmpty()) {
@@ -58,6 +59,7 @@ public class LineTokenAnalyser {
                 if (acc == LineCoverageStatus.EMPTY) {
                     return LineCoverageStatus.NOT_COVERED;
                 } else {
+                    // TODO: PARTLY_COVERED?
                     return acc;
                 }
             case PARTLY_COVERED:

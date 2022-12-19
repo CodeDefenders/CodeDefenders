@@ -24,7 +24,7 @@ public class LineMapping<T> {
 
     protected T get(int line) {
         if (line >= firstLine && line <= lastLine) {
-            return lines.get(line - 1);
+            return lines.get(line);
         } else {
             return getEmpty();
         }
@@ -32,7 +32,7 @@ public class LineMapping<T> {
 
     protected void set(int line, T elem) {
         updateBounds(line);
-        lines.set(line - 1, elem);
+        lines.set(line, elem);
     }
 
     protected void updateBounds(int line) {
@@ -41,7 +41,7 @@ public class LineMapping<T> {
         }
         if (line > lastLine) {
             lastLine = line;
-            while (lines.size() < line) {
+            while (lines.size() < line + 1) {
                 lines.add(getEmpty());
             }
         }

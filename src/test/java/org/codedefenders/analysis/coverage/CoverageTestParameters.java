@@ -72,7 +72,8 @@ class CoverageTestParameters implements ArgumentsProvider {
                 testCase(
                         "classes/Classes.java",
                         "classes/ClassesTest.java",
-                        "classes/ClassesTest.coverage"
+                        "classes/ClassesTest.coverage",
+                        "Utils.java"
                 ),
                 testCase(
                         "classes/Classes.java",
@@ -137,6 +138,24 @@ class CoverageTestParameters implements ArgumentsProvider {
                         "blocks/Blocks.java",
                         "EmptyTest.java",
                         "blocks/EmptyTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "initializerblocks/InitializerBlocks.java",
+                        "initializerblocks/InitializerBlocksTest.java",
+                        "initializerblocks/InitializerBlocksTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "initializerblocks/InitializerBlocks.java",
+                        "EmptyTest.java",
+                        "initializerblocks/EmptyTest.coverage",
+                        "Utils.java"
+                ),
+                testCase(
+                        "playground/Playground.java",
+                        "playground/PlaygroundTest.java",
+                        "playground/PlaygroundTest.coverage",
                         "Utils.java"
                 )
         );

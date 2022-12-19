@@ -3,6 +3,7 @@ package org.codedefenders.analysis.coverage.line;
 import org.jacoco.core.analysis.ICounter;
 
 public enum LineCoverageStatus {
+    // order matters for AstCoverageStatus
     EMPTY,
     NOT_COVERED,
     PARTLY_COVERED,

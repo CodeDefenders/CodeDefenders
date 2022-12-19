@@ -16,4 +16,8 @@ public class Utils {
 
         }
     }
+
+    public static void consume(Object o) {
+
+    }
 }

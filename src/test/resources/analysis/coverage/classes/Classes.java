@@ -19,6 +19,16 @@ public class Classes {
         }
     }
 
+    static abstract class AbstractClassWithoutConstructor {
+
+    }
+
+    static abstract class AbstractClassWithConstructor {
+        public AbstractClassWithConstructor() {
+
+        }
+    }
+
     /**
      * <p>interface
      * <p><b>JaCoCo coverage</b>: never covered
@@ -76,6 +86,22 @@ public class Classes {
      */
     record RecordWithConstructor(int i) {
         public RecordWithConstructor {
+
+        }
+    }
+
+    enum EnumWithoutConstants {
+
+    }
+
+    enum EnumWithoutConstructor {
+        CONSTANT;
+    }
+
+    enum EnumWithConstructor {
+        CONSTANT(true);
+
+        EnumWithConstructor(boolean dummy) {
 
         }
     }

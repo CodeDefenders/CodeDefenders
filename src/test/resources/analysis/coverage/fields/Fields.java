@@ -10,23 +10,25 @@ import static utils.Utils.doThrow;
  *                              to be initialized)
  */
 public class Fields {
-    // field with initializer
-    int i = 0;
+    static class RegularFields {
+        // field with initializer
+        int i = 0;
 
-    // field without initializer
-    int j;
+        // field without initializer
+        int j;
 
-    // not-covered field with exception in initializer
-    int k = doThrow();
+        // not-covered field with exception in initializer
+        int k = doThrow();
 
-    // not-covered field with initializer
-    int l = 1;
+        // not-covered field with initializer
+        int l = 1;
 
-    // not-covered field without initializer
-    int m;
+        // not-covered field without initializer
+        int m;
 
-    // static field with initializer
-    static int n = 1;
+        // static field with initializer
+        static int n = 1;
+    }
 
     // to check if static fields without initializer are covered when the class isn't initialized
     static class StaticFieldWithoutInitializer {
@@ -37,5 +39,14 @@ public class Fields {
         static void method() {
 
         }
+    }
+
+    static class TrickyVariableDeclarators {
+        // field with partly covered initializer
+        Runnable r = () -> {};
+
+        // field with not-covered variable declarator
+        private
+            Runnable s = () -> {};
     }
 }

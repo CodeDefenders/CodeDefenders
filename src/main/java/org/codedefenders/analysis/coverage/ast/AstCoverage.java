@@ -14,7 +14,7 @@ public class AstCoverage {
     }
 
     public AstCoverageStatus get(Node node) {
-        return statusPerNode.getOrDefault(node, AstCoverageStatus.EMPTY);
+        return statusPerNode.getOrDefault(node, AstCoverageStatus.empty());
     }
 
     public void put(Node node, AstCoverageStatus status) {

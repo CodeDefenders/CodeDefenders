@@ -11,21 +11,30 @@
                 margin: 0;
                 padding: 0;
             }
+
             .container {
                 display: flex;
                 flex-direction: row;
                 flex-wrap: nowrap;
             }
             .column {
-                width: 33.3%;
+                flex-basis: 0;
+                flex-grow: 1;
+                min-width: 0;
                 padding: .25em;
                 position: relative;
             }
+            #tokens {
+                flex-grow: 3;
+                overflow: scroll;
+            }
+
             .header {
                 width: fit-content;
                 position: sticky;
                 top: .5em;
                 margin-bottom: 1em;
+                white-space: nowrap;
 
                 background: white;
                 padding: .25em 2em;
@@ -33,24 +42,45 @@
                 border-radius: 1em;
                 box-shadow: 2px 2px black;
                 cursor: default;
+                font-family: sans-serif;
 
                 margin-left: auto;
                 margin-right: auto;
             }
+            .controls {
+                position: absolute;
+                top: 0;
+                right: 0;
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: .25em;
+                padding: .25em;
+            }
+
             .line {
                 font-family: monospace;
                 width: 100%;
-                white-space: nowrap;
+                white-space: pre;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 cursor: default;
+                line-height: 1.3;
             }
             .line::before {
                 font-family: monospace;
                 content: attr(data-line-num);
                 display: inline-block;
-                width: 2em;
+                width: 3em;
             }
+            #expected .line {
+                user-select: none;
+            }
+            #tokens .line {
+                overflow: visible;
+            }
+
             .EMPTY {
                 background: transparent;
             }
@@ -63,62 +93,83 @@
             .NOT_COVERED {
                 background: #ff7373;
             }
-            #controls {
-                position: absolute;
-                top: 0;
-                right: 0;
-
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: .25em;
-                padding: .25em;
-            }
         </style>
         <script>
+            const STATUSES = ['EMPTY', 'NOT_COVERED', 'FULLY_COVERED', 'PARTLY_COVERED'];
+            let editLines = false;
+            let viewTokens = false;
+
+            const handleEditModeButton = function(event) {
+                editLines = !editLines;
+                event.target.innerText = editLines
+                        ? 'disable editing'
+                        : 'enable editing';
+            };
+
+            const handleCopyButton = function(event) {
+                const lines = [];
+                for (const lineElem of document.querySelectorAll('#expected .line')) {
+                    const lineNum = Number(lineElem.dataset.lineNum);
+                    lines[lineNum - 1] = lineElem.classList[1];
+                }
+                navigator.clipboard.writeText(lines.join('\n'));
+            };
+
+            const handleLineClick = function(event) {
+                if (!editLines) {
+                    return;
+                }
+                const status = event.target.classList[1];
+                const index = STATUSES.indexOf(status);
+                event.target.classList.remove(status);
+                event.target.classList.add(STATUSES[(index + 1) % STATUSES.length]);
+            };
+
+            const handleViewTokensButton = function(event) {
+                viewTokens = !viewTokens;
+                event.target.innerText = viewTokens
+                        ? 'hide tokens'
+                        : 'view tokens';
+
+                document.getElementById('original').toggleAttribute('hidden', viewTokens);
+                document.getElementById('expected').toggleAttribute('hidden', viewTokens);
+                document.getElementById('tokens').toggleAttribute('hidden', !viewTokens);
+            };
+
             window.addEventListener('load', function(event) {
-                const statuses = ['EMPTY', 'NOT_COVERED', 'FULLY_COVERED', 'PARTLY_COVERED'];
                 document.getElementById('expected').addEventListener('click', function(event) {
                     if (!event.target.classList.contains('line')) {
                         return;
                     }
-                    if (!document.getElementById('edit').checked) {
-                        return;
-                    }
-                    const status = event.target.classList[1];
-                    const index = statuses.indexOf(status);
-                    event.target.classList.remove(status);
-                    event.target.classList.add(statuses[(index + 1) % statuses.length]);
+                    handleLineClick(event);
                 });
-                document.getElementById('copy').addEventListener('click', function(event) {
-                    const lineStatuses = [];
-                    for (const lineElem of document.querySelectorAll('#expected .line')) {
-                        const lineNum = Number(lineElem.dataset.lineNum);
-                        lineStatuses[lineNum - 1] = lineElem.classList[1];
-                    }
-                    navigator.clipboard.writeText(lineStatuses.join('\n'));
-                });
+                document.getElementById('edit-lines').addEventListener('click', handleEditModeButton);
+                document.getElementById('copy').addEventListener('click', handleCopyButton);
+                document.getElementById('view-tokens').addEventListener('click', handleViewTokensButton);
             });
         </script>
     </head>
     <body>
         <div class="container">
+            <div class="column" id="tokens" hidden>
+                <div class="header">Line Tokens</div>
+                {tokens}
+            </div>
             <div class="column" id="original">
                 <div class="header">JaCoCo Coverage</div>
                 {code_original}
             </div>
             <div class="column" id="transformed">
                 <div class="header">Transformed Coverage</div>
+                <div class="controls">
+                    <button type="button" id="view-tokens">view tokens</button>
+                </div>
                 {code_transformed}
             </div>
             <div class="column" id="expected">
-                <div class="header">
-                    Expected Coverage
-                </div>
-                <div id="controls" title="Click on a line to cycle coverage">
-                    <div>
-                        <input type="checkbox" id="edit"><label for="edit">edit</label>
-                    </div>
+                <div class="header">Expected Coverage</div>
+                <div class="controls" title="Click on a line to cycle coverage">
+                    <button type="button" id="edit-lines">enable editing</button>
                     <button type="button" id="copy">copy</button>
                 </div>
                 {code_expected}

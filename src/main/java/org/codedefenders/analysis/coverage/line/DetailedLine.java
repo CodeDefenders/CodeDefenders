@@ -23,6 +23,10 @@ public class DetailedLine {
         return coveredInstructions;
     }
 
+    public int missedInstructions() {
+        return totalInstructions - coveredInstructions;
+    }
+
     public int totalBranches() {
         return totalBranches;
     }
@@ -31,12 +35,32 @@ public class DetailedLine {
         return coveredBranches;
     }
 
+    public int missedBranches() {
+        return totalBranches - coveredBranches;
+    }
+
+    public boolean hasIns() {
+        return totalInstructions > 0;
+    }
+
     public boolean hasCoveredIns() {
         return coveredInstructions > 0;
     }
 
+    public boolean hasMissedIns() {
+        return missedInstructions() > 0;
+    }
+
+    public boolean hasBranches() {
+        return totalBranches > 0;
+    }
+
     public boolean hasCoveredBranches() {
         return coveredBranches > 0;
+    }
+
+    public boolean hasMissedBranches() {
+        return missedBranches() > 0;
     }
 
     public LineCoverageStatus instructionStatus() {
@@ -47,7 +71,7 @@ public class DetailedLine {
         return computeStatus(totalBranches, coveredBranches);
     }
 
-    public LineCoverageStatus computeStatus() {
+    public LineCoverageStatus combinedStatus() {
         return computeStatus(totalInstructions + totalBranches, coveredInstructions + coveredBranches);
     }
 

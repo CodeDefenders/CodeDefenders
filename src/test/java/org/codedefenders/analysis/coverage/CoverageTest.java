@@ -14,8 +14,13 @@ import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
+import org.codedefenders.analysis.coverage.ast.AstCoverage;
+import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
+import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
+import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
+import org.codedefenders.analysis.coverage.line.LineTokens;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
 import org.codedefenders.analysis.coverage.util.HTMLWriter;
 import org.codedefenders.analysis.coverage.util.InMemoryClassLoader;
@@ -109,11 +114,29 @@ public class CoverageTest {
                 .orElseThrow(() -> new Exception("Could not parse fixture source code."));
 
         // transform the coverage
-        CoverageGenerator coverageGenerator = new CoverageGenerator();
-        NewLineCoverage transformedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
+        // CoverageGenerator coverageGenerator = new CoverageGenerator();
+        // NewLineCoverage transformedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
+        // TODO: this replicates CoverageGenerator::generate to access line tokens, find a better solution
+        AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
+        astVisitor.visit(compilationUnit, null);
+        AstCoverage astCoverage = astVisitor.finish();
+
+        LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
+        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens);
+        lineTokenVisitor.visit(compilationUnit, null);
+
+        LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
+        NewLineCoverage transformedCoverage = lineTokenAnalyser.analyse(lineTokens);
 
         // write HTML report if enabled
-        new HTMLWriter().write(className, testName, classCode, originalCoverage, transformedCoverage, expectedCoverage);
+        new HTMLWriter().write(
+                className,
+                testName,
+                classCode,
+                originalCoverage,
+                transformedCoverage,
+                expectedCoverage,
+                lineTokens);
 
         // assertions
         assertSameCoverage(transformedCoverage, expectedCoverage);

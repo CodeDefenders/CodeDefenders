@@ -38,8 +38,8 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
         for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
             LineCoverageStatus status = coverage.getStatus(line);
             // TODO: push empty too and check in analyse method
-            if (status != LineCoverageStatus.EMPTY) {
-                // lineTokens.pushToken(line, new Token(null, Type.OVERRIDE, status));
+            if (status == LineCoverageStatus.PARTLY_COVERED) {
+                lineTokens.pushToken(line, new Token(null, Type.OVERRIDE, status));
             }
         }
         return lineTokens;
@@ -112,15 +112,7 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
             }
 
             public void cover(AstCoverageStatus status) {
-                cover(status.toLineCoverage());
-            }
-
-            public void block(LineCoverageStatus status) {
-                insert(() -> new Token(originNode, Type.BLOCK, status));
-            }
-
-            public void block(AstCoverageStatus status) {
-                block(status.toLineCoverage());
+                cover(status.status());
             }
 
             public void reset() {
@@ -134,17 +126,23 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
     }
 
     public static class Token {
-        Node originNode;
-        Type type;
-        LineCoverageStatus status;
+        public final Node originNode;
+        public final Type type;
+        public final LineCoverageStatus status;
 
-        List<Token> children;
+        public final List<Token> children;
+
+        // status the LineTokenAnalyser determined after reaching this token
+        // for debugging purposes
+        // TODO: find a better solution than saving it here
+        public LineCoverageStatus analyserStatus;
 
         private Token(Node originNode, Type type, LineCoverageStatus status) {
             this.originNode = originNode;
             this.type = type;
             this.status = status;
             this.children = new ArrayList<>();
+            this.analyserStatus = null;
         }
     }
 
@@ -178,7 +176,6 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
          * this token will determine the coverage of a line.
          */
         COVERABLE,
-        BLOCK,
 
         /**
          * Denotes an AST node that "nullifies" the coverage of its parent nodes.

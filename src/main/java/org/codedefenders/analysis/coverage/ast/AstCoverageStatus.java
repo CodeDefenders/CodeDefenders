@@ -2,77 +2,66 @@ package org.codedefenders.analysis.coverage.ast;
 
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 
-public enum AstCoverageStatus {
-    EMPTY(false, false, 0),
-    BEGIN_NOT_COVERED(false, true, 1),
-    // TODO: use this in AstCoverageVisitor correctly
-    END_NOT_COVERED(false, false, 2),
-    BEGIN_COVERED(true, true, 3),
-    INITIALIZED(true, false, 4),
-    END_COVERED(true, false, 5);
+public class AstCoverageStatus {
+    // TODO: create a new enum for this?
+    private final LineCoverageStatus status;
+    private final boolean doesJump;
 
-    final private boolean isCovered;
-    final private boolean isBreak;
-    final private int upgradePriority;
+    private AstCoverageStatus(LineCoverageStatus status, boolean doesJump) {
+        this.status = status;
+        this.doesJump = doesJump;
+    }
 
-    AstCoverageStatus(boolean isCovered, boolean isBreak, int upgradePriority) {
-        this.isCovered = isCovered;
-        this.isBreak = isBreak;
-        this.upgradePriority = upgradePriority;
+    static AstCoverageStatus empty() {
+        return new AstCoverageStatus(LineCoverageStatus.EMPTY, false);
+    }
+
+    static AstCoverageStatus notCovered() {
+        return new AstCoverageStatus(LineCoverageStatus.NOT_COVERED, false);
+    }
+
+    static AstCoverageStatus covered() {
+        return new AstCoverageStatus(LineCoverageStatus.FULLY_COVERED, false);
+    }
+
+    AstCoverageStatus withJump(boolean doesJump) {
+        return new AstCoverageStatus(status, doesJump);
+    }
+
+    AstCoverageStatus withJump() {
+        return new AstCoverageStatus(status, true);
+    }
+
+    public LineCoverageStatus status() {
+        return status;
+    }
+
+    // TODO: explain this in JavaDoc
+    public boolean reachesEnd() {
+        return !doesJump;
+    }
+
+    public boolean doesJump() {
+        return doesJump;
     }
 
     public boolean isEmpty() {
-        return this == EMPTY;
+        return status == LineCoverageStatus.EMPTY;
     }
 
     public boolean isCovered() {
-        return isCovered;
-    }
-
-    public boolean isEndCovered() {
-        return isCovered && !isBreak;
+        return status == LineCoverageStatus.FULLY_COVERED;
     }
 
     public boolean isNotCovered() {
-        return !isCovered && this != EMPTY;
-    }
-
-    public boolean isEndNotCovered() {
-        return !isCovered && this != EMPTY && !isBreak;
-    }
-
-    public boolean isBreak() {
-        return isBreak;
-    }
-
-    public AstCoverageStatus toBlockCoverage() {
-        if (this == INITIALIZED) {
-            return END_COVERED;
-        }
-        return this;
+        return status == LineCoverageStatus.NOT_COVERED;
     }
 
     public AstCoverageStatus upgrade(AstCoverageStatus other) {
-        if (this.upgradePriority > other.upgradePriority) {
-            return this.toBlockCoverage();
+        if (this.status.ordinal() > other.status.ordinal()) {
+            return new AstCoverageStatus(this.status, this.doesJump && other.doesJump);
         } else {
-            return other.toBlockCoverage();
-        }
-    }
-
-    public LineCoverageStatus toLineCoverage() {
-        switch (this) {
-            case EMPTY:
-                return LineCoverageStatus.EMPTY;
-            case BEGIN_NOT_COVERED:
-            case END_NOT_COVERED:
-                return LineCoverageStatus.NOT_COVERED;
-            case BEGIN_COVERED:
-            case END_COVERED:
-            case INITIALIZED:
-                return LineCoverageStatus.FULLY_COVERED;
-            default:
-                throw new IllegalStateException("Unknown AST coverage status.");
+            return new AstCoverageStatus(other.status, this.doesJump && other.doesJump);
         }
     }
 }

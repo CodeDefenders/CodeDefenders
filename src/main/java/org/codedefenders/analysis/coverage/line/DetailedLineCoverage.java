@@ -18,6 +18,6 @@ public class DetailedLineCoverage extends LineMapping<DetailedLine> implements N
 
     @Override
     public LineCoverageStatus getStatus(int line) {
-        return get(line).computeStatus();
+        return get(line).combinedStatus();
     }
 }
