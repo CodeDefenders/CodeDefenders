@@ -30,11 +30,7 @@
 <jsp:include page="/jsp/header_base.jsp"/>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-<%
-    boolean profileEnabled = UserProfileManager.checkEnabled();
-    boolean accountEnabled = UserSettingsManager.checkEnabled();
-    boolean puzzleEnabled = PuzzleGameManager.checkEnabled();
-%>
+<% boolean puzzleEnabled = PuzzleGameManager.checkEnabled(); %>
 
 <nav class="navbar navbar-expand-md navbar-cd" id="header">
     <div class="container-fluid">
@@ -84,12 +80,8 @@
                     <ul class="dropdown-menu" id="user-dropdown" aria-labelledby="header-user"
                         <%-- Align dropdown menu to the right, so it doesn't get cut off. --%>
                         style="left: auto; right: 0;">
-                        <% if (profileEnabled) { %>
-                            <li><a class="dropdown-item" id="header-profile" href="${pageContext.request.contextPath}${Paths.USER_PROFILE}">Profile</a></li>
-                        <% } %>
-                        <% if (accountEnabled) { %>
-                            <li><a class="dropdown-item" id="header-account" href="${pageContext.request.contextPath}${Paths.USER_SETTINGS}">Account</a></li>
-                        <% } %>
+                        <li><a class="dropdown-item" id="header-profile" href="${pageContext.request.contextPath}${Paths.USER_PROFILE}">Profile</a></li>
+                        <li><a class="dropdown-item" id="header-account" href="${pageContext.request.contextPath}${Paths.USER_SETTINGS}">Account</a></li>
                         <li><a class="dropdown-item" id="header-help" href="${pageContext.request.contextPath}${Paths.HELP_PAGE}">Help</a></li>
                         <li><a class="dropdown-item" id="header-logout" href="${pageContext.request.contextPath}${Paths.LOGOUT}">Logout</a></li>
                     </ul>

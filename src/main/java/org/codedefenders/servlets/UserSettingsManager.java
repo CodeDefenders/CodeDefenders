@@ -31,12 +31,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -48,7 +46,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged
  * in {@link UserEntity}. This functionality may be disabled, e.g. in a class room
- * setting. See {@link #checkEnabled()}.
+ * setting.
  *
  * <p>Serves on path: {@code /account-settings}.
  *
@@ -74,26 +72,9 @@ public class UserSettingsManager extends HttpServlet {
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";
     private static final String DELETED_USER_PASSWORD = "DELETED";
 
-    /**
-     * Checks whether users can view and update their profile information.
-     *
-     * @return {@code true} when users can access their profile, {@code false} otherwise.
-     */
-    public static boolean checkEnabled() {
-        // TODO: add ALLOW_USER_SETTINGS to DB and use it instead of ALLOW_USER_PROFILE.
-        // return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_SETTINGS).getBoolValue();
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkEnabled()) {
-            // Send users to the home page
-            response.sendRedirect(ServletUtils.getBaseURL(request));
-            return;
-        }
-
         if (!userRepo.getUserById(login.getUserId()).isPresent()) {
             response.sendRedirect(request.getContextPath());
             return;
@@ -105,12 +86,6 @@ public class UserSettingsManager extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkEnabled()) {
-            // Send users to the home page
-            response.sendRedirect(request.getContextPath());
-            return;
-        }
-
         String responsePath = request.getContextPath() + Paths.USER_SETTINGS;
 
         final String formType = ServletUtils.formType(request);
