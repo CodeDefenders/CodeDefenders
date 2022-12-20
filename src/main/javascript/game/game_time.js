@@ -223,6 +223,7 @@ class GameTimeValidator {
         for (const input of this.inputs) {
             input.addEventListener('input', this.validateAndSetDuration.bind(this));
         }
+        this.validateAndSetDuration();
     }
 
     setDefaults() {
