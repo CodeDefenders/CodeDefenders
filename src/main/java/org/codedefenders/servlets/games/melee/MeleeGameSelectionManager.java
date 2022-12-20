@@ -20,7 +20,10 @@ package org.codedefenders.servlets.games.melee;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -33,16 +36,12 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MeleeGameDAO;
-import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -52,7 +51,7 @@ import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
-import org.codedefenders.notification.events.server.game.GameStoppedEvent;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
@@ -100,13 +99,13 @@ public class MeleeGameSelectionManager extends HttpServlet {
     private EventDAO eventDAO;
 
     @Inject
-    private ScoreCalculator scoreCalculator;
-
-    @Inject
     private GameManagingUtils gameManagingUtils;
 
     @Inject
     private GameProducer gameProducer;
+
+    @Inject
+    private GameService gameService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -145,6 +144,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
             case "rematch":
                 rematch(request, response);
                 return;
+            case "durationChange":
+                changeDuration(request, response);
+                return;
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
@@ -160,6 +162,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
         Role selectedRole;
+        int duration;
 
         try {
             classId = getIntParameter(request, "class").get();
@@ -169,6 +172,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                     .map(CodeValidatorLevel::valueOrNull).get();
             // If we select "player in the UI this should not result in a null value
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).orElse(Role.NONE);
+            duration = getIntParameter(request, "gameDurationMinutes").get();
         } catch (NoSuchElementException e) {
             logger.error("At least one request parameter was missing or was no valid integer value.", e);
             Redirect.redirectBack(request, response);
@@ -189,6 +193,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 .mutantCoverage(mutantCoverage)
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
+                .gameDurationMinutes(duration)
                 .build();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
@@ -311,8 +316,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         if (game.getState() == GameState.CREATED) {
             logger.info("Starting melee game {} (Setting state to ACTIVE)", gameId);
-            game.setState(GameState.ACTIVE);
-            game.update();
+            gameService.startGame(game);
         }
 
         /*
@@ -337,21 +341,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         int gameId = game.getId();
 
         if (game.getState() == GameState.ACTIVE) {
-            logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);
-            game.setState(GameState.FINISHED);
-            boolean updated = game.update();
-            if (updated) {
-                KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, gameId));
-            }
-
-            scoreCalculator.storeScoresToDB(game.getId());
-
-            /*
-             * Publish the event about the user
-             */
-            GameStoppedEvent gse = new GameStoppedEvent();
-            gse.setGameId(game.getId());
-            notificationService.post(gse);
+            gameService.closeGame(game);
 
             response.sendRedirect(ctx(request) + Paths.MELEE_SELECTION);
         } else {
@@ -419,6 +409,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 .mutantCoverage(oldGame.getMutantCoverage())
                 .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
                 .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
+                .gameDurationMinutes(oldGame.getGameDurationMinutes())
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);
@@ -440,5 +431,47 @@ public class MeleeGameSelectionManager extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath() + Paths.MELEE_GAME + "?gameId=" + newGame.getId());
+    }
+
+    private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final MeleeGame game = gameProducer.getGame();
+
+        if (login.getUser().getId() != game.getCreatorId()) {
+            messages.add("Only the creator of this game can change its duration.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        Optional<Integer> newDuration = getIntParameter(request, "newDuration");
+        if (!newDuration.isPresent()) {
+            logger.debug("No duration value supplied.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        final int maxDuration = AdminDAO.getSystemSetting(
+                AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
+        final int minDuration = 0;
+        final int remainingMinutes = newDuration.get();
+
+        if (remainingMinutes < minDuration) {
+            messages.add("The remaining time cannot be below " + minDuration + " minutes.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        if (remainingMinutes > maxDuration) {
+            messages.add("The new remaining duration must be at most " + maxDuration + " minutes.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        final long startTime = game.getStartTimeUnixSeconds();
+        final long now = Instant.now().getEpochSecond();
+        final int elapsedTimeMinutes = (int) TimeUnit.SECONDS.toMinutes(now - startTime);
+
+        game.setGameDurationMinutes(remainingMinutes + elapsedTimeMinutes);
+        game.update();
+        Redirect.redirectBack(request, response);
     }
 }

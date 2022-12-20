@@ -258,6 +258,51 @@
                                     <label class="form-check-label" for="start-games-switch">Start Games</label>
                                 </div>
                             </div>
+
+                            <div class="col-12" title="The duration for how long the games will be open.">
+                                <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
+                                <%
+                                    request.setAttribute("defaultDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue());
+                                    request.setAttribute("maximumDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
+                                %>
+
+                                <label class="form-label">Set the game's duration:</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" name="days" class="form-control" id="days-input" min="0">
+                                    <label for="days-input" class="input-group-text">days</label>
+                                    <input type="number" name="hours" class="form-control" id="hours-input" min="0">
+                                    <label for="hours-input" class="input-group-text">hours</label>
+                                    <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
+                                    <label for="minutes-input" class="input-group-text">minutes</label>
+                                </div>
+                                <small id="maxDurationInfo" class="mt-1">
+                                    Maximum duration: <span id="displayMaxDuration">&hellip;</span>.
+                                    If the value is greater, it will be limited to this maximum.
+                                </small>
+
+                                <script type="module">
+                                    import {GameTimeValidator, formatTime} from './js/codedefenders_game.mjs';
+
+                                    const gameTimeValidator = new GameTimeValidator(
+                                            Number(${maximumDuration}),
+                                            Number(${defaultDuration}),
+                                            document.getElementById('minutes-input'),
+                                            document.getElementById('hours-input'),
+                                            document.getElementById('days-input'),
+                                            document.getElementById('gameDurationMinutes')
+                                    );
+
+
+                                    document.getElementById('displayMaxDuration').innerText =
+                                            formatTime(${maximumDuration});
+
+                                    // show the max duration limit in red if an invalid duration was given
+                                    const maxDurationInfo = document.getElementById('maxDurationInfo');
+                                    const cn = 'text-danger';
+                                    gameTimeValidator.onInvalidDuration = () => maxDurationInfo.classList.add(cn);
+                                    gameTimeValidator.onValidDuration = () => maxDurationInfo.classList.remove(cn);
+                                </script>
+                            </div>
                         </div>
 
                     </div>
@@ -485,6 +530,7 @@
         import {Popover} from './js/bootstrap.mjs';
         import DataTable from './js/datatables.mjs';
         import $ from './js/jquery.mjs';
+        import {formatTime} from "./js/codedefenders_game.mjs";
 
         const loggedInUserId = ${login.userId};
 
@@ -1052,6 +1098,10 @@
             tr = table.insertRow();
             tr.insertCell().textContent = 'Start Game';
             tr.insertCell().textContent = gameSettings.startGame;
+
+            tr = table.insertRow();
+            tr.insertCell().textContent = 'Game Duration';
+            tr.insertCell().textContent = formatTime(gameSettings.gameDurationMinutes);
 
             return table;
         };

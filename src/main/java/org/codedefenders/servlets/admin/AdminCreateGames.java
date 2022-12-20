@@ -163,6 +163,10 @@ public class AdminCreateGames extends HttpServlet {
             gameSettings.setLevel(GameLevel.valueOf(request.getParameter("level")));
 
             gameSettings.setStartGame(request.getParameter("startGame") != null);
+
+            gameSettings.setGameDurationMinutes(getIntParameter(request, "gameDurationMinutes").get())
+                    .map(messages::add);
+
         } catch (NullPointerException | NoSuchElementException e) {
             messages.add("ERROR: Missing game settings parameter.");
             return null;

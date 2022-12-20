@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%@ page import="org.codedefenders.game.GameState"%>
@@ -26,8 +27,11 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.AbstractGame" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%
     AbstractGame game = (AbstractGame) request.getAttribute("game");
@@ -35,12 +39,25 @@
 
     Role role = null;
     String selectionManagerUrl = null;
+    int duration = -1;
+    long startTime = -1;
     if (game instanceof MeleeGame) {
         selectionManagerUrl = request.getContextPath() + Paths.MELEE_SELECTION;
         role = ((MeleeGame) game).getRole(login.getUserId());
+        duration = ((MeleeGame) game).getGameDurationMinutes();
+        startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
+
+        if (game.getState() == GameState.ACTIVE) {
+            startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
+        }
     } else if (game instanceof MultiplayerGame) {
         selectionManagerUrl = request.getContextPath() + Paths.BATTLEGROUND_SELECTION;
         role = ((MultiplayerGame) game).getRole(login.getUserId());
+        duration = ((MultiplayerGame) game).getGameDurationMinutes();
+
+        if (game.getState() == GameState.ACTIVE) {
+            startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
+        }
     }
 %>
 
@@ -107,6 +124,27 @@
                 </div>
             <%
                     }
+                }
+            %>
+
+            <%
+                final boolean isCreator = game.getCreatorId() == login.getUserId();
+                if (game.getState() == GameState.ACTIVE || (game.getState() == GameState.CREATED && isCreator)) {
+                    request.setAttribute("selectionManagerUrl", selectionManagerUrl);
+                    request.setAttribute("canSetDuration", isCreator);
+                    request.setAttribute("duration", duration);
+                    request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
+                            AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
+                    request.setAttribute("startTime", startTime);
+            %>
+            <t:game_time
+                    gameId="${gameProducer.game.id}"
+                    selectionManagerUrl="${selectionManagerUrl}"
+                    duration="${duration}"
+                    maxDuration="${maxDuration}"
+                    startTime="${startTime}"
+                    canSetDuration="${canSetDuration}"/>
+            <%
                 }
             %>
 

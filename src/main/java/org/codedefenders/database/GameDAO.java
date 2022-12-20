@@ -206,6 +206,18 @@ public class GameDAO {
                 DatabaseValue.of(gameId));
     }
 
+    /**
+     * Fetches a List of Multiplayer- and Melee-Games that have expired.
+     *
+     * @return the expired games.
+     */
+    public static List<AbstractGame> getExpiredGames() {
+        List<AbstractGame> games = new ArrayList<>();
+        games.addAll(MultiplayerGameDAO.getExpiredGames());
+        games.addAll(MeleeGameDAO.getExpiredGames());
+        return games;
+    }
+
     public static Role getRole(int userId, int gameId) {
         String query = String.join("\n",
                 "SELECT *",
@@ -233,5 +245,15 @@ public class GameDAO {
         }
 
         return Optional.ofNullable(role).orElse(Role.NONE);
+    }
+
+    public static boolean storeStartTime(int gameId) {
+        String query = String.join("\n",
+                "UPDATE games",
+                "SET Start_Time = NOW()",
+                "WHERE ID = ?"
+        );
+        DatabaseValue<?>[] values = {DatabaseValue.of(gameId)};
+        return DB.executeUpdateQuery(query, values);
     }
 }

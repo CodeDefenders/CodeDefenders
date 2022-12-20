@@ -181,8 +181,19 @@ public class AdminSystemSettings extends HttpServlet {
             public String toString() {
                 return "The maximum number of tests that will run to validate a lost equivalence duel.";
             }
-        }
-
+        },
+        GAME_DURATION_MINUTES_MAX {
+            @Override
+            public String toString() {
+                return "The maximum duration that can be set for multiplayer/melee games (in minutes).";
+            }
+        },
+        GAME_DURATION_MINUTES_DEFAULT {
+            @Override
+            public String toString() {
+                return "The default duration a multiplayer/melee game is open (in minutes).";
+            }
+        },
     }
 
     public enum SETTING_TYPE {

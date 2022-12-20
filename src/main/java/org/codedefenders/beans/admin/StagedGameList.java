@@ -10,9 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
@@ -296,6 +298,7 @@ public class StagedGameList implements Serializable {
         @Expose private Integer equivalenceThreshold;
         @Expose private GameLevel level;
         @Expose private Role creatorRole;
+        @Expose private Integer gameDurationMinutes;
 
         @Expose private Boolean startGame;
 
@@ -323,6 +326,7 @@ public class StagedGameList implements Serializable {
             this.level = other.level;
             this.creatorRole = other.creatorRole;
             this.startGame = other.startGame;
+            this.gameDurationMinutes = other.gameDurationMinutes;
         }
 
         public GameType getGameType() {
@@ -413,6 +417,40 @@ public class StagedGameList implements Serializable {
             this.creatorRole = creatorRole;
         }
 
+        public int getGameDurationMinutes() {
+            return gameDurationMinutes;
+        }
+
+        /**
+         * Sets the game duration and checks if it is in the valid range defined by the system settings.
+         * If the value is out of bounds, it will be clamped and an info message is returned.
+         *
+         * @param duration The game duration in minutes
+         * @return Info about the boundaries of the duration if clamping was necessary.
+         */
+        public Optional<String> setGameDurationMinutes(final int duration) {
+            final int maxDuration = AdminDAO.getSystemSetting(
+                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
+            final int minDuration = 1;
+
+            if (duration > maxDuration) {
+                this.gameDurationMinutes = maxDuration;
+                return Optional.of(String.format(
+                        "INFO: The max. allowed duration is %d minutes.",
+                        maxDuration
+                ));
+            } else if (duration < minDuration) {
+                this.gameDurationMinutes = minDuration;
+                return Optional.of(String.format(
+                        "INFO: The min. allowed duration is %d minutes.",
+                        minDuration
+                ));
+            } else {
+                this.gameDurationMinutes = duration;
+                return Optional.empty();
+            }
+        }
+
         public boolean isStartGame() {
             return startGame;
         }
@@ -434,6 +472,11 @@ public class StagedGameList implements Serializable {
             gameSettings.setLevel(HARD);
             gameSettings.setCreatorRole(OBSERVER);
             gameSettings.setStartGame(false);
+
+            final int currentDefaultGameDurationMinutes = AdminDAO.getSystemSetting(
+                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue();
+            gameSettings.setGameDurationMinutes(currentDefaultGameDurationMinutes);
+
             return gameSettings;
         }
 

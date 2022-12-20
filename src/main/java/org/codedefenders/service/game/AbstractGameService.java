@@ -36,10 +36,14 @@ import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Player;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.game.GameStartedEvent;
+import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 
@@ -61,6 +65,9 @@ public abstract class AbstractGameService implements IGameService {
         this.userService = userService;
         this.userRepository = userRepository;
     }
+
+    @Inject
+    private INotificationService notificationService;
 
     @Override
     public MutantDTO getMutant(int userId, int mutantId) {
@@ -224,5 +231,41 @@ public abstract class AbstractGameService implements IGameService {
             }
         }
         return result;
+    }
+
+    // Todo: only receive the game-Id as parameter and do not update the whole game
+    @Override
+    public boolean closeGame(AbstractGame game) {
+        game.setState(GameState.FINISHED);
+        boolean updated = game.update();
+
+        if (updated) {
+            GameStoppedEvent gse = new GameStoppedEvent();
+            gse.setGameId(game.getId());
+            notificationService.post(gse);
+        }
+
+        return updated;
+    }
+
+    // Todo: only receive the game-Id as parameter and do not update the whole game
+    @Override
+    public boolean startGame(AbstractGame game) {
+        if (game.getState() == GameState.CREATED) {
+            game.setState(GameState.ACTIVE);
+            boolean updated = game.update();
+
+            if (updated) {
+                GameDAO.storeStartTime(game.getId());
+
+                GameStartedEvent gse = new GameStartedEvent();
+                gse.setGameId(game.getId());
+                notificationService.post(gse);
+            }
+
+            return updated;
+        } else {
+            return false;
+        }
     }
 }

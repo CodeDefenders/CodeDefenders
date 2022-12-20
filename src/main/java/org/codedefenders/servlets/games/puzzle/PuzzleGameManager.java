@@ -61,6 +61,7 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
@@ -138,6 +139,9 @@ public class PuzzleGameManager extends HttpServlet {
 
     @Inject
     private UserRepository userRepo;
+
+    @Inject
+    private GameService gameService;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -303,8 +307,7 @@ public class PuzzleGameManager extends HttpServlet {
             return null;
         }
 
-        game.setState(GameState.ACTIVE);
-        if (!game.update()) {
+        if (!gameService.startGame(game)) {
             logger.error(errorMsg + " Could not update game state.");
             return null;
         }

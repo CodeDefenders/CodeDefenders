@@ -70,6 +70,10 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean chatEnabled;
 
+    private int gameDurationMinutes;
+
+    private long startTimeUnixSeconds;
+
     // 0 means disabled
     private int automaticMutantEquivalenceThreshold = 0;
 
@@ -87,6 +91,8 @@ public class MultiplayerGame extends AbstractGame {
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
         private boolean chatEnabled = false;
+        private int gameDurationMinutes;
+        private long startTimeUnixSeconds;
         private float lineCoverage = 1f;
         private float mutantCoverage = 1f;
         private float prize = 1f;
@@ -126,6 +132,16 @@ public class MultiplayerGame extends AbstractGame {
 
         public Builder chatEnabled(boolean chatEnabled) {
             this.chatEnabled = chatEnabled;
+            return this;
+        }
+
+        public Builder gameDurationMinutes(int gameDurationMinutes) {
+            this.gameDurationMinutes = gameDurationMinutes;
+            return this;
+        }
+
+        public Builder startTimeUnixSeconds(long startTimeUnixSeconds) {
+            this.startTimeUnixSeconds = startTimeUnixSeconds;
             return this;
         }
 
@@ -211,6 +227,20 @@ public class MultiplayerGame extends AbstractGame {
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
         this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
+        this.gameDurationMinutes = builder.gameDurationMinutes;
+        this.startTimeUnixSeconds = builder.startTimeUnixSeconds;
+    }
+
+    public int getGameDurationMinutes() {
+        return gameDurationMinutes;
+    }
+
+    public void setGameDurationMinutes(int gameDurationMinutes) {
+        this.gameDurationMinutes = gameDurationMinutes;
+    }
+
+    public long getStartTimeUnixSeconds() {
+        return startTimeUnixSeconds;
     }
 
     public int getDefenderValue() {
