@@ -48,14 +48,14 @@ public final class LinkUtils {
 
     /**
      * Returns an HTML anchor tag with the username as content and the hyperlink to the corresponding user profile as
-     * href-attribute if the user profiles are enabled in the admin settings. Returns only the username if disabled.
+     * href-attribute if public user profiles are enabled in the admin settings. Returns only the username if disabled.
      *
      * @param request The current servlet request on which the path will be based on
      * @param username The username for which the link will be created
      * @return HTML code containing an anchor-tag or plain text
      */
     public static String getUserProfileAnchorOrText(HttpServletRequest request, String username) {
-        if (UserProfileManager.checkEnabled()) {
+        if (UserProfileManager.isProfilePublic()) {
             return "<a href=\"" + getUserProfileHyperlink(request, username) + "\">" + username + "</a>";
         } else {
             return username;
