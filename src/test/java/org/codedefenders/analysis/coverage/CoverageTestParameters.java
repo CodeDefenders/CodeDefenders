@@ -1,7 +1,9 @@
 package org.codedefenders.analysis.coverage;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,8 +26,20 @@ class CoverageTestParameters implements ArgumentsProvider {
     private final static String RESOURCE_DIR = "analysis/coverage";
     private final static Pattern NAME_REGEX = Pattern.compile("([A-Za-z][A-Za-z1-9]*)\\.java");
 
+    private final static List<String> UTILS_FILES = Arrays.asList(
+            "utils/Call.java",
+            "utils/MethodChain.java",
+            "utils/TestEnum.java",
+            "utils/TestException.java",
+            "utils/TestRuntimeException.java",
+            "utils/ThrowingAutoCloseable.java",
+            "utils/ThrowingIterable.java",
+            "utils/Utils.java"
+    );
+
     private String getClassNameFromPath(String path) {
-        Matcher matcher = NAME_REGEX.matcher(path);
+        String filename = Paths.get(path).getFileName().toString();
+        Matcher matcher = NAME_REGEX.matcher(filename);
         assume().withMessage("Could not determine class name from path '%s'", path)
                 .that(matcher.find()).isTrue();
         return matcher.group(1);
@@ -44,120 +58,152 @@ class CoverageTestParameters implements ArgumentsProvider {
         return expectedCoverage;
     }
 
-    private Arguments testCase(String classPath, String testPath, String expectedCoveragePath, String... utilsPaths)
+    private Arguments testCase(String cutPath,
+                               String testPath,
+                               String[] testArguments,
+                               List<String> additionalJavaFiles,
+                               String expectedCoveragePath)
             throws Exception {
-        String className = getClassNameFromPath(classPath);
+        String cutName = getClassNameFromPath(cutPath);
         String testName = getClassNameFromPath(testPath);
+        String classCode = loadResource(RESOURCE_DIR, cutPath);
 
-        String classCode = loadResource(RESOURCE_DIR, classPath);
-        String testCode = loadResource(RESOURCE_DIR, testPath);
+        List<String> javaFiles = new ArrayList<>();
+        javaFiles.add(cutPath);
+        javaFiles.add(testPath);
+        javaFiles.addAll(additionalJavaFiles);
+        javaFiles.addAll(UTILS_FILES);
 
         List<JavaFileObject> sourceFiles = new ArrayList<>();
-        sourceFiles.add(new InMemorySourceFile(className, classCode));
-        sourceFiles.add(new InMemorySourceFile(testName, testCode));
-
-        for (String path : utilsPaths) {
+        for (String path : javaFiles) {
             String name = getClassNameFromPath(path);
             String code = loadResource(RESOURCE_DIR, path);
             sourceFiles.add(new InMemorySourceFile(name, code));
         }
 
         NewLineCoverage expectedCoverage = readExpectedCoverage(expectedCoveragePath);
-        return Arguments.of(className, testName, sourceFiles, classCode, expectedCoverage);
+        return Arguments.of(cutName, testName,
+                sourceFiles, classCode, expectedCoverage, testArguments);
+    }
+
+    private Arguments simpleTestCase(String cutPath, String testPath)
+            throws Exception {
+        String testName = getClassNameFromPath(testPath);
+        String dirname = Paths.get(cutPath).getParent().toString();
+        return testCase(cutPath,
+                testPath, new String[0],
+                Collections.emptyList(),
+                String.format("%s/%s.coverage", dirname, testName));
+    }
+
+    private Arguments emptyRunnerTestCase(String cutPath) throws Exception {
+        String dirname = Paths.get(cutPath).getParent().toString();
+        return testCase(
+                cutPath,
+                "EmptyRunner.java", new String[0],
+                Collections.emptyList(),
+                dirname + "/EmptyRunner.coverage"
+        );
+    }
+
+    private Arguments defaultRunnerTestCase(String cutPath) throws Exception {
+        String dirname = Paths.get(cutPath).getParent().toString();
+        String cutName = getClassNameFromPath(cutPath);
+        return testCase(
+                cutPath,
+                "DefaultRunner.java", new String[]{cutName},
+                Collections.emptyList(),
+                dirname + "/DefaultRunner.coverage"
+        );
     }
 
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
         return Stream.of(
-                testCase(
-                        "classes/Classes.java",
-                        "classes/ClassesTest.java",
-                        "classes/ClassesTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "classes/Classes.java",
-                        "EmptyTest.java",
-                        "classes/EmptyTest.coverage"
-                ),
-                testCase(
-                        "fields/Fields.java",
-                        "fields/FieldsTest.java",
-                        "fields/FieldsTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "fields/Fields.java",
-                        "EmptyTest.java",
-                        "fields/EmptyTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "constructors/Constructors.java",
-                        "constructors/ConstructorsTest.java",
-                        "constructors/ConstructorsTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "constructors/Constructors.java",
-                        "EmptyTest.java",
-                        "constructors/EmptyTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "methods/Methods.java",
-                        "methods/MethodsTest.java",
-                        "methods/MethodsTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "methods/Methods.java",
-                        "EmptyTest.java",
-                        "methods/EmptyTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "localvariables/LocalVariables.java",
-                        "localvariables/LocalVariablesTest.java",
-                        "localvariables/LocalVariablesTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "localvariables/LocalVariables.java",
-                        "EmptyTest.java",
-                        "localvariables/EmptyTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "blocks/Blocks.java",
-                        "blocks/BlocksTest.java",
-                        "blocks/BlocksTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "blocks/Blocks.java",
-                        "EmptyTest.java",
-                        "blocks/EmptyTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "initializerblocks/InitializerBlocks.java",
-                        "initializerblocks/InitializerBlocksTest.java",
-                        "initializerblocks/InitializerBlocksTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "initializerblocks/InitializerBlocks.java",
-                        "EmptyTest.java",
-                        "initializerblocks/EmptyTest.coverage",
-                        "Utils.java"
-                ),
-                testCase(
-                        "playground/Playground.java",
-                        "playground/PlaygroundTest.java",
-                        "playground/PlaygroundTest.coverage",
-                        "Utils.java"
-                )
+                defaultRunnerTestCase("playground/Playground.java"),
+
+                simpleTestCase("classes/Classes.java",
+                        "classes/ClassesTest.java"),
+                emptyRunnerTestCase("classes/Classes.java"),
+
+                simpleTestCase("fields/Fields.java",
+                "fields/FieldsTest.java"),
+                emptyRunnerTestCase("fields/Fields.java"),
+
+                simpleTestCase("constructors/Constructors.java",
+                "constructors/ConstructorsTest.java"),
+                emptyRunnerTestCase("constructors/Constructors.java"),
+
+                simpleTestCase("methods/Methods.java",
+                "methods/MethodsTest.java"),
+                emptyRunnerTestCase("methods/Methods.java"),
+
+                defaultRunnerTestCase("localvariables/LocalVariables.java"),
+                emptyRunnerTestCase("localvariables/LocalVariables.java"),
+
+                defaultRunnerTestCase("blocks/Blocks.java"),
+                emptyRunnerTestCase("blocks/Blocks.java"),
+
+                emptyRunnerTestCase("initializerblocks/InitializerBlocks.java"),
+                simpleTestCase("initializerblocks/InitializerBlocks.java",
+                        "initializerblocks/InitializerBlocksTest.java"),
+
+                emptyRunnerTestCase("ifs/Ifs.java"),
+                defaultRunnerTestCase("ifs/Ifs.java"),
+
+                defaultRunnerTestCase("methodcalls/MethodCalls.java"),
+                emptyRunnerTestCase("methodcalls/MethodCalls.java"),
+
+                defaultRunnerTestCase("dowhileloops/DoWhileLoops.java"),
+                emptyRunnerTestCase("dowhileloops/DoWhileLoops.java"),
+
+                defaultRunnerTestCase("forloops/ForLoops.java"),
+                emptyRunnerTestCase("forloops/ForLoops.java"),
+
+                defaultRunnerTestCase("foreachloops/ForEachLoops.java"),
+                emptyRunnerTestCase("foreachloops/ForEachLoops.java"),
+
+                defaultRunnerTestCase("whileloops/WhileLoops.java"),
+                emptyRunnerTestCase("whileloops/WhileLoops.java"),
+
+                defaultRunnerTestCase("trycatchblocks/TryCatchBlocks.java"),
+                emptyRunnerTestCase("trycatchblocks/TryCatchBlocks.java"),
+
+                defaultRunnerTestCase("switchstmts/SwitchStmts.java"),
+                emptyRunnerTestCase("switchstmts/SwitchStmts.java"),
+
+                defaultRunnerTestCase("synchronizedblocks/SynchronizedBlocks.java"),
+                emptyRunnerTestCase("synchronizedblocks/SynchronizedBlocks.java"),
+
+                defaultRunnerTestCase("lambdas/Lambdas.java"),
+                emptyRunnerTestCase("lambdas/Lambdas.java"),
+
+                defaultRunnerTestCase("ternaryoperators/TernaryOperators.java"),
+                emptyRunnerTestCase("ternaryoperators/TernaryOperators.java"),
+
+                defaultRunnerTestCase("switchexprs/SwitchExprs.java"),
+                emptyRunnerTestCase("switchexprs/SwitchExprs.java"),
+
+                defaultRunnerTestCase("arrays/Arrays.java"),
+                emptyRunnerTestCase("arrays/Arrays.java"),
+
+                defaultRunnerTestCase("assertions/Assertions.java"),
+                emptyRunnerTestCase("assertions/Assertions.java"),
+
+                defaultRunnerTestCase("casts/Casts.java"),
+                emptyRunnerTestCase("casts/Casts.java"),
+
+                defaultRunnerTestCase("unaryexpressions/UnaryExpressions.java"),
+                emptyRunnerTestCase("unaryexpressions/UnaryExpressions.java"),
+
+                defaultRunnerTestCase("binaryexpressions/BinaryExpressions.java"),
+                emptyRunnerTestCase("binaryexpressions/BinaryExpressions.java"),
+
+                defaultRunnerTestCase("instanceof/Instanceof.java"),
+                emptyRunnerTestCase("instanceof/Instanceof.java")//,
+
+                // simpleTestCase("xmlelement/XmlElement.java",
+                // "xmlelement/XmlElementTest.java"),
         );
     }
 }

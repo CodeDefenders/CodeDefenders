@@ -1,4 +1,8 @@
+import utils.Call;
+import utils.TestRuntimeException;
+
 import static utils.Utils.doThrow;
+import static utils.Utils.doCall;
 
 public class Blocks {
 
@@ -7,7 +11,8 @@ public class Blocks {
      * <p><b>JaCoCo coverage</b>: doesn't consider code blocks at all
      * <p><b>extended coverage</b>: covers the block up to (and including) the closing brace
      */
-    static void coveredToEnd() {
+    @Call
+    public void coveredToEnd() {
 
     }
 
@@ -16,15 +21,18 @@ public class Blocks {
      * <p><b>JaCoCo coverage</b>: doesn't consider code blocks at all
      * <p><b>extended coverage</b>: covers the block up to the jump
      */
-    static void earlyReturn() {
+    @Call
+    public void earlyReturn() {
         return;
 
     }
-    static void earlyException() {
-        throw new RuntimeException();
+    @Call
+    public void earlyException() {
+        throw new TestRuntimeException();
 
     }
-    static void earlyIndirectException() {
+    @Call
+    public void earlyIndirectException() {
         int i = 1;  // some statement to produce coverage, otherwise the method is not covered at all
         doThrow();
 
@@ -37,7 +45,8 @@ public class Blocks {
      *                              classes/methods themselves, as their coverage is not guaranteed even if the
      *                              surrounding code is covered
      */
-    static void independentNodes(boolean cover) {
+    @Call
+    public void independentNodes() {
         // local class
         class LocalClass {
 
@@ -53,13 +62,12 @@ public class Blocks {
 
         // lambda
         Runnable lambda = () -> {
+            return;
 
         };
 
-        if (cover) {
-            new LocalClass();
-            lambda.run();
-        }
+        new LocalClass();
+        lambda.run();
     }
 
     /**
@@ -67,12 +75,50 @@ public class Blocks {
      * <p><b>JaCoCo coverage</b>: doesn't consider code blocks at all
      * <p><b>extended coverage</b>: covers each nested block up to the return statement, but not past it
      */
-    static void nestedBlocks() {
+    @Call
+    public void nestedBlocks() {
         {
             {
                 return;
 
             }
         }
+    }
+
+    @Call
+    public void phases1() {
+        int i = 0;
+        // statusAfter is COVERED
+
+        if (i == 0) {
+            doThrow();
+        }
+        // statusAfter is MAYBE_COVERED (can't determine if then branch was skipped or taken + threw exception)
+        // therefore, space is left EMPTY
+
+        int j = 0;
+        // statusAfter is NOT_COVERED
+
+        return;
+        // statusAfter is ALWAYS_JUMPS
+
+    }
+
+    @Call
+    public void phases2() {
+        int i = 0;
+        // statusAfter is COVERED
+
+        if (i != 0) {
+            doCall();
+        }
+        // statusAfter is MAYBE_COVERED (can't determine if then branch was skipped or taken + threw exception)
+        // but: space is COVERED, since a stmt after it is COVERED
+
+        int j = 0;
+        // statusAfter is COVERED
+
+        return;
+        // statusAfter is ALWAYS_JUMPS
     }
 }

@@ -73,13 +73,14 @@ public class CoverageTest {
                 .that(javaMajorVersion).isAtLeast(16);
     }
 
-    @ParameterizedTest(name = "[{index}] Coverage of {1} on {0}")
+    @ParameterizedTest(name = "[{index}] {1} on {0}")
     @ArgumentsSource(CoverageTestParameters.class)
      public void test(String className,
                       String testName,
                       List<JavaFileObject> sourceFiles,
                       String classCode,
-                      NewLineCoverage expectedCoverage) throws Exception {
+                      NewLineCoverage expectedCoverage,
+                      String[] testArguments) throws Exception {
         // compile and instrument code
         final IRuntime runtime = new LoggerRuntime();
         final Map<String, byte[]> originals = compileCode(sourceFiles);
@@ -95,7 +96,7 @@ public class CoverageTest {
 
         // run the test
         Method main = targetClass.getMethod("main", String[].class);
-        main.invoke(null, new Object[]{new String[0]});
+        main.invoke(null, new Object[]{testArguments});
 
         // collect JaCoCo data
         final ExecutionDataStore executionData = new ExecutionDataStore();

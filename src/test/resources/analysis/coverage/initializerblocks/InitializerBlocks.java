@@ -3,14 +3,18 @@ import static utils.Utils.doThrow;
 public class InitializerBlocks {
     /**
      * <p>static initializer block
-     * <p><b>JaCoCo coverage</b>: covers the statement(s) and the line of the closing brace
+     * <p><b>JaCoCo coverage</b>: only covers the statement(s)
      * <p><b>extended coverage</b>: covers the block
      */
     static {
         int i = 1;
     }
 
-    // empty static block
+    /**
+     * <p>empty static initializer block
+     * <p><b>JaCoCo coverage</b>: covers the line of the closing brace
+     * <p><b>extended coverage</b>: covers the block
+     */
     static {
 
     }
@@ -41,6 +45,46 @@ public class InitializerBlocks {
     // not-covered non-static block
     {
 
+    }
+
+    static class NoCoverageButStaticBlock {
+        // something to access so we can execute the static block
+        static int i;
+
+        static {
+
+        }
+    }
+
+    // fields in a local class
+    // wrap in a not-covered class to check if the ObjectCreationExpression or the surrounding class is checked as the
+    // declaring type
+    static class BlocksInLocalClass {
+        static void method() {
+            class Local {
+                {}
+                { doThrow(); }
+                {}
+            }
+            new Local();
+        }
+    }
+
+    // fields in an anonymous class
+    // wrap in a not-covered class to check if the local class or the surrounding class is checked as the declaring type
+    static class BlocksInAnonymousClass {
+        static void method() {
+            new Runnable() {
+                {}
+                { doThrow(); }
+                {}
+
+                @Override
+                public void run() {
+
+                }
+            };
+        }
     }
 }
 

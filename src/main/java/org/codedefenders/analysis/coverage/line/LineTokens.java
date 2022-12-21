@@ -4,17 +4,20 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 
 import com.github.javaparser.ast.Node;
 
+
 public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
     @Override
     public Deque<Token> getEmpty() {
         Deque<Token> stack = new ArrayDeque<>();
-        stack.push(new Token(null, Type.ROOT, null));
+        stack.push(Token.root());
         return stack;
     }
 
@@ -33,14 +36,26 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
         return get(line).peekLast();
     }
 
-    public static LineTokens fromJaCoCo(NewLineCoverage coverage) {
+    public static LineTokens fromJaCoCo(DetailedLineCoverage coverage) {
         LineTokens lineTokens = new LineTokens();
         for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
-            LineCoverageStatus status = coverage.getStatus(line);
-            // TODO: push empty too and check in analyse method
-            if (status == LineCoverageStatus.PARTLY_COVERED) {
-                lineTokens.pushToken(line, new Token(null, Type.OVERRIDE, status));
+            LineCoverageStatus combinedStatus = coverage.get(line).combinedStatus();
+            if (combinedStatus != LineCoverageStatus.EMPTY) {
+                lineTokens.pushToken(line, Token.override(combinedStatus));
             }
+            /*
+            if (status.branchStatus() != LineCoverageStatus.EMPTY) {
+                lineTokens.pushToken(line, Token.override(status.combinedStatus()));
+            } else if (status.instructionStatus() == LineCoverageStatus.PARTLY_COVERED) {
+                lineTokens.pushToken(line, Token.override(status.instructionStatus()));
+            }
+            */
+            // lines where JaCoCo produces misleading coverage
+            // - first line of record declaration: contains instructions for getter methods, and can therefore
+            //          unexpectedly be PARTLY_COVERED or NOT_COVERED even if the record was initialized
+            // - last line of try-catch-block (sometimes): I don't know what the line represents
+            // - first line of empty finally-block (sometimes): I don't know what the line represents
+            // - last lines of try-block with resources (branch coverage): I don't know what the line represents
         }
         return lineTokens;
     }
@@ -48,7 +63,9 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
     private void pushToken(int line, Token newToken) {
         Deque<Token> stack = get(line);
         Token top = stack.peek();
-        top.children.add(newToken);
+        if (top != null) {
+            top.children.add(newToken);
+        }
         stack.push(newToken);
     }
 
@@ -56,17 +73,28 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
         get(line).pop();
     }
 
-    public TokenInserter forNode(Node originNode) {
-        return new TokenInserter(originNode);
+    public TokenInserter forNode(Node originNode, Runnable visitCallback) {
+        return new TokenInserter(originNode, visitCallback);
     }
 
     public class TokenInserter implements AutoCloseable {
         private final Node originNode;
-        private final Deque<Integer> linesToPop;
+        private final Runnable visitCallback;
 
-        public TokenInserter(Node originNode) {
+        private final List<Integer> linesToPop;
+        private final Set<Integer> emptyLines;
+
+        private TokenInserter(Node originNode, Runnable visitCallback) {
             this.originNode = originNode;
-            this.linesToPop = new ArrayDeque<>();
+            this.visitCallback = visitCallback;
+            this.linesToPop = new ArrayList<>();
+            this.emptyLines = new TreeSet<>();
+
+            int beginLine = originNode.getBegin().get().line;
+            int endLine = originNode.getEnd().get().line;
+            for (int line = beginLine; line <= endLine; line++) {
+                emptyLines.add(line);
+            }
         }
 
         public TokenInserterForPosition lines(int beginLine, int endLine) {
@@ -81,46 +109,65 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
             return lines(node.getBegin().get().line, node.getEnd().get().line);
         }
 
-        // TODO: last line needs to be spared too in some cases e.g. return switch() { ...
-        public TokenInserterForPosition nodeExceptFirstLine(Node node) {
-            return lines(node.getBegin().get().line + 1, node.getEnd().get().line);
-        }
-
         @Override
         public void close() {
-            linesToPop.forEach(LineTokens.this::popToken);
+            // insert EMPTY token for every line that no token has been pushed onto
+            for (int line : emptyLines) {
+                pushToken(line, Token.empty(originNode));
+                linesToPop.add(line);
+            }
+            emptyLines.clear();
+
+            // visit child nodes
+            visitCallback.run();
+
+            // pop all pushed tokens from the stack
+            for (int line : linesToPop) {
+                popToken(line);
+            }
             linesToPop.clear();
         }
 
         public class TokenInserterForPosition {
-            private final List<Integer> lines;
+            private final int beginLine;
+            private final int endLine;
 
             public TokenInserterForPosition(int beginLine, int endLine) {
-                lines = new ArrayList<>();
-                for (int line = beginLine; line <= endLine; line++) {
-                    lines.add(line);
+                this.beginLine = beginLine;
+                this.endLine = endLine;
+            }
+
+            private void insert(int start, int end, Supplier<Token> tokenSup) {
+                for (int line = start; line <= end; line++) {
+                    pushToken(line, tokenSup.get());
+                    linesToPop.add(line);
+                    emptyLines.remove(line);
                 }
             }
 
             private void insert(Supplier<Token> tokenSup) {
-                lines.forEach(line -> pushToken(line, tokenSup.get()));
-                linesToPop.addAll(lines);
+                insert(beginLine, endLine, tokenSup);
             }
 
             public void cover(LineCoverageStatus status) {
-                insert(() -> new Token(originNode, Type.COVERABLE, status));
+                insert(() -> Token.cover(originNode, status));
             }
 
-            public void cover(AstCoverageStatus status) {
-                cover(status.status());
+            public void coverStrong(LineCoverageStatus status) {
+                insert(beginLine, beginLine, () -> Token.coverStrong(originNode, status));
+                insert(beginLine + 1, endLine, () -> Token.cover(originNode, status));
+            }
+
+            public void block(LineCoverageStatus status) {
+                insert(() -> Token.block(originNode, status));
             }
 
             public void reset() {
-                insert(() -> new Token(originNode, Type.RESET, null));
+                insert(() -> Token.reset(originNode));
             }
 
             public void empty() {
-                insert(() -> new Token(originNode, Type.EMPTY, null));
+                insert(() -> Token.empty(originNode));
             }
         }
     }
@@ -128,21 +175,46 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
     public static class Token {
         public final Node originNode;
         public final Type type;
+        public final int priority;
         public final LineCoverageStatus status;
 
         public final List<Token> children;
 
-        // status the LineTokenAnalyser determined after reaching this token
-        // for debugging purposes
-        // TODO: find a better solution than saving it here
-        public LineCoverageStatus analyserStatus;
+        public static Token empty(Node originNode) {
+            return new Token(originNode, Type.EMPTY, LineCoverageStatus.EMPTY, Priority.EMPTY);
+        }
 
-        private Token(Node originNode, Type type, LineCoverageStatus status) {
+        public static Token block(Node originNode, LineCoverageStatus status) {
+            return new Token(originNode, Type.BLOCK, status, Priority.BLOCK);
+        }
+
+        public static Token cover(Node originNode, LineCoverageStatus status) {
+            return new Token(originNode, Type.COVERABLE, status, Priority.STMT);
+        }
+
+        public static Token coverStrong(Node originNode, LineCoverageStatus status) {
+            return new Token(originNode, Type.STRONG_COVERABLE, status, Priority.STMT_STRONG);
+        }
+
+        public static Token reset(Node originNode) {
+            return new Token(originNode, Type.RESET, LineCoverageStatus.EMPTY, Priority.STMT);
+        }
+
+        public static Token root() {
+            return new Token(null, Type.ROOT, null, Priority.EMPTY);
+        }
+
+        public static Token override(LineCoverageStatus status) {
+            return new Token(null, Type.OVERRIDE, status, Priority.OVERRIDE);
+        }
+
+        private Token(Node originNode, Type type, LineCoverageStatus status, int priority) {
             this.originNode = originNode;
             this.type = type;
             this.status = status;
+            this.priority = priority;
+
             this.children = new ArrayList<>();
-            this.analyserStatus = null;
         }
     }
 
@@ -160,14 +232,6 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
          * lines.
          */
         OVERRIDE,
-        /**
-         * Denotes an AST node that does not count as coverable, and does not
-         * influence coverage in any other ways.
-         *
-         * <p>Most expressions aren't coverable code for JaCoCo by themselves,
-         * so we don't count them either. The coverage of those lines will be
-         * determined by the surrounding statement(s) that are coverable.
-         */
         EMPTY,
         /**
          * Denotes an AST node that is coverable.
@@ -176,6 +240,8 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
          * this token will determine the coverage of a line.
          */
         COVERABLE,
+        STRONG_COVERABLE,
+        BLOCK,
 
         /**
          * Denotes an AST node that "nullifies" the coverage of its parent nodes.
@@ -198,6 +264,14 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
          * coverage. In this case another Coverable token is inserted after the Reset.
          */
         RESET
+    }
+
+    public static class Priority {
+        public final static int EMPTY = 0;
+        public final static int BLOCK = 1;
+        public final static int STMT = 2;
+        public final static int STMT_STRONG = 3;
+        public final static int OVERRIDE = 4;
     }
 }
 

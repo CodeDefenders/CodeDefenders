@@ -57,12 +57,12 @@ public class HTMLWriter {
             LineCoverageStatus expectedStatus = expectedCoverage.getStatus(lineNum);
             LineTokens.Token rootToken = lineTokens.getRoot(lineNum);
 
-            originalLines.add(String.format("<div class=\"line %s\" data-line-num=\"%d\">%s</div>",
-                    originalStatus.name(), lineNum, escapedCode));
-            transformedLines.add(String.format("<div class=\"line %s\" data-line-num=\"%d\">%s</div>",
-                    transformedStatus.name(), lineNum, escapedCode));
-            expectedLines.add(String.format("<div class=\"line %s\" data-line-num=\"%d\">%s</div>",
-                    expectedStatus.name(), lineNum, escapedCode));
+            originalLines.add(String.format("<div class=\"line %s\" data-line-num=\"%d\" data-status=\"%s\">%s</div>",
+                    originalStatus.name(), lineNum, originalStatus.name(), escapedCode));
+            transformedLines.add(String.format("<div class=\"line %s\" data-line-num=\"%d\" data-status=\"%s\">%s</div>",
+                    transformedStatus.name(), lineNum, transformedStatus.name(), escapedCode));
+            expectedLines.add(String.format("<div class=\"line %s\" data-line-num=\"%d\" data-status=\"%s\">%s</div>",
+                    expectedStatus.name(), lineNum, expectedStatus.name(), escapedCode));
             tokenLines.add(String.format("<div class=\"line\" data-line-num=\"%d\">%s</div>",
                     lineNum, generateTokenLine(rootToken)));
         }
@@ -87,8 +87,8 @@ public class HTMLWriter {
             String text = token.originNode != null
                     ? String.format("%s[%s]", token.type.name(), token.originNode.getClass().getSimpleName())
                     : token.type.name();
-            String coverageStatus = token.analyserStatus != null
-                    ? token.analyserStatus.name()
+            String coverageStatus = token.status != null
+                    ? token.status.name()
                     : "";
             line.append(String.format("<span class=\"token %s\">%s</span>",
                             coverageStatus, text));

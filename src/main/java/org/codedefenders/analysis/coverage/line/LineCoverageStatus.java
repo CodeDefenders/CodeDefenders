@@ -23,4 +23,20 @@ public enum LineCoverageStatus {
                 throw new IllegalArgumentException("Not a valid JaCoCo coverage status: " + status);
         }
     }
+
+    public LineCoverageStatus upgrade(LineCoverageStatus other) {
+        return this.ordinal() > other.ordinal() ? this : other;
+    }
+
+    public boolean isEmpty() {
+        return this == EMPTY;
+    }
+
+    public boolean isNotCovered() {
+        return this == NOT_COVERED;
+    }
+
+    public boolean isCovered() {
+        return this == FULLY_COVERED || this == PARTLY_COVERED;
+    }
 }

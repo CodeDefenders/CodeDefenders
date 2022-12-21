@@ -30,6 +30,33 @@ public class Fields {
         static int n = 1;
     }
 
+    static class ExceptionWithMultipleDelcarators {
+        int i = 0;
+
+        int j = 0,
+            k = doThrow();
+
+        int l;
+    }
+
+    static class ExceptionWithMultipleDelcaratorsAndEmpty {
+        int i = 0;
+
+        int j = 0,
+            k = doThrow(),
+            l;
+
+        int m;
+    }
+
+    static class ExceptionWithMultipleDelcaratorsOnSameLine {
+        int i = 0;
+
+        int j = 0, k = doThrow();
+
+        int l;
+    }
+
     // to check if static fields without initializer are covered when the class isn't initialized
     static class StaticFieldWithoutInitializer {
         // static field without initializer
@@ -47,6 +74,39 @@ public class Fields {
 
         // field with not-covered variable declarator
         private
-            Runnable s = () -> {};
+        Runnable s = () -> {};
+    }
+
+    // fields in a local class
+    // wrap in a not-covered class to check if the ObjectCreationExpression or the surrounding class is checked as the
+    // declaring type
+    static class FieldsInLocalClass {
+        static void method() {
+            class Local {
+                int i;
+                int j = doThrow();
+                int k;
+                static int l;
+            }
+            new Local();
+        }
+    }
+
+    // fields in an anonymous class
+    // wrap in a not-covered class to check if the local class or the surrounding class is checked as the declaring type
+    static class FieldsInAnonymousClass {
+        static void method() {
+            new Runnable() {
+                int i;
+                int j = doThrow();
+                int k;
+                static int l;
+
+                @Override
+                public void run() {
+
+                }
+            };
+        }
     }
 }

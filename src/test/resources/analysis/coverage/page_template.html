@@ -10,6 +10,7 @@
             html, body {
                 margin: 0;
                 padding: 0;
+                font-size: 16px;
             }
 
             .container {
@@ -22,7 +23,6 @@
                 flex-grow: 1;
                 min-width: 0;
                 padding: .25em;
-                position: relative;
             }
             #tokens {
                 flex-grow: 3;
@@ -30,16 +30,19 @@
             }
 
             .header {
-                width: fit-content;
+                width: 100%;
                 position: sticky;
                 top: .5em;
+            }
+            .header-text{
+                width: fit-content;
                 margin-bottom: 1em;
                 white-space: nowrap;
 
                 background: white;
                 padding: .25em 2em;
                 border: 2px solid;
-                border-radius: 1em;
+                border-radius: 99em;
                 box-shadow: 2px 2px black;
                 cursor: default;
                 font-family: sans-serif;
@@ -56,7 +59,7 @@
                 flex-direction: row;
                 align-items: center;
                 gap: .25em;
-                padding: .25em;
+                padding-right: .5em;
             }
 
             .line {
@@ -66,7 +69,8 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 cursor: default;
-                line-height: 1.3;
+                font-size: 12px;
+                line-height: 1.35;
             }
             .line::before {
                 font-family: monospace;
@@ -76,6 +80,10 @@
             }
             #expected .line {
                 user-select: none;
+            }
+            #expected .line:hover {
+                box-shadow: rgba(0, 0, 0, 0.05) 0 0 0 9999px inset;
+
             }
             #tokens .line {
                 overflow: visible;
@@ -93,11 +101,41 @@
             .NOT_COVERED {
                 background: #ff7373;
             }
+
+            button {
+                box-shadow: 1px 1px black;
+                border: 1px solid black;
+                border-radius: 99em;
+                padding: .2em .75em;
+                cursor: pointer;
+                background: white;
+                font-size: 12px;
+            }
+            button:hover {
+                background: #e6e6e6;
+                box-shadow: none;
+                margin: 1px -1px -1px 1px;
+            }
         </style>
         <script>
             const STATUSES = ['EMPTY', 'NOT_COVERED', 'FULLY_COVERED', 'PARTLY_COVERED'];
+            const lines = [];
+
             let editLines = false;
             let viewTokens = false;
+            let dragLineNum = null;
+
+            const getLine = function(lineNum) {
+                return lines[lineNum - 1] ?? null;
+            };
+            const getNumLines = function() {
+                return lines.length;
+            };
+            const setStatus = function(line, status) {
+                const oldStatus = line.dataset.status;
+                line.dataset.status = status;
+                line.classList.replace(oldStatus, status);
+            };
 
             const handleEditModeButton = function(event) {
                 editLines = !editLines;
@@ -107,22 +145,22 @@
             };
 
             const handleCopyButton = function(event) {
-                const lines = [];
-                for (const lineElem of document.querySelectorAll('#expected .line')) {
-                    const lineNum = Number(lineElem.dataset.lineNum);
-                    lines[lineNum - 1] = lineElem.classList[1];
-                }
-                navigator.clipboard.writeText(lines.join('\n'));
+                const statuses = lines.map(line => line.dataset.status);
+                navigator.clipboard.writeText(statuses.join('\n'));
+
+                event.target.innerText = 'copied';
+                setTimeout(() => event.target.innerText = 'copy', 1000);
             };
 
             const handleLineClick = function(event) {
                 if (!editLines) {
                     return;
                 }
-                const status = event.target.classList[1];
+
+                const status = event.target.dataset.status;
                 const index = STATUSES.indexOf(status);
-                event.target.classList.remove(status);
-                event.target.classList.add(STATUSES[(index + 1) % STATUSES.length]);
+                const newStatus = STATUSES[(index + 1) % STATUSES.length];
+                setStatus(event.target, newStatus);
             };
 
             const handleViewTokensButton = function(event) {
@@ -136,12 +174,85 @@
                 document.getElementById('tokens').toggleAttribute('hidden', !viewTokens);
             };
 
+            const handleLineDrag = function(event) {
+                if (!editLines) {
+                    return;
+                }
+
+                dragLineNum = Number(event.target.dataset.lineNum);
+            };
+
+            const handleLineDrop = function(event) {
+                if (!editLines || dragLineNum === null) {
+                    return;
+                }
+
+                const dropLineNum = Number(event.target.dataset.lineNum);
+
+                if (event.ctrlKey) {
+                    const status = getLine(dragLineNum).dataset.status;
+                    const begin = Math.min(dragLineNum, dropLineNum);
+                    const end = Math.max(dragLineNum, dropLineNum);
+                    for (let i = begin; i <= end; i++) {
+                        const line = getLine(i);
+                        setStatus(line, status);
+                    }
+                    return;
+                }
+
+                if (event.shiftKey) {
+                    const diff = dragLineNum - dropLineNum;
+                    if (dragLineNum > dropLineNum) {
+                        // shift upwards
+                        for (let i = dropLineNum; i <= getNumLines(); i++) {
+                            let sinkLine = getLine(i);
+                            const sourceLine = getLine(i + diff);
+                            const status = sourceLine !== null ? sourceLine.dataset.status : 'EMPTY';
+                            setStatus(sinkLine, status);
+                        }
+                    } else {
+                        // shift downwards
+                        for (let i = getNumLines(); i > dragLineNum; i--) {
+                            let sinkLine = getLine(i);
+                            const sourceLine = getLine(i + diff);
+                            let status = sourceLine !== null ? sourceLine.dataset.status : 'EMPTY';
+                            setStatus(sinkLine, status);
+                        }
+                        for (let i = dragLineNum; i < dropLineNum; i++) {
+                            let line = getLine(i);
+                            setStatus(line, 'EMPTY');
+                        }
+                    }
+                }
+            };
+
             window.addEventListener('load', function(event) {
+                for (const lineElem of document.querySelectorAll('#expected .line')) {
+                    const lineNum = Number(lineElem.dataset.lineNum);
+                    lines[lineNum - 1] = lineElem;
+                }
+
                 document.getElementById('expected').addEventListener('click', function(event) {
                     if (!event.target.classList.contains('line')) {
                         return;
                     }
                     handleLineClick(event);
+                });
+                document.addEventListener('mousedown', function(event) {
+                    if (event.target.classList.contains('line') && event.target.closest('#expected') !== null) {
+                        handleLineDrag(event);
+                    } else {
+                        dragLineNum = null;
+                    }
+                });
+                document.addEventListener('mouseup', function(event) {
+                    if (event.target !== null
+                            && event.target.classList.contains('line')
+                            && event.target.closest('#expected') !== null) {
+                        handleLineDrop(event);
+                    } else {
+                        dragLineNum = null;
+                    }
                 });
                 document.getElementById('edit-lines').addEventListener('click', handleEditModeButton);
                 document.getElementById('copy').addEventListener('click', handleCopyButton);
@@ -152,25 +263,37 @@
     <body>
         <div class="container">
             <div class="column" id="tokens" hidden>
-                <div class="header">Line Tokens</div>
+                <div class="header">
+                    <div class="header-text">Line Tokens</div>
+                </div>
                 {tokens}
             </div>
             <div class="column" id="original">
-                <div class="header">JaCoCo Coverage</div>
+                <div class="header">
+                    <div class="header-text">JaCoCo Coverage</div>
+                </div>
                 {code_original}
             </div>
             <div class="column" id="transformed">
-                <div class="header">Transformed Coverage</div>
-                <div class="controls">
-                    <button type="button" id="view-tokens">view tokens</button>
+                <div class="header">
+                    <div class="header-text">Transformed Coverage</div>
+                    <div class="controls">
+                        <button type="button" id="view-tokens">view tokens</button>
+                    </div>
                 </div>
                 {code_transformed}
             </div>
             <div class="column" id="expected">
-                <div class="header">Expected Coverage</div>
-                <div class="controls" title="Click on a line to cycle coverage">
-                    <button type="button" id="edit-lines">enable editing</button>
-                    <button type="button" id="copy">copy</button>
+                <div class="header">
+                    <div class="header-text">Expected Coverage</div>
+                    <div class="controls">
+                        <button type="button" id="edit-lines"
+                                title="Click on a line to cycle coverage.
+Ctrl+Drag a line to fill with the line's coverage.
+Shift+Drag a line to shift the coverage from that line on.">
+                            enable editing</button>
+                        <button type="button" id="copy">copy</button>
+                    </div>
                 </div>
                 {code_expected}
             </div>

@@ -13,67 +13,97 @@ public class LineTokenAnalyser {
     }
 
     public LineCoverageStatus analyse(Token token) {
-        return analyse(token, LineCoverageStatus.EMPTY);
+        State state = analyse(token, State.defaultState());
+        return state.status;
     }
 
-    private LineCoverageStatus analyse(Token token, LineCoverageStatus currentStatus) {
-        switch (token.type) {
-            case ROOT:
-            case EMPTY:
-                break;
-            case OVERRIDE:
-                currentStatus = token.status;
-                break;
-            case COVERABLE:
-                if (token.status != LineCoverageStatus.EMPTY) {
-                    currentStatus = token.status;
-                }
-                break;
-            case RESET:
-                currentStatus = LineCoverageStatus.EMPTY;
-                break;
-        }
-
-        token.analyserStatus = currentStatus;
+    private State analyse(Token token, State state) {
+        state = state.updateForNextToken(token);
 
         if (token.type == LineTokens.Type.OVERRIDE) {
-            return currentStatus;
+            return state;
         }
 
         if (token.children.isEmpty()) {
-            return currentStatus;
+            return state;
         }
 
-        LineCoverageStatus childrenStatus = LineCoverageStatus.EMPTY;
+        State acc = state;
         for (Token child : token.children) {
-            childrenStatus = mergeForChildren(childrenStatus, analyse(child, currentStatus));
+            State next = analyse(child, state);
+            if (next.iteration > state.iteration) {
+                if (acc.iteration > state.iteration) {
+                    acc = acc.updateForSibling(next);
+                } else {
+                    acc = next;
+                }
+            }
         }
-        return childrenStatus;
+        return acc;
     }
 
-    private LineCoverageStatus mergeForChildren(LineCoverageStatus acc, LineCoverageStatus next) {
-        switch (next) {
-            case EMPTY:
-                return acc;
-            case NOT_COVERED:
-                if (acc == LineCoverageStatus.EMPTY) {
-                    return LineCoverageStatus.NOT_COVERED;
-                } else {
-                    // TODO: PARTLY_COVERED?
-                    return acc;
-                }
-            case PARTLY_COVERED:
-                if (acc == LineCoverageStatus.FULLY_COVERED) {
-                    return LineCoverageStatus.FULLY_COVERED;
-                } else {
-                    return LineCoverageStatus.PARTLY_COVERED;
-                }
-            case FULLY_COVERED:
-                return LineCoverageStatus.FULLY_COVERED;
-            default:
-                throw new IllegalArgumentException("Unknown line coverage status: " + next);
+    private static class State {
+        private final LineCoverageStatus status;
+        private final int priority;
+        private final int iteration;
+
+        public State(LineCoverageStatus status, int priority, int iteration) {
+            this.status = status;
+            this.priority = priority;
+            this.iteration = iteration;
+        }
+
+        public State updateForNextToken(Token token) {
+            switch (token.type) {
+                case ROOT:
+                case EMPTY:
+                    break;
+                case OVERRIDE:
+                case COVERABLE:
+                case BLOCK:
+                    if (priority <= token.priority && token.status != LineCoverageStatus.EMPTY) {
+                        return new State(token.status, token.priority, iteration + 1);
+                    }
+                    break;
+                case STRONG_COVERABLE:
+                    if (priority < token.priority && token.status != LineCoverageStatus.EMPTY) {
+                        return new State(token.status, token.priority, iteration + 1);
+                    }
+                    if (priority == token.priority && token.status != LineCoverageStatus.EMPTY) {
+                        return new State(status.upgrade(token.status), token.priority, iteration + 1);
+                    }
+                    break;
+                case RESET:
+                    if (priority <= token.priority) {
+                        return new State(token.status, LineTokens.Priority.EMPTY, iteration + 1);
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown token type: " + token.type);
+            }
+            return this;
+        }
+
+        public State updateForSibling(State next) {
+            LineCoverageStatus status;
+            int priority;
+
+            if (next.priority > this.priority) {
+                status = next.status;
+                priority = next.priority;
+            } else if (next.priority == this.priority) {
+                status = this.status.upgrade(next.status);
+                priority = this.priority;
+            } else {
+                status = this.status;
+                priority = this.priority;
+            }
+
+            return new State(status, priority, Math.max(this.iteration, next.iteration));
+        }
+
+        public static State defaultState() {
+            return new State(LineCoverageStatus.EMPTY, 0, 0);
         }
     }
-
-    // TODO: are the merge functions correct?
 }

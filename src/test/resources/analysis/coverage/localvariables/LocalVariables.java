@@ -1,3 +1,5 @@
+import utils.Call;
+
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
@@ -9,12 +11,13 @@ public class LocalVariables {
      * <p><b>extended coverage</b>: covers all lines of local variable declarations. variables without initializer are
      *                              treated like empty lines and are covered by the surrounding block as necessary.
      */
-    static void localVariables() {
+    @Call
+    public void localVariables() {
         // variable with initializer
         int i = 0;
 
         // variable with coverable initializer expression
-        int j = doGet();
+        int j = doGet(0);
 
         // variable without initializer
         int k;

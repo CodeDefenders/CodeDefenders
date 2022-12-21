@@ -1,3 +1,5 @@
+import utils.TestRuntimeException;
+
 import static utils.Utils.doThrow;
 
 public class Constructors {
@@ -40,6 +42,17 @@ public class Constructors {
 
         }
     }
+    // test with throw statement here, because compact constructors may not have a return
+    record CompactConstructorsEmptyException1() {
+        CompactConstructorsEmptyException1 {
+            throw new TestRuntimeException();
+        }
+    }
+    record CompactConstructorsEmptyException2() {
+        CompactConstructorsEmptyException2 {
+            doThrow();
+        }
+    }
 
     record CompactConstructors(int i) {
         /**
@@ -50,6 +63,16 @@ public class Constructors {
          */
         CompactConstructors {
 
+        }
+    }
+    record CompactConstructorsException1(int i) {
+        CompactConstructorsException1 {
+            throw new TestRuntimeException();
+        }
+    }
+    record CompactConstructorsException2(int i) {
+        CompactConstructorsException2 {
+            doThrow();
         }
     }
 }

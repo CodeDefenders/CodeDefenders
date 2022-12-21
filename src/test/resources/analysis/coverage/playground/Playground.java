@@ -1,67 +1,163 @@
-import static utils.Utils.consume;
 import java.util.function.Supplier;
+import java.util.function.BinaryOperator;
+import java.util.function.UnaryOperator;
+import java.util.function.Consumer;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import utils.MethodChain;
+import utils.ThrowingAutoCloseable;
+
+import static utils.Utils.doGet;
+import static utils.Utils.doCall;
+import static utils.Utils.doThrow;
+import static utils.Utils.consume;
+import static utils.Utils.callLambda;
+import utils.Call;
 
 public class Playground {
-    public Playground() {
-        new ArrayList<Integer>() {
-            @Override
-            public int size() {
-                return 3;
-            }
+    private final static Integer INTEGER = null;
 
-            @Override
-            public boolean isEmpty() {
-                return size() == 0;
-            }
+    @Call
+    public void test5() {
+        boolean t = true;
+        boolean f = false;
+
+        boolean[] b = new boolean[] {
+                t
+                ||
+                doGet(true),
+                f
+                &&
+                doGet(false)
         };
     }
 
-    private
-        Runnable r = () -> {};
+    public void param() {
 
-
-    public int consume(Runnable r) {
-        return 4;
     }
 
+    @Call
     public void test() {
-        // some very long line for testing the page template -------------------------------------------------------------------------------------------------------------------------------
-
-        if (System.currentTimeMillis()
-
-                > System.currentTimeMillis()
-            +
-            1
-            == true) {
-            System.out.println("ok");
-        }
-
-        if (
-                consume(() -> {})
-            ==
-                consume(() -> {})
-        ) {
-            System.out.println("ok");
-        }
-
-        System.out.println(
-                System.currentTimeMillis() > 0 ? 1 : 0);
-
-        System.out.println(
-                System.currentTimeMillis() > 0
-                        ? 1
-                        : 0);
-
-
-        if (
-                ((Supplier<Integer>) () -> {
-
-                    return 4;
-                }).get() == 3) {
-
-        }
-
-        System.out.println("1"); System.out.println("2");
+        callLambda(
+                this
+                ::
+                param
+        );
     }
+
+    @Call
+    public void test2() {
+        boolean x
+                = doGet(this)
+                instanceof
+                Object;
+    }
+
+    @Call
+    public void test2a() {
+        Object o = this;
+
+        boolean x
+                = o
+                instanceof
+                Integer i;
+
+        boolean y
+                = o
+                instanceof
+                Playground p;
+    }
+
+    @Call(params = "1")
+    public void test3(int i) {
+        boolean x = i == 1
+                ? doGet(this)
+                instanceof
+                Object
+                : this
+                instanceof
+                Object;
+    }
+
+    @Call
+    public void test4() {
+        int[] j
+                =
+                new
+                        int[3];
+
+
+
+    }
+
+    @Call
+    public void test6() {
+        final
+        int
+                a
+                =
+                1,
+                b = 2;
+
+        int
+                c
+                =
+                1,
+                d = 2;
+
+        new TrickyVariableDeclarators().get();
+        consume(a + b + c + d);
+
+        new Tricky2();
+    }
+
+    static class TrickyVariableDeclarators {
+        final
+        int
+            a = 1,
+            b = 2;
+
+
+        int
+                c = 1,
+                d = 2;
+
+        private
+        Runnable s = () -> {};
+
+        int i; // should be COVERED but is NOT_COVERED
+
+        public int get() {
+            return a + b + c + d + i;
+        }
+    }
+
+    static  class Tricky2 {
+        int i = 1;
+        int j = 1,
+            k = INTEGER;
+        int x;
+    }
+
+    @Call
+    public void notCoveredAtAllForSomeReason() {
+        doCall();
+        Object a = null;
+        synchronized (a) {
+
+        }
+    }
+
+    // wrong coverage
+        // assertions
+        // casts
+
+    // tests todo
+        // binary expr
+        // instanceof and pattern
+        // assignments (and nested assignments)
+
+    // TODO: does final modifier impact variabledeclarators?
 }

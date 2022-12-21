@@ -13,6 +13,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.Problem;
+import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
@@ -40,7 +41,7 @@ public class JavaParserUtils {
                 logger.info("Failed to parse Java code. JavaParser reported no problems.");
             } else {
                 final String problemsMessage = problems.stream()
-                        .map(Problem::getMessage)
+                        .map(Problem::getVerboseMessage)
                         .collect(Collectors.joining(System.lineSeparator()));
                 logger.info("Failed to parse Java code. Problems:{}{}", System.lineSeparator(), problemsMessage);
             }
