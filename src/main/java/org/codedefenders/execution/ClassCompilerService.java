@@ -49,12 +49,4 @@ public interface ClassCompilerService {
      * @return A {@link Test} object
      */
     Test compileTest(File dir, String javaFile, int gameId, GameClass cut, int ownerId);
-
-    /**
-     * Compiles CUT.
-     *
-     * @param cut Class under test
-     * @return The path to the compiled CUT
-     */
-    String compileCUT(GameClass cut) throws CompileException;
 }

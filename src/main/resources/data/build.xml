@@ -98,16 +98,6 @@
 		<classpath refid="test.cp"/>
 	</taskdef>
 
-	<!-- Get classname minus .java extension -->
-	<basename property="classname.only" file="${classname}" suffix=".java"/>
-
-	<!-- requires test to compile, and the classname of the file you are testing -->
-	<target name="compile-cut" description="compile a class under test">
-		<javac srcdir="${cut.dir}" destdir="${cut.dir}" target="${java.target.version}" source="${java.target.version}"
-			   classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes"
-			   debug="true" nowarn="true"/>
-	</target>
-
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
 		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="${java.target.version}" classpathref="nocut.cp"
@@ -117,7 +107,6 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-test" description="compile a single test">
-		<!--<classpath refid="test.cp" />-->
 		<javac srcdir="${test.file}" destdir="${test.file}" target="${java.target.version}"
 			   source="${java.target.version}" classpathref="test.cp" includeantruntime="false"
 			   debug="true" nowarn="true"/>
