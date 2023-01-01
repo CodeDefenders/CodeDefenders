@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
@@ -216,6 +217,22 @@ public class GameDAO {
         games.addAll(MultiplayerGameDAO.getExpiredGames());
         games.addAll(MeleeGameDAO.getExpiredGames());
         return games;
+    }
+
+    public static boolean isGameExpired(int gameId) {
+        final String sql = String.join("\n",
+                "SELECT COUNT(*) AS isExpired",
+                "FROM games",
+                "WHERE State = ?",
+                "AND ID = ?",
+                "AND FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW();"
+                // do not use TIMESTAMPADD here to avoid errors with daylight saving
+        );
+        return DB.executeQueryReturnValue(sql,
+                l -> l.getBoolean("isExpired"),
+                DatabaseValue.of(GameState.ACTIVE.toString()),
+                DatabaseValue.of(gameId)
+        );
     }
 
     public static Role getRole(int userId, int gameId) {

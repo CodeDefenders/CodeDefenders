@@ -45,6 +45,7 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -202,8 +203,11 @@ public class MultiplayerGameManager extends HttpServlet {
                     request.setAttribute("openEquivalenceDuel", true);
                 });
 
+        final boolean isGameClosed = game.getState() != GameState.ACTIVE || GameDAO.isGameExpired(gameId);
+
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
+        request.setAttribute("showDetails", isGameClosed);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.BATTLEGROUND_GAME_VIEW_JSP);
         dispatcher.forward(request, response);
