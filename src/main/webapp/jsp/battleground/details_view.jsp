@@ -18,24 +18,54 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-
+<%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 
-<%--
-    @param MutliplayerGame game
-        The game to be displayed.
---%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
 	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+	Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
 
-<%-- -------------------------------------------------------------------------------- --%>
+<jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
+<%
+	playerFeedback.setGameInfo(game.getId(), game.getCreatorId());
+	playerFeedback.setPlayerInfo(login.getUserId(), role);
+%>
 
-<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
-<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+<jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
+<%
+	scoreboard.setGameId(game.getId());
+	scoreboard.setScores(game.getMutantScores(), game.getTestScores());
+	scoreboard.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+%>
+
+<jsp:useBean id="history" class="org.codedefenders.beans.game.HistoryBean" scope="request"/>
+<%
+	history.setLogin(login);
+	history.setGameId(game.getId());
+	history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
+%>
+
+<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
+
+<jsp:include page="/jsp/header_game.jsp"/>
+
+<%-- Push notifications using WebSocket --%>
+<jsp:include page="/jsp/push_socket.jsp"/>
+
+<jsp:include page="/jsp/player_feedback.jsp"/>
+<jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
+<jsp:include page="/jsp/battleground/game_history.jsp"/>
 
 
-<%-- -------------------------------------------------------------------------------- --%>
 
+<!-- This corresponds to dispatcher.Dispatch -->
+<%@ include file="/jsp/footer_game.jsp" %>
+
+
+<% previousSubmission.clear(); %>

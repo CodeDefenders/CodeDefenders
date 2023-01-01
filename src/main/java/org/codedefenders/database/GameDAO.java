@@ -219,6 +219,12 @@ public class GameDAO {
         return games;
     }
 
+    /**
+     * Checks if a game is expired.
+     *
+     * @param gameId the game to check.
+     * @return {@code true} if the game is active but expired.
+     */
     public static boolean isGameExpired(int gameId) {
         final String sql = String.join("\n",
                 "SELECT COUNT(*) AS isExpired",

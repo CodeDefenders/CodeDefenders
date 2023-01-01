@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -203,14 +202,15 @@ public class MultiplayerGameManager extends HttpServlet {
                     request.setAttribute("openEquivalenceDuel", true);
                 });
 
-        final boolean isGameClosed = game.getState() != GameState.ACTIVE || GameDAO.isGameExpired(gameId);
-
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
-        request.setAttribute("showDetails", isGameClosed);
 
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.BATTLEGROUND_GAME_VIEW_JSP);
-        dispatcher.forward(request, response);
+        final boolean isGameClosed = game.getState() != GameState.ACTIVE || GameDAO.isGameExpired(gameId);
+        final String jspPath = isGameClosed
+                ? Constants.BATTLEGROUND_DETAILS_VIEW_JSP
+                : Constants.BATTLEGROUND_GAME_VIEW_JSP;
+
+        request.getRequestDispatcher(jspPath).forward(request, response);
     }
 
     @Override
