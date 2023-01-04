@@ -1,0 +1,21 @@
+.details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4rem;
+    margin-block: 3rem;
+    margin-inline: auto;
+}
+
+.details-content__item {
+    background: #eee;
+    border-radius: 5px;
+    padding: 2rem;
+}
+
+.details-content__item > :is(h1, h2, h3, h4, h5, h6):first-child {
+    margin-block-end: 2rem;
+}
+
+#game-container {
+    max-width: 50rem !important;
+}
