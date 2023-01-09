@@ -290,14 +290,14 @@ public class MeleeGameManager extends HttpServlet {
         switch (action) {
             case "createMutant": {
                 createMutant(request, response, user.get(), game, playerId);
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
                 createTest(request, response, user.get(), game);
                 // After a test is submitted, there's the chance that one or more mutants
                 // already survived enough tests
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "reset": {
@@ -319,49 +319,53 @@ public class MeleeGameManager extends HttpServlet {
         }
     }
 
+    void checkAutomaticMutantEquivalenceForGame(MeleeGame game) {
+        int threshold = game.getAutomaticMutantEquivalenceThreshold();
+        if (threshold > 0) { // Feature is disabled if threshold <= 0
+            try (Histogram.Timer ignored = automaticEquivalenceDuelTrigger.startTimer()) {
+                triggerAutomaticMutantEquivalenceForGame(game);
+            }
+        }
+    }
+
     // This is package protected to enable testing
     void triggerAutomaticMutantEquivalenceForGame(MeleeGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();
-        if (threshold < 1) {
-            // No need to check as this feature is disabled
-            return;
-        }
-        try (Histogram.Timer ignored = automaticEquivalenceDuelTrigger.startTimer()) {
-            // Get all the live mutants in the game
-            for (Mutant aliveMutant : game.getAliveMutants()) {
+        // Get all the live mutants in the game
+        for (Mutant aliveMutant : game.getAliveMutants()) {
+            /*
+             * If the mutant is covered by enough tests trigger the automatic equivalence
+             * duel
+             */
+            int coveringTests = aliveMutant.getCoveringTests().size();
+            if (coveringTests >= threshold) {
+                automaticEquivalenceDuelsTriggered.inc();
+                // Flag the mutant as possibly equivalent
+                aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                aliveMutant.update();
+                // Send the notification about the flagged mutant to attacker
+                int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
+                Event event = new Event(-1, game.getId(), mutantOwnerId,
+                        "One of your mutants survived "
+                                + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
+                                + "tests so it was automatically claimed as equivalent.",
+                        EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
+                        new Timestamp(System.currentTimeMillis()));
+                eventDAO.insert(event);
                 /*
-                 * If the mutant is covered by enough tests trigger the automatic equivalence
-                 * duel
+                 * Register the event to DB
                  */
-                int coveringTests = aliveMutant.getCoveringTests().size();
-                if (coveringTests >= threshold) {
-                    automaticEquivalenceDuelsTriggered.inc();
-                    // Flag the mutant as possibly equivalent
-                    aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                    aliveMutant.update();
-                    // Send the notification about the flagged mutant to attacker
-                    int mutantOwnerId = userRepo.getUserIdForPlayerId(aliveMutant.getPlayerId()).orElse(0);
-                    Event event = new Event(-1, game.getId(), mutantOwnerId,
-                            "One of your mutants survived "
-                                    + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
-                                    + "tests so it was automatically claimed as equivalent.",
-                            EventType.PLAYER_MUTANT_EQUIVALENT, EventStatus.NEW,
-                            new Timestamp(System.currentTimeMillis()));
-                    eventDAO.insert(event);
-                    /*
-                     * Register the event to DB
-                     */
-                    MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
-                    /*
-                     * Send the notification about the flagged mutant to the game channel
-                     */
-                    String flaggingChatMessage = "Code Defenders automatically flagged mutant " + aliveMutant.getId()
-                            + " as equivalent.";
-                    Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
-                            EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
-                            new Timestamp(System.currentTimeMillis()));
-                    eventDAO.insert(gameEvent);
-                }
+                MutantDAO.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                /*
+                 * Send the notification about the flagged mutant to the game channel
+                 */
+                String flaggingChatMessage = "Code Defenders automatically flagged mutant " + aliveMutant.getId()
+                        + " as equivalent.";
+                Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
+                        EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis()));
+                eventDAO.insert(gameEvent);
+
             }
         }
     }
