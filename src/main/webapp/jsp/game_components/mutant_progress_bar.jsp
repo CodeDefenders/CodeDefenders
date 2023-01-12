@@ -18,11 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="mutantProgressBar" class="org.codedefenders.beans.game.MutantProgressBarBean" scope="request"/>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {MutantProgressBar} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {MutantProgressBar} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const progressElement = document.getElementById('progress');

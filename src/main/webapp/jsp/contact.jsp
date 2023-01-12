@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.*" %>
 
@@ -42,7 +44,7 @@
 <%
 	if (AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue()) {
 %>
-	<form action="<%=request.getContextPath() + Paths.API_SEND_EMAIL%>" method="post" class="needs-validation">
+	<form action="${url.forPath(Paths.API_SEND_EMAIL)}" method="post" class="needs-validation">
 		<input type="hidden" name="formType" value="login">
 
         <div class="row g-3">

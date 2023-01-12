@@ -30,6 +30,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
+import org.codedefenders.cron.GameCronJobManager;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.codedefenders.service.MetricsService;
 import org.slf4j.Logger;
@@ -51,6 +52,9 @@ public class SystemStartStop implements ServletContextListener {
     private Configuration config;
 
     @Inject
+    GameCronJobManager gameCronJobManager;
+
+    @Inject
     private MetricsService metricsService;
 
     /**
@@ -66,6 +70,7 @@ public class SystemStartStop implements ServletContextListener {
             logger.error(e.getMessage());
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
+
         mgr.register("test-executor").withCore(config.getNumberOfParallelAntExecutions()).add();
 
         if (config.isMetricsCollectionEnabled()) {
@@ -75,6 +80,8 @@ public class SystemStartStop implements ServletContextListener {
         if (config.isJavaMelodyEnabled()) {
             sce.getServletContext().addServlet("javamelody", new ReportServlet()).addMapping("/monitoring");
         }
+
+        gameCronJobManager.startup();
     }
 
     /**
@@ -83,6 +90,7 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        gameCronJobManager.shutdown();
 
         // https://stackoverflow.com/questions/11872316/tomcat-guice-jdbc-memory-leak
         AbandonedConnectionCleanupThread.checkedShutdown();

@@ -43,7 +43,7 @@ abstract class BaseConfiguration extends Configuration {
     protected final void init() {
         Field[] fields = Configuration.class.getDeclaredFields();
         for (Field f : fields) {
-            if (!f.getName().startsWith("$")) {
+            if (!f.getName().startsWith("_")) {
                 Object prop = resolveAttribute(f.getName());
                 if (prop != null) {
                     setField(f, prop);

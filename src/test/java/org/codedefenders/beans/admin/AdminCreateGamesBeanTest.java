@@ -27,6 +27,8 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.game.GameService;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +53,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(PowerMockRunner.class)
@@ -95,8 +98,9 @@ public class AdminCreateGamesBeanTest {
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);
         EventDAO eventDAO = PowerMockito.mock(EventDAO.class);
         userRepo = PowerMockito.mock(UserRepository.class);
+        GameService gameService = PowerMockito.mock(GameService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo);
+        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
@@ -215,8 +219,24 @@ public class AdminCreateGamesBeanTest {
         assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame4));
     }
 
+    private static void mockGameDurationAdminSettings() {
+        PowerMockito.when(
+                AdminDAO.getSystemSetting(argThat(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT::equals))
+        ).thenReturn(
+                new AdminSystemSettings.SettingsDTO(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT, 60)
+        );
+
+        PowerMockito.when(
+                AdminDAO.getSystemSetting(argThat(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX::equals))
+        ).thenReturn(
+                new AdminSystemSettings.SettingsDTO(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX, 10080)
+        );
+    }
+
     @Test
     public void testCreateStagedGames() throws Exception {
+        mockGameDurationAdminSettings();
+
         GameSettings gameSettings = GameSettings.getDefault();
         GameClass cut = PowerMockito.mock(GameClass.class);
         PowerMockito.when(cut.getId()).thenReturn(0);

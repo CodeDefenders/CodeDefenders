@@ -18,8 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
-<%@page import="org.codedefenders.util.Paths"%>
+<%@ page import="org.codedefenders.util.Paths"%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.Feedback" %>
 <%@ page import="org.codedefenders.model.Player" %>
@@ -28,7 +29,7 @@
 
 <jsp:useBean id="playerFeedback" class="org.codedefenders.beans.game.PlayerFeedbackBean" scope="request"/>
 
-<link href="${pageContext.request.contextPath}/css/specific/player_feedback.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/player_feedback.css")}" rel="stylesheet">
 
 <div id="playerFeedback" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-dialog-responsive">
@@ -61,7 +62,7 @@
                     <div class="tab-content">
                         <div class="tab-pane fade show active" id="give-feedback" role="tabpanel" aria-labelledby="give-feedback-tab">
                             <span class="h4">How much do you agree with the following statements?</span>
-                            <form id="give-feedback-form" action="<%=request.getContextPath() + Paths.API_FEEDBACK%>" method="post" autocomplete="off">
+                            <form id="give-feedback-form" action="${url.forPath(Paths.API_FEEDBACK)}" method="post" autocomplete="off">
                                 <input type="hidden" name="formType" value="sendFeedback">
                                 <input type="hidden" name="gameId" value="${playerFeedback.gameId}">
 
@@ -214,7 +215,7 @@
 </div>
 
 <script type="module">
-    import $ from './js/jquery.mjs';
+    import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
     $(document).ready(() => {

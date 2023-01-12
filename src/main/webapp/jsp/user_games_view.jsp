@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="org.codedefenders.model.GameInfo" %>
@@ -130,7 +132,7 @@
                                     if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
                                 %>
                                     <form id="adminStartBtn-<%=gameId%>"
-                                          action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
+                                          action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
                                           method="post">
                                         <button type="submit" class="btn btn-sm btn-success text-nowrap" id="startGame-<%=gameId%>"
                                                 form="adminStartBtn-<%=gameId%>">
@@ -146,7 +148,7 @@
                                                 if (info.gameState() != GameState.CREATED) {
                                 %>
                                     <a class="btn btn-sm btn-attacker text-nowrap" id="<%="attack-"+gameId%>"
-                                       href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%=gameId%>">
+                                       href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gameId%>">
                                         Attack in battleground
                                     </a>
                                 <%
@@ -157,7 +159,7 @@
                                 <%
                                                     if (gamesJoinable) {
                                 %>
-                                        <form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>"
+                                        <form id="attLeave" action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
                                               method="post">
                                             <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
                                             <input type="hidden" name="gameId" value="<%=gameId%>">
@@ -178,7 +180,7 @@
                                                 if (info.gameState() != GameState.CREATED) {
                                 %>
                                     <a class="btn btn-sm btn-defender text-nowrap" id="<%="defend-"+gameId%>"
-                                       href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gameId%>">
+                                       href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gameId%>">
                                         Defend in battleground
                                     </a>
                                 <%
@@ -189,7 +191,7 @@
                                 <%
                                                     if (gamesJoinable) {
                                 %>
-                                            <form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>"
+                                            <form id="defLeave" action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
                                                   method="post">
                                                 <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
                                                 <input type="hidden" name="gameId" value="<%=gameId%>">
@@ -210,7 +212,7 @@
                                             if (info.creatorId() == info.userId()) {
                                 %>
                                     <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
-                                       href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">
+                                       href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%= gameId %>">
                                         Observe battleground
                                     </a>
                                 <%
@@ -323,7 +325,7 @@
                                         if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
                                     %>
                                         <form id="adminStartBtn-<%=gameId%>"
-                                              action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>"
+                                              action="${url.forPath(Paths.MELEE_SELECTION)}"
                                               method="post">
                                             <button type="submit" class="btn btn-sm btn-success text-nowrap" id="startGame-<%=gameId%>"
                                                     form="adminStartBtn-<%=gameId%>">
@@ -338,7 +340,7 @@
                                                 case OBSERVER:
                                     %>
                                         <a class="btn btn-sm btn-primary text-nowrap" id="<%="observe-"+gameId%>"
-                                           href="<%= request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%= gameId %>">
+                                           href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%= gameId %>">
                                             Observe melee game
                                         </a>
                                     <%
@@ -348,7 +350,7 @@
                                                     if (info.gameState() != GameState.CREATED) {
                                     %>
                                         <a class="btn btn-sm btn-player text-nowrap" id="<%="play-"+gameId%>"
-                                           href="<%= request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gameId%>">
+                                           href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%=gameId%>">
                                             Play in melee game
                                         </a>
                                     <%
@@ -359,7 +361,7 @@
                                     <%
                                                         if (gamesJoinable) {
                                     %>
-                                            <form id="leave" action="<%= request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post">
+                                            <form id="leave" action="${url.forPath(Paths.MELEE_SELECTION)}" method="post">
                                                 <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
                                                 <input type="hidden" name="gameId" value="<%=gameId%>">
                                                 <button class="btn btn-sm btn-danger text-nowrap" id="<%="leave-"+gameId%>" type="submit" form="leave"
@@ -417,10 +419,10 @@
 
     <% if (gamesCreatable) { %>
         <div>
-            <a id="createBattleground" class="btn btn-outline-primary me-2" href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE %>?origin=<%=Paths.GAMES_OVERVIEW%>">
+            <a id="createBattleground" class="btn btn-outline-primary me-2" href="${url.forPath(Paths.BATTLEGROUND_CREATE)}?origin=<%=Paths.GAMES_OVERVIEW%>">
                 Create battleground game
             </a>
-            <a id="createMelee" class="btn btn-outline-primary" href="<%=request.getContextPath() + Paths.MELEE_CREATE%>?origin=<%=Paths.GAMES_OVERVIEW%>">
+            <a id="createMelee" class="btn btn-outline-primary" href="${url.forPath(Paths.MELEE_CREATE)}?origin=<%=Paths.GAMES_OVERVIEW%>">
                 Create melee game
             </a>
         </div>
@@ -477,7 +479,7 @@
                                 </td>
                                 <td>
                                     <form id="joinGameForm_attacker_<%=gameId%>"
-                                          action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
+                                          action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
                                           method="post">
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=info.gameId()%>>
@@ -495,7 +497,7 @@
                                 </td>
                                 <td>
                                     <form id="joinGameForm_defender_<%=gameId%>"
-                                          action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
+                                          action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}"
                                           method="post">
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=gameId%>>
@@ -635,7 +637,7 @@
                                 </td>
                                 <td>
                                     <form id="joinGameForm_player_<%=info.gameId()%>"
-                                          action="<%=request.getContextPath() + Paths.MELEE_SELECTION%>" method="post">
+                                          action="${url.forPath(Paths.MELEE_SELECTION)}" method="post">
                                         <input type="hidden" name="formType" value="joinGame">
                                         <input type="hidden" name="gameId" value=<%=info.gameId()%>>
                                         <input type="hidden" name="player" value=1>
@@ -692,8 +694,8 @@
     %>
 
     <script type="module">
-        import DataTable from './js/datatables.mjs';
-        import $ from './js/jquery.mjs';
+        import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
         $(document).ready(function () {

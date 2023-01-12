@@ -19,6 +19,8 @@
 
 --%>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%--
     Adds highlighting of error (red) lines to a CodeMirror editor.
 
@@ -28,8 +30,8 @@
 <jsp:useBean id="testErrorHighlighting" class="org.codedefenders.beans.game.ErrorHighlightingBean" scope="request"/>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {ErrorHighlighting} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {ErrorHighlighting} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const errorLines = JSON.parse('${testErrorHighlighting.errorLinesJSON}');

@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("User Analytics"); %>
 
@@ -46,16 +48,16 @@
     <div class="row mt-4">
         <div class="col-auto">
             <div class="btn-group">
-                <a download="user-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?fileType=csv"
+                <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download">
                     <i class="fa fa-download me-1"></i>
                     Download table
                 </a>
-                <a download="user-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?fileType=csv"
+                <a download="user-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=csv"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
                     as CSV
                 </a>
-                <a download="user-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?fileType=json"
+                <a download="user-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=json"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
                     as JSON
                 </a>
@@ -65,10 +67,10 @@
 </div>
 
 <script type="module">
-    import DataTable from './js/datatables.mjs';
-    import $ from './js/jquery.mjs';
+    import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import $ from '${url.forPath("/js/jquery.mjs")}';
 
-    import {DataTablesUtils} from './js/codedefenders_main.mjs';
+    import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
     const div = DataTablesUtils.formatDivision;
@@ -144,7 +146,7 @@
     $(document).ready(function() {
         const table = new DataTable('#tableUsers', {
             "ajax": {
-                "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_USERS + "?fileType=json"%>",
+                "url": "${url.forPath(Paths.API_ANALYTICS_USERS)}?fileType=json",
                 "dataSrc": "data"
             },
             "columns": [

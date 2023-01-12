@@ -19,6 +19,7 @@
 package org.codedefenders.notification.web;
 
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -106,16 +107,13 @@ public class TicketingFilter implements Filter {
     }
 
     private boolean requiresTicket(HttpServletRequest httpReq) {
-        String path = httpReq.getRequestURI();
-        String context = httpReq.getContextPath();
+        String servletPath = httpReq.getServletPath();
         /*
          * List here the pages which require the web socket!
          */
-        return path.startsWith(context + Paths.BATTLEGROUND_GAME)
-                || path.startsWith(context + Paths.MELEE_GAME)
-                || path.startsWith(context + Paths.PUZZLE_GAME)
-                || path.startsWith(context + Paths.BATTLEGROUND_HISTORY)
-                || path.startsWith(context + Paths.MELEE_HISTORY);
+        return Stream.of(Paths.BATTLEGROUND_GAME, Paths.MELEE_GAME, Paths.PUZZLE_GAME,
+                        Paths.BATTLEGROUND_HISTORY, Paths.MELEE_HISTORY)
+                .anyMatch(servletPath::startsWith);
     }
 
     @Override

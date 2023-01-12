@@ -22,13 +22,18 @@ package org.codedefenders.service.game;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.dto.SimpleUser;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
@@ -81,5 +86,20 @@ public class MultiplayerGameService extends AbstractGameService {
                 || playerRole == Role.DEFENDER
                 || game.getLevel() == GameLevel.EASY
                 || test.getPlayerId() == player.getId();
+    }
+
+    /**
+     * Closes the given game and enqueues the kill-map computation for it.
+     *
+     * @param game The game to close.
+     * @return {@code true} if the game was closed, {@code false} otherwise.
+     */
+    @Override
+    public boolean closeGame(AbstractGame game) {
+        boolean closed = super.closeGame(game);
+        if (closed) {
+            KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, game.getId()));
+        }
+        return closed;
     }
 }

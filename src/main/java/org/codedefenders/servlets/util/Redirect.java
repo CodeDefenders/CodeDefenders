@@ -23,7 +23,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,54 +39,16 @@ public class Redirect {
      * Redirect back to the referer, or to the start page if the header does not specify a referer.
      */
     public static void redirectBack(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        URLUtils url = CDIUtil.getBeanFromCDI(URLUtils.class);
+
         String referer = request.getHeader("referer");
 
         if (referer == null) {
             logger.debug("Header does not specify a referer, redirecting back to " + Paths.LANDING_PAGE);
-            redirectTo(request, response, Paths.LANDING_PAGE);
-
+            response.sendRedirect(url.forPath(Paths.LANDING_PAGE));
         } else {
             logger.debug("Redirecting back to absolute URL " + referer);
             response.sendRedirect(referer);
-        }
-    }
-
-    /*
-     * TODO: Change this to only take context-relative paths.
-     * TODO: Change other redirects to use this method.
-     */
-    /**
-     * Redirect to the provided target page.
-     * The target page can have three possible formats:
-     * <ul>
-     *     <li>Relative path with leading slash: e.g.: <code>/games/overview</code></li>
-     *     <li>Relative path without leading slash: e.g.: <code>games/overview</code></li>
-     *     <li>
-     *         Absolute path with leading slash: e.g.: <code>/codedefenders/games/overview</code>
-     *         (with <code>/codedefenders</code> as the context path)
-     *     </li>
-     * </ul>
-     */
-    public static void redirectTo(HttpServletRequest request, HttpServletResponse response, String target) throws IOException {
-        // TODO: Should we check this is indeed a valid URL from Paths, we cannot allow to redirect to any web page out there, can't we?
-        String contextPath = request.getContextPath();
-
-        if (target == null) {
-            logger.debug("Target is null, redirecting back to " + Paths.LANDING_PAGE);
-            response.sendRedirect(request.getContextPath() + Paths.LANDING_PAGE);
-
-        // This could fail if the context path is also the name of a relative path within the context path.
-        // E.g. if the context path is "/games".
-        } else if (!contextPath.isEmpty() && target.startsWith(contextPath)) {
-            logger.debug("Redirecting to absolute URL " + target);
-            response.sendRedirect(target);
-
-        } else {
-            String redirectUrl = target.startsWith("/")
-                    ? contextPath + target
-                    : contextPath + "/" + target;
-            logger.debug("Redirecting to relative URL " + redirectUrl);
-            response.sendRedirect(redirectUrl);
         }
     }
 }

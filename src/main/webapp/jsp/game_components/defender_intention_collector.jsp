@@ -18,11 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {DefenderIntentionCollection} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {DefenderIntentionCollection} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const lineToSelect = ${previousSubmission.hasSelectedLine() ? previousSubmission.selectedLine : "null"};

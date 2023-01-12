@@ -39,6 +39,7 @@ import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet(Paths.MELEE_HISTORY)
 public class MeleeGameHistoryManager extends HttpServlet {
@@ -49,6 +50,9 @@ public class MeleeGameHistoryManager extends HttpServlet {
     @Inject
     private UserService userService;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
@@ -58,13 +62,13 @@ public class MeleeGameHistoryManager extends HttpServlet {
 
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
         if (!gameIdOpt.isPresent()) {
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
+            response.sendRedirect(url.forPath(Paths.GAMES_HISTORY));
             return;
         }
         game = MeleeGameDAO.getMeleeGame(gameIdOpt.get());
 
         if (game == null || game.getState() != GameState.FINISHED) {
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 

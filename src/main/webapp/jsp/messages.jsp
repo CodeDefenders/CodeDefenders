@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="messages" type="org.codedefenders.beans.message.MessagesBean"--%>
 
 <c:if test="${messages.count > 0}">
@@ -14,8 +15,8 @@
     </div>
 
     <script type="module">
-        import {Alert} from './js/bootstrap.mjs';
-        import $ from './js/jquery.mjs';
+        import {Alert} from '${url.forPath("/js/bootstrap.mjs")}';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
         $(document).ready(() => {

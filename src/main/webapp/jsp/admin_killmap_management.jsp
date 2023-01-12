@@ -28,6 +28,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("KillMap Management"); %>
 
@@ -106,19 +108,19 @@
     <ul class="nav nav-tabs my-4">
         <li class="nav-item">
             <a class="nav-link <%=currentPage == KillmapPage.MANUAL ? "active" : ""%>"
-               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">
+               href="${url.forPath(Paths.ADMIN_KILLMAPS)}/manual">
                 Enter IDs
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link <%=currentPage == KillmapPage.AVAILABLE ? "active" : ""%>"
-               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/available"%>">
+               href="${url.forPath(Paths.ADMIN_KILLMAPS)}/available">
                 Select Classes / Games
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link <%=currentPage == KillmapPage.QUEUE ? "active" : ""%>"
-               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/queue"%>">
+               href="${url.forPath(Paths.ADMIN_KILLMAPS)}/queue">
                 Queued Killmap Jobs
             </a>
         </li>
@@ -255,18 +257,18 @@
             <div class="col-12">
                 <div class="btn-group">
                     <a download="classes.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-classes">
                         <i class="fa fa-download me-1"></i>
                         Download classes table
                     </a>
                     <a download="classes.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-classes-csv">
                         as CSV
                     </a>
                     <a download="classes.json"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=json"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=class&fileType=json"
                        class="btn btn-sm btn-outline-secondary" id="download-classes-json">
                         as JSON
                     </a>
@@ -275,18 +277,18 @@
             <div class="col-12">
                 <div class="btn-group">
                     <a download="games.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-games">
                         <i class="fa fa-download me-1"></i>
                         Download games table
                     </a>
                     <a download="games.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-games-csv">
                         as CSV
                     </a>
                     <a download="games.json"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=json"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=game&fileType=json"
                        class="btn btn-sm btn-outline-secondary" id="download-games-json">
                         as JSON
                     </a>
@@ -297,8 +299,8 @@
 </div>
 
 <script type="module">
-    import DataTable from './js/datatables.mjs';
-    import $ from './js/jquery.mjs';
+    import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
     const postIds = function (idsString, formType, killmapType) {
@@ -415,7 +417,7 @@
     $(document).ready(function() {
         const classTable = new DataTable('#table-classes', {
             ajax: {
-                url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json',
+                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=class&fileType=json',
                 dataSrc: 'data'
             },
             columns: [
@@ -435,7 +437,7 @@
 
         const gameTable = new DataTable('#table-games', {
             ajax: {
-                url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json',
+                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=game&fileType=json',
                 dataSrc: 'data'
             },
             columns: [

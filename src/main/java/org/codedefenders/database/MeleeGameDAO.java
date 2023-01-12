@@ -71,6 +71,9 @@ public class MeleeGameDAO {
         int defenderValue = rs.getInt("Defender_Value");
         int attackerValue = rs.getInt("Attacker_Value");
 
+        int gameDuration = rs.getInt("Game_Duration_Minutes");
+        long startTime = rs.getLong("Timestamp_Start");
+
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
         return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest)
@@ -84,6 +87,8 @@ public class MeleeGameDAO {
                 .requiresValidation(requiresValidation)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
+                .gameDurationMinutes(gameDuration)
+                .startTimeUnixSeconds(startTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
                 .build();
     }
@@ -166,6 +171,7 @@ public class MeleeGameDAO {
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
+        int gameDurationMinutes = game.getGameDurationMinutes();
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -183,8 +189,9 @@ public class MeleeGameDAO {
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention,",
-                "EquivalenceThreshold)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "EquivalenceThreshold,",
+                "Game_Duration_Minutes)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -201,7 +208,8 @@ public class MeleeGameDAO {
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
                 DatabaseValue.of(capturePlayersIntention),
-                DatabaseValue.of(automaticMutantEquivalenceThreshold)
+                DatabaseValue.of(automaticMutantEquivalenceThreshold),
+                DatabaseValue.of(gameDurationMinutes),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -230,6 +238,7 @@ public class MeleeGameDAO {
         int defenderValue = 0;
         int attackerValue = 0;
 
+        int duration = game.getGameDurationMinutes();
         float lineCoverage = game.getLineCoverage();
         float mutantCoverage = game.getMutantCoverage();
         int id = game.getId();
@@ -244,9 +253,10 @@ public class MeleeGameDAO {
                 "    Attacker_Value = ?,",
                 "    Coverage_Goal = ?,",
                 "    Mutant_Goal = ?,",
-                "    State = ?",
+                "    State = ?,",
+                "    Game_Duration_Minutes = ?",
                 "WHERE ID = ?");
-        DatabaseValue<?>[] values = new DatabaseValue[]{
+        DatabaseValue<?>[] values = new DatabaseValue[] {
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
                 DatabaseValue.of(prize),
@@ -255,7 +265,9 @@ public class MeleeGameDAO {
                 DatabaseValue.of(lineCoverage),
                 DatabaseValue.of(mutantCoverage),
                 DatabaseValue.of(state.name()),
-                DatabaseValue.of(id)};
+                DatabaseValue.of(duration),
+                DatabaseValue.of(id)
+        };
 
         return DB.executeUpdateQuery(query, values);
     }
@@ -435,5 +447,23 @@ public class MeleeGameDAO {
 
         DatabaseValue<?>[] values = new DatabaseValue[]{DatabaseValue.of(playerId)};
         return DB.executeQueryReturnValue(query, MeleeGameDAO::meleeGameFromRS, values);
+    }
+
+    /**
+     * Fetches all expired melee games.
+     *
+     * @return the expired melee games.
+     */
+    public static List<MeleeGame> getExpiredGames() {
+        final String sql = String.join("\n",
+                "SELECT *",
+                "FROM view_melee_games",
+                "WHERE State = ?",
+                "AND FROM_UNIXTIME(Timestamp_Start + Game_Duration_Minutes * 60) <= NOW();"
+                // do not use TIMESTAMPADD here to avoid errors with daylight saving
+        );
+
+        DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
+        return DB.executeQueryReturnList(sql, MeleeGameDAO::meleeGameFromRS, state);
     }
 }
