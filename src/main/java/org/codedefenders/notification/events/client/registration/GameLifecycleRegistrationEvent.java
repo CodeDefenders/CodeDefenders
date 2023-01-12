@@ -7,6 +7,8 @@ import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 
+import com.google.gson.annotations.Expose;
+
 /**
  * A message used to register for game lifecycle events.
  * <br>
@@ -20,6 +22,17 @@ import org.codedefenders.notification.handling.ClientEventHandler;
  * </ul>
  */
 public class GameLifecycleRegistrationEvent extends RegistrationEvent {
+    @Expose
+    private int gameId;
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
+    }
+
     @Override
     public void accept(ClientEventHandler visitor) {
         visitor.visit(this);

@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
@@ -51,7 +53,7 @@
     %>
     <p class="text-center">
         Before you can start games, please
-        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>" class="text-center">upload
+        <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.MELEE_CREATE%>" class="text-center">upload
             a class under test</a>.
     </p>
     <%
@@ -66,7 +68,7 @@
     %>
     <div class="d-flex flex-wrap justify-content-center gap-5">
         <div id="create-game-settings" class="form-width">
-            <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
+            <form id="create" action="${url.forPath(Paths.MELEE_SELECTION)}" method="post"
                   class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="createGame">
 
@@ -86,7 +88,7 @@
                             <span class="input-group-text position-relative cursor-pointer"
                                   title="Upload a class.">
                             <a class="stretched-link text-decoration-none"
-                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>">
+                               href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.MELEE_CREATE%>">
                                 <i class="fa fa-upload"></i>
                             </a>
                         </span>
@@ -224,13 +226,52 @@
                     </div>
                 </div>
 
+                <div class="row mb-3" title="The duration for how long the games will be open.">
+                    <input type="hidden" name="gameDurationMinutes" id="gameDurationMinutes">
+                    <%
+                        request.setAttribute("defaultDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue());
+                        request.setAttribute("maximumDuration", AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
+                    %>
+
+                    <label class="col-4 col-form-label">Set the game's duration:</label>
+                    <div class="col-8 input-group input-group-sm has-validation"
+                         style="width: 66.6666666667%;"><!-- col-8 is overridden by input-group -->
+                        <input type="number" name="days" class="form-control" id="days-input" min="0">
+                        <label for="days-input" class="input-group-text">days</label>
+                        <input type="number" name="hours" class="form-control" id="hours-input" min="0">
+                        <label for="hours-input" class="input-group-text">hours</label>
+                        <input type="number" name="minutes" class="form-control" id="minutes-input" min="0">
+                        <label for="minutes-input" class="input-group-text">minutes</label>
+                        <div class="invalid-feedback">
+                            Please input a valid duration.
+                            Maximum duration: <span id="displayMaxDuration">&hellip;</span>
+                        </div>
+                    </div>
+
+                    <script type="module">
+                        import {GameTimeValidator, formatTime} from './js/codedefenders_game.mjs';
+
+                        const gameTimeValidator = new GameTimeValidator(
+                                Number(${maximumDuration}),
+                                Number(${defaultDuration}),
+                                document.getElementById('minutes-input'),
+                                document.getElementById('hours-input'),
+                                document.getElementById('days-input'),
+                                document.getElementById('gameDurationMinutes')
+                        );
+
+                        document.getElementById('displayMaxDuration').innerText =
+                                formatTime(${maximumDuration});
+                    </script>
+                </div>
+
                 <c:choose>
                     <c:when test="${empty param.origin}">
                         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
                     </c:when>
                     <c:otherwise>
                         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
-                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel"
+                        <a href="${url.forPath(param.origin)}" id="cancel"
                            class="btn btn-outline-primary">Cancel</a>
                     </c:otherwise>
                 </c:choose>

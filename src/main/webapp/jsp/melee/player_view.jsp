@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
@@ -203,8 +205,8 @@
             </div>
 
             <script type="module">
-                import CodeMirror from './js/codemirror.mjs';
-                import {LoadingAnimation} from './js/codedefenders_main.mjs';
+                import CodeMirror from '${url.forPath("/js/codemirror.mjs")}';
+                import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
                 const textarea = document.getElementById('diff');
@@ -222,7 +224,7 @@
             <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 
             <h3 class="mt-3">Not equivalent? Write a killing test here:</h3>
-            <form id="equivalenceForm" action="<%=request.getContextPath() + Paths.EQUIVALENCE_DUELS_GAME%>" method="post">
+            <form id="equivalenceForm" action="${url.forPath(Paths.EQUIVALENCE_DUELS_GAME)}" method="post">
                 <input type="hidden" name="formType" value="resolveEquivalence">
                 <input type="hidden" name="gameId" value="<%=game.getId()%>">
                 <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%=equivMutant.getId()%>">
@@ -235,7 +237,7 @@
                     <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test</button>
 
                     <script type="module">
-                        import {objects} from './js/codedefenders_main.mjs';
+                        import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
                         const testProgressBar = objects.await('testProgressBar');
 
 
@@ -293,9 +295,9 @@
                 </div>
 
                 <script type="module">
-                    import $ from './js/jquery.mjs';
+                    import $ from '${url.forPath("/js/jquery.mjs")}';
 
-                    import {objects} from './js/codedefenders_main.mjs';
+                    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
                     const gameHighlighting = await objects.await('gameHighlighting');
@@ -310,7 +312,7 @@
                     })
                 </script>
 
-                <form id="reset" action="<%=request.getContextPath() + Paths.MELEE_GAME%>" method="post">
+                <form id="reset" action="${url.forPath(Paths.MELEE_GAME)}" method="post">
                     <input type="hidden" name="formType" value="reset">
                     <input type="hidden" name="gameId" value="<%=game.getId()%>">
                     <button class="btn btn-warning" id="btnReset">Reset</button>
@@ -324,7 +326,7 @@
         <t:defender_intention_collection_note/>
 
         <form id="atk"
-              action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
+              action="${url.forPath(Paths.MELEE_GAME)}"
               method="post">
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%=game.getId()%>">
@@ -354,7 +356,7 @@
                 </button>
 
                 <script type="module">
-                    import {objects} from './js/codedefenders_main.mjs';
+                    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
                     const testProgressBar = await objects.await('testProgressBar');
 
 
@@ -368,7 +370,7 @@
         </div>
 
         <form id="def"
-              action="<%=request.getContextPath() + Paths.MELEE_GAME%>"
+              action="${url.forPath(Paths.MELEE_GAME)}"
               method="post">
             <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             <input type="hidden" name="formType" value="createTest">

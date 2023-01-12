@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet("/login")
 public class LoginPage extends HttpServlet {
@@ -41,10 +42,13 @@ public class LoginPage extends HttpServlet {
     @Inject
     PageInfoBean pageInfo;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         if (login.isLoggedIn()) {
-            resp.sendRedirect(req.getContextPath() + Paths.GAMES_OVERVIEW);
+            resp.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
         } else {
             pageInfo.setPageTitle("Login");
 

@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import javax.servlet.http.HttpServletRequest;
 
 import org.codedefenders.servlets.UserProfileManager;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,25 +37,23 @@ public final class LinkUtils {
     /**
      * Returns the URL to the user profile of the given username.
      *
-     * @param request The current servlet request on which the path will be based on
      * @param username The username for which the link will be created
      * @return the URL to the user profile
      */
-    public static String getUserProfileHyperlink(HttpServletRequest request, String username) {
-        return ServletUtils.ctx(request) + Paths.USER_PROFILE + "?user=" + urlEncode(username);
+    public static String getUserProfileHyperlink(String username) {
+        return CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.USER_PROFILE) + "?user=" + urlEncode(username);
     }
 
     /**
      * Returns an HTML anchor tag with the username as content and the hyperlink to the corresponding user profile as
-     * href-attribute if the user profiles are enabled in the admin settings. Returns only the username if disabled.
+     * href-attribute if public user profiles are enabled in the admin settings. Returns only the username if disabled.
      *
-     * @param request The current servlet request on which the path will be based on
      * @param username The username for which the link will be created
      * @return HTML code containing an anchor-tag or plain text
      */
-    public static String getUserProfileAnchorOrText(HttpServletRequest request, String username) {
-        if (UserProfileManager.checkEnabled()) {
-            return "<a href=\"" + getUserProfileHyperlink(request, username) + "\">" + username + "</a>";
+    public static String getUserProfileAnchorOrText(String username) {
+        if (UserProfileManager.isProfilePublic()) {
+            return "<a href=\"" + getUserProfileHyperlink(username) + "\">" + username + "</a>";
         } else {
             return username;
         }

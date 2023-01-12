@@ -36,6 +36,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
@@ -72,14 +73,17 @@ public class AdminCreateGamesBean implements Serializable {
     private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
+    private final GameService gameService;
 
     @Inject
-    public AdminCreateGamesBean(CodeDefendersAuth login, MessagesBean messages, GameManagingUtils gameManagingUtils, EventDAO eventDAO, UserRepository userRepo) {
+    public AdminCreateGamesBean(CodeDefendersAuth login, MessagesBean messages, GameManagingUtils gameManagingUtils,
+                                EventDAO eventDAO, UserRepository userRepo, GameService gameService) {
         this.login = login;
         this.messages = messages;
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
+        this.gameService = gameService;
     }
 
     public Object getSynchronizer() {
@@ -615,26 +619,32 @@ public class AdminCreateGamesBean implements Serializable {
         /* Create the game. */
         AbstractGame game;
         if (gameSettings.getGameType() == MULTIPLAYER) {
-            game = new MultiplayerGame.Builder(gameSettings.getCut().getId(),
-                    login.getUserId(),
-                    gameSettings.getMaxAssertionsPerTest())
+            game = new MultiplayerGame.Builder(
+                        gameSettings.getCut().getId(),
+                        login.getUserId(),
+                        gameSettings.getMaxAssertionsPerTest()
+                    )
                     .cut(gameSettings.getCut())
                     .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
                     .chatEnabled(gameSettings.isChatEnabled())
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
+                    .gameDurationMinutes(gameSettings.getGameDurationMinutes())
                     .build();
         } else if (gameSettings.getGameType() == MELEE) {
-            game = new MeleeGame.Builder(gameSettings.getCut().getId(),
-                    login.getUserId(),
-                    gameSettings.getMaxAssertionsPerTest())
+            game = new MeleeGame.Builder(
+                        gameSettings.getCut().getId(),
+                        login.getUserId(),
+                        gameSettings.getMaxAssertionsPerTest()
+                    )
                     .cut(gameSettings.getCut())
                     .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
                     .chatEnabled(gameSettings.isChatEnabled())
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
+                    .gameDurationMinutes(gameSettings.getGameDurationMinutes())
                     .build();
         } else {
             messages.add(format("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",
@@ -716,8 +726,7 @@ public class AdminCreateGamesBean implements Serializable {
 
         /* Start game if configured to. */
         if (gameSettings.isStartGame()) {
-            game.setState(GameState.ACTIVE);
-            game.update();
+            gameService.startGame(game);
         }
 
         return true;

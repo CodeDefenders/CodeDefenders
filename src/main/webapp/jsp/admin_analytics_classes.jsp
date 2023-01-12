@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Class Analytics"); %>
 
@@ -47,16 +49,16 @@
     <div class="row mt-4">
         <div class="col-auto">
             <div class="btn-group">
-                <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
+                <a download="classes-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_CLASSES)}?fileType=csv"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download">
                     <i class="fa fa-download me-1"></i>
                     Download table
                 </a>
-                <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=csv"
+                <a download="classes-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_CLASSES)}?fileType=csv"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
                     as CSV
                 </a>
-                <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?fileType=json"
+                <a download="classes-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_CLASSES)}?fileType=json"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
                     as JSON
                 </a>
@@ -66,10 +68,10 @@
 </div>
 
 <script type="module">
-    import DataTable from './js/datatables.mjs';
-    import $ from './js/jquery.mjs';
+    import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import $ from '${url.forPath("/js/jquery.mjs")}';
 
-    import {DataTablesUtils} from './js/codedefenders_main.mjs';
+    import {DataTablesUtils} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
     const div = DataTablesUtils.formatDivision;
@@ -149,7 +151,7 @@
     $(document).ready(function() {
         const table = new DataTable('#tableClasses', {
             "ajax": {
-                "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_CLASSES + "?fileType=json"%>",
+                "url": "${url.forPath(Paths.API_ANALYTICS_CLASSES)}?fileType=json",
                 "dataSrc": "data"
             },
             "columns": [

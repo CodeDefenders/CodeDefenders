@@ -20,6 +20,8 @@
 --%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
+<%@ page import="org.codedefenders.util.URLUtils" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -81,7 +83,8 @@
             %><jsp:include page="/jsp/battleground/creator_view.jsp"/><%
             break;
         default:
-            response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);
+            // TODO(Alex): Do not redirect from JSP!!
+            response.sendRedirect(CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.GAMES_OVERVIEW));
             return;
     }
 %>

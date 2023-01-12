@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -125,7 +127,7 @@
                 </button>
 
                 <script type="module">
-                    import {objects} from './js/codedefenders_main.mjs';
+                    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
                     const progressBar = await objects.await('testProgressBar');
@@ -141,7 +143,7 @@
             </div>
         </div>
 
-        <form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
+        <form id="def" action="${url.forPath(Paths.BATTLEGROUND_GAME)}" method="post">
             <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             <input type="hidden" name="formType" value="createTest">
             <input type="hidden" name="gameId" value="<%= game.getId() %>">

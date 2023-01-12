@@ -1,6 +1,9 @@
 <%@ tag pageEncoding="UTF-8" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ attribute name="gameActive" required="true" %>
 <%@ attribute name="intentionCollectionEnabled" required="true" %>
@@ -14,7 +17,7 @@
         </button>
 
         <script type="module">
-            import {objects} from './js/codedefenders_main.mjs';
+            import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
             const mutantProgressBar = await objects.await('mutantProgressBar');
 
 

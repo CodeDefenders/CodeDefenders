@@ -18,7 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <%@ page import="org.codedefenders.game.GameState"%>
 <%@ page import="org.codedefenders.game.Role"%>
@@ -26,8 +29,13 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.AbstractGame" %>
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.util.URLUtils" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
+<%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 <%
     AbstractGame game = (AbstractGame) request.getAttribute("game");
@@ -35,12 +43,25 @@
 
     Role role = null;
     String selectionManagerUrl = null;
+    int duration = -1;
+    long startTime = -1;
     if (game instanceof MeleeGame) {
-        selectionManagerUrl = request.getContextPath() + Paths.MELEE_SELECTION;
+        selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.MELEE_SELECTION);
         role = ((MeleeGame) game).getRole(login.getUserId());
+        duration = ((MeleeGame) game).getGameDurationMinutes();
+        startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
+
+        if (game.getState() == GameState.ACTIVE) {
+            startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
+        }
     } else if (game instanceof MultiplayerGame) {
-        selectionManagerUrl = request.getContextPath() + Paths.BATTLEGROUND_SELECTION;
+        selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.BATTLEGROUND_SELECTION);
         role = ((MultiplayerGame) game).getRole(login.getUserId());
+        duration = ((MultiplayerGame) game).getGameDurationMinutes();
+
+        if (game.getState() == GameState.ACTIVE) {
+            startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
+        }
     }
 %>
 
@@ -49,7 +70,7 @@
 
 <jsp:include page="/jsp/header.jsp" />
 
-<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
@@ -110,6 +131,27 @@
                 }
             %>
 
+            <%
+                final boolean isCreator = game.getCreatorId() == login.getUserId();
+                if (game.getState() == GameState.ACTIVE || (game.getState() == GameState.CREATED && isCreator)) {
+                    request.setAttribute("selectionManagerUrl", selectionManagerUrl);
+                    request.setAttribute("canSetDuration", isCreator);
+                    request.setAttribute("duration", duration);
+                    request.setAttribute("maxDuration", AdminDAO.getSystemSetting(
+                            AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue());
+                    request.setAttribute("startTime", startTime);
+            %>
+            <t:game_time
+                    gameId="${gameProducer.game.id}"
+                    selectionManagerUrl="${selectionManagerUrl}"
+                    duration="${duration}"
+                    maxDuration="${maxDuration}"
+                    startTime="${startTime}"
+                    canSetDuration="${canSetDuration}"/>
+            <%
+                }
+            %>
+
             <div class="btn-group">
                 <button class="btn btn-sm btn-outline-secondary text-nowrap" id="btnScoreboard"
                         data-bs-toggle="modal" data-bs-target="#scoreboard">
@@ -133,7 +175,7 @@
                 Timeline
             </button>
 
-            <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
+            <a href="${url.forPath(Paths.PROJECT_EXPORT)}?gameId=<%=gameId%>"
                class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
                title="Export as a Gradle project to import into an IDE.">
                 <i class="fa fa-download"></i>

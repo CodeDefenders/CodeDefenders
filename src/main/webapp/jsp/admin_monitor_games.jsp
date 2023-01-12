@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Role" %>
@@ -64,7 +66,7 @@
     <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
     <jsp:include page="/jsp/admin_navigation.jsp"/>
 
-    <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post" autocomplete="off">
+    <form id="games" action="${url.forPath(Paths.ADMIN_MONITOR)}" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="startStopGame">
 
         <h3 class="mb-3">Multiplayer Games</h3>
@@ -126,7 +128,7 @@
                         <td>
                             <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
                                 <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                                   href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=gid%>">
+                                   href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gid%>">
                                     Observe
                                 </a>
                             <% } %>
@@ -350,7 +352,7 @@
                         <td>
                             <% if (g.getRole(login.getUserId()) != Role.NONE) { %>
                                 <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                                   href="<%=request.getContextPath() + Paths.MELEE_GAME%>?gameId=<%=gid%>">
+                                   href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%=gid%>">
                                     Observe
                                 </a>
                             <% } %>
@@ -505,7 +507,7 @@
     </form>
 
     <script type="module">
-        import $ from './js/jquery.mjs';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
         $('#selectAllGamesMultiplayer').click(function () {

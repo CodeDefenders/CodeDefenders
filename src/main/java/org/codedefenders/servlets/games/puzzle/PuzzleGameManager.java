@@ -61,12 +61,14 @@ import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
@@ -78,7 +80,6 @@ import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
 import static org.codedefenders.game.puzzle.solving.MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.gameId;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
@@ -139,12 +140,18 @@ public class PuzzleGameManager extends HttpServlet {
     @Inject
     private UserRepository userRepo;
 
+    @Inject
+    private GameService gameService;
+
+    @Inject
+    private URLUtils url;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
-            response.sendRedirect(ServletUtils.getBaseURL(request));
+            response.sendRedirect(url.forPath("/"));
             return;
         }
         final PuzzleGame game;
@@ -159,7 +166,7 @@ public class PuzzleGameManager extends HttpServlet {
             if (game == null) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database"
                         + "for gameId: {}.", gameId);
-                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
+                response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
                 return;
             } else {
                 // TODO Should he make PuzzleDAO inject dependencies instead
@@ -169,14 +176,14 @@ public class PuzzleGameManager extends HttpServlet {
             if (game.getCreatorId() != login.getUserId()) {
                 logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.",
                         login.getUserId(), gameId);
-                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
+                response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
                 return;
             }
         } else {
             final Optional<Integer> puzzleIdOpt = getIntParameter(request, "puzzleId");
             if (!puzzleIdOpt.isPresent()) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve gameId and puzzleId from request.");
-                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
+                response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
                 return;
             }
             final int puzzleId = puzzleIdOpt.get();
@@ -206,7 +213,7 @@ public class PuzzleGameManager extends HttpServlet {
                 break;
             default:
                 logger.error("Trying to enter puzzle game with illegal role {}", role);
-                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
+                response.sendRedirect(url.forPath(Paths.PUZZLE_OVERVIEW));
         }
     }
 
@@ -262,7 +269,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
-        String path = ctx(request) + Paths.PUZZLE_GAME + "?gameId=" + game.getId();
+        String path = url.forPath(Paths.PUZZLE_GAME) + "?gameId=" + game.getId();
         response.sendRedirect(path);
     }
 
@@ -303,8 +310,7 @@ public class PuzzleGameManager extends HttpServlet {
             return null;
         }
 
-        game.setState(GameState.ACTIVE);
-        if (!game.update()) {
+        if (!gameService.startGame(game)) {
             logger.error(errorMsg + " Could not update game state.");
             return null;
         }
@@ -746,13 +752,11 @@ public class PuzzleGameManager extends HttpServlet {
                     ) {
                         message.append(" ")
                                 .append("Try to solve the <a href=")
-                                .append(request.getContextPath())
-                                .append(Paths.PUZZLE_GAME)
+                                .append(url.forPath(Paths.PUZZLE_GAME))
                                 .append("?puzzleId=")
                                 .append(puzzle.getPuzzleId())
                                 .append(">next Puzzle</a>, or go back to the <a href=")
-                                .append(request.getContextPath())
-                                .append(Paths.PUZZLE_GAME)
+                                .append(url.forPath(Paths.PUZZLE_GAME))
                                 .append(">Puzzle Overview</a>.");
                         return message.toString();
                     }
@@ -767,8 +771,7 @@ public class PuzzleGameManager extends HttpServlet {
          */
         message.append(" ")
                 .append("You solved all the puzzles, go back to the <a href=")
-                .append(request.getContextPath())
-                .append(Paths.PUZZLE_GAME)
+                .append(url.forPath(Paths.PUZZLE_GAME))
                 .append(">Puzzle Overview</a>.");
         return message.toString();
     }

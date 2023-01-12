@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.beans.game.HistoryBean" %>
 
@@ -31,7 +33,7 @@
 
 <%--@elvariable id="history" type="org.codedefenders.beans.game.HistoryBean"--%>
 
-<link href="${pageContext.request.contextPath}/css/specific/timeline.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/timeline.css")}" rel="stylesheet">
 
 <div id="history" class="modal fade" tabindex="-1">
     <div class="modal-dialog" style="max-width: 900px">

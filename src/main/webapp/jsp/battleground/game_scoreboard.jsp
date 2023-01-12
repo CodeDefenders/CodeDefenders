@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.util.Constants" %>
@@ -41,7 +43,7 @@
     zeroDummyScore.setDuelInformation("0 / 0 / 0");
 %>
 
-<link href="${pageContext.request.contextPath}/css/specific/game_scoreboard.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game_scoreboard.css")}" rel="stylesheet">
 
 <div id="scoreboard" class="modal fade" tabindex="-1">
     <div class="modal-dialog" style="max-width: 60rem;">
@@ -56,7 +58,7 @@
                         <%=mutantScores.getOrDefault(-1, zeroDummyScore).getTotalScore() +
                            mutantScores.getOrDefault(-2, zeroDummyScore).getTotalScore()%>
                     </span>
-                    <img alt="Code Defenders Logo" style="width: 4rem;" src="${pageContext.request.contextPath}/images/logo.png"/>
+                    <img alt="Code Defenders Logo" style="width: 4rem;" src="${url.forPath("/images/logo.png")}"/>
                     <span class="fg-defender fs-1 text-start">
                         <%=testScores.getOrDefault(-1, zeroDummyScore).getTotalScore()%>
                     </span>

@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Puzzle Management"); %>
 
@@ -58,10 +60,10 @@
     </table>
 
     <script type="module">
-        import DataTable from './js/datatables.mjs';
-        import $ from './js/jquery.mjs';
+        import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
 
-        import {PuzzleAPI} from './js/codedefenders_main.mjs';
+        import {PuzzleAPI} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
         let puzzleTable = null;

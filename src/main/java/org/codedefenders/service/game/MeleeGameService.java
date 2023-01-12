@@ -22,6 +22,7 @@ package org.codedefenders.service.game;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.codedefenders.database.EventDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -29,6 +30,8 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.scoring.ScoreCalculator;
+import org.codedefenders.game.scoring.ScoringPolicyProducer;
 import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
@@ -37,9 +40,12 @@ import org.codedefenders.util.Constants;
 @ApplicationScoped
 public class MeleeGameService extends AbstractGameService {
 
+    private final EventDAO eventDAO;
+
     @Inject
-    public MeleeGameService(UserService userService, UserRepository userRepository) {
+    public MeleeGameService(UserService userService, UserRepository userRepository, EventDAO eventDAO) {
         super(userService, userRepository);
+        this.eventDAO = eventDAO;
     }
 
     @Override
@@ -78,5 +84,26 @@ public class MeleeGameService extends AbstractGameService {
                 || playerRole == Role.OBSERVER
                 || game.getLevel() == GameLevel.EASY
                 || test.getPlayerId() == player.getId();
+    }
+
+    /**
+     * Close the game and additionally write the calculated scores to persistent storage.
+     *
+     * @param game The game to close.
+     *
+     * @return {@code true} if the game was closed, {@code false} otherwise.
+     */
+    @Override
+    public boolean closeGame(AbstractGame game) {
+        boolean closed = super.closeGame(game);
+        if (closed) {
+            createScoreCalculator().storeScoresToDB(game.getId());
+        }
+        return closed;
+    }
+
+    private ScoreCalculator createScoreCalculator() {
+        ScoringPolicyProducer scoringPolicyProducer = new ScoringPolicyProducer();
+        return new ScoreCalculator(scoringPolicyProducer.getTheBasicPolicy(eventDAO));
     }
 }
