@@ -19,6 +19,8 @@
 
 --%>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%--
     Displays the mutant code in a CodeMirror textarea.
 --%>
@@ -113,8 +115,8 @@
 </div>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {MutantEditor} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {MutantEditor} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const editableLinesStart = ${mutantEditor.hasEditableLinesStart() ? mutantEditor.editableLinesStart : "null"};

@@ -31,8 +31,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Games"); %>
@@ -143,7 +144,7 @@
                                         <span class="input-group-text position-relative cursor-pointer"
                                               title="Upload a class.">
                                             <a class="stretched-link text-decoration-none"
-                                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.ADMIN_GAMES%>">
+                                               href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.ADMIN_GAMES%>">
                                                 <i class="fa fa-upload"></i>
                                             </a>
                                         </span>
@@ -281,7 +282,7 @@
                                 </small>
 
                                 <script type="module">
-                                    import {GameTimeValidator, formatTime} from './js/codedefenders_game.mjs';
+                                    import {GameTimeValidator, formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                                     const gameTimeValidator = new GameTimeValidator(
                                             Number(${maximumDuration}),
@@ -527,10 +528,10 @@
     </t:modal>
 
     <script type="module">
-        import {Popover} from './js/bootstrap.mjs';
-        import DataTable from './js/datatables.mjs';
-        import $ from './js/jquery.mjs';
-        import {formatTime} from "./js/codedefenders_game.mjs";
+        import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
+        import DataTable from '${url.forPath("/js/datatables.mjs")}';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
+        import {formatTime} from '${url.forPath("./js/codedefenders_game.mjs")}';
 
         const loggedInUserId = ${login.userId};
 

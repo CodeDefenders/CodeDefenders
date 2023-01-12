@@ -70,6 +70,7 @@ public class SystemStartStop implements ServletContextListener {
             logger.error(e.getMessage());
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
+
         mgr.register("test-executor").withMax(4).withCore(2).add();
 
         if (config.isMetricsCollectionEnabled()) {

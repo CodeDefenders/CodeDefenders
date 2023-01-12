@@ -18,8 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Paths" %>
-
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="gameHighlighting" type="org.codedefenders.beans.game.GameHighlightingBean"--%>
 
 <%--
@@ -37,8 +36,8 @@
 --%>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {GameHighlighting} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {GameHighlighting} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const data = JSON.parse('${gameHighlighting.JSON}');

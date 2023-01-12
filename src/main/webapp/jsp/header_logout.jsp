@@ -18,8 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
@@ -28,8 +29,8 @@
 <nav class="navbar navbar-expand-md navbar-cd" id="header">
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="${pageContext.request.contextPath}">
-            <img src="${pageContext.request.contextPath}/images/logo.png" alt="" class="d-inline-block"
+        <a class="navbar-brand" href="${url.forPath("/")}">
+            <img src="${url.forPath("/images/logo.png")}" alt="" class="d-inline-block"
             <%-- Negative margin to prevent the navbar from getting tall from the tall image. --%>
                  style="height: 2.5rem; margin: -2rem .25rem -1.7rem .2rem;" />
             Code Defenders
@@ -50,7 +51,7 @@
             <c:if test="${!pageContext.request.requestURI.contains(\"login\")}">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="login">Login</a>
+                        <a class="nav-link" href="${url.forPath("/login")}">Login</a>
                     </li>
                 </ul>
             </c:if>

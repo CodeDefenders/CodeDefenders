@@ -18,15 +18,10 @@
  */
 package org.codedefenders.servlets.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class offers static methods, which offer functionality useful for {@link HttpServlet} implementations.
@@ -34,40 +29,8 @@ import org.slf4j.LoggerFactory;
  * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public final class ServletUtils {
-    private static final Logger logger = LoggerFactory.getLogger(ServletUtils.class);
 
     private ServletUtils() {
-    }
-
-    /**
-     * Returns the context path a of a given {@link HttpServletRequest}.
-     *
-     * <p>{@code ctx(request)} can be used as a shorter version of {@code request.getContextPath()}
-     *
-     * @param request the request the context is retrieved from.
-     * @return the application context.
-     */
-    public static String ctx(HttpServletRequest request) {
-        return request.getContextPath();
-    }
-
-    /**
-     * Returns the base URL from a given request.
-     *
-     * @param request the request the URL is retrieved from
-     * @return the base URL as a {@link String} or {@code null} if no base URL could be retrieved.
-     */
-    public static String getBaseURL(HttpServletRequest request) {
-        String baseURL = null;
-        try {
-            baseURL = new URL(request.getScheme(),
-                    request.getServerName(),
-                    request.getServerPort(),
-                    request.getContextPath()).toString();
-        } catch (MalformedURLException ignored) {
-            logger.error("Could not retrieve base URL from request.");
-        }
-        return baseURL;
     }
 
     /**

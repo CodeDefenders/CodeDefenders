@@ -57,12 +57,12 @@ import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
 import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
@@ -107,9 +107,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
     @Inject
     private GameService gameService;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
     }
 
     @Override
@@ -155,8 +158,6 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String contextPath = request.getContextPath();
-
         int classId;
         int maxAssertionsPerTest;
         int automaticEquivalenceTrigger;
@@ -203,12 +204,12 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         // Redirect to admin interface
         if (request.getParameter("fromAdmin").equals("true")) {
-            response.sendRedirect(contextPath + "/admin");
+            response.sendRedirect(url.forPath("/admin"));
             return;
         }
 
         // Redirect to the game selection menu.
-        response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
+        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
     }
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -225,7 +226,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         if (game.hasUserJoined(login.getUserId())) {
             logger.info("User {} already in the requested game.", login.getUserId());
-            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
             return;
         }
         if (game.addPlayer(login.getUserId())) {
@@ -252,15 +253,14 @@ public class MeleeGameSelectionManager extends HttpServlet {
 //            Event notif = new Event(-1, gameId, login.getUserId(), message, notifType, eventStatus, timestamp);
 //            eventDAO.insert(notif);
 
-            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
         } else {
             logger.info("User {} failed to join game {}.", login.getUserId(), gameId);
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
         }
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String contextPath = request.getContextPath();
         MeleeGame game = gameProducer.getGame();
 
         if (game.getCreatorId() != login.getUserId()) {
@@ -274,7 +274,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
             messages.add("An error occurred while leaving game " + gameId);
-            response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 
@@ -300,7 +300,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
         notificationService.post(gle);
 
-        response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
+        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
     }
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -326,7 +326,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         gse.setGameId(game.getId());
         notificationService.post(gse);
 
-        response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + gameId);
+        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
     }
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -343,10 +343,10 @@ public class MeleeGameSelectionManager extends HttpServlet {
         if (game.getState() == GameState.ACTIVE) {
             gameService.closeGame(game);
 
-            response.sendRedirect(ctx(request) + Paths.MELEE_SELECTION);
+            response.sendRedirect(url.forPath(Paths.MELEE_SELECTION));
         } else {
             // TODO Update this later !
-            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_HISTORY + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_HISTORY) + "?gameId=" + gameId);
         }
     }
 
@@ -430,7 +430,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             }
         }
 
-        response.sendRedirect(request.getContextPath() + Paths.MELEE_GAME + "?gameId=" + newGame.getId());
+        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + newGame.getId());
     }
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {

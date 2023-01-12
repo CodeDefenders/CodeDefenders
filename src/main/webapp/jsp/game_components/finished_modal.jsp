@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%--
     Shows a modal, which indicates that a game is finished.
 --%>
@@ -32,7 +34,7 @@
 </t:modal>
 
 <script type="module">
-    import {Modal} from './js/bootstrap.mjs';
+    import {Modal} from '${url.forPath("/js/bootstrap.mjs")}';
 
     new Modal('#finishedModal').show();
 </script>

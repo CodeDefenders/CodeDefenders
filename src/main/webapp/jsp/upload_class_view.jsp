@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="java.util.List" %>
@@ -35,7 +37,7 @@
 <div class="container">
 
     <h2 class="mb-3">${pageInfo.pageTitle}</h2>
-    <form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>"
+    <form id="formUpload" action="${url.forPath(Paths.CLASS_UPLOAD)}"
           method="post" enctype="multipart/form-data"
           class="needs-validation form-width"
           autocomplete="off">
@@ -179,7 +181,7 @@
                                 Upload and stay on this page
                             </button>
                         </div>
-                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel" class="btn btn-outline-primary">Cancel</a>
+                        <a href="${url.forPath(param.origin)}" id="cancel" class="btn btn-outline-primary">Cancel</a>
                     </div>
                 </c:otherwise>
             </c:choose>
@@ -242,8 +244,8 @@
 </div>
 
 <script type="module">
-    import DataTable from './js/datatables.mjs';
-    import $ from './js/jquery.mjs';
+    import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
     $(document).ready(function () {

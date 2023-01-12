@@ -20,6 +20,8 @@
 --%>
 <%@ page pageEncoding="UTF-8" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 
 <!DOCTYPE html>
@@ -33,39 +35,39 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- App context -->
-    <base href="${pageContext.request.contextPath}/">
+    <base href="${url.forPath("/")}">
 
-    <link href="css/global/variables.css" rel="stylesheet">
+    <link href="${url.forPath("/css/global/variables.css")}" rel="stylesheet">
 
     <!-- Favicon.ico -->
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="${url.forPath("/favicon.ico")}" type="image/x-icon">
 
     <!-- JS Init -->
     <script type="module">
-        import './js/codedefenders_init.mjs';
+        import '${url.forPath("/js/codedefenders_init.mjs")}';
     </script>
 
     <!-- Bootstrap -->
-    <link href="webjars/bootstrap/5.0.1/css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/global/bootstrap_customize.css" rel="stylesheet">
+    <link href="${url.forPath("/webjars/bootstrap/5.0.1/css/bootstrap.min.css")}" rel="stylesheet">
+    <link href="${url.forPath("/css/global/bootstrap_customize.css")}" rel="stylesheet">
 
     <!-- Codemirror -->
-    <link href="webjars/codemirror/5.22.0/lib/codemirror.css" rel="stylesheet">
-    <link href="webjars/codemirror/5.22.0/addon/dialog/dialog.css" rel="stylesheet">
-    <link href="webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css" rel="stylesheet">
-    <link href="webjars/codemirror/5.22.0/addon/hint/show-hint.css" rel="stylesheet">
-    <link href="css/global/codemirror_customize.css" rel="stylesheet">
+    <link href="${url.forPath("/webjars/codemirror/5.22.0/lib/codemirror.css")}" rel="stylesheet">
+    <link href="${url.forPath("/webjars/codemirror/5.22.0/addon/dialog/dialog.css")}" rel="stylesheet">
+    <link href="${url.forPath("/webjars/codemirror/5.22.0/addon/search/matchesonscrollbar.css")}" rel="stylesheet">
+    <link href="${url.forPath("/webjars/codemirror/5.22.0/addon/hint/show-hint.css")}" rel="stylesheet">
+    <link href="${url.forPath("/css/global/codemirror_customize.css")}" rel="stylesheet">
 
-    <link href="webjars/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="${url.forPath("/webjars/font-awesome/4.7.0/css/font-awesome.min.css")}" rel="stylesheet">
 
     <!-- DataTables -->
-    <link href="webjars/datatables/1.10.24/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <%-- <link href="webjars/datatables-select/1.3.3/css/select.bootstrap5.min.css" rel="stylesheet"> We use custom CSS instead. --%>
-    <link href="css/global/datatables_customize.css" rel="stylesheet">
+    <link href="${url.forPath("/webjars/datatables/1.10.24/css/dataTables.bootstrap5.min.css")}" rel="stylesheet">
+    <%-- <link href="${url.forPath("/webjars/datatables-select/1.3.3/css/select.bootstrap5.min.css")}" rel="stylesheet"> We use custom CSS instead. --%>
+    <link href="${url.forPath("/css/global/datatables_customize.css")}" rel="stylesheet">
 
-    <link href="css/global/page.css" rel="stylesheet">
-    <link href="css/global/common.css" rel="stylesheet">
-    <link href="css/global/loading_animation.css" rel="stylesheet">
+    <link href="${url.forPath("/css/global/page.css")}" rel="stylesheet">
+    <link href="${url.forPath("/css/global/common.css")}" rel="stylesheet">
+    <link href="${url.forPath("/css/global/loading_animation.css")}" rel="stylesheet">
 </head>
 
 <body>

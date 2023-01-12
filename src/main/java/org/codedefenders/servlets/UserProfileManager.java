@@ -39,6 +39,7 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.URLUtils;
 
 /**
  * This {@link HttpServlet} handles requests for viewing the currently logged
@@ -66,6 +67,9 @@ public class UserProfileManager extends HttpServlet {
 
     @Inject
     private CodeDefendersFormAuthenticationFilter codedefendersFormAuthenticationFilter;
+
+    @Inject
+    private URLUtils url;
 
     /**
      * Checks whether users can view the profile of others.
@@ -106,7 +110,7 @@ public class UserProfileManager extends HttpServlet {
 
         if (!isSelf && !isProfilePublic()) {
             // Someone tries to access a profile of someone else, but profiles are not public. Send user to homepage.
-            response.sendRedirect(ServletUtils.getBaseURL(request));
+            response.sendRedirect(url.forPath("/"));
             return;
         }
 

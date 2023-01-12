@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="org.codedefenders.database.PuzzleDAO" %>
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -93,7 +95,7 @@
                                             final int puzzleId = puzzleEntry.getPuzzleId();
                                 %>
                                                 <a class="btn btn-sm <%=color%>"
-                                                   href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
+                                                   href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=<%=puzzleId%>"
                                                    data-bs-toggle="tooltip"
                                                    title="<%=description%>">
                                                     <%=title%>
@@ -107,7 +109,7 @@
                                                     : "btn-primary";
                                 %>
                                             <a class="btn btn-sm <%=color%>"
-                                               href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
+                                               href="${url.forPath(Paths.PUZZLE_GAME)}?puzzleId=<%=puzzleId%>"
                                                data-bs-toggle="tooltip"
                                                title="<%=description%>">
                                                 <%=title%>

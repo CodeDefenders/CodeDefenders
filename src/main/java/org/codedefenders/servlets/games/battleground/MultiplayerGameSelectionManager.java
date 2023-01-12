@@ -58,13 +58,13 @@ import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_CREATION;
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.GAME_JOINING;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
 import static org.codedefenders.servlets.util.ServletUtils.getFloatParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
@@ -109,9 +109,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     @Inject
     private UserRepository userRepo;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
     }
 
     @Override
@@ -208,12 +211,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         // Redirect to admin interface
         if (request.getParameter("fromAdmin").equals("true")) {
-            response.sendRedirect(request.getContextPath() + "/admin");
+            response.sendRedirect(url.forPath("/admin"));
             return;
         }
 
         // Redirect to the game selection menu.
-        response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
     }
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -231,7 +234,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         if (role != Role.NONE) {
             logger.info("User {} already in the requested game. Has role {}", login.getUserId(), role);
-            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             return;
         }
         boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);
@@ -250,10 +253,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 gje.setUserName(login.getSimpleUser().getName());
                 notificationService.post(gje);
 
-                response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             } else {
                 logger.info("User {} failed to join game {} as a defender.", login.getUserId(), gameId);
-                response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             }
         } else if (attackerParamExists) {
             if (game.addPlayer(login.getUserId(), Role.ATTACKER)) {
@@ -268,26 +271,25 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 gje.setUserName(login.getSimpleUser().getName());
                 notificationService.post(gje);
 
-                response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
             } else {
                 logger.info("User {} failed to join game {} as an attacker.", login.getUserId(), gameId);
-                response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+                response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             }
         } else {
             logger.debug("No 'defender' or 'attacker' request parameter found. Abort request.");
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
         }
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String contextPath = request.getContextPath();
         final MultiplayerGame game = gameProducer.getGame();
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
         if (!removalSuccess) {
             messages.add("An error occurred while leaving game " + gameId);
-            response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 
@@ -312,7 +314,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         gle.setUserName(login.getSimpleUser().getName());
         notificationService.post(gle);
 
-        response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
+        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
     }
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -338,7 +340,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         gse.setGameId(game.getId());
         notificationService.post(gse);
 
-        response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
     }
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -356,9 +358,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             logger.info("Ending multiplayer game {} (Setting state to FINISHED)", gameId);
             gameService.closeGame(game);
 
-            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_SELECTION));
         } else {
-            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_HISTORY + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_HISTORY) + "?gameId=" + gameId);
         }
     }
 
@@ -446,7 +448,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             }
         }
 
-        response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + newGame.getId());
+        response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + newGame.getId());
     }
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {

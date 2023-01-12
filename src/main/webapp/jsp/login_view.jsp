@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.util.Paths" %>
@@ -30,7 +32,7 @@
 
 <div id="login" class="container" style="max-width: 25rem;">
     <h2>Sign in</h2>
-    <form action="<%=request.getContextPath() + Paths.LOGIN%>" method="post" id="login-form" class="needs-validation">
+    <form action="${url.forPath(Paths.LOGIN)}" method="post" id="login-form" class="needs-validation">
 
         <div class="row g-3">
             <div class="col-12">
@@ -82,7 +84,7 @@
 <div id="createacc-modal" class="modal fade" tabindex="-1" aria-labelledby="createacc-modal-title" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 30rem;">
         <div class="modal-content">
-            <form action="<%=request.getContextPath() + Paths.USER%>" method="post" class="needs-validation" autocomplete="off">
+            <form action="${url.forPath(Paths.USER)}" method="post" class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="create">
 
                 <div class="modal-header">
@@ -172,7 +174,7 @@
 <div id="resetpw-modal" class="modal fade" tabindex="-1" aria-labelledby="resetpw-modal-title" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 30rem;">
         <div class="modal-content">
-            <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation" autocomplete="off">
+            <form action="${url.forPath(Paths.PASSWORD)}" method="post" class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="resetPassword">
 
                 <div class="modal-header">
@@ -239,7 +241,7 @@
 <div id="changepw-modal" class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="changepw-modal-title" aria-hidden="true">
     <div class="modal-dialog" style="max-width: 30rem;">
         <div class="modal-content">
-            <form action="<%=request.getContextPath() + Paths.PASSWORD%>" method="post" class="needs-validation" autocomplete="off">
+            <form action="${url.forPath(Paths.PASSWORD)}" method="post" class="needs-validation" autocomplete="off">
                 <input type="hidden" name="resetPwSecret" id="resetPwSecret" value="<%=resetPw%>">
                 <input type="hidden" name="formType" value="changePassword">
 
@@ -285,7 +287,7 @@
 </div>
 
 <script type="module">
-    import {Modal} from './js/bootstrap.mjs';
+    import {Modal} from '${url.forPath("/js/bootstrap.mjs")}';
 
 
     const passwordInput = document.getElementById('changepw-password-input');

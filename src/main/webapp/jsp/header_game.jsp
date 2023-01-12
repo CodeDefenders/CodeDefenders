@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.GameState"%>
 <%@ page import="org.codedefenders.game.Role"%>
 <%@ page import="org.codedefenders.util.Paths"%>
@@ -29,6 +31,8 @@
 <%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.util.URLUtils" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request" />
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
@@ -42,7 +46,7 @@
     int duration = -1;
     long startTime = -1;
     if (game instanceof MeleeGame) {
-        selectionManagerUrl = request.getContextPath() + Paths.MELEE_SELECTION;
+        selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.MELEE_SELECTION);
         role = ((MeleeGame) game).getRole(login.getUserId());
         duration = ((MeleeGame) game).getGameDurationMinutes();
         startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
@@ -51,7 +55,7 @@
             startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
         }
     } else if (game instanceof MultiplayerGame) {
-        selectionManagerUrl = request.getContextPath() + Paths.BATTLEGROUND_SELECTION;
+        selectionManagerUrl = CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.BATTLEGROUND_SELECTION);
         role = ((MultiplayerGame) game).getRole(login.getUserId());
         duration = ((MultiplayerGame) game).getGameDurationMinutes();
 
@@ -66,7 +70,7 @@
 
 <jsp:include page="/jsp/header.jsp" />
 
-<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
     <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
@@ -171,7 +175,7 @@
                 Timeline
             </button>
 
-            <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
+            <a href="${url.forPath(Paths.PROJECT_EXPORT)}?gameId=<%=gameId%>"
                class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
                title="Export as a Gradle project to import into an IDE.">
                 <i class="fa fa-download"></i>

@@ -42,8 +42,8 @@ import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.PuzzleChapterEntry;
 import org.codedefenders.model.PuzzleEntry;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,12 +65,15 @@ public class PuzzleOverview extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     protected void doGet(HttpServletRequest request,
                          HttpServletResponse response) throws ServletException, IOException {
         if (!checkEnabled()) {
             // Send users to the home page
-            response.sendRedirect(ServletUtils.getBaseURL(request));
+            response.sendRedirect(url.forPath("/"));
             return;
         }
         final Set<PuzzleGame> activePuzzles = new HashSet<>(PuzzleDAO.getActivePuzzleGamesForUser(login.getUserId()));
