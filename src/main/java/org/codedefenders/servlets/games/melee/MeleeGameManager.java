@@ -88,6 +88,9 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Histogram;
+
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
 import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
@@ -120,8 +123,15 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  */
 @WebServlet(Paths.MELEE_GAME)
 public class MeleeGameManager extends HttpServlet {
-
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameManager.class);
+
+    private static final Histogram.Child automaticEquivalenceDuelTrigger =
+            GameManagingUtils.automaticEquivalenceDuelTrigger
+                    .labels("melee");
+
+    private static final Counter.Child automaticEquivalenceDuelsTriggered =
+            GameManagingUtils.automaticEquivalenceDuelsTriggered
+                    .labels("melee");
 
     @Inject
     private GameManagingUtils gameManagingUtils;
@@ -282,14 +292,14 @@ public class MeleeGameManager extends HttpServlet {
         switch (action) {
             case "createMutant": {
                 createMutant(request, response, user.get(), game, playerId);
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
                 createTest(request, response, user.get(), game);
                 // After a test is submitted, there's the chance that one or more mutants
                 // already survived enough tests
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "reset": {
@@ -311,13 +321,18 @@ public class MeleeGameManager extends HttpServlet {
         }
     }
 
+    void checkAutomaticMutantEquivalenceForGame(MeleeGame game) {
+        int threshold = game.getAutomaticMutantEquivalenceThreshold();
+        if (threshold > 0) { // Feature is disabled if threshold <= 0
+            try (Histogram.Timer ignored = automaticEquivalenceDuelTrigger.startTimer()) {
+                triggerAutomaticMutantEquivalenceForGame(game);
+            }
+        }
+    }
+
     // This is package protected to enable testing
     void triggerAutomaticMutantEquivalenceForGame(MeleeGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();
-        if (threshold < 1) {
-            // No need to check as this feature is disabled
-            return;
-        }
         // Get all the live mutants in the game
         for (Mutant aliveMutant : game.getAliveMutants()) {
             /*
@@ -326,6 +341,7 @@ public class MeleeGameManager extends HttpServlet {
              */
             int coveringTests = aliveMutant.getCoveringTests().size();
             if (coveringTests >= threshold) {
+                automaticEquivalenceDuelsTriggered.inc();
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
@@ -351,6 +367,7 @@ public class MeleeGameManager extends HttpServlet {
                         EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
+
             }
         }
     }

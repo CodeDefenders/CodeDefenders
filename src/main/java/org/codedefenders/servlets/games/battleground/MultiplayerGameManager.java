@@ -91,6 +91,9 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Histogram;
+
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_MUTANT;
 import static org.codedefenders.execution.TargetExecution.Target.COMPILE_TEST;
 import static org.codedefenders.execution.TargetExecution.Target.TEST_ORIGINAL;
@@ -121,8 +124,25 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  */
 @WebServlet(org.codedefenders.util.Paths.BATTLEGROUND_GAME)
 public class MultiplayerGameManager extends HttpServlet {
-
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
+
+    private static final Histogram.Child automaticEquivalenceDuelTrigger =
+            GameManagingUtils.automaticEquivalenceDuelTrigger
+                    .labels("multiplayer");
+
+    private static final Counter.Child automaticEquivalenceDuelsTriggered =
+            GameManagingUtils.automaticEquivalenceDuelsTriggered
+                    .labels("multiplayer");
+
+    private static final Histogram.Child isEquivalentMutantKillableValidation = Histogram.build()
+            .name("codedefenders_isEquivalentMutantKillableValidation_duration")
+            .help("How long the validation whether an as equivalent accepted mutant is killable took")
+            .unit("seconds")
+            // This can take rather long so add a 25.0 seconds bucket
+            .buckets(new double[]{0.005, 0.01, 0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1.0, 2.5, 5.0, 7.5, 10.0, 25.0})
+            .labelNames("gameType")
+            .register()
+            .labels("multiplayer");
 
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
@@ -228,13 +248,13 @@ public class MultiplayerGameManager extends HttpServlet {
             case "createMutant": {
                 createMutant(request, response, gameId, game);
                 // After creating a mutant, there's the chance that the mutant already survived enough tests
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
                 createTest(request, response, gameId, game);
                 // After a test is submitted, there's the chance that one or more mutants already survived enough tests
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "reset": {
@@ -256,13 +276,18 @@ public class MultiplayerGameManager extends HttpServlet {
         }
     }
 
+    void checkAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
+        int threshold = game.getAutomaticMutantEquivalenceThreshold();
+        if (threshold > 0) { // Feature is disabled if threshold <= 0
+            try (Histogram.Timer ignored = automaticEquivalenceDuelTrigger.startTimer()) {
+                triggerAutomaticMutantEquivalenceForGame(game);
+            }
+        }
+    }
+
     // This is package protected to enable testing
     void triggerAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();
-        if (threshold < 1) {
-            // No need to check as this feature is disabled
-            return;
-        }
         // Get all the live mutants in the game
         for (Mutant aliveMutant : game.getAliveMutants()) {
             /*
@@ -270,21 +295,22 @@ public class MultiplayerGameManager extends HttpServlet {
              * equivalence duel. Consider ONLY the coveringTests submitted after the mutant was created
              */
             Set<Integer> allCoveringTests = aliveMutant.getCoveringTests().stream()
-                        .map(Test::getId)
-                        .collect(Collectors.toSet());
+                    .map(Test::getId)
+                    .collect(Collectors.toSet());
 
             boolean considerOnlydefenders = false;
             Set<Integer> testSubmittedAfterMutant =
                     TestDAO.getValidTestsForGameSubmittedAfterMutant(game.getId(), considerOnlydefenders, aliveMutant)
-                        .stream()
-                        .map(Test::getId)
-                        .collect(Collectors.toSet());
+                            .stream()
+                            .map(Test::getId)
+                            .collect(Collectors.toSet());
 
             allCoveringTests.retainAll(testSubmittedAfterMutant);
 
             int numberOfCoveringTestsSubmittedAfterMutant = allCoveringTests.size();
 
-            if (numberOfCoveringTestsSubmittedAfterMutant  >= threshold) {
+            if (numberOfCoveringTestsSubmittedAfterMutant >= threshold) {
+                automaticEquivalenceDuelsTriggered.inc();
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
@@ -313,6 +339,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 eventDAO.insert(gameEvent);
             }
         }
+
     }
 
     @SuppressWarnings("Duplicates")
@@ -1055,32 +1082,34 @@ public class MultiplayerGameManager extends HttpServlet {
             return false;
         }
 
-        // Get all the covering tests of this mutant which do not belong to this game
-        int classId = mutantToValidate.getClassId();
-        List<Test> tests = TestDAO.getValidTestsForClass(classId);
+        try (Histogram.Timer ignored = isEquivalentMutantKillableValidation.startTimer()) {
+            // Get all the covering tests of this mutant which do not belong to this game
+            int classId = mutantToValidate.getClassId();
+            List<Test> tests = TestDAO.getValidTestsForClass(classId);
 
-        // Remove tests which belong to the same game as the mutant
-        tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());
+            // Remove tests which belong to the same game as the mutant
+            tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());
 
-        List<Test> selectedTests = regressionTestCaseSelector.select(tests, validationThreshold);
-        logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests);
+            List<Test> selectedTests = regressionTestCaseSelector.select(tests, validationThreshold);
+            logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests);
 
-        // At the moment this is purposely blocking.
-        // This is the dumbest, but safest way to deal with it while we design a better solution.
-        KillMap killmap = KillMap.forMutantValidation(selectedTests, mutantToValidate, classId);
+            // At the moment this is purposely blocking.
+            // This is the dumbest, but safest way to deal with it while we design a better solution.
+            KillMap killmap = KillMap.forMutantValidation(selectedTests, mutantToValidate, classId);
 
-        if (killmap == null) {
-            // There was an error we cannot empirically prove the mutant was killable.
-            logger.warn("An error prevents validation of mutant {}", mutantToValidate);
-            return false;
-        } else {
-            for (KillMapEntry killMapEntry : killmap.getEntries()) {
-                if (killMapEntry.status.equals(KillMapEntry.Status.KILL)
-                        || killMapEntry.status.equals(KillMapEntry.Status.ERROR)) {
-                    return true;
+            if (killmap == null) {
+                // There was an error we cannot empirically prove the mutant was killable.
+                logger.warn("An error prevents validation of mutant {}", mutantToValidate);
+                return false;
+            } else {
+                for (KillMapEntry killMapEntry : killmap.getEntries()) {
+                    if (killMapEntry.status.equals(KillMapEntry.Status.KILL)
+                            || killMapEntry.status.equals(KillMapEntry.Status.ERROR)) {
+                        return true;
+                    }
                 }
             }
+            return false;
         }
-        return false;
     }
 }

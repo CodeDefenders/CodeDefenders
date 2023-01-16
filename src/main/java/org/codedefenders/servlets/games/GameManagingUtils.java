@@ -58,6 +58,8 @@ import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Histogram;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
 
@@ -78,6 +80,19 @@ import static org.codedefenders.util.Constants.TESTS_DIR;
 @RequestScoped
 public class GameManagingUtils implements IGameManagingUtils {
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
+
+    public static final Histogram automaticEquivalenceDuelTrigger = Histogram.build()
+            .name("codedefenders_automaticEquivalenceDuelTrigger")
+            .help("How long the execution of automaticEquivalenceDuelTrigger took")
+            .unit("seconds")
+            .labelNames("gameType")
+            .register();
+
+    public static final Counter automaticEquivalenceDuelsTriggered = Counter.build()
+            .name("codedefenders_automaticEquivalenceDuels_mutants_flagged")
+            .help("How many mutants where marked as equivalent through automatic equivalence duel validation")
+            .labelNames("gameType")
+            .register();
 
     @Inject
     private ClassCompilerService classCompiler;
