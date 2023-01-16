@@ -40,7 +40,7 @@ import io.prometheus.client.filter.MetricsFilter;
 @WebFilter(filterName = "metricsFilter")
 public class CodeDefendersMetricsFilter extends MetricsFilter {
     private static final Counter jsessionidIgnoredRequestsCounter = Counter.build()
-            .name("codedefenders_metricsfilter_jsessionid_ignored_requests")
+            .name("codedefenders_metrics_filter_jsessionid_ignored_requests")
             .help("The amount of requests our MetricsFilter did not sample because it contained a 'jsessionid' in the URL")
             .register();
 
