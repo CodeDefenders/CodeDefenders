@@ -188,12 +188,10 @@ public class CodeDefendersRealm extends AuthorizingRealm {
                 UserEntity user = activeUser.get();
 
                 if (settingsRepo.isMailValidationRequired() && !user.isValidated()) {
-                    usernamePasswordToken.clear();
                     throw new LockedAccountException("Account email is not validated.");
                 }
 
                 if (!user.isActive()) {
-                    usernamePasswordToken.clear();
                     throw new LockedAccountException(
                             "Your account is inactive, login is only possible with an active account.");
                 }
@@ -202,7 +200,6 @@ public class CodeDefendersRealm extends AuthorizingRealm {
                 // {@link CodeDefendersCredentialsMatcher} setup in the constructor.
                 return getAccount(user);
             } else {
-                usernamePasswordToken.clear();
                 return null;
             }
         } else {
