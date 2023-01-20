@@ -46,7 +46,9 @@ import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Histogram;
 
+import static org.codedefenders.util.Constants.COMMON_CLASSPATH;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
+import static org.codedefenders.util.Constants.JACOCO_CLASSPATH;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 /**
@@ -334,6 +336,9 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         command.add("-Dclassname=" + cut.getName());
         command.add("-DtestClassname=" + testClassName);
         command.add("-Dcuts.deps=" + Paths.get(cutDir, CUTS_DEPENDENCY_DIR));
+
+        command.add("-Dcommon.cp=" + COMMON_CLASSPATH);
+        command.add("-Djacoco.cp=" + JACOCO_CLASSPATH);
 
         if (mutantDir != null && testDir != null
                 // Limit this code path to targets that depend on the `mutant.test.file` variable.
