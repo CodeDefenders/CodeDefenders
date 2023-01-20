@@ -40,7 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
@@ -57,7 +56,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
@@ -158,10 +156,6 @@ public class MeleeGameManager extends HttpServlet {
     private PreviousSubmissionBean previousSubmission;
 
     @Inject
-    // Note that this automatically gets the current GAME object injected
-    private ScoreCalculator scoreCalculator;
-
-    @Inject
     private EventDAO eventDAO;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
@@ -227,15 +221,6 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
 
-        // Compute the score and pass along the ScoreBoard bean?
-        MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean(userService);
-        // Why ID is necessary here?
-        meleeScoreboardBean.setGameId(game.getId());
-        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(game.getId()),
-                scoreCalculator.getTestScores(game.getId()), scoreCalculator.getDuelScores(game.getId()));
-        meleeScoreboardBean.setPlayers(game.getPlayers());
-        // Set the preconditions for the score board
-        request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
 
         // We need to compute/set this here for the `player_view.jsp`.
         List<Test> playerTests = game.getTests()
