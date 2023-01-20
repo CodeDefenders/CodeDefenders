@@ -90,7 +90,9 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        gameCronJobManager.shutdown();
+        // IMPORTANT: Do not place calls to cleanup/shutdown methods of CDI Beans here.
+        // It is likely that the CDI container does not exist anymore at this point, so the cleanup is not executed
+        // Instead use a @PreDestroy annotated method in the CDI Bean itself.
 
         // https://stackoverflow.com/questions/11872316/tomcat-guice-jdbc-memory-leak
         AbandonedConnectionCleanupThread.checkedShutdown();
