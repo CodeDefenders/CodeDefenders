@@ -22,7 +22,6 @@ package org.codedefenders.service.game;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.KillMap;
@@ -33,7 +32,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.model.Player;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;

@@ -49,6 +49,7 @@ import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMapService;
 import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
@@ -82,9 +83,12 @@ public class Installer {
 
     private final BackendExecutorService backend;
 
+    private final KillMapService killMapService;
+
     @Inject
-    public Installer(BackendExecutorService backend) {
+    public Installer(BackendExecutorService backend, KillMapService killMapService) {
         this.backend = backend;
+        this.killMapService = killMapService;
     }
 
     /**
@@ -461,7 +465,7 @@ public class Installer {
         logger.info("installPuzzle() Created Puzzle " + puzzleId);
 
         try {
-            KillMap killMap = KillMap.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>());
+            KillMap killMap = killMapService.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>());
             KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), puzzleClassId);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Error while calculating killmap for successfully installed puzzle.", e);

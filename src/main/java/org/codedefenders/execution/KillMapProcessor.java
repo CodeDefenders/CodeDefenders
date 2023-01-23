@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -48,8 +49,10 @@ import org.slf4j.LoggerFactory;
 // TODO We should need to decouple the actual processor from the context listener for better testing.
 @WebListener
 public class KillMapProcessor implements ServletContextListener {
+    private static final Logger logger = LoggerFactory.getLogger(KillMapProcessor.class);
 
-    private static Logger logger = LoggerFactory.getLogger(KillMapProcessor.class);
+    @Inject
+    private KillMapService killMapService;
 
     private ScheduledExecutorService executor;
 
@@ -88,7 +91,7 @@ public class KillMapProcessor implements ServletContextListener {
                 switch (theJob.getType()) {
                     case CLASS:
                         try {
-                            KillMap.forClass(theJob.getId());
+                            killMapService.forClass(theJob.getId());
                         } catch (Throwable e) {
                             logger.warn("Killmap computation failed!", e);
                         } finally {
@@ -104,7 +107,7 @@ public class KillMapProcessor implements ServletContextListener {
                             assert game.getId() == theJob.getId();
 
                             logger.info("Computing killmap for game " + game.getId());
-                            KillMap.forGame(game);
+                            killMapService.forGame(game);
                             logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
                             // At this point we can remove the job from the DB
                         } catch (Throwable e) {
