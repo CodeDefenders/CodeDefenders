@@ -18,16 +18,7 @@
 
     <%-- Button with remaining duration. --%>
 
-    <div data-bs-toggle="tooltip"
-    <c:choose>
-        <c:when test="${canSetDuration}">
-            title="Change the game duration."
-        </c:when>
-        <c:otherwise>
-            title="View the game duration."
-        </c:otherwise>
-    </c:choose>
-    >
+    <div data-bs-toggle="tooltip" title="${canSetDuration ? 'Change' : 'View'} the game duration.">
         <button type="button"
                 class="btn btn-sm btn-outline-${canSetDuration ? 'danger' : 'secondary'}"
                 form="durationModalForm"
