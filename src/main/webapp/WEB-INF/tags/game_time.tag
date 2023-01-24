@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ attribute name="gameId" required="true" type="java.lang.Integer" %>
 <%@ attribute name="selectionManagerUrl" required="true" type="java.lang.String" %>
 <%@ attribute name="duration" required="true" type="java.lang.Integer" %>
@@ -123,7 +125,7 @@
     <%-- Validate input and update hidden field containing duration as minutes. --%>
     <c:if test="${canSetDuration}">
         <script type="module">
-            import {GameTimeValidator} from './js/codedefenders_game.mjs';
+            import {GameTimeValidator} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
             const gameTimeValidator = new GameTimeValidator(
                     Number(${maxDuration}), 0,
@@ -137,6 +139,6 @@
 </form>
 
 <script type="module">
-    import {GameTimeManager} from './js/codedefenders_game.mjs';
+    import {GameTimeManager} from '${url.forPath("/js/codedefenders_game.mjs")}';
     const gameTimeManager = new GameTimeManager(".time-left", 10);
 </script>
