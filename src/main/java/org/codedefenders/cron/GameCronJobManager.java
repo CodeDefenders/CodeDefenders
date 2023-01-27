@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -43,6 +44,7 @@ public class GameCronJobManager {
         );
     }
 
+    @PreDestroy
     public void shutdown() {
         try {
             logger.info("GameCronJobManager shutting down");
