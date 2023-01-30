@@ -237,7 +237,7 @@
                     <button class="btn btn-primary" id="reject-equivalent-button" type="button">Submit Killing Test</button>
 
                     <script type="module">
-                        import {objects} from '${url.forPath("/js/codedefenders_main.js")}';
+                        import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
                         const testProgressBar = objects.await('testProgressBar');
 
 
