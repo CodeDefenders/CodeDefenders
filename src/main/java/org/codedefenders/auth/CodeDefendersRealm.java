@@ -50,10 +50,10 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.SettingsRepository;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.MetricsService;
 import org.codedefenders.servlets.auth.CodeDefendersFormAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,11 +80,11 @@ public class CodeDefendersRealm extends AuthorizingRealm {
     private final UserDatabase userDatabase;
 
     public static class CodeDefendersCacheManager extends AbstractCacheManager {
-        private final MetricsService metricsService;
+        private final MetricsRegistry metricsRegistry;
 
         @Inject
-        public CodeDefendersCacheManager(MetricsService metricsService) {
-            this.metricsService = metricsService;
+        public CodeDefendersCacheManager(MetricsRegistry metricsRegistry) {
+            this.metricsRegistry = metricsRegistry;
         }
 
         @Override
@@ -93,7 +93,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
                     .recordStats()
                     .build();
 
-            metricsService.registerGuavaCache("shiroCache_" + s, cache);
+            metricsRegistry.registerGuavaCache("shiroCache_" + s, cache);
 
             return new GuavaCache(cache);
         }

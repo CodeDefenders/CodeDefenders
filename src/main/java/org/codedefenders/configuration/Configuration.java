@@ -103,6 +103,7 @@ public class Configuration {
     protected Integer clusterTimeout;
     protected Boolean forceLocalExecution;
     protected Boolean parallelize;
+    protected Integer parallelizeCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
 
@@ -419,6 +420,10 @@ public class Configuration {
 
     public boolean isParallelize() {
         return parallelize;
+    }
+
+    public int getNumberOfParallelAntExecutions() {
+        return parallelizeCount;
     }
 
     public boolean isBlockAttacker() {

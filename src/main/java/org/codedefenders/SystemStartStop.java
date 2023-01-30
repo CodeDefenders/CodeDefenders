@@ -32,7 +32,7 @@ import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.GameCronJobManager;
 import org.codedefenders.execution.ThreadPoolManager;
-import org.codedefenders.service.MetricsService;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ public class SystemStartStop implements ServletContextListener {
     GameCronJobManager gameCronJobManager;
 
     @Inject
-    private MetricsService metricsService;
+    private MetricsRegistry metricsRegistry;
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -71,10 +71,10 @@ public class SystemStartStop implements ServletContextListener {
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
 
-        mgr.register("test-executor").withMax(4).withCore(2).add();
+        mgr.register("test-executor").withCore(config.getNumberOfParallelAntExecutions()).add();
 
         if (config.isMetricsCollectionEnabled()) {
-            metricsService.registerDefaultCollectors();
+            metricsRegistry.registerDefaultCollectors();
             sce.getServletContext().addServlet("prom", new MetricsServlet()).addMapping("/metrics");
         }
         if (config.isJavaMelodyEnabled()) {
