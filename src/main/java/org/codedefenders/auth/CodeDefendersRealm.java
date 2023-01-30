@@ -188,12 +188,10 @@ public class CodeDefendersRealm extends AuthorizingRealm {
                 UserEntity user = activeUser.get();
 
                 if (settingsRepo.isMailValidationRequired() && !user.isValidated()) {
-                    usernamePasswordToken.clear();
                     throw new LockedAccountException("Account email is not validated.");
                 }
 
                 if (!user.isActive()) {
-                    usernamePasswordToken.clear();
                     throw new LockedAccountException(
                             "Your account is inactive, login is only possible with an active account.");
                 }
@@ -202,7 +200,6 @@ public class CodeDefendersRealm extends AuthorizingRealm {
                 // {@link CodeDefendersCredentialsMatcher} setup in the constructor.
                 return getAccount(user);
             } else {
-                usernamePasswordToken.clear();
                 return null;
             }
         } else {
@@ -265,14 +262,18 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
         @Override
         public Object get(Object o) throws CacheException {
-            return backingCache.getIfPresent(o);
+            if (o == null) {
+                return null;
+            } else {
+                return backingCache.getIfPresent(o);
+            }
         }
 
         @Override
         public synchronized Object put(Object o, Object o2) throws CacheException {
             Object previous;
 
-            previous = backingCache.getIfPresent(o);
+            previous = get(o);
             if (previous == o2) {
                 return null;
             } else {
@@ -283,7 +284,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
 
         @Override
         public synchronized Object remove(Object o) throws CacheException {
-            Object value = backingCache.getIfPresent(o);
+            Object value = get(o);
             backingCache.invalidate(o);
             return value;
         }
