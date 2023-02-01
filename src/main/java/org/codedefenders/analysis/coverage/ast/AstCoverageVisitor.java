@@ -87,6 +87,7 @@ import com.github.javaparser.ast.modules.ModuleOpensDirective;
 import com.github.javaparser.ast.modules.ModuleProvidesDirective;
 import com.github.javaparser.ast.modules.ModuleRequiresDirective;
 import com.github.javaparser.ast.modules.ModuleUsesDirective;
+import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.BreakStmt;
@@ -294,6 +295,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         return -1;
     }
 
+    private int beginOf(NodeWithRange<?> node) {
+        return node.getBegin().get().line;
+    }
+
+    private int endOf(NodeWithRange<?> node) {
+        return node.getEnd().get().line;
+    }
+
     // endregion
     // region COMMON CODE ==============================================================================================
 
@@ -343,15 +352,17 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         return new AstCoverageStatus(status, statusAfter);
     }
 
-    public AstCoverageStatus handleTypeDecl(TypeDeclaration<?> decl, List<? extends Node> constructors)  {
+    public void handleTypeDecl(TypeDeclaration<?> decl, List<? extends Node> constructors)  {
         // if any constructors are covered -> COVERED
         if (anyNodeCovered(constructors)) {
-            return AstCoverageStatus.covered();
+            astCoverage.put(decl, AstCoverageStatus.covered());
+            return;
         }
 
         // if the type declares constructors but none are COVERED -> NOT_COVERED
         if (!constructors.isEmpty()) {
-            return AstCoverageStatus.notCovered();
+            astCoverage.put(decl, AstCoverageStatus.notCovered());
+            return;
         }
 
         // get coverage from the class/record/enum keyword
@@ -364,7 +375,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .getRange().get()
                 .begin.line;
         DetailedLine keywordCoverage = lineCoverage.get(keywordLine);
-        return AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus());
+        astCoverage.put(decl, AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus()));
     }
 
     // TODO: what happens when the superclass constructor throws an exception?
@@ -385,6 +396,10 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         astCoverage.put(body, bodyStatus);
     }
 
+    private void handleLiteral(Node node) {
+
+    }
+
     // endregion
     // region CLASS LEVEL ==============================================================================================
 
@@ -397,7 +412,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
 
-        astCoverage.put(decl, handleTypeDecl(decl, decl.getConstructors()));
+        handleTypeDecl(decl, decl.getConstructors());
     }
 
     @Override
@@ -409,7 +424,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
 
-        astCoverage.put(decl, handleTypeDecl(decl, decl.getConstructors()));
+        handleTypeDecl(decl, decl.getConstructors());
     }
 
     /**
@@ -430,7 +445,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         constructors.addAll(decl.getConstructors());
         constructors.addAll(decl.getCompactConstructors());
 
-        astCoverage.put(decl, handleTypeDecl(decl, constructors));
+        handleTypeDecl(decl, constructors);
     }
 
     @Override
