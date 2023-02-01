@@ -397,7 +397,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     private void handleLiteral(Node node) {
-
+        DetailedLine lineStatus = mergeLineCoverage(node);
+        AstCoverageStatus status = AstCoverageStatus.fromStatus(lineStatus.instructionStatus());
+        astCoverage.put(node, status);
     }
 
     // endregion
@@ -1760,16 +1762,21 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(BooleanLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
     public void visit(CharLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
     public void visit(ClassExpr expr, Void arg) {
         super.visit(expr, arg);
+        DetailedLine lineStatus = mergeLineCoverage(expr);
+        AstCoverageStatus status = AstCoverageStatus.fromStatus(lineStatus.instructionStatus());
+        astCoverage.put(expr, status);
     }
 
     @Override
@@ -1785,16 +1792,19 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(DoubleLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
     public void visit(EmptyStmt stmt, Void arg) {
         super.visit(stmt, arg);
+        handleLiteral(stmt);
     }
 
     @Override
     public void visit(IntegerLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
@@ -1810,6 +1820,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(LongLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
@@ -1825,6 +1836,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(NameExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
@@ -1835,6 +1847,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(NullLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
@@ -1885,6 +1898,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(StringLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
@@ -1895,6 +1909,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(ThisExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
@@ -1985,6 +2000,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(TextBlockLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
+        handleLiteral(expr);
     }
 
     @Override
