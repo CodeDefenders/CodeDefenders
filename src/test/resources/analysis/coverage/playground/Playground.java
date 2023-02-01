@@ -142,6 +142,114 @@ public class Playground {
     }
 
     @Call
+    public void test8() {
+        Runnable s = () -> {};
+
+        int i;
+
+        ;
+    }
+
+    @Call
+    public void test9() {
+        Runnable s
+                =
+                () -> {};
+
+        int i;
+
+        ;
+    }
+
+    @Call
+    public void test7() {
+        Runnable s = () -> {};
+
+        int i;
+
+        ;
+    }
+
+    @Call
+    public void test10() {
+        int i = 1;
+
+        i
+        =
+        2;
+
+        i
+        +=
+        2;
+
+        i
+        =
+        doGet(2);
+
+        i
+        +=
+        doGet(2);
+    }
+
+    @Call
+    public void test11() {
+        int i = 1;
+
+        consume(
+        i
+        =
+        2
+        );
+
+        consume(
+        i
+        +=
+        2
+        );
+
+        consume(
+        i
+        =
+        doGet(2)
+        );
+
+        consume(
+        i
+        +=
+        doGet(2)
+        );
+    }
+    @Call
+    public void test12() {
+        int i = 1;
+
+        i
+        =
+        doThrow();
+    }
+
+    @Call
+    public void test12b() {
+        int i = 1;
+
+        i
+        =
+        doGet(2);
+    }
+
+    @Call
+    public void test13() {
+        int i = 1;
+
+        consume(
+        i
+        =
+        doThrow()
+        );
+    }
+
+
+    @Call
     public void notCoveredAtAllForSomeReason() {
         doCall();
         Object a = null;
