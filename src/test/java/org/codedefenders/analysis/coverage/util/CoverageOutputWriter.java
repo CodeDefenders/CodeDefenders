@@ -1,46 +1,74 @@
 package org.codedefenders.analysis.coverage.util;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.analysis.coverage.CoverageTest;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 import org.codedefenders.analysis.coverage.line.LineTokens;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
+import org.codedefenders.util.ResourceUtils;
 
-import static org.codedefenders.util.ResourceUtils.loadResource;
-
-public class HTMLWriter {
-    private final static String RESOURCE_DIR = "analysis/coverage";
+public class CoverageOutputWriter {
     private final static String HTML_OUTPUT_DIR = "/tmp/coverage";
-    private final static boolean OUTPUT_HTML = true;
+    private final static boolean ENABLED = true;
+    private final static boolean SPLIT_DIR_BY_JVM = true;
 
-    private final String pageTemplate;
+    private final String className;
+    private final String testName;
+    private final String sourceCode;
+    private final DetailedLineCoverage originalCoverage;
+    private final NewLineCoverage transformedCoverage;
+    private final NewLineCoverage expectedCoverage;
+    private final LineTokens lineTokens;
 
-    public HTMLWriter() {
-        pageTemplate = loadResource(RESOURCE_DIR, "page_template.html");
+    public CoverageOutputWriter(
+            String className,
+            String testName,
+            String sourceCode,
+            DetailedLineCoverage originalCoverage,
+            NewLineCoverage transformedCoverage,
+            NewLineCoverage expectedCoverage,
+            LineTokens lineTokens) {
+        this.className = className;
+        this.testName = testName;
+        this.sourceCode = sourceCode;
+        this.originalCoverage = originalCoverage;
+        this.transformedCoverage = transformedCoverage;
+        this.expectedCoverage = expectedCoverage;
+        this.lineTokens = lineTokens;
     }
 
-    public void write(String className,
-                      String testName,
-                      String sourceCode,
-                      DetailedLineCoverage originalCoverage,
-                      NewLineCoverage transformedCoverage,
-                      NewLineCoverage expectedCoverage,
-                      LineTokens lineTokens) throws Exception {
-        if (!OUTPUT_HTML) {
+    public void writeCoverage() throws IOException {
+        if (!ENABLED) {
             return;
         }
 
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        LocalDateTime now = LocalDateTime.now();
-        String fileName = String.format("%s_%s.html", className, testName);
-        String title =  String.format("%s - %s - %s", timeFormatter.format(now), className, testName);
+        String[] lines = sourceCode.split("\r?\n");
+        String coverage = IntStream.rangeClosed(1, lines.length)
+                .mapToObj(transformedCoverage::getStatus)
+                .map(LineCoverageStatus::toString)
+                .collect(Collectors.joining("\n"));
+
+        write(coverage, "coverage");
+    }
+
+    public void writeHtml() throws IOException {
+        if (!ENABLED) {
+            return;
+        }
+
+        String pageTemplate = getPageTemplate();
 
         StringJoiner originalLines = new StringJoiner("\n");
         StringJoiner transformedLines = new StringJoiner("\n");
@@ -68,19 +96,54 @@ public class HTMLWriter {
         }
 
         String html = pageTemplate
-                .replace("{title}", title)
+                .replace("{title}", getPageTitle(className, testName))
                 .replace("{code_original}", originalLines.toString())
                 .replace("{code_transformed}", transformedLines.toString())
                 .replace("{code_expected}", expectedLines.toString())
                 .replace("{tokens}", tokenLines.toString());
 
-        Files.createDirectories(Paths.get(HTML_OUTPUT_DIR));
-        try (PrintWriter writer = new PrintWriter(HTML_OUTPUT_DIR + "/" + fileName)) {
-            writer.write(html);
+        write(html, "html");
+    }
+
+    private void write(String content, String type) throws IOException {
+        Path outputDir = getOutputDir().resolve(type);
+        Files.createDirectories(outputDir);
+
+        Path outputPath = outputDir.resolve(String.format("%s_%s.%s", className, testName, type));
+        try (PrintWriter writer = new PrintWriter(outputPath.toString())) {
+            writer.write(content);
         }
     }
 
-    public String generateTokenLine(LineTokens.Token token) {
+    private Path getOutputDir() {
+        Path dir = Paths.get(HTML_OUTPUT_DIR);
+
+        if (!SPLIT_DIR_BY_JVM) {
+            return dir;
+        }
+
+        String dirName = System.getProperty("coverageOutputName");
+        if (dirName == null) {
+            dirName = String.format("%s %s %s",
+                    System.getProperty("java.vm.version"),
+                    System.getProperty("java.vm.vendor"),
+                    System.getProperty("java.vm.name"));
+        }
+        dirName = dirName.replaceAll("\\W+", "_");
+        return dir.resolve(dirName);
+    }
+
+    private String getPageTemplate() {
+        return ResourceUtils.loadResource(CoverageTest.RESOURCE_DIR, "page_template.html");
+    }
+
+    private String getPageTitle(String className, String testName) {
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        return String.format("%s - %s - %s", timeFormatter.format(now), className, testName);
+    }
+
+    private String generateTokenLine(LineTokens.Token token) {
         StringBuilder line = new StringBuilder();
 
         while (true) {
@@ -104,7 +167,6 @@ public class HTMLWriter {
             }
             token = token.children.get(0);
         }
-
 
         return line.toString();
     }

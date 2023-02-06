@@ -22,7 +22,7 @@ import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
 import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
 import org.codedefenders.analysis.coverage.line.LineTokens;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
-import org.codedefenders.analysis.coverage.util.HTMLWriter;
+import org.codedefenders.analysis.coverage.util.CoverageOutputWriter;
 import org.codedefenders.analysis.coverage.util.InMemoryClassLoader;
 import org.codedefenders.analysis.coverage.util.InMemoryJavaFileManager;
 import org.codedefenders.util.JavaParserUtils;
@@ -51,9 +51,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  * <p>Adapted from the JaCoCo "CoreTutorial" API example.
  * See https://www.jacoco.org/jacoco/trunk/doc/api.html
  *
- * <p>HTML output for easier debugging can be enabled in {@link HTMLWriter}.
+ * <p>HTML output for easier debugging can be enabled in {@link CoverageOutputWriter}.
  */
 public class CoverageTest {
+    public final static String RESOURCE_DIR = "analysis/coverage";
 
     // TODO: extract getJavaMajorVersion into a util class and use it in Configuration as well?
     // TODO: put the InMemory* JavaCompiler into a src package and use it in Compiler as well?
@@ -130,7 +131,7 @@ public class CoverageTest {
         NewLineCoverage transformedCoverage = lineTokenAnalyser.analyse(lineTokens);
 
         // write HTML report if enabled
-        new HTMLWriter().write(
+        CoverageOutputWriter writer = new CoverageOutputWriter(
                 className,
                 testName,
                 classCode,
@@ -138,6 +139,8 @@ public class CoverageTest {
                 transformedCoverage,
                 expectedCoverage,
                 lineTokens);
+        writer.writeCoverage();
+        writer.writeHtml();
 
         // assertions
         assertSameCoverage(transformedCoverage, expectedCoverage);

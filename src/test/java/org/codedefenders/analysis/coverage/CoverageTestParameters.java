@@ -23,7 +23,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.codedefenders.util.ResourceUtils.loadResource;
 
 class CoverageTestParameters implements ArgumentsProvider {
-    private final static String RESOURCE_DIR = "analysis/coverage";
     private final static Pattern NAME_REGEX = Pattern.compile("([A-Za-z][A-Za-z1-9]*)\\.java");
 
     private final static List<String> UTILS_FILES = Arrays.asList(
@@ -46,7 +45,7 @@ class CoverageTestParameters implements ArgumentsProvider {
     }
 
     private NewLineCoverage readExpectedCoverage(String path) {
-        String text = loadResource(RESOURCE_DIR, path);
+        String text = loadResource(CoverageTest.RESOURCE_DIR, path);
         SimpleLineCoverage expectedCoverage = new SimpleLineCoverage();
         String[] lines = text.split("\r?\n");
         for (int lineNum = 1; lineNum <= lines.length; lineNum++) {
@@ -66,7 +65,7 @@ class CoverageTestParameters implements ArgumentsProvider {
             throws Exception {
         String cutName = getClassNameFromPath(cutPath);
         String testName = getClassNameFromPath(testPath);
-        String classCode = loadResource(RESOURCE_DIR, cutPath);
+        String classCode = loadResource(CoverageTest.RESOURCE_DIR, cutPath);
 
         List<String> javaFiles = new ArrayList<>();
         javaFiles.add(cutPath);
@@ -77,7 +76,7 @@ class CoverageTestParameters implements ArgumentsProvider {
         List<JavaFileObject> sourceFiles = new ArrayList<>();
         for (String path : javaFiles) {
             String name = getClassNameFromPath(path);
-            String code = loadResource(RESOURCE_DIR, path);
+            String code = loadResource(CoverageTest.RESOURCE_DIR, path);
             sourceFiles.add(new InMemorySourceFile(name, code));
         }
 
