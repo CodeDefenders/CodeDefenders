@@ -47,39 +47,6 @@ public class Playground {
         );
     }
 
-    @Call
-    public void test2() {
-        boolean x
-                = doGet(this)
-                instanceof
-                Object;
-    }
-
-    @Call
-    public void test2a() {
-        Object o = this;
-
-        boolean x
-                = o
-                instanceof
-                Integer i;
-
-        boolean y
-                = o
-                instanceof
-                Playground p;
-    }
-
-    @Call(params = "1")
-    public void test3(int i) {
-        boolean x = i == 1
-                ? doGet(this)
-                instanceof
-                Object
-                : this
-                instanceof
-                Object;
-    }
 
     @Call
     public void test4() {
@@ -258,10 +225,19 @@ public class Playground {
         }
     }
 
+
+    @Call(params = "1")
+    public void test3(int i) {
+        boolean x = i == 1
+                ? doGet(this)
+                instanceof
+                Object
+                : this
+                instanceof // coverage on this line??
+                Object;
+    }
+
     // tests todo
         // binary expr
-        // instanceof and pattern
         // assignments (and nested assignments)
-
-    // TODO: does final modifier impact variabledeclarators?
 }

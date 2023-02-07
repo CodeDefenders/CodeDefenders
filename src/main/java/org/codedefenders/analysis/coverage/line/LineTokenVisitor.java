@@ -10,11 +10,8 @@ import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.LineTokens.TokenInserter;
 
 import com.github.javaparser.JavaToken;
-import com.github.javaparser.TokenTypes;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.CompactConstructorDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
@@ -32,10 +29,10 @@ import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
+import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
-import com.github.javaparser.ast.expr.PatternExpr;
 import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
@@ -62,7 +59,6 @@ import com.github.javaparser.ast.stmt.ThrowStmt;
 import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.stmt.YieldStmt;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import static org.codedefenders.util.JavaParserUtils.beginOf;
@@ -475,17 +471,29 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(IfStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            AstCoverageStatus status = astCoverage.get(stmt);
+            AstCoverageStatus conditionStatus = astCoverage.get(stmt.getCondition());
+            AstCoverageStatus elseStatus = stmt.getElseStmt()
+                    .map(astCoverage::get)
+                    .orElseGet(AstCoverageStatus::empty);
+
             i.node(stmt).reset();
 
             // cover if keyword and condition
             JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getCondition())
                     .skipOne()
                     .find(JavaToken.Kind.RPAREN);
-
             int ifEndLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
 
-            i.lines(stmt.getBegin().get().line, ifEndLine)
-                    .cover(astCoverage.get(stmt).status());
+            if (status.isCovered() && conditionStatus.statusAfter().isNotCovered()) {
+                i.lines(beginOf(stmt), endOf(stmt.getCondition()))
+                        .cover(status.status());
+                i.lines(endOf(stmt.getCondition()) + 1, ifEndLine)
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.lines(beginOf(stmt), ifEndLine)
+                        .cover(status.status());
+            }
 
             // cover else keyword
             if (stmt.hasElseBranch()) {
@@ -497,7 +505,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                 int elseEndLine = JavaTokenIterator.expandWhitespaceAfter(elseToken);
 
                 i.lines(elseBeginLine, elseEndLine)
-                        .cover(astCoverage.get(stmt.getElseStmt().get()).status());
+                        .cover(elseStatus.status());
             }
         }
     }
@@ -740,12 +748,27 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-    // TODO: cover with NOT_COVERED between if an exception is thrown
     @Override
     public void visit(VariableDeclarationExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
-            i.node(expr).coverStrong(status.status());
+
+            int lastCoveredLine = expr.getBegin().get().line;
+            if (status.isCovered() && !status.statusAfter().isCovered()) {
+                for (VariableDeclarator var : expr.getVariables()) {
+                    lastCoveredLine = var.getBegin().get().line - 1;
+                    AstCoverageStatus varStatus = astCoverage.get(var);
+                    if (!varStatus.statusAfter().isCovered()) {
+                        break;
+                    }
+                }
+                i.lines(expr.getBegin().get().line, lastCoveredLine)
+                        .coverStrong(LineCoverageStatus.FULLY_COVERED);
+                i.lines(lastCoveredLine + 1, expr.getEnd().get().line)
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.node(expr).coverStrong(status.status());
+            }
         }
     }
 
@@ -819,6 +842,21 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(CompactConstructorDeclaration decl, Void arg) {
         try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
             handleMethodDeclaration(i, decl, decl.getBody(), astCoverage.get(decl));
+        }
+    }
+
+    @Override
+    public void visit(InstanceOfExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
+            AstCoverageStatus exprStatus = astCoverage.get(expr.getExpression());
+
+            if (exprStatus.isEmpty()) {
+                i.node(expr).cover(status.selfStatus());
+            } else {
+                i.lines(endOf(expr.getExpression()) + 1, endOf(expr))
+                        .cover(status.selfStatus());
+            }
         }
     }
 }

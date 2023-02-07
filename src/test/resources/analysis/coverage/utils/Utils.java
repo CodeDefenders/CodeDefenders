@@ -37,6 +37,10 @@ public class Utils {
 
     }
 
+    public static void consume(boolean b) {
+
+    }
+
     public static void consume(int i, int j) {
 
     }

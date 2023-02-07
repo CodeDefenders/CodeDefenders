@@ -2,6 +2,7 @@ import utils.Call;
 import utils.MethodChain;
 
 import static utils.Utils.doCall;
+import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
 /**
@@ -298,6 +299,65 @@ public class Ifs {
         ) {
 
         } else {
+
+        }
+    }
+
+    @Call
+    public void exceptionFromCondition1() {
+        if (
+                doThrow() == 1
+        ) {
+
+        }
+    }
+
+    @Call
+    public void exceptionFromCondition2() {
+        if (
+                doGet(1) == doThrow()
+        ) {
+
+        }
+    }
+
+    @Call
+    public void exceptionFromCondition2a() {
+        if
+        (
+                doGet(1) == doThrow()
+        ) {
+
+        }
+    }
+
+    @Call
+    public void exceptionFromCondition3() {
+        if (
+                doGet(1)
+                ==
+                doThrow()
+        ) {
+
+        }
+    }
+
+    @Call
+    public void exceptionFromCondition4() {
+        if (MethodChain.create()
+                .doThrow()
+                .get(1) == 1) {
+
+        }
+    }
+
+    @Call
+    public void exceptionFromCondition5() {
+        if (
+                MethodChain.create()
+                .doThrow()
+                .get(1) == 1
+        ) {
 
         }
     }
