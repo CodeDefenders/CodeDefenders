@@ -258,10 +258,6 @@ public class Playground {
         }
     }
 
-    // wrong coverage
-        // assertions
-        // casts
-
     // tests todo
         // binary expr
         // instanceof and pattern

@@ -10,12 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.JavaToken;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.Problem;
 import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import com.github.javaparser.printer.DefaultPrettyPrinter;
 import com.github.javaparser.printer.Printer;
 import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
@@ -70,5 +72,29 @@ public class JavaParserUtils {
      */
     public static String unparse(Node node) {
         return defaultPrinter().print(node);
+    }
+
+    public static int lineOf(NodeWithRange<?> node) {
+        return beginOf(node);
+    }
+
+    public static int beginOf(NodeWithRange<?> node) {
+        return node.getBegin().get().line;
+    }
+
+    public static int endOf(NodeWithRange<?> node) {
+        return node.getEnd().get().line;
+    }
+
+    public static int lineOf(JavaToken token) {
+        return beginOf(token);
+    }
+
+    public static int beginOf(JavaToken token) {
+        return token.getRange().get().begin.line;
+    }
+
+    public static int endOf(JavaToken token) {
+        return token.getRange().get().end.line;
     }
 }

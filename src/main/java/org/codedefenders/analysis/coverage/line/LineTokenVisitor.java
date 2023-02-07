@@ -65,6 +65,10 @@ import com.github.javaparser.ast.stmt.YieldStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
+import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.endOf;
+import static org.codedefenders.util.JavaParserUtils.lineOf;
+
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     AstCoverage astCoverage;
@@ -232,12 +236,39 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         i.lines(beginLine, endLine).cover(status.status());
     }
 
-    // TODO
     @Override
     public void visit(AssertStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
-            i.node(stmt).coverStrong(status.status());
+            AstCoverageStatus checkStatus = astCoverage.get(stmt.getCheck());
+            AstCoverageStatus messageStatus = astCoverage.get(stmt.getMessage().get());
+
+            JavaToken assertToken = stmt.getTokenRange().get().getBegin();
+            int keywordEndLine = JavaTokenIterator.expandWhitespaceAfter(assertToken);
+            // cover assert token + whitespace after with assert status
+            i.lines(beginOf(stmt), keywordEndLine)
+                    .coverStrong(status.status());
+
+            int checkBeginLine = Math.max(keywordEndLine + 1, beginOf(stmt.getCheck()));
+            if (!stmt.getMessage().isPresent()) {
+                // cover lines after assert keyword until end of stmt with check status
+                i.lines(checkBeginLine, endOf(stmt))
+                        .cover(checkStatus.status());
+                return;
+            }
+
+            JavaToken colonToken = JavaTokenIterator.ofEnd(stmt.getCheck())
+                    .skipOne()
+                    .find(JavaToken.Kind.COLON);
+            int checkEndLine = Math.max(lineOf(colonToken) - 1, endOf(stmt.getCheck()));
+            // cover lines after assert keyword until line before colon with check status.
+            // if colon is on the same line as the check, cover that line as well
+            i.lines(checkBeginLine, checkEndLine)
+                    .cover(checkStatus.status());
+
+            // cover the remaining lines with message status
+            i.lines(checkEndLine + 1, endOf(stmt))
+                    .cover(messageStatus.status());
         }
     }
 
@@ -737,9 +768,6 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(LambdaExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
-            // if (status.selfStatus().isEmpty()) {
-            //     return;
-            // }
 
             i.node(expr).reset();
 

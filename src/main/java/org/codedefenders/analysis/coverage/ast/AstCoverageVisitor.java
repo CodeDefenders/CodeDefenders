@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.codedefenders.analysis.coverage.JavaTokenIterator;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
@@ -87,7 +86,6 @@ import com.github.javaparser.ast.modules.ModuleOpensDirective;
 import com.github.javaparser.ast.modules.ModuleProvidesDirective;
 import com.github.javaparser.ast.modules.ModuleRequiresDirective;
 import com.github.javaparser.ast.modules.ModuleUsesDirective;
-import com.github.javaparser.ast.nodeTypes.NodeWithRange;
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.BreakStmt;
@@ -124,6 +122,9 @@ import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.ast.type.VoidType;
 import com.github.javaparser.ast.type.WildcardType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
+import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.endOf;
 
 // TODO: flow coverage up expressions?
 // TODO: function declarations of anonymous classes can be optimized out if they can't be used from the outside
@@ -293,14 +294,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
             }
         }
         return -1;
-    }
-
-    private int beginOf(NodeWithRange<?> node) {
-        return node.getBegin().get().line;
-    }
-
-    private int endOf(NodeWithRange<?> node) {
-        return node.getEnd().get().line;
     }
 
     // endregion
@@ -1209,29 +1202,78 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     // endregion
     // region STATEMENT LEVEL ==========================================================================================
 
-    // could be improved by looking at the coverage of the check and message
-    // TODO: use instruction coverage on keyword + branch coverage on condition
-    // TODO: test with both branches taken
     @Override
     public void visit(AssertStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
         DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
-        switch (keywordStatus.instructionStatus()) {
-            case NOT_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.notCovered());
-                break;
-            case PARTLY_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.covered()
-                        .withStatusAfter(StatusAfter.MAYBE_COVERED));
-                break;
-            case FULLY_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.covered()
-                        .withStatusAfter(StatusAfter.NOT_COVERED));
-                break;
-            case EMPTY:
-                astCoverage.put(stmt, AstCoverageStatus.empty());
-                break;
+        // branches can be on the keyword or the condition
+        DetailedLine branchStatus = keywordStatus.hasBranches()
+                ? keywordStatus
+                : mergeLineCoverage(stmt.getCheck());
+
+        AstCoverageStatus checkStatus = astCoverage.get(stmt.getCheck());
+        AstCoverageStatus messageStatus = stmt.getMessage()
+                .map(astCoverage::get)
+                .orElseGet(AstCoverageStatus::empty);
+
+        LineCoverageStatus status = keywordStatus.instructionStatus()
+                .upgrade(branchStatus.branchStatus())
+                .upgrade(checkStatus.status())
+                .upgrade(messageStatus.status());
+
+        StatusAfter statusAfter;
+        getStatusAfter: {
+            // no ins covered -> assert wasn't executed
+            // all ins covered -> assert threw
+            switch (keywordStatus.instructionStatus()) {
+                case NOT_COVERED:
+                case FULLY_COVERED:
+                    statusAfter = StatusAfter.NOT_COVERED;
+                    break getStatusAfter;
+            }
+
+            switch (branchStatus.branchStatus()) {
+                case NOT_COVERED:
+                    statusAfter = StatusAfter.NOT_COVERED;
+                    break getStatusAfter;
+                case FULLY_COVERED:
+                    statusAfter = StatusAfter.COVERED;
+                    break getStatusAfter;
+                case PARTLY_COVERED:
+                    if (messageStatus.isCovered() && beginOf(stmt.getMessage().get()) > endOf(stmt.getCheck())) {
+                        statusAfter = StatusAfter.NOT_COVERED;
+                    } else {
+                        statusAfter = StatusAfter.MAYBE_COVERED;
+                    }
+                    break getStatusAfter;
+                default:
+                    throw new IllegalArgumentException("Unknown line coverage status: " + branchStatus.instructionStatus());
+            }
+        }
+
+        astCoverage.put(stmt, AstCoverageStatus.fromStatus(status)
+                .withStatusAfter(statusAfter));
+
+        // update check status
+        if (checkStatus.isEmpty()) {
+            astCoverage.put(stmt.getCheck(), AstCoverageStatus.fromStatus(status));
+        }
+
+        // update message status
+        if (stmt.getMessage().isPresent() && messageStatus.isEmpty()) {
+            if (keywordStatus.instructionStatus().isNotCovered()
+                || branchStatus.branchStatus().isNotCovered()
+                || checkStatus.statusAfter().isNotCovered()) {
+                // check hasn't been fully evaluated -> NOT_COVERED
+                astCoverage.updateStatus(stmt.getMessage().get(), LineCoverageStatus.NOT_COVERED);
+            } else if (status.isCovered() && statusAfter.isNotCovered()) {
+                // assertion threw -> COVERED
+                astCoverage.updateStatus(stmt.getMessage().get(), LineCoverageStatus.FULLY_COVERED);
+            } else {
+                // otherwise, just use the overall status
+                astCoverage.updateStatus(stmt.getMessage().get(), status);
+            }
         }
     }
 
