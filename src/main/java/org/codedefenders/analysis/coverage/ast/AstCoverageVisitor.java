@@ -926,12 +926,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine closingBraceStatus = lineCoverage.get(stmt.getEnd().get().line);
         switch (closingBraceStatus.instructionStatus()) {
             case EMPTY:
-                // if everything is empty, the loop was probably optimized out
-                if (!bodyStatus.isEmpty() || !iterStatus.isEmpty() || conditionStatus.hasBranches()) {
-                    // loop body always jumps
-                    astCoverage.update(stmt.getBody(),
-                            s -> s.withStatusAfter(StatusAfter.ALWAYS_JUMPS));
-                }
                 break;
             case NOT_COVERED:
                 if (bodyStatus.isEmpty()) {
@@ -1576,26 +1570,30 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .instructionStatus();
 
         // determine coverage of arguments
-        LineCoverageStatus argumentsStatus = expr.getArguments().stream()
+        AstCoverageStatus argumentsStatus = expr.getArguments().stream()
                 .map(astCoverage::get)
-                .map(AstCoverageStatus::status)
-                .reduce(LineCoverageStatus.EMPTY, LineCoverageStatus::upgrade);
+                .reduce(this::mergeCoverageForSequence)
+                .orElseGet(AstCoverageStatus::empty);
 
         // determine final AST coverage
         LineCoverageStatus astStatus = selfStatus
-                .upgrade(argumentsStatus)
+                .upgrade(argumentsStatus.status())
                 .upgrade(scopeStatus.status());
+
         StatusAfter statusAfter;
-        if (selfStatus == LineCoverageStatus.NOT_COVERED) {
+        if (argumentsStatus.statusAfter().isNotCovered()) {
+            statusAfter = StatusAfter.NOT_COVERED;
+        } else if (selfStatus == LineCoverageStatus.NOT_COVERED) {
             statusAfter = StatusAfter.NOT_COVERED;
         } else if (selfStatus == LineCoverageStatus.FULLY_COVERED) {
             statusAfter = StatusAfter.COVERED;
         } else {
             statusAfter = scopeStatus.statusAfter();
         }
+
         AstCoverageStatus status = AstCoverageStatus.fromStatus(astStatus)
                         .withStatusAfter(statusAfter)
-                        .withSelfStatus(selfStatus);
+                        .withSelfStatus(selfStatus.upgrade(argumentsStatus.status()));
         astCoverage.put(expr, status);
     }
 
@@ -1620,8 +1618,26 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ObjectCreationExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        DetailedLine newKeywordCoverage = lineCoverage.get(expr.getBegin().get().line);
-        astCoverage.put(expr, AstCoverageStatus.fromStatus(newKeywordCoverage.instructionStatus()));
+        DetailedLine newKeywordCoverage = lineCoverage.get(beginOf(expr));
+
+        // determine coverage of arguments
+        AstCoverageStatus argumentsStatus = expr.getArguments().stream()
+                .map(astCoverage::get)
+                .reduce(this::mergeCoverageForSequence)
+                .orElseGet(AstCoverageStatus::empty);
+
+        LineCoverageStatus status = newKeywordCoverage.instructionStatus()
+                .upgrade(argumentsStatus.status());
+
+        StatusAfter statusAfter;
+        if (argumentsStatus.statusAfter().isNotCovered()) {
+            statusAfter = StatusAfter.NOT_COVERED;
+        } else {
+            statusAfter = StatusAfter.fromLineCoverageStatus(status);
+        }
+
+        astCoverage.put(expr, AstCoverageStatus.fromStatus(status)
+                .withStatusAfter(statusAfter));
     }
 
     /**

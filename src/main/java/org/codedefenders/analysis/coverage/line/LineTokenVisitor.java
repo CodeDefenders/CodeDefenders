@@ -24,6 +24,7 @@ import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
@@ -32,6 +33,7 @@ import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
@@ -73,6 +75,26 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public LineTokenVisitor(AstCoverage astCoverage, LineTokens lineTokens) {
         this.astCoverage = astCoverage;
         this.lineTokens = lineTokens;
+    }
+
+    private Optional<Integer> getFirstNotCoveredLine(Iterable<? extends Node> nodes) {
+        Integer firstNotCoveredLine = null;
+
+        for (Node node : nodes) {
+            AstCoverageStatus status = astCoverage.get(node);
+
+            if (status.isNotCovered() && firstNotCoveredLine == null) {
+                firstNotCoveredLine = beginOf(node);
+            } else if (status.isCovered()) {
+                if (status.statusAfter().isNotCovered()) {
+                    firstNotCoveredLine = beginOf(node);
+                } else {
+                    firstNotCoveredLine = null;
+                }
+            }
+        }
+
+        return Optional.ofNullable(firstNotCoveredLine);
     }
 
     private void handleLoop(TokenInserter i, Node loop, Node body) {
@@ -537,25 +559,32 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
 
             AstCoverageStatus scopeStatus = expr.getScope()
                     .map(astCoverage::get)
-                    .orElseGet(AstCoverageStatus::empty);
-
-            // if the scope is empty of the call has no scope, simply cover the entire call
+                    .orElse(status);
             if (scopeStatus.isEmpty()) {
-                i.node(expr).coverStrong(status.selfStatus());
-                return;
+                scopeStatus = status;
             }
 
-            // if the call has a coverable scope, cover the scope separately
-            // (this only really matters if there are blank lines between calls of a method chain
-            // and the chain throws an exception somewhere)
-            JavaToken scopeEnd = expr.getScope().get().getTokenRange().get().getEnd();
-            int endScopeLine = JavaTokenIterator.expandWhitespaceAfter(scopeEnd);
-            int beginCallLine = JavaTokenIterator.of(scopeEnd)
-                    .skipOne()
-                    .find(JavaToken.Kind.DOT)
-                    .getRange().get().begin.line;
-            i.lines(expr.getBegin().get().line, endScopeLine).cover(scopeStatus.selfStatus());
-            i.lines(beginCallLine, expr.getEnd().get().line).coverStrong(status.selfStatus());
+            int beginCallLine = beginOf(expr);
+            if (expr.hasScope()) {
+                // cover the scope separately
+                // (this only really matters if there are blank lines between calls of a method chain
+                // and the chain throws an exception somewhere)
+                JavaToken scopeEnd = expr.getScope().get().getTokenRange().get().getEnd();
+                int endScopeLine = JavaTokenIterator.expandWhitespaceAfter(scopeEnd);
+                beginCallLine = JavaTokenIterator.of(scopeEnd)
+                        .skipOne()
+                        .find(JavaToken.Kind.DOT)
+                        .getRange().get().begin.line;
+                i.lines(beginOf(expr), endScopeLine)
+                        .cover(scopeStatus.selfStatus());
+            }
+
+            int firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments())
+                    .orElse(endOf(expr) + 1);
+            i.lines(beginCallLine, firstNotCoveredLine - 1)
+                    .coverStrong(status.selfStatus());
+            i.lines(firstNotCoveredLine, endOf(expr))
+                    .cover(LineCoverageStatus.NOT_COVERED);
         }
     }
 
@@ -579,9 +608,14 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(ObjectCreationExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
 
-            // first, cover the whole node
-            i.node(expr).coverStrong(astCoverage.get(expr).status());
+            int firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments())
+                    .orElse(endOf(expr) + 1);
+            i.lines(beginOf(expr), firstNotCoveredLine - 1)
+                    .coverStrong(status.selfStatus());
+            i.lines(firstNotCoveredLine, endOf(expr))
+                    .cover(LineCoverageStatus.NOT_COVERED);
 
             // if the expression has an anonymous class body, reset it
             expr.getAnonymousClassBody().ifPresent(classBody -> {
@@ -859,4 +893,20 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             }
         }
     }
+
+    @Override
+    public void visit(ArrayAccessExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            i.node(expr).cover(astCoverage.get(expr).selfStatus());
+        }
+    }
+
+    @Override
+    public void visit(MethodReferenceExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            i.node(expr).cover(astCoverage.get(expr).selfStatus());
+        }
+    }
+
+
 }
