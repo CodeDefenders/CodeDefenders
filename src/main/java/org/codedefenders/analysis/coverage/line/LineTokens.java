@@ -42,6 +42,8 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
             LineCoverageStatus combinedStatus = coverage.get(line).combinedStatus();
             if (combinedStatus != LineCoverageStatus.EMPTY) {
                 lineTokens.pushToken(line, Token.override(combinedStatus));
+            } else {
+                lineTokens.pushToken(line, Token.empty(null));
             }
             /*
             if (status.branchStatus() != LineCoverageStatus.EMPTY) {

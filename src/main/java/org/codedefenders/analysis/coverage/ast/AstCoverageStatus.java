@@ -189,5 +189,19 @@ public class AstCoverageStatus {
                     throw new IllegalArgumentException("Unknown line coverage status: " + status);
             }
         }
+
+        public LineCoverageStatus toLineCoverageStatus() {
+            switch (this) {
+                case ALWAYS_JUMPS:
+                case MAYBE_COVERED:
+                    return LineCoverageStatus.EMPTY;
+                case NOT_COVERED:
+                    return LineCoverageStatus.NOT_COVERED;
+                case COVERED:
+                    return LineCoverageStatus.FULLY_COVERED;
+                default:
+                    throw new IllegalArgumentException("Unknown StatusAfter value: " + this);
+            }
+        }
     }
 }

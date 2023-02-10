@@ -127,4 +127,21 @@ public class MethodCalls {
 
         ;
     }
+
+    @Call
+    public void exceptionInMethodCallParameter() {
+        MethodChain.create()
+                .call()
+                .consume(
+
+                        MethodChain.create()
+                                .call()
+                                .doThrow()
+                                .get(4)
+
+                );
+
+        ;
+    }
+
 }

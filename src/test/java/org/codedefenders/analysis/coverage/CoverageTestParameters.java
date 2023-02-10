@@ -199,7 +199,10 @@ class CoverageTestParameters implements ArgumentsProvider {
                 emptyRunnerTestCase("binaryexpressions/BinaryExpressions.java"),
 
                 defaultRunnerTestCase("instanceof/Instanceof.java"),
-                emptyRunnerTestCase("instanceof/Instanceof.java")//,
+                emptyRunnerTestCase("instanceof/Instanceof.java"),
+
+                defaultRunnerTestCase("assignments/Assignments.java"),
+                emptyRunnerTestCase("assignments/Assignments.java")
 
                 // simpleTestCase("xmlelement/XmlElement.java",
                 // "xmlelement/XmlElementTest.java"),

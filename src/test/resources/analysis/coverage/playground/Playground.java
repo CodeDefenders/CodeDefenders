@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.function.Supplier;
 import java.util.function.BinaryOperator;
 import java.util.function.UnaryOperator;
@@ -18,46 +19,6 @@ import utils.Call;
 
 public class Playground {
     private final static Integer INTEGER = null;
-
-    @Call
-    public void test5() {
-        boolean t = true;
-        boolean f = false;
-
-        boolean[] b = new boolean[] {
-                t
-                ||
-                doGet(true),
-                f
-                &&
-                doGet(false)
-        };
-    }
-
-    public void param() {
-
-    }
-
-    @Call
-    public void test() {
-        callLambda(
-                this
-                ::
-                param
-        );
-    }
-
-
-    @Call
-    public void test4() {
-        int[] j
-                =
-                new
-                        int[3];
-
-
-
-    }
 
     @Call
     public void test6() {
@@ -138,85 +99,6 @@ public class Playground {
     }
 
     @Call
-    public void test10() {
-        int i = 1;
-
-        i
-        =
-        2;
-
-        i
-        +=
-        2;
-
-        i
-        =
-        doGet(2);
-
-        i
-        +=
-        doGet(2);
-    }
-
-    @Call
-    public void test11() {
-        int i = 1;
-
-        consume(
-        i
-        =
-        2
-        );
-
-        consume(
-        i
-        +=
-        2
-        );
-
-        consume(
-        i
-        =
-        doGet(2)
-        );
-
-        consume(
-        i
-        +=
-        doGet(2)
-        );
-    }
-    @Call
-    public void test12() {
-        int i = 1;
-
-        i
-        =
-        doThrow();
-    }
-
-    @Call
-    public void test12b() {
-        int i = 1;
-
-        i
-        =
-        doGet(2);
-    }
-
-    @Call
-    public void test13() {
-        int i = 1;
-
-        consume(
-        i
-        =
-        doThrow()
-        );
-    }
-
-
-    @Call
     public void notCoveredAtAllForSomeReason() {
         doCall();
         Object a = null;
@@ -224,7 +106,6 @@ public class Playground {
 
         }
     }
-
 
     @Call(params = "1")
     public void test3(int i) {
@@ -237,7 +118,64 @@ public class Playground {
                 Object;
     }
 
+    class Point {
+        int x;
+        int y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    // @Call(params = "(1; 2); (3; 44a); (5; 6)")
+    // @Call(params = "(1; 2); (3; 44); (5; 6)")
+    // @Call(params = "(1; 2); (3; 4); (5; 6)")
+    @Call(params = "(1; ); (3; 4); (5; 6)")
+    public List<Point> parsePoints(String in) {
+        boolean foundParen = false;
+        char[] chars = in.toCharArray();
+
+        String currentMatch = null;
+        List<String> currentPoint = new ArrayList<>();
+
+        List<Point> result = new ArrayList<>();
+
+        for (char c : chars) {
+            if (!foundParen) {
+                if (c == '(') {
+                    foundParen = true;
+                }
+            } else {
+                if (c == ')') {
+                    currentPoint.add(currentMatch);
+                    currentMatch = null;
+
+                    result.add(new Point(
+                            Integer.parseInt(currentPoint.get(0)),
+                            Integer.parseInt(currentPoint.get(1))
+                    ));
+                    currentPoint.clear();
+                    foundParen = false;
+                } else if (c == ';') {
+                    currentPoint.add(currentMatch);
+                    currentMatch = null;
+                } else if (c >= '0' && c <= '9') {
+                    currentMatch = currentMatch == null
+                            ? "" + c
+                            : currentMatch + c;
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+
     // tests todo
         // binary expr
-        // assignments (and nested assignments)
+        // objectcreationexpr
+        // arrays with nested initializers
+        // method calls / constructor calls / super calls with exception in args
 }

@@ -290,12 +290,36 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-    // TODO
     @Override
     public void visit(AssignExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus status = astCoverage.get(expr);
-            i.node(expr).cover(status.status());
+            AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
+            AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
+
+            i.node(expr.getTarget()).cover(targetStatus.status());
+            i.lines(endOf(expr.getTarget()) + 1, beginOf(expr.getValue()) - 1)
+                    .cover(targetStatus.statusAfter().toLineCoverageStatus());
+            i.node(expr.getValue()).cover(valueStatus.status());
+
+            // AstCoverageStatus status = astCoverage.get(expr);
+            // AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
+            // AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
+
+            // if (status.isCovered() && !status.statusAfter().isCovered() && !valueStatus.isCovered()) {
+            //     if (targetStatus.statusAfter().isNotCovered()) {
+            //         i.node(expr.getTarget())
+            //                 .cover(LineCoverageStatus.FULLY_COVERED);
+            //         i.lines(endOf(expr.getTarget()) + 1, endOf(expr))
+            //                 .cover(LineCoverageStatus.NOT_COVERED);
+            //     } else {
+            //         i.lines(beginOf(expr), beginOf(expr.getTarget()) - 1)
+            //                 .cover(LineCoverageStatus.FULLY_COVERED);
+            //         i.node(expr.getTarget())
+            //                 .cover(LineCoverageStatus.NOT_COVERED);
+            //     }
+            // } else {
+            //     i.node(expr).cover(status.status());
+            // }
         }
     }
 
@@ -782,6 +806,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
+    // TODO: does this work with multiple variables on the same line?
     @Override
     public void visit(VariableDeclarationExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
@@ -790,7 +815,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             int lastCoveredLine = expr.getBegin().get().line;
             if (status.isCovered() && !status.statusAfter().isCovered()) {
                 for (VariableDeclarator var : expr.getVariables()) {
-                    lastCoveredLine = var.getBegin().get().line - 1;
+                    lastCoveredLine = endOf(var);
                     AstCoverageStatus varStatus = astCoverage.get(var);
                     if (!varStatus.statusAfter().isCovered()) {
                         break;

@@ -28,4 +28,14 @@ public class LocalVariables {
         // not-covered variable
         int m = 1;
     }
+
+    @Call
+    public void localVariableDeclWithMultipleVariables() {
+        int
+                i = 1,
+
+                j = doThrow(),
+
+                k = 2;
+    }
 }

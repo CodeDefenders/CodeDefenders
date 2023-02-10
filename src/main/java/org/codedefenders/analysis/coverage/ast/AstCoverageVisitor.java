@@ -1432,19 +1432,23 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(expr, arg);
 
         AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
-        if (!valueStatus.isEmpty()) {
-            astCoverage.put(expr, valueStatus.clearSelfStatus());
-            return;
-        }
-
         AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
-        if (!targetStatus.isEmpty()) {
-            astCoverage.put(expr, targetStatus.clearSelfStatus());
-            return;
+
+        AstCoverageStatus status = mergeCoverageForSequence(valueStatus, targetStatus);
+
+        if (status.isEmpty() && status.statusAfter().isUnsure()) {
+            DetailedLine targetLineStatus = mergeLineCoverage(expr.getTarget());
+            status = AstCoverageStatus.fromStatus(targetLineStatus.instructionStatus());
         }
 
-        DetailedLine targetLineStatus = mergeLineCoverage(expr.getTarget());
-        astCoverage.put(expr, AstCoverageStatus.fromStatus(targetLineStatus.instructionStatus()));
+        astCoverage.put(expr, status);
+
+        if (targetStatus.isEmpty() && targetStatus.selfStatus().isEmpty()) {
+            astCoverage.updateStatus(expr.getTarget(), status.status());
+        }
+        if (valueStatus.isEmpty() && valueStatus.selfStatus().isEmpty()) {
+            astCoverage.updateStatus(expr.getValue(), targetStatus.statusAfter().toLineCoverageStatus());
+        }
     }
 
     @Override
@@ -1482,15 +1486,15 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .withStatusAfter(statusAfter));
 
         // set the coverage of the then-expression by its lines if it's not already set
-        // if (astCoverage.get(expr.getElseExpr()).isEmpty()) {
-        //     DetailedLine thenStatus = mergeLineCoverage(expr.getThenExpr());
-        //     astCoverage.updateStatus(expr.getThenExpr(), thenStatus.instructionStatus());
+        // if (thenStatus.isEmpty() && thenStatus.selfStatus().isEmpty()) {
+        //     DetailedLine thenLineStatus = mergeLineCoverage(expr.getThenExpr());
+        //     astCoverage.updateStatus(expr.getThenExpr(), thenLineStatus.instructionStatus());
         // }
 
         // set the coverage of the else-expression by its lines if it's not already set
-        // if (astCoverage.get(expr.getElseExpr()).isEmpty()) {
-        //     DetailedLine elseStatus = mergeLineCoverage(expr.getElseExpr());
-        //     astCoverage.updateStatus(expr.getElseExpr(), elseStatus.instructionStatus());
+        // if (elseStatus.isEmpty() && elseStatus.selfStatus().isEmpty()) {
+        //     DetailedLine elseLineStatus = mergeLineCoverage(expr.getElseExpr());
+        //     astCoverage.updateStatus(expr.getElseExpr(), elseLineStatus.instructionStatus());
         // }
     }
 
