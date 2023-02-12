@@ -13,7 +13,15 @@ public class Utils {
         return obj;
     }
 
+    public static int doThrow(Object arg) {
+        throw new TestRuntimeException();
+    }
+
     public static int doThrow() {
+        throw new TestRuntimeException();
+    }
+
+    public static boolean doThrowBoolean() {
         throw new TestRuntimeException();
     }
 

@@ -1,3 +1,5 @@
+import org.checkerframework.checker.builder.qual.CalledMethods;
+
 import utils.Call;
 import utils.MethodChain;
 
@@ -144,4 +146,15 @@ public class MethodCalls {
         ;
     }
 
+    @Call
+    public void exceptionWithCoveredParameter() {
+        doThrow(
+                doGet(1)
+        );
+    }
+
+    @Call
+    public void exceptionWithCoveredParameter2() {
+        doThrow(doGet(1));
+    }
 }

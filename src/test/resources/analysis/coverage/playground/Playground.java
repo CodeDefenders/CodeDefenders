@@ -174,7 +174,6 @@ public class Playground {
 
 
     // tests todo
-        // binary expr
         // objectcreationexpr
         // arrays with nested initializers
         // method calls / constructor calls / super calls with exception in args

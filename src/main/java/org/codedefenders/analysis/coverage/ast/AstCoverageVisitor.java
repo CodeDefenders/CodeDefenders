@@ -126,10 +126,6 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import static org.codedefenders.util.JavaParserUtils.beginOf;
 import static org.codedefenders.util.JavaParserUtils.endOf;
 
-// TODO: flow coverage up expressions?
-// TODO: function declarations of anonymous classes can be optimized out if they can't be used from the outside
-// TODO: check where to get the branch coverage of conditions from, the branches can sometimes be on lines outside of
-//       the condition (but inside the parenthesis?)
 // TODO: check exceptions thrown in loop and if conditions
 // TODO: check if EMPTY cases are handled everywhere (any statement can be optimized out)
 
@@ -1587,9 +1583,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         StatusAfter statusAfter;
         if (argumentsStatus.statusAfter().isNotCovered()) {
             statusAfter = StatusAfter.NOT_COVERED;
-        } else if (selfStatus == LineCoverageStatus.NOT_COVERED) {
+        } else if (selfStatus.isNotCovered()) {
             statusAfter = StatusAfter.NOT_COVERED;
-        } else if (selfStatus == LineCoverageStatus.FULLY_COVERED) {
+        } else if (selfStatus.isCovered()) {
             statusAfter = StatusAfter.COVERED;
         } else {
             statusAfter = scopeStatus.statusAfter();
@@ -1712,38 +1708,21 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         AstCoverageStatus leftStatus = astCoverage.get(expr.getLeft());
         AstCoverageStatus rightStatus = astCoverage.get(expr.getRight());
 
-        if (leftStatus.statusAfter().isNotCovered() || rightStatus.isEmpty()) {
-            astCoverage.put(expr, leftStatus);
-            return;
-        }
+        AstCoverageStatus status = mergeCoverageForSequence(leftStatus, rightStatus);
 
-        if (leftStatus.isEmpty()) {
-            astCoverage.put(expr, rightStatus.clearSelfStatus());
-            return;
-        }
-
-        // left is COVERED and right is COVERED or NOT_COVERED at this point
+        astCoverage.updateStatus(expr.getLeft(), status.status());
+        astCoverage.updateStatus(expr.getRight(), leftStatus.statusAfter().toLineCoverageStatus());
 
         switch (expr.getOperator()) {
             case OR:
             case AND:
-                if (rightStatus.isCovered()) {
-                    astCoverage.put(expr, rightStatus.clearSelfStatus());
-                } else if (rightStatus.isNotCovered()) {
-                    // left side COVERED and right side NOT_COVERED means we're not sure if
-                    // the right side wasn't evaluated or was evaluated and threw an exception
-                    StatusAfter statusAfter = leftStatus.statusAfter().isCovered()
-                            ? StatusAfter.MAYBE_COVERED
-                            : leftStatus.statusAfter();
-                    astCoverage.put(expr, leftStatus
-                            .withStatusAfter(statusAfter)
-                            .clearSelfStatus());
+                if (leftStatus.statusAfter().isCovered() && rightStatus.isNotCovered()) {
+                    status = status.withStatusAfter(StatusAfter.MAYBE_COVERED);
                 }
                 break;
-            default:
-                astCoverage.put(expr, mergeCoverageForSequence(leftStatus, rightStatus));
-                break;
         }
+
+        astCoverage.put(expr, status);
     }
 
     @Override

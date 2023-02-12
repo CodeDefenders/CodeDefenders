@@ -323,11 +323,16 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-    // TODO
     @Override
     public void visit(BinaryExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            i.node(expr).empty();
+            AstCoverageStatus leftStatus = astCoverage.get(expr.getLeft());
+            AstCoverageStatus rightStatus = astCoverage.get(expr.getRight());
+
+            i.node(expr.getLeft()).cover(leftStatus.status());
+            i.lines(endOf(expr.getLeft()) + 1, beginOf(expr.getRight()) - 1)
+                    .cover(leftStatus.statusAfter().toLineCoverageStatus());
+            i.node(expr.getRight()).cover(rightStatus.status());
         }
     }
 
