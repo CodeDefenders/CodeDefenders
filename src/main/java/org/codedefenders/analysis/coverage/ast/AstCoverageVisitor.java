@@ -1286,7 +1286,25 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(stmt, arg);
 
         DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
-        astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordStatus.instructionStatus()));
+
+        // determine coverage of arguments
+        AstCoverageStatus argumentsStatus = stmt.getArguments().stream()
+                .map(astCoverage::get)
+                .reduce(this::mergeCoverageForSequence)
+                .orElseGet(AstCoverageStatus::empty);
+
+        LineCoverageStatus status = keywordStatus.instructionStatus()
+                .upgrade(argumentsStatus.status());
+
+        StatusAfter statusAfter;
+        if (argumentsStatus.statusAfter().isNotCovered()) {
+            statusAfter = StatusAfter.NOT_COVERED;
+        } else {
+            statusAfter = StatusAfter.fromLineCoverageStatus(status);
+        }
+
+        astCoverage.put(stmt, AstCoverageStatus.fromStatus(status)
+                .withStatusAfter(statusAfter));
     }
 
     @Override

@@ -1,12 +1,12 @@
-import org.checkerframework.checker.builder.qual.CalledMethods;
-
 import utils.Call;
 import utils.MethodChain;
+import utils.TestClass;
 
 import static utils.Utils.callLambda;
 import static utils.Utils.consume;
 import static utils.Utils.dontCallLambda;
 import static utils.Utils.doCall;
+import static utils.Utils.doCatch;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
@@ -80,7 +80,7 @@ public class MethodCalls {
     }
 
     @Call
-    public void lambdaParameters() {
+    public void lambdaArgs() {
         callLambda(() -> {
 
         });
@@ -96,14 +96,14 @@ public class MethodCalls {
     }
 
     @Call
-    public void exceptionInParameter1() {
+    public void exceptionInArg1() {
         consume(
                 doThrow()
         );
     }
 
     @Call
-    public void exceptionInParameter2() {
+    public void exceptionInArg2() {
         consume(
                 doGet(1),
                 doThrow()
@@ -113,7 +113,7 @@ public class MethodCalls {
     }
 
     @Call
-    public void exceptionInParameter3() {
+    public void exceptionInArg3() {
         consume(
                 doThrow(),
                 doGet(1)
@@ -121,7 +121,7 @@ public class MethodCalls {
     }
 
     @Call
-    public void exceptionInLambdaParameter() {
+    public void exceptionInLambdaArg() {
         callLambda(() -> {
                 doCall();
                 doThrow();
@@ -131,7 +131,7 @@ public class MethodCalls {
     }
 
     @Call
-    public void exceptionInMethodCallParameter() {
+    public void exceptionInMethodCallArg() {
         MethodChain.create()
                 .call()
                 .consume(
@@ -147,14 +147,60 @@ public class MethodCalls {
     }
 
     @Call
-    public void exceptionWithCoveredParameter() {
+    public void exceptionWithCoveredArg() {
         doThrow(
                 doGet(1)
         );
     }
 
     @Call
-    public void exceptionWithCoveredParameter2() {
+    public void exceptionWithCoveredArg2() {
         doThrow(doGet(1));
     }
+
+    @Call
+    public void superCalls() {
+        doCatch(() -> new SuperCalls());
+        doCatch(() -> new SuperCalls(0));
+        doCatch(() -> new SuperCalls(0, 0));
+        doCatch(() -> new SuperCalls(0, 0, 0));
+        doCatch(() -> new SuperCalls(0, 0, 0, 0));
+    }
+    public static class SuperCalls extends TestClass {
+        // super call with throwing arg
+        public SuperCalls() {
+            super(doThrow());
+        }
+
+        // super call with throwing arg
+        public SuperCalls(int i) {
+            super(
+                    doThrow());
+        }
+
+        // super call with covered throwing arg
+        public SuperCalls(int i, int j) {
+            super(MethodChain.create()
+                            .doThrow()
+                            .get(1)
+            );
+        }
+
+        // super call with covered throwing arg
+        public SuperCalls(int i, int j, int k) {
+            super(
+                    MethodChain.create()
+                    .doThrow()
+                    .get(1)
+            );
+        }
+
+        // super call with covered and throwing arg
+        public SuperCalls(int i, int j, int k, int l) {
+            super(
+                    doGet(1),
+                    doThrow());
+        }
+    }
+
 }

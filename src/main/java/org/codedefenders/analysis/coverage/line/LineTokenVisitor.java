@@ -486,7 +486,16 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ExplicitConstructorInvocationStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
-            i.node(stmt).cover(status.status());
+
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(stmt.getArguments());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginOf(stmt), firstNotCoveredLine.get() - 1)
+                        .cover(status.selfStatus());
+                i.lines(firstNotCoveredLine.get(), endOf(stmt))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.node(stmt).cover(status.status());
+            }
         }
     }
 
@@ -610,12 +619,16 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                         .cover(scopeStatus.selfStatus());
             }
 
-            int firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments())
-                    .orElse(endOf(expr) + 1);
-            i.lines(beginCallLine, firstNotCoveredLine - 1)
-                    .coverStrong(status.selfStatus());
-            i.lines(firstNotCoveredLine, endOf(expr))
-                    .cover(LineCoverageStatus.NOT_COVERED);
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginCallLine, firstNotCoveredLine.get() - 1)
+                        .coverStrong(status.selfStatus());
+                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+               i.lines(beginCallLine, endOf(expr))
+                       .coverStrong(status.selfStatus());
+            }
         }
     }
 
@@ -641,12 +654,16 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
 
-            int firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments())
-                    .orElse(endOf(expr) + 1);
-            i.lines(beginOf(expr), firstNotCoveredLine - 1)
-                    .coverStrong(status.selfStatus());
-            i.lines(firstNotCoveredLine, endOf(expr))
-                    .cover(LineCoverageStatus.NOT_COVERED);
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
+                        .coverStrong(status.selfStatus());
+                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.lines(beginOf(expr), endOf(expr))
+                        .coverStrong(status.selfStatus());
+            }
 
             // if the expression has an anonymous class body, reset it
             expr.getAnonymousClassBody().ifPresent(classBody -> {
@@ -936,12 +953,16 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(ArrayInitializerExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            int firstNotCoveredLine = getFirstNotCoveredLine(expr.getValues())
-                    .orElse(endOf(expr) + 1);
-            i.lines(beginOf(expr), firstNotCoveredLine - 1)
-                    .empty();
-            i.lines(firstNotCoveredLine, endOf(expr))
-                    .cover(LineCoverageStatus.NOT_COVERED);
+
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getValues());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
+                        .empty();
+                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.node(expr).empty();
+            }
         }
     }
 

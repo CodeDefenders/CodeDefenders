@@ -28,6 +28,7 @@ class CoverageTestParameters implements ArgumentsProvider {
     private final static List<String> UTILS_FILES = Arrays.asList(
             "utils/Call.java",
             "utils/MethodChain.java",
+            "utils/TestClass.java",
             "utils/TestEnum.java",
             "utils/TestException.java",
             "utils/TestRuntimeException.java",
@@ -203,10 +204,12 @@ class CoverageTestParameters implements ArgumentsProvider {
                 emptyRunnerTestCase("instanceof/Instanceof.java"),
 
                 defaultRunnerTestCase("assignments/Assignments.java"),
-                emptyRunnerTestCase("assignments/Assignments.java")
+                emptyRunnerTestCase("assignments/Assignments.java"),
 
-                // simpleTestCase("xmlelement/XmlElement.java",
-                // "xmlelement/XmlElementTest.java"),
+                defaultRunnerTestCase("constructorcalls/ConstructorCalls.java"),
+                emptyRunnerTestCase("constructorcalls/ConstructorCalls.java")
+
+                // simpleTestCase("xmlelement/XmlElement.java", "xmlelement/XmlElementTest.java"),
         );
     }
 }

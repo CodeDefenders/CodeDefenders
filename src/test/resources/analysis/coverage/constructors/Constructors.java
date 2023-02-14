@@ -2,6 +2,7 @@ import utils.TestRuntimeException;
 import utils.ThrowingClass;
 
 import static utils.Utils.doCall;
+import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
 public class Constructors {
@@ -86,6 +87,19 @@ public class Constructors {
     static class ThrowingBaseClassWithSuper extends ThrowingClass {
         ThrowingBaseClassWithSuper() {
             super();
+            doCall();
+        }
+    }
+    static class ThrowingBaseClassWithSuperAndCoveredArg1 extends ThrowingClass {
+        ThrowingBaseClassWithSuperAndCoveredArg1() {
+            super(doGet(1));
+            doCall();
+        }
+    }
+    static class ThrowingBaseClassWithSuperAndCoveredArg2 extends ThrowingClass {
+        ThrowingBaseClassWithSuperAndCoveredArg2() {
+            super(
+                    doGet(1));
             doCall();
         }
     }

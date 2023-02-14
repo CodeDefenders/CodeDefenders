@@ -170,10 +170,4 @@ public class Playground {
 
         return result;
     }
-
-
-
-    // tests todo
-        // objectcreationexpr
-        // method calls / constructor calls / super calls with exception in args
 }
