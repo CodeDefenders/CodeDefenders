@@ -10,6 +10,7 @@ import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.LineTokens.TokenInserter;
 
 import com.github.javaparser.JavaToken;
+import com.github.javaparser.ast.ArrayCreationLevel;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -25,10 +26,12 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
+import com.github.javaparser.ast.expr.ArrayInitializerExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
@@ -53,7 +56,6 @@ import com.github.javaparser.ast.stmt.LabeledStmt;
 import com.github.javaparser.ast.stmt.LocalClassDeclarationStmt;
 import com.github.javaparser.ast.stmt.LocalRecordDeclarationStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
-import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.SwitchEntry;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.SynchronizedStmt;
@@ -84,10 +86,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus status = astCoverage.get(node);
 
             if (status.isNotCovered() && firstNotCoveredLine == null) {
-                firstNotCoveredLine = beginOf(node);
+                firstNotCoveredLine = endOf(node);
             } else if (status.isCovered()) {
                 if (status.statusAfter().isNotCovered()) {
-                    firstNotCoveredLine = beginOf(node);
+                    firstNotCoveredLine = endOf(node);
                 } else {
                     firstNotCoveredLine = null;
                 }
@@ -111,7 +113,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
 
     // phases: COVERED -> MAYBE_COVERED -> NOT_COVERED -> JUMP
     public void handleBlock(TokenInserter i,
-                            List<Statement> statements,
+                            List<? extends Node> statements,
                             AstCoverageStatus status,
                             int beginLine,
                             int endLine) {
@@ -135,7 +137,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // iterate lines to find and update currentStatus and last*Line accordingly
-        for (Statement stmt : statements) {
+        for (Node stmt : statements) {
             AstCoverageStatus stmtStatus = astCoverage.get(stmt);
 
             switch (stmtStatus.status()) {
@@ -166,7 +168,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
 
                     } else if (currentStatus.isUnsure()) {
                         lastMaybeCoveredLine =
-                        lastNotCoveredLine  = stmt.getBegin().get().line - 1;
+                        lastNotCoveredLine = stmt.getBegin().get().line - 1;
 
                     } else if (currentStatus.isNotCovered()) {
                         lastNotCoveredLine = stmt.getBegin().get().line - 1;
@@ -925,18 +927,54 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ArrayAccessExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            i.node(expr).cover(astCoverage.get(expr).selfStatus());
-        }
-    }
-
-    @Override
     public void visit(MethodReferenceExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             i.node(expr).cover(astCoverage.get(expr).selfStatus());
         }
     }
 
+    @Override
+    public void visit(ArrayInitializerExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            int firstNotCoveredLine = getFirstNotCoveredLine(expr.getValues())
+                    .orElse(endOf(expr) + 1);
+            i.lines(beginOf(expr), firstNotCoveredLine - 1)
+                    .empty();
+            i.lines(firstNotCoveredLine, endOf(expr))
+                    .cover(LineCoverageStatus.NOT_COVERED);
+        }
+    }
 
+    @Override
+    public void visit(ArrayCreationLevel node, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(node, () -> super.visit(node, arg))) {
+            AstCoverageStatus status = astCoverage.get(node);
+            if (node.getDimension().isPresent()) {
+                Expression dimension = node.getDimension().get();
+                i.lines(beginOf(node), endOf(dimension))
+                        .cover(status.status());
+                i.lines(endOf(dimension) + 1, endOf(node))
+                        .cover(status.statusAfter().toLineCoverageStatus());
+            } else {
+                i.node(node).cover(status.status());
+            }
+        }
+    }
+
+    @Override
+    public void visit(ArrayAccessExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
+
+            Expression index = expr.getIndex();
+            AstCoverageStatus indexStatus = astCoverage.get(index);
+
+            i.lines(beginOf(expr), beginOf(index) - 1)
+                    .cover(status.selfStatus());
+            i.node(index)
+                    .cover(indexStatus.selfStatus());
+            i.lines(endOf(index) + 1, endOf(expr))
+                    .cover(indexStatus.statusAfter().toLineCoverageStatus());
+        }
+    }
 }

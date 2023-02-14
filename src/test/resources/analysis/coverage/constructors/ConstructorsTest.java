@@ -11,5 +11,7 @@ public class ConstructorsTest {
         new Constructors.CompactConstructors(0);
         doCatch(() -> new Constructors.CompactConstructorsException1(0));
         doCatch(() -> new Constructors.CompactConstructorsException2(0));
+        doCatch(Constructors.ThrowingBaseClass::new);
+        doCatch(Constructors.ThrowingBaseClassWithSuper::new);
     }
 }

@@ -95,4 +95,56 @@ public class Arrays {
 
         ;
     }
+
+    @Call
+    public void nestedInitializers() {
+        int [][] i = new int[][] {
+                {1, 2},
+                {3, 4}
+        };
+    }
+
+    @Call
+    public void nestedInitializerException1() {
+        int [][] i = new int[][] {
+                {1, 2},
+                {3, doThrow()},
+                {5, 6}
+        };
+    }
+
+    @Call
+    public void nestedInitializersException2() {
+        int [][] i = new int[][] {
+                {1, 2},
+                {doGet(3), doThrow()},
+                {5, 6}
+        };
+    }
+
+    @Call
+    public void nestedInitializersException3() {
+        int [][] i = new int[][] {
+                {1, 2},
+                {
+                    3,
+                    doThrow()
+                },
+                {5, 6}
+        };
+    }
+
+    @Call
+    public void nestedInitializersException4() {
+        int [][] i = new int[][] {
+                {1, 2},
+                {
+                        3,
+                        MethodChain.create()
+                                .doThrow()
+                                .get(1)
+                },
+                {5, 6}
+        };
+    }
 }

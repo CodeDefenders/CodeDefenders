@@ -32,6 +32,7 @@ class CoverageTestParameters implements ArgumentsProvider {
             "utils/TestException.java",
             "utils/TestRuntimeException.java",
             "utils/ThrowingAutoCloseable.java",
+            "utils/ThrowingClass.java",
             "utils/ThrowingIterable.java",
             "utils/Utils.java"
     );

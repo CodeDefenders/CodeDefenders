@@ -1613,7 +1613,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      *          = new Object();
      * }</pre>
      */
-    // TODO: handle anonymous classes
     @Override
     public void visit(ObjectCreationExpr expr, Void arg) {
         super.visit(expr, arg);
@@ -1755,7 +1754,11 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .orElseGet(AstCoverageStatus::empty);
 
         AstCoverageStatus status = mergeCoverageForSequence(levelsStatus, initializerStatus);
+
         astCoverage.put(expr, status);
+        expr.getInitializer().ifPresent(
+                initializer -> astCoverage.updateStatus(initializer, status.status())
+        );
     }
 
     @Override

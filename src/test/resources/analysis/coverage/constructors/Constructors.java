@@ -1,5 +1,7 @@
 import utils.TestRuntimeException;
+import utils.ThrowingClass;
 
+import static utils.Utils.doCall;
 import static utils.Utils.doThrow;
 
 public class Constructors {
@@ -73,6 +75,18 @@ public class Constructors {
     record CompactConstructorsException2(int i) {
         CompactConstructorsException2 {
             doThrow();
+        }
+    }
+
+    static class ThrowingBaseClass extends ThrowingClass {
+        ThrowingBaseClass() {
+            doCall();
+        }
+    }
+    static class ThrowingBaseClassWithSuper extends ThrowingClass {
+        ThrowingBaseClassWithSuper() {
+            super();
+            doCall();
         }
     }
 }
