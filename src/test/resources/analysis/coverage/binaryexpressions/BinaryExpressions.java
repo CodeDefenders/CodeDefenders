@@ -218,6 +218,14 @@ public class BinaryExpressions {
     }
 
     @Call
+    public void exceptionInRight5() {
+        int i =
+                1
+                +
+                doThrow();
+    }
+
+    @Call
     public void nestedException1() {
         int i = doGet(1)
                 +
@@ -235,4 +243,13 @@ public class BinaryExpressions {
                 doGet(1);
     }
 
+    @Call
+    public void nestedException3() {
+        int i =
+                1
+                        +
+                        1
+                        +
+                        doThrow();
+    }
 }

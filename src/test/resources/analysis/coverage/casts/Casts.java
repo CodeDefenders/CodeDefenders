@@ -1,7 +1,9 @@
 import utils.Call;
+import utils.MethodChain;
 
 import static utils.Utils.consume;
 import static utils.Utils.doCall;
+import static utils.Utils.doGet;
 
 public class Casts {
 
@@ -71,6 +73,21 @@ public class Casts {
         };
 
         ;
+    }
+
+    @Call(exception = NullPointerException.class)
+    public void npeFromCoveredExpr1() {
+        int i =
+                (int)
+                doGet((Integer) null);
+    }
+
+    @Call(exception = NullPointerException.class)
+    public void npeFromCoveredExpr2() {
+        int i =
+                (int)
+                MethodChain.create()
+                    .get((Integer) null);
     }
 
     public void consumeInt(int i) {

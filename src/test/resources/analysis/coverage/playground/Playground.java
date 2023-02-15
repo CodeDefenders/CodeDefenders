@@ -170,4 +170,66 @@ public class Playground {
 
         return result;
     }
+
+    @Call
+    public void localVariableDeclWithMultipleVariables() {
+        int
+                i = 1, j
+                = doThrow(),
+
+                k = 2;
+    }
+
+    @Call
+    public void trickyadsf() {
+        new TrickyVariableDeclaratorsOrig();
+    }
+
+    static class TrickyVariableDeclaratorsOrig {
+        private
+        Runnable s = () -> {};
+
+        int i; // should be COVERED but is NOT_COVERED
+    }
+
+    @Call
+    public void adklfjdfdaf() {
+        int i
+                =
+                (
+
+                        MethodChain.create()
+                                .doThrow()
+                                .get(1)
+
+                        );
+    }
+
+    @Call
+    public void adklfjdfdaf2() {
+        int i
+                =
+                (
+
+                        doThrow()
+
+                );
+    }
+
+    @Call
+    public void adklfjdfdaf3() {
+        int i
+                =
+                (
+
+                        1
+                        +
+                        doThrow()
+
+                );
+    }
+
+    // TODO: check exceptions thrown in loop and if conditions
+    // TODO: check if EMPTY cases are handled everywhere (any statement can be optimized out)
+
 }

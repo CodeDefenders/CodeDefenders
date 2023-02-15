@@ -126,9 +126,6 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import static org.codedefenders.util.JavaParserUtils.beginOf;
 import static org.codedefenders.util.JavaParserUtils.endOf;
 
-// TODO: check exceptions thrown in loop and if conditions
-// TODO: check if EMPTY cases are handled everywhere (any statement can be optimized out)
-
 /**
  * Extracts line coverage onto a {@link JavaParser} AST.
  *
@@ -217,7 +214,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         return astCoverage;
     }
 
-    // region HELPER ===================================================================================================
+    // region helpers
 
     /**
      * Merges the line coverage values of a line range (begin and end inclusive).
@@ -293,7 +290,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     // endregion
-    // region COMMON CODE ==============================================================================================
+    // region common code
 
     /**
      * Determines the coverage of a block by reducing the coverage of its statements.
@@ -367,7 +364,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         astCoverage.put(decl, AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus()));
     }
 
-    // TODO: what happens when the superclass constructor throws an exception?
     private void handleConstructorDecl(Node decl, BlockStmt body) {
         AstCoverageStatus bodyStatus = astCoverage.get(body);
         DetailedLine openingBraceCoverage = lineCoverage.get(body.getBegin().get().line);
@@ -392,7 +388,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     // endregion
-    // region CLASS LEVEL ==============================================================================================
+    // region class level
 
     @Override
     public void visit(ClassOrInterfaceDeclaration decl, Void arg) {
@@ -611,7 +607,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     // endregion
-    // region METHOD LEVEL =============================================================================================
+    // region method level
 
     @Override
     public void visit(MethodDeclaration decl, Void arg) {
@@ -654,7 +650,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     // endregion
-    // region BLOCK LEVEL ==============================================================================================
+    // region block level
 
     @Override
     public void visit(BlockStmt block, Void arg) {
@@ -1194,7 +1190,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     // endregion
-    // region STATEMENT LEVEL ==========================================================================================
+    // region statement level
 
     @Override
     public void visit(AssertStmt stmt, Void arg) {
@@ -1280,7 +1276,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
     }
 
-    // TODO: what if exceptions
     @Override
     public void visit(ExplicitConstructorInvocationStmt stmt, Void arg) {
         super.visit(stmt, arg);
@@ -1431,8 +1426,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-    // endregion =======================================================================================================
-    // region EXPRESSION LEVEL =========================================================================================
+    // endregion
+    // region expression level
 
     /**
      * <p>An assign expression can be EMPTY if it's nested in another expression. E.g.
@@ -1727,8 +1722,12 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         AstCoverageStatus status = mergeCoverageForSequence(leftStatus, rightStatus);
 
-        astCoverage.updateStatus(expr.getLeft(), status.status());
-        astCoverage.updateStatus(expr.getRight(), leftStatus.statusAfter().toLineCoverageStatus());
+        // can't update left side, since we don't know if the left side is covered just from the binary expr.
+        // the left side could also be EMPTY and covered by a surrounding stmt.
+        // for similar reasons, only update the right side if it's EMPTY.
+        if (rightStatus.isEmpty()) {
+            astCoverage.updateStatus(expr.getRight(), leftStatus.statusAfter().toLineCoverageStatus());
+        }
 
         switch (expr.getOperator()) {
             case OR:
@@ -1807,15 +1806,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .map(astCoverage::get)
                 .orElseGet(AstCoverageStatus::empty);
 
-        if (exprStatus.statusAfter().isNotCovered()) {
-            astCoverage.put(expr, exprStatus.withSelfStatus(LineCoverageStatus.NOT_COVERED));
-        } else if (!exprStatus.isEmpty()) {
-            astCoverage.put(expr, exprStatus.clearSelfStatus());
-        } else if (!patternStatus.isEmpty()) {
-            astCoverage.put(expr, patternStatus);
-        } else {
-            astCoverage.put(expr, AstCoverageStatus.empty());
-        }
+        AstCoverageStatus status = mergeCoverageForSequence(exprStatus, patternStatus);
+        astCoverage.put(expr, status);
     }
 
     @Override
@@ -1850,24 +1842,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-    // endregion =======================================================================================================
-    // region NOT HANDLED ==============================================================================================
-
-    @Override
-    public void visit(AnnotationDeclaration decl, Void arg) {
-        super.visit(decl, arg);
-    }
-
-    @Override
-    public void visit(AnnotationMemberDeclaration decl, Void arg) {
-        super.visit(decl, arg);
-    }
-
-    @Override
-    public void visit(BlockComment node, Void arg) {
-        super.visit(node, arg);
-    }
-
     @Override
     public void visit(BooleanLiteralExpr expr, Void arg) {
         super.visit(expr, arg);
@@ -1887,6 +1861,72 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
+    public void visit(DoubleLiteralExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    @Override
+    public void visit(IntegerLiteralExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    @Override
+    public void visit(LongLiteralExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    @Override
+    public void visit(NameExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    @Override
+    public void visit(NullLiteralExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    @Override
+    public void visit(StringLiteralExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    @Override
+    public void visit(ThisExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    @Override
+    public void visit(TextBlockLiteralExpr expr, Void arg) {
+        super.visit(expr, arg);
+        handleLiteral(expr);
+    }
+
+    // endregion
+    // region not handled
+
+    @Override
+    public void visit(AnnotationDeclaration decl, Void arg) {
+        super.visit(decl, arg);
+    }
+
+    @Override
+    public void visit(AnnotationMemberDeclaration decl, Void arg) {
+        super.visit(decl, arg);
+    }
+
+    @Override
+    public void visit(BlockComment node, Void arg) {
+        super.visit(node, arg);
+    }
+
+    @Override
     public void visit(ClassOrInterfaceType node, Void arg) {
         super.visit(node, arg);
     }
@@ -1897,20 +1937,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(DoubleLiteralExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
-    }
-
-    @Override
     public void visit(EmptyStmt stmt, Void arg) {
         super.visit(stmt, arg);
-    }
-
-    @Override
-    public void visit(IntegerLiteralExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
     }
 
     @Override
@@ -1924,12 +1952,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(LongLiteralExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
-    }
-
-    @Override
     public void visit(MarkerAnnotationExpr expr, Void arg) {
         super.visit(expr, arg);
     }
@@ -1940,20 +1962,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(NameExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
-    }
-
-    @Override
     public void visit(NormalAnnotationExpr expr, Void arg) {
         super.visit(expr, arg);
-    }
-
-    @Override
-    public void visit(NullLiteralExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
     }
 
     @Override
@@ -2002,20 +2012,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(StringLiteralExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
-    }
-
-    @Override
     public void visit(SuperExpr expr, Void arg) {
         super.visit(expr, arg);
-    }
-
-    @Override
-    public void visit(ThisExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
     }
 
     @Override
@@ -2101,12 +2099,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(Modifier node, Void arg) {
         super.visit(node, arg);
-    }
-
-    @Override
-    public void visit(TextBlockLiteralExpr expr, Void arg) {
-        super.visit(expr, arg);
-        handleLiteral(expr);
     }
 
     // endregion =======================================================================================================

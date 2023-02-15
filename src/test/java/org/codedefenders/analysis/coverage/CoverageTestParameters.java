@@ -121,42 +121,39 @@ class CoverageTestParameters implements ArgumentsProvider {
     @Override
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
         return Stream.of(
+                // playground
                 defaultRunnerTestCase("playground/Playground.java"),
 
-                simpleTestCase("classes/Classes.java",
-                        "classes/ClassesTest.java"),
+                // class level
+                simpleTestCase("classes/Classes.java", "classes/ClassesTest.java"),
                 emptyRunnerTestCase("classes/Classes.java"),
 
-                simpleTestCase("fields/Fields.java",
-                "fields/FieldsTest.java"),
+                simpleTestCase("fields/Fields.java", "fields/FieldsTest.java"),
                 emptyRunnerTestCase("fields/Fields.java"),
-
-                simpleTestCase("constructors/Constructors.java",
-                "constructors/ConstructorsTest.java"),
-                emptyRunnerTestCase("constructors/Constructors.java"),
-
-                simpleTestCase("methods/Methods.java",
-                "methods/MethodsTest.java"),
-                emptyRunnerTestCase("methods/Methods.java"),
-
-                defaultRunnerTestCase("localvariables/LocalVariables.java"),
-                emptyRunnerTestCase("localvariables/LocalVariables.java"),
-
-                defaultRunnerTestCase("blocks/Blocks.java"),
-                emptyRunnerTestCase("blocks/Blocks.java"),
 
                 emptyRunnerTestCase("initializerblocks/InitializerBlocks.java"),
                 simpleTestCase("initializerblocks/InitializerBlocks.java",
                         "initializerblocks/InitializerBlocksTest.java"),
 
+                // method level
+                simpleTestCase("constructors/Constructors.java", "constructors/ConstructorsTest.java"),
+                emptyRunnerTestCase("constructors/Constructors.java"),
+
+                simpleTestCase("methods/Methods.java", "methods/MethodsTest.java"),
+                emptyRunnerTestCase("methods/Methods.java"),
+
+                // block level
+                defaultRunnerTestCase("blocks/Blocks.java"),
+                emptyRunnerTestCase("blocks/Blocks.java"),
+
                 emptyRunnerTestCase("ifs/Ifs.java"),
                 defaultRunnerTestCase("ifs/Ifs.java"),
 
-                defaultRunnerTestCase("methodcalls/MethodCalls.java"),
-                emptyRunnerTestCase("methodcalls/MethodCalls.java"),
+                defaultRunnerTestCase("trycatchblocks/TryCatchBlocks.java"),
+                emptyRunnerTestCase("trycatchblocks/TryCatchBlocks.java"),
 
-                defaultRunnerTestCase("dowhileloops/DoWhileLoops.java"),
-                emptyRunnerTestCase("dowhileloops/DoWhileLoops.java"),
+                defaultRunnerTestCase("switchstmts/SwitchStmts.java"),
+                emptyRunnerTestCase("switchstmts/SwitchStmts.java"),
 
                 defaultRunnerTestCase("forloops/ForLoops.java"),
                 emptyRunnerTestCase("forloops/ForLoops.java"),
@@ -167,32 +164,31 @@ class CoverageTestParameters implements ArgumentsProvider {
                 defaultRunnerTestCase("whileloops/WhileLoops.java"),
                 emptyRunnerTestCase("whileloops/WhileLoops.java"),
 
-                defaultRunnerTestCase("trycatchblocks/TryCatchBlocks.java"),
-                emptyRunnerTestCase("trycatchblocks/TryCatchBlocks.java"),
-
-                defaultRunnerTestCase("switchstmts/SwitchStmts.java"),
-                emptyRunnerTestCase("switchstmts/SwitchStmts.java"),
+                defaultRunnerTestCase("dowhileloops/DoWhileLoops.java"),
+                emptyRunnerTestCase("dowhileloops/DoWhileLoops.java"),
 
                 defaultRunnerTestCase("synchronizedblocks/SynchronizedBlocks.java"),
                 emptyRunnerTestCase("synchronizedblocks/SynchronizedBlocks.java"),
 
-                defaultRunnerTestCase("lambdas/Lambdas.java"),
-                emptyRunnerTestCase("lambdas/Lambdas.java"),
+                // statement level
+                defaultRunnerTestCase("assignments/Assignments.java"),
+                emptyRunnerTestCase("assignments/Assignments.java"),
 
-                defaultRunnerTestCase("ternaryoperators/TernaryOperators.java"),
-                emptyRunnerTestCase("ternaryoperators/TernaryOperators.java"),
+                defaultRunnerTestCase("methodcalls/MethodCalls.java"),
+                emptyRunnerTestCase("methodcalls/MethodCalls.java"),
 
-                defaultRunnerTestCase("switchexprs/SwitchExprs.java"),
-                emptyRunnerTestCase("switchexprs/SwitchExprs.java"),
+                defaultRunnerTestCase("constructorcalls/ConstructorCalls.java"),
+                emptyRunnerTestCase("constructorcalls/ConstructorCalls.java"),
 
-                defaultRunnerTestCase("arrays/Arrays.java"),
-                emptyRunnerTestCase("arrays/Arrays.java"),
+                defaultRunnerTestCase("localvariables/LocalVariables.java"),
+                emptyRunnerTestCase("localvariables/LocalVariables.java"),
 
                 defaultRunnerTestCase("assertions/Assertions.java"),
                 emptyRunnerTestCase("assertions/Assertions.java"),
 
-                defaultRunnerTestCase("casts/Casts.java"),
-                emptyRunnerTestCase("casts/Casts.java"),
+                // expression level
+                defaultRunnerTestCase("lambdas/Lambdas.java"),
+                emptyRunnerTestCase("lambdas/Lambdas.java"),
 
                 defaultRunnerTestCase("unaryexpressions/UnaryExpressions.java"),
                 emptyRunnerTestCase("unaryexpressions/UnaryExpressions.java"),
@@ -200,16 +196,23 @@ class CoverageTestParameters implements ArgumentsProvider {
                 defaultRunnerTestCase("binaryexpressions/BinaryExpressions.java"),
                 emptyRunnerTestCase("binaryexpressions/BinaryExpressions.java"),
 
+                defaultRunnerTestCase("arrays/Arrays.java"),
+                emptyRunnerTestCase("arrays/Arrays.java"),
+
+                defaultRunnerTestCase("ternaryoperators/TernaryOperators.java"),
+                emptyRunnerTestCase("ternaryoperators/TernaryOperators.java"),
+
+                defaultRunnerTestCase("switchexprs/SwitchExprs.java"),
+                emptyRunnerTestCase("switchexprs/SwitchExprs.java"),
+
+                defaultRunnerTestCase("casts/Casts.java"),
+                emptyRunnerTestCase("casts/Casts.java"),
+
                 defaultRunnerTestCase("instanceof/Instanceof.java"),
                 emptyRunnerTestCase("instanceof/Instanceof.java"),
 
-                defaultRunnerTestCase("assignments/Assignments.java"),
-                emptyRunnerTestCase("assignments/Assignments.java"),
-
-                defaultRunnerTestCase("constructorcalls/ConstructorCalls.java"),
-                emptyRunnerTestCase("constructorcalls/ConstructorCalls.java")
-
-                // simpleTestCase("xmlelement/XmlElement.java", "xmlelement/XmlElementTest.java"),
+                // real CUT tests
+                simpleTestCase("xmlelement/XmlElement.java", "xmlelement/XmlElementTest.java")
         );
     }
 }
