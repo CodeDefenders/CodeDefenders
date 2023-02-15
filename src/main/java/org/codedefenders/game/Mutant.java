@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,8 +33,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -78,6 +74,14 @@ public class Mutant implements Serializable {
 
     private String creatorName;
     private int creatorId;
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
+
+    public void setRoundKilled(int roundKilled) {
+        this.roundKilled = roundKilled;
+    }
 
     private boolean alive;
 
@@ -269,23 +273,12 @@ public class Mutant implements Serializable {
         return classId;
     }
 
-    // TODO why does incrementScore update the DB entry, shouldn't this be done with update()
-    // TODO Phil 12/12/18: extract database logic to MutantDAO
+    /**
+     * @deprecated Use {@link MutantDAO#incrementMutantScore(Mutant, int)} instead.
+     */
+    @Deprecated
     public void incrementScore(int score) {
-        if (score == 0) {
-            logger.debug("Do not update mutant {} score by 0", getId());
-            return;
-        }
-
-        String query = "UPDATE mutants SET Points = Points + ? WHERE Mutant_ID=? AND Alive=1;";
-        Connection conn = DB.getConnection();
-
-        DatabaseValue<?>[] valueList = new DatabaseValue[]{
-                DatabaseValue.of(score), DatabaseValue.of(id)
-        };
-
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        DB.executeUpdate(stmt, conn);
+        MutantDAO.incrementMutantScore(this, score);
     }
 
     public void setScore(int score) {
@@ -296,32 +289,12 @@ public class Mutant implements Serializable {
         return kill(equivalent);
     }
 
-    // TODO Phil 12/12/18: extract database logic to MutantDAO
+    /**
+     * @deprecated Use {@link MutantDAO#killMutant(Mutant, Equivalence)} instead.
+     */
+    @Deprecated
     public boolean kill(Equivalence equivalent) {
-        alive = false;
-        roundKilled = GameDAO.getCurrentRound(gameId);
-        setEquivalent(equivalent);
-
-        // This should be blocking
-        Connection conn = DB.getConnection();
-
-        String query;
-        if (equivalent.equals(Equivalence.DECLARED_YES) || equivalent.equals(Equivalence.ASSUMED_YES)) {
-            // if mutant is equivalent, we need to set score to 0
-            query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, Points=0 WHERE Mutant_ID=? AND Alive=1;";
-        } else {
-            // We cannot update killed mutants
-            query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
-        }
-
-        DatabaseValue<?>[] values = new DatabaseValue[]{
-                DatabaseValue.of(equivalent.name()),
-                DatabaseValue.of(alive),
-                DatabaseValue.of(roundKilled),
-                DatabaseValue.of(id)
-        };
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
-        return DB.executeUpdate(stmt, conn);
+        return MutantDAO.killMutant(this, equivalent);
     }
 
     public boolean isCovered() {
