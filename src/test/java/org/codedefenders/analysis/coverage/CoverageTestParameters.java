@@ -211,8 +211,11 @@ class CoverageTestParameters implements ArgumentsProvider {
                 defaultRunnerTestCase("instanceof/Instanceof.java"),
                 emptyRunnerTestCase("instanceof/Instanceof.java"),
 
+                defaultRunnerTestCase("enclosedexprs/EnclosedExprs.java"),
+                emptyRunnerTestCase("enclosedexprs/EnclosedExprs.java"),
+
                 // real CUT tests
-                simpleTestCase("xmlelement/XmlElement.java", "xmlelement/XmlElementTest.java")
+                simpleTestCase("cuts/xmlelement/XmlElement.java", "cuts/xmlelement/XmlElementTest.java")
         );
     }
 }

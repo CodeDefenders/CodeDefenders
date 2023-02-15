@@ -402,18 +402,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         handleTypeDecl(decl, decl.getConstructors());
     }
 
-    @Override
-    public void visit(EnumDeclaration decl, Void arg) {
-        super.visit(decl, arg);
-
-        if (anyNodeCovered(decl.getEntries())) {
-            astCoverage.put(decl, AstCoverageStatus.covered());
-            return;
-        }
-
-        handleTypeDecl(decl, decl.getConstructors());
-    }
-
     /**
      * JaCoCo's coverage for records is a bit odd, since it counts the
      * generated getter methods towards the coverage of the first line,
@@ -433,6 +421,18 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         constructors.addAll(decl.getCompactConstructors());
 
         handleTypeDecl(decl, constructors);
+    }
+
+    @Override
+    public void visit(EnumDeclaration decl, Void arg) {
+        super.visit(decl, arg);
+
+        if (anyNodeCovered(decl.getEntries())) {
+            astCoverage.put(decl, AstCoverageStatus.covered());
+            return;
+        }
+
+        handleTypeDecl(decl, decl.getConstructors());
     }
 
     @Override
@@ -762,41 +762,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(DoStmt stmt, Void arg) {
-        super.visit(stmt, arg);
-
-        AstCoverageStatus bodyStatus = astCoverage.get(stmt.getBody());
-        DetailedLine conditionStatus = mergeLineCoverage(stmt.getCondition());
-        switch (conditionStatus.branchStatus()) {
-            case NOT_COVERED:
-                if (bodyStatus.isCovered()) {
-                    // body is COVERED -> set tree status to COVERED, but remember the condition is NOT_COVERED
-                    astCoverage.put(stmt, AstCoverageStatus.covered()
-                            .withStatusAfter(StatusAfter.NOT_COVERED)
-                            .withSelfStatus(LineCoverageStatus.NOT_COVERED));
-                } else {
-                    // body is EMPTY or NOT_COVERED -> set body and loop to NOT_COVERED
-                    astCoverage.put(stmt, AstCoverageStatus.notCovered());
-                    astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.NOT_COVERED);
-                }
-                break;
-            case PARTLY_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.covered()
-                        .withStatusAfter(StatusAfter.MAYBE_COVERED));
-                astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.FULLY_COVERED);
-                break;
-            case FULLY_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.covered());
-                astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.FULLY_COVERED);
-                break;
-            case EMPTY:
-                // inherit coverage from body
-                astCoverage.put(stmt, bodyStatus.clearSelfStatus());
-                break;
-        }
-    }
-
-    @Override
     public void visit(ForStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
@@ -973,6 +938,41 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                     astCoverage.put(stmt, AstCoverageStatus.fromStatus(bodyStatus.status())
                             .withStatusAfter(StatusAfter.MAYBE_COVERED));
                 }
+                break;
+        }
+    }
+
+    @Override
+    public void visit(DoStmt stmt, Void arg) {
+        super.visit(stmt, arg);
+
+        AstCoverageStatus bodyStatus = astCoverage.get(stmt.getBody());
+        DetailedLine conditionStatus = mergeLineCoverage(stmt.getCondition());
+        switch (conditionStatus.branchStatus()) {
+            case NOT_COVERED:
+                if (bodyStatus.isCovered()) {
+                    // body is COVERED -> set tree status to COVERED, but remember the condition is NOT_COVERED
+                    astCoverage.put(stmt, AstCoverageStatus.covered()
+                            .withStatusAfter(StatusAfter.NOT_COVERED)
+                            .withSelfStatus(LineCoverageStatus.NOT_COVERED));
+                } else {
+                    // body is EMPTY or NOT_COVERED -> set body and loop to NOT_COVERED
+                    astCoverage.put(stmt, AstCoverageStatus.notCovered());
+                    astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.NOT_COVERED);
+                }
+                break;
+            case PARTLY_COVERED:
+                astCoverage.put(stmt, AstCoverageStatus.covered()
+                        .withStatusAfter(StatusAfter.MAYBE_COVERED));
+                astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.FULLY_COVERED);
+                break;
+            case FULLY_COVERED:
+                astCoverage.put(stmt, AstCoverageStatus.covered());
+                astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.FULLY_COVERED);
+                break;
+            case EMPTY:
+                // inherit coverage from body
+                astCoverage.put(stmt, bodyStatus.clearSelfStatus());
                 break;
         }
     }
@@ -1268,15 +1268,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ContinueStmt stmt, Void arg) {
-        super.visit(stmt, arg);
-
-        DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
-        astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordStatus.instructionStatus())
-                .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
-    }
-
-    @Override
     public void visit(ExplicitConstructorInvocationStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
@@ -1355,6 +1346,15 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
+    public void visit(ContinueStmt stmt, Void arg) {
+        super.visit(stmt, arg);
+
+        DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
+        astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordStatus.instructionStatus())
+                .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
+    }
+
+    @Override
     public void visit(ReturnStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
@@ -1382,6 +1382,40 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine keywordCoverage = lineCoverage.get(stmt.getBegin().get().line);
         astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus())
                 .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
+    }
+
+    // endregion
+    // region expression level
+
+    /**
+     * <p>An assign expression can be EMPTY if it's nested in another expression. E.g.
+     * <pre>{@code
+     *      System.out.println(     // <- this line will be covered
+     *          someLocal = 1);
+     * }</pre>
+     */
+    @Override
+    public void visit(AssignExpr expr, Void arg) {
+        super.visit(expr, arg);
+
+        AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
+        AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
+
+        AstCoverageStatus status = mergeCoverageForSequence(valueStatus, targetStatus);
+
+        if (status.isEmpty() && status.statusAfter().isUnsure()) {
+            DetailedLine targetLineStatus = mergeLineCoverage(expr.getTarget());
+            status = AstCoverageStatus.fromStatus(targetLineStatus.instructionStatus());
+        }
+
+        astCoverage.put(expr, status);
+
+        if (targetStatus.isEmpty() && targetStatus.selfStatus().isEmpty()) {
+            astCoverage.updateStatus(expr.getTarget(), status.status());
+        }
+        if (valueStatus.isEmpty() && valueStatus.selfStatus().isEmpty()) {
+            astCoverage.updateStatus(expr.getValue(), targetStatus.statusAfter().toLineCoverageStatus());
+        }
     }
 
     /**
@@ -1426,131 +1460,67 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-    // endregion
-    // region expression level
-
     /**
-     * <p>An assign expression can be EMPTY if it's nested in another expression. E.g.
-     * <pre>{@code
-     *      System.out.println(     // <- this line will be covered
-     *          someLocal = 1);
-     * }</pre>
+     * A variable declaration expression inherits the coverage from its variable declarators.
+     * @see AstCoverageVisitor#visit(VariableDeclarator, Void)
      */
     @Override
-    public void visit(AssignExpr expr, Void arg) {
+    public void visit(VariableDeclarationExpr expr, Void arg) {
         super.visit(expr, arg);
-
-        AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
-        AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
-
-        AstCoverageStatus status = mergeCoverageForSequence(valueStatus, targetStatus);
-
-        if (status.isEmpty() && status.statusAfter().isUnsure()) {
-            DetailedLine targetLineStatus = mergeLineCoverage(expr.getTarget());
-            status = AstCoverageStatus.fromStatus(targetLineStatus.instructionStatus());
-        }
-
-        astCoverage.put(expr, status);
-
-        if (targetStatus.isEmpty() && targetStatus.selfStatus().isEmpty()) {
-            astCoverage.updateStatus(expr.getTarget(), status.status());
-        }
-        if (valueStatus.isEmpty() && valueStatus.selfStatus().isEmpty()) {
-            astCoverage.updateStatus(expr.getValue(), targetStatus.statusAfter().toLineCoverageStatus());
-        }
+        AstCoverageStatus varStatus = expr.getVariables().stream()
+                .map(astCoverage::get)
+                .reduce(this::mergeCoverageForSequence)
+                .orElseGet(AstCoverageStatus::empty);
+        astCoverage.put(expr, varStatus);
     }
 
+    /**
+     * <p>A unary expression is coverable if it's a pre- or postfix increment
+     * or decrement. Otherwise, we leave it empty.
+     */
     @Override
-    public void visit(ConditionalExpr expr, Void arg) {
+    public void visit(UnaryExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        DetailedLine conditionLineStatus = mergeLineCoverage(expr.getCondition());
-        AstCoverageStatus conditionStatus = astCoverage.get(expr.getCondition());
-        AstCoverageStatus thenStatus = astCoverage.get(expr.getThenExpr());
-        AstCoverageStatus elseStatus = astCoverage.get(expr.getElseExpr());
-
-        LineCoverageStatus status = conditionLineStatus.branchStatus()
-                .upgrade(conditionStatus.status())
-                .upgrade(thenStatus.status())
-                .upgrade(elseStatus.status());
-
-        StatusAfter statusAfter = thenStatus.statusAfter()
-                .upgrade(elseStatus.statusAfter());
-
-        switch (conditionLineStatus.branchStatus()) {
-            case EMPTY:
-                break;
-            case NOT_COVERED:
-                statusAfter = StatusAfter.NOT_COVERED;
-                break;
-            case PARTLY_COVERED:
-            case FULLY_COVERED:
-                if (thenStatus.isEmpty() && elseStatus.isEmpty()) {
-                    statusAfter = StatusAfter.COVERED;
-                }
-                break;
-        }
-
-        astCoverage.put(expr, AstCoverageStatus.fromStatus(status)
-                .withStatusAfter(statusAfter));
-
-        // set the coverage of the then-expression by its lines if it's not already set
-        // if (thenStatus.isEmpty() && thenStatus.selfStatus().isEmpty()) {
-        //     DetailedLine thenLineStatus = mergeLineCoverage(expr.getThenExpr());
-        //     astCoverage.updateStatus(expr.getThenExpr(), thenLineStatus.instructionStatus());
-        // }
-
-        // set the coverage of the else-expression by its lines if it's not already set
-        // if (elseStatus.isEmpty() && elseStatus.selfStatus().isEmpty()) {
-        //     DetailedLine elseLineStatus = mergeLineCoverage(expr.getElseExpr());
-        //     astCoverage.updateStatus(expr.getElseExpr(), elseLineStatus.instructionStatus());
-        // }
-    }
-
-    @Override
-    public void visit(LambdaExpr expr, Void arg) {
-        super.visit(expr, arg);
-
-        AstCoverageStatus bodyStatus = astCoverage.get(expr.getBody());
-
-        // if the body is a block, update body status with the line coverage of the closing brace
-        if (expr.getBody().isBlockStmt()) {
-            DetailedLine closingBraceStatus = lineCoverage.get(expr.getBody().getEnd().get().line);
-            if (closingBraceStatus.totalInstructions() == 1) {
-                if (closingBraceStatus.hasCoveredIns()) {
-                    bodyStatus = bodyStatus.updateStatusAfter(StatusAfter.COVERED);
-                } else {
-                    bodyStatus = bodyStatus.updateStatusAfter(StatusAfter.NOT_COVERED);
-                }
-            }
-        }
-
-        if (!bodyStatus.isEmpty()) {
-            if (bodyStatus.isCovered()) {
-                astCoverage.put(expr, bodyStatus.clearSelfStatus());
-            } else {
-                // if the lambda is not covered, set the tree status to empty, because the lambda not being executed does
-                // not mean the declaration has not been covered
-                astCoverage.put(expr, AstCoverageStatus.empty()
-                        .withSelfStatus(bodyStatus.status()));
-            }
-            astCoverage.put(expr.getBody(), bodyStatus);
+        AstCoverageStatus exprStatus = astCoverage.get(expr.getExpression());
+        if (exprStatus.statusAfter().isNotCovered()) {
+            astCoverage.put(expr, exprStatus.withSelfStatus(LineCoverageStatus.NOT_COVERED));
+            return;
+        } else if (!exprStatus.isEmpty()) {
+            astCoverage.put(expr, exprStatus.clearSelfStatus());
             return;
         }
 
-        // if the body is empty, check if any line of the body has been covered
-        // we don't cover all expressions, so this is e.g. necessary for () -> 2, or () -> {}
-        DetailedLine bodyLineStatus = mergeLineCoverage(expr.getBody());
-        if (bodyLineStatus.hasCoveredIns()) {
-            astCoverage.put(expr, AstCoverageStatus.covered());
-        } else {
-            // if the lambda is not covered, set the tree status to empty, because the lambda not being executed does
-            // not mean the declaration has not been covered
-            astCoverage.put(expr, AstCoverageStatus.empty()
-                    .withSelfStatus(bodyLineStatus.instructionStatus()));
+        DetailedLine status = mergeLineCoverage(expr.getExpression());
+        astCoverage.put(expr, AstCoverageStatus.fromStatus(status.instructionStatus()));
+    }
+
+    @Override
+    public void visit(BinaryExpr expr, Void arg) {
+        super.visit(expr, arg);
+
+        AstCoverageStatus leftStatus = astCoverage.get(expr.getLeft());
+        AstCoverageStatus rightStatus = astCoverage.get(expr.getRight());
+
+        AstCoverageStatus status = mergeCoverageForSequence(leftStatus, rightStatus);
+
+        // can't update left side, since we don't know if the left side is covered just from the binary expr.
+        // the left side could also be EMPTY and covered by a surrounding stmt.
+        // for similar reasons, only update the right side if it's EMPTY.
+        if (rightStatus.isEmpty()) {
+            astCoverage.updateStatus(expr.getRight(), leftStatus.statusAfter().toLineCoverageStatus());
         }
-        astCoverage.put(expr.getBody(), bodyStatus
-                .updateStatus(bodyLineStatus.instructionStatus()));
+
+        switch (expr.getOperator()) {
+            case OR:
+            case AND:
+                if (leftStatus.statusAfter().isCovered() && rightStatus.isNotCovered()) {
+                    status = status.withStatusAfter(StatusAfter.MAYBE_COVERED);
+                }
+                break;
+        }
+
+        astCoverage.put(expr, status);
     }
 
     /**
@@ -1605,17 +1575,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         AstCoverageStatus status = AstCoverageStatus.fromStatus(astStatus)
-                        .withStatusAfter(statusAfter)
-                        .withSelfStatus(selfStatus.upgrade(argumentsStatus.status()));
+                .withStatusAfter(statusAfter)
+                .withSelfStatus(selfStatus.upgrade(argumentsStatus.status()));
         astCoverage.put(expr, status);
-    }
-
-    @Override
-    public void visit(FieldAccessExpr expr, Void arg) {
-        super.visit(expr, arg);
-
-        AstCoverageStatus status = astCoverage.get(expr.getScope());
-        astCoverage.put(expr, status); // keep selfStatus from scope
     }
 
     /**
@@ -1652,39 +1614,51 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .withStatusAfter(statusAfter));
     }
 
-    /**
-     * <p>A unary expression is coverable if it's a pre- or postfix increment
-     * or decrement. Otherwise, we leave it empty.
-     */
     @Override
-    public void visit(UnaryExpr expr, Void arg) {
+    public void visit(ConditionalExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        AstCoverageStatus exprStatus = astCoverage.get(expr.getExpression());
-        if (exprStatus.statusAfter().isNotCovered()) {
-            astCoverage.put(expr, exprStatus.withSelfStatus(LineCoverageStatus.NOT_COVERED));
-            return;
-        } else if (!exprStatus.isEmpty()) {
-            astCoverage.put(expr, exprStatus.clearSelfStatus());
-            return;
+        DetailedLine conditionLineStatus = mergeLineCoverage(expr.getCondition());
+        AstCoverageStatus conditionStatus = astCoverage.get(expr.getCondition());
+        AstCoverageStatus thenStatus = astCoverage.get(expr.getThenExpr());
+        AstCoverageStatus elseStatus = astCoverage.get(expr.getElseExpr());
+
+        LineCoverageStatus status = conditionLineStatus.branchStatus()
+                .upgrade(conditionStatus.status())
+                .upgrade(thenStatus.status())
+                .upgrade(elseStatus.status());
+
+        StatusAfter statusAfter = thenStatus.statusAfter()
+                .upgrade(elseStatus.statusAfter());
+
+        switch (conditionLineStatus.branchStatus()) {
+            case EMPTY:
+                break;
+            case NOT_COVERED:
+                statusAfter = StatusAfter.NOT_COVERED;
+                break;
+            case PARTLY_COVERED:
+            case FULLY_COVERED:
+                if (thenStatus.isEmpty() && elseStatus.isEmpty()) {
+                    statusAfter = StatusAfter.COVERED;
+                }
+                break;
         }
 
-        DetailedLine status = mergeLineCoverage(expr.getExpression());
-        astCoverage.put(expr, AstCoverageStatus.fromStatus(status.instructionStatus()));
-    }
+        astCoverage.put(expr, AstCoverageStatus.fromStatus(status)
+                .withStatusAfter(statusAfter));
 
-    /**
-     * A variable declaration expression inherits the coverage from its variable declarators.
-     * @see AstCoverageVisitor#visit(VariableDeclarator, Void)
-     */
-    @Override
-    public void visit(VariableDeclarationExpr expr, Void arg) {
-        super.visit(expr, arg);
-        AstCoverageStatus varStatus = expr.getVariables().stream()
-                .map(astCoverage::get)
-                .reduce(this::mergeCoverageForSequence)
-                .orElseGet(AstCoverageStatus::empty);
-        astCoverage.put(expr, varStatus);
+        // set the coverage of the then-expression by its lines if it's not already set
+        // if (thenStatus.isEmpty() && thenStatus.selfStatus().isEmpty()) {
+        //     DetailedLine thenLineStatus = mergeLineCoverage(expr.getThenExpr());
+        //     astCoverage.updateStatus(expr.getThenExpr(), thenLineStatus.instructionStatus());
+        // }
+
+        // set the coverage of the else-expression by its lines if it's not already set
+        // if (elseStatus.isEmpty() && elseStatus.selfStatus().isEmpty()) {
+        //     DetailedLine elseLineStatus = mergeLineCoverage(expr.getElseExpr());
+        //     astCoverage.updateStatus(expr.getElseExpr(), elseLineStatus.instructionStatus());
+        // }
     }
 
     @Override
@@ -1699,46 +1673,71 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         astCoverage.put(expr, status);
     }
 
-    /**
-     * <p>Whether a cast expression coverable depends on the types of the cast.
-     * Usually a cast doesn't correspond to any instructions, unless the cast
-     * boxes or unboxes a value.
-     */
     @Override
-    public void visit(CastExpr expr, Void arg) {
+    public void visit(LambdaExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        // inherit coverage from expression
-        astCoverage.put(expr, astCoverage.get(expr.getExpression())
-                .clearSelfStatus());
+        AstCoverageStatus bodyStatus = astCoverage.get(expr.getBody());
+
+        // if the body is a block, update body status with the line coverage of the closing brace
+        if (expr.getBody().isBlockStmt()) {
+            DetailedLine closingBraceStatus = lineCoverage.get(expr.getBody().getEnd().get().line);
+            if (closingBraceStatus.totalInstructions() == 1) {
+                if (closingBraceStatus.hasCoveredIns()) {
+                    bodyStatus = bodyStatus.updateStatusAfter(StatusAfter.COVERED);
+                } else {
+                    bodyStatus = bodyStatus.updateStatusAfter(StatusAfter.NOT_COVERED);
+                }
+            }
+        }
+
+        if (!bodyStatus.isEmpty()) {
+            if (bodyStatus.isCovered()) {
+                astCoverage.put(expr, bodyStatus.clearSelfStatus());
+            } else {
+                // if the lambda is not covered, set the tree status to empty, because the lambda not being executed does
+                // not mean the declaration has not been covered
+                astCoverage.put(expr, AstCoverageStatus.empty()
+                        .withSelfStatus(bodyStatus.status()));
+            }
+            astCoverage.put(expr.getBody(), bodyStatus);
+            return;
+        }
+
+        // if the body is empty, check if any line of the body has been covered
+        // we don't cover all expressions, so this is e.g. necessary for () -> 2, or () -> {}
+        DetailedLine bodyLineStatus = mergeLineCoverage(expr.getBody());
+        if (bodyLineStatus.hasCoveredIns()) {
+            astCoverage.put(expr, AstCoverageStatus.covered());
+        } else {
+            // if the lambda is not covered, set the tree status to empty, because the lambda not being executed does
+            // not mean the declaration has not been covered
+            astCoverage.put(expr, AstCoverageStatus.empty()
+                    .withSelfStatus(bodyLineStatus.instructionStatus()));
+        }
+        astCoverage.put(expr.getBody(), bodyStatus
+                .updateStatus(bodyLineStatus.instructionStatus()));
     }
 
     @Override
-    public void visit(BinaryExpr expr, Void arg) {
+    public void visit(FieldAccessExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        AstCoverageStatus leftStatus = astCoverage.get(expr.getLeft());
-        AstCoverageStatus rightStatus = astCoverage.get(expr.getRight());
+        // TODO: handle it like here or like in methodrefexpr
+        AstCoverageStatus status = astCoverage.get(expr.getScope());
+        astCoverage.put(expr, status); // keep selfStatus from scope
+    }
 
-        AstCoverageStatus status = mergeCoverageForSequence(leftStatus, rightStatus);
+    @Override
+    public void visit(MethodReferenceExpr expr, Void arg) {
+        super.visit(expr, arg);
 
-        // can't update left side, since we don't know if the left side is covered just from the binary expr.
-        // the left side could also be EMPTY and covered by a surrounding stmt.
-        // for similar reasons, only update the right side if it's EMPTY.
-        if (rightStatus.isEmpty()) {
-            astCoverage.updateStatus(expr.getRight(), leftStatus.statusAfter().toLineCoverageStatus());
+        AstCoverageStatus scopeStatus = astCoverage.get(expr.getScope());
+        if (scopeStatus.statusAfter().isNotCovered()) {
+            astCoverage.put(expr, scopeStatus.withSelfStatus(LineCoverageStatus.NOT_COVERED));
+        } else {
+            astCoverage.put(expr, scopeStatus.clearSelfStatus());
         }
-
-        switch (expr.getOperator()) {
-            case OR:
-            case AND:
-                if (leftStatus.statusAfter().isCovered() && rightStatus.isNotCovered()) {
-                    status = status.withStatusAfter(StatusAfter.MAYBE_COVERED);
-                }
-                break;
-        }
-
-        astCoverage.put(expr, status);
     }
 
     @Override
@@ -1779,6 +1778,18 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
+    public void visit(ArrayCreationLevel expr, Void arg) {
+        super.visit(expr, arg);
+
+        AstCoverageStatus dimensionStatus = expr.getDimension()
+                .map(astCoverage::get)
+                .orElseGet(AstCoverageStatus::empty);
+
+        // inherit coverage from dimension
+        astCoverage.put(expr, dimensionStatus.clearSelfStatus());
+    }
+
+    @Override
     public void visit(ArrayInitializerExpr expr, Void arg) {
         super.visit(expr, arg);
 
@@ -1789,12 +1800,18 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         astCoverage.put(expr, status);
     }
 
+    /**
+     * <p>Whether a cast expression coverable depends on the types of the cast.
+     * Usually a cast doesn't correspond to any instructions, unless the cast
+     * boxes or unboxes a value.
+     */
     @Override
-    public void visit(EnclosedExpr expr, Void arg) {
+    public void visit(CastExpr expr, Void arg) {
         super.visit(expr, arg);
 
         // inherit coverage from expression
-        astCoverage.put(expr, astCoverage.get(expr.getInner()));
+        astCoverage.put(expr, astCoverage.get(expr.getExpression())
+                .clearSelfStatus());
     }
 
     @Override
@@ -1819,27 +1836,11 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ArrayCreationLevel expr, Void arg) {
+    public void visit(EnclosedExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        AstCoverageStatus dimensionStatus = expr.getDimension()
-                .map(astCoverage::get)
-                .orElseGet(AstCoverageStatus::empty);
-
-        // inherit coverage from dimension
-        astCoverage.put(expr, dimensionStatus.clearSelfStatus());
-    }
-
-    @Override
-    public void visit(MethodReferenceExpr expr, Void arg) {
-        super.visit(expr, arg);
-
-        AstCoverageStatus scopeStatus = astCoverage.get(expr.getScope());
-        if (scopeStatus.statusAfter().isNotCovered()) {
-            astCoverage.put(expr, scopeStatus.withSelfStatus(LineCoverageStatus.NOT_COVERED));
-        } else {
-            astCoverage.put(expr, scopeStatus.clearSelfStatus());
-        }
+        // inherit coverage from expression
+        astCoverage.put(expr, astCoverage.get(expr.getInner()));
     }
 
     @Override

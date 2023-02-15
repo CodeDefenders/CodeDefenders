@@ -314,122 +314,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     // endregion
-
-    @Override
-    public void visit(AssertStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            AstCoverageStatus status = astCoverage.get(stmt);
-            AstCoverageStatus checkStatus = astCoverage.get(stmt.getCheck());
-            AstCoverageStatus messageStatus = astCoverage.get(stmt.getMessage().get());
-
-            JavaToken assertToken = stmt.getTokenRange().get().getBegin();
-            int keywordEndLine = JavaTokenIterator.expandWhitespaceAfter(assertToken);
-            // cover assert token + whitespace after with assert status
-            i.lines(beginOf(stmt), keywordEndLine)
-                    .coverStrong(status.status());
-
-            int checkBeginLine = Math.max(keywordEndLine + 1, beginOf(stmt.getCheck()));
-            if (!stmt.getMessage().isPresent()) {
-                // cover lines after assert keyword until end of stmt with check status
-                i.lines(checkBeginLine, endOf(stmt))
-                        .cover(checkStatus.status());
-                return;
-            }
-
-            JavaToken colonToken = JavaTokenIterator.ofEnd(stmt.getCheck())
-                    .skipOne()
-                    .find(JavaToken.Kind.COLON);
-            int checkEndLine = Math.max(lineOf(colonToken) - 1, endOf(stmt.getCheck()));
-            // cover lines after assert keyword until line before colon with check status.
-            // if colon is on the same line as the check, cover that line as well
-            i.lines(checkBeginLine, checkEndLine)
-                    .cover(checkStatus.status());
-
-            // cover the remaining lines with message status
-            i.lines(checkEndLine + 1, endOf(stmt))
-                    .cover(messageStatus.status());
-        }
-    }
-
-    @Override
-    public void visit(AssignExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
-            AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
-
-            i.node(expr.getTarget()).cover(targetStatus.status());
-            i.lines(endOf(expr.getTarget()) + 1, beginOf(expr.getValue()) - 1)
-                    .cover(targetStatus.statusAfter().toLineCoverageStatus());
-            i.node(expr.getValue()).cover(valueStatus.status());
-
-            // AstCoverageStatus status = astCoverage.get(expr);
-            // AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
-            // AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
-
-            // if (status.isCovered() && !status.statusAfter().isCovered() && !valueStatus.isCovered()) {
-            //     if (targetStatus.statusAfter().isNotCovered()) {
-            //         i.node(expr.getTarget())
-            //                 .cover(LineCoverageStatus.FULLY_COVERED);
-            //         i.lines(endOf(expr.getTarget()) + 1, endOf(expr))
-            //                 .cover(LineCoverageStatus.NOT_COVERED);
-            //     } else {
-            //         i.lines(beginOf(expr), beginOf(expr.getTarget()) - 1)
-            //                 .cover(LineCoverageStatus.FULLY_COVERED);
-            //         i.node(expr.getTarget())
-            //                 .cover(LineCoverageStatus.NOT_COVERED);
-            //     }
-            // } else {
-            //     i.node(expr).cover(status.status());
-            // }
-        }
-    }
-
-    @Override
-    public void visit(BinaryExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus leftStatus = astCoverage.get(expr.getLeft());
-            AstCoverageStatus rightStatus = astCoverage.get(expr.getRight());
-
-            i.node(expr.getLeft()).cover(leftStatus.status());
-            i.lines(endOf(expr.getLeft()) + 1, beginOf(expr.getRight()) - 1)
-                    .cover(leftStatus.statusAfter().toLineCoverageStatus());
-            i.node(expr.getRight()).cover(rightStatus.status());
-        }
-    }
-
-    @Override
-    public void visit(BlockStmt block, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(block, () -> super.visit(block, arg))) {
-            handleBlock(i,
-                    block.getStatements(),
-                    astCoverage.get(block),
-                    block.getBegin().get().line,
-                    block.getEnd().get().line);
-        }
-    }
-
-    @Override
-    public void visit(BreakStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            AstCoverageStatus status = astCoverage.get(stmt);
-            i.node(stmt).coverStrong(status.selfStatus());
-        }
-    }
-
-    @Override
-    public void visit(CatchClause node, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(node, () -> super.visit(node, arg))) {
-            JavaToken closingParen = JavaTokenIterator.ofBegin(node.getBody())
-                    .backward()
-                    .skipOne()
-                    .find(JavaToken.Kind.RPAREN);
-            int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
-
-            AstCoverageStatus status = astCoverage.get(node);
-            i.lines(node.getBegin().get().line, endLine)
-                    .cover(status.status());
-        }
-    }
+    // region class level
 
     @Override
     public void visit(ClassOrInterfaceDeclaration decl, Void arg) {
@@ -443,86 +328,9 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ConditionalExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus status = astCoverage.get(expr);
-            AstCoverageStatus thenStatus = astCoverage.get(expr.getThenExpr());
-            AstCoverageStatus elseStatus = astCoverage.get(expr.getElseExpr());
-
-            i.node(expr).cover(status.status());
-
-            int thenBeginLine = JavaTokenIterator.expandWhitespaceBefore(
-                    expr.getThenExpr().getTokenRange().get().getBegin());
-            int thenEndLine = JavaTokenIterator.expandWhitespaceAfter(
-                    expr.getThenExpr().getTokenRange().get().getEnd());
-
-            int elseBeginLine = JavaTokenIterator.expandWhitespaceBefore(
-                    expr.getElseExpr().getTokenRange().get().getBegin());
-            int elseEndLine = JavaTokenIterator.expandWhitespaceAfter(
-                    expr.getElseExpr().getTokenRange().get().getEnd());
-
-            i.lines(thenBeginLine, thenEndLine).cover(thenStatus.status());
-            i.lines(elseBeginLine, elseEndLine).cover(elseStatus.status());
-        }
-    }
-
-    @Override
-    public void visit(ConstructorDeclaration decl, Void arg) {
+    public void visit(RecordDeclaration decl, Void arg) {
         try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
-            handleMethodDeclaration(i, decl, decl.getBody(), astCoverage.get(decl));
-        }
-    }
-
-    @Override
-    public void visit(ContinueStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            AstCoverageStatus status = astCoverage.get(stmt);
-            i.node(stmt).coverStrong(status.status());
-        }
-    }
-
-    @Override
-    public void visit(DoStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            AstCoverageStatus status = astCoverage.get(stmt);
-
-            i.node(stmt).reset();
-
-            // cover lines from 'do' until block as BLOCK
-            JavaToken doToken = stmt.getTokenRange().get().getBegin();
-            int endLine = JavaTokenIterator.expandWhitespaceAfter(doToken);
-            i.lines(stmt.getBegin().get().line, endLine)
-                    .block(status.status());
-
-            // cover lines from block to end as COVERABLE
-            JavaToken whileToken = JavaTokenIterator.ofEnd(stmt.getBody())
-                    .skipOne()
-                    .find(JavaToken.Kind.WHILE);
-            int beginLine = JavaTokenIterator.expandWhitespaceBefore(whileToken);
-            i.lines(beginLine, stmt.getEnd().get().line)
-                    .cover(status.selfStatus());
-        }
-    }
-
-    @Override
-    public void visit(ForEachStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            handleLoop(i, stmt, stmt.getBody());
-        }
-    }
-
-    @Override
-    public void visit(ForStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            handleLoop(i, stmt, stmt.getBody());
-        }
-    }
-
-    @Override
-    public void visit(EnumConstantDeclaration decl, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
-            AstCoverageStatus status = astCoverage.get(decl);
-            i.node(decl).cover(status.status());
+            handleTypeDeclaration(i, decl, astCoverage.get(decl));
         }
     }
 
@@ -534,26 +342,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ExplicitConstructorInvocationStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            AstCoverageStatus status = astCoverage.get(stmt);
-
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(stmt.getArguments());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginOf(stmt), firstNotCoveredLine.get() - 1)
-                        .cover(status.selfStatus());
-                i.lines(firstNotCoveredLine.get(), endOf(stmt))
-                        .cover(LineCoverageStatus.NOT_COVERED);
-            } else {
-                i.node(stmt).cover(status.status());
-            }
-        }
-    }
-
-    @Override
-    public void visit(ExpressionStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            i.node(stmt).empty();
+    public void visit(EnumConstantDeclaration decl, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
+            AstCoverageStatus status = astCoverage.get(decl);
+            i.node(decl).cover(status.status());
         }
     }
 
@@ -578,6 +370,60 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             } else {
                 i.node(decl).coverStrong(status.status());
             }
+        }
+    }
+
+    @Override
+    public void visit(InitializerDeclaration block, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(block, () -> super.visit(block, arg))) {
+            if (block.isStatic()) {
+                AstCoverageStatus status = astCoverage.get(block);
+                JavaToken staticToken = block.getTokenRange().get().getBegin();
+                int endLine = JavaTokenIterator.expandWhitespaceAfter(staticToken);
+                i.lines(block.getBegin().get().line, endLine)
+                        .block(status.status());
+            }
+        }
+    }
+
+    // endregion
+    // region method level
+
+    @Override
+    public void visit(MethodDeclaration decl, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
+            if (!decl.getBody().isPresent()) {
+                return;
+            }
+            handleMethodDeclaration(i, decl, decl.getBody().get(), astCoverage.get(decl));
+        }
+    }
+
+    @Override
+    public void visit(ConstructorDeclaration decl, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
+            handleMethodDeclaration(i, decl, decl.getBody(), astCoverage.get(decl));
+        }
+    }
+
+    @Override
+    public void visit(CompactConstructorDeclaration decl, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
+            handleMethodDeclaration(i, decl, decl.getBody(), astCoverage.get(decl));
+        }
+    }
+
+    // endregion
+    // region block level
+
+    @Override
+    public void visit(BlockStmt block, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(block, () -> super.visit(block, arg))) {
+            handleBlock(i,
+                    block.getStatements(),
+                    astCoverage.get(block),
+                    block.getBegin().get().line,
+                    block.getEnd().get().line);
         }
     }
 
@@ -624,131 +470,100 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(InitializerDeclaration block, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(block, () -> super.visit(block, arg))) {
-            if (block.isStatic()) {
-                AstCoverageStatus status = astCoverage.get(block);
-                JavaToken staticToken = block.getTokenRange().get().getBegin();
-                int endLine = JavaTokenIterator.expandWhitespaceAfter(staticToken);
-                i.lines(block.getBegin().get().line, endLine)
-                        .block(status.status());
-            }
-        }
-    }
-
-    @Override
-    public void visit(LabeledStmt stmt, Void arg) {
+    public void visit(ForStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            i.node(stmt).empty();
+            handleLoop(i, stmt, stmt.getBody());
         }
     }
 
     @Override
-    public void visit(MethodCallExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus status = astCoverage.get(expr);
-
-            AstCoverageStatus scopeStatus = expr.getScope()
-                    .map(astCoverage::get)
-                    .orElse(status);
-            if (scopeStatus.isEmpty()) {
-                scopeStatus = status;
-            }
-
-            int beginCallLine = beginOf(expr);
-            if (expr.hasScope()) {
-                // cover the scope separately
-                // (this only really matters if there are blank lines between calls of a method chain
-                // and the chain throws an exception somewhere)
-                JavaToken scopeEnd = expr.getScope().get().getTokenRange().get().getEnd();
-                int endScopeLine = JavaTokenIterator.expandWhitespaceAfter(scopeEnd);
-                beginCallLine = JavaTokenIterator.of(scopeEnd)
-                        .skipOne()
-                        .find(JavaToken.Kind.DOT)
-                        .getRange().get().begin.line;
-                i.lines(beginOf(expr), endScopeLine)
-                        .cover(scopeStatus.selfStatus());
-            }
-
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginCallLine, firstNotCoveredLine.get() - 1)
-                        .coverStrong(status.selfStatus());
-                i.lines(firstNotCoveredLine.get(), endOf(expr))
-                        .cover(LineCoverageStatus.NOT_COVERED);
-            } else {
-               i.lines(beginCallLine, endOf(expr))
-                       .coverStrong(status.selfStatus());
-            }
+    public void visit(ForEachStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            handleLoop(i, stmt, stmt.getBody());
         }
     }
 
     @Override
-    public void visit(FieldAccessExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            i.node(expr).cover(astCoverage.get(expr).selfStatus());
+    public void visit(WhileStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            handleLoop(i, stmt, stmt.getBody());
         }
     }
 
     @Override
-    public void visit(MethodDeclaration decl, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
-            if (!decl.getBody().isPresent()) {
-                return;
-            }
-            handleMethodDeclaration(i, decl, decl.getBody().get(), astCoverage.get(decl));
+    public void visit(DoStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            AstCoverageStatus status = astCoverage.get(stmt);
+
+            i.node(stmt).reset();
+
+            // cover lines from 'do' until block as BLOCK
+            JavaToken doToken = stmt.getTokenRange().get().getBegin();
+            int endLine = JavaTokenIterator.expandWhitespaceAfter(doToken);
+            i.lines(stmt.getBegin().get().line, endLine)
+                    .block(status.status());
+
+            // cover lines from block to end as COVERABLE
+            JavaToken whileToken = JavaTokenIterator.ofEnd(stmt.getBody())
+                    .skipOne()
+                    .find(JavaToken.Kind.WHILE);
+            int beginLine = JavaTokenIterator.expandWhitespaceBefore(whileToken);
+            i.lines(beginLine, stmt.getEnd().get().line)
+                    .cover(status.selfStatus());
         }
     }
 
     @Override
-    public void visit(ObjectCreationExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus status = astCoverage.get(expr);
+    public void visit(TryStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            i.node(stmt).reset();
 
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
-                        .coverStrong(status.selfStatus());
-                i.lines(firstNotCoveredLine.get(), endOf(expr))
-                        .cover(LineCoverageStatus.NOT_COVERED);
-            } else {
-                i.lines(beginOf(expr), endOf(expr))
-                        .coverStrong(status.selfStatus());
-            }
-
-            // if the expression has an anonymous class body, reset it
-            expr.getAnonymousClassBody().ifPresent(classBody -> {
-                // find the opening and closing brace of the class body
-                JavaTokenIterator it = JavaTokenIterator.ofBegin(expr)
+            int endLine;
+            if (!stmt.getResources().isEmpty()) {
+                JavaToken closingParen = JavaTokenIterator.ofBegin(stmt)
                         .skip(JavaToken.Kind.LPAREN)
-                        .skip(JavaToken.Kind.RPAREN);
-                JavaToken openingBrace = it.find(JavaToken.Kind.LBRACE);
-                JavaToken closingBrace = it.find(JavaToken.Kind.RBRACE);
+                        .find(JavaToken.Kind.RPAREN);
+                endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+            } else {
+                JavaToken tryToken = JavaTokenIterator.ofBegin(stmt)
+                        .find(JavaToken.Kind.TRY);
+                endLine = JavaTokenIterator.expandWhitespaceAfter(tryToken);
+            }
 
-                int beginLine = openingBrace.getRange().get().begin.line;
-                int endLine = closingBrace.getRange().get().end.line;
-
-                // if the first line starts with the opening brace, reset from there,
-                // otherwise start one line further down
-                if (!JavaTokenIterator.lineStartsWith(openingBrace)) {
-                    beginLine++;
-                }
-
-                // if the last line starts with the closing brace, end one line further up,
-                // otherwise end there
-                if (JavaTokenIterator.lineStartsWith(closingBrace)) {
-                    endLine--;
-                }
-
-                i.lines(beginLine, endLine).reset();
-            });
+            i.lines(stmt.getBegin().get().line, endLine)
+                    .cover(astCoverage.get(stmt).status());
         }
     }
 
     @Override
-    public void visit(ReturnStmt stmt, Void arg) {
+    public void visit(CatchClause node, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(node, () -> super.visit(node, arg))) {
+            JavaToken closingParen = JavaTokenIterator.ofBegin(node.getBody())
+                    .backward()
+                    .skipOne()
+                    .find(JavaToken.Kind.RPAREN);
+            int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+
+            AstCoverageStatus status = astCoverage.get(node);
+            i.lines(node.getBegin().get().line, endLine)
+                    .cover(status.status());
+        }
+    }
+
+    @Override
+    public void visit(SwitchStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            i.node(stmt).coverStrong(astCoverage.get(stmt).status());
+            AstCoverageStatus status = astCoverage.get(stmt);
+
+            i.node(stmt).reset();
+
+            JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getSelector())
+                    .skipOne()
+                    .find(JavaToken.Kind.RPAREN);
+            int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+
+            i.lines(stmt.getBegin().get().line, endLine)
+                    .cover(status.status());
         }
     }
 
@@ -798,23 +613,6 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(SwitchStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            AstCoverageStatus status = astCoverage.get(stmt);
-
-            i.node(stmt).reset();
-
-            JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getSelector())
-                    .skipOne()
-                    .find(JavaToken.Kind.RPAREN);
-            int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
-
-            i.lines(stmt.getBegin().get().line, endLine)
-                    .cover(status.status());
-        }
-    }
-
-    @Override
     public void visit(SynchronizedStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
@@ -829,6 +627,85 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
+    // endregion
+    // region statement level
+
+    @Override
+    public void visit(AssertStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            AstCoverageStatus status = astCoverage.get(stmt);
+            AstCoverageStatus checkStatus = astCoverage.get(stmt.getCheck());
+            AstCoverageStatus messageStatus = astCoverage.get(stmt.getMessage().get());
+
+            JavaToken assertToken = stmt.getTokenRange().get().getBegin();
+            int keywordEndLine = JavaTokenIterator.expandWhitespaceAfter(assertToken);
+            // cover assert token + whitespace after with assert status
+            i.lines(beginOf(stmt), keywordEndLine)
+                    .coverStrong(status.status());
+
+            int checkBeginLine = Math.max(keywordEndLine + 1, beginOf(stmt.getCheck()));
+            if (!stmt.getMessage().isPresent()) {
+                // cover lines after assert keyword until end of stmt with check status
+                i.lines(checkBeginLine, endOf(stmt))
+                        .cover(checkStatus.status());
+                return;
+            }
+
+            JavaToken colonToken = JavaTokenIterator.ofEnd(stmt.getCheck())
+                    .skipOne()
+                    .find(JavaToken.Kind.COLON);
+            int checkEndLine = Math.max(lineOf(colonToken) - 1, endOf(stmt.getCheck()));
+            // cover lines after assert keyword until line before colon with check status.
+            // if colon is on the same line as the check, cover that line as well
+            i.lines(checkBeginLine, checkEndLine)
+                    .cover(checkStatus.status());
+
+            // cover the remaining lines with message status
+            i.lines(checkEndLine + 1, endOf(stmt))
+                    .cover(messageStatus.status());
+        }
+    }
+
+    @Override
+    public void visit(ExplicitConstructorInvocationStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            AstCoverageStatus status = astCoverage.get(stmt);
+
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(stmt.getArguments());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginOf(stmt), firstNotCoveredLine.get() - 1)
+                        .cover(status.selfStatus());
+                i.lines(firstNotCoveredLine.get(), endOf(stmt))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.node(stmt).cover(status.status());
+            }
+        }
+    }
+
+    @Override
+    public void visit(BreakStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            AstCoverageStatus status = astCoverage.get(stmt);
+            i.node(stmt).coverStrong(status.selfStatus());
+        }
+    }
+
+    @Override
+    public void visit(ContinueStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            AstCoverageStatus status = astCoverage.get(stmt);
+            i.node(stmt).coverStrong(status.status());
+        }
+    }
+
+    @Override
+    public void visit(ReturnStmt stmt, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            i.node(stmt).coverStrong(astCoverage.get(stmt).status());
+        }
+    }
+
     @Override
     public void visit(ThrowStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
@@ -838,46 +715,54 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(TryStmt stmt, Void arg) {
+    public void visit(YieldStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            i.node(stmt).reset();
-
-            int endLine;
-            if (!stmt.getResources().isEmpty()) {
-                JavaToken closingParen = JavaTokenIterator.ofBegin(stmt)
-                        .skip(JavaToken.Kind.LPAREN)
-                        .find(JavaToken.Kind.RPAREN);
-                endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
-            } else {
-                JavaToken tryToken = JavaTokenIterator.ofBegin(stmt)
-                        .find(JavaToken.Kind.TRY);
-                endLine = JavaTokenIterator.expandWhitespaceAfter(tryToken);
-            }
-
-            i.lines(stmt.getBegin().get().line, endLine)
-                    .cover(astCoverage.get(stmt).status());
+            AstCoverageStatus status = astCoverage.get(stmt);
+            i.node(stmt).coverStrong(status.status());
         }
     }
 
-    @Override
-    public void visit(LocalClassDeclarationStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            i.node(stmt).empty();
-        }
-    }
+    // endregion
+    // region expression level
 
     @Override
-    public void visit(LocalRecordDeclarationStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            i.node(stmt).empty();
-        }
-    }
-
-    @Override
-    public void visit(UnaryExpr expr, Void arg) {
+    public void visit(AssignExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus status = astCoverage.get(expr);
-            i.node(expr).cover(status.selfStatus());
+            AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
+            AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
+
+            i.node(expr.getTarget()).cover(targetStatus.status());
+            i.lines(endOf(expr.getTarget()) + 1, beginOf(expr.getValue()) - 1)
+                    .cover(targetStatus.statusAfter().toLineCoverageStatus());
+            i.node(expr.getValue()).cover(valueStatus.status());
+
+            // AstCoverageStatus status = astCoverage.get(expr);
+            // AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
+            // AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
+
+            // if (status.isCovered() && !status.statusAfter().isCovered() && !valueStatus.isCovered()) {
+            //     if (targetStatus.statusAfter().isNotCovered()) {
+            //         i.node(expr.getTarget())
+            //                 .cover(LineCoverageStatus.FULLY_COVERED);
+            //         i.lines(endOf(expr.getTarget()) + 1, endOf(expr))
+            //                 .cover(LineCoverageStatus.NOT_COVERED);
+            //     } else {
+            //         i.lines(beginOf(expr), beginOf(expr.getTarget()) - 1)
+            //                 .cover(LineCoverageStatus.FULLY_COVERED);
+            //         i.node(expr.getTarget())
+            //                 .cover(LineCoverageStatus.NOT_COVERED);
+            //     }
+            // } else {
+            //     i.node(expr).cover(status.status());
+            // }
+        }
+    }
+
+    @Override
+    public void visit(VariableDeclarator decl, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
+            AstCoverageStatus status = astCoverage.get(decl);
+            i.node(decl).cover(status.status());
         }
     }
 
@@ -899,17 +784,149 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(VariableDeclarator decl, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
-            AstCoverageStatus status = astCoverage.get(decl);
-            i.node(decl).cover(status.status());
+    public void visit(UnaryExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
+            i.node(expr).cover(status.selfStatus());
         }
     }
 
     @Override
-    public void visit(WhileStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            handleLoop(i, stmt, stmt.getBody());
+    public void visit(BinaryExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus leftStatus = astCoverage.get(expr.getLeft());
+            AstCoverageStatus rightStatus = astCoverage.get(expr.getRight());
+
+            i.node(expr.getLeft()).cover(leftStatus.status());
+            i.lines(endOf(expr.getLeft()) + 1, beginOf(expr.getRight()) - 1)
+                    .cover(leftStatus.statusAfter().toLineCoverageStatus());
+            i.node(expr.getRight()).cover(rightStatus.status());
+        }
+    }
+
+    @Override
+    public void visit(MethodCallExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
+
+            AstCoverageStatus scopeStatus = expr.getScope()
+                    .map(astCoverage::get)
+                    .orElse(status);
+            if (scopeStatus.isEmpty()) {
+                scopeStatus = status;
+            }
+
+            int beginCallLine = beginOf(expr);
+            if (expr.hasScope()) {
+                // cover the scope separately
+                // (this only really matters if there are blank lines between calls of a method chain
+                // and the chain throws an exception somewhere)
+                JavaToken scopeEnd = expr.getScope().get().getTokenRange().get().getEnd();
+                int endScopeLine = JavaTokenIterator.expandWhitespaceAfter(scopeEnd);
+                beginCallLine = JavaTokenIterator.of(scopeEnd)
+                        .skipOne()
+                        .find(JavaToken.Kind.DOT)
+                        .getRange().get().begin.line;
+                i.lines(beginOf(expr), endScopeLine)
+                        .cover(scopeStatus.selfStatus());
+            }
+
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginCallLine, firstNotCoveredLine.get() - 1)
+                        .coverStrong(status.selfStatus());
+                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.lines(beginCallLine, endOf(expr))
+                        .coverStrong(status.selfStatus());
+            }
+        }
+    }
+
+    @Override
+    public void visit(ObjectCreationExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
+
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
+                        .coverStrong(status.selfStatus());
+                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.lines(beginOf(expr), endOf(expr))
+                        .coverStrong(status.selfStatus());
+            }
+
+            // if the expression has an anonymous class body, reset it
+            expr.getAnonymousClassBody().ifPresent(classBody -> {
+                // find the opening and closing brace of the class body
+                JavaTokenIterator it = JavaTokenIterator.ofBegin(expr)
+                        .skip(JavaToken.Kind.LPAREN)
+                        .skip(JavaToken.Kind.RPAREN);
+                JavaToken openingBrace = it.find(JavaToken.Kind.LBRACE);
+                JavaToken closingBrace = it.find(JavaToken.Kind.RBRACE);
+
+                int beginLine = openingBrace.getRange().get().begin.line;
+                int endLine = closingBrace.getRange().get().end.line;
+
+                // if the first line starts with the opening brace, reset from there,
+                // otherwise start one line further down
+                if (!JavaTokenIterator.lineStartsWith(openingBrace)) {
+                    beginLine++;
+                }
+
+                // if the last line starts with the closing brace, end one line further up,
+                // otherwise end there
+                if (JavaTokenIterator.lineStartsWith(closingBrace)) {
+                    endLine--;
+                }
+
+                i.lines(beginLine, endLine).reset();
+            });
+        }
+    }
+
+    @Override
+    public void visit(ConditionalExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
+            AstCoverageStatus thenStatus = astCoverage.get(expr.getThenExpr());
+            AstCoverageStatus elseStatus = astCoverage.get(expr.getElseExpr());
+
+            i.node(expr).cover(status.status());
+
+            int thenBeginLine = JavaTokenIterator.expandWhitespaceBefore(
+                    expr.getThenExpr().getTokenRange().get().getBegin());
+            int thenEndLine = JavaTokenIterator.expandWhitespaceAfter(
+                    expr.getThenExpr().getTokenRange().get().getEnd());
+
+            int elseBeginLine = JavaTokenIterator.expandWhitespaceBefore(
+                    expr.getElseExpr().getTokenRange().get().getBegin());
+            int elseEndLine = JavaTokenIterator.expandWhitespaceAfter(
+                    expr.getElseExpr().getTokenRange().get().getEnd());
+
+            i.lines(thenBeginLine, thenEndLine).cover(thenStatus.status());
+            i.lines(elseBeginLine, elseEndLine).cover(elseStatus.status());
+        }
+    }
+
+    @Override
+    public void visit(SwitchExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            AstCoverageStatus status = astCoverage.get(expr);
+
+            i.node(expr).reset();
+
+            JavaToken closingParen = JavaTokenIterator.ofEnd(expr.getSelector())
+                    .skipOne()
+                    .find(JavaToken.Kind.RPAREN);
+            int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+
+            i.lines(expr.getBegin().get().line, endLine)
+                    .cover(status.status());
         }
     }
 
@@ -933,41 +950,79 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(SwitchExpr expr, Void arg) {
+    public void visit(FieldAccessExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            i.node(expr).cover(astCoverage.get(expr).selfStatus());
+        }
+    }
+
+    @Override
+    public void visit(MethodReferenceExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            i.node(expr).cover(astCoverage.get(expr).selfStatus());
+        }
+    }
+
+    @Override
+    public void visit(ArrayAccessExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
 
-            i.node(expr).reset();
+            Expression index = expr.getIndex();
+            AstCoverageStatus indexStatus = astCoverage.get(index);
 
-            JavaToken closingParen = JavaTokenIterator.ofEnd(expr.getSelector())
-                    .skipOne()
-                    .find(JavaToken.Kind.RPAREN);
-            int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
-
-            i.lines(expr.getBegin().get().line, endLine)
-                    .cover(status.status());
+            i.lines(beginOf(expr), beginOf(index) - 1)
+                    .cover(status.selfStatus());
+            i.node(index)
+                    .cover(indexStatus.selfStatus());
+            i.lines(endOf(index) + 1, endOf(expr))
+                    .cover(indexStatus.statusAfter().toLineCoverageStatus());
         }
     }
 
     @Override
-    public void visit(YieldStmt stmt, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            AstCoverageStatus status = astCoverage.get(stmt);
-            i.node(stmt).coverStrong(status.status());
+    public void visit(ArrayCreationExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            i.node(expr).empty();
         }
     }
 
     @Override
-    public void visit(RecordDeclaration decl, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
-            handleTypeDeclaration(i, decl, astCoverage.get(decl));
+    public void visit(ArrayCreationLevel node, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(node, () -> super.visit(node, arg))) {
+            AstCoverageStatus status = astCoverage.get(node);
+            if (node.getDimension().isPresent()) {
+                Expression dimension = node.getDimension().get();
+                i.lines(beginOf(node), endOf(dimension))
+                        .cover(status.status());
+                i.lines(endOf(dimension) + 1, endOf(node))
+                        .cover(status.statusAfter().toLineCoverageStatus());
+            } else {
+                i.node(node).cover(status.status());
+            }
         }
     }
 
     @Override
-    public void visit(CompactConstructorDeclaration decl, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(decl, () -> super.visit(decl, arg))) {
-            handleMethodDeclaration(i, decl, decl.getBody(), astCoverage.get(decl));
+    public void visit(ArrayInitializerExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+
+            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getValues());
+            if (firstNotCoveredLine.isPresent()) {
+                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
+                        .empty();
+                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                        .cover(LineCoverageStatus.NOT_COVERED);
+            } else {
+                i.node(expr).empty();
+            }
+        }
+    }
+
+    @Override
+    public void visit(CastExpr expr, Void arg) {
+        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
+            i.node(expr).cover(astCoverage.get(expr).status());
         }
     }
 
@@ -992,72 +1047,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(MethodReferenceExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            i.node(expr).cover(astCoverage.get(expr).selfStatus());
-        }
-    }
-
-    @Override
-    public void visit(ArrayInitializerExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getValues());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
-                        .empty();
-                i.lines(firstNotCoveredLine.get(), endOf(expr))
-                        .cover(LineCoverageStatus.NOT_COVERED);
-            } else {
-                i.node(expr).empty();
-            }
-        }
-    }
-
-    @Override
-    public void visit(ArrayCreationLevel node, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(node, () -> super.visit(node, arg))) {
-            AstCoverageStatus status = astCoverage.get(node);
-            if (node.getDimension().isPresent()) {
-                Expression dimension = node.getDimension().get();
-                i.lines(beginOf(node), endOf(dimension))
-                        .cover(status.status());
-                i.lines(endOf(dimension) + 1, endOf(node))
-                        .cover(status.statusAfter().toLineCoverageStatus());
-            } else {
-                i.node(node).cover(status.status());
-            }
-        }
-    }
-
-    @Override
-    public void visit(ArrayAccessExpr expr, Void arg) {
+    public void visit(PatternExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
-
-            Expression index = expr.getIndex();
-            AstCoverageStatus indexStatus = astCoverage.get(index);
-
-            i.lines(beginOf(expr), beginOf(index) - 1)
-                    .cover(status.selfStatus());
-            i.node(index)
-                    .cover(indexStatus.selfStatus());
-            i.lines(endOf(index) + 1, endOf(expr))
-                    .cover(indexStatus.statusAfter().toLineCoverageStatus());
-        }
-    }
-
-    @Override
-    public void visit(CastExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            i.node(expr).cover(astCoverage.get(expr).status());
-        }
-    }
-
-    @Override
-    public void visit(ArrayCreationExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            i.node(expr).empty();
+            i.node(expr).cover(status.status());
         }
     }
 
@@ -1070,16 +1063,8 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         }
     }
 
-
-    @Override
-    public void visit(PatternExpr expr, Void arg) {
-        try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
-            AstCoverageStatus status = astCoverage.get(expr);
-            i.node(expr).cover(status.status());
-        }
-    }
-
-    // region new
+    // endregion
+    // region not handled
 
     @Override
     public void visit(BooleanLiteralExpr n, Void arg) {
@@ -1140,10 +1125,6 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(TextBlockLiteralExpr n, Void arg) {
         super.visit(n, arg);
     }
-
-
-    // endregion
-    // region not handled
 
     @Override
     public void visit(AnnotationDeclaration n, Void arg) {
@@ -1328,5 +1309,25 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(Modifier n, Void arg) {
         super.visit(n, arg);
+    }
+
+    @Override
+    public void visit(ExpressionStmt stmt, Void arg) {
+        super.visit(stmt, arg);
+    }
+
+    @Override
+    public void visit(LocalClassDeclarationStmt stmt, Void arg) {
+        super.visit(stmt, arg);
+    }
+
+    @Override
+    public void visit(LocalRecordDeclarationStmt stmt, Void arg) {
+        super.visit(stmt, arg);
+    }
+
+    @Override
+    public void visit(LabeledStmt stmt, Void arg) {
+        super.visit(stmt, arg);
     }
 }
