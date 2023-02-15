@@ -35,6 +35,8 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -474,5 +476,46 @@ public class TestDAO {
         };
         final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
         return new HashSet<>(mutants);
+    }
+
+    public static void incrementTestScore(Test test, int score) {
+        if (score == 0) {
+            // Why this is happening?
+            // Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
+            logger.warn("Do not increment score for test {} when score is zero", test.getId());
+            return;
+        }
+
+        String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
+
+        try {
+            boolean incremented = CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,
+                    score, test.getId()) > 0;
+
+            logger.info("Increment score for {} by {}. Update? {} ", test, score, incremented);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void killMutant(Test test) {
+        // TODO Phil 06/08/19: Why isn't the out-commented code called?
+        // mutantsKilled++;
+        // update();
+        logger.info("Test {} killed a new mutant", test.getId());
+
+        String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
+
+        try {
+            boolean updated = CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,1, test.getId()) > 0;
+
+            // Eventually update the kill count from the DB
+            int mutantsKilled = TestDAO.getTestById(test.getId()).getMutantsKilled();
+            test.setMutantsKilled(mutantsKilled);
+
+            logger.info("Test {} new killcount is {}. Was updated ? {} ", test, mutantsKilled, updated);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
