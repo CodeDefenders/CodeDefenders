@@ -3,10 +3,11 @@
     flex-direction: column;
     gap: 4rem;
     margin-block: 3rem;
+    max-width: 50rem !important;
     margin-inline: auto;
 }
 
-.details-content__item {
+.details-content .details-content__item {
     background: #eee;
     border-radius: 5px;
     padding: 2rem;
@@ -16,6 +17,6 @@
     margin-block-end: 2rem;
 }
 
-#game-container {
-    max-width: 50rem !important;
+.details-content .details-content__item .game-component-header {
+    margin-top: 0;
 }

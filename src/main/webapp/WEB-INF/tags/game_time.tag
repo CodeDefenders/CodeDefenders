@@ -123,20 +123,21 @@
     <%-- Validate input and update hidden field containing duration as minutes. --%>
     <c:if test="${canSetDuration}">
         <script type="module">
-            import {GameTimeValidator} from './js/codedefenders_game.mjs';
+            import {GameTimeValidator} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
             const gameTimeValidator = new GameTimeValidator(
-                    Number(${maxDuration}), 0,
-                    document.getElementById('minutes-input'),
-                    document.getElementById('hours-input'),
-                    document.getElementById('days-input'),
-                    document.getElementById('duration-total')
+                Number(${maxDuration}), 0,
+                document.getElementById('minutes-input'),
+                document.getElementById('hours-input'),
+                document.getElementById('days-input'),
+                document.getElementById('duration-total')
             );
         </script>
     </c:if>
 </form>
 
 <script type="module">
-    import {GameTimeManager} from './js/codedefenders_game.mjs';
+    import {GameTimeManager} from '${url.forPath("/js/codedefenders_game.mjs")}';
+
     const gameTimeManager = new GameTimeManager(".time-left", 10);
 </script>

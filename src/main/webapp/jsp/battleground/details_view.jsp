@@ -55,8 +55,10 @@
 <jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
 
 <%-- HEADER --%>
-<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
-<link href="${pageContext.request.contextPath}/css/specific/game_details_view.css" rel="stylesheet">
+<link href="${url.forPath("css/specific/game.css")}" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game_details_view.css")}" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game_scoreboard.css")}" rel="stylesheet">
+<link href="${url.forPath("/css/specific/timeline.css")}" rel="stylesheet">
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Details of Game " + game.getId() + " (" + role.getFormattedString() + ")"); %>
@@ -136,7 +138,7 @@
 				</div>
 
 				<script type="module">
-					import {GameTimeManager} from './js/codedefenders_game.mjs';
+					import {GameTimeManager} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 					const gameTimeManager = new GameTimeManager(".time-left", 10);
 				</script>
@@ -147,123 +149,15 @@
 			<h3>Timeline</h3>
 			<t:game_timeline/>
 		</div>
-	</div>
 
-	<jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
-	<jsp:include page="/jsp/battleground/game_history.jsp"/>
-
-	<div class="details-content__item">
-		<h3>Useful Actions</h3>
-
-		<table id="tableKillmaps" class="table table-striped">
-			<thead>
-			<tr>
-				<th>User ID</th>
-				<th>User Name</th>
-				<th>Class ID</th>
-				<th>Class Name</th>
-				<th>Role</th>
-				<th>Useful Mutants</th>
-				<th>Useful Tests</th>
-				<th>Useful Actions</th>
-			</tr>
-			</thead>
-		</table>
-
-		<div class="row g-3 mt-4">
-			<div class="col-12">
-				<a data-bs-toggle="modal" data-bs-target="#useful-actions-explanation"
-				   class="btn btn-outline-secondary btn-sm">
-					What are useful actions?
-				</a>
-			</div>
-			<div class="col-12">
-				<div class="btn-group">
-					<a download="killmap-analytics.csv"
-					   href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
-					   type="button" class="btn btn-sm btn-outline-secondary" id="download">
-						<i class="fa fa-download me-1"></i>
-						Download table
-					</a>
-					<a download="killmap-analytics.csv"
-					   href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
-					   type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
-						as CSV
-					</a>
-					<a download="killmap-analytics.json"
-					   href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
-					   type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
-						as JSON
-					</a>
-				</div>
-			</div>
+		<div class="details-content__item">
+			<t:mutant_accordion/>
 		</div>
 
-		<t:modal title="Useful Actions Explanation" id="useful-actions-explanation">
-			<jsp:attribute name="content">
-				<p>
-					This table uses data from the class killmaps to determine the number of useful tests and mutants per
-					player, class and role.
-				</p>
-				<table class="table table-no-last-border mb-0">
-					<tbody>
-					<tr>
-						<td class="text-nowrap"><b>Useful Tests:</b></td>
-						<td>Number of tests, which killed at least one mutant.</td>
-					</tr>
-					<tr>
-						<td class="text-nowrap"><b>Useful Mutants:</b></td>
-						<td>Number of mutants, which were killed by at least one test,
-							but were covered and not killed by at least one other test.
-						</td>
-					</tr>
-					<tr>
-						<td class="text-nowrap"><b>Useful Actions:</b></td>
-						<td>Sum of useful tests and useful mutants.</td>
-					</tr>
-					</tbody>
-				</table>
-			</jsp:attribute>
-		</t:modal>
-
-		<script type="module">
-			import DataTable from './js/datatables.mjs';
-			import $ from './js/jquery.mjs';
-
-
-			$(document).ready(function () {
-				const table = new DataTable('#tableKillmaps', {
-					"ajax": {
-						"url": "<%=request.getContextPath() + Paths.API_PUBLIC_KILLMAP + "?fileType=json"%>",
-						"dataSrc": "data"
-					},
-					"columns": [
-						{"data": "userId"},
-						{"data": "userName"},
-						{"data": "classId"},
-						{"data": "className"},
-						{"data": "role"},
-						{"data": "usefulMutants"},
-						{"data": "usefulTests"},
-						{
-							"data":
-									function (row, type, val, meta) {
-										return row.usefulMutants + row.usefulTests;
-									}
-						}
-					],
-					/* "columnDefs": [
-						{ className: "text-right", "targets": [0,2,5,6,7] },
-					], */
-					"pageLength": 50,
-					"order": [[1, "asc"]],
-					"scrollY": '600px',
-					"scrollCollapse": true,
-					"paging": false,
-					"language": {"info": "Showing _TOTAL_ entries"}
-				});
-			});
-		</script>
+		<div class="details-content__item">
+			<div class="game-component-header"><h3>JUnit Tests</h3></div>
+			<t:test_accordion/>
+		</div>
 	</div>
 
 	<!-- This corresponds to dispatcher.Dispatch -->
