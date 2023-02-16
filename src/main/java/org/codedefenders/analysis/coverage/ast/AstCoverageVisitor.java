@@ -230,9 +230,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
      * Merges the line coverage values of the lines encompassing the given node.
      */
     private DetailedLine mergeLineCoverage(Node node) {
-        int beginLine = node.getBegin().get().line;
-        int endLine = node.getEnd().get().line;
-        return mergeLineCoverage(beginLine, endLine);
+        return mergeLineCoverage(beginOf(node), endOf(node));
     }
 
     private DetailedLine mergeLineCoverageForCondition(Node node) {
@@ -366,8 +364,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
     private void handleConstructorDecl(Node decl, BlockStmt body) {
         AstCoverageStatus bodyStatus = astCoverage.get(body);
-        DetailedLine openingBraceCoverage = lineCoverage.get(body.getBegin().get().line);
-        DetailedLine closingBraceCoverage = lineCoverage.get(body.getEnd().get().line);
+        DetailedLine openingBraceCoverage = lineCoverage.get(beginOf(body));
+        DetailedLine closingBraceCoverage = lineCoverage.get(endOf(body));
 
         bodyStatus = bodyStatus.updateStatus(openingBraceCoverage.instructionStatus());
 
@@ -453,7 +451,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
          *         int x = 3;
          * if the field has an initializer, the first line is always coverable
          */
-        DetailedLine firstLineCoverage = lineCoverage.get(decl.getBegin().get().line);
+        DetailedLine firstLineCoverage = lineCoverage.get(beginOf(decl));
 
         if (firstLineCoverage.hasIns()) {
             AstCoverageStatus status = AstCoverageStatus.fromStatus(firstLineCoverage.instructionStatus());
@@ -548,7 +546,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         // if block is static and empty, check the coverage of the closing brace -> COVERED / NOT_COVERED
         // the closing brace of an initializer block is *only* covered if the block is empty and static
         if (decl.isStatic()) {
-            DetailedLine closingBraceCoverage = lineCoverage.get(decl.getEnd().get().line);
+            DetailedLine closingBraceCoverage = lineCoverage.get(endOf(decl));
             astCoverage.put(decl, AstCoverageStatus.fromStatus(closingBraceCoverage.instructionStatus()));
             astCoverage.updateStatus(decl.getBody(), closingBraceCoverage.instructionStatus());
             return;
@@ -621,7 +619,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
         BlockStmt body = optBody.get();
         AstCoverageStatus bodyStatus = astCoverage.get(body);
-        DetailedLine closingBraceCoverage = lineCoverage.get(body.getEnd().get().line);
+        DetailedLine closingBraceCoverage = lineCoverage.get(endOf(body));
 
         if (bodyStatus.isEmpty()) {
             bodyStatus = bodyStatus.updateStatus(closingBraceCoverage.instructionStatus());
@@ -880,7 +878,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // closing brace is covered if the end of the body is reached in an iteration
-        DetailedLine closingBraceStatus = lineCoverage.get(stmt.getEnd().get().line);
+        DetailedLine closingBraceStatus = lineCoverage.get(endOf(stmt));
         switch (closingBraceStatus.instructionStatus()) {
             case EMPTY:
                 break;
@@ -1038,7 +1036,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         AstCoverageStatus bodyStatus = astCoverage.get(node.getBody());
 
-        DetailedLine catchKeywordStatus = lineCoverage.get(node.getBegin().get().line);
+        DetailedLine catchKeywordStatus = lineCoverage.get(beginOf(node));
         switch (catchKeywordStatus.instructionStatus()) {
             case NOT_COVERED:
                 bodyStatus = bodyStatus.updateStatus(LineCoverageStatus.NOT_COVERED);
@@ -1066,7 +1064,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .orElse(LineCoverageStatus.EMPTY);
         AstCoverageStatus selectorStatus = astCoverage.get(stmt.getSelector());
         DetailedLine selectorLineStatus = mergeLineCoverageForCondition(stmt.getSelector());
-        DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordStatus = lineCoverage.get(beginOf(stmt));
 
         LineCoverageStatus status = entriesStatus
                 .upgrade(selectorStatus.status())
@@ -1152,8 +1150,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         AstCoverageStatus bodyStatus = astCoverage.get(stmt.getBody());
         AstCoverageStatus monitorStatus = astCoverage.get(stmt.getExpression());
 
-        DetailedLine keywordCoverage = lineCoverage.get(stmt.getBegin().get().line);
-        DetailedLine closingBraceCoverage = lineCoverage.get(stmt.getEnd().get().line);
+        DetailedLine keywordCoverage = lineCoverage.get(beginOf(stmt));
+        DetailedLine closingBraceCoverage = lineCoverage.get(endOf(stmt));
 
         LineCoverageStatus status = bodyStatus.status()
                 .upgrade(monitorStatus.status())
@@ -1196,7 +1194,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(AssertStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
-        DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordStatus = lineCoverage.get(beginOf(stmt));
         // branches can be on the keyword or the condition
         DetailedLine branchStatus = keywordStatus.hasBranches()
                 ? keywordStatus
@@ -1271,7 +1269,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ExplicitConstructorInvocationStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
-        DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordStatus = lineCoverage.get(beginOf(stmt));
 
         // determine coverage of arguments
         AstCoverageStatus argumentsStatus = stmt.getArguments().stream()
@@ -1340,7 +1338,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(stmt, arg);
 
         // check coverage of break keyword
-        DetailedLine keywordCoverage = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordCoverage = lineCoverage.get(beginOf(stmt));
         astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus())
                 .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
     }
@@ -1349,7 +1347,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ContinueStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
-        DetailedLine keywordStatus = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordStatus = lineCoverage.get(beginOf(stmt));
         astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordStatus.instructionStatus())
                 .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
     }
@@ -1359,7 +1357,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(stmt, arg);
 
         // check coverage of return keyword
-        DetailedLine keywordCoverage = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordCoverage = lineCoverage.get(beginOf(stmt));
         astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus())
                 .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
     }
@@ -1369,7 +1367,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(stmt, arg);
 
         // check coverage of throw keyword
-        DetailedLine keywordCoverage = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordCoverage = lineCoverage.get(beginOf(stmt));
         astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus())
                 .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
     }
@@ -1379,7 +1377,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(stmt, arg);
 
         // check coverage of yield keyword
-        DetailedLine keywordCoverage = lineCoverage.get(stmt.getBegin().get().line);
+        DetailedLine keywordCoverage = lineCoverage.get(beginOf(stmt));
         astCoverage.put(stmt, AstCoverageStatus.fromStatus(keywordCoverage.instructionStatus())
                 .withStatusAfter(StatusAfter.ALWAYS_JUMPS));
     }
@@ -1681,7 +1679,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // if the body is a block, update body status with the line coverage of the closing brace
         if (expr.getBody().isBlockStmt()) {
-            DetailedLine closingBraceStatus = lineCoverage.get(expr.getBody().getEnd().get().line);
+            DetailedLine closingBraceStatus = lineCoverage.get(endOf(expr.getBody()));
             if (closingBraceStatus.totalInstructions() == 1) {
                 if (closingBraceStatus.hasCoveredIns()) {
                     bodyStatus = bodyStatus.updateStatusAfter(StatusAfter.COVERED);

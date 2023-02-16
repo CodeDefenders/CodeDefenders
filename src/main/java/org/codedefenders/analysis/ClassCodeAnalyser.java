@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -37,6 +38,9 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
+import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.endOf;
 
 /**
  * Analyses game classes for general class information:
@@ -94,11 +98,8 @@ public class ClassCodeAnalyser {
 
             if (isCompileTimeConstant) {
                 for (VariableDeclarator varDecl : fieldDecl.getVariables()) {
-                    int begin = varDecl.getBegin().get().line;
-                    int end = varDecl.getBegin().get().line;
-                    for (int line = begin; line <= end; line++) {
-                        result.compileTimeConstants.add(line);
-                    }
+                    IntStream.rangeClosed(beginOf(varDecl), endOf(varDecl))
+                            .forEach(result.compileTimeConstants::add);
                 }
             }
         }
@@ -111,12 +112,10 @@ public class ClassCodeAnalyser {
                 return;
             }
 
-            int begin = methodDecl.getBegin().get().line;
-            int end = methodDecl.getEnd().get().line;
-
             String signature = methodDecl.getDeclarationAsString(false, false, false);
             signature = signature.substring(signature.indexOf(' ') + 1); // remove return type
-            result.methodDescriptions.add(new GameClass.MethodDescription(signature, begin, end));
+            result.methodDescriptions.add(new GameClass.MethodDescription(signature,
+                    beginOf(methodDecl), endOf(methodDecl)));
         }
     }
 

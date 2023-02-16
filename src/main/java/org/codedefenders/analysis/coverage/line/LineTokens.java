@@ -7,10 +7,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Supplier;
-
-import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
+import java.util.stream.IntStream;
 
 import com.github.javaparser.ast.Node;
+
+import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.endOf;
 
 
 public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
@@ -92,11 +94,8 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
             this.linesToPop = new ArrayList<>();
             this.emptyLines = new TreeSet<>();
 
-            int beginLine = originNode.getBegin().get().line;
-            int endLine = originNode.getEnd().get().line;
-            for (int line = beginLine; line <= endLine; line++) {
-                emptyLines.add(line);
-            }
+            IntStream.rangeClosed(beginOf(originNode), endOf(originNode))
+                    .forEach(emptyLines::add);
         }
 
         public TokenInserterForPosition lines(int beginLine, int endLine) {
@@ -108,7 +107,7 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
         }
 
         public TokenInserterForPosition node(Node node) {
-            return lines(node.getBegin().get().line, node.getEnd().get().line);
+            return lines(beginOf(node), endOf(node));
         }
 
         @Override
