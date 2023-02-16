@@ -26,7 +26,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -92,6 +91,9 @@ public class AdminKillmapManagement extends HttpServlet {
 
     @Inject
     private CodeDefendersAuth login;
+
+    @Inject
+    private KillMapProcessor killMapProcessor;
 
     @Inject
     private URLUtils url;
@@ -278,9 +280,6 @@ public class AdminKillmapManagement extends HttpServlet {
     }
 
     private void toggleProcessing(boolean enable) {
-        ServletContext context = getServletContext();
-        KillMapProcessor killMapProcessor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
-
         if (enable) {
             killMapProcessor.setEnabled(true);
             if (AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, true))) {

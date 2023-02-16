@@ -31,6 +31,7 @@ import javax.servlet.annotation.WebListener;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.GameCronJobManager;
+import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.slf4j.Logger;
@@ -57,6 +58,9 @@ public class SystemStartStop implements ServletContextListener {
     @Inject
     private MetricsRegistry metricsRegistry;
 
+    @Inject
+    private KillMapProcessor killMapProcessor;
+
     /**
      * This method is called when the servlet context is initialized(when
      * the Web application is deployed). You can initialize servlet context
@@ -82,6 +86,8 @@ public class SystemStartStop implements ServletContextListener {
         }
 
         gameCronJobManager.startup();
+
+        killMapProcessor.start();
     }
 
     /**

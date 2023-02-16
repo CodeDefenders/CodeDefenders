@@ -58,6 +58,7 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMapService;
 import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
@@ -103,7 +104,11 @@ public class ClassUploadManager extends HttpServlet {
     private BackendExecutorService backend;
 
     @Inject
+    private KillMapService killMapService;
+
+    @Inject
     private URLUtils url;
+
 
     private static List<String> reservedClassNames = Arrays.asList(
             "Test.java"
@@ -535,7 +540,7 @@ public class ClassUploadManager extends HttpServlet {
             // Since gameID = -1, DAOs cannot find the class linked to this
             // game, hence its if, which is needed instead inside mutants and
             // tests
-            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>());
+            KillMap killMap = killMapService.forCustom(tests, mutants, cutId, new ArrayList<>());
             KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), cutId);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Could error while calculating killmap for successfully uploaded class.", e);

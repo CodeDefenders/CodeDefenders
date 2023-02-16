@@ -36,7 +36,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
@@ -55,6 +54,7 @@ import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
+import org.codedefenders.execution.KillMapService;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -189,6 +189,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private URLUtils url;
+
+    @Inject
+    private KillMapService killMapService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -1095,7 +1098,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             // At the moment this is purposely blocking.
             // This is the dumbest, but safest way to deal with it while we design a better solution.
-            KillMap killmap = KillMap.forMutantValidation(selectedTests, mutantToValidate, classId);
+            KillMap killmap = killMapService.forMutantValidation(selectedTests, mutantToValidate, classId);
 
             if (killmap == null) {
                 // There was an error we cannot empirically prove the mutant was killable.
