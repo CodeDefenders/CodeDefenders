@@ -133,24 +133,24 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
 
     // region helpers
 
-    private Optional<Integer> getFirstNotCoveredLine(Iterable<? extends Node> nodes) {
-        Integer firstNotCoveredLine = null;
+    private Optional<Node> getFirstNotCoveredNode(Iterable<? extends Node> nodes) {
+        Node firstNotCoveredNode = null;
 
         for (Node node : nodes) {
             AstCoverageStatus status = astCoverage.get(node);
 
-            if (status.isNotCovered() && firstNotCoveredLine == null) {
-                firstNotCoveredLine = endOf(node);
+            if (status.isNotCovered() && firstNotCoveredNode == null) {
+                firstNotCoveredNode = node;
             } else if (status.isCovered()) {
                 if (status.statusAfter().isNotCovered()) {
-                    firstNotCoveredLine = endOf(node);
+                    firstNotCoveredNode = node;
                 } else {
-                    firstNotCoveredLine = null;
+                    firstNotCoveredNode = null;
                 }
             }
         }
 
-        return Optional.ofNullable(firstNotCoveredLine);
+        return Optional.ofNullable(firstNotCoveredNode);
     }
 
     // endregion
@@ -677,11 +677,11 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
 
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(stmt.getArguments());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginOf(stmt), firstNotCoveredLine.get() - 1)
+            Optional<Node> firstNotCoveredNode = getFirstNotCoveredNode(stmt.getArguments());
+            if (firstNotCoveredNode.isPresent()) {
+                i.lines(beginOf(stmt), endOf(firstNotCoveredNode.get()))
                         .cover(status.selfStatus());
-                i.lines(firstNotCoveredLine.get(), endOf(stmt))
+                i.lines(endOf(firstNotCoveredNode.get()) + 1, endOf(stmt))
                         .cover(LineCoverageStatus.NOT_COVERED);
             } else {
                 i.node(stmt).cover(status.status());
@@ -777,11 +777,11 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
 
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getVariables());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
+            Optional<Node> firstNotCoveredNode = getFirstNotCoveredNode(expr.getVariables());
+            if (firstNotCoveredNode.isPresent()) {
+                i.lines(beginOf(expr), endOf(firstNotCoveredNode.get()))
                         .cover(status.status());
-                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                i.lines(endOf(firstNotCoveredNode.get()) + 1, endOf(expr))
                         .cover(LineCoverageStatus.NOT_COVERED);
             } else {
                 i.node(expr).cover(status.status());
@@ -837,11 +837,11 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                         .cover(scopeStatus.selfStatus());
             }
 
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginCallLine, firstNotCoveredLine.get() - 1)
+            Optional<Node> firstNotCoveredNode = getFirstNotCoveredNode(expr.getArguments());
+            if (firstNotCoveredNode.isPresent()) {
+                i.lines(beginCallLine, endOf(firstNotCoveredNode.get()))
                         .coverStrong(status.selfStatus());
-                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                i.lines(endOf(firstNotCoveredNode.get()) + 1, endOf(expr))
                         .cover(LineCoverageStatus.NOT_COVERED);
             } else {
                 i.lines(beginCallLine, endOf(expr))
@@ -855,11 +855,11 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
 
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getArguments());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
+            Optional<Node> firstNotCoveredNode = getFirstNotCoveredNode(expr.getArguments());
+            if (firstNotCoveredNode.isPresent()) {
+                i.lines(beginOf(expr), endOf(firstNotCoveredNode.get()))
                         .coverStrong(status.selfStatus());
-                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                i.lines(endOf(firstNotCoveredNode.get()) + 1, endOf(expr))
                         .cover(LineCoverageStatus.NOT_COVERED);
             } else {
                 i.lines(beginOf(expr), endOf(expr))
@@ -973,16 +973,12 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ArrayAccessExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
-
             Expression index = expr.getIndex();
-            AstCoverageStatus indexStatus = astCoverage.get(index);
 
-            i.lines(beginOf(expr), beginOf(index) - 1)
+            i.lines(beginOf(expr), endOf(index))
                     .cover(status.selfStatus());
-            i.node(index)
-                    .cover(indexStatus.selfStatus());
             i.lines(endOf(index) + 1, endOf(expr))
-                    .cover(indexStatus.statusAfter().toLineCoverageStatus());
+                    .cover(status.statusAfter().toLineCoverageStatus());
         }
     }
 
@@ -1013,11 +1009,11 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ArrayInitializerExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
 
-            Optional<Integer> firstNotCoveredLine = getFirstNotCoveredLine(expr.getValues());
-            if (firstNotCoveredLine.isPresent()) {
-                i.lines(beginOf(expr), firstNotCoveredLine.get() - 1)
+            Optional<Node> firstNotCoveredNode = getFirstNotCoveredNode(expr.getValues());
+            if (firstNotCoveredNode.isPresent()) {
+                i.lines(beginOf(expr), endOf(firstNotCoveredNode.get()))
                         .empty();
-                i.lines(firstNotCoveredLine.get(), endOf(expr))
+                i.lines(endOf(firstNotCoveredNode.get()) + 1, endOf(expr))
                         .cover(LineCoverageStatus.NOT_COVERED);
             } else {
                 i.node(expr).empty();
