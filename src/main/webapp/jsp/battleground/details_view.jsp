@@ -146,6 +146,33 @@
 		</div>
 
 		<div class="details-content__item">
+			<h3>Class under test</h3>
+			<div class="p-0 codemirror-expand loading loading-bg-gray loading-height-200">
+				<pre class="m-0"><textarea aria-label="Class under test" id="class-under-test"></textarea></pre>
+			</div>
+			<script>
+				(async function () {
+					const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
+					const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
+
+					const textarea = document.getElementById('class-under-test');
+
+					const editor = CodeMirror.fromTextArea(textarea, {
+						lineNumbers: true,
+						readOnly: true,
+						mode: 'text/x-java',
+						autoRefresh: true,
+						viewportMargin: Infinity,
+					});
+					editor.getWrapperElement().classList.add('codemirror-readonly');
+
+					await InfoApi.setClassEditorValue(editor, <%=game.getClassId()%>);
+					LoadingAnimation.hideAnimation(textarea);
+				})();
+			</script>
+		</div>
+
+		<div class="details-content__item">
 			<h3>Timeline</h3>
 			<t:game_timeline/>
 		</div>
