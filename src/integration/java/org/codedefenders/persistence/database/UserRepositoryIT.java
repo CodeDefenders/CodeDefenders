@@ -26,8 +26,8 @@ import org.codedefenders.DatabaseRule;
 import org.codedefenders.DatabaseTest;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
-import org.codedefenders.service.MetricsService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,7 +53,7 @@ public class UserRepositoryIT {
 
     @Before
     public void setUp() throws Exception {
-        userRepo = new UserRepository(databaseRule.getQueryRunner(), mock(MetricsService.class));
+        userRepo = new UserRepository(databaseRule.getQueryRunner(), mock(MetricsRegistry.class));
     }
 
     private final String username1 = "user";

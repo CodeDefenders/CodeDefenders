@@ -36,6 +36,7 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.jboss.weld.junit4.WeldInitiator;
@@ -84,7 +85,8 @@ public class GameManagingUtilsTest {
             .from(GameManagingUtils.class,
                     GameManagingUtilsTest.class,
                     TestSmellDetectorProducer.class,
-                    NotificationService.class)
+                    NotificationService.class,
+                    MetricsRegistry.class)
             .inject(this)
             .activate(RequestScoped.class)
             .activate(ApplicationScoped.class)

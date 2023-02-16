@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
 <%@ page import="org.codedefenders.model.Player" %>
@@ -113,7 +115,7 @@
                     <td><%=g.gameLevel().getFormattedString()%></td>
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
-                           href="<%=request.getContextPath() + Paths.BATTLEGROUND_HISTORY%>?gameId=<%=gameId%>">
+                           href="${url.forPath(Paths.BATTLEGROUND_HISTORY)}?gameId=<%=gameId%>">
                             View Results
                         </a>
                     </td>
@@ -249,7 +251,7 @@
                     <td><%=g.gameLevel().getFormattedString()%></td>
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
-                           href="<%=request.getContextPath() + Paths.MELEE_HISTORY%>?gameId=<%=gameId%>">
+                           href="${url.forPath(Paths.MELEE_HISTORY)}?gameId=<%=gameId%>">
                             View Results
                         </a>
                     </td>
@@ -297,7 +299,7 @@
     </table>
 
     <script type="module">
-        import $ from './js/jquery.mjs';
+        import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
         $('table td.toggle-details').on('click', function () {

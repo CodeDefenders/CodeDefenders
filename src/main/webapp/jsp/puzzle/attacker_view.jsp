@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
@@ -111,7 +113,7 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
 
 <jsp:include page="/jsp/push_socket.jsp"/>
 
@@ -143,7 +145,7 @@
                 <h3>Create a mutant here</h3>
                 <div>
 
-                    <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
+                    <form id="reset" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
                         <input type="hidden" name="formType" value="reset">
                         <input type="hidden" name="gameId" value="<%= game.getId() %>">
                         <button class="btn btn-warning" id="btnReset">
@@ -156,7 +158,7 @@
                 </div>
             </div>
 
-            <form id="atk" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
+            <form id="atk" action="${url.forPath(Paths.PUZZLE_GAME)}" method="post">
                 <input type="hidden" name="formType" value="createMutant">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
                 <input type="hidden" id="attacker_intention" name="attacker_intention" value="">

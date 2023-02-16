@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ attribute name="classId" required="true" %>
 <%@ attribute name="classAlias" required="true" %>
 <%@ attribute name="htmlId" required="true" %>
@@ -31,8 +33,8 @@
                     return;
                 }
 
-                const {default: CodeMirror} = await import('./js/codemirror.mjs');
-                const {InfoApi, LoadingAnimation} = await import('./js/codedefenders_main.mjs');
+                const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
+                const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
 
                 const editor = CodeMirror.fromTextArea(textarea, {
                     lineNumbers: true,

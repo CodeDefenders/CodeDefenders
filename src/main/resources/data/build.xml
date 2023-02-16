@@ -42,6 +42,8 @@
 		<!-- JUnit -->
 		<pathelement path="${lib.dir}/junit-${junit4.version}.jar"/>
 		<pathelement path="${lib.dir}/junit-jupiter-api-${junit5.version}.jar"/>
+		<pathelement path="${lib.dir}/opentest4j-${opentest4j.version}.jar"/>
+		<pathelement path="${lib.dir}/junit-platform-commons-${junit5.platform.version}.jar"/>
 
 		<!-- Mockito -->
 		<pathelement path="${lib.dir}/mockito-core-${mockito.version}.jar"/>
@@ -71,6 +73,8 @@
 		<!-- JUnit -->
 		<pathelement path="${lib.dir}/junit-${junit4.version}.jar"/>
 		<pathelement path="${lib.dir}/junit-jupiter-api-${junit5.version}.jar"/>
+		<pathelement path="${lib.dir}/opentest4j-${opentest4j.version}.jar"/>
+		<pathelement path="${lib.dir}/junit-platform-commons-${junit5.platform.version}.jar"/>
 
 		<!-- Mockito -->
 		<pathelement path="${lib.dir}/mockito-core-${mockito.version}.jar"/>

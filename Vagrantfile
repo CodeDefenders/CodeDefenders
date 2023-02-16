@@ -6,10 +6,11 @@ vagrant_file_dir = File.expand_path(File.dirname(__FILE__))
 settings = YAML.load_file("#{vagrant_file_dir}/vagrant.yml") rescue puts("INFO: Could not read vagrant.yml"); Hash.new
 
 # Load settings with default fallback values
-vm_memory = (settings['vm']['memory'] rescue puts("INFO: Could not load 'vm.settings' from vagrant.yml. Using default value."); nil) || "2048"
-ports_tomcat = (settings['ports']['tomcat'] rescue puts("INFO: Could not load 'ports.tomcat' from vagrant.yml. Using default value."); nil) || 8080
-ports_debugging = (settings['ports']['debugging'] rescue puts("INFO: Could not load 'ports.debugging' from vagrant.yml. Using default value."); nil) || 8000
-ports_database = (settings['ports']['database'] rescue puts("INFO: Could not load 'ports.database' from vagrant.yml. Using default value."); nil)|| 3306
+vm_memory = (settings['vm']['memory'] rescue puts("INFO: Could not load 'vm.settings' from vagrant.yml. Using default value.")) || "2048"
+ports_tomcat = (settings['ports']['tomcat'] rescue puts("INFO: Could not load 'ports.tomcat' from vagrant.yml. Using default value.")) || 8080
+ports_debugging = (settings['ports']['debugging'] rescue puts("INFO: Could not load 'ports.debugging' from vagrant.yml. Using default value.")) || 8000
+ports_database = (settings['ports']['database'] rescue puts("INFO: Could not load 'ports.database' from vagrant.yml. Using default value."))|| 3306
+admin_user = (settings['admin']['username'] rescue puts("INFO: Could not load 'admin.username' from vagrant.yml. Using default value."))|| "admin"
 
 Vagrant.configure("2") do |config|
 
@@ -35,9 +36,15 @@ Vagrant.configure("2") do |config|
 
     dev.vm.provision :shell do |s|
       install_pom_xml = File.read("#{vagrant_file_dir}/installation/installation-pom.xml")
-      sed_expression = 's|</tomcat-users>|  <role rolename="admin"/>\n  <role rolename="manager-script"/>\n  <role rolename="manager-gui"/>\n  <user username="admin" password="admin" roles="admin"/>\n  <user username="manager" password="manager" roles="manager-gui,manager-script"/>\n</tomcat-users>|'
+      sed_expression = 's|</tomcat-users>|  <role rolename="manager-script"/>\n  <role rolename="manager-gui"/>\n  <role rolename="codedefenders-admin"/>\n  <user username="'+admin_user+'" roles="codedefenders-admin"/>\n  <user username="manager" password="manager" roles="manager-gui,manager-script"/>\n</tomcat-users>|'
       tomcat9_overwrite = '[Service]\nEnvironment="CATALINA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000"\nReadWritePaths="/srv/codedefenders"\n'
-      codedefenders_properties = 'data.dir=/srv/codedefenders\ndb.password=codedefenders\n'
+      codedefenders_properties = <<-CONFIG
+      data.dir=/srv/codedefenders
+      db.password=codedefenders
+      auth.admin.role=codedefenders-admin
+      metrics=true
+      javamelody=true
+      CONFIG
       s.inline = <<-SHELL
       export DEBIAN_FRONTEND=noninteractive
       # System update & upgrade
@@ -47,8 +54,8 @@ Vagrant.configure("2") do |config|
       # Install required packages
       apt install -y tomcat9 tomcat9-admin mariadb-server maven ant
 
-      # Remove default tomcat webapp
-      rm -r /var/lib/tomcat9/webapps/ROOT
+      # Change owner, so tomcat itself can replace it (e.g. with a (re)deploy via maven)
+      chown -R tomcat:tomcat /var/lib/tomcat9/ROOT
 
       # Bind mariadb-server to all addresses
       sed -i -E 's|bind-address.*|bind-address = 0.0.0.0|' /etc/mysql/mariadb.conf.d/50-server.cnf

@@ -31,8 +31,9 @@ import javax.servlet.annotation.WebListener;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
 import org.codedefenders.cron.GameCronJobManager;
+import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.execution.ThreadPoolManager;
-import org.codedefenders.service.MetricsService;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,10 @@ public class SystemStartStop implements ServletContextListener {
     GameCronJobManager gameCronJobManager;
 
     @Inject
-    private MetricsService metricsService;
+    private MetricsRegistry metricsRegistry;
+
+    @Inject
+    private KillMapProcessor killMapProcessor;
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -70,10 +74,11 @@ public class SystemStartStop implements ServletContextListener {
             logger.error(e.getMessage());
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
-        mgr.register("test-executor").withMax(4).withCore(2).add();
+
+        mgr.register("test-executor").withCore(config.getNumberOfParallelAntExecutions()).add();
 
         if (config.isMetricsCollectionEnabled()) {
-            metricsService.registerDefaultCollectors();
+            metricsRegistry.registerDefaultCollectors();
             sce.getServletContext().addServlet("prom", new MetricsServlet()).addMapping("/metrics");
         }
         if (config.isJavaMelodyEnabled()) {
@@ -81,6 +86,8 @@ public class SystemStartStop implements ServletContextListener {
         }
 
         gameCronJobManager.startup();
+
+        killMapProcessor.start();
     }
 
     /**
@@ -89,7 +96,9 @@ public class SystemStartStop implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        gameCronJobManager.shutdown();
+        // IMPORTANT: Do not place calls to cleanup/shutdown methods of CDI Beans here.
+        // It is likely that the CDI container does not exist anymore at this point, so the cleanup is not executed
+        // Instead use a @PreDestroy annotated method in the CDI Bean itself.
 
         // https://stackoverflow.com/questions/11872316/tomcat-guice-jdbc-memory-leak
         AbandonedConnectionCleanupThread.checkedShutdown();

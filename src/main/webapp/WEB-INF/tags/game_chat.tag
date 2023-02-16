@@ -1,11 +1,12 @@
 <%@ tag pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="gameChat" type="org.codedefenders.beans.game.GameChatBean"--%>
 
 <c:if test="${gameChat.chatEnabled}">
 
-<link href="${pageContext.request.contextPath}/css/specific/game_chat.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game_chat.css")}" rel="stylesheet">
 
 <div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;" hidden>
     <div class="card m-0">
@@ -72,8 +73,8 @@
 </button>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {GameChat} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {GameChat} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const gameId = ${gameChat.gameId};

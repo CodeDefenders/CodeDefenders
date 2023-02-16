@@ -28,10 +28,11 @@
 
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <script type="module">
-    import {objects, PushSocket} from './js/codedefenders_main.mjs';
+    import {objects, PushSocket} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
     const baseWsUri = document.baseURI

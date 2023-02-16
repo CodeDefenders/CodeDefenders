@@ -39,6 +39,7 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +69,9 @@ public class UserSettingsManager extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private URLUtils url;
+
     private static final String DELETED_USER_NAME = "DELETED";
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";
     private static final String DELETED_USER_PASSWORD = "DELETED";
@@ -76,7 +80,7 @@ public class UserSettingsManager extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         if (!userRepo.getUserById(login.getUserId()).isPresent()) {
-            response.sendRedirect(request.getContextPath());
+            response.sendRedirect(url.forPath("/"));
             return;
         }
 
@@ -86,7 +90,7 @@ public class UserSettingsManager extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String responsePath = request.getContextPath() + Paths.USER_SETTINGS;
+        String responsePath = url.forPath(Paths.USER_SETTINGS);
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
@@ -149,7 +153,7 @@ public class UserSettingsManager extends HttpServlet {
                      * so)
                      */
                     // messages.add("You successfully deleted your account. Sad to see you go. :(");
-                    response.sendRedirect(request.getContextPath() + Paths.LOGOUT);
+                    response.sendRedirect(url.forPath(Paths.LOGOUT));
                 } else {
                     logger.info("Failed to set user {} as inactive.", login.getUserId());
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");

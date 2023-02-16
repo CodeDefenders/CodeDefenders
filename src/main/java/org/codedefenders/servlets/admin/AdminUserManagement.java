@@ -19,12 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -44,6 +39,7 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +65,9 @@ public class AdminUserManagement extends HttpServlet {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private URLUtils url;
 
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
@@ -97,7 +96,7 @@ public class AdminUserManagement extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String responsePath = request.getContextPath() + Paths.ADMIN_USERS;
+        String responsePath = url.forPath(Paths.ADMIN_USERS);
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
@@ -122,7 +121,7 @@ public class AdminUserManagement extends HttpServlet {
                 }
                 final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
                 if (userToEdit.isPresent()) {
-                    responsePath = request.getContextPath() + Paths.ADMIN_USERS
+                    responsePath = url.forPath(Paths.ADMIN_USERS)
                             + "?editUser=" + userToEdit.get();
                 }
                 break;
@@ -163,7 +162,7 @@ public class AdminUserManagement extends HttpServlet {
                         Optional<String> result = userService.updateUser(userId.get(), newUsername, newEmail, newPassword);
 
                         if (result.isPresent()) { // There was an error
-                            responsePath = request.getContextPath() + Paths.ADMIN_USERS
+                            responsePath = url.forPath(Paths.ADMIN_USERS)
                                     + "?editUser=" + userId.get();
                             msg = result.get();
                         } else {
@@ -197,7 +196,7 @@ public class AdminUserManagement extends HttpServlet {
         final String[] lines = userNameListString.split(USER_NAME_LIST_DELIMITER);
 
         final boolean sendMail = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
-        final String hostAddress = ServletUtils.getBaseURL(request);
+        final String hostAddress = url.getAbsoluteURLForPath("/");
 
         for (String credentials : lines) {
             createUserAccount(credentials.trim(), sendMail, hostAddress);

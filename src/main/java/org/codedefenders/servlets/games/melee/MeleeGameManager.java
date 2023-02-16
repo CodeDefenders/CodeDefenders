@@ -20,7 +20,6 @@ package org.codedefenders.servlets.games.melee;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -41,7 +40,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
@@ -58,7 +56,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.scoring.ScoreCalculator;
 import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
@@ -82,14 +79,17 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.prometheus.client.Counter;
+import io.prometheus.client.Histogram;
+
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
 import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
@@ -121,8 +121,15 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  */
 @WebServlet(Paths.MELEE_GAME)
 public class MeleeGameManager extends HttpServlet {
-
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameManager.class);
+
+    private static final Histogram.Child automaticEquivalenceDuelTrigger =
+            GameManagingUtils.automaticEquivalenceDuelTrigger
+                    .labels("melee");
+
+    private static final Counter.Child automaticEquivalenceDuelsTriggered =
+            GameManagingUtils.automaticEquivalenceDuelsTriggered
+                    .labels("melee");
 
     @Inject
     private GameManagingUtils gameManagingUtils;
@@ -149,10 +156,6 @@ public class MeleeGameManager extends HttpServlet {
     private PreviousSubmissionBean previousSubmission;
 
     @Inject
-    // Note that this automatically gets the current GAME object injected
-    private ScoreCalculator scoreCalculator;
-
-    @Inject
     private EventDAO eventDAO;
 
     @SuppressWarnings("CdiInjectionPointsInspection")
@@ -171,6 +174,9 @@ public class MeleeGameManager extends HttpServlet {
     @Inject
     private IntentionDAO intentionDAO;
 
+    @Inject
+    private URLUtils url;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -187,7 +193,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (!game.hasUserJoined(userId) && game.getCreatorId() != userId) {
             logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 
@@ -196,7 +202,7 @@ public class MeleeGameManager extends HttpServlet {
         if (game.getCreatorId() != userId && playerId == -1) {
             // Something odd with the registration - TODO
             logger.warn("Wrong registration with the User {} in Melee Game {}", userId, gameId);
-            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 
@@ -215,15 +221,6 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("game", game);
         request.setAttribute("playerId", playerId);
 
-        // Compute the score and pass along the ScoreBoard bean?
-        MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean(userService);
-        // Why ID is necessary here?
-        meleeScoreboardBean.setGameId(game.getId());
-        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(game.getId()),
-                scoreCalculator.getTestScores(game.getId()), scoreCalculator.getDuelScores(game.getId()));
-        meleeScoreboardBean.setPlayers(game.getPlayers());
-        // Set the preconditions for the score board
-        request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
 
         // We need to compute/set this here for the `player_view.jsp`.
         List<Test> playerTests = game.getTests()
@@ -280,19 +277,19 @@ public class MeleeGameManager extends HttpServlet {
         switch (action) {
             case "createMutant": {
                 createMutant(request, response, user.get(), game, playerId);
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
                 createTest(request, response, user.get(), game);
                 // After a test is submitted, there's the chance that one or more mutants
                 // already survived enough tests
-                triggerAutomaticMutantEquivalenceForGame(game);
+                checkAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "reset": {
                 previousSubmission.clear();
-                response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
             case "claimEquivalent": {
@@ -309,13 +306,18 @@ public class MeleeGameManager extends HttpServlet {
         }
     }
 
+    void checkAutomaticMutantEquivalenceForGame(MeleeGame game) {
+        int threshold = game.getAutomaticMutantEquivalenceThreshold();
+        if (threshold > 0) { // Feature is disabled if threshold <= 0
+            try (Histogram.Timer ignored = automaticEquivalenceDuelTrigger.startTimer()) {
+                triggerAutomaticMutantEquivalenceForGame(game);
+            }
+        }
+    }
+
     // This is package protected to enable testing
     void triggerAutomaticMutantEquivalenceForGame(MeleeGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();
-        if (threshold < 1) {
-            // No need to check as this feature is disabled
-            return;
-        }
         // Get all the live mutants in the game
         for (Mutant aliveMutant : game.getAliveMutants()) {
             /*
@@ -324,6 +326,7 @@ public class MeleeGameManager extends HttpServlet {
              */
             int coveringTests = aliveMutant.getCoveringTests().size();
             if (coveringTests >= threshold) {
+                automaticEquivalenceDuelsTriggered.inc();
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
@@ -349,6 +352,7 @@ public class MeleeGameManager extends HttpServlet {
                         EventType.PLAYER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                         new Timestamp(System.currentTimeMillis()));
                 eventDAO.insert(gameEvent);
+
             }
         }
     }
@@ -357,12 +361,9 @@ public class MeleeGameManager extends HttpServlet {
     private void createTest(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game)
             throws IOException {
 
-        final String contextPath = ctx(request);
-        final HttpSession session = request.getSession();
-
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -370,7 +371,7 @@ public class MeleeGameManager extends HttpServlet {
         final Optional<String> test = ServletUtils.getStringParameter(request, "test");
         if (!test.isPresent()) {
             previousSubmission.clear();
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
         final String testText = test.get();
@@ -397,7 +398,7 @@ public class MeleeGameManager extends HttpServlet {
         if (!validationSuccess) {
             messages.addAll(validationMessages);
             previousSubmission.setTestCode(testText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -412,7 +413,7 @@ public class MeleeGameManager extends HttpServlet {
         } catch (IOException io) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
             previousSubmission.setTestCode(testText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -447,7 +448,7 @@ public class MeleeGameManager extends HttpServlet {
             if (!validatedCoveredLines) {
                 messages.add(userIntentionsValidationMessage.toString());
                 previousSubmission.setTestCode(testText);
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
         }
@@ -476,7 +477,7 @@ public class MeleeGameManager extends HttpServlet {
             messages.add(decorate).escape(false).fadeOut(false);
 
             previousSubmission.setTestCode(testText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
         TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
@@ -485,7 +486,7 @@ public class MeleeGameManager extends HttpServlet {
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
             messages.add(testOriginalTarget.message);
             previousSubmission.setTestCode(testText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -511,17 +512,15 @@ public class MeleeGameManager extends HttpServlet {
 
         // Clean up the session
         previousSubmission.clear();
-        response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, SimpleUser user, MeleeGame game,
             int playerId) throws IOException {
 
-        final String contextPath = ctx(request);
-
         if (game.getState() != GameState.ACTIVE) {
             messages.add(GRACE_PERIOD_MESSAGE);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -529,7 +528,7 @@ public class MeleeGameManager extends HttpServlet {
         final Optional<String> mutant = ServletUtils.getStringParameter(request, "mutant");
         if (!mutant.isPresent()) {
             previousSubmission.clear();
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -546,7 +545,7 @@ public class MeleeGameManager extends HttpServlet {
                 && config.isBlockAttacker()) {
             messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
             previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -570,7 +569,7 @@ public class MeleeGameManager extends HttpServlet {
         if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -605,7 +604,7 @@ public class MeleeGameManager extends HttpServlet {
                 messages.add(decorate).escape(false);
             }
             previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -619,7 +618,7 @@ public class MeleeGameManager extends HttpServlet {
             previousSubmission.setMutantCode(mutantText);
             logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}", game.getId(),
                     game.getClassId(), user.getId(), mutantText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
         TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
@@ -642,7 +641,7 @@ public class MeleeGameManager extends HttpServlet {
 
             }
             previousSubmission.setMutantCode(mutantText);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -668,7 +667,7 @@ public class MeleeGameManager extends HttpServlet {
             if (intention == null) {
                 messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
                 previousSubmission.setMutantCode(mutantText);
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
             collectAttackerIntentions(newMutant, intention);
@@ -676,7 +675,7 @@ public class MeleeGameManager extends HttpServlet {
         // Clean the mutated code only if mutant is accepted
         previousSubmission.clear();
         logger.info("Successfully created mutant {} ", newMutant.getId());
-        response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
 
     @SuppressWarnings("Duplicates")
@@ -684,13 +683,12 @@ public class MeleeGameManager extends HttpServlet {
             int gameId, MeleeGame game, //
             int playerId) throws IOException {
 
-        final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
         session.setAttribute("messages", messages);
 
         if (game.getState() == GameState.FINISHED) {
             messages.add(String.format("Game %d has finished.", gameId));
-            response.sendRedirect(contextPath + Paths.MELEE_SELECTION);
+            response.sendRedirect(url.forPath(Paths.MELEE_SELECTION));
             return;
         }
 
@@ -701,7 +699,7 @@ public class MeleeGameManager extends HttpServlet {
             final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
             if (!equivMutantId.isPresent()) {
                 logger.debug("Missing equivMutantId parameter.");
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
             int mutantId = equivMutantId.get();
@@ -729,21 +727,21 @@ public class MeleeGameManager extends HttpServlet {
                             new Timestamp(System.currentTimeMillis()));
                     eventDAO.insert(scoreEvent);
 
-                    response.sendRedirect(request.getContextPath() + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                    response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                     return;
                 }
             }
 
             logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.",
                     login.getUserId(), mutantId);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
 
         } else if ("reject".equals(resolveAction)) {
             // Reject equivalence and submit killing test case
             final Optional<String> test = ServletUtils.getStringParameter(request, "test");
             if (!test.isPresent()) {
                 previousSubmission.clear();
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
             final String testText = test.get();
@@ -771,7 +769,7 @@ public class MeleeGameManager extends HttpServlet {
             if (!validationSuccess) {
                 messages.addAll(validationMessage);
                 previousSubmission.setTestCode(testText);
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
 
@@ -783,7 +781,7 @@ public class MeleeGameManager extends HttpServlet {
             } catch (IOException io) {
                 messages.add(TEST_GENERIC_ERROR_MESSAGE);
                 previousSubmission.setTestCode(testText);
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
 
@@ -791,7 +789,7 @@ public class MeleeGameManager extends HttpServlet {
             if (!equivMutantId.isPresent()) {
                 logger.info("Missing equivMutantId parameter.");
                 previousSubmission.setTestCode(testText);
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
             int mutantId = equivMutantId.get();
@@ -816,7 +814,7 @@ public class MeleeGameManager extends HttpServlet {
                 }
 
                 previousSubmission.setTestCode(testText);
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
             TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
@@ -828,7 +826,7 @@ public class MeleeGameManager extends HttpServlet {
                 messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
                 messages.add(testOriginalTarget.message).fadeOut(false);
                 previousSubmission.setTestCode(testText);
-                response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+                response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
                 return;
             }
 
@@ -927,7 +925,7 @@ public class MeleeGameManager extends HttpServlet {
             newTest.update();
             game.update();
             logger.info("Resolving equivalence was handled successfully");
-            response.sendRedirect(ctx(request) + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
 
         } else {
             logger.info("Rejecting resolving equivalence request. Invalid value for 'resolveAction': " + resolveAction);
@@ -938,8 +936,6 @@ public class MeleeGameManager extends HttpServlet {
     private void claimEquivalent(HttpServletRequest request, HttpServletResponse response, //
             int gameId, MeleeGame game, //
             int playerId) throws IOException {
-
-        final String contextPath = ctx(request);
 
         if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
             messages.add("You cannot claim mutants as equivalent in this game anymore.");
@@ -1000,7 +996,7 @@ public class MeleeGameManager extends HttpServlet {
 
         if (noneCovered.get()) {
             messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-            response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
             return;
         }
 
@@ -1017,7 +1013,7 @@ public class MeleeGameManager extends HttpServlet {
         String flaggingMessage = nClaimed == 0 ? "Mutant has already been claimed as equivalent or killed!"
                 : String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's'));
         messages.add(flaggingMessage);
-        response.sendRedirect(contextPath + Paths.MELEE_GAME + "?gameId=" + game.getId());
+        response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + game.getId());
     }
 
     private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {

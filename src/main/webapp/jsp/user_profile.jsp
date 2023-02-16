@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="profile" class="org.codedefenders.beans.user.UserProfileBean" scope="request"/>
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
@@ -32,7 +34,7 @@
 <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
-<link rel="stylesheet" href="css/specific/dashboard.css">
+<link rel="stylesheet" href="${url.forPath("/css/specific/dashboard.css")}">
 
 <div class="container">
     <h1>${pageInfo.pageTitle}</h1>
@@ -135,7 +137,7 @@
             <h2 class="mb-3" id="played-games">Played games</h2>
             <p>
                 You can find a list of your past games in the
-                <a href="${pageContext.request.contextPath}${Paths.GAMES_HISTORY}">games history</a>.
+                <a href="${url.forPath(Paths.GAMES_HISTORY)}">games history</a>.
             </p>
         </section>
 
@@ -147,7 +149,7 @@
             </p>
             <p>
                 Change your account information, password or delete your account in the
-                <a href="${pageContext.request.contextPath}${Paths.USER_SETTINGS}"
+                <a href="${url.forPath(Paths.USER_SETTINGS)}"
                    title="Edit or delete your CodeDefenders account.">account settings</a>.
             </p>
         </section>

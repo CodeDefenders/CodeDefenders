@@ -18,9 +18,10 @@
   --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="mutantAccordion" type="org.codedefenders.beans.game.MutantAccordionBean"--%>
 
-<link href="${pageContext.request.contextPath}/css/specific/mutant_accordion.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/mutant_accordion.css")}" rel="stylesheet">
 
 <div id="mutants-div">
 
@@ -85,8 +86,8 @@
     </div>
 
     <script type="module">
-        import {objects} from './js/codedefenders_main.mjs';
-        import {MutantAccordion} from './js/codedefenders_game.mjs';
+        import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+        import {MutantAccordion} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
         const categories = JSON.parse('${mutantAccordion.jsonFromCategories()}');

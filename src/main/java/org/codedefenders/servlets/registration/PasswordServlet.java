@@ -37,6 +37,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,9 @@ public class PasswordServlet extends HttpServlet {
 
     @Inject
     private UserRepository userRepo;
+
+    @Inject
+    private URLUtils url;
 
     // TODO Move this to Injectable configuration
     private static final int PW_RESET_SECRET_LENGTH = 20;
@@ -82,10 +86,8 @@ public class PasswordServlet extends HttpServlet {
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
                     userRepo.setPasswordResetSecret(u.get().getId(), resetPwSecret);
-                    String hostAddr = request.getScheme() + "://" + request.getServerName() + ":"
-                            + request.getServerPort() + request.getContextPath();
-                    String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
-                    String msg = String.format(CHANGE_PASSWORD_MSG, u.get().getUsername(), url,
+                    String resetUrl =  url.getAbsoluteURLForPath(Paths.LOGIN) + "?resetPW=" + resetPwSecret;
+                    String msg = String.format(CHANGE_PASSWORD_MSG, u.get().getUsername(), resetUrl,
                             AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN)
                                     .getIntValue());
                     if (EmailUtils.sendEmail(u.get().getEmail(), "Code Defenders Password reset", msg)) {
@@ -94,7 +96,7 @@ public class PasswordServlet extends HttpServlet {
                         messages.add("Something went wrong. No email could be sent.");
                     }
                 }
-                response.sendRedirect(request.getContextPath() + Paths.LOGIN);
+                response.sendRedirect(url.forPath(Paths.LOGIN));
                 break;
 
             case "changePassword":
@@ -102,7 +104,7 @@ public class PasswordServlet extends HttpServlet {
                 confirm = request.getParameter("inputConfirmPasswordChange");
                 password = request.getParameter("inputPasswordChange");
 
-                String responseURL = request.getContextPath() + Paths.LOGIN + "?resetPW=" + resetPwSecret;
+                String responseURL = url.forPath(Paths.LOGIN) + "?resetPW=" + resetPwSecret;
                 Optional<Integer> userId = userRepo.getUserIdForPasswordResetSecret(resetPwSecret);
                 if (resetPwSecret != null && userId.isPresent()) {
                     if (!(validator.validPassword(password))) {
@@ -113,7 +115,7 @@ public class PasswordServlet extends HttpServlet {
                             user.get().setEncodedPassword(UserEntity.encodePassword(password));
                             if (user.get().update()) {
                                 userRepo.setPasswordResetSecret(user.get().getId(), null);
-                                responseURL = request.getContextPath() + Paths.LOGIN;
+                                responseURL = url.forPath(Paths.LOGIN);
                                 messages.add("Successfully changed your password.");
                             }
                         }
@@ -122,7 +124,7 @@ public class PasswordServlet extends HttpServlet {
                     }
                 } else {
                     messages.add("Your password reset link is not valid or has expired.");
-                    responseURL = request.getContextPath() + Paths.LOGIN;
+                    responseURL = url.forPath(Paths.LOGIN);
                 }
                 response.sendRedirect(responseURL);
                 break;

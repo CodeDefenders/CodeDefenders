@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<link href="${pageContext.request.contextPath}/css/specific/timeline.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/timeline.css")}" rel="stylesheet">
 
 <div id="history" class="modal fade" tabindex="-1">
     <div class="modal-dialog" style="max-width: 900px">

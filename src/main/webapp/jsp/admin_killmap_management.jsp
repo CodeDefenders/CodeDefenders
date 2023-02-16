@@ -24,9 +24,13 @@
 <%@ page import="org.codedefenders.execution.KillMapProcessor.KillMapJob" %>
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
+<%@ page import="org.codedefenders.util.CDIUtil" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+<%--@elvariable id="killMapProcessor" type="org.codedefenders.execution.KillMapProcessor"--%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("KillMap Management"); %>
@@ -42,11 +46,8 @@
     KillmapPage currentPage = (KillmapPage) request.getAttribute("page");
 
     String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.toString();
-    ServletContext context = pageContext.getServletContext();
-    KillMapProcessor processor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
 
-    boolean processorEnabled = processor.isEnabled();
-    KillMapJob currentJob = processor.getCurrentJob();
+    KillMapJob currentJob = CDIUtil.getBeanFromCDI(KillMapProcessor.class).getCurrentJob();
 
     int numClassesQueued = KillmapDAO.getNumClassKillmapJobsQueued();
     int numGamesQueued = KillmapDAO.getNumGameKillmapJobsQueued();
@@ -66,11 +67,14 @@
             </p>
 
             <p class="m-0">
-                <% if (processorEnabled) { %>
-                    Killmap Processing is <span class="text-success">enabled</span>.
-                <% } else { %>
-                    Killmap Processing is <span class="text-danger">disabled</span>.
-                <% } %>
+                <c:choose>
+                    <c:when test="${killMapProcessor.enabled}">
+                        Killmap Processing is <span class="text-success">enabled</span>.
+                    </c:when>
+                    <c:otherwise>
+                        Killmap Processing is <span class="text-danger">disabled</span>.
+                    </c:otherwise>
+                </c:choose>
             </p>
 
             <%
@@ -90,15 +94,18 @@
             <form id="killmap-processor-settings" class="mt-3" name="killmap-processor-settings" title="<%=processorExplanation%>"
                   method="post">
                 <input type="hidden" name="formType" value="toggleKillMapProcessing">
-                <% if (processorEnabled) { %>
-                    <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
-                        Disable KillMap Processing
-                    </button>
-                <% } else { %>
-                    <button type="submit" name="enable" value="true" id="toggle-killmap-processing" class="btn btn-success">
-                        Enable KillMap Processing
-                    </button>
-                <% } %>
+                <c:choose>
+                    <c:when test="${killMapProcessor.enabled}">
+                        <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
+                            Disable KillMap Processing
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <button type="submit" name="enable" value="true" id="toggle-killmap-processing" class="btn btn-success">
+                            Enable KillMap Processing
+                        </button>
+                    </c:otherwise>
+                </c:choose>
             </form>
         </div>
     </div>
@@ -106,19 +113,19 @@
     <ul class="nav nav-tabs my-4">
         <li class="nav-item">
             <a class="nav-link <%=currentPage == KillmapPage.MANUAL ? "active" : ""%>"
-               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual"%>">
+               href="${url.forPath(Paths.ADMIN_KILLMAPS)}/manual">
                 Enter IDs
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link <%=currentPage == KillmapPage.AVAILABLE ? "active" : ""%>"
-               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/available"%>">
+               href="${url.forPath(Paths.ADMIN_KILLMAPS)}/available">
                 Select Classes / Games
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link <%=currentPage == KillmapPage.QUEUE ? "active" : ""%>"
-               href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS + "/queue"%>">
+               href="${url.forPath(Paths.ADMIN_KILLMAPS)}/queue">
                 Queued Killmap Jobs
             </a>
         </li>
@@ -255,18 +262,18 @@
             <div class="col-12">
                 <div class="btn-group">
                     <a download="classes.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-classes">
                         <i class="fa fa-download me-1"></i>
                         Download classes table
                     </a>
                     <a download="classes.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=class&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-classes-csv">
                         as CSV
                     </a>
                     <a download="classes.json"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=class&fileType=json"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=class&fileType=json"
                        class="btn btn-sm btn-outline-secondary" id="download-classes-json">
                         as JSON
                     </a>
@@ -275,18 +282,18 @@
             <div class="col-12">
                 <div class="btn-group">
                     <a download="games.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-games">
                         <i class="fa fa-download me-1"></i>
                         Download games table
                     </a>
                     <a download="games.csv"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=game&fileType=csv"
                        class="btn btn-sm btn-outline-secondary" id="download-games-csv">
                         as CSV
                     </a>
                     <a download="games.json"
-                       href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%=currentPage%>&killmapType=game&fileType=json"
+                       href="${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%=currentPage%>&killmapType=game&fileType=json"
                        class="btn btn-sm btn-outline-secondary" id="download-games-json">
                         as JSON
                     </a>
@@ -297,8 +304,8 @@
 </div>
 
 <script type="module">
-    import DataTable from './js/datatables.mjs';
-    import $ from './js/jquery.mjs';
+    import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
     const postIds = function (idsString, formType, killmapType) {
@@ -415,7 +422,7 @@
     $(document).ready(function() {
         const classTable = new DataTable('#table-classes', {
             ajax: {
-                url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json',
+                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=class&fileType=json',
                 dataSrc: 'data'
             },
             columns: [
@@ -435,7 +442,7 @@
 
         const gameTable = new DataTable('#table-games', {
             ajax: {
-                url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json',
+                url: '${url.forPath(Paths.API_KILLMAP_MANAGEMENT)}?dataType=<%= currentPage %>&killmapType=game&fileType=json',
                 dataSrc: 'data'
             },
             columns: [

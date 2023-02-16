@@ -20,7 +20,7 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<link href="${pageContext.request.contextPath}/css/specific/game_scoreboard.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game_scoreboard.css")}" rel="stylesheet">
 
 <div id="scoreboard" class="modal fade" tabindex="-1">
     <div class="modal-dialog" style="max-width: 60rem;">

@@ -19,13 +19,14 @@
 
 --%>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 </div> <%-- closes #game-container --%>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
     (async function () {
         /** @type {PushSocket} */

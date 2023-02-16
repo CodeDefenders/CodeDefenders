@@ -33,6 +33,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet(Paths.ADMIN_SETTINGS)
 // TODO Does this enable CDI using @Property@Inject ?
@@ -43,6 +44,9 @@ public class AdminSystemSettings extends HttpServlet {
 
     @Inject
     private ConnectionFactory connectionFactory;
+
+    @Inject
+    private URLUtils url;
 
     public enum SETTING_NAME {
         SHOW_PLAYER_FEEDBACK {
@@ -266,7 +270,7 @@ public class AdminSystemSettings extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String responsePath = request.getContextPath() + "/admin/settings";
+        String responsePath = url.forPath("/admin/settings");
 
         switch (request.getParameter("formType")) {
             case "saveSettings":

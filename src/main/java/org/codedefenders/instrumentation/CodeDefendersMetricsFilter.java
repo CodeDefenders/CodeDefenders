@@ -17,7 +17,7 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.util;
+package org.codedefenders.instrumentation;
 
 import java.io.IOException;
 import java.util.stream.Stream;
@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.configuration.Configuration;
+import org.codedefenders.util.Paths;
 
 import io.prometheus.client.Counter;
 import io.prometheus.client.filter.MetricsFilter;
@@ -39,7 +40,7 @@ import io.prometheus.client.filter.MetricsFilter;
 @WebFilter(filterName = "metricsFilter")
 public class CodeDefendersMetricsFilter extends MetricsFilter {
     private static final Counter jsessionidIgnoredRequestsCounter = Counter.build()
-            .name("codedefenders_metricsfilter_jsessionid_ignored_requests")
+            .name("codedefenders_metrics_filter_jsessionid_ignored_requests")
             .help("The amount of requests our MetricsFilter did not sample because it contained a 'jsessionid' in the URL")
             .register();
 

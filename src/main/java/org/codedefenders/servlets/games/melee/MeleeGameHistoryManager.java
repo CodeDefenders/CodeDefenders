@@ -30,24 +30,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.game.MeleeScoreboardBean;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.scoring.ScoreCalculator;
-import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet(Paths.MELEE_HISTORY)
 public class MeleeGameHistoryManager extends HttpServlet {
 
     @Inject
-    private ScoreCalculator scoreCalculator;
-
-    @Inject
-    private UserService userService;
+    private URLUtils url;
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -58,28 +53,18 @@ public class MeleeGameHistoryManager extends HttpServlet {
 
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
         if (!gameIdOpt.isPresent()) {
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
+            response.sendRedirect(url.forPath(Paths.GAMES_HISTORY));
             return;
         }
         game = MeleeGameDAO.getMeleeGame(gameIdOpt.get());
 
         if (game == null || game.getState() != GameState.FINISHED) {
-            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
             return;
         }
 
         request.setAttribute("game", game);
 
-
-        // Compute the score and pass along the ScoreBoard bean?
-        MeleeScoreboardBean meleeScoreboardBean = new MeleeScoreboardBean(userService);
-        // Why ID is necessary here?
-        meleeScoreboardBean.setGameId(game.getId());
-        meleeScoreboardBean.setScores(scoreCalculator.getMutantScores(game.getId()),
-                scoreCalculator.getTestScores(game.getId()), scoreCalculator.getDuelScores(game.getId()));
-        meleeScoreboardBean.setPlayers(game.getPlayers());
-        // Set the preconditions for the score board
-        request.setAttribute("meleeScoreboardBean", meleeScoreboardBean);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_HISTORY_VIEW_JSP);
         dispatcher.forward(request, response);

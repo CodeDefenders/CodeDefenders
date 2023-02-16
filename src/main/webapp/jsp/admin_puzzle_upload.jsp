@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Puzzle Upload"); %>
 
@@ -31,7 +33,7 @@
 
     <p>Puzzle information is uploaded in a single zip file. For details on the convention, expand the description.</p>
 
-    <form id="uploadPuzzles" name="uploadPuzzles" action="<%=request.getContextPath() + Paths.ADMIN_PUZZLE_UPLOAD%>"
+    <form id="uploadPuzzles" name="uploadPuzzles" action="${url.forPath(Paths.ADMIN_PUZZLE_UPLOAD)}"
           class="form-width mb-3" method="post" enctype="multipart/form-data" autocomplete="off">
         <input type="hidden" name="formType" value="uploadPuzzles">
 

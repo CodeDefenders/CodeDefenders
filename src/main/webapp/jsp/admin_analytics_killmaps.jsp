@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("KillMap Analytics"); %>
 
@@ -55,16 +57,16 @@
         </div>
         <div class="col-12">
             <div class="btn-group">
-                <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
+                <a download="killmap-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=csv"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download">
                     <i class="fa fa-download me-1"></i>
                     Download table
                 </a>
-                <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=csv"
+                <a download="killmap-analytics.csv" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=csv"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-csv">
-                    as CSV
+                    as CS
                 </a>
-                <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?fileType=json"
+                <a download="killmap-analytics.json" href="${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=json"
                    type="button" class="btn btn-sm btn-outline-secondary" id="download-json">
                     as JSON
                 </a>
@@ -100,14 +102,14 @@
 </div>
 
 <script type="module">
-    import DataTable from './js/datatables.mjs';
-    import $ from './js/jquery.mjs';
+    import DataTable from '${url.forPath("/js/datatables.mjs")}';
+    import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
     $(document).ready(function () {
         const table = new DataTable('#tableKillmaps', {
             "ajax": {
-                "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_KILLMAP + "?fileType=json"%>",
+                "url": "${url.forPath(Paths.API_ANALYTICS_KILLMAP)}?fileType=json",
                 "dataSrc": "data"
             },
             "columns": [

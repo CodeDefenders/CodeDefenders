@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.NotImplementedException;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.dto.User;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.transaction.Transactional;
@@ -57,7 +58,7 @@ public class UserService {
     private final UserRepository userRepo;
 
     @Inject
-    public UserService(UserRepository userRepo, MetricsService metricsService) {
+    public UserService(UserRepository userRepo, MetricsRegistry metricsRegistry) {
         this.userRepo = userRepo;
 
         simpleUserForUserIdCache = CacheBuilder.newBuilder()
@@ -78,7 +79,7 @@ public class UserService {
                         }
                 );
 
-        metricsService.registerGuavaCache("simpleUserForUserId", simpleUserForUserIdCache);
+        metricsRegistry.registerGuavaCache("simpleUserForUserId", simpleUserForUserIdCache);
     }
 
 

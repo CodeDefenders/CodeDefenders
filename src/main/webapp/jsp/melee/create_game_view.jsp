@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
@@ -51,7 +53,7 @@
     %>
     <p class="text-center">
         Before you can start games, please
-        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>" class="text-center">upload
+        <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.MELEE_CREATE%>" class="text-center">upload
             a class under test</a>.
     </p>
     <%
@@ -66,7 +68,7 @@
     %>
     <div class="d-flex flex-wrap justify-content-center gap-5">
         <div id="create-game-settings" class="form-width">
-            <form id="create" action="<%=request.getContextPath()  + Paths.MELEE_SELECTION%>" method="post"
+            <form id="create" action="${url.forPath(Paths.MELEE_SELECTION)}" method="post"
                   class="needs-validation" autocomplete="off">
                 <input type="hidden" name="formType" value="createGame">
 
@@ -86,7 +88,7 @@
                             <span class="input-group-text position-relative cursor-pointer"
                                   title="Upload a class.">
                             <a class="stretched-link text-decoration-none"
-                               href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.MELEE_CREATE%>">
+                               href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.MELEE_CREATE%>">
                                 <i class="fa fa-upload"></i>
                             </a>
                         </span>
@@ -269,7 +271,7 @@
                     </c:when>
                     <c:otherwise>
                         <button type="submit" class="btn btn-primary" id="createButton">Create Game</button>
-                        <a href="${pageContext.request.contextPath}${param.origin}" id="cancel"
+                        <a href="${url.forPath(param.origin)}" id="cancel"
                            class="btn btn-outline-primary">Cancel</a>
                     </c:otherwise>
                 </c:choose>

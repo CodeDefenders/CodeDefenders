@@ -38,14 +38,11 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.SimpleUser;
-import org.codedefenders.execution.KillMap.KillMapType;
-import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -60,6 +57,7 @@ import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet(Paths.ADMIN_MONITOR)
 public class AdminMonitorGames extends HttpServlet {
@@ -81,6 +79,9 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private GameService gameService;
+
+    @Inject
+    private URLUtils url;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -189,7 +190,7 @@ public class AdminMonitorGames extends HttpServlet {
                     gameId = Integer.parseInt(gameSelectedViaPlayButton);
                 } catch (Exception e) {
                     messages.add("There was a problem with the form.");
-                    response.sendRedirect(request.getContextPath() + "/admin");
+                    response.sendRedirect(url.forPath("/admin"));
                     return;
                 }
 
@@ -202,7 +203,7 @@ public class AdminMonitorGames extends HttpServlet {
                 }
             }
         }
-        response.sendRedirect(request.getContextPath() + Paths.ADMIN_MONITOR);
+        response.sendRedirect(url.forPath(Paths.ADMIN_MONITOR));
     }
 
     private void startStopGame(int gameId, GameState pNewState) {
