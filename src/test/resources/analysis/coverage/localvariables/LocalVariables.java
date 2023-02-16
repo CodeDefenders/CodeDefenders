@@ -36,6 +36,29 @@ public class LocalVariables {
 
                 j = doThrow(),
 
-                k = 2;
+                k;
+    }
+
+    @Call
+    public void localVariableDeclWithMultipleVariables2() {
+        int
+                i = 1, j = doThrow(),
+
+                k;
+    }
+
+    @Call
+    public void uncoveredParam1() {
+        Runnable s =
+                () -> {};
+
+        ;
+    }
+
+    @Call
+    public void uncoveredParam2() {
+        Runnable s = () -> {};
+
+        ;
     }
 }

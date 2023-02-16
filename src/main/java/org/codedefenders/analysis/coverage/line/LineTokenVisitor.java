@@ -616,14 +616,22 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(SynchronizedStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
+            AstCoverageStatus exprStatus = astCoverage.get(stmt.getExpression());
 
             JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getExpression())
                     .skipOne()
                     .find(JavaToken.Kind.RPAREN);
             int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
 
-            i.lines(stmt.getBegin().get().line, endLine)
-                    .cover(status.status());
+            if (exprStatus.statusAfter().isNotCovered()) {
+                i.lines(beginOf(stmt), endOf(stmt.getExpression()))
+                        .cover(status.status());
+                i.lines(endOf(stmt.getExpression()), endLine)
+                        .cover(exprStatus.statusAfter().toLineCoverageStatus());
+            } else {
+                i.lines(beginOf(stmt), endLine)
+                        .cover(status.status());
+            }
         }
     }
 

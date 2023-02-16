@@ -213,4 +213,16 @@ public class TernaryOperators {
                 ? doGet(1)
                 : doGet(0));
     }
+
+    @Call(params = "1")
+    public void strangeCoverage1(int i) {
+        boolean x = i == 1
+                ? doGet(this)
+                instanceof
+                Object
+                : this
+                instanceof // partly_covered on this line?
+                Object;
+    }
+
 }
