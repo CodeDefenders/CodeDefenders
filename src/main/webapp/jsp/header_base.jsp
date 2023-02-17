@@ -34,6 +34,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
+    <!-- Context path of server, so plain JS code (without JSP templating) can construct a correct url. -->
+    <script>
+        const contextPath = "${url.forPath("/")}";
+        const applicationURL = "${url.getAbsoluteURLForPath("/")}";
+    </script>
+
     <link href="${url.forPath("/css/global/variables.css")}" rel="stylesheet">
 
     <!-- Favicon.ico -->
