@@ -1212,12 +1212,21 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         StatusAfter statusAfter;
         getStatusAfter: {
-            // no ins covered -> assert wasn't executed
-            // all ins covered -> assert threw
+            // all ins covered means assert threw
             switch (keywordStatus.instructionStatus()) {
                 case NOT_COVERED:
-                case FULLY_COVERED:
                     statusAfter = StatusAfter.NOT_COVERED;
+                    break getStatusAfter;
+                case FULLY_COVERED:
+                    if (branchStatus.totalBranches() == 2) {
+                        if (branchStatus.coveredBranches() == 2) {
+                            statusAfter = StatusAfter.COVERED;
+                        } else {
+                            statusAfter = StatusAfter.NOT_COVERED;
+                        }
+                    } else {
+                        statusAfter = StatusAfter.MAYBE_COVERED;
+                    }
                     break getStatusAfter;
             }
 
@@ -1399,7 +1408,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
         AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
 
-        AstCoverageStatus status = mergeCoverageForSequence(valueStatus, targetStatus);
+        AstCoverageStatus status = mergeCoverageForSequence(targetStatus, valueStatus);
 
         if (status.isEmpty() && status.statusAfter().isUnsure()) {
             DetailedLine targetLineStatus = mergeLineCoverage(expr.getTarget());

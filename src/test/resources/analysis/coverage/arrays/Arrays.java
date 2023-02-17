@@ -26,7 +26,7 @@ public class Arrays {
                 doThrow()
         };
 
-        ; // empty stmt to check if the coverage after the above stmt is correct
+        // block: ignore_end_status
     }
 
     @Call
@@ -38,7 +38,7 @@ public class Arrays {
                         .get(2)
         };
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -49,7 +49,7 @@ public class Arrays {
                 doGet(1)
         };
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -58,7 +58,7 @@ public class Arrays {
                 doThrow()
         ];
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -69,7 +69,7 @@ public class Arrays {
                         .get(1)
         ];
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -80,7 +80,7 @@ public class Arrays {
                 doThrow()
         ];
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -93,7 +93,7 @@ public class Arrays {
                         .get(1)
         ];
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call

@@ -125,7 +125,7 @@ public class CoverageTest {
         AstCoverage astCoverage = astVisitor.finish();
 
         LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
-        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens);
+        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens, true);
         lineTokenVisitor.visit(compilationUnit, null);
 
         LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();

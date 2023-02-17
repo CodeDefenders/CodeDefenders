@@ -35,7 +35,7 @@ public class MethodCalls {
                 .doThrow()
                 .call();
 
-        ; // empty stmt to check if the coverage after the above stmt is correct
+        // block: ignore_end_status
     }
 
     @Call
@@ -48,7 +48,7 @@ public class MethodCalls {
                         .field
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -63,7 +63,7 @@ public class MethodCalls {
                         [0]
         );
 
-        ; // empty stmt to check if the coverage after the above stmt is correct
+        // block: ignore_end_status
     }
 
     @Call
@@ -109,7 +109,7 @@ public class MethodCalls {
                 doThrow()
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -127,7 +127,7 @@ public class MethodCalls {
                 doThrow();
         });
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -143,7 +143,7 @@ public class MethodCalls {
 
                 );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call

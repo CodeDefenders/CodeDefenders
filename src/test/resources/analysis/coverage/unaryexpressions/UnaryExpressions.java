@@ -32,7 +32,7 @@ public class UnaryExpressions {
         i
         ++;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -42,7 +42,7 @@ public class UnaryExpressions {
                 i
                 ++;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -53,7 +53,7 @@ public class UnaryExpressions {
                 ++
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -63,7 +63,7 @@ public class UnaryExpressions {
                 !
                 b;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -72,7 +72,7 @@ public class UnaryExpressions {
         doGet(i)[0]
                 ++;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -81,7 +81,7 @@ public class UnaryExpressions {
         int j = doGet(i)[0]
                 ++;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -92,7 +92,7 @@ public class UnaryExpressions {
                 ++
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -102,7 +102,7 @@ public class UnaryExpressions {
                 !
                 doGet(b)[0];
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -112,7 +112,7 @@ public class UnaryExpressions {
                 .get(i)[0]
                 ++;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -122,7 +122,7 @@ public class UnaryExpressions {
                 .get(i)[0]
                 ++;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -134,7 +134,7 @@ public class UnaryExpressions {
                 ++
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -145,7 +145,7 @@ public class UnaryExpressions {
                 MethodChain.create()
                         .get(b)[0];
 
-        ;
+        // block: ignore_end_status
     }
 
 }

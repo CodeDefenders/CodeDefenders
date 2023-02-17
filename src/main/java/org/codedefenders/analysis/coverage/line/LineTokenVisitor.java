@@ -34,6 +34,7 @@ import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.BlockComment;
+import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.comments.JavadocComment;
 import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.AnnotationExpr;
@@ -123,12 +124,18 @@ import static org.codedefenders.util.JavaParserUtils.lineOf;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
-    AstCoverage astCoverage;
-    LineTokens lineTokens;
+    private final AstCoverage astCoverage;
+    private final LineTokens lineTokens;
+    private final boolean testMode;
 
     public LineTokenVisitor(AstCoverage astCoverage, LineTokens lineTokens) {
+        this(astCoverage, lineTokens, false);
+    }
+
+    public LineTokenVisitor(AstCoverage astCoverage, LineTokens lineTokens, boolean testMode) {
         this.astCoverage = astCoverage;
         this.lineTokens = lineTokens;
+        this.testMode = testMode;
     }
 
     // region helpers
@@ -173,7 +180,8 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                             List<? extends Node> statements,
                             AstCoverageStatus status,
                             int beginLine,
-                            int endLine) {
+                            int endLine,
+                            boolean ignoreEndStatus) {
         // if the block is empty, cover it now
         if (statements.isEmpty() || status.isEmpty()) {
             i.lines(beginLine, endLine).block(status.status());
@@ -217,20 +225,20 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                     lastNotCoveredLine = beginOf(stmt) - 1;
                     break;
 
-                case EMPTY:
-                    if (currentStatus.isCovered()) {
-                        lastCoveredLine =
-                        lastMaybeCoveredLine =
-                        lastNotCoveredLine = beginOf(stmt) - 1;
+                // case EMPTY:
+                //     if (currentStatus.isCovered()) {
+                //         lastCoveredLine =
+                //         lastMaybeCoveredLine =
+                //         lastNotCoveredLine = beginOf(stmt) - 1;
 
-                    } else if (currentStatus.isUnsure()) {
-                        lastMaybeCoveredLine =
-                        lastNotCoveredLine = beginOf(stmt) - 1;
+                //     } else if (currentStatus.isUnsure()) {
+                //         lastMaybeCoveredLine =
+                //         lastNotCoveredLine = beginOf(stmt) - 1;
 
-                    } else if (currentStatus.isNotCovered()) {
-                        lastNotCoveredLine = beginOf(stmt) - 1;
-                    }
-                    break;
+                //     } else if (currentStatus.isNotCovered()) {
+                //         lastNotCoveredLine = beginOf(stmt) - 1;
+                //     }
+                //     break;
             }
 
             if (!stmtStatus.isEmpty() && !stmtStatus.statusAfter().alwaysJumps()) {
@@ -241,7 +249,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         // check how the space after the last stmt is covered
         // we use the block's statusAfter for this, since it is updated from a nodes where
         // more information is available, e.g. MethodDeclaration, IfStmt
-        switch (status.statusAfter()) {
+        StatusAfter endStatus = ignoreEndStatus
+                ? currentStatus
+                : status.statusAfter();
+        switch (endStatus) {
             case COVERED:
                 lastCoveredLine = endLine;
                 lastMaybeCoveredLine = lastCoveredLine;
@@ -419,11 +430,15 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(BlockStmt block, Void arg) {
         try (TokenInserter i = lineTokens.forNode(block, () -> super.visit(block, arg))) {
+            boolean ignoreEndStatus = testMode && block.getOrphanComments().stream()
+                    .map(Comment::getContent)
+                    .anyMatch(content -> content.matches("\\s*block:\\s*ignore_end_status\\s*"));
             handleBlock(i,
                     block.getStatements(),
                     astCoverage.get(block),
                     beginOf(block),
-                    endOf(block));
+                    endOf(block),
+                    ignoreEndStatus);
         }
     }
 
@@ -592,7 +607,8 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                             entry.getStatements(),
                             status,
                             beginLine,
-                            endLine);
+                            endLine,
+                            false);
                     break;
                 }
                 case EXPRESSION: {

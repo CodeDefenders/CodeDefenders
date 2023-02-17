@@ -61,7 +61,7 @@ public class Casts {
         doCall();
         consumeInt(i);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "null", exception = NullPointerException.class)
@@ -72,7 +72,7 @@ public class Casts {
                 i
         };
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)

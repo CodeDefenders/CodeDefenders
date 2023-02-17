@@ -37,7 +37,7 @@ public class Assertions {
                 i != 0
                 : "";
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
@@ -46,7 +46,7 @@ public class Assertions {
                 doGet(i) != 0
                 : "";
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
@@ -55,7 +55,7 @@ public class Assertions {
                 i != 0
                 : "" + doGet(i);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
@@ -64,7 +64,7 @@ public class Assertions {
                 doGet(i) != 0
                 : "" + doGet(i);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = {"0", "1"}, exception = AssertionError.class)
@@ -73,7 +73,7 @@ public class Assertions {
                 doGet(i) != 0
                 : "" + doGet(i);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0")
@@ -82,7 +82,7 @@ public class Assertions {
                 doThrow() != 0
                 : "" + doGet(i);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0")
@@ -91,7 +91,7 @@ public class Assertions {
                 doThrow() != 0
                 : "";
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0")
@@ -100,35 +100,35 @@ public class Assertions {
                 i != 0
                 : "" + doThrow();
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
     public void throwingAssertion1OneLine(int i) {
         assert i != 0 : "";
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
     public void throwingAssertion2OneLine(int i) {
         assert doGet(i) != 0 : "";
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
     public void throwingAssertion3OneLine(int i) {
         assert i != 0 : "" + doGet(i);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
     public void throwingAssertion4OneLine(int i) {
         assert doGet(i) != 0 : "" + doGet(i);
 
-        ;
+        // block: ignore_end_status
     }
 }
 

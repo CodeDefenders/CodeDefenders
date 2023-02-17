@@ -99,7 +99,7 @@ public class Assignments {
             =
             doThrow();
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -112,7 +112,7 @@ public class Assignments {
                 doThrow()
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -126,7 +126,7 @@ public class Assignments {
 
                 doGet(1);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -137,9 +137,9 @@ public class Assignments {
 
                 =
 
-                doThrow()
+                doThrow();
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -153,10 +153,10 @@ public class Assignments {
         MethodChain.create()
                 .call()
                 .doThrow()
-                .get(1)
+                .get(1);
 
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call

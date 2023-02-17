@@ -52,13 +52,13 @@ public class LocalVariables {
         Runnable s =
                 () -> {};
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
     public void uncoveredParam2() {
         Runnable s = () -> {};
 
-        ;
+        // block: ignore_end_status
     }
 }

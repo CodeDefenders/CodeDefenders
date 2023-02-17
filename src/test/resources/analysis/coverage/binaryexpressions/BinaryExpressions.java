@@ -23,7 +23,7 @@ public class BinaryExpressions {
                 &&
                 true;
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -34,7 +34,7 @@ public class BinaryExpressions {
                 true
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -45,14 +45,14 @@ public class BinaryExpressions {
                 &&
                 doGet(true);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
     public void shortCircuit2OneLine() {
         boolean b = doGet(false) && doGet(true);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -64,14 +64,14 @@ public class BinaryExpressions {
                 doGet(true)
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
     public void shortCircuit2bOneLine() {
         consume(doGet(false) && doGet(true));
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -82,7 +82,7 @@ public class BinaryExpressions {
                 MethodChain.create()
                         .get(true);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -98,7 +98,7 @@ public class BinaryExpressions {
                         .get(true)
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -110,7 +110,7 @@ public class BinaryExpressions {
                 MethodChain.create()
                         .get(true);
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -123,7 +123,7 @@ public class BinaryExpressions {
                         .get(true)
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call

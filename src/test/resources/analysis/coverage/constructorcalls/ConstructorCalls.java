@@ -39,7 +39,7 @@ public class ConstructorCalls {
                 doThrow()
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -60,7 +60,7 @@ public class ConstructorCalls {
                         .get(1)
         );
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
@@ -70,7 +70,7 @@ public class ConstructorCalls {
             doThrow();
         });
 
-        ;
+        // block: ignore_end_status
     }
 
     @Call
