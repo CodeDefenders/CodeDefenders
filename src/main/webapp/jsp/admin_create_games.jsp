@@ -531,7 +531,7 @@
         import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
-        import {formatTime} from '${url.forPath("./js/codedefenders_game.mjs")}';
+        import {formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
         const loggedInUserId = ${login.userId};
 
