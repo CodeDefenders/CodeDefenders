@@ -1,7 +1,7 @@
 import utils.Call;
 import utils.MethodChain;
 
-import static utils.Utils.consume;
+import static utils.Utils.consumeInt;
 import static utils.Utils.doCall;
 import static utils.Utils.doGet;
 
@@ -88,9 +88,5 @@ public class Casts {
                 (int)
                 MethodChain.create()
                     .get((Integer) null);
-    }
-
-    public void consumeInt(int i) {
-        // TODO: put in utils
     }
 }

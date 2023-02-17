@@ -13,10 +13,6 @@ public class MethodChain {
         return this;
     }
 
-    public MethodChain consume2(int i, int j) {
-        return this;
-    }
-
     public MethodChain callLambda(Runnable r) {
         r.run();
         return this;
@@ -37,9 +33,5 @@ public class MethodChain {
 
     public <T> T get(T obj) {
         return obj;
-    }
-
-    public boolean getCondition(boolean condition) {
-        return condition;
     }
 }

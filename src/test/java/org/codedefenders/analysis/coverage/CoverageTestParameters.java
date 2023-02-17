@@ -122,7 +122,7 @@ class CoverageTestParameters implements ArgumentsProvider {
     public Stream<? extends Arguments> provideArguments(ExtensionContext extensionContext) throws Exception {
         return Stream.of(
                 // playground
-                defaultRunnerTestCase("playground/Playground.java"),
+                // defaultRunnerTestCase("playground/Playground.java"),
 
                 // class level
                 simpleTestCase("classes/Classes.java", "classes/ClassesTest.java"),
@@ -214,8 +214,21 @@ class CoverageTestParameters implements ArgumentsProvider {
                 defaultRunnerTestCase("enclosedexprs/EnclosedExprs.java"),
                 emptyRunnerTestCase("enclosedexprs/EnclosedExprs.java"),
 
+                // other tests
+                defaultRunnerTestCase("etc/Etc.java"),
+                emptyRunnerTestCase("etc/Etc.java"),
+
                 // real CUT tests
-                simpleTestCase("cuts/xmlelement/XmlElement.java", "cuts/xmlelement/XmlElementTest.java")
+                simpleTestCase("cuts/bytevector/ByteVector.java",
+                        "cuts/bytevector/ByteVectorTest1.java"),
+                simpleTestCase("cuts/bytevector/ByteVector.java",
+                        "cuts/bytevector/ByteVectorTest2.java"),
+
+                simpleTestCase("cuts/caseinsensitivestring/CaseInsensitiveString.java",
+                        "cuts/caseinsensitivestring/CaseInsensitiveStringTest.java"),
+
+                simpleTestCase("cuts/xmlelement/XmlElement.java",
+                        "cuts/xmlelement/XmlElementTest.java")
         );
     }
 }

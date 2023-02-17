@@ -9,5 +9,8 @@ public class XmlElementTest {
 
         a.getElement("b");
         a.addSubElement("b.c.d");
+
+        a.equals(null);
+        a.hashCode();
     }
 }

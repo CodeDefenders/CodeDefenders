@@ -9,11 +9,11 @@ public class Utils {
 
     }
 
-    public static <T> T doGet(T obj) {
-        return obj;
+    public static <T> T doGet(T arg) {
+        return arg;
     }
 
-    public static int doThrow(Object arg) {
+    public static <T> T doThrow(T arg) {
         throw new TestRuntimeException();
     }
 
@@ -39,6 +39,10 @@ public class Utils {
         } catch (TestRuntimeException ignored) {
 
         }
+    }
+
+    public static void consumeInt(int i) {
+
     }
 
     public static void consume(int i) {
