@@ -1,13 +1,14 @@
 import utils.Call;
+import utils.MethodChain;
 
 import static utils.Utils.doCall;
 import static utils.Utils.doThrow;
 
 /**
- * <p>do-while loops
- * <p><b>JaCoCo coverage</b>: only covers the condition
- * <p><b>extended coverage</b>: covers space from 'do' keyword up to body based on wheter the start of the body has been
- *                              executed. covers space from body to end based on wheter the condition has been executed.
+ * <p>Do-while loops
+ * <p>JaCoCo coverage: Only covers the condition.
+ * <p>Extended coverage: Covers space from 'do' keyword up to body based on wheter the start of the body has been
+ *                       executed. Covers space from body to end based on wheter the condition has been executed.
  */
 public class DoWhileLoops {
     @Call
@@ -35,7 +36,9 @@ public class DoWhileLoops {
         int i = 0;
 
         // only exception
-        do {
+        do
+
+        {
             doThrow();
 
         } while(i == 0);
@@ -92,5 +95,25 @@ public class DoWhileLoops {
 
         } while (i == 0);
 
+    }
+
+    @Call
+    public void exceptionInCondition() {
+        do {
+
+        }
+
+        while (doThrow() == 0);
+    }
+
+    @Call
+    public void exceptionFromCoveredExprInCondition() {
+        do {
+
+        }
+
+        while (MethodChain.create()
+                .doThrow()
+                .get(0) == 0);
     }
 }

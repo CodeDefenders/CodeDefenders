@@ -5,7 +5,21 @@ import static utils.Utils.consumeInt;
 import static utils.Utils.doCall;
 import static utils.Utils.doGet;
 
+/**
+ * <p>Casts
+ * <p>JaCoCo coverage: Only covers the casted expression if it's coverable.
+ * <p>Extended coverage: Covers the cast as well.
+ */
 public class Casts {
+
+    @Call
+    public void regularCast() {
+        Object o = 1;
+
+        Integer i =
+                (Integer)
+                o;
+    }
 
     @Call(params = "1")
     public void implicitCastFromIntToInteger(int j) {

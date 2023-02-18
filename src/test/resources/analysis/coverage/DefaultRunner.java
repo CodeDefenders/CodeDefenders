@@ -1,6 +1,7 @@
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,16 +15,19 @@ public class DefaultRunner {
     public static void main(String[] args) throws Exception {
         // get the class
         Class<?> clazz = Class.forName(args[0]);
-
-        // instantiate the class
-        Constructor<?> constructor = clazz.getConstructor();
-        Object instance = constructor.newInstance();
+        Object instance = null;
 
         for (Method method : clazz.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(Call.class)) {
                 continue;
             }
             method.setAccessible(true);
+
+            // instantiate the class if necessary
+            if (!Modifier.isStatic(method.getModifiers())) {
+                Constructor<?> constructor = clazz.getConstructor();
+                instance = constructor.newInstance();
+            }
 
             // parse parameters
             Object[][] paramSets = getParameters(method);

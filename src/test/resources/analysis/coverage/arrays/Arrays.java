@@ -4,16 +4,27 @@ import utils.MethodChain;
 import static utils.Utils.doThrow;
 import static utils.Utils.doGet;
 
+/**
+ * <p>Arrays
+ * <p>JaCoCo coverage: Doesn't cover array expressions themselves. Only coverable expressions inside the bounds, index
+ *                     or initializers are covered.
+ * <p>Extended coverage: Covers array expressions according to the coverage of the child expressions. In the case of
+ *                       exceptions, we cover the parts after the exceptional expression as NOT_COVERED.
+ */
 public class Arrays {
 
     @Call
     public void regularArrayUsage() {
-        int[] i = new int[] {
+        int[] i =
+                new
+                int[] {
                 1,
                 2
         };
 
-        int[] j = new int[3];
+        int[] j =
+                new
+                int[3];
 
         int k =
                 i[1];
@@ -42,12 +53,8 @@ public class Arrays {
     }
 
     @Call
-    public void excpetionAndMethodCallInInit() {
-        int[] i = new int[] {
-                doThrow(),
-
-                doGet(1)
-        };
+    public void exceptionInInitSingleLine() {
+        int[] i = new int[] { 1, doThrow() };
 
         // block: ignore_end_status
     }
@@ -62,7 +69,7 @@ public class Arrays {
     }
 
     @Call
-    public void exceptionInCoveredBounds() {
+    public void exceptionFromCoveredExprInBounds() {
         int[] i = new int[
                 MethodChain.create()
                         .doThrow()
@@ -84,7 +91,16 @@ public class Arrays {
     }
 
     @Call
-    public void exceptionInCoveredIndex() {
+    public void exceptionInIndexSingleLine() {
+        int[] i = new int[2];
+
+        int j = i[doThrow()];
+
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void exceptionFromCoveredExprInIndex() {
         int[] i = new int[2];
 
         int j = i[
@@ -111,6 +127,8 @@ public class Arrays {
                 {3, doThrow()},
                 {5, 6}
         };
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -120,6 +138,8 @@ public class Arrays {
                 {doGet(3), doThrow()},
                 {5, 6}
         };
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -132,6 +152,8 @@ public class Arrays {
                 },
                 {5, 6}
         };
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -146,5 +168,7 @@ public class Arrays {
                 },
                 {5, 6}
         };
+
+        // block: ignore_end_status
     }
 }

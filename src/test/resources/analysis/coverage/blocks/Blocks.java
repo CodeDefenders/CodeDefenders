@@ -7,9 +7,9 @@ import static utils.Utils.doCall;
 public class Blocks {
 
     /**
-     * <p>code blocks that are executed to the end
-     * <p><b>JaCoCo coverage</b>: doesn't consider code blocks at all
-     * <p><b>extended coverage</b>: covers the block up to (and including) the closing brace
+     * <p>Code blocks that are executed to the end
+     * <p>JaCoCo coverage: Doesn't consider code blocks at all.
+     * <p>Extended coverage: Covers the block up to (and including) the closing brace.
      */
     @Call
     public void coveredToEnd() {
@@ -17,9 +17,9 @@ public class Blocks {
     }
 
     /**
-     * <p>code blocks with return/break/exception/etc.
-     * <p><b>JaCoCo coverage</b>: doesn't consider code blocks at all
-     * <p><b>extended coverage</b>: covers the block up to the jump
+     * <p>Code blocks with return/break/exception/etc
+     * <p>JaCoCo coverage: Doesn't consider code blocks at all.
+     * <p>Extended coverage: Covers the block up to the jump.
      */
     @Call
     public void earlyReturn() {
@@ -39,11 +39,11 @@ public class Blocks {
     }
 
     /**
-     * <p>code blocks with local classes/anonymous classes/lambdas
-     * <p><b>JaCoCo coverage</b>: doesn't consider code blocks at all
-     * <p><b>extended coverage</b>: covers the block around the classes/methods (as appropriate), but not the
-     *                              classes/methods themselves, as their coverage is not guaranteed even if the
-     *                              surrounding code is covered
+     * <p>Code blocks with local classes/anonymous classes/lambdas
+     * <p>JaCoCo coverage: Doesn't consider code blocks at all
+     * <p>extended coverage: Covers the block around the classes/methods (as appropriate), but not the
+     *                       classes/methods themselves, as their coverage is not guaranteed even if the
+     *                       surrounding code is covered
      */
     @Call
     public void independentNodes() {
@@ -71,9 +71,9 @@ public class Blocks {
     }
 
     /**
-     * <p>nested code blocks with return
-     * <p><b>JaCoCo coverage</b>: doesn't consider code blocks at all
-     * <p><b>extended coverage</b>: covers each nested block up to the return statement, but not past it
+     * <p>Nested code blocks with return
+     * <p>JaCoCo coverage: Doesn't consider code blocks at all.
+     * <p>Extended coverage: Covers each nested block up to the return statement, but not past it.
      */
     @Call
     public void nestedBlocks() {

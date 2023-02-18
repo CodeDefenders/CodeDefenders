@@ -1,35 +1,55 @@
+import utils.Call;
 import utils.TestRuntimeException;
 import utils.ThrowingClass;
 
 import static utils.Utils.doCall;
+import static utils.Utils.doCatch;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
 public class Constructors {
+    @Call
+    public static void test() {
+        new Constructors();
+        new Constructors(0);
+        doCatch(() -> new Constructors(0, 0));
+        new Constructors.CompactConstructorsEmpty();
+        doCatch(Constructors.CompactConstructorsEmptyException1::new);
+        doCatch(Constructors.CompactConstructorsEmptyException2::new);
+        new Constructors.CompactConstructors(0);
+        doCatch(() -> new Constructors.CompactConstructorsException1(0));
+        doCatch(() -> new Constructors.CompactConstructorsException2(0));
+        doCatch(Constructors.ThrowingBaseClass::new);
+        doCatch(Constructors.ThrowingBaseClassWithSuper::new);
+        doCatch(Constructors.ThrowingBaseClassWithSuperAndCoveredArg1::new);
+        doCatch(Constructors.ThrowingBaseClassWithSuperAndCoveredArg2::new);
+    }
+
+
     /**
-     * <p>empty constructor
-     * <p><b>JaCoCo coverage</b>: covers the opening and closing brace (closing brace of methods with implicit
-     *                            return is always covered)
-     * <p><b>extended coverage</b>: covers the entire signature and sets the body to covered (coverage of the body
-     *                              is handled by the code block)
+     * <p>Empty constructor
+     * <p>JaCoCo coverage: Covers the opening and closing brace (closing brace of methods with implicit
+     *                     return is always covered).
+     * <p>Extended coverage: Covers the entire signature and sets the body to covered (coverage of the body
+     *                       is handled by the code block).
      */
     Constructors() {
 
     }
 
     /**
-     * <p>constructor with return
-     * <p><b>JaCoCo coverage</b>: covers the opening brace
-     * <p><b>extended coverage</b>: covers the entire signature (coverage of the body is handled by the code block)
+     * <p>Constructor with return
+     * <p>JaCoCo coverage: Covers the opening brace (and the return instead of the closing brace).
+     * <p>Extended coverage: Covers the entire signature (coverage of the body is handled by the code block).
      */
     Constructors(int i) {
         return;
     }
 
     /**
-     * <p>constructor with exception
-     * <p><b>JaCoCo coverage</b>: covers the opening brace
-     * <p><b>extended coverage</b>: covers the entire signature (coverage of the body is handled by the code block)
+     * <p>Constructor with exception
+     * <p>JaCoCo coverage: Covers the opening brace and closing brace.
+     * <p>Extended coverage: Covers the entire signature (coverage of the body is handled by the code block).
      */
     Constructors(int i, int j) {
         doThrow();
@@ -37,9 +57,9 @@ public class Constructors {
 
     record CompactConstructorsEmpty() {
         /**
-         * <p>compact constructor of empty record
-         * <p><b>JaCoCo coverage</b>: covers the opening brace and closing brace
-         * <p><b>extended coverage</b>: covers the entire signature (coverage of the body is handled by the code block)
+         * <p>Compact constructor of empty record
+         * <p>JaCoCo coverage: Covers the opening brace and closing brace.
+         * <p>Extended coverage: Covers the entire signature (coverage of the body is handled by the code block).
          */
         CompactConstructorsEmpty {
 
@@ -59,10 +79,10 @@ public class Constructors {
 
     record CompactConstructors(int i) {
         /**
-         * <p>compact constructor of non-empty record
-         * <p><b>JaCoCo coverage</b>: covers the opening brace, closing brace and constructor name (probably for the
-         *                            implicit field initialization)
-         * <p><b>extended coverage</b>: covers the entire signature (coverage of the body is handled by the code block)
+         * <p>Compact constructor of non-empty record
+         * <p>JaCoCo coverage: Covers the opening brace, closing brace and constructor name (probably for the
+         *                     implicit field initialization).
+         * <p>Extended coverage: Covers the entire signature (coverage of the body is handled by the code block).
          */
         CompactConstructors {
 

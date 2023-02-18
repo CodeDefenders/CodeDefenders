@@ -7,6 +7,12 @@ import static utils.Utils.doThrow;
 import static utils.Utils.doCall;
 import static utils.Utils.doGet;
 
+/**
+ * <p>Constructor calls
+ * <p>JaCoCo coverage: Covers the 'new' keyword.
+ * <p>Extended coverage: Covers the call like a method call. If the call has an anonymous inner class declaration,
+ *                       it is reset, such that it can be covered like a class.
+ */
 public class ConstructorCalls {
 
     @Call
@@ -89,6 +95,26 @@ public class ConstructorCalls {
                 doGet(1));
     }
 
+    @Call
+    public void anonymousInnerClass1() {
+        new Runnable() {
+           int i = 1;
 
+           public void run() {
+               i = 2;
+           }
+        };
+    }
 
+    @Call
+    public void anonymousInnerClass2() {
+        new Runnable()
+        {
+
+            int i = 1;
+
+            public void run() {
+                i = 2;
+            }};
+    }
 }

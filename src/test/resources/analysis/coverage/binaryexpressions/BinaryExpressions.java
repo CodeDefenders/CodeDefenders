@@ -6,6 +6,13 @@ import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 import static utils.Utils.doThrowBoolean;
 
+/**
+ * <p>Binary Expressions
+ * <p>JaCoCo coverage: Usually doesn't cover binary expressions themselves, only coverable sub-expressions.
+ *                     However, if the binary expressions short-circuits and the rhs expression is coverable,
+ *                     one line of the rhs expression is PARTLY_COVERED instead of NOT_COVERED.
+ * <p>Extended coverage: Covers uncoverable expressions if possible, and covers the space between the lhs and rhs.
+ */
 public class BinaryExpressions {
 
     @Call
@@ -44,6 +51,28 @@ public class BinaryExpressions {
                 doGet(false)
                 &&
                 doGet(true);
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "false, true")
+    public void shortCircuit3(boolean False, boolean True) {
+        // not great
+        boolean b =
+                False
+                &&
+                True;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "false, true")
+    public void shortCircuit4(boolean False, boolean True) {
+        // not great
+        boolean b =
+                False
+                &&
+                doGet(True);
 
         // block: ignore_end_status
     }
@@ -247,9 +276,9 @@ public class BinaryExpressions {
     public void nestedException3() {
         int i =
                 1
-                        +
-                        1
-                        +
-                        doThrow();
+                +
+                1
+                +
+                doThrow();
     }
 }

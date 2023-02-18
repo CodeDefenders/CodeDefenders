@@ -5,6 +5,13 @@ import static utils.Utils.consume;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Assignments
+ * <p>JaCoCo coverage: Usually covers the first line of the assignment target. This is not always the case though, e.g.
+ *                     if the assignment expression is method call argument.
+ * <p>Extended coverage: Covers the target and value if possible. Covers the space between target and value
+ *                       according to the coverage.
+ */
 public class Assignments {
 
     @Call

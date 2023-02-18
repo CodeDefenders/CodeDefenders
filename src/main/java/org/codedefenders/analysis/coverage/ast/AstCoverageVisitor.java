@@ -945,34 +945,33 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         super.visit(stmt, arg);
 
         AstCoverageStatus bodyStatus = astCoverage.get(stmt.getBody());
-        DetailedLine conditionStatus = mergeLineCoverage(stmt.getCondition());
-        switch (conditionStatus.branchStatus()) {
+        AstCoverageStatus conditionStatus = astCoverage.get(stmt.getCondition());
+        DetailedLine conditionLineStatus = mergeLineCoverage(stmt.getCondition());
+
+        AstCoverageStatus status = mergeCoverageForSequence(bodyStatus, conditionStatus);
+        if (status.isEmpty()) {
+            status = AstCoverageStatus.fromStatus(conditionLineStatus.branchStatus());
+        }
+
+        switch (conditionLineStatus.branchStatus()) {
             case NOT_COVERED:
-                if (bodyStatus.isCovered()) {
-                    // body is COVERED -> set tree status to COVERED, but remember the condition is NOT_COVERED
-                    astCoverage.put(stmt, AstCoverageStatus.covered()
-                            .withStatusAfter(StatusAfter.NOT_COVERED)
-                            .withSelfStatus(LineCoverageStatus.NOT_COVERED));
-                } else {
-                    // body is EMPTY or NOT_COVERED -> set body and loop to NOT_COVERED
-                    astCoverage.put(stmt, AstCoverageStatus.notCovered());
-                    astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.NOT_COVERED);
-                }
+                LineCoverageStatus selfStatus = conditionStatus.status().upgrade(LineCoverageStatus.NOT_COVERED);
+                status = status.withStatusAfter(StatusAfter.NOT_COVERED)
+                        .withSelfStatus(selfStatus);
                 break;
             case PARTLY_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.covered()
-                        .withStatusAfter(StatusAfter.MAYBE_COVERED));
-                astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.FULLY_COVERED);
+                status = status.withStatusAfter(StatusAfter.MAYBE_COVERED);
                 break;
             case FULLY_COVERED:
-                astCoverage.put(stmt, AstCoverageStatus.covered());
-                astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.FULLY_COVERED);
+                status = status.updateStatus(LineCoverageStatus.FULLY_COVERED)
+                        .withStatusAfter(StatusAfter.COVERED);
                 break;
             case EMPTY:
-                // inherit coverage from body
-                astCoverage.put(stmt, bodyStatus.clearSelfStatus());
                 break;
         }
+
+        astCoverage.updateStatus(stmt.getBody(), status.status());
+        astCoverage.put(stmt, status);
     }
 
     // TODO: the closing brace is also covered. what instructions does it represent?

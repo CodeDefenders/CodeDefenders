@@ -295,11 +295,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void handleTypeDeclaration(TokenInserter i, TypeDeclaration<?> decl, AstCoverageStatus status) {
         i.node(decl).reset();
 
-        int beginLine = beginOf(decl);
-        int endLine = JavaTokenIterator.ofBegin(decl)
-                .find(JavaToken.Kind.LBRACE)
-                .getRange().get().begin.line;
-        i.lines(beginLine, endLine).cover(status.status());
+        JavaToken openingBrace = JavaTokenIterator.ofBegin(decl)
+                .find(JavaToken.Kind.LBRACE);
+
+        i.lines(beginOf(decl), lineOf(openingBrace)).cover(status.status());
     }
 
     public void handleMethodDeclaration(TokenInserter i, BodyDeclaration<?> decl, BlockStmt body,
@@ -679,8 +678,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             int checkEndLine = Math.max(lineOf(colonToken) - 1, endOf(stmt.getCheck()));
             // cover lines after assert keyword until line before colon with check status.
             // if colon is on the same line as the check, cover that line as well
-            i.lines(checkBeginLine, checkEndLine)
+            i.lines(checkBeginLine, endOf(stmt.getCheck()))
                     .cover(checkStatus.status());
+            i.lines(endOf(stmt.getCheck()) + 1, checkEndLine)
+                    .cover(checkStatus.statusAfter().toLineCoverageStatus());
 
             // cover the remaining lines with message status
             i.lines(checkEndLine + 1, endOf(stmt))
