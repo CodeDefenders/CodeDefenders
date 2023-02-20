@@ -19,6 +19,7 @@ package org.codedefenders.servlets.registration;
  */
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.Random;
 
@@ -63,6 +64,8 @@ public class PasswordServlet extends HttpServlet {
 
     private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
             + "This link is only valid for %d hours.\n\n" + "Greetings, your Code Defenders team";
+
+    private static final SecureRandom secureRandom = new SecureRandom();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -138,9 +141,8 @@ public class PasswordServlet extends HttpServlet {
         char[] initialSet = LOWER;
         initialSet = ArrayUtils.addAll(initialSet, DIGITS);
 
-        Random random = new Random();
         for (int i = 0; i < PW_RESET_SECRET_LENGTH; i++) {
-            sb.append(initialSet[random.nextInt(initialSet.length)]);
+            sb.append(initialSet[secureRandom.nextInt(initialSet.length)]);
         }
         return sb.toString();
     }
