@@ -18,19 +18,20 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME" %>
+<%@ page import="org.codedefenders.cron.KillMapCronJob" %>
+<%@ page import="org.codedefenders.execution.KillMap.KillMapJob" %>
 <%@ page import="org.codedefenders.database.KillmapDAO" %>
-<%@ page import="org.codedefenders.execution.KillMapProcessor" %>
-<%@ page import="org.codedefenders.execution.KillMapProcessor.KillMapJob" %>
-<%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 <%@ page import="org.codedefenders.util.CDIUtil" %>
+
+<%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="killMapProcessor" type="org.codedefenders.execution.KillMapProcessor"--%>
+<%--@elvariable id="killMapCronJob" type="org.codedefenders.cron.KillMapCronJob"--%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("KillMap Management"); %>
@@ -47,7 +48,7 @@
 
     String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.toString();
 
-    KillMapJob currentJob = CDIUtil.getBeanFromCDI(KillMapProcessor.class).getCurrentJob();
+    KillMapJob currentJob = CDIUtil.getBeanFromCDI(KillMapCronJob.class).getCurrentJob();
 
     int numClassesQueued = KillmapDAO.getNumClassKillmapJobsQueued();
     int numGamesQueued = KillmapDAO.getNumGameKillmapJobsQueued();
@@ -68,7 +69,7 @@
 
             <p class="m-0">
                 <c:choose>
-                    <c:when test="${killMapProcessor.enabled}">
+                    <c:when test="${killMapCronJob.enabled}">
                         Killmap Processing is <span class="text-success">enabled</span>.
                     </c:when>
                     <c:otherwise>
@@ -95,7 +96,7 @@
                   method="post">
                 <input type="hidden" name="formType" value="toggleKillMapProcessing">
                 <c:choose>
-                    <c:when test="${killMapProcessor.enabled}">
+                    <c:when test="${killMapCronJob.enabled}">
                         <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
                             Disable KillMap Processing
                         </button>

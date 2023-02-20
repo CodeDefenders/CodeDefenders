@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
-import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -163,7 +162,7 @@ public class KillmapDAO {
     /**
      * Return a list of pending killmap jobs ordered by timestamp.
      */
-    public static List<KillMapProcessor.KillMapJob> getPendingJobs() {
+    public static List<KillMap.KillMapJob> getPendingJobs() {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM killmapjob",
@@ -175,11 +174,11 @@ public class KillmapDAO {
             // if SQL NULL then int is 0
             KillMap.KillMapType type = (classId != 0) ? KillMap.KillMapType.CLASS : KillMap.KillMapType.GAME;
             int reference = (classId != 0) ? classId : gameId;
-            return new KillMapProcessor.KillMapJob(type, reference);
+            return new KillMap.KillMapJob(type, reference);
         });
     }
 
-    public static boolean enqueueJob(KillMapProcessor.KillMapJob theJob) {
+    public static boolean enqueueJob(KillMap.KillMapJob theJob) {
         String query;
         switch (theJob.getType()) {
             case CLASS:
@@ -196,7 +195,7 @@ public class KillmapDAO {
         return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getId()));
     }
 
-    public static boolean removeJob(KillMapProcessor.KillMapJob theJob) {
+    public static boolean removeJob(KillMap.KillMapJob theJob) {
         String query;
         switch (theJob.getType()) {
             case CLASS:

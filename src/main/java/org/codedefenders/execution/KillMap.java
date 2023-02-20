@@ -256,4 +256,25 @@ public class KillMap {
             return String.format("Test %d - Mutant %d: %s", test.getId(), mutant.getId(), status.toString());
         }
     }
+
+    /**
+     * Represents a job for computing a killmap.
+     */
+    public static class KillMapJob {
+        private final KillMapType type;
+        private final Integer id;
+
+        public KillMapJob(KillMapType type, Integer id) {
+            this.type = type;
+            this.id = id;
+        }
+
+        public KillMapType getType() {
+            return type;
+        }
+
+        public Integer getId() {
+            return id;
+        }
+    }
 }

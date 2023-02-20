@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -96,7 +95,7 @@ public class MultiplayerGameService extends AbstractGameService {
     public boolean closeGame(AbstractGame game) {
         boolean closed = super.closeGame(game);
         if (closed) {
-            KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, game.getId()));
+            KillmapDAO.enqueueJob(new KillMap.KillMapJob(KillMap.KillMapType.GAME, game.getId()));
         }
         return closed;
     }
