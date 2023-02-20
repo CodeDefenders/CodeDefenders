@@ -276,20 +276,6 @@ public class GameClass {
         return StringEscapeUtils.escapeHtml4(getSourceCode());
     }
 
-    /**
-     * Returns a mapping of dependency class names and its HTML escaped class content.
-     */
-    public Map<String, String> getHTMLEscapedDependencyCode() {
-        return GameClassDAO.getMappedDependenciesForClassId(id)
-                .stream()
-                .map(Dependency::getJavaFile)
-                .map(Paths::get)
-                .collect(Collectors.toMap(
-                        FileUtils::extractFileNameNoExtension,
-                        FileUtils::readJavaFileWithDefaultHTMLEscaped)
-                );
-    }
-
     private void createTestTemplate() {
         this.testTemplate = TestTemplate.build(this)
                 .testingFramework(getTestingFramework())

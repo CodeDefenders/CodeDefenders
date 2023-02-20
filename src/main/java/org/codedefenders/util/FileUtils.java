@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,13 +181,6 @@ public class FileUtils {
             logger.error("Could not read file " + javaFilePath);
             return "[File Not Readable]";
         }
-    }
-
-    /**
-     * Similar to {@link #readJavaFileWithDefault(Path)} but HTML escaped.
-     */
-    public static String readJavaFileWithDefaultHTMLEscaped(Path javaFilePath) {
-        return StringEscapeUtils.escapeHtml4(readJavaFileWithDefault(javaFilePath));
     }
 
     /**
