@@ -44,7 +44,6 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
-import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -71,6 +70,7 @@ import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.persistence.database.IntentionRepository;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -172,7 +172,7 @@ public class MeleeGameManager extends HttpServlet {
     private UserService userService;
 
     @Inject
-    private IntentionDAO intentionDAO;
+    private IntentionRepository intentionRepository;
 
     @Inject
     private URLUtils url;
@@ -1019,7 +1019,7 @@ public class MeleeGameManager extends HttpServlet {
     private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {
         try {
             DefenderIntention intention = new DefenderIntention(selectedLines, selectedMutants);
-            intentionDAO.storeIntentionForTest(newTest, intention);
+            intentionRepository.storeIntentionForTest(newTest, intention);
         } catch (Exception e) {
             logger.error("Cannot store intention to database.", e);
         }
@@ -1027,7 +1027,7 @@ public class MeleeGameManager extends HttpServlet {
 
     private void collectAttackerIntentions(Mutant newMutant, AttackerIntention intention) {
         try {
-            intentionDAO.storeIntentionForMutant(newMutant, intention);
+            intentionRepository.storeIntentionForMutant(newMutant, intention);
         } catch (Exception e) {
             logger.error("Cannot store intention to database.", e);
         }

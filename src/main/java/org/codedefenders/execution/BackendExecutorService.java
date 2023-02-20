@@ -57,15 +57,4 @@ public interface BackendExecutorService {
      * @return A {@link TargetExecution} object
      */
     TargetExecution testMutant(Mutant m, Test t);
-
-    boolean potentialEquivalent(Mutant mutant);
-
-    /**
-     * Checks whether a given mutant is killed by a given test.
-     *
-     * @param mutant the mutant to be tested.
-     * @param test   the test applied to the mutant.
-     * @return {@code true} iff the test kills the given mutant, {@code false} otherwise.
-     */
-    boolean testKillsMutant(Mutant mutant, Test test);
 }

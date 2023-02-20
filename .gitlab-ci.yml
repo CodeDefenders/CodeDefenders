@@ -44,6 +44,7 @@ checkstyle:
   needs: [ ]
   script:
     - mvn $MAVEN_ARGS validate
+  after_script: # Will also execute if the above fails so the errors will be shown in the MergeRequest
     - scripts/ci/generate-codequality-report-from-checkstyle.sh ./target/checkstyle-result.xml > checkstyle-report.json
   artifacts:
     reports:

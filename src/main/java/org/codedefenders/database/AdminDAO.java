@@ -297,20 +297,4 @@ public class AdminDAO {
         String query = "SELECT * FROM settings WHERE settings.name = ?;";
         return DB.executeQueryReturnValue(query, AdminDAO::settingFromRS, DatabaseValue.of(name.name()));
     }
-
-    /**
-     * This does not close the given {@link Connection}.
-     */
-    // TODO this is just used to initialize the connection pool, we should probably make more specific methods for that
-    static AdminSystemSettings.SettingsDTO getSystemSettingInt(SETTING_NAME name, Connection conn) throws SQLException {
-        String query = "SELECT * FROM settings WHERE settings.name = ?;";
-        PreparedStatement stmt = conn.prepareStatement(query);
-        stmt.setString(1, name.name());
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            SETTING_TYPE settingType = SETTING_TYPE.valueOf(rs.getString("type"));
-            return new AdminSystemSettings.SettingsDTO(name, rs.getInt(settingType.name()));
-        }
-        return null;
-    }
 }
