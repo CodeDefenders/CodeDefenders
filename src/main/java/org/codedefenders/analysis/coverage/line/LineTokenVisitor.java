@@ -8,6 +8,7 @@ import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.LineTokens.TokenInserter;
+import org.codedefenders.util.JavaParserUtils;
 
 import com.github.javaparser.JavaToken;
 import com.github.javaparser.ast.ArrayCreationLevel;
@@ -241,7 +242,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                 //     break;
             }
 
-            if (!stmtStatus.isEmpty() && !stmtStatus.statusAfter().alwaysJumps()) {
+            if (!(stmtStatus.isEmpty() && stmtStatus.statusAfter().isUnsure())) {
                 currentStatus = currentStatus.downgrade(stmtStatus.statusAfter());
             }
         }
@@ -446,35 +447,54 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
             AstCoverageStatus conditionStatus = astCoverage.get(stmt.getCondition());
+            AstCoverageStatus thenStatus = astCoverage.get(stmt.getThenStmt());
             AstCoverageStatus elseStatus = stmt.getElseStmt()
                     .map(astCoverage::get)
                     .orElseGet(AstCoverageStatus::empty);
 
-            i.node(stmt).reset();
+            LineCoverageStatus statusAfterCondition = conditionStatus.isEmpty()
+                    ? status.status()
+                    : conditionStatus.statusAfter().toLineCoverageStatus();
 
-            // cover if keyword and condition
             JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getCondition())
                     .skipOne()
                     .find(JavaToken.Kind.RPAREN);
-            int ifEndLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
 
-            if (status.isCovered() && conditionStatus.statusAfter().isNotCovered()) {
-                i.lines(beginOf(stmt), endOf(stmt.getCondition()))
-                        .cover(status.status());
-                i.lines(endOf(stmt.getCondition()) + 1, ifEndLine)
-                        .cover(LineCoverageStatus.NOT_COVERED);
-            } else {
-                i.lines(beginOf(stmt), ifEndLine)
-                        .cover(status.status());
+            JavaToken elseToken = null;
+            if (stmt.hasElseBranch()) {
+                elseToken = JavaTokenIterator.ofEnd(stmt.getThenStmt())
+                        .skipOne()
+                        .find(JavaToken.Kind.ELSE);
+            }
+
+            int conditionEndLine = stmt.getThenStmt().isBlockStmt()
+                    ? JavaTokenIterator.expandWhitespaceAfter(closingParen)
+                    : lineOf(closingParen);
+
+            // reset
+            i.node(stmt).reset();
+
+            // cover if keyword and condition
+            i.lines(beginOf(stmt), endOf(stmt.getCondition()))
+                    .cover(status.status());
+            i.lines(endOf(stmt.getCondition()) + 1, conditionEndLine)
+                    .cover(statusAfterCondition);
+
+            // cover empty space if then branch is not a block
+            if (!stmt.getThenStmt().isBlockStmt()) {
+                i.lines(conditionEndLine + 1, endOf(stmt.getThenStmt()))
+                        .cover(thenStatus.status());
+                if (stmt.hasElseBranch()) {
+                    i.lines(endOf(stmt.getThenStmt()), lineOf(elseToken) - 1)
+                            .cover(thenStatus.statusAfter().toLineCoverageStatus());
+                }
             }
 
             // cover else keyword
             if (stmt.hasElseBranch()) {
-                JavaToken elseToken = JavaTokenIterator.ofEnd(stmt.getThenStmt())
-                        .skipOne()
-                        .find(JavaToken.Kind.ELSE);
-
-                int elseBeginLine = JavaTokenIterator.expandWhitespaceBefore(elseToken);
+                int elseBeginLine = stmt.getThenStmt().isBlockStmt()
+                        ? JavaTokenIterator.expandWhitespaceBefore(elseToken)
+                        : lineOf(elseToken);
                 int elseEndLine = JavaTokenIterator.expandWhitespaceAfter(elseToken);
 
                 i.lines(elseBeginLine, elseEndLine)
@@ -486,14 +506,76 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(ForStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            handleLoop(i, stmt, stmt.getBody());
+            AstCoverageStatus status = astCoverage.get(stmt);
+
+            // TODO: set these statuses in AstCoverageVisitor?
+            LineCoverageStatus statusAfterInit = stmt.getInitialization().getLast()
+                    .map(astCoverage::get)
+                    .map(AstCoverageStatus::statusAfter)
+                    .map(StatusAfter::toLineCoverageStatus)
+                    .orElseGet(status::status);
+            LineCoverageStatus statusAfterCompare = stmt.getCompare()
+                    .map(astCoverage::get)
+                    .map(AstCoverageStatus::statusAfter)
+                    .map(StatusAfter::toLineCoverageStatus)
+                    .orElse(statusAfterInit);
+            LineCoverageStatus statusAfterUpdate = stmt.getUpdate().getLast()
+                    .map(astCoverage::get)
+                    .map(AstCoverageStatus::statusAfter)
+                    .map(StatusAfter::toLineCoverageStatus)
+                    .orElse(statusAfterCompare);
+
+            JavaToken closingParen = JavaTokenIterator.ofBegin(stmt.getBody())
+                    .backward()
+                    .skipOne()
+                    .find(JavaToken.Kind.RPAREN);
+            int endOfHeader = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+
+            int endOfUpdate = stmt.getUpdate().getLast()
+                    .map(JavaParserUtils::endOf)
+                    .orElse(endOfHeader);
+            int endOfCompare = stmt.getCompare()
+                    .map(JavaParserUtils::endOf)
+                    .orElse(endOfUpdate);
+            int endOfInit = stmt.getInitialization().getLast()
+                    .map(JavaParserUtils::endOf)
+                    .orElse(endOfCompare);
+
+            i.node(stmt).reset();
+            i.lines(beginOf(stmt), endOfInit)
+                    .cover(status.status());
+            i.lines(endOfInit + 1, endOfCompare)
+                    .cover(statusAfterInit);
+            i.lines(endOfCompare + 1, endOfUpdate)
+                    .cover(statusAfterCompare);
+            i.lines(endOfUpdate + 1, endOfHeader)
+                    .cover(statusAfterUpdate);
         }
     }
 
     @Override
     public void visit(ForEachStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            handleLoop(i, stmt, stmt.getBody());
+            AstCoverageStatus status = astCoverage.get(stmt);
+            AstCoverageStatus iterableStatus = astCoverage.get(stmt.getIterable());
+
+            // TODO: set the iterable's status in AstCoverageVisitor?
+            LineCoverageStatus statusAfterIterable = iterableStatus.statusAfter().toLineCoverageStatus();
+            if (statusAfterIterable.isEmpty()) {
+                statusAfterIterable = status.status();
+            }
+
+            JavaToken closingParen = JavaTokenIterator.ofBegin(stmt.getBody())
+                    .backward()
+                    .skipOne()
+                    .find(JavaToken.Kind.RPAREN);
+            int endOfHeader = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+
+            i.node(stmt).reset();
+            i.lines(beginOf(stmt), endOf(stmt.getIterable()))
+                    .cover(status.status());
+            i.lines(endOf(stmt.getIterable()) + 1, endOfHeader)
+                    .cover(statusAfterIterable);
         }
     }
 
@@ -568,6 +650,11 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(SwitchStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
+            AstCoverageStatus selectorStatus = astCoverage.get(stmt.getSelector());
+
+            LineCoverageStatus statusAfterSelector = selectorStatus.isEmpty()
+                    ? status.status()
+                    : selectorStatus.statusAfter().toLineCoverageStatus();
 
             i.node(stmt).reset();
 
@@ -576,8 +663,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                     .find(JavaToken.Kind.RPAREN);
             int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
 
-            i.lines(beginOf(stmt), endLine)
+            i.lines(beginOf(stmt), endOf(stmt.getSelector()))
                     .cover(status.status());
+            i.lines(endOf(stmt.getSelector()) + 1, endLine)
+                    .cover(statusAfterSelector);
         }
     }
 
@@ -631,20 +720,19 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus status = astCoverage.get(stmt);
             AstCoverageStatus exprStatus = astCoverage.get(stmt.getExpression());
 
+            LineCoverageStatus statusAfterExpr = exprStatus.isEmpty()
+                    ? status.status()
+                    : exprStatus.statusAfter().toLineCoverageStatus();
+
             JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getExpression())
                     .skipOne()
                     .find(JavaToken.Kind.RPAREN);
             int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
 
-            if (exprStatus.statusAfter().isNotCovered()) {
-                i.lines(beginOf(stmt), endOf(stmt.getExpression()))
-                        .cover(status.status());
-                i.lines(endOf(stmt.getExpression()), endLine)
-                        .cover(exprStatus.statusAfter().toLineCoverageStatus());
-            } else {
-                i.lines(beginOf(stmt), endLine)
-                        .cover(status.status());
-            }
+            i.lines(beginOf(stmt), endOf(stmt.getExpression()))
+                    .cover(status.status());
+            i.lines(endOf(stmt.getExpression()), endLine)
+                    .cover(statusAfterExpr);
         }
     }
 
@@ -916,10 +1004,13 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(ConditionalExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
+            AstCoverageStatus conditionStatus = astCoverage.get(expr.getCondition());
             AstCoverageStatus thenStatus = astCoverage.get(expr.getThenExpr());
             AstCoverageStatus elseStatus = astCoverage.get(expr.getElseExpr());
 
-            i.node(expr).cover(status.status());
+            LineCoverageStatus statusAfterCondition = conditionStatus.isEmpty()
+                    ? status.status()
+                    : conditionStatus.statusAfter().toLineCoverageStatus();
 
             int thenBeginLine = JavaTokenIterator.expandWhitespaceBefore(
                     expr.getThenExpr().getTokenRange().get().getBegin());
@@ -931,7 +1022,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             int elseEndLine = JavaTokenIterator.expandWhitespaceAfter(
                     expr.getElseExpr().getTokenRange().get().getEnd());
 
+            i.lines(beginOf(expr), endOf(expr.getCondition())).cover(status.status());
+            i.lines(endOf(expr.getCondition()) + 1, thenBeginLine - 1).cover(statusAfterCondition);
             i.lines(thenBeginLine, thenEndLine).cover(thenStatus.status());
+            i.lines(thenEndLine + 1, elseBeginLine - 1).cover(statusAfterCondition);
             i.lines(elseBeginLine, elseEndLine).cover(elseStatus.status());
         }
     }
@@ -940,6 +1034,11 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     public void visit(SwitchExpr expr, Void arg) {
         try (TokenInserter i = lineTokens.forNode(expr, () -> super.visit(expr, arg))) {
             AstCoverageStatus status = astCoverage.get(expr);
+            AstCoverageStatus selectorStatus = astCoverage.get(expr.getSelector());
+
+            LineCoverageStatus statusAfterSelector = selectorStatus.isEmpty()
+                    ? status.status()
+                    : selectorStatus.statusAfter().toLineCoverageStatus();
 
             i.node(expr).reset();
 
@@ -948,8 +1047,10 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                     .find(JavaToken.Kind.RPAREN);
             int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
 
-            i.lines(beginOf(expr), endLine)
+            i.lines(beginOf(expr), endOf(expr.getSelector()))
                     .cover(status.status());
+            i.lines(endOf(expr.getSelector()) + 1, endLine)
+                    .cover(statusAfterSelector);
         }
     }
 

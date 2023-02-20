@@ -1,34 +1,64 @@
+import utils.Call;
+import utils.MethodChain;
+
+import static utils.Utils.consume;
+import static utils.Utils.doCall;
+import static utils.Utils.doCatch;
+import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Methods
+ * <p>JaCoCo coverage: Covers the closing brace if the closing brace can be reached (i.e. there is not an explicit
+ *                     jump in every path).
+ * <p>Extended coverage: Covers the method signature and sets the coverage of the body if empty.
+ */
 public class Methods {
-    /**
-     * <p>empty method
-     * <p><b>JaCoCo coverage</b>: covers the closing brace (closing brace of methods with implicit return is always
-     *                            covered)
-     * <p><b>extended coverage</b>: covers the entire signature and sets the body to covered (coverage of the body
-     *                              is handled by the code block)
-     */
-    static void empty() {
+    @Call
+    public void test() {
+        new Methods.InterfaceDefaultMethods(){}.empty();
+        new Methods.InterfaceDefaultMethods(){}.explicitReturn();
+        doCatch(new Methods.InterfaceDefaultMethods(){}::throwsException);
+        doCatch(new Methods.InterfaceDefaultMethods(){}::throwsExceptionFromCoveredExpr);
+        doCatch(new Methods.InterfaceDefaultMethods(){}::doesCallAndThrowsException);
+    }
+
+    @Call
+    public void empty() {
 
     }
 
-    /**
-     * <p>method with return
-     * <p><b>JaCoCo coverage</b>: doesn't cover the method itself at all
-     * <p><b>extended coverage</b>: covers the entire signature (coverage of the body is handled by the code block)
-     */
-    static void explicitReturn() {
+    @Call
+    public void explicitReturn() {
         return;
     }
 
-    /**
-     * <p>method with only exception-throwing stmt
-     * <p><b>JaCoCo coverage</b>: covers neither the method nor the stmt
-     * <p><b>extended coverage</b>: also covers nothing (we can't reliably detect if the method has been called, but
-     *                              neither could a human)
-     */
-    static void throwsException() {
+    @Call
+    public void throwsException() {
         doThrow();
+
+    }
+
+    @Call
+    public void throwsExceptionFromCoveredExpr1() {
+        MethodChain.create()
+                .doThrow();
+
+    }
+
+    @Call
+    public void throwsExceptionFromCoveredExpr2() {
+        consume(
+                doGet(1),
+                doThrow());
+
+    }
+
+    @Call
+    public void doesCallAndThrowsException() {
+        doCall();
+        doThrow();
+
     }
 
     // same with interface default methods
@@ -42,6 +72,16 @@ public class Methods {
         }
 
         default void throwsException() {
+            doThrow();
+        }
+
+        default void throwsExceptionFromCoveredExpr() {
+            MethodChain.create()
+                    .doThrow();
+        }
+
+        default void doesCallAndThrowsException() {
+            doCall();
             doThrow();
         }
     }

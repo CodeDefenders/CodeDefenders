@@ -39,4 +39,12 @@ public enum LineCoverageStatus {
     public boolean isCovered() {
         return this == FULLY_COVERED || this == PARTLY_COVERED;
     }
+
+    public boolean isPartlyCovered() {
+        return this == PARTLY_COVERED;
+    }
+
+    public boolean isFullyCovered() {
+        return this == FULLY_COVERED;
+    }
 }

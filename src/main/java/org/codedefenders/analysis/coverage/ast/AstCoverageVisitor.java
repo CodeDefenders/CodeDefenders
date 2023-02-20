@@ -846,6 +846,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         AstCoverageStatus iterStatus = astCoverage.get(stmt.getIterable());
         // condition probably corresponds to hasNext() call on the iterator
         DetailedLine conditionStatus = mergeLineCoverage(stmt.getIterable());
+        DetailedLine closingBraceStatus = lineCoverage.get(endOf(stmt));
 
         switch (conditionStatus.branchStatus()) {
             case NOT_COVERED:
@@ -858,11 +859,23 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.NOT_COVERED);
                 break;
             case PARTLY_COVERED:
-                // either the iterable is empty, or the body jumped out of the loop before the last item was reached
+                // either the iterable is empty,
+                // or the body jumped out of the loop before the last item was reached,
+                // or the iterator threw an exception
                 if (bodyStatus.isEmpty() && !bodyStatus.statusAfter().alwaysJumps()) {
-                    astCoverage.put(stmt, AstCoverageStatus.covered());
-                    // body is empty -> the iterable was empty
-                    astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.NOT_COVERED);
+                    if (closingBraceStatus.instructionStatus().isFullyCovered()) {
+                        // the iterator threw after the first loop
+                        astCoverage.put(stmt, AstCoverageStatus.covered()
+                                .withStatusAfter(StatusAfter.NOT_COVERED));
+                        astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.FULLY_COVERED);
+                    } else {
+                        // the iterable was empty
+                        astCoverage.put(stmt, AstCoverageStatus.covered());
+                        astCoverage.updateStatus(stmt.getBody(), LineCoverageStatus.NOT_COVERED);
+                    }
+                } else if (bodyStatus.isCovered() && bodyStatus.statusAfter().isNotCovered()) {
+                    astCoverage.put(stmt, AstCoverageStatus.covered()
+                            .withStatusAfter(StatusAfter.NOT_COVERED));
                 } else {
                     astCoverage.put(stmt, AstCoverageStatus.covered()
                             .withStatusAfter(StatusAfter.MAYBE_COVERED));
@@ -878,7 +891,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // closing brace is covered if the end of the body is reached in an iteration
-        DetailedLine closingBraceStatus = lineCoverage.get(endOf(stmt));
         switch (closingBraceStatus.instructionStatus()) {
             case EMPTY:
                 break;
@@ -949,7 +961,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine conditionLineStatus = mergeLineCoverage(stmt.getCondition());
 
         AstCoverageStatus status = mergeCoverageForSequence(bodyStatus, conditionStatus);
-        if (status.isEmpty()) {
+        if (bodyStatus.statusAfter().alwaysJumps()) {
+            status = status.withStatusAfter(StatusAfter.MAYBE_COVERED);
+        } else if (status.isEmpty()) {
             status = AstCoverageStatus.fromStatus(conditionLineStatus.branchStatus());
         }
 
@@ -1670,12 +1684,16 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(SwitchExpr expr, Void arg) {
         super.visit(expr, arg);
+        AstCoverageStatus selectorStatus = astCoverage.get(expr.getSelector());
 
         // merge coverage from the entries -> NOT_COVERED or COVERED
-        AstCoverageStatus status = expr.getEntries().stream()
+        AstCoverageStatus entriesStatus = expr.getEntries().stream()
                 .map(astCoverage::get)
                 .reduce(this::mergeCoverageForFork)
                 .orElseGet(AstCoverageStatus::empty);
+
+        AstCoverageStatus status = mergeCoverageForSequence(selectorStatus, entriesStatus);
+
         astCoverage.put(expr, status);
     }
 

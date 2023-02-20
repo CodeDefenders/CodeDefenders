@@ -6,95 +6,148 @@ import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
 /**
- * <p>if statements
- * <p><b>JaCoCo coverage</b>: covers a line of the condition to indicate how many branches were taken.
- *                            which line of the condition is covered varies based on the structure of the condition.
- * <p><b>extended coverage</b>: covers all lines up to the then-statement and all lines between the then- and else
- *                              statement. if the condition is partly covered, then the partly-covered line in the
- *                              condition is inherited from JaCoCo. in the case of empty branches, we try do determine
- *                              which branches are taken and which aren't, but leave them empty if we can't determine
- *                              it with 100% confidence.
+ * <p>If statements
+ * <p>JaCoCo coverage: Covers the condition with branch coverage. Which line of the condition is covered varies based on
+ *                     the structure of the condition. The branch coverage can also be on one of the parentheses and not
+ *                     on the condition itsef.
+ * <p>Extended coverage: Also covers all lines up to the then-statement and all lines between the then- and else
+ *                       statement. In the case of empty branches, we try do determine which branches are taken and
+ *                       which aren't, but leave them empty if we can't reliably determine it.
  */
 public class Ifs {
-    // test if the correct branches are taken under normal circumstances
     @Call(params = "true")
-    public void branches(boolean alwaysTrue) {
-        // then-branch taken
+    public void thenBranchTaken1(boolean alwaysTrue) {
         if (alwaysTrue) {
+
             doCall();
-        }
-        if (alwaysTrue) {
-            doCall();
-        } else {
-            doCall();
+
         }
 
-        // else-branch taken
-        if (!alwaysTrue) {
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void thenBranchTaken2(boolean alwaysTrue) {
+        if (alwaysTrue) {
+
             doCall();
-        }
-        if (!alwaysTrue){
-            doCall();
+
         } else {
+
             doCall();
+
         }
 
-        // else-if-branch taken
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void elseBranchTaken1(boolean alwaysTrue) {
         if (!alwaysTrue) {
+
             doCall();
+
+        }
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void elseBranchTaken2(boolean alwaysTrue) {
+        if (!alwaysTrue) {
+
+            doCall();
+
+        } else {
+
+            doCall();
+
+        }
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void elseIfBranchTaken(boolean alwaysTrue) {
+        if (!alwaysTrue) {
+
+            doCall();
+
         } else if (alwaysTrue) {
+
             doCall();
+
         } else {
+
             doCall();
+
         }
 
-        // second else-branch taken
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void secondElseBranchTaken(boolean alwaysTrue) {
         if (!alwaysTrue) {
+
             doCall();
+
         } else if (!alwaysTrue) {
+
             doCall();
+
         } else {
+
             doCall();
+
         }
+
+        // block: ignore_end_status
     }
 
-    // test if the space after jumps is correctly left empty
     @Call(params = "true")
-    public void jumps1(boolean alwaysTrue) {
-        // jump in one branch (not covered)
+    public void notCoveredJump(boolean alwaysTrue) {
         if (!alwaysTrue) {
             return;
-
         }
 
-        // jump in one branch (covered)
-        if (alwaysTrue) {
-            return;
-
-        }
-
-        // jump in both branches
-        if (alwaysTrue) {
-            return;
-
-        } else {
-            return;
-
-        }
-
+        // block: ignore_end_status
     }
 
-    // test if the space after jumps is correctly left empty
     @Call(params = "true")
-    public void jumps2(boolean alwaysTrue) {
-        // second jump behind a second if
+    public void coveredJump(boolean alwaysTrue) {
+        if (alwaysTrue) {
+            return;
+        }
+
+        // block: ignore_end_status
+    }
+
+
+    @Call(params = "true")
+    public void jumpInBothBranches(boolean alwaysTrue) {
+        if (alwaysTrue) {
+            return;
+        } else {
+            return;
+        }
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void jumpFromElseIf(boolean alwaysTrue) {
         if (alwaysTrue) {
             return;
         } else if (alwaysTrue) {
             return;
         }
 
-        // jump in three branches
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void jumpFromSecondElse(boolean alwaysTrue) {
         if (alwaysTrue) {
             return;
         } else if (alwaysTrue) {
@@ -103,6 +156,7 @@ public class Ifs {
             return;
         }
 
+        // block: ignore_end_status
     }
 
     @Call(params = "true")
@@ -112,23 +166,35 @@ public class Ifs {
             doThrow();
         }
 
+        // block: ignore_end_status
     }
 
-    // test if the space up to the exception is covered
     @Call(params = {"true", "false"})
-    public void exceptionWithBothBranchesTaken(boolean trueOrFalse) {
-        // for some reason, swapping doThrow() and doCall() here doesn't work,
-        // as it leads to partial coverage in the condition
+    public void exceptionWithBothBranchesTaken1(boolean trueOrFalse) {
         if (trueOrFalse) {
 
             doThrow();
         } else {
             doCall();
         }
+
+        // block: ignore_end_status
     }
 
-    @Call(params = {"true, true", "true, false"})
-    public void emptyBranches(boolean alwaysTrue, boolean trueOrFalse) {
+    @Call(params = {"true", "false"})
+    public void exceptionWithBothBranchesTaken2(boolean trueOrFalse) {
+        if (trueOrFalse) {
+            doCall();
+        } else {
+
+            doThrow();
+        }
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void emptyBranches1(boolean alwaysTrue) {
         // can't determine if the then or else branch has been taken, since both are empty
         if (alwaysTrue) {
 
@@ -136,18 +202,33 @@ public class Ifs {
 
         }
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = {"true", "false"})
+    public void emptyBranches2(boolean trueOrFalse) {
         if (trueOrFalse) {
 
         } else {
 
         }
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void emptyBranches3(boolean alwaysTrue) {
         if (alwaysTrue) {
             doCall();
         } else {
 
         }
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "true")
+    public void emptyBranches4(boolean alwaysTrue) {
         // can't determine if the then or else branch has been taken, since doCall could throw an exception,
         // which would also result in a not-covered line
         if (alwaysTrue) {
@@ -155,34 +236,45 @@ public class Ifs {
         } else {
             doCall();
         }
+
+        // block: ignore_end_status
     }
 
     /**
-     * <p>if statements with empty conditions (optimized out)
-     * <p><b>JaCoCo coverage</b>: only covers statements of the taken branch, since the rest is optimized out
-     * <p><b>extended coverage</b>: determines which branch is optimized out from the coverage and marks the other
-     *                              branch as not-covered. if this can't be determined the branches and if stmt are
-     *                              left EMPTY.
+     * <p>If statements with empty conditions (optimized out)
+     * <p>JaCoCo coverage: Only covers statements of the taken branch, since the rest is optimized out
+     * <p>Extended coverage: Determines which branch is optimized out from the coverage and marks the other
+     *                       branch as not-covered. If this can't be determined the branches and if stmt are
+     *                       left EMPTY.
      */
     @Call
-    public void emptyConditions() {
+    public void emptyConditions1() {
         // can determine which branch was optimized out
         if (true) {
             doCall();
         }
 
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void emptyConditions2() {
         if (true) {
             doCall();
         } else {
             doCall();
         }
-
+    }
+    @Call
+    public void emptyConditions3() {
         if (false) {
             doCall();
         } else {
             doCall();
         }
-
+    }
+    @Call
+    public void emptyConditions4() {
         if (true) {
             doCall();
         } else if (true) {
@@ -190,7 +282,9 @@ public class Ifs {
         } else {
             doCall();
         }
-
+    }
+    @Call
+    public void emptyConditions5() {
         if (false) {
             doCall();
         } else if (false) {
@@ -198,18 +292,26 @@ public class Ifs {
         } else {
             doCall();
         }
-
+    }
+    @Call
+    public void emptyConditions6() {
         // can't determine which branch was optimized out (could be improved later)
         if (false) {
             doCall();
         }
+    }
 
+    @Call
+    public void emptyConditions7() {
         if (false) {
             doCall();
         } else {
 
         }
+    }
 
+    @Call
+    public void emptyConditions8() {
         if (true) {
 
         } else {
@@ -221,18 +323,28 @@ public class Ifs {
     public void withoutBraces(boolean alwaysTrue) {
         // then-branch taken
         if (alwaysTrue)
+
             doCall();
+
         if (alwaysTrue)
+
             doCall();
+
         else
+
             doCall();
 
         // else-branch taken
         if (!alwaysTrue)
+
             doCall();
+
         if (!alwaysTrue)
+
             doCall();
+
         else
+
             doCall();
     }
 
@@ -313,8 +425,16 @@ public class Ifs {
     }
 
     @Call
+    public void exceptionFromCondition1OneLine() {
+        if (doThrow() == 1) {
+
+        }
+    }
+
+    @Call
     public void exceptionFromCondition2() {
         if (
+
                 doGet(1) == doThrow()
         ) {
 
@@ -322,11 +442,8 @@ public class Ifs {
     }
 
     @Call
-    public void exceptionFromCondition2a() {
-        if
-        (
-                doGet(1) == doThrow()
-        ) {
+    public void exceptionFromCondition2OneLine() {
+        if (doGet(1) == doThrow()) {
 
         }
     }
@@ -334,6 +451,7 @@ public class Ifs {
     @Call
     public void exceptionFromCondition3() {
         if (
+
                 doGet(1)
                 ==
                 doThrow()
@@ -344,7 +462,8 @@ public class Ifs {
 
     @Call
     public void exceptionFromCondition4() {
-        if (MethodChain.create()
+        if (
+                MethodChain.create()
                 .doThrow()
                 .get(1) == 1) {
 
@@ -352,12 +471,8 @@ public class Ifs {
     }
 
     @Call
-    public void exceptionFromCondition5() {
-        if (
-                MethodChain.create()
-                .doThrow()
-                .get(1) == 1
-        ) {
+    public void exceptionFromCondition5OneLine() {
+        if (MethodChain.create().doThrow().get(1) == 1) {
 
         }
     }

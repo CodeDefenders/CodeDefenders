@@ -5,15 +5,37 @@ import static utils.Utils.consume;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Ternary operators
+ * <p>JaCoCo coverage: Covers the condition (branch coverage) and the then- and else-expression if they are not already
+ *                     covered.
+ *                     <p> Also covers a line of the else-expression even if it should not be covered.
+ *                     This seems to only be the case if the expr is part of an assignment.
+ * <p>Extended coverage: Covers space before and after the condition and then- and else-expression as well.
+ */
 public class TernaryOperators {
     @Call
     public void literalsInAssignment() {
         int i =
                 doGet(1) > 0
+
                         ? 1
+
                         : 0;
 
         int j = doGet(1) > 0 ? 1 : 0;
+    }
+
+    @Call
+    public void literalsInAssignment2() {
+        int i =
+                doGet(1) < 0
+
+                        ? 1
+
+                        : 0;
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -49,7 +71,7 @@ public class TernaryOperators {
     }
 
     @Call
-    public void literalsInParameter() {
+    public void literalsInMethodArg() {
         consume(doGet(1) > 0
                 ? 1
                 : 0);
@@ -58,7 +80,7 @@ public class TernaryOperators {
     }
 
     @Call
-    public void expressionsInParameter() {
+    public void expressionsInMethodArg() {
         consume(doGet(1) > 0
                 ? 1
                   + 1
@@ -67,7 +89,7 @@ public class TernaryOperators {
     }
 
     @Call
-    public void methodCallsInParameter() {
+    public void methodCallsInMethodArg() {
         consume(doGet(1) > 0
                         ? doGet(1)
                         : doGet(0));
@@ -76,7 +98,7 @@ public class TernaryOperators {
     }
 
     @Call
-    public void methodChainsInParameter() {
+    public void methodChainsInMethodArg() {
         consume(doGet(1) > 0
                 ? MethodChain.create()
                         .call()
@@ -87,20 +109,22 @@ public class TernaryOperators {
     }
 
     @Call
-    public void exceptionAtExpressionsInAssignment1() {
+    public void exceptionAtExpressions1() {
         int i =
                 doGet(1) > 0
                         ? doThrow()
                         : doThrow();
+
+        // block: ignore_end_status
     }
 
     @Call
-    public void exceptionAtExpressionsInAssignment2() {
+    public void exceptionAtExpressions2() {
         int j = doGet(1) > 0 ? doThrow() : doThrow();
     }
 
     @Call
-    public void exceptionAtConditionInAssignment1() {
+    public void exceptionAtCondition1() {
         int i =
                 doThrow() > 0
                         ? doGet(1)
@@ -108,12 +132,12 @@ public class TernaryOperators {
     }
 
     @Call
-    public void exceptionAtConditionInAssignment2() {
+    public void exceptionAtCondition2() {
         int j = doThrow() > 0 ? doGet(1) : doGet(0);
     }
 
     @Call
-    public void exceptionAtConditionInAssignment3() {
+    public void exceptionAtCondition3() {
         int i =
                 doThrow() > 0
                         ? 1
@@ -121,57 +145,22 @@ public class TernaryOperators {
     }
 
     @Call
-    public void exceptionAtConditionInAssignment4() {
+    public void exceptionAtCondition4() {
         int i =
+
                 MethodChain.create()
                         .doThrow()
                         .get(0) > 0
+
                         ? 1
+
                         : 0;
+
+        // block: ignore_end_status
     }
 
     @Call
-    public void exceptionAtExpressionsInParameter1() {
-        consume(doGet(1) > 0
-                ? doThrow()
-                : doThrow());
-    }
-
-    @Call
-    public void exceptionAtExpressionsInParameter2() {
-        consume(doGet(1) > 0 ? doThrow() : doThrow());
-    }
-
-    @Call
-    public void exceptionAtConditionInParameter1() {
-        consume(doThrow() > 0
-                ? doGet(1)
-                : doGet(0));
-    }
-
-    @Call
-    public void exceptionAtConditionInParameter2() {
-        consume(doThrow() > 0 ? doGet(1) : doGet(0));
-    }
-
-    @Call
-    public void exceptionAtConditionInParameter3() {
-        consume(doThrow() > 0
-                ? 1
-                : 0);
-    }
-
-    @Call
-    public void exceptionAtConditionInParameter4() {
-        consume(MethodChain.create()
-                .doThrow()
-                .get(0) > 0
-                ? 1
-                : 0);
-    }
-
-    @Call
-    public void literalsWithEmptyConditionInAssignment() {
+    public void literalsWithEmptyCondition() {
         int i = true
                 ? 1
                 : 0;
@@ -182,7 +171,7 @@ public class TernaryOperators {
     }
 
     @Call
-    public void methodCallsWithEmptyConditionInAssignment() {
+    public void methodCallsWithEmptyCondition() {
         int i = true
                 ? doGet(1)
                 : doGet(0);
@@ -190,28 +179,8 @@ public class TernaryOperators {
         int j = false
                 ? doGet(1)
                 : doGet(0);
-    }
 
-    @Call
-    public void literalsWithEmptyConditionInParameter() {
-        consume(true
-                ? 1
-                : 0);
-
-        consume(false
-                ? 1
-                : 0);
-    }
-
-    @Call
-    public void methodCallsWithEmptyConditionInParameter() {
-        consume(true
-                ? doGet(1)
-                : doGet(0));
-
-        consume(false
-                ? doGet(1)
-                : doGet(0));
+        // block: ignore_end_status
     }
 
     @Call(params = "1")

@@ -5,6 +5,11 @@ import utils.TestEnum;
 import static utils.Utils.doCall;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Switch statements
+ * <p>JaCoCo coverage: Covers the selector (branch coverage).
+ * <p>Extended coverage: Covers space before and after the selector, as well as space before and after the entries.
+ */
 public class SwitchStmts {
     @Call(params = "A")
     public void regularSwitchStmts(TestEnum arg) {
@@ -64,6 +69,8 @@ public class SwitchStmts {
                 doCall();
                 break;
         }
+
+        // block: ignore_end_status
     }
 
     @Call(params = "A")
@@ -81,6 +88,8 @@ public class SwitchStmts {
                 doCall();
                 break;
         }
+
+        // block: ignore_end_status
     }
 
     @Call(params = "A")
@@ -104,6 +113,8 @@ public class SwitchStmts {
             default:
                 break;
         }
+
+        // block: ignore_end_status
     }
 
     @Call(params = "A")
@@ -116,6 +127,8 @@ public class SwitchStmts {
                 doCall();
                 break;
         }
+
+        // block: ignore_end_status
     }
 
     @Call(params = "A")
@@ -129,6 +142,8 @@ public class SwitchStmts {
                 doCall();
                 break;
         }
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -140,6 +155,8 @@ public class SwitchStmts {
                 doCall();
                 break;
         }
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -153,6 +170,8 @@ public class SwitchStmts {
                 doCall();
                 break;
         }
+
+        // block: ignore_end_status
     }
 
     @Call(params = "A")

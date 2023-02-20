@@ -5,21 +5,39 @@ import static utils.Utils.doCall;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Synchronized blocks
+ * <p>JaCoCo coverage: Covers monitor expression. Covers the closing brace if it can be reached (i.e. not every path in
+ *                     the block jumps).
+ * <p>Extended coverage: Covers space before and after monitor expression as well.
+ */
 public class SynchronizedBlocks {
     @Call
-    public void regularBlocks() {
+    public void regularBlocks1() {
         synchronized (this) {
 
         }
 
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void regularBlocks2() {
         synchronized (doGet(this)) {
 
         }
 
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void regularBlocks3() {
         synchronized (this) {
             return;
 
         }
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -27,6 +45,8 @@ public class SynchronizedBlocks {
         synchronized (this) {
             doThrow();
         }
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -35,6 +55,8 @@ public class SynchronizedBlocks {
             doCall();
             doThrow();
         }
+
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -43,6 +65,8 @@ public class SynchronizedBlocks {
         synchronized (o) {
 
         }
+
+        // block: ignore_end_status
     }
 
     @Call(exception = NullPointerException.class)
@@ -53,6 +77,8 @@ public class SynchronizedBlocks {
         ) {
 
         }
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -64,5 +90,7 @@ public class SynchronizedBlocks {
         ) {
 
         }
+
+        // block: ignore_end_status
     }
 }

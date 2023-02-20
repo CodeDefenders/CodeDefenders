@@ -128,18 +128,17 @@ class CoverageTestParameters implements ArgumentsProvider {
                 defaultRunnerTestCase("classes/Classes.java"),
                 emptyRunnerTestCase("classes/Classes.java"),
 
-                simpleTestCase("fields/Fields.java", "fields/FieldsTest.java"),
+                defaultRunnerTestCase("fields/Fields.java"),
                 emptyRunnerTestCase("fields/Fields.java"),
 
                 emptyRunnerTestCase("initializerblocks/InitializerBlocks.java"),
-                simpleTestCase("initializerblocks/InitializerBlocks.java",
-                        "initializerblocks/InitializerBlocksTest.java"),
+                defaultRunnerTestCase("initializerblocks/InitializerBlocks.java"),
 
                 // method level
                 defaultRunnerTestCase("constructors/Constructors.java"),
                 emptyRunnerTestCase("constructors/Constructors.java"),
 
-                simpleTestCase("methods/Methods.java", "methods/MethodsTest.java"),
+                defaultRunnerTestCase("methods/Methods.java"),
                 emptyRunnerTestCase("methods/Methods.java"),
 
                 // block level

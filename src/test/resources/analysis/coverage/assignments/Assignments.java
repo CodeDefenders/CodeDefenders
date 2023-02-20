@@ -2,6 +2,7 @@ import utils.Call;
 import utils.MethodChain;
 
 import static utils.Utils.consume;
+import static utils.Utils.doCall;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
@@ -118,6 +119,17 @@ public class Assignments {
                 =
                 doThrow()
         );
+
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void lambda() {
+        Runnable r = () -> {};
+
+        r = () -> {
+            doCall();
+        };
 
         // block: ignore_end_status
     }

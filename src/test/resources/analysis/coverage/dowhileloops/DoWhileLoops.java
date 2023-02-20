@@ -12,23 +12,39 @@ import static utils.Utils.doThrow;
  */
 public class DoWhileLoops {
     @Call
-    public void regularLoops() {
+    public void regularLoops1() {
         int i = 0;
 
         // fully covered condition, non-empty body
         do {
             i++;
-        } while(i < 5);
+        } while (i < 5);
+
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void regularLoops2() {
+        int i = 0;
 
         // partly covered condition, non-empty body
         do {
-             i++;
-        } while(i > 10);
+            i++;
+        } while (i > 10);
+
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void regularLoops3() {
+        int i = 0;
 
         // partly covered condition, empty body
         do {
 
-        } while(i > 10);
+        } while (i > 10);
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -43,6 +59,7 @@ public class DoWhileLoops {
 
         } while(i == 0);
 
+        // block: ignore_end_status
     }
 
     @Call
@@ -55,10 +72,12 @@ public class DoWhileLoops {
             doThrow();
 
         } while(i == 0);
+
+        // block: ignore_end_status
     }
 
     @Call
-    public void emptyConditions() {
+    public void emptyConditions1() {
         int i = 0;
 
         // condition always the same
@@ -66,13 +85,21 @@ public class DoWhileLoops {
             doCall();
         } while(false);
 
+        // block: ignore_end_status
+    }
+
+    @Call
+    public void emptyConditions2() {
+        int i = 0;
+
         // loop body always jumps
         do {
             break;
         } while(i < 5);
+
+        // block: ignore_end_status
     }
 
-    // space after loop is empty, since loops always jumps
     @Call
     public void jumps1() {
         int i = 0;
@@ -82,9 +109,9 @@ public class DoWhileLoops {
 
         } while(i == 0);
 
+        // block: ignore_end_status
     }
 
-    // space after loop with jump is covered, we detect that the method runs until the end
     @Call
     public void jumps2() {
         int i = 0;
@@ -95,6 +122,7 @@ public class DoWhileLoops {
 
         } while (i == 0);
 
+        // block: ignore_end_status
     }
 
     @Call
@@ -104,6 +132,8 @@ public class DoWhileLoops {
         }
 
         while (doThrow() == 0);
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -115,5 +145,7 @@ public class DoWhileLoops {
         while (MethodChain.create()
                 .doThrow()
                 .get(0) == 0);
+
+        // block: ignore_end_status
     }
 }

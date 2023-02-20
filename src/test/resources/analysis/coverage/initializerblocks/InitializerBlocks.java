@@ -1,31 +1,43 @@
+import utils.Call;
+
+import static utils.Utils.doCatch;
 import static utils.Utils.doThrow;
+import static utils.Utils.consume;
 
 public class InitializerBlocks {
+    @Call
+    public static void test() {
+        doCatch(InitializerBlocks::new);
+        consume(InitializerBlocks.NoCoverageButStaticBlock.i);
+        doCatch(InitializerBlocks.BlocksInLocalClass::method);
+        doCatch(InitializerBlocks.BlocksInAnonymousClass::method);
+    }
+
     /**
-     * <p>static initializer block
-     * <p><b>JaCoCo coverage</b>: only covers the statement(s)
-     * <p><b>extended coverage</b>: covers the block
+     * <p>Static initializer block
+     * <p>JaCoCo coverage: Only covers the statement(s).
+     * <p>Extended coverage: Covers the block.
      */
     static {
         int i = 1;
     }
 
     /**
-     * <p>empty static initializer block
-     * <p><b>JaCoCo coverage</b>: covers the line of the closing brace
-     * <p><b>extended coverage</b>: covers the block
+     * <p>Empty static initializer block
+     * <p>JaCoCo coverage: Covers the line of the closing brace.
+     * <p>Extended coverage: Covers the block.
      */
     static {
 
     }
 
-    // we don't consider static blocks throwing exceptions, because that leads to an ExceptionInInitializerError
+    // We don't consider static blocks throwing exceptions, because that leads to an ExceptionInInitializerError.
 
     /**
-     * <p>non-static initializer block with statement(s)
-     * <p><b>JaCoCo coverage</b>: only covers the statement(s)
-     * <p><b>extended coverage</b>: covers the block. if empty, the coverage depends on wheter the class has been
-     *                              initialized, and whether non-static initializer blocks before it have been covered
+     * <p>Non-static initializer block with statement(s)
+     * <p>JaCoCo coverage: Only covers the statement(s).
+     * <p>Extended coverage: Covers the block. If empty, the coverage depends on wheter the class has been initialized,
+     *                       and whether non-static initializer blocks before it have been covered.
      */
     {
         int i = 1;
@@ -56,9 +68,8 @@ public class InitializerBlocks {
         }
     }
 
-    // fields in a local class
-    // wrap in a not-covered class to check if the ObjectCreationExpression or the surrounding class is checked as the
-    // declaring type
+    // fields in a local class (wrap in a not-covered class to check if the ObjectCreationExpression or the surrounding
+    // class is checked as the declaring type)
     static class BlocksInLocalClass {
         static void method() {
             class Local {
@@ -70,8 +81,8 @@ public class InitializerBlocks {
         }
     }
 
-    // fields in an anonymous class
-    // wrap in a not-covered class to check if the local class or the surrounding class is checked as the declaring type
+    // fields in an anonymous class (wrap in a not-covered class to check if the local class or the surrounding class is
+    // checked as the declaring type)
     static class BlocksInAnonymousClass {
         static void method() {
             new Runnable() {

@@ -3,6 +3,11 @@ import utils.MethodChain;
 
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Enclosed Expressions
+ * <p>JaCoCo coverage: Seems to sometimes cover the opening paranthesis.
+ * <p>Extended coverage: Covers the space before and after the expression based on the expr's coverage.
+ */
 public class EnclosedExprs {
     @Call
     public void exception1() {

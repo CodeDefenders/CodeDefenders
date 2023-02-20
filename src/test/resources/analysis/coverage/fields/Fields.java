@@ -1,15 +1,31 @@
+import utils.Call;
+import utils.MethodChain;
+
+import static utils.Utils.doCatch;
 import static utils.Utils.doThrow;
 
 /**
- * <p>fields
- * <p><b>JaCoCo coverage</b>: covers the first line of fields. doesn't cover fields without initializer, since they
- *                            don't correspond to a bytecode instruction
- * <p><b>extended coverage</b>: covers all lines of fields. non-static fields without initializer are covered if the
- *                              class is covered and no field before them is not-covered. static fields without
- *                              initializer are covered if anything in the class is covered (the class does not have
- *                              to be initialized)
+ * <p>Fields
+ * <p>JaCoCo coverage: Covers the first line of fields. Doesn't cover fields without initializer.
+ * <p>Extended coverage: Covers all lines of fields based on the coverage of the field and the initializer expresison.
+ *                       <p>Non-static fields without initializer are covered if the class is covered and no field
+ *                       before them is not-covered. Static fields without initializer are covered if anything in the
+ *                       class is covered (the class does not have to be initialized).
  */
 public class Fields {
+    @Call
+    public void test() {
+        doCatch(Fields.RegularFields::new);
+        doCatch(Fields.ExceptionWithMultipleDelcarators::new);
+        doCatch(Fields.ExceptionWithMultipleDelcaratorsAndCoveredExpr::new);
+        doCatch(Fields.ExceptionWithMultipleDelcaratorsAndEmpty::new);
+        doCatch(Fields.ExceptionWithMultipleDelcaratorsOnSameLine::new);
+        new Fields.TrickyVariableDeclarators();
+        Fields.StaticFieldWithoutInitializer.method();
+        doCatch(Fields.FieldsInLocalClass::method);
+        doCatch(Fields.FieldsInAnonymousClass::method);
+    }
+
     static class RegularFields {
         // field with initializer
         int i = 0;
@@ -34,7 +50,22 @@ public class Fields {
         int i = 0;
 
         int j = 0,
-            k = doThrow();
+
+            k =
+                    doThrow();
+
+        int l;
+    }
+
+    static class ExceptionWithMultipleDelcaratorsAndCoveredExpr {
+        int i = 0;
+
+        int j = 0,
+
+        k =
+                MethodChain.create()
+                        .doThrow()
+                        .get(1);
 
         int l;
     }
@@ -44,6 +75,7 @@ public class Fields {
 
         int j = 0,
             k = doThrow(),
+
             l;
 
         int m;

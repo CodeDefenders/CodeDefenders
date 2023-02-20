@@ -8,6 +8,13 @@ import utils.Call;
 import static utils.Utils.doCall;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Lambdas
+ * <p>JaCoCo coverage: Lambdas with expressions: Covers the expression.
+ *                     Lambdas with blocks: If the block doesn't always jump, covers the closing brace of the block.
+ *                     The closing brace is, however, not covered on Java version < 16
+ * <p>Extended coverage: Also covers empty space in the block according the the statements and closing brace coverage.
+ */
 public class Lambdas {
     @Call
     public void test() {

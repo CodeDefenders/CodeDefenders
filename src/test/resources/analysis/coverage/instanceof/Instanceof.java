@@ -5,6 +5,11 @@ import static utils.Utils.doCall;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrowObject;
 
+/**
+ * <p>Instanceof expressions
+ * <p>JaCoCo coverage: Only covers the lhs expression if it's coverable, and the rhs type if it's a pattern expression.
+ * <p>Extended coverage: Covers the entire expression.
+ */
 public class Instanceof {
 
     @Call
@@ -244,44 +249,25 @@ public class Instanceof {
 
     @Call
     public void exception1() {
-        boolean a = doThrowObject() instanceof Integer;
-    }
-
-    @Call
-    public void exception2() {
         boolean b =
                 doThrowObject() instanceof Integer;
     }
 
     @Call
-    public void exception3() {
-        consume(doThrowObject() instanceof Integer);
-    }
-
-    @Call
-    public void exception4() {
+    public void exception2() {
         consume(
                 doThrowObject() instanceof Integer);
     }
 
     @Call
-    public void exception5() {
+    public void exception3() {
         if (doThrowObject() instanceof Integer) {
             doCall();
         }
     }
 
     @Call
-    public void exception6() {
-        if (
-            doThrowObject() instanceof Integer
-        ) {
-            doCall();
-        }
-    }
-
-    @Call
-    public void exception7() {
+    public void exception4() {
         if (
                 doThrowObject()
                 instanceof
@@ -292,45 +278,26 @@ public class Instanceof {
     }
 
     @Call
-    public void exception8() {
-        boolean a = doThrowObject() instanceof Integer i;
-    }
-
-    @Call
-    public void exception9() {
+    public void exception5() {
         boolean b =
                 doThrowObject() instanceof Integer i;
     }
 
     @Call
-    public void exception10() {
-        consume(doThrowObject() instanceof Integer i);
-    }
-
-    @Call
-    public void exception11() {
+    public void exception6() {
         consume(
                 doThrowObject() instanceof Integer i);
     }
 
     @Call
-    public void exception12() {
+    public void exception7() {
         if (doThrowObject() instanceof Integer i) {
             doCall();
         }
     }
 
     @Call
-    public void exception13() {
-        if (
-                doThrowObject() instanceof Integer i
-        ) {
-            doCall();
-        }
-    }
-
-    @Call
-    public void exception14() {
+    public void exception8() {
         if (
                 doThrowObject()
                 instanceof

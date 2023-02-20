@@ -7,21 +7,61 @@ import static utils.Utils.consume;
 import static utils.Utils.doCall;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Switch Expressions
+ * <p>JaCoCo coverage:
+ * <ul>
+ *     <li>Covers the selector (branch coverage).</li>
+ *     <li>Expression-type switch entries: Covers a line of the expression if it's not usually coverable.</li>
+ *     <li>
+ *         Switch without default case: Covers a line of the last switch entry, even if it should not be covered.
+ *         This seems to only be the case if the switch expr is part of an assignment.
+ *     </li>
+ * </ul>
+ * <p>Extended coverage: Covers all lines of switch entries.
+ */
 public class SwitchExprs {
 
-    // ----------------- regular expression-type entries
+    // ----------------- expression-type entries
 
     // expression-type case entries
     // no default case
+    // inside local variable decl
     @Call(params = "A")
-    public void expression1(TestEnum arg) {
+    public void expression1VariableDecl(TestEnum arg) {
         int i = switch(arg) {
-            case A -> 1;
-            case B -> 2;
+            case A ->
+                    1;
+            case B ->
+                    2;
         };
+    }
+
+    // expression-type case entries
+    // no default case
+    // inside assignment
+    @Call(params = "A")
+    public void expression1Assignment(TestEnum arg) {
+        int i = 1;
+
+        i = switch(arg) {
+            case A ->
+                    1;
+            case B ->
+                    2;
+        };
+    }
+
+    // expression-type case entries
+    // no default case
+    // inside mehtod argument
+    @Call(params = "A")
+    public void expression1MethodArg(TestEnum arg) {
         consume(switch(arg) {
-            case A -> 1;
-            case B -> 2;
+            case A ->
+                    1;
+            case B ->
+                    2;
         });
     }
 
@@ -99,7 +139,7 @@ public class SwitchExprs {
         });
     }
 
-    // ----------------- regular block-type entries
+    // ----------------- block-type entries
 
     // block-type case entries
     // no default case
@@ -223,7 +263,7 @@ public class SwitchExprs {
         });
     }
 
-    // ----------------- regular throw-type entries
+    // ----------------- throw-type entries
 
     // throw-type case entries
     // no default case
@@ -388,6 +428,30 @@ public class SwitchExprs {
         };
     }
 
+    // exception in selector
+    @Call
+    public void exception8() {
+        int i = switch(doThrow()) {
+            case 1 -> 1;
+            default -> 2;
+        };
+    }
+
+    // exception from covered expr in selector
+    @Call
+    public void exception9() {
+        int i = switch(
+
+                MethodChain.create()
+                    .doThrow()
+                    .get(1)
+
+                ) {
+            case 1 -> 1;
+            default -> 2;
+        };
+    }
+
     // ------------------ other
 
     @Call(params = "B")
@@ -403,7 +467,12 @@ public class SwitchExprs {
 
     @Call(params = "A")
     public void multilineExpressionsAndSpacing(TestEnum arg) {
-        int i = switch(arg) {
+        int i =
+                switch(
+                        arg
+                        )
+
+                        {
 
             case A ->
                     1
@@ -415,7 +484,12 @@ public class SwitchExprs {
 
         };
 
-        consume(switch(arg) {
+        consume(
+                switch(
+                        arg
+                        )
+
+                        {
 
             case A ->
                     1
@@ -426,5 +500,37 @@ public class SwitchExprs {
                     + 1;
 
         });
+    }
+
+    @Call(params = "B")
+    public void testStatusAfterExpr1(TestEnum arg) {
+        int i = switch(arg) {
+            case A -> 1;
+            default -> 2;
+        };
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "B")
+    public void testStatusAfterExpr2(TestEnum arg) {
+        int i = switch(arg) {
+            case A -> 1;
+            default -> doThrow();
+        };
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "B")
+    public void testStatusAfterExpr3(TestEnum arg) {
+        int i = switch(arg) {
+            case A -> 1;
+            default -> MethodChain.create()
+                    .doThrow()
+                    .get(1);
+        };
+
+        // block: ignore_end_status
     }
 }
