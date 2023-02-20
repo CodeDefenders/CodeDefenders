@@ -160,6 +160,7 @@ public class ClassUploadManagerTest {
         //isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
         //
         // Setup the environment
+        /* TODO(Alex): DATA_DIR is nowadays exposed via Configuration#getDataDir()
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),
                 Paths.get(new File("src/test/resources/itests/build.xml").getAbsolutePath()));
 
@@ -168,7 +169,7 @@ public class ClassUploadManagerTest {
 
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "lib").toPath(),
                 Paths.get(new File("src/test/resources/itests/lib").getAbsolutePath()));
-
+        */
     }
 
     /**

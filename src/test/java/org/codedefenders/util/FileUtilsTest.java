@@ -25,14 +25,29 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import javax.enterprise.inject.Produces;
+
+import org.codedefenders.configuration.Configuration;
+import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Assert;
 import org.junit.Assume;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
  * Testing {@link FileUtils}.
  */
 public class FileUtilsTest {
+
+    // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
+    @Rule
+    public WeldInitiator weld = WeldInitiator.of(FileUtilsTest.class);
+
+    @Produces
+    public Configuration produceConfiguration() {
+        return new Configuration() {};
+    }
+
 
     @Test
     public void testCreateJavaTestFile() {

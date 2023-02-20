@@ -21,9 +21,13 @@ package org.codedefenders;
 import java.io.File;
 import java.io.IOException;
 
+import javax.enterprise.inject.Produces;
 import javax.servlet.ServletException;
 
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.util.FileUtils;
+import org.jboss.weld.junit4.WeldInitiator;
+import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -32,6 +36,17 @@ import static org.junit.Assert.assertEquals;
  * @author Jose Rojas
  */
 public class GameManagerTest {
+
+    // Required for mocking Configuration, which is loaded into a static field of FileUtils.
+    @Rule
+    public WeldInitiator weld = WeldInitiator.of(GameManagerTest.class);
+
+    @Produces
+    public Configuration produceConfiguration() {
+        return new Configuration() {};
+    }
+
+
     @Test
     public void testGetNextSubDirEmpty() throws IOException {
         File folder = getCleanTmpGameDir(1);
