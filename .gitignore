@@ -9,6 +9,7 @@ credentials*
 config.properties
 docker.properties
 docker/.env
+database.properties
 
 ### Logs ###
 *.log

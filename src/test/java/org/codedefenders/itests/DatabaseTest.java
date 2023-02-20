@@ -113,15 +113,16 @@ public class DatabaseTest {
 
     // This will re-create the same DB from scratch every time... is this really
     // necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
-    @Rule
-    public DatabaseRule db = new DatabaseRule();
+    // TODO(Alex): Migrate to /src/integration/ and convert to proper Database Test
+    //@Rule
+    //public DatabaseRule db = new DatabaseRule();
 
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
         PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
             // Return a new connection from the rule instead
-            return db.getConnection();
+            return null; //db.getConnection();
         });
     }
 
@@ -232,7 +233,7 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testInsertPlayer() throws Exception {
-        UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsRegistry.class));
+        UserRepository userRepo = null; //new UserRepository(db.getQueryRunner(), mock(MetricsRegistry.class));
 
         assumeTrue(creator.insert());
         assumeTrue(user1.insert());
