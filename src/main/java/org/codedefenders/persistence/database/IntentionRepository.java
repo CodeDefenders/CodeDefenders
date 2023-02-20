@@ -59,7 +59,7 @@ public class IntentionRepository {
      * @param test      the given test as a {@link Test}.
      * @param intention the given intention as an {@link DefenderIntention}.
      * @return the generated identifier of the intention as an {@code int}.
-     * @throws Exception If storing the intention was not successful.
+     * @throws UncheckedSQLException If an SQLException occurs while trying to store the intention.
      */
     public Optional<Integer> storeIntentionForTest(Test test, DefenderIntention intention) {
         int testId = test.getId();
@@ -87,7 +87,7 @@ public class IntentionRepository {
      * @param mutant    the given mutant as a {@link Mutant}.
      * @param intention the given intention as an {@link AttackerIntention}.
      * @return the generated identifier of the intention as an {@code int}.
-     * @throws Exception If storing the intention was not successful.
+     * @throws UncheckedSQLException If an SQLException occurs while trying to store the intention.
      */
     public Optional<Integer> storeIntentionForMutant(Mutant mutant, AttackerIntention intention) {
         final String query = "INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type) VALUES (?,?,?);";
