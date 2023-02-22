@@ -4,64 +4,84 @@ import static utils.Utils.doCall;
 import static utils.Utils.doThrow;
 
 public class WhileLoops {
-    @Call
-    public void regularLoops() {
-        int i = 0;
-
-        // fully covered condition
+    @Call(params = "0")
+    public void fullyCoveredCondition(int i) {
         while (i < 5) {
             i++;
-
         }
 
-        // partly covered condition, body entered
-        while (i < 10) {
-            i++;
-            if (i > 7) {
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void partlyCoveredConditionBodyEntered(int i) {
+        while (i < 5) {
+            if (i == 0) {
                 break;
             }
 
         }
 
-        // partly covered condition, body always jumps
-        while (i < 10) {
-            i++;
-            break;
-
-        }
-
-        // partly covered condition, body not entered
-        while (i > 15) {
-            i++;
-
-        }
+        // block: ignore_end_status
     }
 
-    @Call
-    public void exceptions1() {
-        int i = 0;
+    @Call(params = "10")
+    public void partlyCoveredConditionBodySkipped(int i) {
+        while (i < 5) {
+            i++;
+        }
 
-        // only exception
-        while (i == 0) {
+        // block: ignore_end_status
+    }
+
+    @Call(params = "10")
+    public void partlyCoveredConditionBodySkippedWithEmptyBody(int i) {
+        while (i < 5) {
+
+        }
+
+        // block: ignore_end_status
+    }
+
+
+    @Call(params = "0")
+    public void bodyThrows(int i) {
+        while (i < 5) {
             doThrow();
+
         }
+
+        // block: ignore_end_status
     }
 
-    @Call
-    public void exceptions2() {
-        int i = 0;
-
-        // exception and regular method call
+    @Call(params = "0")
+    public void bodyCoveredAndThrows(int i) {
         while (i == 0) {
             doCall();
             doThrow();
+
         }
+
+        // block: ignore_end_status
     }
 
-    @Call
-    public void emptyConditions() {
-        int i = 0;
+    @Call(params = "0")
+    public void bodySometimesThrows(int i) {
+        while (i < 5) {
+            i++;
+            if (i == 2) {
+                doThrow();
+            }
 
+        }
+
+        // block: ignore_end_status
+    }
+
+
+    // while(false) doesn't compile: 'error: unreachable statement'
+    @Call(params = "0")
+    public void emptyCondition(int i) {
         while (true) {
             i++;
             if (i > 2) {
@@ -70,34 +90,37 @@ public class WhileLoops {
 
         }
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void emptyConditionWithCoveredBody(int i) {
         while (true) {
             break;
 
         }
 
-        // while(false) doesn't compile: 'error: unreachable statement'
+        // block: ignore_end_status
     }
 
-
     // space after loop is empty, since loops always jumps
-    @Call
-    public void jumps1() {
-        int i = 0;
+    @Call(params = "0")
+    public void bodyAlwaysJumpsWithReturn(int i) {
         while (i == 0) {
             return;
 
         }
 
+        // block: ignore_end_status
     }
 
-    // space after loop with jump is covered, we detect that the method runs until the end
-    @Call
-    public void jumps2() {
-        int i = 0;
+    @Call(params = "0")
+    public void bodyAlwaysJumpsWithBreak(int i) {
         while (i == 0) {
             break;
 
         }
 
+        // block: ignore_end_status
     }
 }

@@ -4,6 +4,12 @@ import utils.MethodChain;
 import static utils.Utils.doGet;
 import static utils.Utils.consume;
 
+/**
+ * <p>Unary expressions
+ * <p>JaCoCo coverage: If the unary expression is a increment/decrement and the inner exprssion is not coverable
+ *                     itself, covers some line of the expression.
+ * <p>Extended coverage: Covers the whole expression.
+ */
 public class UnaryExpressions {
 
     @Call
@@ -13,17 +19,25 @@ public class UnaryExpressions {
 
         i++;
 
+        ++
+        i;
+
         i
-                ++;
+        ++;
 
         j[0]++;
 
-        j[0]
-                ++;
+        ++
+        j[0];
 
-        doGet
-                (j)[0]
-                ++;
+        j[0]
+        ++;
+
+        doGet (j)[0]
+        ++;
+
+        ++
+        doGet(j)[0];
     }
 
     @Call(exception = NullPointerException.class)
@@ -58,6 +72,17 @@ public class UnaryExpressions {
 
     @Call(exception = NullPointerException.class)
     public void exceptionFromVariable4() {
+        Integer i = null;
+        consume(
+                ++
+                i
+        );
+
+        // block: ignore_end_status
+    }
+
+    @Call(exception = NullPointerException.class)
+    public void exceptionFromVariable5() {
         Boolean b = null;
         boolean c =
                 !
@@ -147,5 +172,4 @@ public class UnaryExpressions {
 
         // block: ignore_end_status
     }
-
 }

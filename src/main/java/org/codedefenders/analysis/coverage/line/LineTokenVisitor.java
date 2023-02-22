@@ -612,22 +612,43 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(TryStmt stmt, Void arg) {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
+            AstCoverageStatus status = astCoverage.get(stmt);
+
             i.node(stmt).reset();
 
-            int endLine;
             if (!stmt.getResources().isEmpty()) {
                 JavaToken closingParen = JavaTokenIterator.ofBegin(stmt)
                         .skip(JavaToken.Kind.LPAREN)
                         .find(JavaToken.Kind.RPAREN);
-                endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+                int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+
+                Optional<Node> firstNotCoveredNode = getFirstNotCoveredNode(stmt.getResources());
+                if (firstNotCoveredNode.isPresent()) {
+                    i.lines(beginOf(stmt), endOf(firstNotCoveredNode.get()))
+                            .cover(status.status());
+                    i.lines(endOf(firstNotCoveredNode.get()) + 1, endLine)
+                            .cover(LineCoverageStatus.NOT_COVERED);
+                } else {
+                    i.lines(beginOf(stmt), endLine)
+                            .cover(status.status());
+                }
             } else {
                 JavaToken tryToken = JavaTokenIterator.ofBegin(stmt)
                         .find(JavaToken.Kind.TRY);
-                endLine = JavaTokenIterator.expandWhitespaceAfter(tryToken);
+                int endLine = JavaTokenIterator.expandWhitespaceAfter(tryToken);
+
+                i.lines(beginOf(stmt), endLine)
+                        .cover(status.status());
             }
 
-            i.lines(beginOf(stmt), endLine)
-                    .cover(astCoverage.get(stmt).status());
+            if (stmt.getFinallyBlock().isPresent()) {
+                JavaToken finallyToken = JavaTokenIterator.ofBegin(stmt.getFinallyBlock().get())
+                        .backward()
+                        .skipOne()
+                        .find(JavaToken.Kind.FINALLY);
+                int endLine = JavaTokenIterator.expandWhitespaceAfter(finallyToken);
+                i.lines(lineOf(finallyToken), endLine).block(status.status());
+            }
         }
     }
 

@@ -13,7 +13,8 @@ import static utils.Utils.doThrow;
  * <p>JaCoCo coverage: Lambdas with expressions: Covers the expression.
  *                     Lambdas with blocks: If the block doesn't always jump, covers the closing brace of the block.
  *                     The closing brace is, however, not covered on Java version < 16
- * <p>Extended coverage: Also covers empty space in the block according the the statements and closing brace coverage.
+ * <p>Extended coverage: Also covers empty space in the expression or block (according the the statements and closing
+ *                       brace coverage).
  */
 public class Lambdas {
     @Call
@@ -80,6 +81,7 @@ public class Lambdas {
     public void exception1() {
         Runnable r = () -> {
             doThrow();
+
         };
         r.run();
     }
@@ -89,7 +91,22 @@ public class Lambdas {
         Runnable r = () -> {
             doCall();
             doThrow();
+
         };
         r.run();
+    }
+
+    @Call
+    public void exception3() {
+        Supplier s = () -> doThrow();
+        s.get();
+    }
+
+    @Call
+    public void exception4() {
+        Supplier s = () ->
+
+                doThrow();
+        s.get();
     }
 }

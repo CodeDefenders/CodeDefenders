@@ -993,6 +993,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(TryStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
+        AstCoverageStatus tryStatus = astCoverage.get(stmt.getTryBlock());
+
         // merge coverage status from resources
         AstCoverageStatus resourcesStatus = stmt.getResources().stream()
                 .map(astCoverage::get)
@@ -1000,28 +1002,32 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .orElseGet(AstCoverageStatus::empty);
 
         // merge coverage status from try block and catch blocks
-        AstCoverageStatus tryAndCatchStatus = stmt.getCatchClauses().stream()
+        AstCoverageStatus catchStatus = stmt.getCatchClauses().stream()
                 .map(astCoverage::get)
                 .reduce(this::mergeCoverageForFork)
                 .orElseGet(AstCoverageStatus::empty);
-        tryAndCatchStatus = mergeCoverageForFork(tryAndCatchStatus, astCoverage.get(stmt.getTryBlock()));
 
         // get coverage for finally block
         AstCoverageStatus finallyStatus = stmt.getFinallyBlock()
                 .map(astCoverage::get)
                 .orElse(AstCoverageStatus.empty());
 
-        LineCoverageStatus status = resourcesStatus.status()
-                .upgrade(tryAndCatchStatus.status())
+        LineCoverageStatus status = tryStatus.status()
+                .upgrade(resourcesStatus.status())
+                .upgrade(catchStatus.status())
                 .upgrade(finallyStatus.status());
 
         StatusAfter statusAfter;
-        if (!finallyStatus.isEmpty()) {
-            statusAfter = finallyStatus.statusAfter();
-        } else if (!tryAndCatchStatus.isEmpty()) {
-            statusAfter = tryAndCatchStatus.statusAfter();
-        } else if (!resourcesStatus.isEmpty()) {
-            statusAfter = resourcesStatus.statusAfter();
+        if (finallyStatus.statusAfter().isNotCovered()) {
+            statusAfter = StatusAfter.NOT_COVERED;
+        } else if (tryStatus.statusAfter().isCovered()) {
+            statusAfter = StatusAfter.COVERED;
+        } else if (!catchStatus.isEmpty()) {
+            statusAfter = catchStatus.statusAfter();
+        } else if (tryStatus.statusAfter().isNotCovered()) {
+            statusAfter = StatusAfter.NOT_COVERED;
+        } else if (resourcesStatus.statusAfter().isNotCovered()) {
+            statusAfter = StatusAfter.NOT_COVERED;
         } else {
             statusAfter = StatusAfter.MAYBE_COVERED;
         }

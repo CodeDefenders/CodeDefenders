@@ -10,6 +10,11 @@ import static utils.Utils.doCatch;
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
 
+/**
+ * <p>Methods
+ * <p>JaCoCo coverage: Covers the opening parenthesis of method calls.
+ * <p>Extended coverage: Covers the entire call, including the scope.
+ */
 public class MethodCalls {
     @Call
     public void methodChain() {
@@ -76,7 +81,7 @@ public class MethodCalls {
                         ::call
         );
 
-        ; // empty stmt to check if the coverage after the above stmt is correct
+        // block: ignore_end_status
     }
 
     @Call
@@ -134,7 +139,8 @@ public class MethodCalls {
     public void exceptionInMethodCallArg() {
         MethodChain.create()
                 .call()
-                .consume(
+                .consume
+                        (
 
                         MethodChain.create()
                                 .call()
@@ -151,6 +157,8 @@ public class MethodCalls {
         doThrow(
                 doGet(1)
         );
+
+        // block: ignore_end_status
     }
 
     @Call
@@ -176,6 +184,8 @@ public class MethodCalls {
         public SuperCalls(int i) {
             super(
                     doThrow());
+
+            // block: ignore_end_status
         }
 
         // super call with covered throwing arg
@@ -184,6 +194,8 @@ public class MethodCalls {
                             .doThrow()
                             .get(1)
             );
+
+            // block: ignore_end_status
         }
 
         // super call with covered throwing arg
@@ -193,6 +205,8 @@ public class MethodCalls {
                     .doThrow()
                     .get(1)
             );
+
+            // block: ignore_end_status
         }
 
         // super call with covered and throwing arg
@@ -200,6 +214,8 @@ public class MethodCalls {
             super(
                     doGet(1),
                     doThrow());
+
+            // block: ignore_end_status
         }
     }
 
