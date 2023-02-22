@@ -362,11 +362,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
         int newGameId = MeleeGameDAO.storeMeleeGame(game);
         game.setId(newGameId);
 
-        /*
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
-                EventStatus.GAME, new Timestamp(System.currentTimeMillis());
+                EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(event);
-        */
 
         // Always add system player to send mutants and tests at runtime!
         game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER);
