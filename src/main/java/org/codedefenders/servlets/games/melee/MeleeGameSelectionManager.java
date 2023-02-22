@@ -229,7 +229,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
             return;
         }
-        if (game.addPlayer(login.getUserId())) {
+        if (game.addPlayer(login.getUserId(), Role.PLAYER)) {
             logger.info("User {} joined game {}.", login.getUserId(), gameId);
 
             /*
