@@ -67,7 +67,8 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 @SessionScoped
 public class AdminCreateGamesBean implements Serializable {
 
-    private final Object synchronizer = new Object();
+    // TODO(Alex): Can not use Object, because it is not Serializable. Does it work like this?!
+    private final Object synchronizer = new Serializable() {};
     private final CodeDefendersAuth login;
     private final MessagesBean messages;
     private final GameManagingUtils gameManagingUtils;
