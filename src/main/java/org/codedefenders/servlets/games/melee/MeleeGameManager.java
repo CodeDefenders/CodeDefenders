@@ -176,7 +176,7 @@ public class MeleeGameManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
@@ -242,7 +242,7 @@ public class MeleeGameManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
