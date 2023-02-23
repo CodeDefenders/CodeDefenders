@@ -20,7 +20,7 @@ package org.codedefenders;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.codedefenders.analysis.ClassCodeAnalyser;
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;

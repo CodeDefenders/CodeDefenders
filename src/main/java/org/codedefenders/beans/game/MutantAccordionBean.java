@@ -15,6 +15,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
@@ -63,7 +65,7 @@ public class MutantAccordionBean {
                 new MutantAccordionCategory("Mutants outside methods", "noMethod");
         categories.add(mutantsWithoutMethod);
 
-        List<GameClass.MethodDescription> methodDescriptions = game.getCUT().getMethodDescriptions();
+        List<MethodDescription> methodDescriptions = game.getCUT().getMethodDescriptions();
         List<MutantAccordionCategory> methodCategories = new ArrayList<>();
         for (int i = 0; i < methodDescriptions.size(); i++) {
             methodCategories.add(new MutantAccordionCategory(methodDescriptions.get(i), String.valueOf(i)));
@@ -170,7 +172,7 @@ public class MutantAccordionBean {
             this.id = id;
         }
 
-        public MutantAccordionCategory(GameClass.MethodDescription methodDescription, String id) {
+        public MutantAccordionCategory(MethodDescription methodDescription, String id) {
             this(methodDescription.getDescription(), id);
             this.startLine = methodDescription.getStartLine();
             this.endLine = methodDescription.getEndLine();

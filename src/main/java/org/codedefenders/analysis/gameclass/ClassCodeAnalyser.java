@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.analysis;
+package org.codedefenders.analysis.gameclass;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,6 +28,7 @@ import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.util.JavaParserUtils;
 
@@ -53,7 +54,6 @@ import static org.codedefenders.util.JavaParserUtils.endOf;
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 @ApplicationScoped
 public class ClassCodeAnalyser {
-
     /**
      * Performs the analysis on the given compilation unit.
      *
@@ -75,6 +75,17 @@ public class ClassCodeAnalyser {
     public Optional<ClassAnalysisResult> analyze(String code) {
         Optional<CompilationUnit> parseResult = JavaParserUtils.parse(code);
         return parseResult.map(this::analyze);
+    }
+
+    /**
+     * Performs the analysis on the given CUT.
+     *
+     * @param classId The ID of the CUT.
+     * @return The result of the analysis.
+     */
+    public Optional<ClassAnalysisResult> analyze(int classId) {
+        GameClass cut = GameClassDAO.getClassForId(classId);
+        return analyze(cut.getSourceCode());
     }
 
     private static class ClassCodeVisitor extends VoidVisitorAdapter<ClassAnalysisResult> {
@@ -114,7 +125,7 @@ public class ClassCodeAnalyser {
 
             String signature = methodDecl.getDeclarationAsString(false, false, false);
             signature = signature.substring(signature.indexOf(' ') + 1); // remove return type
-            result.methodDescriptions.add(new GameClass.MethodDescription(signature,
+            result.methodDescriptions.add(new MethodDescription(signature,
                     beginOf(methodDecl), endOf(methodDecl)));
         }
     }
@@ -122,7 +133,7 @@ public class ClassCodeAnalyser {
     public static class ClassAnalysisResult {
         private final List<String> additionalImports = new ArrayList<>();
         private final Set<Integer> compileTimeConstants = new HashSet<>();
-        private final List<GameClass.MethodDescription> methodDescriptions = new ArrayList<>();
+        private final List<MethodDescription> methodDescriptions = new ArrayList<>();
 
         public List<String> getAdditionalImports() {
             return additionalImports;
@@ -134,7 +145,7 @@ public class ClassCodeAnalyser {
                     .collect(Collectors.toList());
         }
 
-        public List<GameClass.MethodDescription> getMethodDescriptions() {
+        public List<MethodDescription> getMethodDescriptions() {
             return methodDescriptions;
         }
     }

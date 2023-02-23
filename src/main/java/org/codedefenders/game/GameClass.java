@@ -28,11 +28,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.analysis.ClassCodeAnalyser;
-import org.codedefenders.analysis.ClassCodeAnalyser.ClassAnalysisResult;
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.service.ClassAnalysisService;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -134,20 +136,6 @@ public class GameClass {
                 .puzzleClass(true)
                 .parentClassId(other.getId())
                 .create();
-    }
-
-    private void analyzeCode() {
-        if (!this.visitedCode) {
-            ClassCodeAnalyser analyser = CDIUtil.getBeanFromCDI(ClassCodeAnalyser.class);
-            Optional<ClassAnalysisResult> analysisResult = analyser.analyze(this.getSourceCode());
-            if (analysisResult.isPresent()) {
-                ClassAnalysisResult analysisResult_ = analysisResult.get();
-                this.additionalImports.addAll(analysisResult_.getAdditionalImports());
-                this.linesOfCompileTimeConstants.addAll(analysisResult_.getCompileTimeConstants());
-                this.methodDescriptions.addAll(analysisResult_.getMethodDescriptions());
-            }
-            this.visitedCode = true;
-        }
     }
 
     /**
@@ -298,7 +286,7 @@ public class GameClass {
     /**
      * HTML escapes the test template.
      *
-     * @return a HTML escaped test template for a Junit Test as a {@link String}.
+     * @return an HTML escaped test template for a Junit Test as a {@link String}.
      */
     public String getHTMLEscapedTestTemplate() {
         return StringEscapeUtils.escapeHtml4(getTestTemplate());
@@ -324,25 +312,28 @@ public class GameClass {
      * Returns a copy of the additional import statements computed for this class.
      */
     public List<String> getAdditionalImports() {
-        analyzeCode();
-        return Collections.unmodifiableList(additionalImports);
+        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
+        ClassAnalysisResult result = analyser.analyze(getId()).get();
+        return Collections.unmodifiableList(result.getAdditionalImports());
     }
 
     /**
-     * Return the lines which correspond to Compile Time Constants. Mutation of those lines requires tests
+     * Return the lines which correspond to compile-time constants. Mutation of those lines requires tests
      * to be recompiled against the mutant.
      *
      * @return All lines of compile time constants as a {@link List} of {@link Integer Integers}.
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getCompileTimeConstants() {
-        analyzeCode();
-        return Collections.unmodifiableList(linesOfCompileTimeConstants);
+        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
+        ClassAnalysisResult result = analyser.analyze(getId()).get();
+        return Collections.unmodifiableList(result.getCompileTimeConstants());
     }
 
     public List<MethodDescription> getMethodDescriptions() {
-        analyzeCode();
-        return Collections.unmodifiableList(methodDescriptions);
+        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
+        ClassAnalysisResult result = analyser.analyze(getId()).get();
+        return Collections.unmodifiableList(result.getMethodDescriptions());
     }
 
     @Override
@@ -429,30 +420,6 @@ public class GameClass {
 
         public GameClass create() {
             return new GameClass(this);
-        }
-    }
-
-    public static class MethodDescription {
-        private String description;
-        private int startLine;
-        private int endLine;
-
-        public MethodDescription(String description, int startLine, int endLine) {
-            this.description = description;
-            this.startLine = startLine;
-            this.endLine = endLine;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public int getStartLine() {
-            return startLine;
-        }
-
-        public int getEndLine() {
-            return endLine;
         }
     }
 }
