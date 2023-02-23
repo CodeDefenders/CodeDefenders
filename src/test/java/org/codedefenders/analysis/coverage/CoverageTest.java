@@ -18,7 +18,6 @@ import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
-import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
 import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
 import org.codedefenders.analysis.coverage.line.LineTokens;
@@ -37,7 +36,7 @@ import org.jacoco.core.instr.Instrumenter;
 import org.jacoco.core.runtime.IRuntime;
 import org.jacoco.core.runtime.LoggerRuntime;
 import org.jacoco.core.runtime.RuntimeData;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
@@ -61,8 +60,8 @@ public class CoverageTest {
     // TODO: put the InMemory* JavaCompiler into a src package and use it in Compiler as well?
     // TODO: use CDI for CoverageGenerator
 
-    @BeforeAll
-    public static void checkJavaVersion() {
+    @BeforeEach
+    public void checkJavaVersion() {
         String javaVersion = System.getProperty("java.version");
         if (javaVersion.startsWith("1.")) {
             javaVersion = javaVersion.substring(2);
@@ -75,7 +74,7 @@ public class CoverageTest {
                 .that(javaMajorVersion).isAtLeast(16);
     }
 
-    @ParameterizedTest(name = "[{index}] {1} on {0}")
+    @ParameterizedTest(name = "[{index}] {0} with {1}")
     @ArgumentsSource(CoverageTestParameters.class)
      public void test(String className,
                       String testName,
