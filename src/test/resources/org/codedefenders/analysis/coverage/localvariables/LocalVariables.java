@@ -2,6 +2,7 @@ import utils.Call;
 
 import static utils.Utils.doGet;
 import static utils.Utils.doThrow;
+import static utils.Utils.consume;
 
 /**
  * <p>Local variables declarations
@@ -72,14 +73,14 @@ public class LocalVariables {
     @Call
     public void uncoveredParam1() {
         Runnable s =
-                () -> {};
+                () -> consume(1);
 
         // block: ignore_end_status
     }
 
     @Call
     public void uncoveredParam2() {
-        Runnable s = () -> {};
+        Runnable s = () -> consume(2);
 
         // block: ignore_end_status
     }

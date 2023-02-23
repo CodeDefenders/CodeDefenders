@@ -3,6 +3,7 @@ import utils.MethodChain;
 
 import static utils.Utils.doCatch;
 import static utils.Utils.doThrow;
+import static utils.Utils.consume;
 
 /**
  * <p>Fields
@@ -102,11 +103,11 @@ public class Fields {
 
     static class TrickyVariableDeclarators {
         // field with partly covered initializer
-        Runnable r = () -> {};
+        Runnable r = () -> consume(1);
 
         // field with not-covered variable declarator
         private
-        Runnable s = () -> {};
+        Runnable s = () -> consume(2);
     }
 
     // fields in a local class

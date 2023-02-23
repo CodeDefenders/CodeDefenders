@@ -12,22 +12,24 @@ import static utils.Utils.doThrow;
  * <p>Lambdas
  * <p>JaCoCo coverage: Lambdas with expressions: Covers the expression.
  *                     Lambdas with blocks: If the block doesn't always jump, covers the closing brace of the block.
- *                     The closing brace is, however, not covered on Java version < 16
+ *                     <p>Note: Java 16/17 seems to deduplicate lambdas. Therefore, if a class contains multiple of the
+ *                     same lambda, the coverage of them will be combined on the first instance and the rest will be
+ *                     left empty.
  * <p>Extended coverage: Also covers empty space in the expression or block (according the the statements and closing
  *                       brace coverage).
  */
 public class Lambdas {
     @Call
     public void test() {
-        this.r.run();
-        this.s.run();
+        c.accept(1.0f);
+        d.accept(1.0);
     }
 
-    private Runnable r = () -> {
+    private Consumer<Float> c = x -> {
 
     };
 
-    private Runnable s = () -> {
+    private Consumer<Double> d = x -> {
         return;
 
     };
@@ -50,8 +52,8 @@ public class Lambdas {
             return 1;
         };
 
-        Supplier<Integer> u =
-        () -> 1;
+        Supplier<Long> u =
+        () -> 1L;
 
         UnaryOperator<Integer> v =
         (i) -> {
@@ -80,7 +82,7 @@ public class Lambdas {
     @Call
     public void exception1() {
         Runnable r = () -> {
-            doThrow();
+            doThrow(0);
 
         };
         r.run();
@@ -98,7 +100,7 @@ public class Lambdas {
 
     @Call
     public void exception3() {
-        Supplier s = () -> doThrow();
+        Supplier s = () -> doThrow(1);
         s.get();
     }
 
@@ -106,7 +108,7 @@ public class Lambdas {
     public void exception4() {
         Supplier s = () ->
 
-                doThrow();
+                doThrow(2);
         s.get();
     }
 }

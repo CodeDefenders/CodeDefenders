@@ -87,15 +87,18 @@ public class MethodCalls {
     @Call
     public void lambdaArgs() {
         callLambda(() -> {
+            consume(1);
 
         });
 
         dontCallLambda(() -> {
+            consume(2);
 
         });
 
         dontCallLambda(
                 () -> {
+            consume(3);
 
         });
     }

@@ -379,7 +379,7 @@ public class Ifs {
         if (
                 MethodChain.create()
                         .callLambda(() -> {
-                            int i = System.currentTimeMillis() < 0 ? 0 : 1;
+                            int i = System.currentTimeMillis() < 0 ? 2 : 3;
                         })
                         .get(trueOrFalse)
         ) {
@@ -390,7 +390,7 @@ public class Ifs {
         if (
                 MethodChain.create()
                         .callLambda(() -> {
-                            int i = System.currentTimeMillis() < 0 ? 0 : 1;
+                            int i = System.currentTimeMillis() < 0 ? 4 : 5;
                         })
                         .get(trueOrFalse)
         ) {
