@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  * <p>HTML output for easier debugging can be enabled in {@link CoverageOutputWriter}.
  */
 public class CoverageTest {
-    public final static String RESOURCE_DIR = "analysis/coverage";
+    public final static String RESOURCE_DIR = "org/codedefenders/analysis/coverage";
 
     // TODO: extract getJavaMajorVersion into a util class and use it in Configuration as well?
     // TODO: put the InMemory* JavaCompiler into a src package and use it in Compiler as well?
