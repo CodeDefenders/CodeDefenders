@@ -59,6 +59,7 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMapService;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -70,13 +71,13 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.util.ZipFileUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
@@ -105,6 +106,13 @@ public class ClassUploadManager extends HttpServlet {
     @Inject
     private CoverageGenerator coverageGenerator;
 
+    @Inject
+    private KillMapService killMapService;
+
+    @Inject
+    private URLUtils url;
+
+
     private static List<String> reservedClassNames = Arrays.asList(
             "Test.java"
     );
@@ -117,7 +125,7 @@ public class ClassUploadManager extends HttpServlet {
             dispatcher.forward(request, response);
         } else {
             messages.add("Class upload is disabled.");
-            response.sendRedirect(ctx(request) + org.codedefenders.util.Paths.GAMES_OVERVIEW);
+            response.sendRedirect(url.forPath(org.codedefenders.util.Paths.GAMES_OVERVIEW));
         }
     }
 
@@ -535,7 +543,7 @@ public class ClassUploadManager extends HttpServlet {
             // Since gameID = -1, DAOs cannot find the class linked to this
             // game, hence its if, which is needed instead inside mutants and
             // tests
-            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>());
+            KillMap killMap = killMapService.forCustom(tests, mutants, cutId, new ArrayList<>());
             KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), cutId);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Could error while calculating killmap for successfully uploaded class.", e);
@@ -550,7 +558,7 @@ public class ClassUploadManager extends HttpServlet {
             Redirect.redirectBack(request, response);
         } else {
             logger.info("Automatically redirecting to origin " + origin);
-            Redirect.redirectTo(request, response, origin);
+            response.sendRedirect(url.forPath(origin));
         }
     }
 

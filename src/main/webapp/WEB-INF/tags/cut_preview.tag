@@ -18,6 +18,8 @@
   --%>
 <%@ tag pageEncoding="UTF-8" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <div id="create-game-cut-preview" class="w-100 h-100">
 <div class="card" style="height: 100%; min-height: 200px; resize: vertical; overflow: auto;">
     <div class="card-body p-0 codemirror-fill w-100 h-100">
@@ -26,9 +28,9 @@
 </div>
 
 <script type="module">
-    import CodeMirror from './js/codemirror.mjs';
+    import CodeMirror from '${url.forPath("/js/codemirror.mjs")}';
 
-    import {InfoApi} from './js/codedefenders_main.mjs';
+    import {InfoApi} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
     const cutPreview = document.querySelector('#create-game-cut-preview')

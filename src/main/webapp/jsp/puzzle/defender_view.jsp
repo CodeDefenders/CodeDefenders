@@ -20,6 +20,8 @@
 --%>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.*" %>
@@ -108,7 +110,7 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<link href="${pageContext.request.contextPath}/css/specific/game.css" rel="stylesheet">
+<link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
 
 <jsp:include page="/jsp/push_socket.jsp"/>
 
@@ -142,7 +144,7 @@
                     </button>
 
                     <script type="module">
-                        import {objects} from './js/codedefenders_main.mjs';
+                        import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
                         const testProgressBar = await objects.await('testProgressBar');
 
 
@@ -156,7 +158,7 @@
             </div>
 
             <form id="def"
-                  action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>"
+                  action="${url.forPath(Paths.PUZZLE_GAME)}"
                   method="post">
                 <input type="hidden" name="formType" value="createTest">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">

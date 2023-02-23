@@ -33,6 +33,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.ConnectionFactory;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet(Paths.ADMIN_SETTINGS)
 // TODO Does this enable CDI using @Property@Inject ?
@@ -43,6 +44,9 @@ public class AdminSystemSettings extends HttpServlet {
 
     @Inject
     private ConnectionFactory connectionFactory;
+
+    @Inject
+    private URLUtils url;
 
     public enum SETTING_NAME {
         SHOW_PLAYER_FEEDBACK {
@@ -164,20 +168,12 @@ public class AdminSystemSettings extends HttpServlet {
                 return "Turn on the automatic killmaps computation";
             }
         },
-        ALLOW_USER_PROFILE {
+        PUBLIC_USER_PROFILE {
             @Override
             public String toString() {
-                return "Let users manage their account and view their own profile and the profile pages of others.";
+                return "Let users visit the profile pages of others.";
             }
         },
-        /*
-        ALLOW_USER_SETTINGS {
-            @Override
-            public String toString() {
-                return "Let users manage their account.";
-            }
-        },
-        */
         ALLOW_PUZZLE_SECTION {
             @Override
             public String toString() {
@@ -189,8 +185,19 @@ public class AdminSystemSettings extends HttpServlet {
             public String toString() {
                 return "The maximum number of tests that will run to validate a lost equivalence duel.";
             }
-        }
-
+        },
+        GAME_DURATION_MINUTES_MAX {
+            @Override
+            public String toString() {
+                return "The maximum duration that can be set for multiplayer/melee games (in minutes).";
+            }
+        },
+        GAME_DURATION_MINUTES_DEFAULT {
+            @Override
+            public String toString() {
+                return "The default duration a multiplayer/melee game is open (in minutes).";
+            }
+        },
     }
 
     public enum SETTING_TYPE {
@@ -263,7 +270,7 @@ public class AdminSystemSettings extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String responsePath = request.getContextPath() + "/admin/settings";
+        String responsePath = url.forPath("/admin/settings");
 
         switch (request.getParameter("formType")) {
             case "saveSettings":

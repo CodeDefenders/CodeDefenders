@@ -23,12 +23,12 @@
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.dto.User" %>
-<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.util.LinkUtils" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="settingsRepository" type="org.codedefenders.persistence.database.SettingsRepository"--%>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
@@ -49,7 +49,7 @@
     %>
         <h3>Editing User <%=u.getId()%></h3>
 
-        <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post"
+        <form id="editUser" action="${url.forPath(Paths.ADMIN_USERS)}" method="post"
               class="needs-validation form-width mb-4"
               autocomplete="off">
             <input type="hidden" name="formType" value="editUser">
@@ -105,13 +105,13 @@
                 </div>
 
                 <div class="col-12">
-                    <a href="<%=request.getContextPath() + Paths.ADMIN_USERS%>" class="btn btn-secondary me-2">Cancel</a>
+                    <a href="${url.forPath(Paths.ADMIN_USERS)}" class="btn btn-secondary me-2">Cancel</a>
                     <button type="submit" class="btn btn-primary" name="submit_edit_user" id="submit_edit_user">Save</button>
                 </div>
             </div>
 
             <script type="module">
-                import $ from './js/jquery.mjs';
+                import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
                 $(document).ready(() => {
@@ -138,7 +138,7 @@
         }
     %>
 
-    <form id="manageUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
+    <form id="manageUsers" action="${url.forPath(Paths.ADMIN_USERS)}" method="post">
         <input type="hidden" name="formType" value="manageUsers">
 
         <table id="tableUsers" class="table table-striped table-v-align-middle">
@@ -169,7 +169,7 @@
                             <%=userId%>
                             <input type="hidden" name="added_uid" value=<%=userId%>>
                         </td>
-                        <td><%=LinkUtils.getUserProfileAnchorOrText(request, username)%></td>
+                        <td><%=LinkUtils.getUserProfileAnchorOrText(username)%></td>
                         <td><%=email%></td>
                         <td><%=totalScore%></td>
                         <td><%=lastLogin%></td>
@@ -197,8 +197,8 @@
         </table>
 
         <script type="module">
-            import DataTable from './js/datatables.mjs';
-            import $ from './js/jquery.mjs';
+            import DataTable from '${url.forPath("/js/datatables.mjs")}';
+            import $ from '${url.forPath("/js/jquery.mjs")}';
 
 
             $(document).ready(function () {
@@ -223,7 +223,7 @@
 
     <h3 class="mt-4 mb-3">Create Accounts</h3>
 
-    <form id="createUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post" autocomplete="off">
+    <form id="createUsers" action="${url.forPath(Paths.ADMIN_USERS)}" method="post" autocomplete="off">
         <input type="hidden" name="formType" value="createUsers">
 
         <div class="row g-3">

@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="java.util.Map" %>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
 <jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
 
@@ -110,8 +110,8 @@
 </div>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {ClassViewer} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {ClassViewer} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const numDependencies = ${classViewer.hasDependencies() ? classViewer.dependencies.size() : 0};

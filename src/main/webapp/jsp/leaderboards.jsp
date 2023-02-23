@@ -18,14 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <%@ page import="org.codedefenders.util.LinkUtils" %>
 
-<%-- Attributes set in the servlet --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="pageInfo" type="org.codedefenders.beans.page.PageInfoBean"--%>
 <%--@elvariable id="leaderboardService" type="org.codedefenders.service.LeaderboardService"--%>
 
 <c:choose>
@@ -55,7 +54,7 @@
         <tbody>
             <c:forEach var="entry" items="${leaderboardService.all}">
                 <tr>
-                    <td>${LinkUtils.getUserProfileAnchorOrText(pageContext.request, entry.username)}</td>
+                    <td>${LinkUtils.getUserProfileAnchorOrText(entry.username)}</td>
                     <td>${entry.mutantsSubmitted}</td>
                     <td>${entry.attackerScore}</td>
                     <td>${entry.testsSubmitted}</td>
@@ -68,7 +67,7 @@
     </table>
 
     <script type="module">
-        import DataTable from './js/datatables.mjs';
+        import DataTable from '${url.forPath("/js/datatables.mjs")}';
 
 
         new DataTable('#tableMPLeaderboard', {

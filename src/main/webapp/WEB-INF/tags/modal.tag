@@ -15,7 +15,7 @@
 <%@ attribute name="closeButtonText" required="false" %>
 <c:set var="closeButtonText" value="${(empty closeButtonText) ? 'Close' : closeButtonText}" />
 
-<div class="modal fade" tabindex="-1" aria-hidden="true" <c:if test="${not empty id}">id="${id}"</c:if>>
+<div class="modal fade" tabindex="-1" aria-hidden="true" role="dialog" <c:if test="${not empty id}">id="${id}"</c:if>>
     <div class="modal-dialog ${modalDialogClasses}">
         <div class="modal-content">
             <div class="modal-header ${modalHeaderClasses}">

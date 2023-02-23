@@ -46,7 +46,8 @@ import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.codedefenders.util.Constants.AI_DIR;
+import io.prometheus.client.Histogram;
+
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
@@ -56,13 +57,15 @@ import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
  * @author Alessio Gambi (last edit)
  */
 @ManagedBean
-public class AntRunner implements //
-        BackendExecutorService, //
-        ClassCompilerService, //
-        TestGeneratorService, //
-        MutantGeneratorService {
-
+public class AntRunner implements BackendExecutorService, ClassCompilerService {
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
+
+    private static final Histogram antProcessDuration = Histogram.build()
+            .name("codedefenders_antProcess_duration")
+            .unit("seconds")
+            .help("Duration of executing various ant processes")
+            .labelNames("antTarget")
+            .register();
 
     private final Configuration config;
     private final CoverageGenerator coverageGenerator;
@@ -72,19 +75,6 @@ public class AntRunner implements //
                      CoverageGenerator coverageGenerator) {
         this.config = config;
         this.coverageGenerator = coverageGenerator;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean testKillsMutant(Mutant mutant, Test test) {
-        GameClass cut = GameClassDAO.getClassForGameId(mutant.getGameId());
-
-        AntProcessResult result = runAntTarget("test-mutant", mutant.getDirectory(), test.getDirectory(),
-                cut, test.getFullyQualifiedClassName());
-
-        // Return true iff test failed
-        return result.hasFailure();
     }
 
     /**
@@ -128,50 +118,6 @@ public class AntRunner implements //
         }
         newExec.insert();
         return newExec;
-    }
-
-    @SuppressWarnings("Duplicates")
-    public TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
-        logger.info("Running test {} on mutant {}", t.getId(), m.getId());
-        GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
-
-        AntProcessResult result = runAntTarget("recompile-test-mutant", m.getDirectory(),
-                t.getDirectory(), cut, t.getFullyQualifiedClassName());
-
-        TargetExecution newExec;
-
-        if (result.hasFailure()) {
-            // The test failed, i.e., it detected the mutant
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
-                    TargetExecution.Status.FAIL, null);
-        } else if (result.hasError()) {
-            // The test is in error, interpreted also as detecting the mutant
-            String message = result.getErrorMessage();
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
-                    TargetExecution.Status.ERROR, message);
-        } else {
-            // The test passed, i.e., it did not detect the mutant
-            newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT,
-                    TargetExecution.Status.SUCCESS, null);
-        }
-        newExec.insert();
-        return newExec;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean potentialEquivalent(Mutant m) {
-        logger.info("Checking if mutant {} is potentially equivalent.", m.getId());
-        GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
-        String suiteDir = Paths.get(AI_DIR, "tests", cut.getAlias()).toString();
-
-        // TODO: is this actually executing a whole test suite?
-        AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), suiteDir,
-                cut, cut.getName() + Constants.SUITE_EXT);
-
-        // return true if tests pass without failures or errors
-        return !(result.hasError() || result.hasFailure());
     }
 
     /**
@@ -343,31 +289,6 @@ public class AntRunner implements //
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public void generateMutantsFromCUT(final GameClass cut) {
-        runAntTarget("mutant-gen-cut", null, null, cut, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void generateTestsFromCUT(final GameClass cut) {
-        runAntTarget("test-gen-cut", null, null, cut, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean compileGenTestSuite(final GameClass cut) {
-        AntProcessResult result = runAntTarget("compile-gen-tests", null, null, cut,
-                cut.getName() + Constants.SUITE_EXT);
-
-        // Return true iff compilation succeeds
-        return result.compiled();
-    }
-
-    /**
      * Runs a specific Ant target in the build.xml file
      *
      * @param target        An Ant target
@@ -477,7 +398,9 @@ public class AntRunner implements //
         logger.info("Executing Ant Command {} from directory {}", pb.command().toString(),
                 config.getDataDir().getAbsolutePath());
 
-        return runAntProcess(pb);
+        try (Histogram.Timer ignored = antProcessDuration.labels(target).startTimer()) {
+            return runAntProcess(pb);
+        }
     }
 
     private static AntProcessResult runAntProcess(ProcessBuilder pb) {

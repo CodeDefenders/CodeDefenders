@@ -33,12 +33,14 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.codedefenders.auth.CodeDefendersRealm;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,13 +59,15 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
     private final MessagesBean messages;
     private final UserService userService;
+    private final URLUtils url;
 
     @Inject
-    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService) {
+    public CodeDefendersFormAuthenticationFilter(MessagesBean messages, UserService userService, URLUtils urlUtils) {
         super();
 
         this.messages = messages;
         this.userService = userService;
+        this.url = urlUtils;
 
         // org.codedefenders.util.Paths.LOGIN = "/login";
         this.setLoginUrl(org.codedefenders.util.Paths.LOGIN);
@@ -71,6 +75,11 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         this.setSuccessUrl(org.codedefenders.util.Paths.GAMES_OVERVIEW);
     }
 
+    /**
+     * @implNote The return value is passed all the way up to {@link org.apache.shiro.web.servlet.AdviceFilter} and
+     * determines whether other filter should be invoked after this one (the chain continued) or not.
+     * We simply delegate this to our superclass.
+     */
     @Override
     protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request,
             ServletResponse response) throws Exception {
@@ -85,10 +94,19 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
         userService.recordSession(userId, ipAddress);
         logger.info("Successful login for username '{}' from ip {}", token.getPrincipal(), ipAddress);
 
+        if (token instanceof UsernamePasswordToken) { // Clear token to avoid possibility of later memory access
+            ((UsernamePasswordToken) token).clear();
+        }
+
         // Call the super method, as this is the one doing the redirect after a successful login.
         return super.onLoginSuccess(token, subject, request, response);
     }
 
+    /**
+     * @implNote The return value is passed all the way up to {@link org.apache.shiro.web.servlet.AdviceFilter} and
+     * determines whether other filters should be invoked after this one (the chain continued) or not.
+     * We redirect the user to the login page, so invoking other filters could result in errors, so we return false.
+     */
     @Override
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
             ServletResponse response) {
@@ -111,12 +129,18 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             }
 
             try {
-                httpResponse.sendRedirect(httpRequest.getContextPath() + Paths.LOGIN);
+                httpResponse.sendRedirect(url.forPath(Paths.LOGIN));
             } catch (IOException ioException) {
                 logger.error("TODO", e);
             }
         }
 
+        if (token instanceof UsernamePasswordToken) { // Clear token to avoid possibility of later memory access
+            ((UsernamePasswordToken) token).clear();
+        }
+
+        // We return false, because sending a redirect closes the response, and other filters should not try to interact
+        // with the request/response anymore.
         return false;
     }
 

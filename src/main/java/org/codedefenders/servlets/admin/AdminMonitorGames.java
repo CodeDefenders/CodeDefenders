@@ -38,14 +38,11 @@ import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.dto.SimpleUser;
-import org.codedefenders.execution.KillMap.KillMapType;
-import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -56,9 +53,11 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
+import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 @WebServlet(Paths.ADMIN_MONITOR)
 public class AdminMonitorGames extends HttpServlet {
@@ -77,6 +76,12 @@ public class AdminMonitorGames extends HttpServlet {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private GameService gameService;
+
+    @Inject
+    private URLUtils url;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -185,48 +190,49 @@ public class AdminMonitorGames extends HttpServlet {
                     gameId = Integer.parseInt(gameSelectedViaPlayButton);
                 } catch (Exception e) {
                     messages.add("There was a problem with the form.");
-                    response.sendRedirect(request.getContextPath() + "/admin");
+                    response.sendRedirect(url.forPath("/admin"));
                     return;
                 }
 
-
-                String errorMessage = "ERROR trying to start or stop game " + gameId
-                        + ".\nIf this problem persists, contact your administrator.";
-
-                game = GameDAO.getGame(gameId);
-
-                if (game == null) {
-                    messages.add(errorMessage);
-                } else {
-                    GameState newState = game.getState() == GameState.ACTIVE ? GameState.FINISHED : GameState.ACTIVE;
-                    game.setState(newState);
-                    if (!game.update()) {
-                        messages.add(errorMessage);
-                    } else {
-                        // Schedule the killmap
-                        if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob(new KillMapJob(KillMapType.GAME, gameId));
-                        }
-                    }
-                }
+                startStopGame(gameId, null);
             } else {
                 GameState newState = request.getParameter("games_btn").equals("Start Games")
                         ? GameState.ACTIVE : GameState.FINISHED;
                 for (String gameId : selectedGames) {
-                    game = GameDAO.getGame(Integer.parseInt(gameId));
-                    game.setState(newState);
-                    if (!game.update()) {
-                        messages.add("ERROR trying to start or stop game " + String.valueOf(gameId));
-                    } else {
-                        // Schedule the killmap
-                        if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob(new KillMapJob(KillMapType.GAME, Integer.parseInt(gameId)));
-                        }
-                    }
+                    startStopGame(Integer.parseInt(gameId), newState);
                 }
             }
         }
-        response.sendRedirect(request.getContextPath() + Paths.ADMIN_MONITOR);
+        response.sendRedirect(url.forPath(Paths.ADMIN_MONITOR));
+    }
+
+    private void startStopGame(int gameId, GameState pNewState) {
+        AbstractGame game = GameDAO.getGame(gameId);
+        boolean updated = false;
+
+        if (game != null) {
+            GameState invertedState = game.getState().equals(GameState.ACTIVE) ? GameState.FINISHED : GameState.ACTIVE;
+            GameState newState = pNewState == null ? invertedState : pNewState;
+
+            if (newState != invertedState) {
+                // skip games that already have the desired state
+                return;
+            }
+
+            if (newState == GameState.FINISHED) { // close game
+                updated = gameService.closeGame(game);
+            } else { // start game
+                game.setState(newState);
+                updated = game.update();
+            }
+        }
+
+        if (!updated) {
+            messages.add(String.format(
+                    "ERROR trying to start or stop game %d.\nIf this problem persists, contact your administrator.",
+                    gameId
+            ));
+        }
     }
 
 

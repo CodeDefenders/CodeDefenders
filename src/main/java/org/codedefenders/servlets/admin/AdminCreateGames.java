@@ -52,6 +52,7 @@ import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,9 @@ public class AdminCreateGames extends HttpServlet {
 
     @Inject
     private AdminCreateGamesBean adminCreateGamesBean;
+
+    @Inject
+    private URLUtils url;
 
     private StagedGameList stagedGameList;
 
@@ -135,7 +139,7 @@ public class AdminCreateGames extends HttpServlet {
                     break;
             }
 
-            response.sendRedirect(request.getContextPath() + Paths.ADMIN_GAMES);
+            response.sendRedirect(url.forPath(Paths.ADMIN_GAMES));
         }
     }
 
@@ -163,6 +167,10 @@ public class AdminCreateGames extends HttpServlet {
             gameSettings.setLevel(GameLevel.valueOf(request.getParameter("level")));
 
             gameSettings.setStartGame(request.getParameter("startGame") != null);
+
+            gameSettings.setGameDurationMinutes(getIntParameter(request, "gameDurationMinutes").get())
+                    .map(messages::add);
+
         } catch (NullPointerException | NoSuchElementException e) {
             messages.add("ERROR: Missing game settings parameter.");
             return null;

@@ -32,10 +32,10 @@ import javax.inject.Inject;
 
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.util.QueryRunner;
-import org.codedefenders.service.MetricsService;
 import org.codedefenders.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +61,7 @@ public class UserRepository {
     private final QueryRunner queryRunner;
 
     @Inject
-    public UserRepository(QueryRunner queryRunner, MetricsService metricsService) {
+    public UserRepository(QueryRunner queryRunner, MetricsRegistry metricsRegistry) {
         this.queryRunner = queryRunner;
 
         userIdForPlayerIdCache = CacheBuilder.newBuilder()
@@ -78,7 +78,7 @@ public class UserRepository {
                         }
                 );
 
-        metricsService.registerGuavaCache("userIdForPlayerId", userIdForPlayerIdCache);
+        metricsRegistry.registerGuavaCache("userIdForPlayerId", userIdForPlayerIdCache);
     }
 
     /**

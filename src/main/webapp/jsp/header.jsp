@@ -21,26 +21,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 <%@ page import="org.codedefenders.servlets.games.puzzle.PuzzleGameManager" %>
-<%@ page import="org.codedefenders.servlets.UserSettingsManager" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="auth" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
-<%
-    boolean profileEnabled = UserProfileManager.checkEnabled();
-    boolean accountEnabled = UserSettingsManager.checkEnabled();
-    boolean puzzleEnabled = PuzzleGameManager.checkEnabled();
-%>
-
 <nav class="navbar navbar-expand-md navbar-cd" id="header">
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="${pageContext.request.contextPath}">
-            <img src="${pageContext.request.contextPath}/images/logo.png" alt="" class="d-inline-block"
+        <a class="navbar-brand" href="${url.forPath("/")}">
+            <img src="${url.forPath("/images/logo.png")}" alt="" class="d-inline-block"
                  <%-- Negative margin to prevent the navbar from getting tall from the tall image. --%>
                  style="height: 2.5rem; margin: -2rem .25rem -1.7rem .2rem;" />
             Code Defenders
@@ -59,19 +51,19 @@
                         Multiplayer
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="header-multiplayer">
-                        <li><a class="dropdown-item" id="header-games" href="${pageContext.request.contextPath}${Paths.GAMES_OVERVIEW}">Games</a></li>
-                        <li><a class="dropdown-item" id="header-games-history" href="${pageContext.request.contextPath}${Paths.GAMES_HISTORY}">History</a></li>
-                        <li><a class="dropdown-item" id="header-leaderboard" href="${pageContext.request.contextPath}${Paths.LEADERBOARD_PAGE}">Leaderboard</a></li>
+                        <li><a class="dropdown-item" id="header-games" href="${url.forPath(Paths.GAMES_OVERVIEW)}">Games</a></li>
+                        <li><a class="dropdown-item" id="header-games-history" href="${url.forPath(Paths.GAMES_HISTORY)}">History</a></li>
+                        <li><a class="dropdown-item" id="header-leaderboard" href="${url.forPath(Paths.LEADERBOARD_PAGE)}">Leaderboard</a></li>
                     </ul>
                 </li>
-                <% if (puzzleEnabled) { %>
-                <li class="nav-item nav-item-highlight me-3">
-                    <a class="nav-link" id="header-puzzle" href="${pageContext.request.contextPath}${Paths.PUZZLE_OVERVIEW}">Puzzles</a>
-                </li>
-                <% } %>
+                <c:if test="${PuzzleGameManager.checkEnabled()}">
+                    <li class="nav-item nav-item-highlight me-3">
+                    <a class="nav-link" id="header-puzzle" href="${url.forPath(Paths.PUZZLE_OVERVIEW)}">Puzzles</a>
+                    </li>
+                </c:if>
                 <c:if test="${auth.admin}">
                     <li class="nav-item nav-item-highlight me-3">
-                        <a class="nav-link" id="header-admin" href="${pageContext.request.contextPath}/admin">Admin</a>
+                        <a class="nav-link" id="header-admin" href="${url.forPath("/admin")}">Admin</a>
                     </li>
                 </c:if>
             </ul>
@@ -84,14 +76,10 @@
                     <ul class="dropdown-menu" id="user-dropdown" aria-labelledby="header-user"
                         <%-- Align dropdown menu to the right, so it doesn't get cut off. --%>
                         style="left: auto; right: 0;">
-                        <% if (profileEnabled) { %>
-                            <li><a class="dropdown-item" id="header-profile" href="${pageContext.request.contextPath}${Paths.USER_PROFILE}">Profile</a></li>
-                        <% } %>
-                        <% if (accountEnabled) { %>
-                            <li><a class="dropdown-item" id="header-account" href="${pageContext.request.contextPath}${Paths.USER_SETTINGS}">Account</a></li>
-                        <% } %>
-                        <li><a class="dropdown-item" id="header-help" href="${pageContext.request.contextPath}${Paths.HELP_PAGE}">Help</a></li>
-                        <li><a class="dropdown-item" id="header-logout" href="${pageContext.request.contextPath}${Paths.LOGOUT}">Logout</a></li>
+                        <li><a class="dropdown-item" id="header-profile" href="${url.forPath(Paths.USER_PROFILE)}">Profile</a></li>
+                        <li><a class="dropdown-item" id="header-account" href="${url.forPath(Paths.USER_SETTINGS)}">Account</a></li>
+                        <li><a class="dropdown-item" id="header-help" href="${url.forPath(Paths.HELP_PAGE)}">Help</a></li>
+                        <li><a class="dropdown-item" id="header-logout" href="${url.forPath(Paths.LOGOUT)}">Logout</a></li>
                     </ul>
                 </li>
             </ul>

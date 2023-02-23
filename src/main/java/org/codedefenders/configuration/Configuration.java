@@ -22,6 +22,8 @@ package org.codedefenders.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
@@ -79,10 +81,12 @@ import com.google.common.net.InternetDomainName;
 public class Configuration {
     private static final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
-    private boolean $validated;
-    private ConfigurationValidationException $configurationValidationException;
+    private boolean _validated;
+    private ConfigurationValidationException _configurationValidationException;
 
     // All the attributes need to be initialized with a null value and therefore need to be objects
+    protected String appUrl;
+    protected Optional<URL> _appUrl;
     protected String dataDir;
     protected String antHome;
     protected String antJavaHome;
@@ -99,6 +103,8 @@ public class Configuration {
     protected Integer clusterTimeout;
     protected Boolean forceLocalExecution;
     protected Boolean parallelize;
+    protected Integer parallelizeCount;
+    protected Integer parallelizeKillmapCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
 
@@ -114,8 +120,24 @@ public class Configuration {
      * @throws ConfigurationValidationException This lists all the reasons why the validation failed.
      */
     public final void validate() throws ConfigurationValidationException {
-        if (!$validated) {
+        if (!_validated) {
             List<String> validationErrors = new ArrayList<>();
+
+            if (appUrl != null) {
+                Optional<URL> realAppUrlOpt = getApplicationURL();
+                if (!realAppUrlOpt.isPresent()) {
+                    validationErrors.add("Property " + resolveAttributeName("appUrl") + " has invalid format");
+                } else {
+                    URL realAppUrl = realAppUrlOpt.get();
+                    if (realAppUrl.getProtocol() == null
+                            || realAppUrl.getHost() == null
+                            || realAppUrl.getUserInfo() != null
+                            || realAppUrl.getQuery() != null
+                            || realAppUrl.getRef() != null) {
+                        validationErrors.add("App url invalid");
+                    }
+                }
+            }
 
             if (dataDir == null || dataDir.equals("")) {
                 validationErrors.add("Property " + resolveAttributeName("dataDir") + " is missing");
@@ -130,7 +152,6 @@ public class Configuration {
                     validationErrors.add(setupFile(dataDir, "security.policy",
                             () -> this.getClass().getResourceAsStream("/data/security.policy")));
 
-                    validationErrors.add(setupDirectory(getAiDir()));
                     validationErrors.add(setupDirectory(getMutantDir()));
                     validationErrors.add(setupDirectory(getTestsDir()));
                     validationErrors.add(setupDirectory(getSourcesDir()));
@@ -220,14 +241,14 @@ public class Configuration {
              */
 
             validationErrors.removeIf(Objects::isNull);
-            $validated = true;
+            _validated = true;
             if (!validationErrors.isEmpty()) {
-                $configurationValidationException = new ConfigurationValidationException(validationErrors);
-                throw $configurationValidationException;
+                _configurationValidationException = new ConfigurationValidationException(validationErrors);
+                throw _configurationValidationException;
             }
         } else {
-            if ($configurationValidationException != null) {
-                throw $configurationValidationException;
+            if (_configurationValidationException != null) {
+                throw _configurationValidationException;
             }
         }
     }
@@ -295,6 +316,26 @@ public class Configuration {
         return true;
     }
 
+
+    /**
+     * @return A URL that has a protocol, host, path, and optional a port.
+     */
+    public Optional<URL> getApplicationURL() {
+        //noinspection OptionalAssignedToNull
+        if (_appUrl == null) {
+            _appUrl = Optional.ofNullable(appUrl)
+                    .filter(s -> !s.trim().isEmpty())
+                    .map(s -> {
+                        try {
+                            return new URL(s);
+                        } catch (MalformedURLException ignored) {
+                            return null;
+                        }
+                    });
+        }
+        return _appUrl;
+    }
+
     public File getDataDir() {
         return new File(dataDir);
     }
@@ -313,10 +354,6 @@ public class Configuration {
 
     public File getLibraryDir() {
         return new File(getDataDir(), "lib");
-    }
-
-    public File getAiDir() {
-        return new File(getDataDir(), "ai");
     }
 
     public File getAntHome() {
@@ -381,6 +418,10 @@ public class Configuration {
         return parallelize;
     }
 
+    public int getNumberOfParallelAntExecutions() {
+        return parallelizeCount;
+    }
+
     public boolean isBlockAttacker() {
         return blockAttacker;
     }
@@ -390,7 +431,11 @@ public class Configuration {
     }
 
     public int getNumberOfKillmapThreads() {
-        return 40;
+        if (parallelizeKillmapCount == null) {
+            return Runtime.getRuntime().availableProcessors();
+        } else {
+            return parallelizeKillmapCount;
+        }
     }
 
     public boolean isMetricsCollectionEnabled() {

@@ -35,6 +35,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,9 @@ public class AdminClassesManagement extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private URLUtils url;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -105,7 +109,7 @@ public class AdminClassesManagement extends HttpServlet {
                 break;
         }
 
-        response.sendRedirect(request.getContextPath() + Paths.ADMIN_CLASSES);
+        response.sendRedirect(url.forPath(Paths.ADMIN_CLASSES));
     }
 
     private boolean setClassInactive(int classId) {

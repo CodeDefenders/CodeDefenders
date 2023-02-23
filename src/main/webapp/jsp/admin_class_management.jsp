@@ -21,6 +21,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
 
@@ -53,7 +55,7 @@
                 <tr>
                     <td colspan="100" class="text-center">
                         There are no classes yet.
-                        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.ADMIN_CLASSES%>">Click here</a>
+                        <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.ADMIN_CLASSES%>">Click here</a>
                         to upload a new class.
                     </td>
                 </tr>
@@ -85,7 +87,7 @@
                         <%
                             if (deletable) {
                         %>
-                            <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
+                            <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
                                 <input type="hidden" name="formType" value="classRemoval">
                                 <button class="btn btn-sm btn-danger" id="<%="delete_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
                                         title="Delete class from the system. This class won't be available for games afterwards."
@@ -96,7 +98,7 @@
                         <%
                             } else {
                         %>
-                            <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
+                            <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
                                 <input type="hidden" name="formType" value="classInactive">
 
                                 <button class="btn btn-sm btn-danger" id="<%="inactive_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
@@ -123,7 +125,7 @@
 
     <% if (!allClasses.isEmpty()) { %>
         <p>
-            <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?origin=<%=Paths.ADMIN_CLASSES%>">Click here</a>
+            <a href="${url.forPath(Paths.CLASS_UPLOAD)}?origin=<%=Paths.ADMIN_CLASSES%>">Click here</a>
             to upload a new class.
         </p>
     <% } %>

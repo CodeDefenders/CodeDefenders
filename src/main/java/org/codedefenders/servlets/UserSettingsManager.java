@@ -31,16 +31,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.database.AdminDAO;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserService;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.input.CodeDefendersValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This {@link HttpServlet} handles requests for managing the currently logged
  * in {@link UserEntity}. This functionality may be disabled, e.g. in a class room
- * setting. See {@link #checkEnabled()}.
+ * setting.
  *
  * <p>Serves on path: {@code /account-settings}.
  *
@@ -70,32 +69,18 @@ public class UserSettingsManager extends HttpServlet {
     @Inject
     private CodeDefendersAuth login;
 
+    @Inject
+    private URLUtils url;
+
     private static final String DELETED_USER_NAME = "DELETED";
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";
     private static final String DELETED_USER_PASSWORD = "DELETED";
 
-    /**
-     * Checks whether users can view and update their profile information.
-     *
-     * @return {@code true} when users can access their profile, {@code false} otherwise.
-     */
-    public static boolean checkEnabled() {
-        // TODO: add ALLOW_USER_SETTINGS to DB and use it instead of ALLOW_USER_PROFILE.
-        // return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_SETTINGS).getBoolValue();
-        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkEnabled()) {
-            // Send users to the home page
-            response.sendRedirect(ServletUtils.getBaseURL(request));
-            return;
-        }
-
         if (!userRepo.getUserById(login.getUserId()).isPresent()) {
-            response.sendRedirect(request.getContextPath());
+            response.sendRedirect(url.forPath("/"));
             return;
         }
 
@@ -105,13 +90,7 @@ public class UserSettingsManager extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkEnabled()) {
-            // Send users to the home page
-            response.sendRedirect(request.getContextPath());
-            return;
-        }
-
-        String responsePath = request.getContextPath() + Paths.USER_SETTINGS;
+        String responsePath = url.forPath(Paths.USER_SETTINGS);
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
@@ -174,7 +153,7 @@ public class UserSettingsManager extends HttpServlet {
                      * so)
                      */
                     // messages.add("You successfully deleted your account. Sad to see you go. :(");
-                    response.sendRedirect(request.getContextPath() + Paths.LOGOUT);
+                    response.sendRedirect(url.forPath(Paths.LOGOUT));
                 } else {
                     logger.info("Failed to set user {} as inactive.", login.getUserId());
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");

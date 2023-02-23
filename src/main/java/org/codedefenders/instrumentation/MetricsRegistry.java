@@ -17,7 +17,9 @@
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.codedefenders.service;
+package org.codedefenders.instrumentation;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -29,21 +31,21 @@ import io.prometheus.client.hotspot.DefaultExports;
  * Provides additional functionality for Metrics collection.
  */
 @ApplicationScoped
-public class MetricsService {
+public class MetricsRegistry {
 
-    private CacheMetricsCollector cacheMetrics;
+    private static final CacheMetricsCollector cacheMetrics = new CacheMetricsCollector().register();
+    private static final ThreadPoolMetricsCollector threadPoolExecutorMetrics = new ThreadPoolMetricsCollector().register();
 
-    public MetricsService() {
-    }
-
-    synchronized public void registerGuavaCache(String name, Cache<?, ?> cache) {
-        if (cacheMetrics == null) {
-            cacheMetrics = new CacheMetricsCollector().register();
-        }
-        cacheMetrics.addCache(name, cache);
-    }
 
     public void registerDefaultCollectors() {
         DefaultExports.initialize();
+    }
+
+    public void registerGuavaCache(String name, Cache<?, ?> cache) {
+        cacheMetrics.addCache(name, cache);
+    }
+
+    public void registerThreadPoolExecutor(String name, ThreadPoolExecutor executor) {
+        threadPoolExecutorMetrics.addThreadPoolExecutor(name, executor);
     }
 }

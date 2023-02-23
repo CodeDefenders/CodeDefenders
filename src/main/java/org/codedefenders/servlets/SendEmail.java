@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +46,9 @@ public class SendEmail extends HttpServlet {
 
     @Inject
     private MessagesBean messages;
+
+    @Inject
+    private URLUtils url;
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -67,6 +71,6 @@ public class SendEmail extends HttpServlet {
             messages.add("Sorry! There was an error when trying to send the message.");
         }
 
-        response.sendRedirect(request.getContextPath() + Paths.CONTACT_PAGE);
+        response.sendRedirect(url.forPath(Paths.CONTACT_PAGE));
     }
 }

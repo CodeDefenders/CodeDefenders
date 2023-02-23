@@ -30,12 +30,13 @@ import javax.servlet.http.HttpSession;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.MetricsService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminUserManagement;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,6 +52,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.when;
 
 /*
 `@PowerMockIgnore` is required to fix some strange exception caused by PowerMock:
@@ -144,7 +146,7 @@ public class AdminUserManagementIT {
     }
 
     @Test
-    public void testCorrentURLinEmail() throws Exception {
+    public void testCorrectURLinEmail() throws Exception {
 
 //        Validation is done using instances of CodeDefendersValidator now.
 //        PowerMockito.mockStatic(LoginManager.class);
@@ -187,7 +189,7 @@ public class AdminUserManagementIT {
 
             Field fieldUserRepo = AdminUserManagement.class.getDeclaredField("userRepo");
             fieldUserRepo.setAccessible(true);
-            UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsService.class));
+            UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsRegistry.class));
             fieldUserRepo.set(adminUserManagement, userRepo);
 
             Field fieldMessages = AdminUserManagement.class.getDeclaredField("messages");
@@ -195,13 +197,18 @@ public class AdminUserManagementIT {
             MessagesBean messagesBean = mock(MessagesBean.class);
             fieldMessages.set(adminUserManagement, messagesBean);
 
+            Field fieldURLUtils = AdminUserManagement.class.getDeclaredField("url");
+            fieldURLUtils.setAccessible(true);
+            URLUtils url = mock(URLUtils.class);
+            fieldURLUtils.set(adminUserManagement, url);
+            when(url.getAbsoluteURLForPath("/")).thenReturn("http://localhost:8080/");
+
             adminUserManagement.doPost(request, response);
         } catch (IOException | ServletException e) {
             e.printStackTrace();
             Assert.fail("Exception raised");
         }
 
-        //PowerMockito.verifyStatic();
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         PowerMockito.verifyStatic(EmailUtils.class);
         EmailUtils.sendEmail(Mockito.anyString(), Mockito.anyString(), captor.capture());

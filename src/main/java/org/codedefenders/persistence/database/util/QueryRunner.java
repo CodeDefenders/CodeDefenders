@@ -82,6 +82,10 @@ public interface QueryRunner {
     <T> T insert(@Language("SQL") @Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
             @Nonnull Object... params) throws SQLException;
 
+
+    <T> T insertBatch(@Language("SQL") @Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
+            @Nonnull Object[][] params) throws SQLException;
+
     /**
      * Executes the given INSERT, UPDATE, or DELETE SQL statement without any replacement parameters.
      *
@@ -123,4 +127,6 @@ public interface QueryRunner {
      */
     <T> List<T> execute(@Language("SQL") @Nonnull String sql, @Nonnull ResultSetHandler<T> mapper,
             @Nonnull Object... params) throws SQLException;
+
+    int[] batch(@Language("SQL") @Nonnull String sql, @Nonnull Object[][] params) throws SQLException;
 }

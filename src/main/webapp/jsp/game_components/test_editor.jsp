@@ -23,6 +23,7 @@
     Displays the test code in a CodeMirror textarea.
 --%>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 
 <jsp:useBean id="testEditor" class="org.codedefenders.beans.game.TestEditorBean" scope="request"/>
@@ -34,8 +35,8 @@
 </div>
 
 <script type="module">
-    import {objects} from './js/codedefenders_main.mjs';
-    import {TestEditor} from './js/codedefenders_game.mjs';
+    import {objects} from '${url.forPath("/js/codedefenders_main.mjs")}';
+    import {TestEditor} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
 
     const editableLinesStart = ${testEditor.hasEditableLinesStart() ? testEditor.editableLinesStart : "null"};

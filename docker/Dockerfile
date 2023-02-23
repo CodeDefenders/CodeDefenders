@@ -4,7 +4,8 @@ WORKDIR /Codedefenders/
 COPY ./local-repo ./local-repo/
 COPY pom.xml .
 # Download dependencies before copying the source code as the dependencies don't change that often
-RUN mvn --no-transfer-progress dependency:go-offline
+# javamelody-core depends on strange/old artifacts that can't be properly resolved/downloaded but we simply ignore this.
+RUN mvn --no-transfer-progress dependency:go-offline || true
 COPY ./.git ./.git/
 COPY ./src ./src/
 COPY package.json .

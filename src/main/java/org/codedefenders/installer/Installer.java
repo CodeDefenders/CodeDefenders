@@ -38,6 +38,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -50,6 +51,7 @@ import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMapService;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -81,12 +83,18 @@ public class Installer {
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
     private final BackendExecutorService backend;
+
     private final CoverageGenerator coverageGenerator;
 
+    private final KillMapService killMapService;
+
     @Inject
-    public Installer(BackendExecutorService backend, CoverageGenerator coverageGenerator) {
+    public Installer(BackendExecutorService backend,
+                     CoverageGenerator coverageGenerator,
+                     KillMapService killMapService) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
+        this.killMapService = killMapService;
     }
 
     /**
@@ -145,23 +153,13 @@ public class Installer {
      * @return a list of found files. Empty if none or an error occurred.
      */
     private static List<File> getFilesForDir(Path directory, String fileExtension) {
-        List<File> files;
-        try {
-            files = Files.find(directory, 5, (path, basicFileAttributes) -> {
-                if (path.toFile().isDirectory()) {
-                    return false;
-                }
-                if (!path.getFileName().toString().endsWith(fileExtension)) {
-                    return false;
-                }
-                return true;
-            })
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
+        try (Stream<Path> paths = Files.find(directory, 5,
+                (path, attrs) -> !Files.isDirectory(path) && path.getFileName().toString().endsWith(fileExtension))) {
+            return paths.map(Path::toFile).collect(Collectors.toList());
         } catch (IOException e) {
-            files = new ArrayList<>();
+            logger.error("Failed to search files in directory", e);
+            return new ArrayList<>();
         }
-        return files;
     }
 
     private void run(List<File> cuts, List<File> mutants, List<File> tests,
@@ -463,7 +461,7 @@ public class Installer {
         logger.info("installPuzzle() Created Puzzle " + puzzleId);
 
         try {
-            KillMap killMap = KillMap.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>());
+            KillMap killMap = killMapService.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>());
             KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), puzzleClassId);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Error while calculating killmap for successfully installed puzzle.", e);

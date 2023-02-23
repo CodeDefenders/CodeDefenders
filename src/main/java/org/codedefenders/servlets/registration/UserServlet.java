@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.service.UserService;
 import org.codedefenders.util.Paths;
+import org.codedefenders.util.URLUtils;
 
 
 @WebServlet(Paths.USER)
@@ -23,6 +24,9 @@ public class UserServlet extends HttpServlet {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private URLUtils url;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -45,7 +49,7 @@ public class UserServlet extends HttpServlet {
                     messages.add(result.get());
                 }
             }
-            response.sendRedirect(request.getContextPath() + Paths.LOGIN);
+            response.sendRedirect(url.forPath(Paths.LOGIN));
         } else { // Anything different from "create" is an error, so we not allow it
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }

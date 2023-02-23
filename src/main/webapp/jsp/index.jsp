@@ -24,6 +24,8 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%
     List<MultiplayerGame> openGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
     Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
@@ -38,7 +40,7 @@
 <div class="container py-4 h-100 d-flex flex-column justify-content-center align-items-center">
 
     <div class="d-flex align-items-center gap-3 mb-3">
-        <img src="images/logo.png" alt="Code Defenders Logo" width="58">
+        <img src="${url.forPath("/images/logo.png")}" alt="Code Defenders Logo" width="58">
         <%-- Make the header break nicely on smaller screens. --%>
         <h1 class="d-lg-block d-flex flex-column">
             <span>Code Defenders: </span>
@@ -46,7 +48,7 @@
         </h1>
     </div>
 
-    <a href="${pageContext.request.contextPath}<%=Paths.LOGIN%>"
+    <a href="${url.forPath(Paths.LOGIN)}"
        class="btn btn-lg btn-primary btn-highlight"
        style="margin-bottom: 5rem;">
         Log in or Sign up

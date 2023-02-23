@@ -41,12 +41,12 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.MetricsService;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
@@ -232,7 +232,7 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testInsertPlayer() throws Exception {
-        UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsService.class));
+        UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsRegistry.class));
 
         assumeTrue(creator.insert());
         assumeTrue(user1.insert());
