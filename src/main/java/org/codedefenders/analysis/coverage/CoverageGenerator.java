@@ -18,14 +18,15 @@
  */
 package org.codedefenders.analysis.coverage;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -68,8 +69,8 @@ public class CoverageGenerator {
      */
     public NewLineCoverage generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
-        final File execFile = findJacocoExecFile(testJavaFile);
-        final Collection<File> relevantClassFiles = findRelevantClassFiles(gameClass);
+        final Path execFile = findJacocoExecFile(testJavaFile);
+        final Collection<Path> relevantClassFiles = findRelevantClassFiles(gameClass);
 
         CoverageBuilder coverageBuilder = readJacocoCoverage(execFile, relevantClassFiles);
         DetailedLineCoverage originalCoverage = extractLineCoverage(coverageBuilder, gameClass);
@@ -104,54 +105,52 @@ public class CoverageGenerator {
         }
     }
 
-    public CoverageBuilder readJacocoCoverage(File execFile, Collection<File> relevantClassFiles)
+    public CoverageBuilder readJacocoCoverage(Path execFile, Collection<Path> relevantClassFiles)
             throws CoverageGeneratorException {
         final ExecFileLoader execFileLoader = new ExecFileLoader();
         try {
-            execFileLoader.load(execFile);
+            execFileLoader.load(execFile.toFile());
         } catch (IOException e) {
-            throw new CoverageGeneratorException("Failed to load jacoco.exec file: " + execFile.getPath(), e);
+            throw new CoverageGeneratorException("Failed to load jacoco.exec file: " + execFile, e);
         }
 
         final ExecutionDataStore executionDataStore = execFileLoader.getExecutionDataStore();
         final CoverageBuilder coverageBuilder = new CoverageBuilder();
         final Analyzer analyzer = new Analyzer(executionDataStore, coverageBuilder);
 
-        for (File classFile : relevantClassFiles) {
-            try (InputStream is = Files.newInputStream(classFile.toPath())) {
-                analyzer.analyzeClass(is, classFile.getPath());
+        for (Path classFile : relevantClassFiles) {
+            try (InputStream is = Files.newInputStream(classFile)) {
+                analyzer.analyzeClass(is, classFile.toString());
             } catch (IOException e) {
-                throw new CoverageGeneratorException("Failed to analyze file: " + classFile.getPath(), e);
+                throw new CoverageGeneratorException("Failed to analyze file: " + classFile, e);
             }
         }
 
         return coverageBuilder;
     }
 
-    public File findJacocoExecFile(Path testJavaFile)
+    public Path findJacocoExecFile(Path testJavaFile)
             throws CoverageGeneratorException {
-        final File reportDirectory = testJavaFile.getParent().toFile();
-        final File execFile = new File(reportDirectory, JACOCO_REPORT_FILE);
-        if (!execFile.isFile()) {
+        final Path reportDirectory = testJavaFile.getParent();
+        final Path execFile = reportDirectory.resolve(JACOCO_REPORT_FILE);
+        if (!Files.isRegularFile(execFile)) {
             throw new CoverageGeneratorException("Could not find JaCoCo exec file for test: " + testJavaFile);
         }
         return execFile;
     }
 
-    public Collection<File> findRelevantClassFiles(GameClass gameClass)
-            throws CoverageGeneratorException {
-        final File classFileFolder = new File(gameClass.getClassFile()).getParentFile();
+    public Collection<Path> findRelevantClassFiles(GameClass gameClass) throws CoverageGeneratorException {
+        final Path classFileFolder = Paths.get(gameClass.getClassFile()).getParent();
 
         final String innerClassRegex = gameClass.getName() + "(\\$.*)?.class";
         final Pattern innerClassPattern = Pattern.compile(innerClassRegex);
 
-        File[] relevantFiles = classFileFolder.listFiles(
-                (dir, name) -> innerClassPattern.matcher(name).matches());
-
-        if (relevantFiles == null) {
+        try (Stream<Path> files = Files.find(classFileFolder, 1,
+                (path, ignored) -> innerClassPattern.matcher(path.getFileName().toString()).matches())) {
+            return files.collect(Collectors.toList());
+        } catch (IOException e) {
             throw new CoverageGeneratorException("Could not list class files for class: " + gameClass.getClassFile());
         }
-        return Arrays.asList(relevantFiles);
     }
 
     public DetailedLineCoverage extractLineCoverage(CoverageBuilder coverageBuilder, GameClass gameClass) {
