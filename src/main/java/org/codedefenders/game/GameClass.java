@@ -308,13 +308,21 @@ public class GameClass {
         return testTemplate.getEditableLinesStart();
     }
 
+    private ClassAnalysisResult getClassAnalysis() {
+        if (id != null) {
+            ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
+            return analyser.analyze(getId()).get();
+        } else {
+            ClassCodeAnalyser analyser = CDIUtil.getBeanFromCDI(ClassCodeAnalyser.class);
+            return analyser.analyze(getSourceCode()).get();
+        }
+    }
+
     /**
      * Returns a copy of the additional import statements computed for this class.
      */
     public List<String> getAdditionalImports() {
-        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
-        ClassAnalysisResult result = analyser.analyze(getId()).get();
-        return Collections.unmodifiableList(result.getAdditionalImports());
+        return Collections.unmodifiableList(getClassAnalysis().getAdditionalImports());
     }
 
     /**
@@ -325,15 +333,11 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getCompileTimeConstants() {
-        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
-        ClassAnalysisResult result = analyser.analyze(getId()).get();
-        return Collections.unmodifiableList(result.getCompileTimeConstants());
+        return Collections.unmodifiableList(getClassAnalysis().getCompileTimeConstants());
     }
 
     public List<MethodDescription> getMethodDescriptions() {
-        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
-        ClassAnalysisResult result = analyser.analyze(getId()).get();
-        return Collections.unmodifiableList(result.getMethodDescriptions());
+        return Collections.unmodifiableList(getClassAnalysis().getMethodDescriptions());
     }
 
     @Override
