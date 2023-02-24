@@ -93,6 +93,7 @@ public class CoverageTest {
 
         // load instrumented code
         final InMemoryClassLoader memoryClassLoader = new InMemoryClassLoader(instrumented);
+        memoryClassLoader.setDefaultAssertionStatus(true); // enable assertions for tests
         final Class<?> targetClass = memoryClassLoader.loadClass(testName);
 
         // run the test
