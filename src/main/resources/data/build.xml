@@ -139,13 +139,14 @@
 				<formatter type="plain" usefile="false"/>
 				<jvmarg value="-Djava.security.manager"/>
 				<jvmarg value="-Djava.security.policy==${policyfile}"/>
+				<assertions><enable/></assertions>
 			</junit>
 		</jacoco:coverage>
 	</target>
 
 	<!-- requires test, mutant, and the name of the class -->
 	<target name="test-mutant" description="run test on mutant to see if test fails">
-		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false">
+		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false" fork="true" clonevm="true">
             <sysproperty key="codedef.home" value="${codedef.home}" />
 
 			<!-- Sets the content of the classpath to the mutant -->
@@ -157,6 +158,7 @@
 			<formatter type="plain" usefile="false"/>
 			<jvmarg value="-Djava.security.manager"/>
 			<jvmarg value="-Djava.security.policy==${policyfile}"/>
+			<assertions><enable/></assertions>
 		</junit>
 	</target>
 
@@ -175,9 +177,9 @@
 
 	<!-- in some cases we need to recompile the test with the mutant and then execute the test -->
 	<target name="recompiled-test-mutant"
-			description="recompile the test using the mutant, and test the mutant to see if test fails"
+			description="test a recompiled test against a mutant to see if test fails"
 			depends="recompile-test-with-mutant">
-		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false">
+		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false" fork="true" clonevm="true">
             <sysproperty key="codedef.home" value="${codedef.home}" />
 
 			<!-- Sets the content of the classpath to the mutant -->
@@ -190,6 +192,7 @@
 			<formatter type="plain" usefile="false"/>
 			<jvmarg value="-Djava.security.manager"/>
 			<jvmarg value="-Djava.security.policy==${policyfile}"/>
+			<assertions><enable/></assertions>
 		</junit>
 	</target>
 
