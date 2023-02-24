@@ -1247,9 +1247,10 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .upgrade(checkStatus.status())
                 .upgrade(messageStatus.status());
 
-        StatusAfter statusAfter;
+        StatusAfter statusAfter = StatusAfter.MAYBE_COVERED;
         getStatusAfter: {
             // all ins covered means assert threw
+            // we don't do anything on partial coverage, because it could be from another stmt on the same line
             switch (keywordStatus.instructionStatus()) {
                 case NOT_COVERED:
                     statusAfter = StatusAfter.NOT_COVERED;
@@ -1261,10 +1262,11 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                         } else {
                             statusAfter = StatusAfter.NOT_COVERED;
                         }
-                    } else {
-                        statusAfter = StatusAfter.MAYBE_COVERED;
+                        break getStatusAfter;
+                    } else if (branchStatus.totalBranches() == 0) {
+                        statusAfter = StatusAfter.NOT_COVERED;
+                        break getStatusAfter;
                     }
-                    break getStatusAfter;
             }
 
             switch (branchStatus.branchStatus()) {
@@ -1277,12 +1279,10 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 case PARTLY_COVERED:
                     if (messageStatus.isCovered() && beginOf(stmt.getMessage().get()) > endOf(stmt.getCheck())) {
                         statusAfter = StatusAfter.NOT_COVERED;
-                    } else {
-                        statusAfter = StatusAfter.MAYBE_COVERED;
+                    } else if (messageStatus.isNotCovered() && status.isCovered()) {
+                        statusAfter = StatusAfter.COVERED;
                     }
                     break getStatusAfter;
-                default:
-                    throw new IllegalArgumentException("Unknown line coverage status: " + branchStatus.instructionStatus());
             }
         }
 

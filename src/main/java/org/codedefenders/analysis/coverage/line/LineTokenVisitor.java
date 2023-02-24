@@ -783,7 +783,9 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = lineTokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
             AstCoverageStatus checkStatus = astCoverage.get(stmt.getCheck());
-            AstCoverageStatus messageStatus = astCoverage.get(stmt.getMessage().get());
+            AstCoverageStatus messageStatus = stmt.getMessage()
+                    .map(astCoverage::get)
+                    .orElseGet(AstCoverageStatus::empty);
 
             JavaToken assertToken = stmt.getTokenRange().get().getBegin();
             int keywordEndLine = JavaTokenIterator.expandWhitespaceAfter(assertToken);

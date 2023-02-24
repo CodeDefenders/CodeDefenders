@@ -13,30 +13,74 @@ import static utils.Utils.doThrow;
  */
 public class Assertions {
     @Call(params = "0")
-    public void passingAssertions(int i) {
+    public void passingAssertion1(int i) {
+        assert true;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion2(int i) {
         assert
                 i == 0
                 : "";
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion3(int i) {
         assert
                 doGet(i) == 0
                 : "";
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion4(int i) {
         assert
                 i == 0
                 : "" + doGet(i);
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion5(int i) {
         assert
                 doGet(i) == 0
                 : "" + doGet(i);
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion6(int i) {
         assert i == 0 : "";
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion7(int i) {
         assert doGet(i) == 0 : "";
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion8(int i) {
         assert i == 0 : "" + doGet(i);
 
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertion9(int i) {
         assert doGet(i) == 0 : "" + doGet(i);
+
+        // block: ignore_end_status
     }
 
     @Call(params = "0", exception = AssertionError.class)
@@ -154,6 +198,87 @@ public class Assertions {
     @Call(params = "0", exception = AssertionError.class)
     public void throwingAssertion4OneLine(int i) {
         assert doGet(i) != 0 : "" + doGet(i);
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertion5(int i) {
+        assert false : "";
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertion6(int i) {
+        assert false
+                : doGet(i) + "";
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertion6OneLine(int i) {
+        assert false : doGet(i) + "";
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertionWithoutMessage1(int i) {
+        assert i == 0;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertionWithoutMessage2(int i) {
+        assert
+                doGet(i) == 0;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0")
+    public void passingAssertionWithoutMessage2OneLine(int i) {
+        assert doGet(i) == 0;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertionWithoutMessage1(int i) {
+        assert false;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertionWithoutMessage2(int i) {
+        assert
+                i != 0;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertionWithoutMessage2OneLine(int i) {
+        assert i != 0;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertionWithoutMessage3(int i) {
+        assert
+                doGet(i) != 0;
+
+        // block: ignore_end_status
+    }
+
+    @Call(params = "0", exception = AssertionError.class)
+    public void throwingAssertionWithoutMessage3OneLine(int i) {
+        assert doGet(i) != 0;
 
         // block: ignore_end_status
     }
