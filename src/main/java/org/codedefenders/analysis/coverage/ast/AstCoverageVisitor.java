@@ -31,6 +31,7 @@ import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
+import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.JavaToken;
@@ -160,33 +161,23 @@ import static org.codedefenders.util.JavaParserUtils.endOf;
  *         covered. Therefore, we mostly check for single lines to determine the coverage of an AST node.
  *     </li>
  *     <li>
- *         Many expressions aren't covered because they don't always produce a coverable instruction on their line.
- *         A surrounding statement may determine their status from the line-coverage. E.g. consider:
+ *         Many expressions aren't usually covered on their own, because they don't produce a instruction on their line.
+ *         E.g. consider:
  *         <pre>{@code
- *              () ->
- *                  2 + 2;  // <- this line will be covered
+ *              int i =         // <- this line is covered by JaCoCo
+ *                      2 + 2;  // <- this line is empty
  *         }</pre>
- *         Here, the status of the {@link BinaryExpr} [2 + 2] will be EMPTY since it's not
- *         always coverable. Here, for example
- *         <pre>{@code
- *              int i =     // <- this line will be covered
- *                  2 + 2;
- *         }</pre>
- *         it doesn't produce a coverable instruction on the {@code 2 + 2} line.
- *         Therefore, the surrounding lambda expression checks the lines of it's expression and determines their
- *         coverage itself. The same is done for if conditions, for example.
- *         Another way to handle this would be count every expression as coverable and flow their coverage up in the
- *         AST, but this would also lead to some expressions being covered while others are not, so I tried doing it
- *         this way for now.
+ *         In this case, empty expressions are usually left EMPTY. {@link LineTokenVisitor} will still cover their lines
+ *         based on the surrounding statements and/or expressions.
  *     </li>
  * </ul>
  *
  * <p>Some notes on JaCoCo line coverage:
  * <ul>
  *     <li>
- *         When a statement throws an exception (not via throws, but indirectly e.g. a method call that throws), JaCoCo
- *         marks the line as {@link LineCoverageStatus#NOT_COVERED}, unless there is another covered statement on the
- *         same line (even then it's sometimes NOT_COVERED).
+ *         When a statement throws an exception (not via a throw statement, but indirectly e.g. a method call that
+ *         throws), JaCoCo will usually mark the line as {@link LineCoverageStatus#NOT_COVERED}, unless there is another
+ *         covered statement on the same line (even then it's sometimes NOT_COVERED).
  *     </li>
  *     <li>
  *         Any statement can be EMPTY, since it can be optimized out. E.g.:
@@ -196,14 +187,14 @@ import static org.codedefenders.util.JavaParserUtils.endOf;
  *              }
  *         }</pre>
  *     </li>
+ *     <li>Notes about the coverage of individual Java constructs can be found in the CoverageTest test code.</li>
  * </ul>
  *
  * <p>Note about terminology:
  * <ul>
  *     <li>
  *         coverable: An AST node is coverable if it produces a non-EMPTY line coverage status without relying on a
- *         parent node. A coverable node should never be EMPTY.
- *         // TODO did I always use coverable with this meaning?
+ *         parent node. A coverable node should never be EMPTY unless optimized out.
  *     </li>
  *     <li>
  *         not-covered: A not-covered AST node has the status NOT_COVERED
@@ -1006,7 +997,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         astCoverage.put(stmt, status);
     }
 
-    // TODO: the closing brace is also covered. what instructions does it represent?
     @Override
     public void visit(TryStmt stmt, Void arg) {
         super.visit(stmt, arg);
@@ -1691,18 +1681,6 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         astCoverage.put(expr, AstCoverageStatus.fromStatus(status)
                 .withStatusAfter(statusAfter));
-
-        // set the coverage of the then-expression by its lines if it's not already set
-        // if (thenStatus.isEmpty() && thenStatus.selfStatus().isEmpty()) {
-        //     DetailedLine thenLineStatus = mergeLineCoverage(expr.getThenExpr());
-        //     astCoverage.updateStatus(expr.getThenExpr(), thenLineStatus.instructionStatus());
-        // }
-
-        // set the coverage of the else-expression by its lines if it's not already set
-        // if (elseStatus.isEmpty() && elseStatus.selfStatus().isEmpty()) {
-        //     DetailedLine elseLineStatus = mergeLineCoverage(expr.getElseExpr());
-        //     astCoverage.updateStatus(expr.getElseExpr(), elseLineStatus.instructionStatus());
-        // }
     }
 
     @Override
@@ -1771,9 +1749,12 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(FieldAccessExpr expr, Void arg) {
         super.visit(expr, arg);
 
-        // TODO: handle it like here or like in methodrefexpr
-        AstCoverageStatus status = astCoverage.get(expr.getScope());
-        astCoverage.put(expr, status); // keep selfStatus from scope
+        AstCoverageStatus scopeStatus = astCoverage.get(expr.getScope());
+        if (scopeStatus.statusAfter().isNotCovered()) {
+            astCoverage.put(expr, scopeStatus.withSelfStatus(LineCoverageStatus.NOT_COVERED));
+        } else {
+            astCoverage.put(expr, scopeStatus.clearSelfStatus());
+        }
     }
 
     @Override
