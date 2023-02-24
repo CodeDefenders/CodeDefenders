@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -142,11 +143,8 @@ public class CoverageGenerator {
     public Collection<Path> findRelevantClassFiles(GameClass gameClass) throws CoverageGeneratorException {
         final Path classFileFolder = Paths.get(gameClass.getClassFile()).getParent();
 
-        final String innerClassRegex = gameClass.getName() + "(\\$.*)?.class";
-        final Pattern innerClassPattern = Pattern.compile(innerClassRegex);
-
-        try (Stream<Path> files = Files.find(classFileFolder, 1,
-                (path, ignored) -> innerClassPattern.matcher(path.getFileName().toString()).matches())) {
+        try (Stream<Path> files = Files.list(classFileFolder)
+                .filter(path -> path.toString().endsWith(".class"))) {
             return files.collect(Collectors.toList());
         } catch (IOException e) {
             throw new CoverageGeneratorException("Could not list class files for class: " + gameClass.getClassFile());
