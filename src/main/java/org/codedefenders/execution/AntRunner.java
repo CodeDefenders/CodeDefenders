@@ -34,6 +34,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.analysis.coverage.CoverageGenerator;
+import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -151,7 +152,14 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
                 cut, t.getFullyQualifiedClassName(), config.isForceLocalExecution());
 
         // add coverage information
-        final LineCoverage coverage = coverageGenerator.generateOrEmpty(cut, Paths.get(t.getJavaFile()));
+        LineCoverage coverage;
+        try {
+            coverage = coverageGenerator.generate(cut, Paths.get(t.getJavaFile())).getLineCoverage();
+        } catch (CoverageGeneratorException e) {
+            // TODO: don't return empty coverage here
+            logger.error("Error while computing coverage for test " + t.getId(), e);
+            coverage = LineCoverage.empty();
+        }
         t.setLineCoverage(coverage);
         t.update();
 

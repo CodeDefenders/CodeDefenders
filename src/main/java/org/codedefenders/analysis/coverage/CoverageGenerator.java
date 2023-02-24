@@ -23,9 +23,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,7 +38,6 @@ import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
 import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
 import org.codedefenders.analysis.coverage.line.LineTokens;
-import org.codedefenders.analysis.coverage.line.NewLineCoverage;
 import org.codedefenders.analysis.coverage.line.SimpleLineCoverage;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -59,6 +58,12 @@ public class CoverageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(CoverageGenerator.class);
     private static final String JACOCO_REPORT_FILE = "jacoco.exec";
 
+    private boolean testMode = false;
+
+    public void setTestMode(boolean testMode) {
+        this.testMode = testMode;
+    }
+
     /**
      * Reads the coverage data for a test execution and extends it.
      *
@@ -68,7 +73,7 @@ public class CoverageGenerator {
      * @param testJavaFile the path to the test Java file (the 'jacoco.exe' file must exist in the same directory)
      * @return the extended line coverage
      */
-    public NewLineCoverage generate(GameClass gameClass, Path testJavaFile)
+    public CoverageGeneratorResult generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
         final Path execFile = findJacocoExecFile(testJavaFile);
         final Collection<Path> relevantClassFiles = findRelevantClassFiles(gameClass);
@@ -82,28 +87,20 @@ public class CoverageGenerator {
         return generate(originalCoverage, compilationUnit);
     }
 
-    public NewLineCoverage generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
+    public CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
         AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
         astVisitor.visit(compilationUnit, null);
         AstCoverage astCoverage = astVisitor.finish();
 
         LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
         LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens);
+        lineTokenVisitor.setTestMode(testMode);
         lineTokenVisitor.visit(compilationUnit, null);
 
         LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
-        return lineTokenAnalyser.analyse(lineTokens);
-    }
+        SimpleLineCoverage transformedCoverage = lineTokenAnalyser.analyse(lineTokens);
 
-    // TODO: this replicates the old behavior. replace this with better error handling
-    public LineCoverage generateOrEmpty(GameClass gameClass, Path testJavaFile) {
-        try {
-            NewLineCoverage coverage = generate(gameClass, testJavaFile);
-            return ((SimpleLineCoverage) coverage).toLineCoverage(); // see todo in toLineCoverage()
-        } catch (CoverageGeneratorException e) {
-            logger.error(e.getMessage(), e.getCause());
-            return LineCoverage.empty();
-        }
+        return new CoverageGeneratorResult(originalCoverage, transformedCoverage, lineTokens);
     }
 
     public CoverageBuilder readJacocoCoverage(Path execFile, Collection<Path> relevantClassFiles)
@@ -174,6 +171,42 @@ public class CoverageGenerator {
 
         public CoverageGeneratorException(String message, Throwable cause) {
             super(message, cause);
+        }
+    }
+
+    public static class CoverageGeneratorResult {
+        public final DetailedLineCoverage originalCoverage;
+        public final SimpleLineCoverage transformedCoverage;
+        public final LineTokens lineTokens;
+
+        public CoverageGeneratorResult(
+                DetailedLineCoverage originalCoverage,
+                SimpleLineCoverage transformedCoverage,
+                LineTokens lineTokens) {
+            this.originalCoverage = originalCoverage;
+            this.transformedCoverage = transformedCoverage;
+            this.lineTokens = lineTokens;
+        }
+
+        public LineCoverage getLineCoverage() {
+            List<Integer> coveredLines = new ArrayList<>();
+            List<Integer> uncoveredLines = new ArrayList<>();
+            int firstLine = transformedCoverage.getFirstLine();
+            int lastLine = transformedCoverage.getLastLine();
+            for (int line = firstLine; line <= lastLine; line++) {
+                switch (transformedCoverage.get(line)) {
+                    case PARTLY_COVERED:
+                    case FULLY_COVERED:
+                        coveredLines.add(line);
+                        break;
+                    case NOT_COVERED:
+                        uncoveredLines.add(line);
+                        break;
+                    case EMPTY:
+                        break;
+                }
+            }
+            return new LineCoverage(coveredLines, uncoveredLines);
         }
     }
 }

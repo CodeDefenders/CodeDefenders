@@ -21,7 +21,7 @@ package org.codedefenders.analysis.coverage.line;
 import org.codedefenders.analysis.coverage.line.LineTokens.Token;
 
 public class LineTokenAnalyser {
-    public NewLineCoverage analyse(LineTokens lineTokens) {
+    public SimpleLineCoverage analyse(LineTokens lineTokens) {
         SimpleLineCoverage coverage = new SimpleLineCoverage();
         for (int line = lineTokens.getFirstLine(); line <= lineTokens.getLastLine(); line++) {
             Token root = lineTokens.getRoot(line);

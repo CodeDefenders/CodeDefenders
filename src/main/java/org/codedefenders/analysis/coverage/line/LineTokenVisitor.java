@@ -145,15 +145,14 @@ import static org.codedefenders.util.JavaParserUtils.lineOf;
 public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
     private final AstCoverage astCoverage;
     private final LineTokens lineTokens;
-    private final boolean testMode;
+    private boolean testMode = false;
 
     public LineTokenVisitor(AstCoverage astCoverage, LineTokens lineTokens) {
-        this(astCoverage, lineTokens, false);
-    }
-
-    public LineTokenVisitor(AstCoverage astCoverage, LineTokens lineTokens, boolean testMode) {
         this.astCoverage = astCoverage;
         this.lineTokens = lineTokens;
+    }
+
+    public void setTestMode(boolean testMode) {
         this.testMode = testMode;
     }
 

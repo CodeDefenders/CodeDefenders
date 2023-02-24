@@ -14,13 +14,9 @@ import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
-import org.codedefenders.analysis.coverage.ast.AstCoverage;
-import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
+import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorResult;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
-import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
-import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
-import org.codedefenders.analysis.coverage.line.LineTokens;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
 import org.codedefenders.analysis.coverage.util.CoverageOutputWriter;
 import org.codedefenders.analysis.coverage.util.InMemoryClassLoader;
@@ -110,19 +106,9 @@ public class CoverageTest {
                 .orElseThrow(() -> new Exception("Could not parse fixture source code."));
 
         // transform the coverage
-        // CoverageGenerator coverageGenerator = new CoverageGenerator();
-        // NewLineCoverage transformedCoverage = coverageGenerator.generate(originalCoverage, compilationUnit);
-        // TODO: this replicates CoverageGenerator::generate to access line tokens, find a better solution
-        AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
-        astVisitor.visit(compilationUnit, null);
-        AstCoverage astCoverage = astVisitor.finish();
-
-        LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
-        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens, true);
-        lineTokenVisitor.visit(compilationUnit, null);
-
-        LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
-        NewLineCoverage transformedCoverage = lineTokenAnalyser.analyse(lineTokens);
+        CoverageGenerator coverageGenerator = new CoverageGenerator();
+        coverageGenerator.setTestMode(true);
+        CoverageGeneratorResult result = coverageGenerator.generate(originalCoverage, compilationUnit);
 
         // write HTML report if enabled
         CoverageOutputWriter writer = new CoverageOutputWriter(
@@ -130,14 +116,14 @@ public class CoverageTest {
                 testName,
                 classCode,
                 originalCoverage,
-                transformedCoverage,
+                result.transformedCoverage,
                 expectedCoverage,
-                lineTokens);
+                result.lineTokens);
         writer.writeCoverage();
         writer.writeHtml();
 
         // assertions
-        assertSameCoverage(transformedCoverage, expectedCoverage);
+        assertSameCoverage(result.transformedCoverage, expectedCoverage);
     }
 
     public Map<String, byte[]> compileCode(List<JavaFileObject> sourceFiles) {
