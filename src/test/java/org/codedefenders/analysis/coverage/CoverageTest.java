@@ -48,13 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  * <p>Adapted from the JaCoCo "CoreTutorial" API example.
  * See https://www.jacoco.org/jacoco/trunk/doc/api.html
  *
- * <p>HTML output for easier debugging can be enabled in {@link CoverageOutputWriter}.
+ * <p>Coverage and HTML output for easier debugging can be enabled in {@link CoverageOutputWriter}.
  */
 public class CoverageTest {
     public final static String RESOURCE_DIR = "org/codedefenders/analysis/coverage";
-
-    // TODO: put the InMemory* JavaCompiler into a src package and use it in Compiler as well?
-    // TODO: use CDI for CoverageGenerator
 
     @BeforeEach
     public void checkJavaVersion() {
@@ -65,7 +62,7 @@ public class CoverageTest {
 
     @ParameterizedTest(name = "[{index}] {0} with {1}")
     @ArgumentsSource(CoverageTestParameters.class)
-     public void test(String className,
+    public void test(String className,
                       String testName,
                       List<JavaFileObject> sourceFiles,
                       String classCode,
