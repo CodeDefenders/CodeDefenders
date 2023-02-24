@@ -26,6 +26,7 @@ import org.codedefenders.analysis.coverage.util.CoverageOutputWriter;
 import org.codedefenders.analysis.coverage.util.InMemoryClassLoader;
 import org.codedefenders.analysis.coverage.util.InMemoryJavaFileManager;
 import org.codedefenders.util.JavaParserUtils;
+import org.codedefenders.util.JavaVersionUtils;
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.ILine;
@@ -56,20 +57,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 public class CoverageTest {
     public final static String RESOURCE_DIR = "org/codedefenders/analysis/coverage";
 
-    // TODO: extract getJavaMajorVersion into a util class and use it in Configuration as well?
     // TODO: put the InMemory* JavaCompiler into a src package and use it in Compiler as well?
     // TODO: use CDI for CoverageGenerator
 
     @BeforeEach
     public void checkJavaVersion() {
-        String javaVersion = System.getProperty("java.version");
-        if (javaVersion.startsWith("1.")) {
-            javaVersion = javaVersion.substring(2);
-        }
-        int dotPos = javaVersion.indexOf('.');
-        int dashPos = javaVersion.indexOf('-');
-        int javaMajorVersion = Integer.parseInt(javaVersion.substring(0,
-                dotPos > -1 ? dotPos : dashPos > -1 ? dashPos : 1));
+        int javaMajorVersion = JavaVersionUtils.getJavaMajorVersion();
         assume().withMessage("Coverage tests only work with Java version >= 16")
                 .that(javaMajorVersion).isAtLeast(16);
     }
