@@ -178,7 +178,7 @@
 		</div>
 
 		<div class="details-content__item">
-			<t:mutant_accordion/>
+			<t:killmap_mutant_accordion/>
 		</div>
 
 		<div class="details-content__item">
