@@ -56,8 +56,8 @@ public class CoverageTest {
     @BeforeEach
     public void checkJavaVersion() {
         int javaMajorVersion = JavaVersionUtils.getJavaMajorVersion();
-        assume().withMessage("Coverage tests only work with Java version >= 16")
-                .that(javaMajorVersion).isAtLeast(16);
+        assume().withMessage("Coverage tests only work with Java version >= 11")
+                .that(javaMajorVersion).isAtLeast(11);
     }
 
     @ParameterizedTest(name = "[{index}] {0} with {1}")
@@ -130,9 +130,9 @@ public class CoverageTest {
         assume().withMessage("Platform provided no java compiler.")
                 .that(compiler).isNotNull();
         List<String> options = Arrays.asList(
-                "-encoding", "UTF-8",
-                "-source", "16",
-                "-target", "16"
+                "-encoding", "UTF-8"
+                // "-source", "16",
+                // "-target", "16"
         );
 
         // set up in-memory file manager
