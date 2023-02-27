@@ -103,8 +103,9 @@ public class CoverageTest {
                 .orElseThrow(() -> new Exception("Could not parse fixture source code."));
 
         // transform the coverage
-        CoverageGenerator coverageGenerator = new CoverageGenerator();
-        coverageGenerator.setTestMode(true);
+        CoverageGenerator coverageGenerator = new CoverageGenerator() {{
+            testMode = true;
+        }};
         CoverageGeneratorResult result = coverageGenerator.generate(originalCoverage, compilationUnit);
 
         // write HTML report if enabled

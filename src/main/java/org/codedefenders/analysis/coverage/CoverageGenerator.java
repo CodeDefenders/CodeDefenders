@@ -58,11 +58,7 @@ public class CoverageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(CoverageGenerator.class);
     private static final String JACOCO_REPORT_FILE = "jacoco.exec";
 
-    private boolean testMode = false;
-
-    public void setTestMode(boolean testMode) {
-        this.testMode = testMode;
-    }
+    protected boolean testMode = false;
 
     /**
      * Reads the coverage data for a test execution and extends it.
@@ -93,8 +89,9 @@ public class CoverageGenerator {
         AstCoverage astCoverage = astVisitor.finish();
 
         LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
-        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens);
-        lineTokenVisitor.setTestMode(testMode);
+        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens) {{
+            testMode = CoverageGenerator.this.testMode;
+        }};
         lineTokenVisitor.visit(compilationUnit, null);
 
         LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
