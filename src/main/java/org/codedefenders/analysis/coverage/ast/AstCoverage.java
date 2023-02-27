@@ -23,10 +23,14 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
+import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 
 import com.github.javaparser.ast.Node;
 
+/**
+ * Maps JavaParser AST nodes to their coverage status.
+ */
 public class AstCoverage {
     private final Map<Node, AstCoverageStatus> statusPerNode;
 
@@ -48,6 +52,11 @@ public class AstCoverage {
     }
 
     public void updateStatus(Node node, LineCoverageStatus newStatus) {
+        AstCoverageStatus status = get(node);
+        statusPerNode.put(node, status.updateStatus(newStatus));
+    }
+
+    public void updateStatus(Node node, Status newStatus) {
         AstCoverageStatus status = get(node);
         statusPerNode.put(node, status.updateStatus(newStatus));
     }

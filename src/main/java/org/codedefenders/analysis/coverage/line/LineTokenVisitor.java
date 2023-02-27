@@ -24,6 +24,7 @@ import java.util.Optional;
 import org.codedefenders.analysis.coverage.JavaTokenIterator;
 import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
+import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.LineTokens.TokenInserter;
 import org.codedefenders.util.JavaParserUtils;
@@ -220,8 +221,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus stmtStatus = astCoverage.get(stmt);
 
             switch (stmtStatus.status()) {
-                case PARTLY_COVERED:
-                case FULLY_COVERED:
+                case COVERED:
                     lastCoveredLine =
                     lastMaybeCoveredLine =
                     lastNotCoveredLine = beginOf(stmt) - 1;
@@ -465,9 +465,9 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
                     .map(astCoverage::get)
                     .orElseGet(AstCoverageStatus::empty);
 
-            LineCoverageStatus statusAfterCondition = conditionStatus.isEmpty()
+            Status statusAfterCondition = conditionStatus.isEmpty()
                     ? status.status()
-                    : conditionStatus.statusAfter().toLineCoverageStatus();
+                    : conditionStatus.statusAfter().toAstCoverageStatus();
 
             JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getCondition())
                     .skipOne()
@@ -522,20 +522,20 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus status = astCoverage.get(stmt);
 
             // TODO: set these statuses in AstCoverageVisitor?
-            LineCoverageStatus statusAfterInit = stmt.getInitialization().getLast()
+            Status statusAfterInit = stmt.getInitialization().getLast()
                     .map(astCoverage::get)
                     .map(AstCoverageStatus::statusAfter)
-                    .map(StatusAfter::toLineCoverageStatus)
+                    .map(StatusAfter::toAstCoverageStatus)
                     .orElseGet(status::status);
-            LineCoverageStatus statusAfterCompare = stmt.getCompare()
+            Status statusAfterCompare = stmt.getCompare()
                     .map(astCoverage::get)
                     .map(AstCoverageStatus::statusAfter)
-                    .map(StatusAfter::toLineCoverageStatus)
+                    .map(StatusAfter::toAstCoverageStatus)
                     .orElse(statusAfterInit);
-            LineCoverageStatus statusAfterUpdate = stmt.getUpdate().getLast()
+            Status statusAfterUpdate = stmt.getUpdate().getLast()
                     .map(astCoverage::get)
                     .map(AstCoverageStatus::statusAfter)
-                    .map(StatusAfter::toLineCoverageStatus)
+                    .map(StatusAfter::toAstCoverageStatus)
                     .orElse(statusAfterCompare);
 
             JavaToken closingParen = JavaTokenIterator.ofBegin(stmt.getBody())
@@ -573,7 +573,7 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus iterableStatus = astCoverage.get(stmt.getIterable());
 
             // TODO: set the iterable's status in AstCoverageVisitor?
-            LineCoverageStatus statusAfterIterable = iterableStatus.statusAfter().toLineCoverageStatus();
+            Status statusAfterIterable = iterableStatus.statusAfter().toAstCoverageStatus();
             if (statusAfterIterable.isEmpty()) {
                 statusAfterIterable = status.status();
             }
@@ -686,9 +686,9 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus status = astCoverage.get(stmt);
             AstCoverageStatus selectorStatus = astCoverage.get(stmt.getSelector());
 
-            LineCoverageStatus statusAfterSelector = selectorStatus.isEmpty()
+            Status statusAfterSelector = selectorStatus.isEmpty()
                     ? status.status()
-                    : selectorStatus.statusAfter().toLineCoverageStatus();
+                    : selectorStatus.statusAfter().toAstCoverageStatus();
 
             i.node(stmt).reset();
 
@@ -754,9 +754,9 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus status = astCoverage.get(stmt);
             AstCoverageStatus exprStatus = astCoverage.get(stmt.getExpression());
 
-            LineCoverageStatus statusAfterExpr = exprStatus.isEmpty()
+            Status statusAfterExpr = exprStatus.isEmpty()
                     ? status.status()
-                    : exprStatus.statusAfter().toLineCoverageStatus();
+                    : exprStatus.statusAfter().toAstCoverageStatus();
 
             JavaToken closingParen = JavaTokenIterator.ofEnd(stmt.getExpression())
                     .skipOne()
@@ -1044,9 +1044,9 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus thenStatus = astCoverage.get(expr.getThenExpr());
             AstCoverageStatus elseStatus = astCoverage.get(expr.getElseExpr());
 
-            LineCoverageStatus statusAfterCondition = conditionStatus.isEmpty()
+            Status statusAfterCondition = conditionStatus.isEmpty()
                     ? status.status()
-                    : conditionStatus.statusAfter().toLineCoverageStatus();
+                    : conditionStatus.statusAfter().toAstCoverageStatus();
 
             int thenBeginLine = JavaTokenIterator.expandWhitespaceBefore(
                     expr.getThenExpr().getTokenRange().get().getBegin());
@@ -1072,9 +1072,9 @@ public class LineTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus status = astCoverage.get(expr);
             AstCoverageStatus selectorStatus = astCoverage.get(expr.getSelector());
 
-            LineCoverageStatus statusAfterSelector = selectorStatus.isEmpty()
+            Status statusAfterSelector = selectorStatus.isEmpty()
                     ? status.status()
-                    : selectorStatus.statusAfter().toLineCoverageStatus();
+                    : selectorStatus.statusAfter().toAstCoverageStatus();
 
             i.node(expr).reset();
 

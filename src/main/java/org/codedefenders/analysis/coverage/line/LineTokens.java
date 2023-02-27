@@ -27,6 +27,9 @@ import java.util.TreeSet;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
+import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
+import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;
+
 import com.github.javaparser.ast.Node;
 
 import static org.codedefenders.util.JavaParserUtils.beginOf;
@@ -172,13 +175,25 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
                 insert(() -> Token.cover(originNode, status));
             }
 
+            public void cover(Status status) {
+                cover(status.toLineCoverageStatus());
+            }
+
             public void coverStrong(LineCoverageStatus status) {
                 insert(beginLine, beginLine, () -> Token.coverStrong(originNode, status));
                 insert(beginLine + 1, endLine, () -> Token.cover(originNode, status));
             }
 
+            public void coverStrong(Status status) {
+                coverStrong(status.toLineCoverageStatus());
+            }
+
             public void block(LineCoverageStatus status) {
                 insert(() -> Token.block(originNode, status));
+            }
+
+            public void block(Status status) {
+                block(status.toLineCoverageStatus());
             }
 
             public void reset() {

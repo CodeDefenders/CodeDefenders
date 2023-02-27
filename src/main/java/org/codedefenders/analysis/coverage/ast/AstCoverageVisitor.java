@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.codedefenders.analysis.coverage.JavaTokenIterator;
+import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
@@ -144,6 +145,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import static org.codedefenders.util.JavaParserUtils.beginOf;
 import static org.codedefenders.util.JavaParserUtils.endOf;
+import static org.codedefenders.util.JavaParserUtils.lineOf;
 
 /**
  * Extracts line coverage onto a {@link JavaParser} AST.
@@ -334,13 +336,13 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         if (next.isEmpty() && next.statusAfter().isUnsure()) {
             return acc;
         }
-        LineCoverageStatus status = acc.status().upgrade(next.status());
+        Status status = acc.status().upgrade(next.status());
         StatusAfter statusAfter = next.statusAfter();
         return new AstCoverageStatus(status, statusAfter);
     }
 
     private AstCoverageStatus mergeCoverageForFork(AstCoverageStatus acc, AstCoverageStatus next) {
-        LineCoverageStatus status = acc.status().upgrade(next.status());
+        Status status = acc.status().upgrade(next.status());
         StatusAfter statusAfter = acc.statusAfter().upgrade(next.statusAfter());
         return new AstCoverageStatus(status, statusAfter);
     }
@@ -682,7 +684,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine firstLineStatus = lineCoverage.get(beginOf(stmt));
         DetailedLine conditionLineStatus = mergeLineCoverageForCondition(stmt.getCondition());
 
-        LineCoverageStatus status = conditionStatus.status()
+        Status status = conditionStatus.status()
                 .upgrade(thenStatus.status())
                 .upgrade(elseStatus.status())
                 .upgrade(firstLineStatus.instructionStatus())
@@ -978,7 +980,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         switch (conditionLineStatus.branchStatus()) {
             case NOT_COVERED:
-                LineCoverageStatus selfStatus = conditionStatus.status().upgrade(LineCoverageStatus.NOT_COVERED);
+                Status selfStatus = conditionStatus.status().upgrade(LineCoverageStatus.NOT_COVERED);
                 status = status.withStatusAfter(StatusAfter.NOT_COVERED)
                         .withSelfStatus(selfStatus);
                 break;
@@ -1020,7 +1022,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .map(astCoverage::get)
                 .orElse(AstCoverageStatus.empty());
 
-        LineCoverageStatus status = tryStatus.status()
+        Status status = tryStatus.status()
                 .upgrade(resourcesStatus.status())
                 .upgrade(catchStatus.status())
                 .upgrade(finallyStatus.status());
@@ -1041,9 +1043,9 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         // update try block coverage
-        if (status == LineCoverageStatus.FULLY_COVERED && !resourcesStatus.statusAfter().isNotCovered()) {
+        if (status.isCovered() && !resourcesStatus.statusAfter().isNotCovered()) {
             astCoverage.updateStatus(stmt.getTryBlock(), LineCoverageStatus.FULLY_COVERED);
-        } else if (status == LineCoverageStatus.NOT_COVERED || resourcesStatus.statusAfter().isNotCovered()) {
+        } else if (status.isNotCovered() || resourcesStatus.statusAfter().isNotCovered()) {
             astCoverage.updateStatus(stmt.getTryBlock(), LineCoverageStatus.NOT_COVERED);
         }
 
@@ -1084,16 +1086,16 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
     public void visit(SwitchStmt stmt, Void arg) {
         super.visit(stmt, arg);
 
-        LineCoverageStatus entriesStatus = stmt.getEntries().stream()
+        Status entriesStatus = stmt.getEntries().stream()
                 .map(astCoverage::get)
                 .map(AstCoverageStatus::status)
-                .reduce(LineCoverageStatus::upgrade)
-                .orElse(LineCoverageStatus.EMPTY);
+                .reduce(Status::upgrade)
+                .orElse(Status.EMPTY);
         AstCoverageStatus selectorStatus = astCoverage.get(stmt.getSelector());
         DetailedLine selectorLineStatus = mergeLineCoverageForCondition(stmt.getSelector());
         DetailedLine keywordStatus = lineCoverage.get(beginOf(stmt));
 
-        LineCoverageStatus status = entriesStatus
+        Status status = entriesStatus
                 .upgrade(selectorStatus.status())
                 .upgrade(selectorLineStatus.branchStatus())
                 .upgrade(keywordStatus.instructionStatus());
@@ -1105,7 +1107,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                         .anyMatch(entry -> entry.getLabels().isEmpty());
                 // no default case and full condition coverage means control flow jumped past the switch statement
                 // if a default case is present it takes the place of the jump-past-the-switch branch
-                if (hasDefaultCase || entriesStatus == LineCoverageStatus.EMPTY) {
+                if (hasDefaultCase || entriesStatus.isEmpty()) {
                     astCoverage.put(stmt, AstCoverageStatus.covered());
                 } else {
                     astCoverage.put(stmt, AstCoverageStatus.covered()
@@ -1180,7 +1182,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine keywordCoverage = lineCoverage.get(beginOf(stmt));
         DetailedLine closingBraceCoverage = lineCoverage.get(endOf(stmt));
 
-        LineCoverageStatus status = bodyStatus.status()
+        Status status = bodyStatus.status()
                 .upgrade(monitorStatus.status())
                 .upgrade(keywordCoverage.instructionStatus());
 
@@ -1232,7 +1234,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .map(astCoverage::get)
                 .orElseGet(AstCoverageStatus::empty);
 
-        LineCoverageStatus status = keywordStatus.instructionStatus()
+        Status status = Status.fromLineCoverageStatus(keywordStatus.instructionStatus())
                 .upgrade(branchStatus.branchStatus())
                 .upgrade(checkStatus.status())
                 .upgrade(messageStatus.status());
@@ -1313,14 +1315,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .reduce(this::mergeCoverageForSequence)
                 .orElseGet(AstCoverageStatus::empty);
 
-        LineCoverageStatus status = keywordStatus.instructionStatus()
+        Status status = Status.fromLineCoverageStatus(keywordStatus.instructionStatus())
                 .upgrade(argumentsStatus.status());
 
         StatusAfter statusAfter;
         if (argumentsStatus.statusAfter().isNotCovered()) {
             statusAfter = StatusAfter.NOT_COVERED;
         } else {
-            statusAfter = StatusAfter.fromLineCoverageStatus(status);
+            statusAfter = StatusAfter.fromAstCoverageStatus(status);
         }
 
         astCoverage.put(stmt, AstCoverageStatus.fromStatus(status)
@@ -1483,7 +1485,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         }
 
         DetailedLine targetStatus = mergeLineCoverage(decl.getName());
-        LineCoverageStatus status = initStatus.status()
+        Status status = initStatus.status()
                 .upgrade(targetStatus.instructionStatus());
 
         if (initStatus.statusAfter().isUnsure()) {
@@ -1583,8 +1585,8 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
         // determine coverage from the line of the opening parenthesis -> COVERED / NOT_COVERED / EMPTY
         // (can only be EMPTY if the method was optimized out, e.g. "if (false) someCall()")
-        LineCoverageStatus selfStatus = lineCoverage.get(openingParen.getRange().get().begin.line)
-                .instructionStatus();
+        Status selfStatus = Status.fromLineCoverageStatus(
+                lineCoverage.get(lineOf(openingParen)).instructionStatus());
 
         // determine coverage of arguments
         AstCoverageStatus argumentsStatus = expr.getArguments().stream()
@@ -1593,7 +1595,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .orElseGet(AstCoverageStatus::empty);
 
         // determine final AST coverage
-        LineCoverageStatus astStatus = selfStatus
+        Status astStatus = selfStatus
                 .upgrade(argumentsStatus.status())
                 .upgrade(scopeStatus.status());
 
@@ -1634,14 +1636,14 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
                 .reduce(this::mergeCoverageForSequence)
                 .orElseGet(AstCoverageStatus::empty);
 
-        LineCoverageStatus status = newKeywordCoverage.instructionStatus()
+        Status status = Status.fromLineCoverageStatus(newKeywordCoverage.instructionStatus())
                 .upgrade(argumentsStatus.status());
 
         StatusAfter statusAfter;
         if (argumentsStatus.statusAfter().isNotCovered()) {
             statusAfter = StatusAfter.NOT_COVERED;
         } else {
-            statusAfter = StatusAfter.fromLineCoverageStatus(status);
+            statusAfter = StatusAfter.fromAstCoverageStatus(status);
         }
 
         astCoverage.put(expr, AstCoverageStatus.fromStatus(status)
@@ -1657,7 +1659,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         AstCoverageStatus thenStatus = astCoverage.get(expr.getThenExpr());
         AstCoverageStatus elseStatus = astCoverage.get(expr.getElseExpr());
 
-        LineCoverageStatus status = conditionLineStatus.branchStatus()
+        Status status = Status.fromLineCoverageStatus(conditionLineStatus.branchStatus())
                 .upgrade(conditionStatus.status())
                 .upgrade(thenStatus.status())
                 .upgrade(elseStatus.status());
