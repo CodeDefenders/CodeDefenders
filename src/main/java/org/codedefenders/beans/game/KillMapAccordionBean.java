@@ -16,9 +16,6 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.execution.KillMap;
@@ -27,6 +24,10 @@ import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 @Named(value = "killMapAccordion")
 @ManagedBean
@@ -48,8 +49,8 @@ public class KillMapAccordionBean {
     private static final Logger logger = LoggerFactory.getLogger(KillMapAccordionBean.class);
 
     @Inject
-    public KillMapAccordionBean(MutantAccordionBean mutantAccordionBean,
-                                TestAccordionBean testAccordionBean,
+    public KillMapAccordionBean(@Named("mutantAccordion") MutantAccordionBean mutantAccordionBean,
+                                @Named("testAccordion") TestAccordionBean testAccordionBean,
                                 GameService gameService, GameProducer gameProducer) {
         this.mutantAccordionBean = mutantAccordionBean;
         this.testAccordionBean = testAccordionBean;
