@@ -20,7 +20,7 @@ package org.codedefenders.analysis.coverage.line;
 
 public class DetailedLineCoverage extends LineMapping<DetailedLine> implements NewLineCoverage {
     @Override
-    public DetailedLine getEmpty() {
+    protected DetailedLine getEmpty() {
         return DetailedLine.empty();
     }
 

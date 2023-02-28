@@ -37,7 +37,7 @@ import static org.codedefenders.util.JavaParserUtils.endOf;
 
 public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
     @Override
-    public Deque<Token> getEmpty() {
+    protected Deque<Token> getEmpty() {
         Deque<Token> stack = new ArrayDeque<>();
         stack.push(Token.root());
         return stack;
@@ -218,7 +218,7 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
         }
 
         public static Token block(Node originNode, LineCoverageStatus status) {
-            return new Token(originNode, Type.BLOCK, status, Priority.BLOCK);
+            return new Token(originNode, Type.COVERABLE, status, Priority.BLOCK);
         }
 
         public static Token cover(Node originNode, LineCoverageStatus status) {
@@ -256,28 +256,40 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
          * A dummy node to represent the tree root.
          */
         ROOT,
+
         /**
-         * Denotes and a value from the JaCoCo coverage that should override our
-         * computed coverage.
-         *
-         * <p>Can only occur as the root node. When found, the
-         * following tokens are only used to compute block coverage for surrounding
-         * lines.
+         * Represents a value from the JaCoCo coverage that should override the coverage computed from other tokens.
          */
         OVERRIDE,
-        EMPTY,
+
         /**
-         * Denotes an AST node that is coverable.
+         * Represents either an empty part of a coverable node, or a node that is not coverable.
+         */
+        EMPTY,
+
+        /**
+         * Represents a coverable AST node.
          *
          * <p>Statements and some expressions fall under this category. Most often,
          * this token will determine the coverage of a line.
          */
         COVERABLE,
+
+        /**
+         * Represents a coverable AST node that should be prioritized over others.
+         *
+         * <p>E.g. the first line of a COVERED method call should always be covered, even if a call parameter on the
+         * same line is NOT_COVERED.
+         */
         STRONG_COVERABLE,
+
+        /**
+         * Represents a code block. BLOCK has lower priority than COVERABLE or STRONG_COVERABLE.
+         */
         BLOCK,
 
         /**
-         * Denotes an AST node that "nullifies" the coverage of its parent nodes.
+         * Represents an AST node that "nullifies" the coverage of its parent nodes.
          *
          * <p>The coverage inside a class, method or lambda is (mostly)
          * independent of the surrounding statements.
@@ -289,12 +301,12 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
          *     3:       public void handleEvent() {
          *     4:           // whatever
          *     5:       }
-         *    6:   });
+         *     6:   });
          * }</pre>
          * The coverage of lines 2-5 is not influenced by the coverage of the
          * surrounding call to {@code addEventListener}. Lines 1 and 6 are part of
          * the local class declaration but are influenced by the surrounding
-         * coverage. In this case another Coverable token is inserted after the Reset.
+         * coverage. In this case another COVERABLE token is inserted after the RESET.
          */
         RESET
     }

@@ -142,10 +142,22 @@ import static org.codedefenders.util.JavaParserUtils.beginOf;
 import static org.codedefenders.util.JavaParserUtils.endOf;
 import static org.codedefenders.util.JavaParserUtils.lineOf;
 
-@SuppressWarnings("OptionalGetWithoutIsPresent")
+/**
+ * Takes an AST covered by ASTCoverageVisitor and generates a CoverageTokens tree for each line of source code.
+ *
+ * <p>We traverse the AST top-down, inserting tokens on the way down, and popping them when returning.
+ * Each node generates one or more tokens for every line it encompasses.
+ *
+ * <p>See {@link CoverageTokens} and {@link CoverageTokenAnalyser} for more details.
+ */
+@SuppressWarnings("protected")
 public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
     private final AstCoverage astCoverage;
     private final CoverageTokens tokens;
+
+    /**
+     * If true, enables code comments that control the generated coverage.
+     */
     protected boolean testMode = false;
 
     public CoverageTokenVisitor(AstCoverage astCoverage, CoverageTokens tokens) {
@@ -155,6 +167,10 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
 
     // region helpers
 
+    /**
+     * Returns the first node that is either NOT_COVERED or COVERED with statusAfter == NOT_COVERED.
+     * If there are COVERED nodes after that node, the NOT_COVERED node is ignored.
+     */
     private Optional<Node> getFirstNotCoveredNode(Iterable<? extends Node> nodes) {
         Node firstNotCoveredNode = null;
 

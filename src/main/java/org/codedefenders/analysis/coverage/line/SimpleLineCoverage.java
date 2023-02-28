@@ -20,7 +20,7 @@ package org.codedefenders.analysis.coverage.line;
 
 public class SimpleLineCoverage extends LineMapping<LineCoverageStatus> implements NewLineCoverage {
     @Override
-    public LineCoverageStatus getEmpty() {
+    protected LineCoverageStatus getEmpty() {
         return LineCoverageStatus.EMPTY;
     }
 

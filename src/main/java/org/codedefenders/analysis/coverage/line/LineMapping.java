@@ -65,7 +65,7 @@ public class LineMapping<T> {
         }
     }
 
-    public T getEmpty() {
+    protected T getEmpty() {
         return null;
     }
 }
