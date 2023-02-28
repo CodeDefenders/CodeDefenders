@@ -20,15 +20,39 @@ package org.codedefenders.analysis.coverage.ast;
 
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
 
+/**
+ * An immutable data class representing the coverage status of an AST node.
+ * Saves the status of the node's subtree (status), the status of the node itself (selfStatus) and the status after the
+ * node (statusAfter).
+ */
 public class AstCoverageStatus {
 
+    /**
+     * Represents the status of an AST node's subtree.
+     * <ol>
+     *     <li>if anything in the subtree is COVERED -> COVERED</li>
+     *     <li>else if anything in the subtree is NOT_COVERED -> NOT_COVERED</li>
+     *     <li>else -> EMPTY</li>
+     * </ol>
+     */
     private final Status status;
+
+    /**
+     * Represents the coverage status after the AST node.
+     * <ol>
+     *     <li>if the node always jumps -> ALWAYS_JUMPS</li>
+     *     <li>else if the status can reliably be determined -> NOT_COVERED or COVERED</li>
+     *     <li>else (if the node is EMPTY or the status can't be determined) -> MAYBE_COVERED</li>
+     * </ol>
+     */
     private final StatusAfter statusAfter;
 
     /**
-     * For nodes where the merged status from the node's children is different from the node's own status.
-     * E.g. the AST structure of method chains is opposite to the control flow, so each node saves the merged status
-     * of the chain in status and the own status in selfStatus.
+     * Represents the status of the AST node itself, instead of the subtree. This is used for nodes where the subtree
+     * status is different from the node's own status.
+     *
+     * <p>E.g. the AST structure of method chains is opposite to the control flow (last call is outermost expression),
+     * so each node saves the merged status of the chain in status and the own status in selfStatus.
      */
     private final Status selfStatus;
 
@@ -42,6 +66,9 @@ public class AstCoverageStatus {
         this(status, statusAfter, status);
     }
 
+    /**
+     * Constructs a new AstCoverageStatus based on the given tree status.
+     */
     public static AstCoverageStatus fromStatus(Status status) {
         switch (status) {
             case EMPTY:
@@ -55,42 +82,57 @@ public class AstCoverageStatus {
         }
     }
 
-    public static AstCoverageStatus fromStatus(LineCoverageStatus status) {
+    public static AstCoverageStatus fromLineStatus(LineCoverageStatus status) {
         return fromStatus(Status.fromLineCoverageStatus(status));
     }
 
+    /**
+     * Constructs a new empty AstCoverageStatus.
+     */
     public static AstCoverageStatus empty() {
         return new AstCoverageStatus(Status.EMPTY, StatusAfter.MAYBE_COVERED);
     }
 
+    /**
+     * Constructs a new not-covered AstCoverageStatus.
+     */
     public static AstCoverageStatus notCovered() {
         return new AstCoverageStatus(Status.NOT_COVERED, StatusAfter.NOT_COVERED);
     }
 
+    /**
+     * Constructs a new covered AstCoverageStatus.
+     */
     public static AstCoverageStatus covered() {
         return new AstCoverageStatus(Status.COVERED, StatusAfter.COVERED);
     }
 
+    /**
+     * Constructs a new AstCoverageStatus with the new status (and same attributes otherwise).
+     * Consider using {@link AstCoverageStatus#fromStatus(Status)} or
+     * {@link AstCoverageStatus#updateStatus(Status)} instead.
+     */
     public AstCoverageStatus withStatus(Status status) {
         return new AstCoverageStatus(status, this.statusAfter, this.selfStatus);
     }
 
-    public AstCoverageStatus withStatus(LineCoverageStatus status) {
-        return withStatus(Status.fromLineCoverageStatus(status));
-    }
-
+    /**
+     * Constructs a new AstCoverageStatus with the new statusAfter (and same attributes otherwise).
+     */
     public AstCoverageStatus withStatusAfter(StatusAfter statusAfter) {
         return new AstCoverageStatus(this.status, statusAfter, this.selfStatus);
     }
 
+    /**
+     * Constructs a new AstCoverageStatus with the new selfStatus (and same attributes otherwise).
+     */
     public AstCoverageStatus withSelfStatus(Status selfStatus) {
         return new AstCoverageStatus(this.status, this.statusAfter, selfStatus);
     }
 
-    public AstCoverageStatus withSelfStatus(LineCoverageStatus selfStatus) {
-        return withSelfStatus(Status.fromLineCoverageStatus(selfStatus));
-    }
-
+    /**
+     * Constructs a new AstCoverageStatus with the selfStatus = status (and same attributes otherwise).
+     */
     public AstCoverageStatus clearSelfStatus() {
         return new AstCoverageStatus(this.status, this.statusAfter);
     }
@@ -119,6 +161,13 @@ public class AstCoverageStatus {
         return status == Status.COVERED;
     }
 
+    /**
+     * Constructs a new AstCoverageStatus with an updated tree status,
+     * and an updated statusAfter as well if it can be updated from the new status.
+     *
+     * <p>Status and statusAfter are only updated if they make the AstCoverageStatus "more covered",
+     * i.e. EMPTY -> NOT_COVERED, or NOT_COVERED -> COVERED.
+     */
     public AstCoverageStatus updateStatus(Status newStatus) {
         switch (newStatus) {
             case EMPTY:
@@ -155,6 +204,10 @@ public class AstCoverageStatus {
         return updateStatus(Status.fromLineCoverageStatus(newStatus));
     }
 
+    /**
+     * Constructs a new AstCoverageStatus with an updated statusAfter,
+     * and updates the tree status accordingly if it was EMPTY before.
+     */
     public AstCoverageStatus updateStatusAfter(StatusAfter newStatusAfter) {
         if (newStatusAfter.isUnsure()) {
             return this;
@@ -267,24 +320,6 @@ public class AstCoverageStatus {
             }
         }
 
-        public static StatusAfter fromLineCoverageStatus(LineCoverageStatus status) {
-            return fromAstCoverageStatus(Status.fromLineCoverageStatus(status));
-        }
-
-        public LineCoverageStatus toLineCoverageStatus() {
-            switch (this) {
-                case ALWAYS_JUMPS:
-                case MAYBE_COVERED:
-                    return LineCoverageStatus.EMPTY;
-                case NOT_COVERED:
-                    return LineCoverageStatus.NOT_COVERED;
-                case COVERED:
-                    return LineCoverageStatus.FULLY_COVERED;
-                default:
-                    throw new IllegalArgumentException("Unknown StatusAfter value: " + this);
-            }
-        }
-
         public Status toAstCoverageStatus() {
             switch (this) {
                 case ALWAYS_JUMPS:
@@ -297,6 +332,10 @@ public class AstCoverageStatus {
                 default:
                     throw new IllegalArgumentException("Unknown StatusAfter value: " + this);
             }
+        }
+
+        public LineCoverageStatus toLineCoverageStatus() {
+            return toAstCoverageStatus().toLineCoverageStatus();
         }
     }
 }
