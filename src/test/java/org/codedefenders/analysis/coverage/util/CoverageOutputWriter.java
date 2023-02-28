@@ -15,13 +15,13 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.coverage.CoverageTest;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
-import org.codedefenders.analysis.coverage.line.LineTokens;
+import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
 import org.codedefenders.util.ResourceUtils;
 
 public class CoverageOutputWriter {
     private final static String HTML_OUTPUT_DIR = "/tmp/coverage";
-    private final static boolean ENABLED = true;
+    private final static boolean ENABLED = false;
     private final static boolean SPLIT_DIR_BY_JVM = true;
 
     private final String className;
@@ -30,7 +30,7 @@ public class CoverageOutputWriter {
     private final DetailedLineCoverage originalCoverage;
     private final NewLineCoverage transformedCoverage;
     private final NewLineCoverage expectedCoverage;
-    private final LineTokens lineTokens;
+    private final CoverageTokens coverageTokens;
 
     public CoverageOutputWriter(
             String className,
@@ -39,14 +39,14 @@ public class CoverageOutputWriter {
             DetailedLineCoverage originalCoverage,
             NewLineCoverage transformedCoverage,
             NewLineCoverage expectedCoverage,
-            LineTokens lineTokens) {
+            CoverageTokens coverageTokens) {
         this.className = className;
         this.testName = testName;
         this.sourceCode = sourceCode;
         this.originalCoverage = originalCoverage;
         this.transformedCoverage = transformedCoverage;
         this.expectedCoverage = expectedCoverage;
-        this.lineTokens = lineTokens;
+        this.coverageTokens = coverageTokens;
     }
 
     public void writeCoverage() throws IOException {
@@ -83,7 +83,7 @@ public class CoverageOutputWriter {
             LineCoverageStatus originalStatus = originalCoverage.getStatus(lineNum);
             LineCoverageStatus transformedStatus = transformedCoverage.getStatus(lineNum);
             LineCoverageStatus expectedStatus = expectedCoverage.getStatus(lineNum);
-            LineTokens.Token rootToken = lineTokens.getRoot(lineNum);
+            CoverageTokens.Token rootToken = coverageTokens.getRoot(lineNum);
 
             originalLines.add(String.format("<div class=\"line %s\" data-line-num=\"%d\" data-status=\"%s\">%s</div>",
                     originalStatus.name(), lineNum, originalStatus.name(), escapedCode));
@@ -143,7 +143,7 @@ public class CoverageOutputWriter {
         return String.format("%s - %s - %s", timeFormatter.format(now), className, testName);
     }
 
-    private String generateTokenLine(LineTokens.Token token) {
+    private String generateTokenLine(CoverageTokens.Token token) {
         StringBuilder line = new StringBuilder();
 
         while (true) {

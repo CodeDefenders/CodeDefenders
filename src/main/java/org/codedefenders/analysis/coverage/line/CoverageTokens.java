@@ -27,7 +27,6 @@ import java.util.TreeSet;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
-import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;
 
 import com.github.javaparser.ast.Node;
@@ -36,7 +35,7 @@ import static org.codedefenders.util.JavaParserUtils.beginOf;
 import static org.codedefenders.util.JavaParserUtils.endOf;
 
 
-public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
+public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
     @Override
     public Deque<Token> getEmpty() {
         Deque<Token> stack = new ArrayDeque<>();
@@ -59,30 +58,30 @@ public class LineTokens extends LineMapping<Deque<LineTokens.Token>> {
         return get(line).peekLast();
     }
 
-    public static LineTokens fromJaCoCo(DetailedLineCoverage coverage) {
-        LineTokens lineTokens = new LineTokens();
+    public static CoverageTokens fromJaCoCo(DetailedLineCoverage coverage) {
+        CoverageTokens coverageTokens = new CoverageTokens();
         for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
-            LineCoverageStatus combinedStatus = coverage.get(line).combinedStatus();
-            if (combinedStatus != LineCoverageStatus.EMPTY) {
-                lineTokens.pushToken(line, Token.override(combinedStatus));
+            DetailedLine status = coverage.get(line);
+            if (!status.combinedStatus().isEmpty()) {
+                coverageTokens.pushToken(line, Token.override(status.combinedStatus()));
             } else {
-                lineTokens.pushToken(line, Token.empty(null));
+                coverageTokens.pushToken(line, Token.empty(null));
             }
-            /*
-            if (status.branchStatus() != LineCoverageStatus.EMPTY) {
-                lineTokens.pushToken(line, Token.override(status.combinedStatus()));
-            } else if (status.instructionStatus() == LineCoverageStatus.PARTLY_COVERED) {
-                lineTokens.pushToken(line, Token.override(status.instructionStatus()));
-            }
-            */
+
+            // if (status.branchStatus() != LineCoverageStatus.EMPTY) {
+            //     coverageTokens.pushToken(line, Token.override(status.combinedStatus()));
+            // } else if (status.instructionStatus() == LineCoverageStatus.PARTLY_COVERED) {
+            //     coverageTokens.pushToken(line, Token.override(status.instructionStatus()));
+            // }
+
             // lines where JaCoCo produces misleading coverage
             // - first line of record declaration: contains instructions for getter methods, and can therefore
             //          unexpectedly be PARTLY_COVERED or NOT_COVERED even if the record was initialized
-            // - last line of try-catch-block (sometimes): I don't know what the line represents
-            // - first line of empty finally-block (sometimes): I don't know what the line represents
-            // - last lines of try-block with resources (branch coverage): I don't know what the line represents
+            // - last line of try-catch-block (sometimes): see TryCatchBlocks coverage test
+            // - first line of empty finally-block (sometimes): see TryCatchBlocks coverage test
+            // - last lines of try-block with resources (branch coverage): see TryCatchBlocks coverage test
         }
-        return lineTokens;
+        return coverageTokens;
     }
 
     private void pushToken(int line, Token newToken) {

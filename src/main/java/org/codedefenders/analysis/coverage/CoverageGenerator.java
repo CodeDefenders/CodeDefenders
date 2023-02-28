@@ -35,9 +35,9 @@ import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
-import org.codedefenders.analysis.coverage.line.LineTokenAnalyser;
-import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
-import org.codedefenders.analysis.coverage.line.LineTokens;
+import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
+import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
+import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.SimpleLineCoverage;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -88,16 +88,16 @@ public class CoverageGenerator {
         astVisitor.visit(compilationUnit, null);
         AstCoverage astCoverage = astVisitor.finish();
 
-        LineTokens lineTokens = LineTokens.fromJaCoCo(originalCoverage);
-        LineTokenVisitor lineTokenVisitor = new LineTokenVisitor(astCoverage, lineTokens) {{
+        CoverageTokens coverageTokens = CoverageTokens.fromJaCoCo(originalCoverage);
+        CoverageTokenVisitor coverageTokenVisitor = new CoverageTokenVisitor(astCoverage, coverageTokens) {{
             testMode = CoverageGenerator.this.testMode;
         }};
-        lineTokenVisitor.visit(compilationUnit, null);
+        coverageTokenVisitor.visit(compilationUnit, null);
 
-        LineTokenAnalyser lineTokenAnalyser = new LineTokenAnalyser();
-        SimpleLineCoverage transformedCoverage = lineTokenAnalyser.analyse(lineTokens);
+        CoverageTokenAnalyser coverageTokenAnalyser = new CoverageTokenAnalyser();
+        SimpleLineCoverage transformedCoverage = coverageTokenAnalyser.analyse(coverageTokens);
 
-        return new CoverageGeneratorResult(originalCoverage, transformedCoverage, lineTokens);
+        return new CoverageGeneratorResult(originalCoverage, transformedCoverage, coverageTokens);
     }
 
     public CoverageBuilder readJacocoCoverage(Path execFile, Collection<Path> relevantClassFiles)
@@ -174,15 +174,15 @@ public class CoverageGenerator {
     public static class CoverageGeneratorResult {
         public final DetailedLineCoverage originalCoverage;
         public final SimpleLineCoverage transformedCoverage;
-        public final LineTokens lineTokens;
+        public final CoverageTokens coverageTokens;
 
         public CoverageGeneratorResult(
                 DetailedLineCoverage originalCoverage,
                 SimpleLineCoverage transformedCoverage,
-                LineTokens lineTokens) {
+                CoverageTokens coverageTokens) {
             this.originalCoverage = originalCoverage;
             this.transformedCoverage = transformedCoverage;
-            this.lineTokens = lineTokens;
+            this.coverageTokens = coverageTokens;
         }
 
         public LineCoverage getLineCoverage() {

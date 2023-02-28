@@ -31,7 +31,7 @@ import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
-import org.codedefenders.analysis.coverage.line.LineTokenVisitor;
+import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.JavaToken;
@@ -168,7 +168,7 @@ import static org.codedefenders.util.JavaParserUtils.lineOf;
  *              int i =         // <- this line is covered by JaCoCo
  *                      2 + 2;  // <- this line is empty
  *         }</pre>
- *         In this case, empty expressions are usually left EMPTY. {@link LineTokenVisitor} will still cover their lines
+ *         In this case, empty expressions are usually left EMPTY. {@link CoverageTokenVisitor} will still cover their lines
  *         based on the surrounding statements and/or expressions.
  *     </li>
  * </ul>
@@ -580,7 +580,7 @@ public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
         DetailedLine closingBraceCoverage = lineCoverage.get(endOf(body));
 
         // update body based on coverage of the closing brace
-        if (closingBraceCoverage.instructionStatus() == LineCoverageStatus.NOT_COVERED) {
+        if (closingBraceCoverage.instructionStatus().isNotCovered()) {
             bodyStatus = bodyStatus.updateStatusAfter(StatusAfter.NOT_COVERED);
         } else if (closingBraceCoverage.hasCoveredIns()) {
             bodyStatus = bodyStatus.updateStatusAfter(StatusAfter.COVERED);

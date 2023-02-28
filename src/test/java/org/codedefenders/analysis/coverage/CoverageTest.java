@@ -116,7 +116,7 @@ public class CoverageTest {
                 originalCoverage,
                 result.transformedCoverage,
                 expectedCoverage,
-                result.lineTokens);
+                result.coverageTokens);
         writer.writeCoverage();
         writer.writeHtml();
 

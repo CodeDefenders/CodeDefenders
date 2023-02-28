@@ -18,13 +18,13 @@
  */
 package org.codedefenders.analysis.coverage.line;
 
-import org.codedefenders.analysis.coverage.line.LineTokens.Token;
+import org.codedefenders.analysis.coverage.line.CoverageTokens.Token;
 
-public class LineTokenAnalyser {
-    public SimpleLineCoverage analyse(LineTokens lineTokens) {
+public class CoverageTokenAnalyser {
+    public SimpleLineCoverage analyse(CoverageTokens coverageTokens) {
         SimpleLineCoverage coverage = new SimpleLineCoverage();
-        for (int line = lineTokens.getFirstLine(); line <= lineTokens.getLastLine(); line++) {
-            Token root = lineTokens.getRoot(line);
+        for (int line = coverageTokens.getFirstLine(); line <= coverageTokens.getLastLine(); line++) {
+            Token root = coverageTokens.getRoot(line);
             coverage.set(line, analyse(root));
         }
         return coverage;
@@ -38,7 +38,7 @@ public class LineTokenAnalyser {
     private State analyse(Token token, State state) {
         state = state.updateForNextToken(token);
 
-        if (token.type == LineTokens.Type.OVERRIDE) {
+        if (token.type == CoverageTokens.Type.OVERRIDE) {
             return state;
         }
 
@@ -93,7 +93,7 @@ public class LineTokenAnalyser {
                     break;
                 case RESET:
                     if (priority <= token.priority) {
-                        return new State(token.status, LineTokens.Priority.EMPTY, iteration + 1);
+                        return new State(token.status, CoverageTokens.Priority.EMPTY, iteration + 1);
                     }
                     break;
                 default:

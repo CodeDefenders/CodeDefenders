@@ -221,7 +221,7 @@ public class AstCoverageStatus {
             }
         }
 
-        return withStatusAfter(statusAfter);
+        return withStatusAfter(newStatusAfter);
     }
 
     public enum Status {
