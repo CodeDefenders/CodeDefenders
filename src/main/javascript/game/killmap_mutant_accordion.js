@@ -1,5 +1,6 @@
 import DataTable from '../thirdparty/datatables';
 import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
+import {Popover} from "../thirdparty/bootstrap";
 
 /**
  * @typedef {object} MutantAccordionCategory
@@ -157,33 +158,33 @@ class KillMapMutantAccordion {
                             : 'No tests cover this method.'
                     },
                     createdRow: function (row, data, index) {
-                        // self._setupPopover(
-                        //     row.querySelector('.ta-covered-link'),
-                        //     data,
-                        //     self._renderCoveredMutantsPopoverTitle.bind(self),
-                        //     self._renderCoveredMutantsPopoverBody.bind(self)
-                        // );
-                        //
-                        // self._setupPopover(
-                        //     row.querySelector('.ta-killed-link'),
-                        //     data,
-                        //     self._renderKilledMutantsPopoverTitle.bind(self),
-                        //     self._renderKilledMutantsPopoverBody.bind(self)
-                        // );
-                        //
-                        // self._setupPopover(
-                        //     row.querySelector('.ta-smells-link'),
-                        //     data,
-                        //     self._renderSmellsPopoverTitle.bind(self),
-                        //     self._renderSmellsPopoverBody.bind(self)
-                        // );
-                        //
-                        // const element = row.querySelector('.ta-view-button');
-                        // if (element !== null) {
-                        //     element.addEventListener('click', function (event) {
-                        //         self._viewTestModal(data);
-                        //     });
-                        // }
+                        self._setupPopover(
+                            row.querySelector('.ta-covered-link'),
+                            data,
+                            self._renderCoveredMutantsPopoverTitle.bind(self),
+                            self._renderCoveredMutantsPopoverBody.bind(self)
+                        );
+
+                        self._setupPopover(
+                            row.querySelector('.ta-killed-link'),
+                            data,
+                            self._renderKilledMutantsPopoverTitle.bind(self),
+                            self._renderKilledMutantsPopoverBody.bind(self)
+                        );
+
+                        self._setupPopover(
+                            row.querySelector('.ta-smells-link'),
+                            data,
+                            self._renderSmellsPopoverTitle.bind(self),
+                            self._renderSmellsPopoverBody.bind(self)
+                        );
+
+                        const element = row.querySelector('.ta-view-button');
+                        if (element !== null) {
+                            element.addEventListener('click', function (event) {
+                                self._viewTestModal(data);
+                            });
+                        }
                     }
                 });
             }
@@ -194,6 +195,76 @@ class KillMapMutantAccordion {
 
         // LoadingAnimation.hideAnimation(document.getElementById('mutant-categories-accordion'));
     }
+
+    /**
+     * Sets up a popover trigger on the given element.
+     * @param {HTMLElement} triggerElement A DOM element to be used as the popover trigger.
+     * @param {object} data The data of the row, as given by datatables.
+     * @param {function} renderTitle A function to render the heading of the popover with.
+     * @param {function} renderContent A function to render the body of the popover with.
+     * @private
+     */
+    _setupPopover(triggerElement, data, renderTitle, renderContent) {
+        new Popover(triggerElement, {
+            container: document.body,
+            template:
+                `<div class="popover" role="tooltip">
+                    <div class="popover-arrow"></div>
+                    <h3 class="popover-header"></h3>
+                    <div class="popover-body px-3 py-2" style="max-width: 250px;"></div>
+                </div>`,
+            placement: 'top',
+            trigger: 'hover',
+            html: true,
+            title: () => renderTitle(data),
+            content: () => renderContent(data)
+        });
+    };
+
+
+    /**
+     * Creates a modal to display the given test and shows it.
+     * References to created models are cached so they don't need to be generated again.
+     * @param {TestDTO} test The test DTO to display.
+     * @private
+     */
+    async _viewTestModal(test) {
+        let modal = this._testModals.get(test.id);
+        if (modal !== undefined) {
+            modal.controls.show();
+            return;
+        }
+
+        /* Create a new modal. */
+        modal = new Modal();
+        modal.title.innerText = `Test ${test.id} (by ${test.creator.name})`;
+        modal.body.innerHTML =
+            `<div class="card">
+                    <div class="card-body p-0 codemirror-expand codemirror-test-modal-size">
+                        <pre class="m-0"><textarea></textarea></pre>
+                    </div>
+                </div>`;
+        modal.dialog.classList.add('modal-dialog-responsive');
+        modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
+        this._testModals.set(test.id, modal);
+
+        /* Initialize the editor. */
+        const textarea = modal.body.querySelector('textarea');
+        const editor = CodeMirror.fromTextArea(textarea, {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: 'text/x-java',
+            readOnly: true,
+            autoRefresh: true
+        });
+        editor.getWrapperElement().classList.add('codemirror-readonly');
+
+        modal.controls.show();
+
+        await InfoApi.setTestEditorValue(editor, test.id);
+        LoadingAnimation.hideAnimation(modal.body);
+    };
+
 
     _renderKillMapResult(data) {
         switch (data.killMapResult) {
