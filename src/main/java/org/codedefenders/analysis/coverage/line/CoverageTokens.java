@@ -54,11 +54,18 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
         return super.get(line);
     }
 
+    /**
+     * Gets the tree root for the given line.
+     */
     public Token getRoot(int line) {
         return get(line).peekLast();
     }
 
-    public static CoverageTokens fromJaCoCo(DetailedLineCoverage coverage) {
+    /**
+     * Initializes a CoverageTokens instance by inserting and OVERRIDE token on every line that the given coverage
+     * covers as non-EMPTY.
+     */
+    public static CoverageTokens fromExistingCoverage(DetailedLineCoverage coverage) {
         CoverageTokens coverageTokens = new CoverageTokens();
         for (int line = coverage.getFirstLine(); line <= coverage.getLastLine(); line++) {
             DetailedLine status = coverage.get(line);
@@ -84,6 +91,10 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
         return coverageTokens;
     }
 
+    /**
+     * Pushes a new token onto the stack on the given line,
+     * and adds the token as a child to the token currently on top of the stack.
+     */
     private void pushToken(int line, Token newToken) {
         Deque<Token> stack = get(line);
         Token top = stack.peek();
@@ -101,6 +112,29 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
         return new TokenInserter(originNode, visitCallback);
     }
 
+    /**
+     * A helper class to easily insert tokens on a range of lines.
+     *
+     * <p>Use in a try-block like e.g.:
+     * <pre>{@code
+     *     try (TokenInserter i = tokens.forNode(node, () -> super.visit(node, arg))) {
+     *          // ...
+     *          i.node(node.getExpr())
+     *                  .cover(LineCoverageStatus.FULLY_COVERED).
+     *          // ...
+     *          i.lines(endOf(node.getExpr()) + 1, endOf(node))
+     *                  .block(LineCoverageStatus.NOT_COVERED).
+     *          // ...
+     *     }
+     * }</pre>
+     *
+     * <p>On closing, the TokenInserter will
+     * <ol>
+     *     <li>push EMPTY tokens onto lines that didn't have a token added</li>
+     *     <li>call the given callback to visit the next node</li>
+     *     <li>upon returning from the visit, pop the tokens that were previously added</li>
+     * </ol>
+     */
     public class TokenInserter implements AutoCloseable {
         private final Node originNode;
         private final Runnable visitCallback;
@@ -118,14 +152,20 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
                     .forEach(emptyLines::add);
         }
 
+        /**
+         * Starts an insert for the given lines.
+         * If beginLine > endLine, no tokens will be added to any lines.
+         *
+         * @param beginLine The line to start the insertion at (1-indexed, inclusive).
+         * @param endLine The line to end the insertion at (1-indexed, inclusive).
+         */
         public TokenInserterForPosition lines(int beginLine, int endLine) {
             return new TokenInserterForPosition(beginLine, endLine);
         }
 
-        public TokenInserterForPosition line(int line) {
-            return lines(line, line);
-        }
-
+        /**
+         * Starts an insert for all lines encompassing the given node.
+         */
         public TokenInserterForPosition node(Node node) {
             return lines(beginOf(node), endOf(node));
         }
@@ -170,35 +210,60 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
                 insert(beginLine, endLine, tokenSup);
             }
 
+            /**
+             * Inserts a {@link CoverageTokens.Type#COVERABLE} token with the given status on each line.
+             */
             public void cover(LineCoverageStatus status) {
                 insert(() -> Token.cover(originNode, status));
             }
 
+            /**
+             * @see TokenInserterForPosition#cover(LineCoverageStatus)
+             */
             public void cover(Status status) {
                 cover(status.toLineCoverageStatus());
             }
 
+            /**
+             * Inserts a {@link CoverageTokens.Type#STRONG_COVERABLE} token with the given status on the first line,
+             * and a {@link CoverageTokens.Type#COVERABLE} token on each other line.
+             */
             public void coverStrong(LineCoverageStatus status) {
                 insert(beginLine, beginLine, () -> Token.coverStrong(originNode, status));
                 insert(beginLine + 1, endLine, () -> Token.cover(originNode, status));
             }
 
+            /**
+             * @see TokenInserterForPosition#coverStrong(LineCoverageStatus)
+             */
             public void coverStrong(Status status) {
                 coverStrong(status.toLineCoverageStatus());
             }
 
+            /**
+             * Inserts a {@link CoverageTokens.Type#BLOCK} token with the given status on each line.
+             */
             public void block(LineCoverageStatus status) {
                 insert(() -> Token.block(originNode, status));
             }
 
+            /**
+             * @see TokenInserterForPosition#block(LineCoverageStatus)
+             */
             public void block(Status status) {
                 block(status.toLineCoverageStatus());
             }
 
+            /**
+             * Inserts a {@link CoverageTokens.Type#RESET} token on each line.
+             */
             public void reset() {
                 insert(() -> Token.reset(originNode));
             }
 
+            /**
+             * Inserts a {@link CoverageTokens.Type#EMPTY} token on each line.
+             */
             public void empty() {
                 insert(() -> Token.empty(originNode));
             }

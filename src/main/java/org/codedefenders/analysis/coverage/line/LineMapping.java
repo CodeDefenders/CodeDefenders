@@ -21,10 +21,25 @@ package org.codedefenders.analysis.coverage.line;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LineMapping<T> {
+/**
+ * Represents a mapping from line numbers to anything, with non-assigned lines being mapped to an empty value
+ * given by {@link LineMapping#getEmpty()}.
+ */
+public abstract class LineMapping<T> {
+    /**
+     * A list containing the values, indexed by line number (1-indexed).
+     */
     private final List<T> lines;
-    private int firstLine; // inclusive
-    private int lastLine; // inclusive
+
+    /**
+     * The first line of the mapping (1-indexed, inclusive).
+     */
+    private int firstLine;
+
+    /**
+     * The last line of the mapping (1-indexed, inclusive).
+     */
+    private int lastLine;
 
     public LineMapping() {
         lines = new ArrayList<>();
@@ -40,6 +55,10 @@ public class LineMapping<T> {
         return lastLine;
     }
 
+    /**
+     * Gets the associated value of the line number, or an empty value if the line does not fall into the range of
+     * (firstLine, lastLine).
+     */
     protected T get(int line) {
         if (line >= firstLine && line <= lastLine) {
             return lines.get(line);
@@ -48,11 +67,18 @@ public class LineMapping<T> {
         }
     }
 
+    /**
+     * Sets the associated value for a line number.
+     */
     protected void set(int line, T elem) {
         updateBounds(line);
         lines.set(line, elem);
     }
 
+    /**
+     * Updates firstLine and lastLine to fit the given line number into the range,
+     * and fills any new slots with the empty value.
+     */
     protected void updateBounds(int line) {
         if (line < firstLine) {
             firstLine = line;
@@ -65,7 +91,8 @@ public class LineMapping<T> {
         }
     }
 
-    protected T getEmpty() {
-        return null;
-    }
+    /**
+     * Returns the empty element of the mapping.
+     */
+    abstract protected T getEmpty();
 }

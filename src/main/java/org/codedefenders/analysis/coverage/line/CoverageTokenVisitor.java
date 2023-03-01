@@ -194,19 +194,38 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
     // endregion
     // region common code
 
-    private void handleLoop(TokenInserter i, Node loop, Node body) {
-        JavaToken closingParen = JavaTokenIterator.ofBegin(body)
-                .backward()
-                .skipOne()
-                .find(JavaToken.Kind.RPAREN);
-        int endLine = JavaTokenIterator.expandWhitespaceAfter(closingParen);
-
-        i.node(loop).reset();
-        i.lines(beginOf(loop), endLine)
-                .cover(astCoverage.get(loop).status());
-    }
-
     // phases: COVERED -> MAYBE_COVERED -> NOT_COVERED -> JUMP
+
+    /**
+     * Covers a block based on the block's and its statements' coverage.
+     *
+     * <p>The coverage of a block follows 4 phases:
+     * <ol>
+     *     <li>
+     *         <b>COVERED</b>: If the block is COVERED, the lines from the beginning up to the last COVERED statement
+     *         are covered as COVERED.
+     *     </li>
+     *     <li>
+     *         <b>MAYBE_COVERED</b>: If the last COVERED statement has {@code statusAfter == MAYBE_COVERED}, the space
+     *         between it and the first NOT_COVERED statement are left EMPTY.
+     *     </li>
+     *     <li>
+     *         <b>NOT_COVERED</b>: The lines after the first statement with {@code statusAfter == NOT_COVERED} until the
+     *         last statement (if it always jumps) or the end is covered as NOT_COVERED.
+     *     </li>
+     *     <li>
+     *         <b>JUMP</b>: If the last statement always jumps, the lines from the last statement until the end are
+     *         left EMPTY.
+     *     </li>
+     * </ol>
+     *
+     * @param i The TokenInserter of the node.
+     * @param statements The statements that make up the block.
+     * @param status The AstCoverageStatus of the block.
+     * @param beginLine The first line of the block (inclusive).
+     * @param endLine The last line of the block (inclusive).
+     * @param ignoreEndStatus Whether to ignore the block's statusAfter (and use the last statement's instead).
+     */
     public void handleBlock(TokenInserter i,
                             List<? extends Node> statements,
                             AstCoverageStatus status,
@@ -341,7 +360,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
             JavaToken firstMethodToken = JavaTokenIterator.ofEnd(lastAnnotation.get())
                     .skipOne()
                     .findNext();
-            beginLine = firstMethodToken.getRange().get().begin.line;
+            beginLine = lineOf(firstMethodToken);
         }
 
         JavaToken closingParen = JavaTokenIterator.ofBegin(body)
@@ -588,7 +607,6 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
             AstCoverageStatus status = astCoverage.get(stmt);
             AstCoverageStatus iterableStatus = astCoverage.get(stmt.getIterable());
 
-            // TODO: set the iterable's status in AstCoverageVisitor?
             Status statusAfterIterable = iterableStatus.statusAfter().toAstCoverageStatus();
             if (statusAfterIterable.isEmpty()) {
                 statusAfterIterable = status.status();
@@ -611,7 +629,25 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
     @Override
     public void visit(WhileStmt stmt, Void arg) {
         try (TokenInserter i = tokens.forNode(stmt, () -> super.visit(stmt, arg))) {
-            handleLoop(i, stmt, stmt.getBody());
+            AstCoverageStatus status = astCoverage.get(stmt);
+            AstCoverageStatus conditionStatus = astCoverage.get(stmt.getCondition());
+
+            Status statusAfterCondition = conditionStatus.statusAfter().toAstCoverageStatus();
+            if (statusAfterCondition.isEmpty()) {
+                statusAfterCondition = status.status();
+            }
+
+            JavaToken closingParen = JavaTokenIterator.ofBegin(stmt.getBody())
+                    .backward()
+                    .skipOne()
+                    .find(JavaToken.Kind.RPAREN);
+            int endOfHeader = JavaTokenIterator.expandWhitespaceAfter(closingParen);
+
+            i.node(stmt).reset();
+            i.lines(beginOf(stmt), endOf(stmt.getCondition()))
+                    .cover(status.status());
+            i.lines(endOf(stmt.getCondition()) + 1, endOfHeader)
+                    .cover(statusAfterCondition);
         }
     }
 

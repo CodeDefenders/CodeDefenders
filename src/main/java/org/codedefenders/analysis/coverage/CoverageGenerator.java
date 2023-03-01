@@ -88,7 +88,7 @@ public class CoverageGenerator {
         astVisitor.visit(compilationUnit, null);
         AstCoverage astCoverage = astVisitor.finish();
 
-        CoverageTokens coverageTokens = CoverageTokens.fromJaCoCo(originalCoverage);
+        CoverageTokens coverageTokens = CoverageTokens.fromExistingCoverage(originalCoverage);
         CoverageTokenVisitor coverageTokenVisitor = new CoverageTokenVisitor(astCoverage, coverageTokens) {{
             testMode = CoverageGenerator.this.testMode;
         }};

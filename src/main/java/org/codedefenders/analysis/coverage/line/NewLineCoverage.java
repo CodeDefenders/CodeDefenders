@@ -19,9 +19,18 @@
 package org.codedefenders.analysis.coverage.line;
 
 public interface NewLineCoverage {
+    /**
+     * Returns the first line number of the coverage (inclusive, 1-indexed).
+     */
     int getFirstLine();
 
+    /**
+     * Returns the last line number of the coverage (inclusive, 1-indexed).
+     */
     int getLastLine();
 
+    /**
+     * Returns the line coverage status for the given line number (1-indexed).
+     */
     LineCoverageStatus getStatus(int line);
 }
