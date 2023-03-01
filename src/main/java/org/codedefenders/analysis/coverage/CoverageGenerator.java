@@ -63,11 +63,11 @@ public class CoverageGenerator {
     /**
      * Reads the coverage data for a test execution and extends it.
      *
-     * <p>The method requires the 'jacoco.exec' file to be present in the test folder.
+     * <p>A 'jacoco.exec' file must be present in the test folder.
      *
-     * @param gameClass the CUT
-     * @param testJavaFile the path to the test Java file (the 'jacoco.exe' file must exist in the same directory)
-     * @return the extended line coverage
+     * @param gameClass The CUT.
+     * @param testJavaFile The path to the test Java file (a 'jacoco.exe' file must exist in the same directory).
+     * @return The extended line coverage.
      */
     public CoverageGeneratorResult generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
@@ -83,6 +83,13 @@ public class CoverageGenerator {
         return generate(originalCoverage, compilationUnit);
     }
 
+    /**
+     * Extends the given line coverage.
+     *
+     * @param originalCoverage The original line coverage.
+     * @param compilationUnit The CompilationUnit for the file that the line coverage is for.
+     * @return The extended line coverage.
+     */
     public CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
         AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
         astVisitor.visit(compilationUnit, null);
@@ -100,6 +107,13 @@ public class CoverageGenerator {
         return new CoverageGeneratorResult(originalCoverage, transformedCoverage, coverageTokens);
     }
 
+    /**
+     * Reads the coverage from a 'jacoco.exec' file.
+     *
+     * @param execFile The path to the 'jacoco.exec' file.
+     * @param relevantClassFiles Paths to all class files that are relevant for the coverage.
+     * @return The coverage in JaCoCo's format.
+     */
     public CoverageBuilder readJacocoCoverage(Path execFile, Collection<Path> relevantClassFiles)
             throws CoverageGeneratorException {
         final ExecFileLoader execFileLoader = new ExecFileLoader();
@@ -124,6 +138,9 @@ public class CoverageGenerator {
         return coverageBuilder;
     }
 
+    /**
+     * Given a path to a test's Java file, finds the path to the test's 'jacoco.exec' file.
+     */
     public Path findJacocoExecFile(Path testJavaFile)
             throws CoverageGeneratorException {
         final Path reportDirectory = testJavaFile.getParent();
@@ -134,6 +151,9 @@ public class CoverageGenerator {
         return execFile;
     }
 
+    /**
+     * Given a CUT, finds paths to all class files that are relevant for computing coverage for the CUT.
+     */
     public Collection<Path> findRelevantClassFiles(GameClass gameClass) throws CoverageGeneratorException {
         final Path classFileFolder = Paths.get(gameClass.getClassFile()).getParent();
 
@@ -145,6 +165,9 @@ public class CoverageGenerator {
         }
     }
 
+    /**
+     * Extracts JaCoCo's (source file) coverage in to a {@link DetailedLineCoverage}.
+     */
     public DetailedLineCoverage extractLineCoverage(CoverageBuilder coverageBuilder, GameClass gameClass) {
         DetailedLineCoverage coverage = new DetailedLineCoverage();
 

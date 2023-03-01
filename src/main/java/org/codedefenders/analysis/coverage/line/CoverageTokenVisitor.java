@@ -359,7 +359,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
         if (lastAnnotation.isPresent()) {
             JavaToken firstMethodToken = JavaTokenIterator.ofEnd(lastAnnotation.get())
                     .skipOne()
-                    .findNext();
+                    .findNextNonEmpty();
             beginLine = lineOf(firstMethodToken);
         }
 

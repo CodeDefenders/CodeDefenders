@@ -34,7 +34,9 @@ import com.github.javaparser.ast.Node;
 import static org.codedefenders.util.JavaParserUtils.beginOf;
 import static org.codedefenders.util.JavaParserUtils.endOf;
 
-
+/**
+ * Maps line numbers to trees of tokens used to compute line coverage.
+ */
 public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
     @Override
     protected Deque<Token> getEmpty() {

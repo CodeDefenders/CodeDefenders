@@ -24,12 +24,21 @@ import java.util.function.UnaryOperator;
 import com.github.javaparser.JavaToken;
 import com.github.javaparser.ast.Node;
 
-// TODO: rewrite so that find() stops with current == found token
-// TODO: add a get() method to get the current token
-// TODO: add a getLine method to get the line of the current token
+import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.endOf;
 
+/**
+ * Utility class to make iterating through {@link JavaToken} tokens easier.
+ */
 public class JavaTokenIterator {
+    /**
+     * The next token to be checked in any find or skip operation. Could also be considered the current token.
+     */
     private JavaToken next;
+
+    /**
+     * Operator to get the next token. For backwards traversal.
+     */
     private UnaryOperator<JavaToken> getNext;
 
     private JavaTokenIterator(JavaToken token, UnaryOperator<JavaToken> getNext) {
@@ -37,19 +46,31 @@ public class JavaTokenIterator {
         this.getNext = getNext;
     }
 
+    /**
+     * Constructs a new JavaTokenIterator pointing to the given token.
+     */
     public static JavaTokenIterator of(JavaToken token) {
         return new JavaTokenIterator(token,
                 next -> next.getNextToken().orElse(null));
     }
 
+    /**
+     * Constructs a new JavaTokenIterator pointing to the first token of the given token.
+     */
     public static JavaTokenIterator ofBegin(Node node) {
         return JavaTokenIterator.of(node.getTokenRange().get().getBegin());
     }
 
+    /**
+     * Constructs a new JavaTokenIterator pointing to the last token of the given token.
+     */
     public static JavaTokenIterator ofEnd(Node node) {
         return JavaTokenIterator.of(node.getTokenRange().get().getEnd());
     }
 
+    /**
+     * Changes the direction of the iterator to go backward.
+     */
     public JavaTokenIterator backward() {
         getNext = next -> next.getPreviousToken().orElse(null);
         return this;
@@ -100,75 +121,115 @@ public class JavaTokenIterator {
         return null;
     }
 
+    /**
+     * Finds the next token matching the given predicate.
+     * Afterwards, the iterator points to the token after the found token.
+     */
     public JavaToken find(Predicate<JavaToken.Kind> predicate) {
         return findInternal(next -> predicate.test(JavaToken.Kind.valueOf(next.getKind())));
     }
 
+    /**
+     * Finds the next token of the given kind.
+     * Afterwards, the iterator points to the token after the found token.
+     */
     public JavaToken find(JavaToken.Kind search) {
         return findInternal(next -> search == JavaToken.Kind.valueOf(next.getKind()));
     }
 
-    public JavaToken findNext() {
+    /**
+     * Finds the next token that is not whitespace or a comment.
+     * Afterwards, the iterator points to the token after the found token.
+     */
+    public JavaToken findNextNonEmpty() {
         return findInternal(next -> !next.getCategory().isWhitespaceOrComment());
     }
 
+    /**
+     * Skips the next token matching the given predicate.
+     * Afterwards, the iterator points to the token after the found token.
+     */
     public JavaTokenIterator skip(Predicate<JavaToken.Kind> predicate) {
         return find(predicate) != null ? this : null;
     }
 
+    /**
+     * Skips the next token of the given kind.
+     * Afterwards, the iterator points to the token after the found token.
+     */
     public JavaTokenIterator skip(JavaToken.Kind search) {
         return find(search) != null ? this : null;
     }
 
+    /**
+     * Skips the current token.
+     * Afterwards, the iterator points to the next token.
+     */
     public JavaTokenIterator skipOne() {
         next = this.getNext.apply(next);
         return next != null ? this : null;
     }
 
+    /**
+     * Finds the first whitespace line before the token,
+     * or the start line of the token itself if there is no whitespace line before the token.
+     */
     public static int expandWhitespaceBefore(JavaToken token) {
-        int originalLine = token.getRange().get().begin.line;
-        JavaToken find = JavaTokenIterator.of(token)
+        int originalLine = beginOf(token);
+        JavaToken foundToken = JavaTokenIterator.of(token)
                 .backward()
                 .skipOne()
-                .findNext();
-        int foundLine = find.getRange().get().end.line;
+                .findNextNonEmpty();
+        int foundLine = endOf(foundToken);
         return Math.min(originalLine, foundLine + 1);
     }
 
+    /**
+     * Finds the last whitespace line after the token,
+     * or the end line of the token itself if there is no whitespace line after the token.
+     */
     public static int expandWhitespaceAfter(JavaToken token) {
-        int originalLine = token.getRange().get().begin.line;
-        JavaToken find = JavaTokenIterator.of(token)
+        int originalLine = endOf(token);
+        JavaToken foundToken = JavaTokenIterator.of(token)
                 .skipOne()
-                .findNext();
-        int foundLine = find.getRange().get().end.line;
+                .findNextNonEmpty();
+        int foundLine = beginOf(foundToken);
         return Math.max(originalLine, foundLine - 1);
     }
 
+    /**
+     * Checks whether the line starts with the given node.
+     */
     public static boolean lineStartsWith(Node node) {
         return lineStartsWith(node.getTokenRange().get().getBegin());
     }
 
+    /**
+     * Checks whether the line starts with the given token.
+     */
     public static boolean lineStartsWith(JavaToken token) {
-        int originalLine = token.getRange().get().begin.line;
-        JavaToken find = JavaTokenIterator.of(token)
+        JavaToken foundToken = JavaTokenIterator.of(token)
                 .backward()
                 .skipOne()
-                .findInternal(next -> !next.getCategory().isWhitespaceOrComment()
-                    || next.getRange().get().begin.line != originalLine);
-        return find == null || find.getRange().get().begin.line != originalLine;
+                .findNextNonEmpty();
+        return foundToken == null || endOf(foundToken) < beginOf(token);
     }
 
+    /**
+     * Checks whether the line ends with the given node.
+     */
     public static boolean lineEndsWith(Node node) {
         return lineEndsWith(node.getTokenRange().get().getEnd());
     }
 
+    /**
+     * Checks whether the line ends with the given token.
+     */
     public static boolean lineEndsWith(JavaToken token) {
-        int originalLine = token.getRange().get().begin.line;
-        JavaToken find = JavaTokenIterator.of(token)
+        JavaToken foundToken = JavaTokenIterator.of(token)
                 .skipOne()
-                .findInternal(next -> !next.getCategory().isWhitespaceOrComment()
-                        || next.getRange().get().begin.line != originalLine);
-        return find == null || find.getRange().get().begin.line != originalLine;
+                .findNextNonEmpty();
+        return foundToken == null || beginOf(foundToken) > endOf(token);
     }
 }
 

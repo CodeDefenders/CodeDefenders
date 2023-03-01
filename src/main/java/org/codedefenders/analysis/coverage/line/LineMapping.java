@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a mapping from line numbers to anything, with non-assigned lines being mapped to an empty value
+ * Represents a mapping from line numbers to any values, with non-assigned lines being mapped to an empty value
  * given by {@link LineMapping#getEmpty()}.
  */
 public abstract class LineMapping<T> {

@@ -225,6 +225,7 @@ public class AstCoverageStatus {
     }
 
     public enum Status {
+        // order matters
         EMPTY,
         NOT_COVERED,
         COVERED;
@@ -278,9 +279,35 @@ public class AstCoverageStatus {
     }
 
     public enum StatusAfter {
+        // order matters
+
+        /**
+         * The node always jumps, therefore space directly after the node is not coverable.
+         */
         ALWAYS_JUMPS,
+
+        /**
+         * The space after the node is NOT_COVERED, e.g. because:
+         * <ul>
+         *     <li>the node is NOT_COVERED to begin with</li>
+         *     <li>the node threw an exception</li>
+         *     <li>the node jumped (but doesn't jump on every path)</li>
+         * </ul>
+         */
         NOT_COVERED,
+
+        /**
+         * The space after the node could be COVERED or NOT_COVERED, e.g. because
+         * <ul>
+         *     <li>the node's coverage is EMPTY</li>
+         *     <li>we can't reliably determine if the node threw an exception or jumped</li>
+         * </ul>
+         */
         MAYBE_COVERED,
+
+        /**
+         * The space after the node is COVERED.
+         */
         COVERED;
 
         public StatusAfter upgrade(StatusAfter other) {

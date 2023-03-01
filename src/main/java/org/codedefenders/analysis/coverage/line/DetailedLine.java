@@ -20,6 +20,9 @@ package org.codedefenders.analysis.coverage.line;
 
 import org.jacoco.core.analysis.ILine;
 
+/**
+ * Saves the number of total/covered instructions and branches for a given line.
+ */
 public class DetailedLine {
     private final int totalInstructions;
     private final int coveredInstructions;

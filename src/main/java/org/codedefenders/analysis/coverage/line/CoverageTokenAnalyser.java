@@ -21,10 +21,10 @@ package org.codedefenders.analysis.coverage.line;
 import org.codedefenders.analysis.coverage.line.CoverageTokens.Token;
 
 public class CoverageTokenAnalyser {
-    public SimpleLineCoverage analyse(CoverageTokens coverageTokens) {
+    public SimpleLineCoverage analyse(CoverageTokens tokens) {
         SimpleLineCoverage coverage = new SimpleLineCoverage();
-        for (int line = coverageTokens.getFirstLine(); line <= coverageTokens.getLastLine(); line++) {
-            Token root = coverageTokens.getRoot(line);
+        for (int line = tokens.getFirstLine(); line <= tokens.getLastLine(); line++) {
+            Token root = tokens.getRoot(line);
             coverage.set(line, analyse(root));
         }
         return coverage;
@@ -38,14 +38,17 @@ public class CoverageTokenAnalyser {
     private State analyse(Token token, State state) {
         state = state.updateForNextToken(token);
 
+        // if we have an OVERRIDE token, we can stop here
         if (token.type == CoverageTokens.Type.OVERRIDE) {
             return state;
         }
 
+        // if we have no children, we can stop here
         if (token.children.isEmpty()) {
             return state;
         }
 
+        // merge the states of children
         State acc = state;
         for (Token child : token.children) {
             State next = analyse(child, state);
@@ -60,9 +63,24 @@ public class CoverageTokenAnalyser {
         return acc;
     }
 
+    /**
+     * An immutable state object, that captures the state of analysing a token tree.
+     */
     private static class State {
+        /**
+         * The current coverage status.
+         */
         private final LineCoverageStatus status;
+
+        /**
+         * The current priority. This is determined from the kinds of tokens that have been visited.
+         */
         private final int priority;
+
+        /**
+         * The current iteration. This is incremented every time the state changes, and is used to determine if
+         * a child token changed the state.
+         */
         private final int iteration;
 
         public State(LineCoverageStatus status, int priority, int iteration) {
@@ -71,6 +89,10 @@ public class CoverageTokenAnalyser {
             this.iteration = iteration;
         }
 
+        /**
+         * Updates the state for a child token.
+         * I.e. 'this' is the state of the parent token, 'token' is the next token.
+         */
         public State updateForNextToken(Token token) {
             switch (token.type) {
                 case ROOT:
@@ -102,6 +124,10 @@ public class CoverageTokenAnalyser {
             return this;
         }
 
+        /**
+         * Updates the state for a sibling token.
+         * I.e. 'this' is the state of on node, 'next' is the state of a sibling in the token tree.
+         */
         public State updateForSibling(State next) {
             LineCoverageStatus status;
             int priority;

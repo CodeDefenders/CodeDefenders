@@ -46,16 +46,25 @@ public class AstCoverage {
         statusPerNode.put(node, status);
     }
 
+    /**
+     * Transforms a node's status with the given update function.
+     */
     public void update(Node node, UnaryOperator<AstCoverageStatus> updater) {
         AstCoverageStatus status = get(node);
         statusPerNode.put(node, updater.apply(status));
     }
 
+    /**
+     * Updates a node's status via the {@link AstCoverageStatus#updateStatus(LineCoverageStatus)} method.
+     */
     public void updateStatus(Node node, LineCoverageStatus newStatus) {
         AstCoverageStatus status = get(node);
         statusPerNode.put(node, status.updateStatus(newStatus));
     }
 
+    /**
+     * Updates a node's status via the {@link AstCoverageStatus#updateStatus(Status)} method.
+     */
     public void updateStatus(Node node, Status newStatus) {
         AstCoverageStatus status = get(node);
         statusPerNode.put(node, status.updateStatus(newStatus));
