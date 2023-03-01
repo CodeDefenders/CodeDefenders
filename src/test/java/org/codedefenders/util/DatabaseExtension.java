@@ -79,6 +79,7 @@ public class DatabaseExtension implements ParameterResolver, BeforeAllCallback, 
         FluentConfiguration flywayConfig = Flyway.configure();
         flywayConfig.dataSource(dbConnectionUrl, username, password);
         flywayConfig.locations("classpath:db/migrations");
+        flywayConfig.cleanDisabled(false);
 
         Flyway flyway = flywayConfig.load();
         // For the Tests we always clean the database
