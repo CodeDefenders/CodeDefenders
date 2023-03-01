@@ -26,47 +26,52 @@
 <div id="mutants-div">
 
     <div class="game-component-header">
-        <h3>Mutants with kill-maps</h3>
-        <div id="ma-filter">
-            <input type="radio" class="btn-check" name="filter" id="all" value="ALL" checked>
-            <label class="btn btn-xs btn-outline-secondary" for="all">
+        <h3>Kill-maps by Mutants</h3>
+        <div id="kma-filter">
+            <input type="radio" class="btn-check" name="filter" id="km-all" value="ALL" checked>
+            <label class="btn btn-xs btn-outline-secondary" for="km-all">
                 <span class="align-middle">All</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="alive" value="ALIVE">
-            <label class="btn btn-xs btn-outline-secondary" for="alive">
+            <input type="radio" class="btn-check" name="filter" id="km-kill" value="KILL">
+            <label class="btn btn-xs btn-outline-secondary" for="km-kill">
                 <span class="mutantCUTImage mutantImageAlive align-middle"></span>
-                <span class="align-middle">Alive</span>
+                <span class="align-middle">Kill</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="killed" value="KILLED">
-            <label class="btn btn-xs btn-outline-secondary" for="killed">
+            <input type="radio" class="btn-check" name="filter" id="km-no-kill" value="NO_KILL">
+            <label class="btn btn-xs btn-outline-secondary" for="km-no-kill">
                 <span class="mutantCUTImage mutantImageKilled align-middle"></span>
-                <span class="align-middle">Killed</span>
+                <span class="align-middle">No Kill</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="marked" value="FLAGGED">
-            <label class="btn btn-xs btn-outline-secondary" for="marked">
+            <input type="radio" class="btn-check" name="filter" id="km-no-cov" value="NO_COVERAGE">
+            <label class="btn btn-xs btn-outline-secondary" for="km-no-cov">
                 <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
-                <span class="align-middle">Claimed Equivalent</span>
+                <span class="align-middle">No Coverage</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="equivalent" value="EQUIVALENT">
-            <label class="btn btn-xs btn-outline-secondary" for="equivalent">
+            <input type="radio" class="btn-check" name="filter" id="km-error" value="ERROR">
+            <label class="btn btn-xs btn-outline-secondary" for="km-error">
                 <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
-                <span class="align-middle">Equivalent</span>
+                <span class="align-middle">Error</span>
+            </label>
+            <input type="radio" class="btn-check" name="filter" id="km-unknown" value="UNKNOWN">
+            <label class="btn btn-xs btn-outline-secondary" for="km-unknown">
+                <span class="mutantCUTImage mutantImageAlive align-middle"></span>
+                <span class="align-middle">Unknown</span>
             </label>
         </div>
     </div>
 
-    <div class="accordion" id="mutant-categories-accordion">
+    <div class="accordion loading loading-border-card loading-bg-gray" id="kill-map-mutant-accordion">
         <c:forEach items="${killMapAccordion.categories}" var="category">
             <div class="accordion-item">
-                <h2 class="accordion-header" id="ma-heading-${category.id}">
+                <h2 class="accordion-header" id="kma-heading-${category.id}">
                         <%-- ${empty …} doesn't work with Set --%>
-                    <button class="${category.mutantIds.size() == 0 ? "" : 'ma-covered'} accordion-button collapsed"
+                    <button class="${category.mutantIds.size() == 0 ? "" : 'kma-covered'} accordion-button collapsed"
                             type="button" data-bs-toggle="collapse"
-                            data-bs-target="#ma-collapse-${category.id}"
-                            aria-controls="ma-collapse-${category.id}">
+                            data-bs-target="#kma-collapse-${category.id}"
+                            aria-controls="kma-collapse-${category.id}">
                             <%-- ${empty …} doesn't work with Set --%>
-                        <span class="badge bg-attacker me-2 ma-count"
-                              id="ma-count-${category.id}"
+                        <span class="badge bg-attacker me-2 kma-count"
+                              id="kma-count-${category.id}"
                               <c:if test="${category.mutantIds.size() == 0}">hidden</c:if>>
                                 ${category.mutantIds.size()}
                         </span>
@@ -74,29 +79,28 @@
                     </button>
                 </h2>
                 <div class="accordion-collapse collapse"
-                     id="ma-collapse-${category.id}"
-                     data-bs-parent="#mutant-categories-accordion"
-                     aria-expanded="false" aria-labelledby="ma-heading-${category.id}">
+                     id="kma-collapse-${category.id}"
+                     data-bs-parent="#kill-map-mutant-accordion"
+                     aria-expanded="false" aria-labelledby="kma-heading-${category.id}">
                     <div class="accordion-body p-0">
-                        <div class="accordion" id="mutant-killmap-accordion">
+                        <div class="accordion" id="mutant-kill-map-accordion-${category.id}">
                             <c:if test="${category.mutantIds.size() == 0}">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
                                         <p class="text-center m-0">No mutants in this category.</p>
                                     </div>
                                 </div>
-
                             </c:if>
                             <c:forEach items="${killMapAccordion.getMutantsByCategory(category)}" var="mutant">
                                 <div class="accordion-item">
-                                    <h3 class="accordion-header" id="ma-heading-mutant-${mutant.id}">
-                                        <button class="${category.testIds.size() == 0 ? "" : 'ma-covered'}
+                                    <h3 class="accordion-header"
+                                        id="kma-heading-category-${category.id}-mutant-${mutant.id}">
+                                        <button class="${category.testIds.size() == 0 ? "" : 'kma-covered'}
                                                         accordion-button collapsed"
                                                 type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#ma-collapse-mutant-${mutant.id}"
-                                                aria-controls="ma-collapse-mutant-${mutant.id}">
-                                            <c:set var="state"
-                                                   value="${mutant.state}"/>
+                                                data-bs-target="#kma-collapse-category-${category.id}-mutant-${mutant.id}"
+                                                aria-controls="kma-collapse-category-${category.id}-mutant-${mutant.id}">
+                                            <c:set var="state" value="${mutant.state}"/>
                                             <c:choose>
                                                 <c:when test="${state == 'ALIVE'}">
                                                     <span class="mutantCUTImage mutantImageAlive"></span>
@@ -111,19 +115,30 @@
                                                     <span class="mutantCUTImage mutantImageFlagged"></span>
                                                 </c:when>
                                             </c:choose>
-                                            <span class="ma-mutant-link">
+                                            <span class="kma-mutant-link">
                                                 Mutant ${mutant.id}
                                             </span>
-                                            <span class="ma-column-name mx-2">by</span>
+                                            <span class="kma-col">
+                                                <span class="kma-column-name mx-2">by</span>
                                                 ${mutant.creator.name}
+                                            </span>
+                                            <span class="kma-col">
+                                                    ${mutant.description}
+                                            </span>
+                                            <span class="kma-col">
+                                                <span class="ma-column-name">Points:</span>
+                                                ${mutant.points}
+                                            </span>
                                         </button>
                                     </h3>
                                     <div class="accordion-collapse collapse"
-                                         id="ma-collapse-mutant-${mutant.id}"
-                                         data-bs-parent="#mutant-killmap-accordion"
-                                         aria-expanded="false" aria-labelledby="ma-heading-mutant-${mutant.id}">
+                                         id="kma-collapse-category-${category.id}-mutant-${mutant.id}"
+                                         data-bs-parent="#mutant-kill-map-accordion-${category.id}"
+                                         aria-expanded="false"
+                                         aria-labelledby="kma-heading-category-${category.id}-mutant-${mutant.id}">
                                         <div class="accordion-body p-0">
-                                            <table id="ma-table-mutant-${mutant.id}" class="table table-sm"></table>
+                                            <table id="kma-table-category-${category.id}-mutant-${mutant.id}"
+                                                   class="table table-sm"></table>
                                         </div>
                                     </div>
                                 </div>

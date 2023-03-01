@@ -105,7 +105,7 @@ class KillMapMutantAccordion {
 
         /**
          * Maps category ids to the mutants with their datatable that displays the tests of the category.
-         * @type {Map<number, Map<number, DataTable>>}
+         * @type {Map<string, Map<number, DataTable>>}
          */
         this._dataTablesByCategoryAndMutant = new Map();
 
@@ -120,11 +120,11 @@ class KillMapMutantAccordion {
 
         /* Loop through the categories and mutants and create a test table for each one. */
         for (const category of this._categories) {
-            console.log(`#ma-collapse-${category.id}`);
-            const categoryAccordion = document.querySelector(`#ma-collapse-${category.id}`);
+            const categoryAccordion = document.querySelector(`#kma-collapse-${category.id}`);
+            this._dataTablesByCategoryAndMutant.set(category.id, new Map());
             for (const mutantId of category.mutantIds) {
                 /* Create the DataTable. */
-                const tableElement = categoryAccordion.querySelector(`#ma-table-mutant-${mutantId}`);
+                const tableElement = categoryAccordion.querySelector(`#kma-table-category-${category.id}-mutant-${mutantId}`);
                 const rows = category.testIds
                     .sort((a, b) => a - b)
                     .map(testId => {
@@ -132,8 +132,6 @@ class KillMapMutantAccordion {
                         testDTO.killMapResult = this._killMap[mutantId][testId];
                         return testDTO;
                     });
-
-                console.log(category.description, JSON.stringify(rows));
 
                 const dataTable = new DataTable(tableElement, {
                     data: rows,
@@ -187,13 +185,14 @@ class KillMapMutantAccordion {
                         }
                     }
                 });
+
+                this._dataTablesByCategoryAndMutant.get(category.id).set(mutantId, dataTable);
             }
         }
 
-        console.log(this)
+        this._initFilters();
 
-
-        // LoadingAnimation.hideAnimation(document.getElementById('mutant-categories-accordion'));
+        LoadingAnimation.hideAnimation(document.getElementById('kill-map-mutant-accordion'));
     }
 
     /**
@@ -265,6 +264,40 @@ class KillMapMutantAccordion {
         LoadingAnimation.hideAnimation(modal.body);
     };
 
+    /**
+     * Initializes the filter radio to filter mutants by equivalence status.
+     * @private
+     */
+    _initFilters() {
+        /* Bind "this" to safely use it in callback functions. */
+        const self = this;
+
+        /* Setup filter functionality for mutant-accordion */
+        document.getElementById('kma-filter')
+            .addEventListener('change', function (event) {
+                const selectedKillMapResult = event.target.value;
+
+                const searchFunction = (settings, renderedData, index, data, counter) => {
+                    /* Let this only affect kill-map mutant accordion tables. */
+                    if (!settings.nTable.id.startsWith('kma-table-')) {
+                        return true;
+                    }
+                    const originalData = renderedData[1].replace(" ", "_").replace("?", "UNKNOWN").toUpperCase();
+                    return selectedKillMapResult === 'ALL' || selectedKillMapResult === originalData;
+                }
+
+                DataTable.ext.search.push(searchFunction);
+
+                for (const category of self._categories) {
+                    for (const mutantId of category.mutantIds) {
+                        self._dataTablesByCategoryAndMutant.get(category.id).get(mutantId).draw();
+                    }
+                }
+
+                /* Remove search function again after tables have been filtered. */
+                DataTable.ext.search.splice(DataTable.ext.search.indexOf(searchFunction), 1);
+            })
+    }
 
     _renderKillMapResult(data) {
         switch (data.killMapResult) {
