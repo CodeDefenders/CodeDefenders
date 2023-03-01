@@ -104,8 +104,8 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
 
     /**
      * @implNote The return value is passed all the way up to {@link org.apache.shiro.web.servlet.AdviceFilter} and
-     * determines whether other filter should be invoked after this one (the chain continued) or not.
-     * We simply delegate this to our superclass.
+     * determines whether other filters should be invoked after this one (the chain continued) or not.
+     * We redirect the user to the login page, so invoking other filters could result in errors, so we return false.
      */
     @Override
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request,
@@ -139,8 +139,9 @@ public class CodeDefendersFormAuthenticationFilter extends FormAuthenticationFil
             ((UsernamePasswordToken) token).clear();
         }
 
-        // Leave the return value to the super method.
-        return super.onLoginFailure(token, e, request, response);
+        // We return false, because sending a redirect closes the response, and other filters should not try to interact
+        // with the request/response anymore.
+        return false;
     }
 
     @Override

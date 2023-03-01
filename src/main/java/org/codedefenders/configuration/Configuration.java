@@ -104,6 +104,7 @@ public class Configuration {
     protected Boolean forceLocalExecution;
     protected Boolean parallelize;
     protected Integer parallelizeCount;
+    protected Integer parallelizeKillmapCount;
     protected Boolean blockAttacker;
     protected Boolean mutantCoverage;
 
@@ -151,7 +152,6 @@ public class Configuration {
                     validationErrors.add(setupFile(dataDir, "security.policy",
                             () -> this.getClass().getResourceAsStream("/data/security.policy")));
 
-                    validationErrors.add(setupDirectory(getAiDir()));
                     validationErrors.add(setupDirectory(getMutantDir()));
                     validationErrors.add(setupDirectory(getTestsDir()));
                     validationErrors.add(setupDirectory(getSourcesDir()));
@@ -356,10 +356,6 @@ public class Configuration {
         return new File(getDataDir(), "lib");
     }
 
-    public File getAiDir() {
-        return new File(getDataDir(), "ai");
-    }
-
     public File getAntHome() {
         return new File(antHome);
     }
@@ -435,7 +431,11 @@ public class Configuration {
     }
 
     public int getNumberOfKillmapThreads() {
-        return 40;
+        if (parallelizeKillmapCount == null) {
+            return Runtime.getRuntime().availableProcessors();
+        } else {
+            return parallelizeKillmapCount;
+        }
     }
 
     public boolean isMetricsCollectionEnabled() {

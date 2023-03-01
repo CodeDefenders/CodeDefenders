@@ -83,14 +83,6 @@ public class Constants {
     @Deprecated
     public static final String TESTS_DIR = Paths.get(DATA_DIR, "tests").toString();
 
-    /**
-     * Deprecated.
-     *
-     * @deprecated Use {@link Configuration#getAiDir()} instead.
-     */
-    @Deprecated
-    public static final String AI_DIR = Paths.get(DATA_DIR, "ai").toString();
-
     public static final String TEST_CLASSPATH = Stream.of(
                     "byte-buddy-1.12.14.jar",
                     "byte-buddy-agent-1.12.14.jar",

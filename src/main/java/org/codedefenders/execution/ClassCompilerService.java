@@ -57,12 +57,4 @@ public interface ClassCompilerService {
      * @return The path to the compiled CUT
      */
     String compileCUT(GameClass cut) throws CompileException;
-
-    /**
-     * Compiles generated test suite.
-     *
-     * @param cut Class under test
-     */
-    boolean compileGenTestSuite(final GameClass cut);
-
 }

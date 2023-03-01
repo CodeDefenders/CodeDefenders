@@ -57,13 +57,16 @@ class TieredConfiguration extends BaseConfiguration {
             Field field = Configuration.class.getDeclaredField(camelCaseName);
             if (!Modifier.isStatic(field.getModifiers()) && !Modifier.isFinal(field.getModifiers())) {
                 field.setAccessible(true);
+                String propSetBy = null;
                 for (BaseConfiguration otherConfig : configurations) {
                     Object otherConf = field.get(otherConfig);
                     if (otherConf != null) {
-                        logger.info(otherConfig.getClass().getSimpleName() + " overwrote property " + field.getName());
+                        propSetBy = otherConfig.getClass().getSimpleName();
+                        logger.debug("Property " + field.getName() + " present in " + propSetBy);
                         result = otherConf;
                     }
                 }
+                logger.info("Property " + field.getName() + (propSetBy != null ? " set by " + propSetBy : " not set."));
             }
         } catch (NoSuchFieldException e) {
             logger.info("Could not access nonexistent field ", e);

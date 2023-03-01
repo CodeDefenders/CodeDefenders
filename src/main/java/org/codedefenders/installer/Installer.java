@@ -38,6 +38,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -147,23 +148,13 @@ public class Installer {
      * @return a list of found files. Empty if none or an error occurred.
      */
     private static List<File> getFilesForDir(Path directory, String fileExtension) {
-        List<File> files;
-        try {
-            files = Files.find(directory, 5, (path, basicFileAttributes) -> {
-                if (path.toFile().isDirectory()) {
-                    return false;
-                }
-                if (!path.getFileName().toString().endsWith(fileExtension)) {
-                    return false;
-                }
-                return true;
-            })
-                    .map(Path::toFile)
-                    .collect(Collectors.toList());
+        try (Stream<Path> paths = Files.find(directory, 5,
+                (path, attrs) -> !Files.isDirectory(path) && path.getFileName().toString().endsWith(fileExtension))) {
+            return paths.map(Path::toFile).collect(Collectors.toList());
         } catch (IOException e) {
-            files = new ArrayList<>();
+            logger.error("Failed to search files in directory", e);
+            return new ArrayList<>();
         }
-        return files;
     }
 
     private void run(List<File> cuts, List<File> mutants, List<File> tests,
