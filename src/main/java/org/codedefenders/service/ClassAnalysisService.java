@@ -28,6 +28,7 @@ import javax.inject.Inject;
 
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
+import org.codedefenders.instrumentation.MetricsRegistry;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -40,7 +41,7 @@ public class ClassAnalysisService {
     private final ClassCodeAnalyser classCodeAnalyser;
 
     @Inject
-    public ClassAnalysisService(ClassCodeAnalyser classCodeAnalyser) {
+    public ClassAnalysisService(ClassCodeAnalyser classCodeAnalyser, MetricsRegistry metricsRegistry) {
         this.classCodeAnalyser = classCodeAnalyser;
 
         cache = CacheBuilder.newBuilder()
@@ -58,6 +59,8 @@ public class ClassAnalysisService {
                             }
                         }
                 );
+
+        metricsRegistry.registerGuavaCache("classAnalysisForClassId", cache);
     }
 
     /**
