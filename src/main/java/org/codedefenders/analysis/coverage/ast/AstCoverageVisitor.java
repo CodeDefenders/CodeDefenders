@@ -28,10 +28,10 @@ import java.util.stream.IntStream;
 import org.codedefenders.analysis.coverage.JavaTokenIterator;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
+import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
-import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.JavaToken;

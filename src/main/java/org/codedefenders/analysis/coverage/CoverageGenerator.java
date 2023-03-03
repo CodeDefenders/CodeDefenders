@@ -33,11 +33,11 @@ import javax.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
-import org.codedefenders.analysis.coverage.line.DetailedLine;
-import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
 import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
 import org.codedefenders.analysis.coverage.line.CoverageTokens;
+import org.codedefenders.analysis.coverage.line.DetailedLine;
+import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.SimpleLineCoverage;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;

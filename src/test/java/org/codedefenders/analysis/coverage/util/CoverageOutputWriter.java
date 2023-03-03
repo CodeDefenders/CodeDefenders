@@ -13,9 +13,9 @@ import java.util.stream.IntStream;
 
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.coverage.CoverageTest;
+import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.LineCoverageStatus;
-import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
 import org.codedefenders.util.ResourceUtils;
 
