@@ -21,7 +21,7 @@ import org.codedefenders.util.ResourceUtils;
 
 public class CoverageOutputWriter {
     private final static String HTML_OUTPUT_DIR = "/tmp/coverage";
-    private final static boolean ENABLED = true;
+    private final static boolean ENABLED = false;
     private final static boolean SPLIT_DIR_BY_JVM = true;
 
     private final String className;
