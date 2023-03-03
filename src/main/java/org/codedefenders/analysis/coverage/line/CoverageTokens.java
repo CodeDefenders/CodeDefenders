@@ -77,12 +77,6 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
                 coverageTokens.pushToken(line, Token.empty(null));
             }
 
-            // if (status.branchStatus() != LineCoverageStatus.EMPTY) {
-            //     coverageTokens.pushToken(line, Token.override(status.combinedStatus()));
-            // } else if (status.instructionStatus() == LineCoverageStatus.PARTLY_COVERED) {
-            //     coverageTokens.pushToken(line, Token.override(status.instructionStatus()));
-            // }
-
             // lines where JaCoCo produces misleading coverage
             // - first line of record declaration: contains instructions for getter methods, and can therefore
             //          unexpectedly be PARTLY_COVERED or NOT_COVERED even if the record was initialized
@@ -174,7 +168,7 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
 
         @Override
         public void close() {
-            // insert EMPTY token for every line that no token has been pushed onto
+            // insert EMPTY token for every line that no token has have been pushed onto
             for (int line : emptyLines) {
                 pushToken(line, Token.empty(originNode));
                 linesToPop.add(line);

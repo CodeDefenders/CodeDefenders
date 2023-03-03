@@ -129,6 +129,7 @@ public class CoverageTokenAnalyser {
          * I.e. 'this' is the state of on node, 'next' is the state of a sibling in the token tree.
          */
         public State updateForSibling(State next) {
+            int iteration = Math.max(this.iteration, next.iteration);
             LineCoverageStatus status;
             int priority;
 
@@ -143,7 +144,7 @@ public class CoverageTokenAnalyser {
                 priority = this.priority;
             }
 
-            return new State(status, priority, Math.max(this.iteration, next.iteration));
+            return new State(status, priority, iteration);
         }
 
         public static State defaultState() {

@@ -59,6 +59,14 @@ class CoverageTestParameters implements ArgumentsProvider {
         return expectedCoverage;
     }
 
+    /**
+     * Provides arguments for CoverageTest.
+     * @param cutPath The path to the CUT java file.
+     * @param testPath The path to the test java file.
+     * @param testArguments Arguments passed to the test file's main function.
+     * @param additionalJavaFiles Additional java files that should be compiled.
+     * @param expectedCoveragePath Path to the expected coverage information.
+     */
     private Arguments testCase(String cutPath,
                                String testPath,
                                String[] testArguments,
@@ -83,10 +91,15 @@ class CoverageTestParameters implements ArgumentsProvider {
         }
 
         NewLineCoverage expectedCoverage = readExpectedCoverage(expectedCoveragePath);
-        return Arguments.of(cutName, testName,
-                sourceFiles, classCode, expectedCoverage, testArguments);
+        return Arguments.of(cutName, testName, sourceFiles, classCode, expectedCoverage, testArguments);
     }
 
+    /**
+     * Provides arguments for CoverageTest in a simpler form.
+     * The path to the expected coverage is derived from the class and test paths (class_dir/test_name.coverage).
+     * @param cutPath The path to the CUT java file.
+     * @param testPath The path to the test java file.
+     */
     private Arguments simpleTestCase(String cutPath, String testPath)
             throws Exception {
         String testName = getClassNameFromPath(testPath);
@@ -97,6 +110,11 @@ class CoverageTestParameters implements ArgumentsProvider {
                 String.format("%s/%s.coverage", dirname, testName));
     }
 
+    /**
+     * Provides arguments to run a CoverageTest with EmptyRunner.
+     * The path to the expected coverage is derived from the class and test paths (class_dir/EmptyRunner.coverage).
+     * @param cutPath The path to the CUT java file.
+     */
     private Arguments emptyRunnerTestCase(String cutPath) throws Exception {
         String dirname = Paths.get(cutPath).getParent().toString();
         return testCase(
@@ -107,6 +125,11 @@ class CoverageTestParameters implements ArgumentsProvider {
         );
     }
 
+    /**
+     * Provides arguments to run a CoverageTest with DefaultRunner.
+     * The path to the expected coverage is derived from the class and test paths (class_dir/DefaultRunner.coverage).
+     * @param cutPath The path to the CUT java file.
+     */
     private Arguments defaultRunnerTestCase(String cutPath) throws Exception {
         String dirname = Paths.get(cutPath).getParent().toString();
         String cutName = getClassNameFromPath(cutPath);

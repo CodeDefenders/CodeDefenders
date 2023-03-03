@@ -187,12 +187,11 @@ public class CoverageTest {
         List<Executable> assertions = new ArrayList<>();
         for (int line = firstLine; line <= lastLine; line++) {
             final int finalLine = line;
-            assertions.add(() -> {
-                assert_()
-                        .withMessage("Coverage on line %s", finalLine)
-                        .that(actual.getStatus(finalLine))
-                        .isEqualTo(expected.getStatus(finalLine));
-            });
+            Executable assertion = () -> assert_()
+                    .withMessage("Coverage on line %s", finalLine)
+                    .that(actual.getStatus(finalLine))
+                    .isEqualTo(expected.getStatus(finalLine));
+            assertions.add(assertion);
         }
         assertAll(assertions);
     }

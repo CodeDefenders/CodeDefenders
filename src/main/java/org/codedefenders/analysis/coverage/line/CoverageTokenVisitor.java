@@ -139,7 +139,9 @@ import com.github.javaparser.ast.type.WildcardType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.beginToken;
 import static org.codedefenders.util.JavaParserUtils.endOf;
+import static org.codedefenders.util.JavaParserUtils.endToken;
 import static org.codedefenders.util.JavaParserUtils.lineOf;
 
 /**
@@ -150,7 +152,7 @@ import static org.codedefenders.util.JavaParserUtils.lineOf;
  *
  * <p>See {@link CoverageTokens} and {@link CoverageTokenAnalyser} for more details.
  */
-@SuppressWarnings("protected")
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
     private final AstCoverage astCoverage;
     private final CoverageTokens tokens;
@@ -437,7 +439,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = tokens.forNode(block, () -> super.visit(block, arg))) {
             if (block.isStatic()) {
                 AstCoverageStatus status = astCoverage.get(block);
-                JavaToken staticToken = block.getTokenRange().get().getBegin();
+                JavaToken staticToken = beginToken(block);
                 int endLine = JavaTokenIterator.expandWhitespaceAfter(staticToken);
                 i.lines(beginOf(block), endLine)
                         .block(status.status());
@@ -556,7 +558,6 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
         try (TokenInserter i = tokens.forNode(stmt, () -> super.visit(stmt, arg))) {
             AstCoverageStatus status = astCoverage.get(stmt);
 
-            // TODO: set these statuses in AstCoverageVisitor?
             Status statusAfterInit = stmt.getInitialization().getLast()
                     .map(astCoverage::get)
                     .map(AstCoverageStatus::statusAfter)
@@ -659,7 +660,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
             i.node(stmt).reset();
 
             // cover lines from 'do' until block as BLOCK
-            JavaToken doToken = stmt.getTokenRange().get().getBegin();
+            JavaToken doToken = beginToken(stmt);
             int endLine = JavaTokenIterator.expandWhitespaceAfter(doToken);
             i.lines(beginOf(stmt), endLine)
                     .block(status.status());
@@ -767,14 +768,10 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
                         break;
                     }
 
-                    JavaToken firstStmtBegin = entry.getStatements()
-                            .getFirst().get()
-                            .getTokenRange().get().getBegin();
+                    JavaToken firstStmtBegin = beginToken(entry.getStatements().getFirst().get());
                     int beginLine = JavaTokenIterator.expandWhitespaceBefore(firstStmtBegin);
 
-                    JavaToken lastStmtEnd = entry.getStatements()
-                            .getLast().get()
-                            .getTokenRange().get().getEnd();
+                    JavaToken lastStmtEnd = endToken(entry.getStatements().getLast().get());
                     int endLine = JavaTokenIterator.expandWhitespaceAfter(lastStmtEnd);
 
                     handleBlock(i,
@@ -834,7 +831,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
                     .map(astCoverage::get)
                     .orElseGet(AstCoverageStatus::empty);
 
-            JavaToken assertToken = stmt.getTokenRange().get().getBegin();
+            JavaToken assertToken = beginToken(stmt);
             int keywordEndLine = JavaTokenIterator.expandWhitespaceAfter(assertToken);
             // cover assert token + whitespace after with assert status
             i.lines(beginOf(stmt), keywordEndLine)
@@ -934,26 +931,6 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
             i.lines(endOf(expr.getTarget()) + 1, beginOf(expr.getValue()) - 1)
                     .cover(targetStatus.statusAfter().toLineCoverageStatus());
             i.node(expr.getValue()).cover(valueStatus.status());
-
-            // AstCoverageStatus status = astCoverage.get(expr);
-            // AstCoverageStatus targetStatus = astCoverage.get(expr.getTarget());
-            // AstCoverageStatus valueStatus = astCoverage.get(expr.getValue());
-
-            // if (status.isCovered() && !status.statusAfter().isCovered() && !valueStatus.isCovered()) {
-            //     if (targetStatus.statusAfter().isNotCovered()) {
-            //         i.node(expr.getTarget())
-            //                 .cover(LineCoverageStatus.FULLY_COVERED);
-            //         i.lines(endOf(expr.getTarget()) + 1, endOf(expr))
-            //                 .cover(LineCoverageStatus.NOT_COVERED);
-            //     } else {
-            //         i.lines(beginOf(expr), beginOf(expr.getTarget()) - 1)
-            //                 .cover(LineCoverageStatus.FULLY_COVERED);
-            //         i.node(expr.getTarget())
-            //                 .cover(LineCoverageStatus.NOT_COVERED);
-            //     }
-            // } else {
-            //     i.node(expr).cover(status.status());
-            // }
         }
     }
 
@@ -1020,7 +997,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
                 // cover the scope separately
                 // (this only really matters if there are blank lines between calls of a method chain
                 // and the chain throws an exception somewhere)
-                JavaToken scopeEnd = expr.getScope().get().getTokenRange().get().getEnd();
+                JavaToken scopeEnd = endToken(expr.getScope().get());
                 int endScopeLine = JavaTokenIterator.expandWhitespaceAfter(scopeEnd);
                 beginCallLine = JavaTokenIterator.of(scopeEnd)
                         .skipOne()
@@ -1100,15 +1077,11 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
                     ? status.status()
                     : conditionStatus.statusAfter().toAstCoverageStatus();
 
-            int thenBeginLine = JavaTokenIterator.expandWhitespaceBefore(
-                    expr.getThenExpr().getTokenRange().get().getBegin());
-            int thenEndLine = JavaTokenIterator.expandWhitespaceAfter(
-                    expr.getThenExpr().getTokenRange().get().getEnd());
+            int thenBeginLine = JavaTokenIterator.expandWhitespaceBefore(beginToken(expr.getThenExpr()));
+            int thenEndLine = JavaTokenIterator.expandWhitespaceAfter(endToken(expr.getThenExpr()));
 
-            int elseBeginLine = JavaTokenIterator.expandWhitespaceBefore(
-                    expr.getElseExpr().getTokenRange().get().getBegin());
-            int elseEndLine = JavaTokenIterator.expandWhitespaceAfter(
-                    expr.getElseExpr().getTokenRange().get().getEnd());
+            int elseBeginLine = JavaTokenIterator.expandWhitespaceBefore(beginToken(expr.getElseExpr()));
+            int elseEndLine = JavaTokenIterator.expandWhitespaceAfter(endToken(expr.getElseExpr()));
 
             i.lines(beginOf(expr), endOf(expr.getCondition())).cover(status.status());
             i.lines(endOf(expr.getCondition()) + 1, thenBeginLine - 1).cover(statusAfterCondition);

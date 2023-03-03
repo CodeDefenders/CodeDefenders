@@ -25,7 +25,9 @@ import com.github.javaparser.JavaToken;
 import com.github.javaparser.ast.Node;
 
 import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.beginToken;
 import static org.codedefenders.util.JavaParserUtils.endOf;
+import static org.codedefenders.util.JavaParserUtils.endToken;
 
 /**
  * Utility class to make iterating through {@link JavaToken} tokens easier.
@@ -58,14 +60,14 @@ public class JavaTokenIterator {
      * Constructs a new JavaTokenIterator pointing to the first token of the given token.
      */
     public static JavaTokenIterator ofBegin(Node node) {
-        return JavaTokenIterator.of(node.getTokenRange().get().getBegin());
+        return JavaTokenIterator.of(beginToken(node));
     }
 
     /**
      * Constructs a new JavaTokenIterator pointing to the last token of the given token.
      */
     public static JavaTokenIterator ofEnd(Node node) {
-        return JavaTokenIterator.of(node.getTokenRange().get().getEnd());
+        return JavaTokenIterator.of(endToken(node));
     }
 
     /**
@@ -124,6 +126,8 @@ public class JavaTokenIterator {
     /**
      * Finds the next token matching the given predicate.
      * Afterwards, the iterator points to the token after the found token.
+     *
+     * <p>Node: Only matches if the encountered parens/brackets/braces up to the match are balanced.
      */
     public JavaToken find(Predicate<JavaToken.Kind> predicate) {
         return findInternal(next -> predicate.test(JavaToken.Kind.valueOf(next.getKind())));
@@ -132,6 +136,8 @@ public class JavaTokenIterator {
     /**
      * Finds the next token of the given kind.
      * Afterwards, the iterator points to the token after the found token.
+     *
+     * <p>Node: Only matches if the encountered parens/brackets/braces up to the match are balanced.
      */
     public JavaToken find(JavaToken.Kind search) {
         return findInternal(next -> search == JavaToken.Kind.valueOf(next.getKind()));
@@ -148,6 +154,8 @@ public class JavaTokenIterator {
     /**
      * Skips the next token matching the given predicate.
      * Afterwards, the iterator points to the token after the found token.
+     *
+     * <p>Node: Only matches if the encountered parens/brackets/braces up to the match are balanced.
      */
     public JavaTokenIterator skip(Predicate<JavaToken.Kind> predicate) {
         return find(predicate) != null ? this : null;
@@ -156,6 +164,8 @@ public class JavaTokenIterator {
     /**
      * Skips the next token of the given kind.
      * Afterwards, the iterator points to the token after the found token.
+     *
+     * <p>Node: Only matches if the encountered parens/brackets/braces up to the match are balanced.
      */
     public JavaTokenIterator skip(JavaToken.Kind search) {
         return find(search) != null ? this : null;
@@ -201,7 +211,7 @@ public class JavaTokenIterator {
      * Checks whether the line starts with the given node.
      */
     public static boolean lineStartsWith(Node node) {
-        return lineStartsWith(node.getTokenRange().get().getBegin());
+        return lineStartsWith(beginToken(node));
     }
 
     /**
@@ -219,7 +229,7 @@ public class JavaTokenIterator {
      * Checks whether the line ends with the given node.
      */
     public static boolean lineEndsWith(Node node) {
-        return lineEndsWith(node.getTokenRange().get().getEnd());
+        return lineEndsWith(endToken(node));
     }
 
     /**

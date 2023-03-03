@@ -24,6 +24,7 @@ import com.github.javaparser.printer.configuration.DefaultConfigurationOption;
 import com.github.javaparser.printer.configuration.DefaultPrinterConfiguration;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 public class JavaParserUtils {
     private static final Logger logger = LoggerFactory.getLogger(JavaParserUtils.class);
 
@@ -96,5 +97,13 @@ public class JavaParserUtils {
 
     public static int endOf(JavaToken token) {
         return token.getRange().get().end.line;
+    }
+
+    public static JavaToken beginToken(Node node) {
+        return node.getTokenRange().get().getBegin();
+    }
+
+    public static JavaToken endToken(Node node) {
+        return node.getTokenRange().get().getEnd();
     }
 }
