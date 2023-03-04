@@ -51,9 +51,11 @@ import org.codedefenders.game.Test;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.test.TestCompiledEvent;
 import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
+import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -384,7 +386,8 @@ public class GameManagingUtils implements IGameManagingUtils {
             if (m.find()) {
                 // Replace the entire line with a link to the source code
                 String replacedLine = String.format(
-                        "<a onclick=\"import('./js/codedefenders_main.mjs').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
+                        "<a onclick=\"import('%s').then(module => module.objects.await('%s').then(editor => editor.jumpToLine(%s)));\" href=\"javascript:void(0);\">%s</a>",
+                        CDIUtil.getBeanFromCDI(URLUtils.class).forPath("/js/codedefenders_main.mjs"),
                         editor, m.group(1), line);
                 decorated.append(replacedLine).append("\n");
             } else {
