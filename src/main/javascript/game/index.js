@@ -10,6 +10,7 @@ import KillMapMutantAccordion from './killmap_mutant_accordion';
 import MutantEditor from './mutant_editor';
 import MutantProgressBar from './mutant_progress_bar';
 import TestAccordion from './test_accordion';
+import KillMapTestAccordion from "./killmap_test_accordion";
 import TestEditor from './test_editor';
 import TestProgressBar from './test_progress_bar';
 
@@ -29,6 +30,7 @@ export {
     MutantEditor,
     MutantProgressBar,
     TestAccordion,
+    KillMapTestAccordion,
     TestEditor,
     TestProgressBar
 };

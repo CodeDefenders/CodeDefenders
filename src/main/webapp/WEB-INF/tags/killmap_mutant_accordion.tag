@@ -26,33 +26,33 @@
 <div id="mutants-div">
 
     <div class="game-component-header">
-        <h3>Kill-maps by Mutants</h3>
+        <h2>Kill-maps by Mutants</h2>
         <div id="kma-filter">
-            <input type="radio" class="btn-check" name="filter" id="km-all" value="ALL" checked>
+            <input type="radio" class="btn-check" name="kma-filter" id="km-all" value="ALL" checked>
             <label class="btn btn-xs btn-outline-secondary" for="km-all">
                 <span class="align-middle">All</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="km-kill" value="KILL">
+            <input type="radio" class="btn-check" name="kma-filter" id="km-kill" value="KILL">
             <label class="btn btn-xs btn-outline-secondary" for="km-kill">
                 <span class="mutantCUTImage mutantImageAlive align-middle"></span>
                 <span class="align-middle">Kill</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="km-no-kill" value="NO_KILL">
+            <input type="radio" class="btn-check" name="kma-filter" id="km-no-kill" value="NO_KILL">
             <label class="btn btn-xs btn-outline-secondary" for="km-no-kill">
                 <span class="mutantCUTImage mutantImageKilled align-middle"></span>
                 <span class="align-middle">No Kill</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="km-no-cov" value="NO_COVERAGE">
+            <input type="radio" class="btn-check" name="kma-filter" id="km-no-cov" value="NO_COVERAGE">
             <label class="btn btn-xs btn-outline-secondary" for="km-no-cov">
                 <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
                 <span class="align-middle">No Coverage</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="km-error" value="ERROR">
+            <input type="radio" class="btn-check" name="kma-filter" id="km-error" value="ERROR">
             <label class="btn btn-xs btn-outline-secondary" for="km-error">
                 <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
                 <span class="align-middle">Error</span>
             </label>
-            <input type="radio" class="btn-check" name="filter" id="km-unknown" value="UNKNOWN">
+            <input type="radio" class="btn-check" name="kma-filter" id="km-unknown" value="UNKNOWN">
             <label class="btn btn-xs btn-outline-secondary" for="km-unknown">
                 <span class="mutantCUTImage mutantImageAlive align-middle"></span>
                 <span class="align-middle">Unknown</span>
@@ -83,7 +83,8 @@
                      data-bs-parent="#kill-map-mutant-accordion"
                      aria-expanded="false" aria-labelledby="kma-heading-${category.id}">
                     <div class="accordion-body p-0">
-                        <div class="accordion" id="mutant-kill-map-accordion-${category.id}">
+                        <div class="accordion ${category.mutantIds.size() == 0 ? 'empty' : ''}"
+                             id="mutant-kill-map-accordion-${category.id}">
                             <c:if test="${category.mutantIds.size() == 0}">
                                 <div class="accordion-item">
                                     <div class="accordion-header">

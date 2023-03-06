@@ -182,8 +182,7 @@
 		</div>
 
 		<div class="details-content__item">
-			<div class="game-component-header"><h3>JUnit Tests</h3></div>
-			<t:test_accordion/>
+			<t:killmap_test_accordion/>
 		</div>
 	</div>
 

@@ -233,16 +233,16 @@ class KillMapAccordion {
     _renderKillMapResult(data) {
         switch (data.killMapResult) {
             case 'KILL':
-                return '<span class="ta-kill-map-result ta-kill-map-result-kill">Kill</span>';
+                return '<span class="ka-kill-map-result ka-kill-map-result-kill">Kill</span>';
             case 'NO_KILL':
-                return '<span class="ta-kill-map-result ta-kill-map-result-no-kill">No Kill</span>';
+                return '<span class="ka-kill-map-result ka-kill-map-result-no-kill">No Kill</span>';
             case 'NO_COVERAGE':
-                return '<span class="ta-kill-map-result ta-kill-map-result-no-coverage">No Coverage</span>';
+                return '<span class="ka-kill-map-result ka-kill-map-result-no-coverage">No Coverage</span>';
             case 'ERROR':
-                return '<span class="ta-kill-map-result ta-kill-map-result-error">Error</span>';
+                return '<span class="ka-kill-map-result ka-kill-map-result-error">Error</span>';
             case 'UNKNOWN':
             default:
-                return '<span class="ta-kill-map-result ta-kill-map-result-unknown">?</span>';
+                return '<span class="ka-kill-map-result ka-kill-map-result-unknown">?</span>';
         }
     }
 
@@ -253,7 +253,7 @@ class KillMapAccordion {
 
     /** @protected */
     _renderPoints(data) {
-        return `<span class="ta-column-name">Points:</span> ${data.points}`;
+        return `<span class="ka-column-name">Points:</span> ${data.points}`;
     }
 
 }

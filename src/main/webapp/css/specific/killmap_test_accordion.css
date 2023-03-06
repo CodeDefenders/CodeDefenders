@@ -1,19 +1,19 @@
 /* Customization of Bootstrap 5 accordion style.
 ----------------------------------------------------------------------------- */
 
-#kill-map-mutant-accordion .accordion-button {
+#kill-map-test-accordion .accordion-button {
     padding: .6rem .8rem;
     background-color: rgba(0, 0, 0, .03);
 }
 
 /* Clear the box shadow from .accordion-button. This removes the blue outline when selecting a button, and the
    border between the header and content of accordion items when expanded. */
-#kill-map-mutant-accordion .accordion-button {
+#kill-map-test-accordion .accordion-button {
     box-shadow: none;
 }
 
 /* Always display the chevron icon in black. */
-#kill-map-mutant-accordion .accordion-button:not(.collapsed)::after {
+#kill-map-test-accordion .accordion-button:not(.collapsed)::after {
     /* Copied from Bootstrap 5. */
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23212529'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
 }
@@ -21,33 +21,33 @@
 /* Categories.
 ----------------------------------------------------------------------------- */
 
-#kill-map-mutant-accordion .accordion-button:not(.kma-covered) {
+#kill-map-test-accordion .accordion-button:not(.kta-covered) {
     color: #B0B0B0;
 }
 
-#kill-map-mutant-accordion .accordion-button.kma-covered {
+#kill-map-test-accordion .accordion-button.kta-covered {
     color: black;
 }
 
-/* Mutant headers.
+/* test headers.
 ----------------------------------------------------------------------------- */
-#kill-map-mutant-accordion .accordion-item .accordion-item .accordion-header .accordion-button {
+#kill-map-test-accordion .accordion-item .accordion-item .accordion-header .accordion-button {
     display: flex;
     flex-direction: row;
     gap: 1.5rem;
-    background: #edcece88; /*transparentize(var(--bg-attacker-light));*/
+    background: #ced6ed88; /*transperentize(var(--bg-defender-light));*/
 }
 
 /* Indent inner accordions */
-#kill-map-mutant-accordion .accordion:not(.empty) {
+#kill-map-test-accordion .accordion:not(.empty) {
     padding-inline-start: .6rem;
 }
 
-#kill-map-mutant-accordion .accordion-body {
+#kill-map-test-accordion .accordion-body {
     background: rgba(0, 0, 0, .03);
 }
 
-#kill-map-mutant-accordion .accordion .accordion-body {
+#kill-map-test-accordion .accordion .accordion-body {
     background: #fff;
 
     /* Add back the border between header and content of accordion items. */
@@ -58,34 +58,34 @@
 /* Tables.
 ----------------------------------------------------------------------------- */
 
-#kill-map-mutant-accordion thead {
+#kill-map-test-accordion thead {
     display: none;
 }
 
-#kill-map-mutant-accordion .dataTables_scrollHead {
+#kill-map-test-accordion .dataTables_scrollHead {
     display: none;
 }
 
-#kill-map-mutant-accordion td {
+#kill-map-test-accordion td {
     vertical-align: middle;
 }
 
-#kill-map-mutant-accordion table {
+#kill-map-test-accordion table {
     font-size: inherit;
 }
 
-#kill-map-mutant-accordion tr:last-child > td {
+#kill-map-test-accordion tr:last-child > td {
     border-bottom: none;
 }
 
-#kill-map-mutant-accordion .ta-kill-map-result-kill {
+#kill-map-test-accordion .ka-kill-map-result-kill {
     color: var(--fg-attacker);
 }
 
 /* Inline elements.
 ----------------------------------------------------------------------------- */
 
-#kill-map-mutant-accordion .kma-column-name {
+#kill-map-test-accordion .kta-column-name {
     color: #B0B0B0;
 }
 

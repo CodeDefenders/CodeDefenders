@@ -20,7 +20,6 @@ import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,15 +33,14 @@ import com.google.gson.annotations.Expose;
 @RequestScoped
 public class KillMapAccordionBean {
 
+    private static final String CATEGORY_OUTSIDE_METHODS = "noMethod";
+    private static final String CATEGORY_ALL = "all";
+
     private final MutantAccordionBean mutantAccordionBean;
     private final TestAccordionBean testAccordionBean;
-    private final GameService gameService;
-    private final GameProducer gameProducer;
     private final AbstractGame game;
 
-    private Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> killMapForTests;
-    private Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> killMapForMutants;
-
+    private final Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> killMapForMutants;
     private final List<KillMapAccordionCategory> categories = new ArrayList<>();
     private final Map<Integer, MutantDTO> mutantsById;
 
@@ -51,14 +49,11 @@ public class KillMapAccordionBean {
     @Inject
     public KillMapAccordionBean(@Named("mutantAccordion") MutantAccordionBean mutantAccordionBean,
                                 @Named("testAccordion") TestAccordionBean testAccordionBean,
-                                GameService gameService, GameProducer gameProducer) {
+                                GameProducer gameProducer) {
         this.mutantAccordionBean = mutantAccordionBean;
         this.testAccordionBean = testAccordionBean;
-        this.gameService = gameService;
-        this.gameProducer = gameProducer;
         this.game = gameProducer.getGame();
 
-        this.killMapForTests = getKillMapForTests();
         this.killMapForMutants = getKillMapForMutants();
 
         mutantsById = this.mutantAccordionBean.getMutants().stream()
@@ -71,15 +66,21 @@ public class KillMapAccordionBean {
         int categoryId = 0;
         for (MutantAccordionBean.MutantAccordionCategory mc : mutantAccordionBean.getCategories()) {
             for (TestAccordionBean.TestAccordionCategory tc : testAccordionBean.getCategories()) {
-                boolean isSameMethod = mc.getDescription().equals(tc.getDescription());
-                boolean isMutantCategoryAll = mc.getDescription().equals("All Mutants");
-                boolean isTestCategoryAll = tc.getDescription().equals("All Tests");
-                boolean isCategoryOutsideMethods = mc.getDescription().equals("Mutants outside methods");
-                if (isSameMethod || isMutantCategoryAll && isTestCategoryAll ||
-                        isCategoryOutsideMethods && isTestCategoryAll) {
+
+                final boolean isMutantCategoryAll = mc.getId().equals(CATEGORY_ALL);
+                final boolean isTestCategoryAll = tc.getId().equals(CATEGORY_ALL);
+                final boolean isBothCategoryAll = isMutantCategoryAll && isTestCategoryAll;
+                final boolean isSameMethod = mc.getDescription().equals(tc.getDescription());
+                final boolean isCategoryOutsideMethods = mc.getId().equals(CATEGORY_OUTSIDE_METHODS)
+                        &&
+                        isTestCategoryAll; // We only want to add the category "Mutants outside methods" once with all tests.
+
+                if (isSameMethod || isBothCategoryAll || isCategoryOutsideMethods) {
                     KillMapAccordionCategory category = new KillMapAccordionCategory(
-                            mc.getDescription(),
-                            String.valueOf(categoryId++)
+                            isBothCategoryAll ? "All Mutants and Tests" : mc.getDescription(),
+                            isBothCategoryAll ? CATEGORY_ALL
+                                    : isCategoryOutsideMethods ? CATEGORY_OUTSIDE_METHODS
+                                    : String.valueOf(categoryId++)
                     );
                     category.addTestIds(tc.getTestIds());
                     category.addMutantIds(mc.getMutantIds());
@@ -93,17 +94,6 @@ public class KillMapAccordionBean {
         return KillmapDAO.getKillMapEntriesForGame(game.getId());
     }
 
-    private Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> getKillMapForTests() {
-        Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> killMapForTests = new HashMap<>();
-        for (KillMap.KillMapEntry entry : getKillMap()) {
-            if (!killMapForTests.containsKey(entry.test.getId())) {
-                killMapForTests.put(entry.test.getId(), new HashMap<>());
-            }
-            killMapForTests.get(entry.test.getId()).put(entry.mutant.getId(), entry.status);
-        }
-        return killMapForTests;
-    }
-
     private Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> getKillMapForMutants() {
         Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> killMapForMutants = new HashMap<>();
         for (KillMap.KillMapEntry entry : getKillMap()) {
@@ -113,13 +103,6 @@ public class KillMapAccordionBean {
             killMapForMutants.get(entry.mutant.getId()).put(entry.test.getId(), entry.status);
         }
         return killMapForMutants;
-    }
-
-    public String getKillMapForTestsAsJSON() {
-        Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-        return gson.toJson(killMapForTests);
     }
 
     public String getKillMapForMutantsAsJSON() {
@@ -133,7 +116,14 @@ public class KillMapAccordionBean {
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
-        return gson.toJson(categories);
+        return gson.toJson(getCategories());
+    }
+
+    public String getCategoriesForTestsAsJSON() {
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        return gson.toJson(getCategoriesForTests());
     }
 
     public String getTestsAsJSON() {
@@ -152,11 +142,24 @@ public class KillMapAccordionBean {
         return categories;
     }
 
+    public List<KillMapAccordionCategory> getCategoriesForTests() {
+        return categories.stream()
+                .filter(c -> !c.getId().equals(CATEGORY_OUTSIDE_METHODS))
+                .collect(Collectors.toList());
+    }
+
     public List<MutantDTO> getMutantsByCategory(KillMapAccordionCategory category) {
         return category.getMutantIds().stream()
                 .map(mutantsById::get)
                 .collect(Collectors.toList());
     }
+
+    public Object getTestsByCategory(KillMapAccordionCategory category) {
+        return category.getTestIds().stream()
+                .map(testAccordionBean.getTests()::get)
+                .collect(Collectors.toList());
+    }
+
 
     /**
      * Represents a category (accordion section) of the test accordion.

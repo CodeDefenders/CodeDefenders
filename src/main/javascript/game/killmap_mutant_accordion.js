@@ -64,7 +64,8 @@ class KillMapMutantAccordion extends KillMapAccordion {
                     language: {
                         emptyTable: category.id === 'all'
                             ? 'No tests.'
-                            : 'No tests cover this method.'
+                            : 'No tests cover this method.',
+                        zeroRecords: 'No tests match the selected category and filter.'
                     },
                     createdRow: function (row, data, index) {
                         self._setupPopover(
