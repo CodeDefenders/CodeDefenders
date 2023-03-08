@@ -50,8 +50,8 @@ public class GameProducer implements Serializable {
             return null;
         }
         if (game == null && !gameQueried) {
-            gameQueried = true;
             game = GameDAO.getGame(gameId);
+            gameQueried = true;
             if (game != null) {
                 game.setEventDAO(eventDAO);
                 game.setUserRepository(userRepo);
@@ -64,6 +64,7 @@ public class GameProducer implements Serializable {
 
     @Nullable
     public MultiplayerGame getMultiplayerGame() {
+        AbstractGame game = getGame();
         if (game instanceof MultiplayerGame) {
             return (MultiplayerGame) game;
         } else {
@@ -73,6 +74,7 @@ public class GameProducer implements Serializable {
 
     @Nullable
     public MeleeGame getMeleeGame() {
+        AbstractGame game = getGame();
         if (game instanceof MeleeGame) {
             return (MeleeGame) game;
         } else {
@@ -82,6 +84,7 @@ public class GameProducer implements Serializable {
 
     @Nullable
     public PuzzleGame getPuzzleGame() {
+        AbstractGame game = getGame();
         if (game instanceof PuzzleGame) {
             return (PuzzleGame) game;
         } else {
