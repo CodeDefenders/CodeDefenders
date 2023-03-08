@@ -88,6 +88,7 @@ public class Configuration {
     protected String appUrl;
     protected Optional<URL> _appUrl;
     protected String dataDir;
+    protected String libDir;
     protected String antHome;
     protected String antJavaHome;
     protected String dbHost;
@@ -353,7 +354,7 @@ public class Configuration {
     }
 
     public File getLibraryDir() {
-        return new File(getDataDir(), "lib");
+        return getDataDir().toPath().resolve(libDir).toFile();
     }
 
     public File getAntHome() {
