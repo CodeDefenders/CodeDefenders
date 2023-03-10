@@ -17,7 +17,7 @@ stages:
   - visualize
 
 default:
-  image: maven:3-jdk-11-slim
+  image: maven:3.8.5-openjdk-17-slim
   cache:
     paths:
       - .m2/repository/
@@ -174,8 +174,8 @@ spotbugs-sast:
   needs:
     - build
   variables:
-    # We target Java 11 (non default)
-    SAST_JAVA_VERSION: 11
+    # We target Java 17 (non default)
+    SAST_JAVA_VERSION: 17
     # We already have a compiled version of the project, no need to recompile it
     COMPILE: 'false'
     # GitLab Spotbugs uses MAVEN_CLI_OPTS for additional CLI flags
