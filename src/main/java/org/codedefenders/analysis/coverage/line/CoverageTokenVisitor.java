@@ -259,14 +259,14 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
 
             switch (stmtStatus.status()) {
                 case COVERED:
-                    lastCoveredLine =
-                    lastMaybeCoveredLine =
+                    lastCoveredLine = beginOf(stmt) - 1;
+                    lastMaybeCoveredLine = beginOf(stmt) - 1;
                     lastNotCoveredLine = beginOf(stmt) - 1;
                     break;
 
                 case NOT_COVERED:
                     if (currentStatus.isCovered()) {
-                        lastCoveredLine =
+                        lastCoveredLine = beginOf(stmt) - 1;
                         lastMaybeCoveredLine = beginOf(stmt) - 1;
 
                     } else if (currentStatus.isUnsure()) {
@@ -275,21 +275,6 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
 
                     lastNotCoveredLine = beginOf(stmt) - 1;
                     break;
-
-                // case EMPTY:
-                //     if (currentStatus.isCovered()) {
-                //         lastCoveredLine =
-                //         lastMaybeCoveredLine =
-                //         lastNotCoveredLine = beginOf(stmt) - 1;
-
-                //     } else if (currentStatus.isUnsure()) {
-                //         lastMaybeCoveredLine =
-                //         lastNotCoveredLine = beginOf(stmt) - 1;
-
-                //     } else if (currentStatus.isNotCovered()) {
-                //         lastNotCoveredLine = beginOf(stmt) - 1;
-                //     }
-                //     break;
             }
 
             if (!(stmtStatus.isEmpty() && stmtStatus.statusAfter().isUnsure())) {
