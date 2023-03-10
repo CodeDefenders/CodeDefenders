@@ -19,11 +19,14 @@
 package org.codedefenders.coverage;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
+import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.service.ClassAnalysisService;
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,15 +35,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.Mockito.mock;
 
 public class TestTemplateTest {
 
     @Rule
     public WeldInitiator weld = WeldInitiator
-            .from(ClassCodeAnalyser.class)
+            .from(TestTemplateTest.class,
+                    ClassAnalysisService.class,
+                    ClassCodeAnalyser.class)
             .inject(this)
             .activate(ApplicationScoped.class)
             .build();
+
+    @ApplicationScoped
+    @Produces
+    public MetricsRegistry getMockedMetricsRegistry() {
+        return mock(MetricsRegistry.class);
+    }
 
     private void assertEditableLineCorrect(GameClass gc) {
         int editableLineNr = gc.getTestTemplateFirstEditLine();
