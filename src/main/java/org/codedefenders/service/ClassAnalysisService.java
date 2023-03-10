@@ -79,6 +79,17 @@ public class ClassAnalysisService {
         }
     }
 
+    /**
+     * Performs the analysis on the given source code.
+     * The result is not cached.
+     *
+     * @param sourceCode The source code of the class.
+     * @return The result of the analysis.
+     */
+    public Optional<ClassAnalysisResult> analyze(String sourceCode) {
+        return classCodeAnalyser.analyze(sourceCode);
+    }
+
     public static class AnalysisException extends Exception {
 
     }

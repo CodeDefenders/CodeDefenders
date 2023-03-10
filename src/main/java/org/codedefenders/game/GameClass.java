@@ -309,11 +309,10 @@ public class GameClass {
     }
 
     private ClassAnalysisResult getClassAnalysis() {
+        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
         if (id != null) {
-            ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
             return analyser.analyze(getId()).get();
         } else {
-            ClassCodeAnalyser analyser = CDIUtil.getBeanFromCDI(ClassCodeAnalyser.class);
             return analyser.analyze(getSourceCode()).get();
         }
     }
