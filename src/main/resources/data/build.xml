@@ -6,13 +6,19 @@
 	</description>
 
 	<property name="policyfile" location="security.policy"/>
-	<property name="mutOp" value=":ALL"/>
-
-	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
-	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
-	<property name="ai.cuts.dir" value="${codedef.home}/ai/cuts"/>
-	<property name="cuts.deps" value="${codedef.home}/deps"/>
 	<property name="java.target.version" value="1.8"/>
+
+	<!--
+	Properties set via System Properties in AntRunner.java:
+	- codedef.home
+	- mutant.file
+	- test.file
+	- cut.dir
+	- testClassname
+	- cuts.deps
+	- common.cp
+	- jacoco.cp
+	-->
 
 	<path id="nocut.cp">
 		<!-- Common includes junit, mockito, hamcrest, googleTruth -->
@@ -45,7 +51,7 @@
 			   debug="true" nowarn="true"/>
 	</target>
 
-	<!-- requires test to compile, and the classname of the file you are testing -->
+	<!-- requires test to compile only -->
 	<target name="compile-test" description="compile a single test">
 		<javac srcdir="${test.file}" destdir="${test.file}" target="${java.target.version}"
 			   source="${java.target.version}" classpathref="test.cp" includeantruntime="false"
@@ -57,7 +63,7 @@
 		<echo message="Test path: ${test.path.unix}"/>
 	</target>
 
-	<!-- requires test to compile, and the classname of the file you are testing -->
+	<!-- requires test to compile, and the classname of the test file -->
 	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
 		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec" dumponexit="true">
 			<junit printsummary="true" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
