@@ -76,17 +76,6 @@ public class ClassCodeAnalyser {
         return parseResult.map(this::analyze);
     }
 
-    /**
-     * Performs the analysis on the given CUT.
-     *
-     * @param classId The ID of the CUT.
-     * @return The result of the analysis.
-     */
-    public Optional<ClassAnalysisResult> analyze(int classId) {
-        GameClass cut = GameClassDAO.getClassForId(classId);
-        return analyze(cut.getSourceCode());
-    }
-
     private static class ClassCodeVisitor extends VoidVisitorAdapter<ClassAnalysisResult> {
         @Override
         public void visit(ImportDeclaration importDecl, ClassAnalysisResult result) {

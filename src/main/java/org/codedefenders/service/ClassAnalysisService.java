@@ -28,6 +28,8 @@ import javax.inject.Inject;
 
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 
 import com.google.common.cache.CacheBuilder;
@@ -52,9 +54,9 @@ public class ClassAnalysisService {
                         new CacheLoader<Integer, ClassAnalysisResult>() {
                             @Nonnull
                             @Override
-                            public ClassAnalysisResult load(@Nonnull Integer classId)
-                                    throws Exception {
-                                return classCodeAnalyser.analyze(classId)
+                            public ClassAnalysisResult load(@Nonnull Integer classId) throws Exception {
+                                GameClass clazz = GameClassDAO.getClassForId(classId);
+                                return classCodeAnalyser.analyze(clazz.getSourceCode())
                                         .orElseThrow(AnalysisException::new);
                             }
                         }
