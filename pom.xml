@@ -1085,23 +1085,16 @@
 
 		<!-- Mocking frameworks -->
 		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-module-junit4</artifactId>
-			<version>${powermock.version}</version>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>5.1.1</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- This provides mockito 1.10.19 -->
 		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito2</artifactId>
-			<version>${powermock.version}</version>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>5.1.1</version>
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.objenesis</groupId>
-					<artifactId>objenesis</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<!-- End Test Dependencies -->
 

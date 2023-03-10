@@ -9,15 +9,14 @@ import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.KillMap.KillMapEntry.Status;
 import org.codedefenders.game.tcs.impl.KillCountTestCaseSelector;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({KillmapDAO.class, GameDAO.class})
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mockStatic;
+
+@ExtendWith(MockitoExtension.class)
 public class KillCountTestCaseSelectorTest {
 
     /*
@@ -36,28 +35,29 @@ public class KillCountTestCaseSelectorTest {
 
     @Test
     public void testSorting() throws Exception {
-        PowerMockito.mockStatic(GameDAO.class);
-        PowerMockito.mockStatic(KillmapDAO.class);
+        List<org.codedefenders.game.Test> allTests;
+        org.codedefenders.game.Test t1, t2, t3, t31;
 
+        try (var mockedGameDAO = mockStatic(GameDAO.class)) {
+            mockedGameDAO.when(() -> GameDAO.getCurrentRound(gameId))
+                    .thenReturn(0);
 
-        PowerMockito.when(GameDAO.class, "getCurrentRound", gameId).thenReturn(0);
+            // Test calss is UNTESTABLE ! it requires the Database !
+            t1 = new org.codedefenders.game.Test(1, classId, gameId, javaFile, classFile,
+                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
+            t2 = new org.codedefenders.game.Test(2, classId, gameId, javaFile, classFile,
+                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
+            t3 = new org.codedefenders.game.Test(3, classId, gameId, javaFile, classFile,
+                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
 
+            // What happens if we get different instances of the same test?
+            t31 = new org.codedefenders.game.Test(3, classId, gameId, javaFile, classFile,
+                    roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
+
+            allTests = Arrays.asList(t1, t2, t3);
+        }
 
         List<KillMapEntry> killMapEntriesForClass = new ArrayList<>();
-
-
-        // Test calss is UNTESTABLE ! it requires the Database !
-        org.codedefenders.game.Test t1 = new org.codedefenders.game.Test(1, classId, gameId, javaFile, classFile,
-                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
-        org.codedefenders.game.Test t2 = new org.codedefenders.game.Test(2, classId, gameId, javaFile, classFile,
-                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
-        org.codedefenders.game.Test t3 = new org.codedefenders.game.Test(3, classId, gameId, javaFile, classFile,
-                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
-
-        // What happens if we get different instances of the same test?
-        org.codedefenders.game.Test t31 = new org.codedefenders.game.Test(3, classId, gameId, javaFile, classFile,
-                roundCreated, mutantsKilled, playerId, linesCovered, linesUncovered, score);
-
         // t1 covers 3 killed one mutant
         killMapEntriesForClass.add(new KillMapEntry(t1, null, Status.KILL));
         killMapEntriesForClass.add(new KillMapEntry(t1, null, Status.KILL));
@@ -72,17 +72,15 @@ public class KillCountTestCaseSelectorTest {
         killMapEntriesForClass.add(new KillMapEntry(t3, null, Status.NO_KILL));
 
 
-        // Return the configured list
-        PowerMockito.when(KillmapDAO.class, "getKillMapEntriesForClass", classId).thenReturn(killMapEntriesForClass);
-
         KillCountTestCaseSelector cut = new KillCountTestCaseSelector();
 
-        List<org.codedefenders.game.Test> allTests = Arrays.asList(t1, t2, t3);
+        try (var mockedKillmapDAO = mockStatic(KillmapDAO.class)) {
+            mockedKillmapDAO.when(() -> KillmapDAO.getKillMapEntriesForClass(classId))
+                    .thenReturn(killMapEntriesForClass);
 
-        int maxTests = 10;
-
-        List<org.codedefenders.game.Test> sortedAndselectedTests = cut.select(allTests, maxTests);
-
-        Assert.assertEquals(3, sortedAndselectedTests.size());
+            int maxTests = 10;
+            List<org.codedefenders.game.Test> sortedAndSelectedTests = cut.select(allTests, maxTests);
+            assertEquals(3, sortedAndSelectedTests.size());
+        }
     }
 }
