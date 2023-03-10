@@ -51,7 +51,6 @@ import static org.codedefenders.util.JavaParserUtils.endOf;
  *     <li>method descriptions (names, line ranges)</li>
  * </ul>
  */
-@SuppressWarnings("OptionalGetWithoutIsPresent")
 @ApplicationScoped
 public class ClassCodeAnalyser {
     /**
