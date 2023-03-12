@@ -82,7 +82,7 @@
 					</div>
 					<form id="rematch-form" action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}" method="post">
 						<input type="hidden" name="formType" value="rematch">
-						<input type="hidden" name="gameId" value="<%=game.getId()%>">
+						<input type="hidden" name="gameId" value="${game.id}">
 						<t:modal title="Confirm Rematch" id="rematch-modal" closeButtonText="Cancel">
 							<jsp:attribute name="content">
 								Are you sure you want to create a new game with opposite roles?
@@ -95,7 +95,7 @@
 				</div>
 			</c:if>
 
-			<a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=game.getId()%>"
+			<a href="${url.forPath(Paths.PROJECT_EXPORT)}?gameId=${game.id}"
 			   class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
 			   title="Export as a Gradle project to import into an IDE.">
 				<i class="fa fa-download"></i>
@@ -126,10 +126,8 @@
 		<div class="details-content__item">
 			<h3>The game's duration</h3>
 
-			<%
-				request.setAttribute("duration", game.getGameDurationMinutes());
-				request.setAttribute("startTime", game.getStartTimeUnixSeconds());
-			%>
+			<c:set var="duration" value="${game.gameDurationMinutes}"/>
+			<c:set var="startTime" value="${game.startTimeUnixSeconds}"/>
 
 			<%-- Progress Bar --%>
 			<div class="progress mb-3" style="height: 1em;">
@@ -192,7 +190,7 @@
 					});
 					editor.getWrapperElement().classList.add('codemirror-readonly');
 
-					await InfoApi.setClassEditorValue(editor, <%=game.getClassId()%>);
+					await InfoApi.setClassEditorValue(editor, ${game.classId});
 					LoadingAnimation.hideAnimation(textarea);
 				})();
 			</script>
