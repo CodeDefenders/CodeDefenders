@@ -20,10 +20,12 @@
 --%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.game.multiplayer.MeleeGame" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
+
+<%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MultiplayerGame"--%>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -69,6 +71,30 @@
 	<div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
 		<h2 class="m-0 text-center">${pageInfo.pageTitle}</h2>
 		<div class="d-flex flex-wrap align-items-center gap-2">
+			<c:if test="${game.state == GameState.ACTIVE || game.state == GameState.FINISHED}">
+				<div>
+					<div data-bs-toggle="tooltip"
+						 title="Start a new game with the same settings and opposite roles.">
+						<button type="submit" class="btn btn-sm btn-warning" id="rematch"
+								data-bs-toggle="modal" data-bs-target="#rematch-modal">
+							Rematch
+						</button>
+					</div>
+					<form id="rematch-form" action="${url.forPath(Paths.BATTLEGROUND_SELECTION)}" method="post">
+						<input type="hidden" name="formType" value="rematch">
+						<input type="hidden" name="gameId" value="<%=game.getId()%>">
+						<t:modal title="Confirm Rematch" id="rematch-modal" closeButtonText="Cancel">
+							<jsp:attribute name="content">
+								Are you sure you want to create a new game with opposite roles?
+							</jsp:attribute>
+							<jsp:attribute name="footer">
+								<button type="submit" class="btn btn-primary">Confirm Rematch</button>
+							</jsp:attribute>
+						</t:modal>
+					</form>
+				</div>
+			</c:if>
+
 			<a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=game.getId()%>"
 			   class="btn btn-sm btn-outline-secondary text-nowrap" id="btnProjectExport"
 			   title="Export as a Gradle project to import into an IDE.">
