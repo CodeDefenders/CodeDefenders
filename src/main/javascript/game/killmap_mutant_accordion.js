@@ -34,8 +34,16 @@ class KillMapMutantAccordion extends KillMapAccordion {
             const categoryAccordion = document.querySelector(`#kma-collapse-${category.id}`);
             this._dataTablesByCategoryAndMutant.set(category.id, new Map());
             for (const mutantId of category.mutantIds) {
+                const identifier = `category-${category.id}-mutant-${mutantId}`;
+                /* Init "View mutant" button. */
+                const btn = categoryAccordion.querySelector(`#kma-heading-${identifier} .kma-view-button`);
+                btn.addEventListener('click', event => {
+                    self._viewMutantModal(self._mutants.get(mutantId));
+                    event.stopPropagation(); // prevent the parent button from toggling the accordion does not work :(
+                }, true); // use capture
+
                 /* Create the DataTable. */
-                const tableElement = categoryAccordion.querySelector(`#kma-table-category-${category.id}-mutant-${mutantId}`);
+                const tableElement = categoryAccordion.querySelector(`#kma-table-${identifier}`);
                 const rows = category.testIds
                     .sort((a, b) => a - b)
                     .map(testId => {

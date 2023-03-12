@@ -98,7 +98,7 @@
                                         id="kma-heading-category-${category.id}-mutant-${mutant.id}">
                                         <button class="${category.testIds.size() == 0 ? "" : 'kma-covered'}
                                                         accordion-button collapsed"
-                                                type="button" data-bs-toggle="collapse"
+                                                type="button" role="button" data-bs-toggle="collapse"
                                                 data-bs-target="#kma-collapse-category-${category.id}-mutant-${mutant.id}"
                                                 aria-controls="kma-collapse-category-${category.id}-mutant-${mutant.id}">
                                             <c:set var="state" value="${mutant.state}"/>
@@ -127,9 +127,12 @@
                                                     ${mutant.description}
                                             </span>
                                             <span class="kma-col">
-                                                <span class="ma-column-name">Points:</span>
+                                                <span class="kma-column-name">Points:</span>
                                                 ${mutant.points}
                                             </span>
+                                            <!-- Buttons should not contain interactive elements. Use a span here as exception. -->
+                                            <span role="button"
+                                                  class="kma-view-button btn btn-primary btn-xs pull-right">View</span>
                                         </button>
                                     </h3>
                                     <div class="accordion-collapse collapse"
