@@ -26,6 +26,7 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="game" type="org.codedefenders.game.multiplayer.MultiplayerGame"--%>
+<%--@elvariable id="playerId" type="java.lang.Integer"--%>
 
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
@@ -121,7 +122,10 @@
                 </jsp:attribute>
 			</t:modal>
 
-			<t:game_scoreboard/>
+			<t:game_scoreboard
+					playerId="${playerId}"
+					gameFinished="${game.state == GameState.ACTIVE || game.state == GameState.FINISHED}"
+			/>
 		</div>
 		<div class="details-content__item">
 			<h3>The game's duration</h3>

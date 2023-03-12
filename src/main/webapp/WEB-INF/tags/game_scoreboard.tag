@@ -28,6 +28,11 @@
 <%@ tag import="java.util.List" %>
 <%@ tag import="org.codedefenders.model.UserEntity" %>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<%@ attribute name="playerId" required="false" type="java.lang.Integer" %>
+<%@ attribute name="gameFinished" required="false" type="java.lang.Boolean" %>
+
 <jsp:useBean id="scoreboard" class="org.codedefenders.beans.game.ScoreboardBean" scope="request"/>
 <%
     Map<Integer, PlayerScore> mutantScores = scoreboard.getMutantsScores();
@@ -42,16 +47,35 @@
     zeroDummyScore.setDuelInformation("0 / 0 / 0");
 %>
 
+<%-- default values for the attributes --%>
+<c:set var="playerStatus" value="${empty playerId ? '' : scoreboard.getStatusForPlayer(playerId).toString()}"/>
+<c:set var="gameFinished" value="${empty gameFinished ? false : gameFinished}"/>
+
 <div class="w-100 d-flex justify-content-center align-content-center gap-3 mb-3">
-    <span class="fg-attacker fs-1 text-end">
-        <%=
-        mutantScores.getOrDefault(-1, zeroDummyScore).getTotalScore() +
-                mutantScores.getOrDefault(-2, zeroDummyScore).getTotalScore()
-        %>
+    <span class="fg-attacker fs-1 text-end total-attacker-score">
+        <c:if test="${gameFinished}">
+            <span class="player-message">
+                <c:choose>
+                    <c:when test="${playerStatus == 'WINNING_ATTACKER'}">Your team won!</c:when>
+                    <c:when test="${playerStatus == 'LOSING_ATTACKER'}">Your team lost!</c:when>
+                    <c:when test="${playerStatus == 'TIE_ATTACKER'}">Tie!</c:when>
+                </c:choose>
+            </span>
+        </c:if>
+        ${scoreboard.totalAttackerScore}
     </span>
     <img alt="Code Defenders Logo" style="width: 4rem;" src="${pageContext.request.contextPath}/images/logo.png"/>
-    <span class="fg-defender fs-1 text-start">
-        <%=testScores.getOrDefault(-1, zeroDummyScore).getTotalScore()%>
+    <span class="fg-defender fs-1 text-start total-defender-score">
+        ${scoreboard.totalDefenderScore}
+        <c:if test="${gameFinished}">
+            <span class="player-message">
+                <c:choose>
+                    <c:when test="${playerStatus == 'WINNING_DEFENDER'}">Your team won!</c:when>
+                    <c:when test="${playerStatus == 'LOSING_DEFENDER'}">Your team lost!</c:when>
+                    <c:when test="${playerStatus == 'TIE_DEFENDER'}">Tie!</c:when>
+                </c:choose>
+            </span>
+        </c:if>
     </span>
 </div>
 <table class="scoreboard table m-0 text-white">
