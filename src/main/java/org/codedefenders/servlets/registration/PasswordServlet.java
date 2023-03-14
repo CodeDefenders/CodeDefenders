@@ -21,7 +21,6 @@ package org.codedefenders.servlets.registration;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;

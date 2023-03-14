@@ -22,7 +22,6 @@ package org.codedefenders.itests;
 import java.sql.Connection;
 import java.sql.Timestamp;
 
-import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -41,7 +40,6 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -51,7 +49,6 @@ import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -66,7 +63,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Jose Rojas
