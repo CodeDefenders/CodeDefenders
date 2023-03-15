@@ -32,29 +32,29 @@
             <label class="btn btn-xs btn-outline-secondary" for="kt-all">
                 <span class="align-middle">All</span>
             </label>
-            <input type="radio" class="btn-check" name="kta-filter" id="kt-kill" value="KILL">
-            <label class="btn btn-xs btn-outline-secondary" for="kt-kill">
-                <span class="mutantCUTImage mutantImageAlive align-middle"></span>
-                <span class="align-middle">Kill</span>
-            </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-no-kill" value="NO_KILL">
             <label class="btn btn-xs btn-outline-secondary" for="kt-no-kill">
-                <span class="mutantCUTImage mutantImageKilled align-middle"></span>
+                <span class="killMapImage killMapImageNoKill align-middle"></span>
                 <span class="align-middle">No Kill</span>
             </label>
-            <input type="radio" class="btn-check" name="kta-filter" id="kt-no-cov" value="NO_COVERAGE">
-            <label class="btn btn-xs btn-outline-secondary" for="kt-no-cov">
-                <span class="mutantCUTImage mutantImageFlagged align-middle"></span>
-                <span class="align-middle">No Coverage</span>
+            <input type="radio" class="btn-check" name="kta-filter" id="kt-kill" value="KILL">
+            <label class="btn btn-xs btn-outline-secondary" for="kt-kill">
+                <span class="killMapImage killMapImageKill align-middle"></span>
+                <span class="align-middle">Kill</span>
             </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-error" value="ERROR">
             <label class="btn btn-xs btn-outline-secondary" for="kt-error">
-                <span class="mutantCUTImage mutantImageEquiv align-middle"></span>
+                <span class="killMapImage killMapImageError align-middle"></span>
                 <span class="align-middle">Error</span>
+            </label>
+            <input type="radio" class="btn-check" name="kta-filter" id="kt-no-cov" value="NO_COVERAGE">
+            <label class="btn btn-xs btn-outline-secondary" for="kt-no-cov">
+                <span class="killMapImage killMapImageNoCoverage align-middle"></span>
+                <span class="align-middle">No Coverage</span>
             </label>
             <input type="radio" class="btn-check" name="kta-filter" id="kt-unknown" value="UNKNOWN">
             <label class="btn btn-xs btn-outline-secondary" for="kt-unknown">
-                <span class="mutantCUTImage mutantImageAlive align-middle"></span>
+                <span class="killMapImage killMapImageUnknown align-middle"></span>
                 <span class="align-middle">Unknown</span>
             </label>
         </div>

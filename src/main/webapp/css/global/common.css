@@ -83,7 +83,8 @@
 /* Mutant icons
 ----------------------------------------------------------------------------- */
 
-.mutantCUTImage {
+.mutantCUTImage,
+.killMapImage {
     width: 18px;
     height: 18px;
     background-size: contain;
@@ -96,14 +97,37 @@
 .mutantImageEquiv {
     background-image: url('../../images/ingameicons/mutantEquiv.png');
 }
+
 .mutantImageFlagged {
     background-image: url('../../images/ingameicons/mutantFlagged.png');
 }
+
 .mutantImageKilled {
     background-image: url('../../images/ingameicons/mutantKilled.png');
 }
+
 .mutantImageFlagAction {
     background-image: url('../../images/ingameicons/flag.png');
+}
+
+.killMapImageKill {
+    background-image: url('../../images/ingameicons/kill.png');
+}
+
+.killMapImageNoKill {
+    background-image: url('../../images/ingameicons/nokill.png');
+}
+
+.killMapImageError {
+    background-image: url('../../images/ingameicons/error.png');
+}
+
+.killMapImageNoCoverage {
+    background-image: url('../../images/ingameicons/nocoverage.png');
+}
+
+.killMapImageUnknown {
+    background-image: url('../../images/ingameicons/unknown.png');
 }
 
 /* Terminal-like text style for command-line output <pre>s

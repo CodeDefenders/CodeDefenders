@@ -233,16 +233,48 @@ class KillMapAccordion {
     _renderKillMapResult(data) {
         switch (data.killMapResult) {
             case 'KILL':
-                return '<span class="ka-kill-map-result ka-kill-map-result-kill">Kill</span>';
+                return '<span class="killMapImage killMapImageKill" aria-label="Kill"></span>';
             case 'NO_KILL':
-                return '<span class="ka-kill-map-result ka-kill-map-result-no-kill">No Kill</span>';
+                return '<span class="killMapImage killMapImageNoKill" aria-label="No Kill"></span>';
             case 'NO_COVERAGE':
-                return '<span class="ka-kill-map-result ka-kill-map-result-no-coverage">No Coverage</span>';
+                return '<span class="killMapImage killMapImageNoCoverage" aria-label="No Coverage"></span>';
             case 'ERROR':
-                return '<span class="ka-kill-map-result ka-kill-map-result-error">Error</span>';
+                return '<span class="killMapImage killMapImageError" aria-label="Error"></span>';
             case 'UNKNOWN':
             default:
-                return '<span class="ka-kill-map-result ka-kill-map-result-unknown">?</span>';
+                return '<span class="killMapImage killMapImageUnknown" aria-label="Unknown"></span>';
+        }
+    }
+
+    _renderKillMapImagePopoverTitle(data) {
+        switch (data.killMapResult) {
+            case 'KILL':
+                return 'Kill';
+            case 'NO_KILL':
+                return 'No kill';
+            case 'NO_COVERAGE':
+                return 'No coverage';
+            case 'ERROR':
+                return 'Error';
+            case 'UNKNOWN':
+            default:
+                return '';
+        }
+    }
+
+    _renderKillMapImagePopoverBody(data) {
+        switch (data.killMapResult) {
+            case 'KILL':
+                return 'The mutant was killed by the test.';
+            case 'NO_KILL':
+                return 'The test covered the mutant, but did not kill it.';
+            case 'NO_COVERAGE':
+                return 'The mutant was not covered by this test.';
+            case 'ERROR':
+                return 'The execution resulted in an error, killing the mutant.';
+            case 'UNKNOWN':
+            default:
+                return 'Unknown';
         }
     }
 

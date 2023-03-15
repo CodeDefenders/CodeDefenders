@@ -35,17 +35,16 @@ class KillMapTestAccordion extends KillMapAccordion {
                 const tableElement = categoryAccordion.querySelector(`#kta-table-category-${category.id}-test-${testId}`);
                 const rows = category.mutantIds
                     .sort((a, b) => a - b)
-                    .map(mutantId => {
-                        const mutantDTO = this._mutants.get(mutantId);
-                        mutantDTO.killMapResult = this._killMap[mutantId][testId];
-                        return mutantDTO;
-                    });
+                    .map(mutantId => ({
+                        ...this._mutants.get(mutantId),
+                        killMapResult: this._killMap[mutantId][testId]
+                    }));
 
                 const dataTable = new DataTable(tableElement, {
                     data: rows,
                     columns: [
                         {data: null, title: '', defaultContent: ''},
-                        {data: this._renderIcon.bind(this), title: ''},
+                        // {data: this._renderIcon.bind(this), title: ''},
                         {data: this._renderKillMapResult.bind(this), title: ''},
                         {data: this._renderId.bind(this), title: ''},
                         {data: this._renderLines.bind(this), title: ''},
@@ -64,6 +63,13 @@ class KillMapTestAccordion extends KillMapAccordion {
                         zeroRecords: 'No mutants match the selected category and filter.'
                     },
                     createdRow: function (row, data, index) {
+                        self._setupPopover(
+                            row.querySelector('.killMapImage'),
+                            data,
+                            self._renderKillMapImagePopoverTitle.bind(self),
+                            self._renderKillMapImagePopoverBody.bind(self)
+                        );
+
                         /* Assign function to the "View" buttons. */
                         let element = row.querySelector('.ma-view-button');
                         if (element !== null) {
@@ -120,8 +126,7 @@ class KillMapTestAccordion extends KillMapAccordion {
                     if (!settings.nTable.id.startsWith('kta-table-')) {
                         return true;
                     }
-                    const originalData = renderedData[2].replace(" ", "_").replace("?", "UNKNOWN").toUpperCase();
-                    return selectedKillMapResult === 'ALL' || selectedKillMapResult === originalData;
+                    return selectedKillMapResult === 'ALL' || selectedKillMapResult === data.killMapResult;
                 }
 
                 DataTable.ext.search.push(searchFunction);

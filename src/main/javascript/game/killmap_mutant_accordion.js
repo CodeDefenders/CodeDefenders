@@ -46,11 +46,7 @@ class KillMapMutantAccordion extends KillMapAccordion {
                 const tableElement = categoryAccordion.querySelector(`#kma-table-${identifier}`);
                 const rows = category.testIds
                     .sort((a, b) => a - b)
-                    .map(testId => {
-                        const testDTO = this._tests.get(testId);
-                        testDTO.killMapResult = this._killMap[mutantId][testId];
-                        return testDTO;
-                    });
+                    .map(testId => ({...this._tests.get(testId), killMapResult: this._killMap[mutantId][testId]}));
 
                 const dataTable = new DataTable(tableElement, {
                     data: rows,
@@ -76,6 +72,13 @@ class KillMapMutantAccordion extends KillMapAccordion {
                         zeroRecords: 'No tests match the selected category and filter.'
                     },
                     createdRow: function (row, data, index) {
+                        self._setupPopover(
+                            row.querySelector('.killMapImage'),
+                            data,
+                            self._renderKillMapImagePopoverTitle.bind(self),
+                            self._renderKillMapImagePopoverBody.bind(self)
+                        );
+
                         self._setupPopover(
                             row.querySelector('.ta-covered-link'),
                             data,
@@ -134,8 +137,7 @@ class KillMapMutantAccordion extends KillMapAccordion {
                     if (!settings.nTable.id.startsWith('kma-table-')) {
                         return true;
                     }
-                    const originalData = renderedData[1].replace(" ", "_").replace("?", "UNKNOWN").toUpperCase();
-                    return selectedKillMapResult === 'ALL' || selectedKillMapResult === originalData;
+                    return selectedKillMapResult === 'ALL' || selectedKillMapResult === data.killMapResult;
                 }
 
                 DataTable.ext.search.push(searchFunction);

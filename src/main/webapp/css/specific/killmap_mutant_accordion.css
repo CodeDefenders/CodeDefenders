@@ -82,6 +82,10 @@
     color: var(--fg-attacker);
 }
 
+#kill-map-mutant-accordion td.sorting_1 {
+    width: 0.05rem; /* button has .8rem padding, tds have .25rem each. */
+}
+
 /* Inline elements.
 ----------------------------------------------------------------------------- */
 
