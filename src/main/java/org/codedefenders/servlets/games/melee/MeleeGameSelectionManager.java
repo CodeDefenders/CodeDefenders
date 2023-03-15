@@ -120,7 +120,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
         final String action = formType(request);
 
         if (!action.equals("createGame")) {
-            MeleeGame game = gameProducer.getGame();
+            MeleeGame game = gameProducer.getMeleeGame();
             if (game == null) {
                 logger.error("No game or wrong type of game found. Aborting request.");
                 Redirect.redirectBack(request, response);
@@ -221,7 +221,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             return;
         }
 
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
         int gameId = game.getId();
 
         if (game.hasUserJoined(login.getUserId())) {
@@ -229,7 +229,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
             return;
         }
-        if (game.addPlayer(login.getUserId())) {
+        if (game.addPlayer(login.getUserId(), Role.PLAYER)) {
             logger.info("User {} joined game {}.", login.getUserId(), gameId);
 
             /*
@@ -261,7 +261,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -304,7 +304,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -330,7 +330,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can end the game.");
@@ -362,11 +362,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
         int newGameId = MeleeGameDAO.storeMeleeGame(game);
         game.setId(newGameId);
 
-        /*
         Event event = new Event(-1, game.getId(), login.getUserId(), "Game Created", EventType.GAME_CREATED,
-                EventStatus.GAME, new Timestamp(System.currentTimeMillis());
+                EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         eventDAO.insert(event);
-        */
 
         // Always add system player to send mutants and tests at runtime!
         game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER);
@@ -390,7 +388,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        MeleeGame oldGame = gameProducer.getGame();
+        MeleeGame oldGame = gameProducer.getMeleeGame();
 
         if (login.getUser().getId() != oldGame.getCreatorId()) {
             messages.add("Only the creator of this game can call a rematch.");
@@ -434,7 +432,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
     }
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final MeleeGame game = gameProducer.getGame();
+        final MeleeGame game = gameProducer.getMeleeGame();
 
         if (login.getUser().getId() != game.getCreatorId()) {
             messages.add("Only the creator of this game can change its duration.");

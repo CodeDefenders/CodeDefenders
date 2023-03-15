@@ -18,9 +18,11 @@
  */
 package org.codedefenders;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -42,9 +44,22 @@ import static org.mockito.Mockito.mock;
 public class DatabaseRule extends ExternalResource {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseRule.class);
 
-    private final String dbConnectionUrl = "jdbc:mysql://database:3306/codedefenders";
-    private final String username = "root";
-    private final String password = "";
+    private final String dbConnectionUrl;
+    private final String username;
+    private final String password;
+
+    public DatabaseRule() {
+        Properties props = new Properties();
+        try {
+            props.load(getClass().getClassLoader().getResourceAsStream("database.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        dbConnectionUrl = "jdbc:mysql://" + props.getProperty("url");
+        username = props.getProperty("username");
+        password = props.getProperty("password");
+    }
 
     public QueryRunner getQueryRunner() throws SQLException {
         return new TransactionAwareQueryRunner(getConnectionFactory());

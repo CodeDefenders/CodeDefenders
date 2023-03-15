@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
       apt install -y tomcat9 tomcat9-admin mariadb-server maven ant
 
       # Change owner, so tomcat itself can replace it (e.g. with a (re)deploy via maven)
-      chown -R tomcat:tomcat /var/lib/tomcat9/ROOT
+      chown -R tomcat:tomcat /var/lib/tomcat9/webapps/
 
       # Bind mariadb-server to all addresses
       sed -i -E 's|bind-address.*|bind-address = 0.0.0.0|' /etc/mysql/mariadb.conf.d/50-server.cnf

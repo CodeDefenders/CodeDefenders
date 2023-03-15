@@ -2,6 +2,7 @@ package org.codedefenders.servlets.games;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -9,6 +10,9 @@ import javax.inject.Named;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.persistence.database.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,18 +37,21 @@ public class GameProducer implements Serializable {
     }
 
     /**
-     * Tries to find a game for the former set gameId {@link #setGameId(Integer)} and cast it to the required type.
+     * Tries to find a game for the former set gameId {@link #setGameId(Integer)}.
      *
-     * @param <GameT> The type of game you need.
-     * @return The game with the required type if it exists otherwise null.
+     * <p>If you only need a specific game type use on of {@link #getMultiplayerGame()},
+     * {@link #getMeleeGame()}, or {@link #getPuzzleGame()}.
+     *
+     * @return The game if it exists otherwise null.
      */
-    public <GameT extends AbstractGame> GameT getGame() {
+    @Nullable
+    public AbstractGame getGame() {
         if (gameId == null) {
             return null;
         }
         if (game == null && !gameQueried) {
-            gameQueried = true;
             game = GameDAO.getGame(gameId);
+            gameQueried = true;
             if (game != null) {
                 game.setEventDAO(eventDAO);
                 game.setUserRepository(userRepo);
@@ -52,14 +59,39 @@ public class GameProducer implements Serializable {
                 logger.debug("Could not retrieve game with id {} from database", gameId);
             }
         }
-        try {
-            //This has to be an unchecked cast, because the (game instanceOf GameT) check doesn't work with generics
-            //noinspection unchecked
-            return (GameT) game;
-        } catch (ClassCastException e) {
+        return game;
+    }
+
+    @Nullable
+    public MultiplayerGame getMultiplayerGame() {
+        AbstractGame game = getGame();
+        if (game instanceof MultiplayerGame) {
+            return (MultiplayerGame) game;
+        } else {
             return null;
         }
     }
+
+    @Nullable
+    public MeleeGame getMeleeGame() {
+        AbstractGame game = getGame();
+        if (game instanceof MeleeGame) {
+            return (MeleeGame) game;
+        } else {
+            return null;
+        }
+    }
+
+    @Nullable
+    public PuzzleGame getPuzzleGame() {
+        AbstractGame game = getGame();
+        if (game instanceof PuzzleGame) {
+            return (PuzzleGame) game;
+        } else {
+            return null;
+        }
+    }
+
 
     public void setGameId(Integer gameId) {
         this.gameId = gameId;

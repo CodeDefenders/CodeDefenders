@@ -41,31 +41,6 @@ import org.slf4j.LoggerFactory;
 public class KillmapDAO {
     private static final Logger logger = LoggerFactory.getLogger(KillmapDAO.class);
 
-    // TODO: remove (hasKillMap will be replaced with progress)
-    /**
-     * Returns if the given game already has a computed killmap.
-     */
-    public static Boolean hasKillMap(int gameId) throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT HasKillMap",
-                "FROM games",
-                "WHERE games.ID = ?");
-        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("HasKillMap"), DatabaseValue.of(gameId));
-    }
-
-    // TODO: remove (hasKillMap will be replaced with progress)
-    /**
-     * Sets a flag that indicates if the given game has a computed killmap.
-     */
-    public static boolean setHasKillMap(int gameId, boolean hasKillMap) {
-        String query = String.join("\n",
-                "UPDATE games",
-                "SET HasKillMap = ?",
-                "WHERE ID = ?;");
-
-        return DB.executeUpdateQuery(query, DatabaseValue.of(hasKillMap), DatabaseValue.of(gameId));
-    }
-
     /**
      * Helper method to retrieve killmap entries from the database.
      */
@@ -456,7 +431,7 @@ public class KillmapDAO {
      * @param classId The class id.
      * @return The killmap progress for the class.
      */
-    private static KillMapProgress getKillMapProgressForClass(int classId) {
+    public static KillMapProgress getKillMapProgressForClass(int classId) {
         String nrTestsQuery = String.join("\n",
                 "SELECT COUNT(Test_ID)",
                 "FROM view_valid_tests",
@@ -494,7 +469,7 @@ public class KillmapDAO {
      * @param gameId The game id.
      * @return The killmap progress for the game.
      */
-    private static KillMapProgress getKillMapProgressForGame(int gameId) {
+    public static KillMapProgress getKillMapProgressForGame(int gameId) {
         String nrTestsQuery = String.join("\n",
                 "SELECT COUNT(Test_ID)",
                 "FROM view_valid_tests",
