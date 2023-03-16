@@ -13,7 +13,8 @@
 	<property name="ai.cuts.dir" value="${codedef.home}/ai/cuts"/>
 	<property name="cuts.deps" value="${codedef.home}/deps"/>
 	<property name="lib.dir" value="${codedef.home}/lib"/>
-	<property name="java.target.version" value="1.8"/>
+
+	<property name="java.release.version" value="16"/>
 
 	<!-- JaCoCo -->
 	<property name="jacoco.version" value="0.8.8"/>
@@ -103,23 +104,23 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
-		<javac srcdir="${cut.dir}" destdir="${cut.dir}" target="${java.target.version}" source="${java.target.version}"
+		<javac srcdir="${cut.dir}" destdir="${cut.dir}" release="${java.release.version}"
 			   classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes"
 			   debug="true" nowarn="true"/>
 	</target>
 
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
-		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="${java.target.version}" classpathref="nocut.cp"
-			   source="${java.target.version}" includeantruntime="false"
+		<javac srcdir="${mutant.file}" destdir="${mutant.file}" classpathref="nocut.cp"
+			   release="${java.release.version}" includeantruntime="false"
 			   debug="true" nowarn="true"/>
 	</target>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-test" description="compile a single test">
 		<!--<classpath refid="test.cp" />-->
-		<javac srcdir="${test.file}" destdir="${test.file}" target="${java.target.version}"
-			   source="${java.target.version}" classpathref="test.cp" includeantruntime="false"
+		<javac srcdir="${test.file}" destdir="${test.file}" release="${java.release.version}"
+			   classpathref="test.cp" includeantruntime="false"
 			   debug="true" nowarn="true"/>
 	</target>
 
@@ -168,7 +169,7 @@
 		<javac
 				srcdir="${test.file}"
 				destdir="${mutant.test.file}"
-				target="${java.target.version}" source="${java.target.version}"
+				release="${java.release.version}"
 				classpathref="nocut.cp"
 				classpath="${mutant.file}"
 				includeantruntime="false"

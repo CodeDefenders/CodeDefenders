@@ -444,10 +444,8 @@ public class Compiler {
             options.add(classpath);
         }
 
-        options.add("-source");
-        options.add("1.8");
-        options.add("-target");
-        options.add("1.8");
+        options.add("--release");
+        options.add("16");
 
         return options;
     }
