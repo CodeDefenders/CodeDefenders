@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.RecordDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
@@ -40,6 +41,7 @@ import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
@@ -135,6 +137,19 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
         super.visit(stmt, args);
+    }
+
+    @Override
+    public void visit(RecordDeclaration decl, Void args) {
+        if (!isValid) {
+            return;
+        }
+
+        if (classCount++ > MAX_NUMBER_OF_CLASSES) {
+            isValid = false;
+            return;
+        }
+        super.visit(decl, args);
     }
 
     @Override
@@ -237,11 +252,20 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     }
 
     @Override
-    public void visit(ConditionalExpr stmt, Void args) {
+    public void visit(ConditionalExpr expr, Void args) {
         if (!isValid) {
             return;
         }
-        messages.add("Test contains an invalid statement: " + JavaParserUtils.unparse(stmt));
+        messages.add("Test contains an invalid expression: " + JavaParserUtils.unparse(expr));
+        isValid = false;
+    }
+
+    @Override
+    public void visit(SwitchExpr expr, Void args) {
+        if (!isValid) {
+            return;
+        }
+        messages.add("Test contains an invalid expression: " + JavaParserUtils.unparse(expr));
         isValid = false;
     }
 
@@ -313,8 +337,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         Optional<Expression> initializer = stmt.getInitializer();
         if (initializer.isPresent()) {
             String initString = JavaParserUtils.unparse(initializer.get());
-            // TODO(Marvin): what is this even checking for? an expression cannot start with "System.*"
-            if (initString.startsWith("System.*") || initString.startsWith("Random.*")
+            if (initString.startsWith("System.") || initString.startsWith("Random.")
                     || initString.contains("Thread")) {
                 messages.add("Test contains an invalid variable declaration: " + initString);
                 isValid = false;
