@@ -189,6 +189,14 @@ public class Configuration {
                     validationErrors.add(resolveAttributeName("antJavaHome") + " doesn't contain the java executable "
                             + javaExecutable);
                 }
+                Optional<Integer> antMajorJavaVersion = JavaVersionUtils.getMajorJavaVersionFromExecutable(
+                        javaExecutable.toPath());
+                if (antMajorJavaVersion.isEmpty()) {
+                    validationErrors.add(String.format("%s: got an error while running the java executable '%s'. Please check the logs.",
+                                    resolveAttributeName("antJavaHome"), javaExecutable));
+                } else if (antMajorJavaVersion.get() < 17) {
+                    validationErrors.add(resolveAttributeName("antJavaHome") + ": Ant Java version must be >= 17");
+                }
             }
 
             boolean dbvalid = true;
