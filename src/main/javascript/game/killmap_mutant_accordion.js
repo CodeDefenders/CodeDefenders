@@ -42,8 +42,9 @@ class KillMapMutantAccordion extends KillMapAccordion {
                 if (btn) btn.addEventListener('click', self._viewMutantModal.bind(self, mutant));
 
                 /* Init "View killing test" button. */
+                const killingTest = self._tests.get(mutant.killedByTestId);
                 btn = categoryAccordion.querySelector(`#kma-collapse-${identifier} .kma-view-test-button`);
-                if (btn) btn.addEventListener('click', self._viewTestModal.bind(self, self._tests.get(mutant.killedByTestId)));
+                if (btn) btn.addEventListener('click', self._viewMutantTestModal.bind(self, mutant, killingTest));
 
                 /* Create the DataTable. */
                 const tableElement = categoryAccordion.querySelector(`#kma-table-${identifier}`);

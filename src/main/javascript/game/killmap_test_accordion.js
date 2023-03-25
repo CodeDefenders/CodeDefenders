@@ -89,7 +89,7 @@ class KillMapTestAccordion extends KillMapAccordion {
                         element = row.querySelector('.ma-view-test-button');
                         if (element !== null) {
                             element.addEventListener('click', function (event) {
-                                self._viewTestModal(self._tests.get(data.killedByTestId));
+                                self._viewMutantTestModal(data, self._tests.get(data.killedByTestId));
                             })
                         }
                     }
