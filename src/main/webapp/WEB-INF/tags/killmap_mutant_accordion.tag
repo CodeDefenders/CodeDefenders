@@ -140,6 +140,10 @@
                                         <div class="accordion-body p-0">
                                             <div class="kma-mutant-details">
                                                 <small><a role="button" class="kma-view-button">View Mutant</a></small>
+                                                <c:if test="${mutant.state == 'KILLED'}">
+                                                    <small><a role="button"
+                                                              class="kma-view-test-button">View Killing Test</a></small>
+                                                </c:if>
                                             </div>
                                             <table id="kma-table-category-${category.id}-mutant-${mutant.id}"
                                                    class="table table-sm"></table>

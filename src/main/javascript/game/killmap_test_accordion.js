@@ -36,7 +36,7 @@ class KillMapTestAccordion extends KillMapAccordion {
 
                 /* Init "View test" button. */
                 const btn = categoryAccordion.querySelector(`#kta-collapse-${identifier} .kta-view-button`);
-                btn.addEventListener('click', self._viewTestModal.bind(self, test));
+                if (btn) btn.addEventListener('click', self._viewTestModal.bind(self, test));
 
                 /* Create the DataTable. */
                 const tableElement = categoryAccordion.querySelector(`#kta-table-${identifier}`);
