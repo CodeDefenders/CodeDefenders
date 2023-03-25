@@ -115,7 +115,7 @@
                                                 ${test.killedMutantIds.size()}
                                             </span>
                                             <span class="kta-col">
-                                                <span class="ma-column-name">Points:</span>
+                                                <span class="kta-column-name">Points:</span>
                                                 ${test.points}
                                             </span>
                                         </button>
