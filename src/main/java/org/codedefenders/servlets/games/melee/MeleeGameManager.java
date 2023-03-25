@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -44,6 +43,7 @@ import org.codedefenders.beans.game.PreviousSubmissionBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -240,8 +240,9 @@ public class MeleeGameManager extends HttpServlet {
         request.setAttribute("playerTests", playerTests);
         request.setAttribute("enemyTests", enemyTests);
 
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.MELEE_GAME_VIEW_JSP);
-        dispatcher.forward(request, response);
+        final boolean isGameClosed = game.getState() == GameState.FINISHED || GameDAO.isGameExpired(gameId);
+        final String jspPath = isGameClosed ? Constants.MELEE_DETAILS_VIEW_JSP : Constants.MELEE_GAME_VIEW_JSP;
+        request.getRequestDispatcher(jspPath).forward(request, response);
     }
 
     @Override
