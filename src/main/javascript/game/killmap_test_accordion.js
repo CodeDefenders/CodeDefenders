@@ -31,8 +31,15 @@ class KillMapTestAccordion extends KillMapAccordion {
             const categoryAccordion = document.querySelector(`#kta-collapse-${category.id}`);
             this._dataTablesByCategoryAndTest.set(category.id, new Map());
             for (const testId of category.testIds) {
+                const identifier = `category-${category.id}-test-${testId}`;
+                const test = self._tests.get(testId);
+
+                /* Init "View test" button. */
+                const btn = categoryAccordion.querySelector(`#kta-collapse-${identifier} .kta-view-button`);
+                btn.addEventListener('click', self._viewTestModal.bind(self, test));
+
                 /* Create the DataTable. */
-                const tableElement = categoryAccordion.querySelector(`#kta-table-category-${category.id}-test-${testId}`);
+                const tableElement = categoryAccordion.querySelector(`#kta-table-${identifier}`);
                 const rows = category.mutantIds
                     .sort((a, b) => a - b)
                     .map(mutantId => ({
@@ -74,7 +81,7 @@ class KillMapTestAccordion extends KillMapAccordion {
                         let element = row.querySelector('.ma-view-button');
                         if (element !== null) {
                             element.addEventListener('click', function (event) {
-                                self._viewMutantModal(data);
+                                self._viewMutantTestModal(data, test);
                             })
                         }
 
@@ -85,18 +92,6 @@ class KillMapTestAccordion extends KillMapAccordion {
                                 self._viewTestModal(self._tests.get(data.killedByTestId));
                             })
                         }
-
-                        /* Assign function to the "Mutant <id>" link. */
-                        row.querySelector('.ma-mutant-link').addEventListener('click', async function (event) {
-                            const editor = (await Promise.race([
-                                objects.await('classViewer'),
-                                objects.await('mutantEditor')
-                            ])).editor;
-                            editor.getWrapperElement().scrollIntoView();
-                            editor.scrollIntoView(
-                                {line: data.lines[0] - 1, char: 0},
-                                editor.getScrollInfo().clientHeight / 2 - 10);
-                        });
                     }
                 });
 

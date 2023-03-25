@@ -126,6 +126,9 @@
                                          aria-expanded="false"
                                          aria-labelledby="kta-heading-category-${category.id}-test-${test.id}">
                                         <div class="accordion-body p-0">
+                                            <div class="kta-test-details">
+                                                <small><a role="button" class="kta-view-button">View Test</a></small>
+                                            </div>
                                             <table id="kta-table-category-${category.id}-test-${test.id}"
                                                    class="table table-sm"></table>
                                         </div>

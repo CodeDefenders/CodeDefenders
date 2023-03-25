@@ -124,15 +124,12 @@
                                                 ${mutant.creator.name}
                                             </span>
                                             <span class="kma-col">
-                                                    ${mutant.description}
+                                                ${mutant.description}
                                             </span>
                                             <span class="kma-col">
                                                 <span class="kma-column-name">Points:</span>
                                                 ${mutant.points}
                                             </span>
-                                            <!-- Buttons should not contain interactive elements. Use a span here as exception. -->
-                                            <span role="button"
-                                                  class="kma-view-button btn btn-primary btn-xs pull-right">View</span>
                                         </button>
                                     </h3>
                                     <div class="accordion-collapse collapse"
@@ -141,6 +138,9 @@
                                          aria-expanded="false"
                                          aria-labelledby="kma-heading-category-${category.id}-mutant-${mutant.id}">
                                         <div class="accordion-body p-0">
+                                            <div class="kma-mutant-details">
+                                                <small><a role="button" class="kma-view-button">View Mutant</a></small>
+                                            </div>
                                             <table id="kma-table-category-${category.id}-mutant-${mutant.id}"
                                                    class="table table-sm"></table>
                                         </div>

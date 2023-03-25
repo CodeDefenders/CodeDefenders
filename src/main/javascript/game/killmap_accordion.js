@@ -1,4 +1,3 @@
-import DataTable from '../thirdparty/datatables';
 import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
 import {Popover} from "../thirdparty/bootstrap";
 
@@ -102,6 +101,12 @@ class KillMapAccordion {
          * @type {Map<number, Modal>}
          */
         this._testModals = new Map();
+
+        /**
+         * Maps mutant and test ids to the modal that shows the code of the mutant and the test side by side.
+         * @type {Map<number, Map<number, Modal>>}
+         */
+        this._mutantTestModals = new Map();
     }
 
     /**
@@ -176,6 +181,72 @@ class KillMapAccordion {
         modal.controls.show();
 
         await InfoApi.setMutantEditorValue(editor, mutant.id);
+        LoadingAnimation.hideAnimation(modal.body);
+    };
+
+
+    /**
+     * Creates a modal to display the given mutant and shows it.
+     * References to created models are cached in a map, so they don't need to be generated again.
+     * @param {MutantDTO} mutant The mutant DTO to display.
+     * @param {TestDTO} test The test DTO to display.
+     * @protected
+     */
+    async _viewMutantTestModal(mutant, test) {
+        let modal = this._mutantTestModals.get(mutant.id)?.get(test.id);
+        if (modal !== undefined) {
+            modal.controls.show();
+            return;
+        }
+
+        /* Create a new modal. */
+        modal = new Modal();
+        modal.title.innerHTML =
+            `<span>Mutant ${mutant.id} (by ${mutant.creator.name})</span>
+            <span>Test ${test.id} (by ${test.creator.name})</span>`;
+        modal.body.innerHTML =
+            `<div class="card mutant">
+                 <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
+                     <pre class="m-0"><textarea></textarea></pre>
+                 </div>
+             </div>
+             <div class="card test">
+                 <div class="card-body p-0 codemirror-expand codemirror-mutant-modal-size">
+                     <pre class="m-0"><textarea></textarea></pre>
+                 </div>
+             </div>`;
+        modal.dialog.classList.add('modal-dialog-responsive', 'mutant-test-modal');
+        modal.body.classList.add('loading', 'loading-bg-gray', 'loading-size-200');
+        if (!this._mutantTestModals.has(mutant.id)) {
+            this._mutantTestModals.set(mutant.id, new Map());
+        }
+        this._mutantTestModals.get(mutant.id).set(test.id, modal);
+
+        /* Initialize the editor. */
+        const textareaMutant = modal.body.querySelector('.mutant textarea');
+        const editorMutant = CodeMirror.fromTextArea(textareaMutant, {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: 'text/x-diff',
+            readOnly: true,
+            autoRefresh: true
+        });
+        editorMutant.getWrapperElement().classList.add('codemirror-readonly');
+
+        const textareaTest = modal.body.querySelector('.test textarea');
+        const editorTest = CodeMirror.fromTextArea(textareaTest, {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: 'text/x-java',
+            readOnly: true,
+            autoRefresh: true
+        });
+        editorTest.getWrapperElement().classList.add('codemirror-readonly');
+
+        modal.controls.show();
+
+        await InfoApi.setMutantEditorValue(editorMutant, mutant.id);
+        await InfoApi.setTestEditorValue(editorTest, test.id);
         LoadingAnimation.hideAnimation(modal.body);
     };
 

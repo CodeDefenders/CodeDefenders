@@ -35,12 +35,11 @@ class KillMapMutantAccordion extends KillMapAccordion {
             this._dataTablesByCategoryAndMutant.set(category.id, new Map());
             for (const mutantId of category.mutantIds) {
                 const identifier = `category-${category.id}-mutant-${mutantId}`;
+                const mutant = self._mutants.get(mutantId);
+
                 /* Init "View mutant" button. */
-                const btn = categoryAccordion.querySelector(`#kma-heading-${identifier} .kma-view-button`);
-                btn.addEventListener('click', event => {
-                    self._viewMutantModal(self._mutants.get(mutantId));
-                    event.stopPropagation(); // prevent the parent button from toggling the accordion does not work :(
-                }, true); // use capture
+                const btn = categoryAccordion.querySelector(`#kma-collapse-${identifier} .kma-view-button`);
+                btn.addEventListener('click', self._viewMutantModal.bind(self, mutant));
 
                 /* Create the DataTable. */
                 const tableElement = categoryAccordion.querySelector(`#kma-table-${identifier}`);
@@ -103,7 +102,7 @@ class KillMapMutantAccordion extends KillMapAccordion {
                         const element = row.querySelector('.ta-view-button');
                         if (element !== null) {
                             element.addEventListener('click', function (event) {
-                                self._viewTestModal(data);
+                                self._viewMutantTestModal(mutant, data);
                             });
                         }
                     }
