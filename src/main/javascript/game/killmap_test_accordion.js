@@ -44,7 +44,7 @@ class KillMapTestAccordion extends KillMapAccordion {
                     .sort((a, b) => a - b)
                     .map(mutantId => ({
                         ...this._mutants.get(mutantId),
-                        killMapResult: this._killMap[mutantId][testId]
+                        killMapResult: this._killMapAt(mutantId, testId)
                     }));
 
                 const dataTable = new DataTable(tableElement, {

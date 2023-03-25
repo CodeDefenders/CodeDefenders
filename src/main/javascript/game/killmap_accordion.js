@@ -109,6 +109,14 @@ class KillMapAccordion {
         this._mutantTestModals = new Map();
     }
 
+    _killMapAt(mutantId, testId) {
+        if (this._killMap[mutantId] === undefined || this._killMap[mutantId][testId] === undefined) {
+            return 'UNKNOWN';
+        } else {
+            return this._killMap[mutantId][testId];
+        }
+    }
+
     /**
      * @protected
      * @abstract

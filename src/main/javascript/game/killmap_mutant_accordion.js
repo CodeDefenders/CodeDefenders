@@ -50,7 +50,7 @@ class KillMapMutantAccordion extends KillMapAccordion {
                 const tableElement = categoryAccordion.querySelector(`#kma-table-${identifier}`);
                 const rows = category.testIds
                     .sort((a, b) => a - b)
-                    .map(testId => ({...this._tests.get(testId), killMapResult: this._killMap[mutantId][testId]}));
+                    .map(testId => ({...this._tests.get(testId), killMapResult: this._killMapAt(mutantId, testId)}));
 
                 const dataTable = new DataTable(tableElement, {
                     data: rows,
