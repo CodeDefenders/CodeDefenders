@@ -231,8 +231,8 @@ public class GameDAO {
                 "FROM games",
                 "WHERE State = ?",
                 "AND ID = ?",
-                "AND FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW();"
                 // do not use TIMESTAMPADD here to avoid errors with daylight saving
+                "AND FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW();"
         );
         return DB.executeQueryReturnValue(sql,
                 l -> l.getBoolean("isExpired"),

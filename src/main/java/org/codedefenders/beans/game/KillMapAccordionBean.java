@@ -18,6 +18,7 @@ import javax.inject.Named;
 
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.dto.MutantDTO;
+import org.codedefenders.dto.TestDTO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.servlets.games.GameProducer;
@@ -46,6 +47,13 @@ public class KillMapAccordionBean {
 
     private static final Logger logger = LoggerFactory.getLogger(KillMapAccordionBean.class);
 
+    /**
+     * The bean providing data for the kill-map test and mutant accordions.
+     *
+     * @param mutantAccordionBean The MutantAccordionBean for the normal mutant accordion.
+     * @param testAccordionBean   The TestAccordionBean for the normal test accordion.
+     * @param gameProducer        The GameProducer for the current game.
+     */
     @Inject
     public KillMapAccordionBean(@Named("mutantAccordion") MutantAccordionBean mutantAccordionBean,
                                 @Named("testAccordion") TestAccordionBean testAccordionBean,
@@ -72,8 +80,7 @@ public class KillMapAccordionBean {
                 final boolean isBothCategoryAll = isMutantCategoryAll && isTestCategoryAll;
                 final boolean isSameMethod = mc.getDescription().equals(tc.getDescription());
                 final boolean isCategoryOutsideMethods = mc.getId().equals(CATEGORY_OUTSIDE_METHODS)
-                        &&
-                        isTestCategoryAll; // We only want to add the category "Mutants outside methods" once with all tests.
+                        && isTestCategoryAll; // only add the category "Mutants outside methods" once with all tests.
 
                 if (isSameMethod || isBothCategoryAll || isCategoryOutsideMethods) {
                     KillMapAccordionCategory category = new KillMapAccordionCategory(
@@ -154,7 +161,7 @@ public class KillMapAccordionBean {
                 .collect(Collectors.toList());
     }
 
-    public Object getTestsByCategory(KillMapAccordionCategory category) {
+    public List<TestDTO> getTestsByCategory(KillMapAccordionCategory category) {
         return category.getTestIds().stream()
                 .map(testAccordionBean.getTests()::get)
                 .collect(Collectors.toList());
