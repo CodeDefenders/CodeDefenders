@@ -29,10 +29,6 @@
 <jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
 
 <%
-    boolean showDetails = request.getAttribute("showDetails") != null && (boolean) request.getAttribute("showDetails");
-%>
-
-<%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 	Role role = game.getRole(login.getUserId()); // required for header_game, too
 %>
@@ -71,10 +67,7 @@
 <%
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
 
-    if (showDetails) { %>
-        <jsp:include page="/jsp/battleground/details_view.jsp"/>
-    <% } else {
-        switch (role){
+    switch (role) {
         case ATTACKER:
             if (openEquivalenceDuel) { %>
                 <jsp:include page="/jsp/battleground/equivalence_view.jsp"/>
@@ -93,7 +86,6 @@
             // TODO(Alex): Do not redirect from JSP!!
             response.sendRedirect(CDIUtil.getBeanFromCDI(URLUtils.class).forPath(Paths.GAMES_OVERVIEW));
             return;
-        }
     }
 %>
 
