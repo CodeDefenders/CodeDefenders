@@ -2,6 +2,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
+
 <%@ attribute name="gameId" required="true" type="java.lang.Integer" %>
 <%@ attribute name="selectionManagerUrl" required="true" type="java.lang.String" %>
 <%@ attribute name="duration" required="true" type="java.lang.Integer" %>
@@ -16,16 +18,7 @@
 
     <%-- Button with remaining duration. --%>
 
-    <div data-bs-toggle="tooltip"
-    <c:choose>
-        <c:when test="${canSetDuration}">
-            title="Change the game duration."
-        </c:when>
-        <c:otherwise>
-            title="View the game duration."
-        </c:otherwise>
-    </c:choose>
-    >
+    <div data-bs-toggle="tooltip" title="${canSetDuration ? 'Change' : 'View'} the game duration.">
         <button type="button"
                 class="btn btn-sm btn-outline-${canSetDuration ? 'danger' : 'secondary'}"
                 form="durationModalForm"
@@ -126,11 +119,11 @@
             import {GameTimeValidator} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
             const gameTimeValidator = new GameTimeValidator(
-                Number(${maxDuration}), 0,
-                document.getElementById('minutes-input'),
-                document.getElementById('hours-input'),
-                document.getElementById('days-input'),
-                document.getElementById('duration-total')
+                    Number(${maxDuration}), 0,
+                    document.getElementById('minutes-input'),
+                    document.getElementById('hours-input'),
+                    document.getElementById('days-input'),
+                    document.getElementById('duration-total')
             );
         </script>
     </c:if>
@@ -138,6 +131,5 @@
 
 <script type="module">
     import {GameTimeManager} from '${url.forPath("/js/codedefenders_game.mjs")}';
-
     const gameTimeManager = new GameTimeManager(".time-left", 10);
 </script>

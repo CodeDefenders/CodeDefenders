@@ -41,14 +41,14 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.prometheus.client.Histogram;
 
+import static org.codedefenders.util.Constants.COMMON_CLASSPATH;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
-import static org.codedefenders.util.Constants.CUTS_DIR;
+import static org.codedefenders.util.Constants.JACOCO_CLASSPATH;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 /**
@@ -168,34 +168,6 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
                 TargetExecution.Target.TEST_ORIGINAL, status, message);
         testExecution.insert();
         return testExecution;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public String compileCUT(GameClass cut) throws CompileException {
-        AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, config.isForceLocalExecution());
-
-        logger.info("Compile New CUT, Compilation result: {}", result);
-
-        String pathCompiledClassName = null;
-        if (result.compiled()) {
-            // If the input stream returned a 'successful build' message, the CUT compiled correctly
-            logger.info("Compiled uploaded CUT successfully");
-            File f = Paths.get(CUTS_DIR, cut.getAlias()).toFile();
-            final String compiledClassName = FilenameUtils.getBaseName(cut.getJavaFile()) + Constants.JAVA_CLASS_EXT;
-            LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(
-                    f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
-            if (!matchingFiles.isEmpty()) {
-                pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
-            }
-        } else {
-            // Otherwise the CUT failed to compile
-            String message = result.getCompilerOutput();
-            logger.error("Failed to compile uploaded CUT: {}", message);
-            throw new CompileException(message);
-        }
-        return pathCompiledClassName;
     }
 
     /**
@@ -359,11 +331,11 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         command.add("-Dmutant.file=" + mutantDir);
         command.add("-Dtest.file=" + testDir);
         command.add("-Dcut.dir=" + cutDir);
-        command.add("-Dclassalias=" + cut.getAlias());
-        command.add("-Dclassbasename=" + cut.getBaseName());
-        command.add("-Dclassname=" + cut.getName());
         command.add("-DtestClassname=" + testClassName);
         command.add("-Dcuts.deps=" + Paths.get(cutDir, CUTS_DEPENDENCY_DIR));
+
+        command.add("-Dcommon.cp=" + COMMON_CLASSPATH);
+        command.add("-Djacoco.cp=" + JACOCO_CLASSPATH);
 
         if (mutantDir != null && testDir != null
                 // Limit this code path to targets that depend on the `mutant.test.file` variable.

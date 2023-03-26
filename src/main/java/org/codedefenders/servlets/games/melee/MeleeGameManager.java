@@ -55,7 +55,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
@@ -141,9 +140,6 @@ public class MeleeGameManager extends HttpServlet {
     private TestSmellsDAO testSmellsDAO;
 
     @Inject
-    private ITestCaseSelector regressionTestCaseSelector;
-
-    @Inject
     private INotificationService notificationService;
 
     @Inject
@@ -180,7 +176,7 @@ public class MeleeGameManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");
@@ -247,7 +243,7 @@ public class MeleeGameManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        MeleeGame game = gameProducer.getGame();
+        MeleeGame game = gameProducer.getMeleeGame();
 
         if (game == null) {
             logger.error("No game found. Aborting request.");

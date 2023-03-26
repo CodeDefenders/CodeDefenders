@@ -19,8 +19,8 @@ package org.codedefenders.servlets.registration;
  */
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.Random;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -64,22 +64,19 @@ public class PasswordServlet extends HttpServlet {
     private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" + "Change your password here: %s\n"
             + "This link is only valid for %d hours.\n\n" + "Greetings, your Code Defenders team";
 
+    private static final SecureRandom secureRandom = new SecureRandom();
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         CodeDefendersValidator validator = new CodeDefendersValidator();
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String email = request.getParameter("email");
         String formType = request.getParameter("formType");
-
-        String confirm = request.getParameter("confirm");
 
         switch (formType) {
             case "resetPassword":
-                email = request.getParameter("accountEmail");
-                username = request.getParameter("accountUsername");
+                String email = request.getParameter("accountEmail");
+                String username = request.getParameter("accountUsername");
                 Optional<UserEntity> u = userRepo.getUserByEmail(email);
                 if (!u.isPresent() || !u.get().getUsername().equals(username) || !u.get().getEmail().equalsIgnoreCase(email)) {
                     messages.add("No user was found for this username and email. Please check if the username and email match.");
@@ -101,8 +98,8 @@ public class PasswordServlet extends HttpServlet {
 
             case "changePassword":
                 String resetPwSecret = request.getParameter("resetPwSecret");
-                confirm = request.getParameter("inputConfirmPasswordChange");
-                password = request.getParameter("inputPasswordChange");
+                String confirm = request.getParameter("inputConfirmPasswordChange");
+                String password = request.getParameter("inputPasswordChange");
 
                 String responseURL = url.forPath(Paths.LOGIN) + "?resetPW=" + resetPwSecret;
                 Optional<Integer> userId = userRepo.getUserIdForPasswordResetSecret(resetPwSecret);
@@ -143,9 +140,8 @@ public class PasswordServlet extends HttpServlet {
         char[] initialSet = LOWER;
         initialSet = ArrayUtils.addAll(initialSet, DIGITS);
 
-        Random random = new Random();
         for (int i = 0; i < PW_RESET_SECRET_LENGTH; i++) {
-            sb.append(initialSet[random.nextInt(initialSet.length)]);
+            sb.append(initialSet[secureRandom.nextInt(initialSet.length)]);
         }
         return sb.toString();
     }
