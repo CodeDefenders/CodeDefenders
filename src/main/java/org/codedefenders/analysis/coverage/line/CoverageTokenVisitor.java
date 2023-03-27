@@ -21,7 +21,7 @@ package org.codedefenders.analysis.coverage.line;
 import java.util.List;
 import java.util.Optional;
 
-import org.codedefenders.analysis.coverage.JavaTokenIterator;
+import org.codedefenders.analysis.coverage.util.JavaTokenIterator;
 import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;

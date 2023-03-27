@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.codedefenders.analysis.coverage.JavaTokenIterator;
+import org.codedefenders.analysis.coverage.util.JavaTokenIterator;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.Status;
 import org.codedefenders.analysis.coverage.ast.AstCoverageStatus.StatusAfter;
 import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
