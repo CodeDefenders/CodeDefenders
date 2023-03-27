@@ -62,10 +62,13 @@ public class CoverageGenerator {
     protected boolean testMode = false;
 
     private final AstCoverageGenerator astCoverageGenerator;
+    private final CoverageTokenAnalyser coverageTokenAnalyser;
 
     @Inject
-    public CoverageGenerator(AstCoverageGenerator astCoverageGenerator) {
+    public CoverageGenerator(AstCoverageGenerator astCoverageGenerator,
+                             CoverageTokenAnalyser coverageTokenAnalyser) {
         this.astCoverageGenerator = astCoverageGenerator;
+        this.coverageTokenAnalyser = coverageTokenAnalyser;
     }
 
     /**
@@ -107,7 +110,6 @@ public class CoverageGenerator {
         }};
         coverageTokenVisitor.visit(compilationUnit, null);
 
-        CoverageTokenAnalyser coverageTokenAnalyser = new CoverageTokenAnalyser();
         SimpleLineCoverage transformedCoverage = coverageTokenAnalyser.analyse(coverageTokens);
 
         return new CoverageGeneratorResult(originalCoverage, transformedCoverage, coverageTokens);
