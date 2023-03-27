@@ -46,16 +46,14 @@
 
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
-		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="${java.target.version}" classpathref="nocut.cp"
-			   source="${java.target.version}" includeantruntime="false"
-			   debug="true" nowarn="true"/>
+		<javac srcdir="${mutant.file}" destdir="${mutant.file}" release="${java.target.version}" classpathref="nocut.cp"
+			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 
 	<!-- requires test to compile only -->
 	<target name="compile-test" description="compile a single test">
-		<javac srcdir="${test.file}" destdir="${test.file}" target="${java.target.version}"
-			   source="${java.target.version}" classpathref="test.cp" includeantruntime="false"
-			   debug="true" nowarn="true"/>
+		<javac srcdir="${test.file}" destdir="${test.file}" release="${java.target.version}" classpathref="test.cp"
+			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 
 	<target name="echo-path" description="Echo test path">
@@ -69,11 +67,15 @@
 			<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
 			<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
 			<junit printsummary="true" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
-                <sysproperty key="codedef.home" value="${codedef.home}" />
+                <sysproperty key="codedef.home" value="${codedef.home}"/>
+
 				<classpath refid="test.cp"/>
 				<classpath location="${test.file}"/>
+
 				<test name="${testClassname}"/>
+
 				<formatter type="plain" usefile="false"/>
+
 				<jvmarg value="-Djava.security.manager"/>
 				<jvmarg value="-Djava.security.policy==${policyfile}"/>
 				<assertions><enable/></assertions>
@@ -86,15 +88,18 @@
 		<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
 		<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
 		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
-            <sysproperty key="codedef.home" value="${codedef.home}" />
+            <sysproperty key="codedef.home" value="${codedef.home}"/>
 
 			<!-- Sets the content of the classpath to the mutant -->
 			<classpath refid="nocut.cp"/>
 			<classpath location="${mutant.file}"/>
 			<classpath location="${test.file}"/>
+
 			<!-- testname -->
 			<test name="${testClassname}"/>
+
 			<formatter type="plain" usefile="false"/>
+
 			<jvmarg value="-Djava.security.manager"/>
 			<jvmarg value="-Djava.security.policy==${policyfile}"/>
 			<assertions><enable/></assertions>
@@ -104,14 +109,9 @@
 	<!-- in some cases we need to recompile the test with the mutant and then execute the test -->
 	<target name="recompile-test-with-mutant" description="compile a single test including the mutant in the classpath"
 			depends="compile-mutant, compile-test">
-		<javac
-				srcdir="${test.file}"
-				destdir="${mutant.test.file}"
-				target="${java.target.version}" source="${java.target.version}"
-				classpathref="nocut.cp"
-				classpath="${mutant.file}"
-				includeantruntime="false"
-				debug="true" nowarn="true"/>
+		<javac srcdir="${test.file}" destdir="${mutant.test.file}" release="${java.target.version}"
+			   classpathref="nocut.cp" classpath="${mutant.file}"
+			   includeantruntime="false" debug="true" nowarn="true"/>
 	</target>
 
 	<!-- in some cases we need to recompile the test with the mutant and then execute the test -->
@@ -121,7 +121,7 @@
 		<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
 		<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
 		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
-            <sysproperty key="codedef.home" value="${codedef.home}" />
+            <sysproperty key="codedef.home" value="${codedef.home}"/>
 
 			<!-- Sets the content of the classpath to the mutant -->
 			<classpath refid="nocut.cp"/>
@@ -130,7 +130,9 @@
 
 			<!-- testname -->
 			<test name="${testClassname}"/>
+
 			<formatter type="plain" usefile="false"/>
+
 			<jvmarg value="-Djava.security.manager"/>
 			<jvmarg value="-Djava.security.policy==${policyfile}"/>
 			<assertions><enable/></assertions>
