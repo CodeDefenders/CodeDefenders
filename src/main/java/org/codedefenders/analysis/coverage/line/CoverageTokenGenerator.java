@@ -27,13 +27,17 @@ import com.github.javaparser.ast.CompilationUnit;
 
 @ApplicationScoped
 public class CoverageTokenGenerator {
-    protected boolean testMode = false;
+
+    /**
+     * This method allows modifying the CoverageTokenVisitor in the CoverageTest
+     */
+    protected CoverageTokenVisitor getNewCoverageTokenVisitor(AstCoverage astCoverage, CoverageTokens coverageTokens) {
+        return new CoverageTokenVisitor(astCoverage, coverageTokens);
+    }
 
     public CoverageTokens generate(CompilationUnit compilationUnit, DetailedLineCoverage originalCoverage, AstCoverage astCoverage) {
         CoverageTokens coverageTokens = CoverageTokens.fromExistingCoverage(originalCoverage);
-        CoverageTokenVisitor coverageTokenVisitor = new CoverageTokenVisitor(astCoverage, coverageTokens) {{
-            testMode = CoverageTokenGenerator.this.testMode;
-        }};
+        CoverageTokenVisitor coverageTokenVisitor = getNewCoverageTokenVisitor(astCoverage, coverageTokens);
         coverageTokenVisitor.visit(compilationUnit, null);
         return coverageTokens;
     }

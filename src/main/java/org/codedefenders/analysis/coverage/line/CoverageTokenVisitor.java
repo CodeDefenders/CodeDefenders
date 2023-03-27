@@ -157,10 +157,6 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
     private final AstCoverage astCoverage;
     private final CoverageTokens tokens;
 
-    /**
-     * If true, enables code comments that control the generated coverage.
-     */
-    protected boolean testMode = false;
 
     public CoverageTokenVisitor(AstCoverage astCoverage, CoverageTokens tokens) {
         this.astCoverage = astCoverage;
@@ -227,6 +223,7 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
      * @param beginLine The first line of the block (inclusive).
      * @param endLine The last line of the block (inclusive).
      * @param ignoreEndStatus Whether to ignore the block's statusAfter (and use the last statement's instead).
+     *                        (Mostly/Only used for tests)
      */
     public void handleBlock(TokenInserter i,
                             List<? extends Node> statements,
@@ -462,19 +459,24 @@ public class CoverageTokenVisitor extends VoidVisitorAdapter<Void> {
     // endregion
     // region block level
 
+
     @Override
     public void visit(BlockStmt block, Void arg) {
         try (TokenInserter i = tokens.forNode(block, () -> super.visit(block, arg))) {
-            boolean ignoreEndStatus = testMode && block.getOrphanComments().stream()
-                    .map(Comment::getContent)
-                    .anyMatch(content -> content.matches("\\s*block:\\s*ignore_end_status\\s*"));
-            handleBlock(i,
-                    block.getStatements(),
-                    astCoverage.get(block),
-                    beginOf(block),
-                    endOf(block),
-                    ignoreEndStatus);
+            visitBlockStmt(block, i);
         }
+    }
+
+    /**
+     * Allows customization of BlockStmt handling in CoverageTest via subclassing.
+     */
+    protected void visitBlockStmt(BlockStmt block, TokenInserter i) {
+        handleBlock(i,
+                block.getStatements(),
+                astCoverage.get(block),
+                beginOf(block),
+                endOf(block),
+                false);
     }
 
     @Override
