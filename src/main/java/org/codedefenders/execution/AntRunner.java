@@ -154,7 +154,7 @@ public class AntRunner implements BackendExecutorService, ClassCompilerService {
         // add coverage information
         LineCoverage coverage;
         try {
-            coverage = coverageGenerator.generate(cut, Paths.get(t.getJavaFile())).getLineCoverage();
+            coverage = coverageGenerator.generate(cut, Paths.get(t.getJavaFile()));
         } catch (CoverageGeneratorException e) {
             // TODO: don't return empty coverage here
             logger.error("Error while computing coverage for test " + t.getId(), e);

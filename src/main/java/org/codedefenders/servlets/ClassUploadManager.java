@@ -819,8 +819,7 @@ public class ClassUploadManager extends HttpServlet {
 
             LineCoverage lineCoverage;
             try {
-                lineCoverage = coverageGenerator.generate(cut, Paths.get(javaFilePath))
-                        .getLineCoverage();
+                lineCoverage = coverageGenerator.generate(cut, Paths.get(javaFilePath));
             } catch (CoverageGeneratorException e) {
                 logger.error("Class upload with test failed. Failed to compute coverage.", e);
                 messages.add("Class upload failed. Internal error. Sorry about that!");

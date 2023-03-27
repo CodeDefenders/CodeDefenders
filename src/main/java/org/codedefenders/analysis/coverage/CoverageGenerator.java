@@ -67,9 +67,9 @@ public class CoverageGenerator {
      *
      * @param gameClass The CUT.
      * @param testJavaFile The path to the test Java file (a 'jacoco.exe' file must exist in the same directory).
-     * @return The extended line coverage.
+     * @return The LineCoverage of the Test on the CUT.
      */
-    public CoverageGeneratorResult generate(GameClass gameClass, Path testJavaFile)
+    public LineCoverage generate(GameClass gameClass, Path testJavaFile)
             throws CoverageGeneratorException {
         final Path execFile = findJacocoExecFile(testJavaFile);
         final Collection<Path> relevantClassFiles = findRelevantClassFiles(gameClass);
@@ -80,7 +80,7 @@ public class CoverageGenerator {
         CompilationUnit compilationUnit = JavaParserUtils.parse(gameClass.getSourceCode())
                 .orElseThrow(() -> new CoverageGeneratorException("Could not parse java file: " + gameClass.getJavaFile()));
 
-        return generate(originalCoverage, compilationUnit);
+        return generate(originalCoverage, compilationUnit).getLineCoverage();
     }
 
     /**
@@ -90,7 +90,7 @@ public class CoverageGenerator {
      * @param compilationUnit The CompilationUnit for the file that the line coverage is for.
      * @return The extended line coverage.
      */
-    public CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
+    CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
         AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
         astVisitor.visit(compilationUnit, null);
         AstCoverage astCoverage = astVisitor.finish();
@@ -114,7 +114,7 @@ public class CoverageGenerator {
      * @param relevantClassFiles Paths to all class files that are relevant for the coverage.
      * @return The coverage in JaCoCo's format.
      */
-    public CoverageBuilder readJacocoCoverage(Path execFile, Collection<Path> relevantClassFiles)
+    CoverageBuilder readJacocoCoverage(Path execFile, Collection<Path> relevantClassFiles)
             throws CoverageGeneratorException {
         final ExecFileLoader execFileLoader = new ExecFileLoader();
         try {
@@ -141,7 +141,7 @@ public class CoverageGenerator {
     /**
      * Given a path to a test's Java file, finds the path to the test's 'jacoco.exec' file.
      */
-    public Path findJacocoExecFile(Path testJavaFile)
+    Path findJacocoExecFile(Path testJavaFile)
             throws CoverageGeneratorException {
         final Path reportDirectory = testJavaFile.getParent();
         final Path execFile = reportDirectory.resolve(JACOCO_REPORT_FILE);
@@ -154,7 +154,7 @@ public class CoverageGenerator {
     /**
      * Given a CUT, finds paths to all class files that are relevant for computing coverage for the CUT.
      */
-    public Collection<Path> findRelevantClassFiles(GameClass gameClass) throws CoverageGeneratorException {
+    Collection<Path> findRelevantClassFiles(GameClass gameClass) throws CoverageGeneratorException {
         final Path classFileFolder = Paths.get(gameClass.getClassFile()).getParent();
 
         try (Stream<Path> files = Files.list(classFileFolder)
@@ -168,7 +168,7 @@ public class CoverageGenerator {
     /**
      * Extracts JaCoCo's (source file) coverage in to a {@link DetailedLineCoverage}.
      */
-    public DetailedLineCoverage extractLineCoverage(CoverageBuilder coverageBuilder, GameClass gameClass) {
+    DetailedLineCoverage extractLineCoverage(CoverageBuilder coverageBuilder, GameClass gameClass) {
         DetailedLineCoverage coverage = new DetailedLineCoverage();
 
         for (ISourceFileCoverage sourceCoverage : coverageBuilder.getSourceFiles()) {
@@ -194,7 +194,7 @@ public class CoverageGenerator {
         }
     }
 
-    public static class CoverageGeneratorResult {
+    static class CoverageGeneratorResult {
         public final DetailedLineCoverage originalCoverage;
         public final SimpleLineCoverage transformedCoverage;
         public final CoverageTokens coverageTokens;
