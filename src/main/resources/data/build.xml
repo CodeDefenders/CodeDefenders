@@ -66,6 +66,8 @@
 	<!-- requires test to compile, and the classname of the test file -->
 	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
 		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec" dumponexit="true">
+			<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
+			<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
 			<junit printsummary="true" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
                 <sysproperty key="codedef.home" value="${codedef.home}" />
 				<classpath refid="test.cp"/>
@@ -81,7 +83,9 @@
 
 	<!-- requires test, mutant, and the name of the class -->
 	<target name="test-mutant" description="run test on mutant to see if test fails">
-		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false" fork="true" clonevm="true">
+		<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
+		<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
+		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
             <sysproperty key="codedef.home" value="${codedef.home}" />
 
 			<!-- Sets the content of the classpath to the mutant -->
@@ -114,7 +118,9 @@
 	<target name="recompiled-test-mutant"
 			description="test a recompiled test against a mutant to see if test fails"
 			depends="recompile-test-with-mutant">
-		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false" fork="true" clonevm="true">
+		<!-- We set 'includeantruntime="true"' so the 'ant-junit.jar' is included in the classpath of the forked JVM.-->
+		<!-- Without this all test-on-mutant executions fail with a ClassNotFound exception.-->
+		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="true" fork="true" clonevm="true">
             <sysproperty key="codedef.home" value="${codedef.home}" />
 
 			<!-- Sets the content of the classpath to the mutant -->
