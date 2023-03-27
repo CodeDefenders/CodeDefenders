@@ -30,9 +30,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.codedefenders.analysis.coverage.ast.AstCoverage;
-import org.codedefenders.analysis.coverage.ast.AstCoverageVisitor;
+import org.codedefenders.analysis.coverage.ast.AstCoverageGenerator;
 import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
 import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
 import org.codedefenders.analysis.coverage.line.CoverageTokens;
@@ -59,6 +60,13 @@ public class CoverageGenerator {
     private static final String JACOCO_REPORT_FILE = "jacoco.exec";
 
     protected boolean testMode = false;
+
+    private final AstCoverageGenerator astCoverageGenerator;
+
+    @Inject
+    public CoverageGenerator(AstCoverageGenerator astCoverageGenerator) {
+        this.astCoverageGenerator = astCoverageGenerator;
+    }
 
     /**
      * Reads the coverage data for a test execution and extends it.
@@ -91,9 +99,7 @@ public class CoverageGenerator {
      * @return The extended line coverage.
      */
     CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
-        AstCoverageVisitor astVisitor = new AstCoverageVisitor(originalCoverage);
-        astVisitor.visit(compilationUnit, null);
-        AstCoverage astCoverage = astVisitor.finish();
+        AstCoverage astCoverage = astCoverageGenerator.generate(compilationUnit, originalCoverage);
 
         CoverageTokens coverageTokens = CoverageTokens.fromExistingCoverage(originalCoverage);
         CoverageTokenVisitor coverageTokenVisitor = new CoverageTokenVisitor(astCoverage, coverageTokens) {{

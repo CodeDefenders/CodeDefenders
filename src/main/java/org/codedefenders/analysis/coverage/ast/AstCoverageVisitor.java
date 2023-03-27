@@ -204,7 +204,7 @@ import static org.codedefenders.util.JavaParserUtils.lineOf;
  * </ul>
  */
 @SuppressWarnings("OptionalGetWithoutIsPresent")
-public class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
+class AstCoverageVisitor extends VoidVisitorAdapter<Void> {
 
     private final DetailedLineCoverage lineCoverage;
     private final AstCoverage astCoverage;
