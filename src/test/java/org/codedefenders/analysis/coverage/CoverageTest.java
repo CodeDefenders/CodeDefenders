@@ -17,6 +17,7 @@ import javax.tools.ToolProvider;
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorResult;
 import org.codedefenders.analysis.coverage.ast.AstCoverageGenerator;
 import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
+import org.codedefenders.analysis.coverage.line.CoverageTokenGenerator;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
@@ -105,9 +106,9 @@ public class CoverageTest {
                 .orElseThrow(() -> new Exception("Could not parse fixture source code."));
 
         // transform the coverage
-        CoverageGenerator coverageGenerator = new CoverageGenerator(new AstCoverageGenerator(), new CoverageTokenAnalyser()) {{
+        CoverageGenerator coverageGenerator = new CoverageGenerator(new AstCoverageGenerator(), new CoverageTokenGenerator() {{
             testMode = true;
-        }};
+        }}, new CoverageTokenAnalyser());
         CoverageGeneratorResult result = coverageGenerator.generate(originalCoverage, compilationUnit);
 
         // write HTML report if enabled

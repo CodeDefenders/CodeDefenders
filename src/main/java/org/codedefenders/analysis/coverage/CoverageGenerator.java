@@ -35,7 +35,7 @@ import javax.inject.Inject;
 import org.codedefenders.analysis.coverage.ast.AstCoverage;
 import org.codedefenders.analysis.coverage.ast.AstCoverageGenerator;
 import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
-import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
+import org.codedefenders.analysis.coverage.line.CoverageTokenGenerator;
 import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
@@ -59,15 +59,16 @@ public class CoverageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(CoverageGenerator.class);
     private static final String JACOCO_REPORT_FILE = "jacoco.exec";
 
-    protected boolean testMode = false;
 
     private final AstCoverageGenerator astCoverageGenerator;
+    private final CoverageTokenGenerator coverageTokenGenerator;
     private final CoverageTokenAnalyser coverageTokenAnalyser;
 
     @Inject
-    public CoverageGenerator(AstCoverageGenerator astCoverageGenerator,
+    public CoverageGenerator(AstCoverageGenerator astCoverageGenerator, CoverageTokenGenerator coverageTokenGenerator,
                              CoverageTokenAnalyser coverageTokenAnalyser) {
         this.astCoverageGenerator = astCoverageGenerator;
+        this.coverageTokenGenerator = coverageTokenGenerator;
         this.coverageTokenAnalyser = coverageTokenAnalyser;
     }
 
@@ -104,11 +105,7 @@ public class CoverageGenerator {
     CoverageGeneratorResult generate(DetailedLineCoverage originalCoverage, CompilationUnit compilationUnit) {
         AstCoverage astCoverage = astCoverageGenerator.generate(compilationUnit, originalCoverage);
 
-        CoverageTokens coverageTokens = CoverageTokens.fromExistingCoverage(originalCoverage);
-        CoverageTokenVisitor coverageTokenVisitor = new CoverageTokenVisitor(astCoverage, coverageTokens) {{
-            testMode = CoverageGenerator.this.testMode;
-        }};
-        coverageTokenVisitor.visit(compilationUnit, null);
+        CoverageTokens coverageTokens = coverageTokenGenerator.generate(compilationUnit, originalCoverage, astCoverage);
 
         SimpleLineCoverage transformedCoverage = coverageTokenAnalyser.analyse(coverageTokens);
 
