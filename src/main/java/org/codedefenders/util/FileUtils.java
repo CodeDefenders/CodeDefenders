@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +48,57 @@ import static org.codedefenders.util.Constants.TEST_PREFIX;
  */
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+
+    /*
+     * Some Notes regarding file organization of Code Defenders.
+     *
+     * Overview:
+     * <data dir>/
+     *   build.xml                               <- ant build/project file
+     *   security.policy                         <- Java Security Manager config files
+     *   lib/                                    <- Contains .jar files we need for execution e.g. JUnit
+     *   sources/                                <- Contains a folder per uploaded class under test
+     *     <ClassAlias>/
+     *       <PackageStructure>/                 <- The CUT is direct in the folder (with package structure)
+     *         <ClassName>.java
+     *         <ClassName>.class
+     *         <ClassName>$<InnerClassName>.class
+     *       dependencies/
+     *         <PackageStructure>/               <- Dependencies of the CUT (like other source files) are in the 'dependencies' subdirectory
+     *           <DependencyClassName>.java
+     *           <DependencyClassName>.class
+     *           <DependencyClassName>$<InnerClassName>.class
+     *   mutants/
+     *     mp/
+     *       <GameId>/
+     *         <UserId>/
+     *           <Nr>/
+     *             <PackageStructure>/
+     *               <ClassName>.java
+     *               <ClassName>.class
+     *               <ClassName>$<InnerClassName>.class
+     *   tests/
+     *     mp/
+     *       <GameId>/
+     *         <UserId>/
+     *           original/                       <- Normal Test
+     *             <Nr>/
+     *               <PackageStructure>/
+     *                 Test<ClassName>.java
+     *                 Test<ClassName>.class
+     *                 jacoco.exec
+     *           <UserId>-<Nr>/                  <- Test recompiled against mutant from <UserId> with <Nr>
+     *             <Nr>/
+     *               <PackageStructure>/
+     *                 Test<ClassName>.java
+     *                 Test<ClassName>.class
+     *                 jacoco.exec
+     *
+     * Notes: We split the CUT and it's dependencies in separate directories, so one can swap the CUT
+     * with a mutant.
+     * Normal classpath: <data dir>/sources/<ClassAlias>:<data dir>/sources/<ClassAlias>/dependencies
+     * Mutant classpath: <data dir>/
+     */
 
     public static String createIndexXML(File dir, String fileName, String contents) throws IOException {
         Path path = Paths.get(dir.getAbsolutePath(), fileName + ".xml");
@@ -131,13 +181,6 @@ public class FileUtils {
             logger.error("Could not read file " + javaFilePath);
             return "[File Not Readable]";
         }
-    }
-
-    /**
-     * Similar to {@link #readJavaFileWithDefault(Path)} but HTML escaped.
-     */
-    public static String readJavaFileWithDefaultHTMLEscaped(Path javaFilePath) {
-        return StringEscapeUtils.escapeHtml4(readJavaFileWithDefault(javaFilePath));
     }
 
     /**

@@ -95,10 +95,6 @@ public class KillMapService {
                         game.getMode(), game.getId(), tests.size(), mutants.size(), entries.size()));
 
                 compute(killmap, executor);
-
-                if (game.isFinished()) {
-                    KillmapDAO.setHasKillMap(game.getId(), true);
-                }
             }
         } else {
             logger.info("Killmap for game " + game.getId() + " already computed");

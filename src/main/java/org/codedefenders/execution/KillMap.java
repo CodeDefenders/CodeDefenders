@@ -31,10 +31,12 @@ import org.codedefenders.game.Test;
 
 /**
  * Maps tests to their killed mutants in a finished game.
- * Killmaps are computed and saved to the DB on the first time they are requested. This may take a long time.
- * {@link KillmapDAO#hasKillMap(int)}  can be used to check if a finished game's killmap has already been computed.
- * <p/>
- * Only one killmap can be computed at a time. Further request are queued via {@code synchronized}.
+ *
+ * <p>Killmaps are computed and saved to the DB on the first time they are requested. This may take a long time.
+ * {@link KillmapDAO#getKillMapProgressForGame(int)} and can be used to check if a finished game's killmap has already
+ * been computed.
+ *
+ * <p>Only one killmap can be computed at a time. Further request are queued via {@code synchronized}.
  * This is mostly to prevent multiple calculations of the same killmap at once, e.g. by accidentally refreshing a page.
  */
 public class KillMap {

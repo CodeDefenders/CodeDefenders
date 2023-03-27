@@ -23,15 +23,13 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -411,13 +409,14 @@ public class Compiler {
      */
     private static Path getClassPath(JavaFileObject javaFile, Path baseDirectory) throws IOException {
         final String targetName = javaFile.getName().replace(".java", ".class");
-        final BiPredicate<Path, BasicFileAttributes> matcher =
-                (path, attr) -> path.getFileName().toString().equals(targetName);
 
-        final Optional<Path> first = Files.find(baseDirectory, 200, matcher).findFirst();
-        return first
-                .map(Path::toAbsolutePath)
-                .orElseGet(() -> Paths.get(javaFile.getPath().replace(".java", ".class")));
+        try (Stream<Path> pathStream = Files.walk(baseDirectory, 200)) {
+            return pathStream
+                    .filter(path -> path.getFileName().toString().equals(targetName))
+                    .findFirst()
+                    .map(Path::toAbsolutePath)
+                    .orElseGet(() -> Paths.get(javaFile.getPath().replace(".java", ".class")));
+        }
     }
 
     private static javax.tools.JavaCompiler getCompiler() {

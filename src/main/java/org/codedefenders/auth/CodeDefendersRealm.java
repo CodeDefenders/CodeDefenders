@@ -19,6 +19,7 @@
 
 package org.codedefenders.auth;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -238,7 +239,7 @@ public class CodeDefendersRealm extends AuthorizingRealm {
         }
     }
 
-    public static class LocalUserId {
+    public static class LocalUserId implements Serializable {
         private final int userId;
 
         public LocalUserId(int userId) {
