@@ -55,13 +55,13 @@ import static org.codedefenders.util.JavaParserUtils.endOf;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 /**
- * <p>Adapted from the JaCoCo "CoreTutorial" API example.
+ * Adapted from the JaCoCo "CoreTutorial" API example.
  * See https://www.jacoco.org/jacoco/trunk/doc/api.html
  *
  * <p>Coverage and HTML output for easier debugging can be enabled in {@link CoverageOutputWriter}.
  */
 public class CoverageTest {
-    public final static String RESOURCE_DIR = "org/codedefenders/analysis/coverage";
+    public static final String RESOURCE_DIR = "org/codedefenders/analysis/coverage";
 
     @BeforeEach
     public void checkJavaVersion() {

@@ -23,9 +23,9 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.codedefenders.util.ResourceUtils.loadResource;
 
 class CoverageTestParameters implements ArgumentsProvider {
-    private final static Pattern NAME_REGEX = Pattern.compile("([A-Za-z][A-Za-z1-9]*)\\.java");
+    private static final Pattern NAME_REGEX = Pattern.compile("([A-Za-z][A-Za-z1-9]*)\\.java");
 
-    private final static List<String> UTILS_FILES = Arrays.asList(
+    private static final List<String> UTILS_FILES = Arrays.asList(
             "utils/Call.java",
             "utils/MethodChain.java",
             "utils/TestClass.java",

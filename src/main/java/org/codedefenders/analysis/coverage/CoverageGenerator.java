@@ -229,6 +229,8 @@ public class CoverageGenerator {
                         break;
                     case EMPTY:
                         break;
+                    default:
+                        throw new IllegalStateException("Encountered unknown LineCoverageStatus " + transformedCoverage.get(line));
                 }
             }
             return new LineCoverage(coveredLines, uncoveredLines);

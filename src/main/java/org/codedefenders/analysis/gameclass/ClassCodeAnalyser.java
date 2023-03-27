@@ -28,8 +28,6 @@ import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.GameClass;
 import org.codedefenders.util.JavaParserUtils;
 
 import com.github.javaparser.ast.CompilationUnit;

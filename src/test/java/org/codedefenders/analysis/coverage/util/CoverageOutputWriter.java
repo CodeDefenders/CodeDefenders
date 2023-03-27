@@ -20,9 +20,9 @@ import org.codedefenders.analysis.coverage.line.NewLineCoverage;
 import org.codedefenders.util.ResourceUtils;
 
 public class CoverageOutputWriter {
-    private final static String HTML_OUTPUT_DIR = "/tmp/coverage";
-    private final static boolean ENABLED = false;
-    private final static boolean SPLIT_DIR_BY_JVM = true;
+    private static final String HTML_OUTPUT_DIR = "/tmp/coverage";
+    private static final boolean ENABLED = false;
+    private static final boolean SPLIT_DIR_BY_JVM = true;
 
     private final String className;
     private final String testName;

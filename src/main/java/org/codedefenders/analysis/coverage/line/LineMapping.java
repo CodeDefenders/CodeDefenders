@@ -94,5 +94,5 @@ public abstract class LineMapping<T> {
     /**
      * Returns the empty element of the mapping.
      */
-    abstract protected T getEmpty();
+    protected abstract T getEmpty();
 }
