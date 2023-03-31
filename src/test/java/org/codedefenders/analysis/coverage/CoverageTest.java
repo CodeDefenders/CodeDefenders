@@ -15,6 +15,12 @@ import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
 import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorResult;
+import org.codedefenders.analysis.coverage.ast.AstCoverage;
+import org.codedefenders.analysis.coverage.ast.AstCoverageGenerator;
+import org.codedefenders.analysis.coverage.line.CoverageTokenAnalyser;
+import org.codedefenders.analysis.coverage.line.CoverageTokenGenerator;
+import org.codedefenders.analysis.coverage.line.CoverageTokenVisitor;
+import org.codedefenders.analysis.coverage.line.CoverageTokens;
 import org.codedefenders.analysis.coverage.line.DetailedLine;
 import org.codedefenders.analysis.coverage.line.DetailedLineCoverage;
 import org.codedefenders.analysis.coverage.line.NewLineCoverage;
@@ -39,19 +45,23 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.stmt.BlockStmt;
 
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.codedefenders.util.JavaParserUtils.beginOf;
+import static org.codedefenders.util.JavaParserUtils.endOf;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 /**
- * <p>Adapted from the JaCoCo "CoreTutorial" API example.
+ * Adapted from the JaCoCo "CoreTutorial" API example.
  * See https://www.jacoco.org/jacoco/trunk/doc/api.html
  *
  * <p>Coverage and HTML output for easier debugging can be enabled in {@link CoverageOutputWriter}.
  */
 public class CoverageTest {
-    public final static String RESOURCE_DIR = "org/codedefenders/analysis/coverage";
+    public static final String RESOURCE_DIR = "org/codedefenders/analysis/coverage";
 
     @BeforeEach
     public void checkJavaVersion() {
@@ -102,10 +112,33 @@ public class CoverageTest {
         CompilationUnit compilationUnit = JavaParserUtils.parse(classCode)
                 .orElseThrow(() -> new Exception("Could not parse fixture source code."));
 
+        CoverageTokenGenerator coverageTokenGenerator = new CoverageTokenGenerator() {
+            @Override
+            protected CoverageTokenVisitor getNewCoverageTokenVisitor(AstCoverage astCoverage,
+                                                                   CoverageTokens coverageTokens) {
+                return new CoverageTokenVisitor(astCoverage, coverageTokens) {
+                    /**
+                     * Enables code comments that control the generated coverage.
+                     */
+                    @Override
+                    protected void visitBlockStmt(BlockStmt block, CoverageTokens.TokenInserter i) {
+                        boolean ignoreEndStatus = block.getOrphanComments().stream()
+                                .map(Comment::getContent)
+                                .anyMatch(content -> content.matches("\\s*block:\\s*ignore_end_status\\s*"));
+                        handleBlock(i,
+                                block.getStatements(),
+                                astCoverage.get(block),
+                                beginOf(block),
+                                endOf(block),
+                                ignoreEndStatus);
+                    }
+                };
+            }
+        };
+
         // transform the coverage
-        CoverageGenerator coverageGenerator = new CoverageGenerator() {{
-            testMode = true;
-        }};
+        CoverageGenerator coverageGenerator = new CoverageGenerator(new AstCoverageGenerator(), coverageTokenGenerator,
+                new CoverageTokenAnalyser());
         CoverageGeneratorResult result = coverageGenerator.generate(originalCoverage, compilationUnit);
 
         // write HTML report if enabled

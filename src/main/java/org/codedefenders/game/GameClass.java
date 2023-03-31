@@ -22,18 +22,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.model.Dependency;
 import org.codedefenders.service.ClassAnalysisService;
 import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
@@ -240,20 +235,6 @@ public class GameClass {
 
     public String getAsHTMLEscapedString() {
         return StringEscapeUtils.escapeHtml4(getSourceCode());
-    }
-
-    /**
-     * Returns a mapping of dependency class names and its HTML escaped class content.
-     */
-    public Map<String, String> getHTMLEscapedDependencyCode() {
-        return GameClassDAO.getMappedDependenciesForClassId(id)
-                .stream()
-                .map(Dependency::getJavaFile)
-                .map(Paths::get)
-                .collect(Collectors.toMap(
-                        FileUtils::extractFileNameNoExtension,
-                        FileUtils::readJavaFileWithDefaultHTMLEscaped)
-                );
     }
 
     private void createTestTemplate() {

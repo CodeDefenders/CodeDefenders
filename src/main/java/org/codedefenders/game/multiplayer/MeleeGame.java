@@ -345,23 +345,6 @@ public class MeleeGame extends AbstractGame {
         return !requiresValidation || userRepository.getUserById(userId).map(UserEntity::isValidated).orElse(false);
     }
 
-    public boolean addPlayer(int userId) {
-        if (canJoinGame(userId) && addPlayerForce(userId, Role.PLAYER)) {
-            Optional<UserEntity> u = userRepository.getUserById(userId);
-            final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined melee game", EventType.PLAYER_JOINED,
-                    EventStatus.GAME, timestamp);
-            eventDAO.insert(e);
-            Event notif = new Event(-1, id, userId, "You joined melee game", EventType.PLAYER_JOINED, EventStatus.NEW,
-                    timestamp);
-            eventDAO.insert(notif);
-            //
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     @Override
     public boolean addPlayer(int userId, Role role) {
         return canJoinGame(userId) && addPlayerForce(userId, role);
@@ -375,6 +358,14 @@ public class MeleeGame extends AbstractGame {
         if (!GameDAO.addPlayerToGame(id, userId, role)) {
             return false;
         }
+        Optional<UserEntity> u = userRepository.getUserById(userId);
+        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        Event e = new Event(-1, id, userId, u.map(UserEntity::getUsername).orElse("") + " joined melee game", EventType.PLAYER_JOINED,
+                EventStatus.GAME, timestamp);
+        eventDAO.insert(e);
+        Event notif = new Event(-1, id, userId, "You joined melee game", EventType.PLAYER_JOINED, EventStatus.NEW,
+                timestamp);
+        eventDAO.insert(notif);
 
         return true;
     }

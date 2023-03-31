@@ -203,7 +203,7 @@ class GameChat {
          * Fetches the messages for the game from the API and adds them.
          */
         async fetch () {
-            const response = await fetch(`api/game-chat?gameId=${this.gameChat._gameId}&limit=1000`, {
+            const response = await fetch(`${contextPath}api/game-chat?gameId=${this.gameChat._gameId}&limit=1000`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

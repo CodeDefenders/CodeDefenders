@@ -29,7 +29,6 @@ import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -66,8 +65,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 @Named("adminCreateGames")
 @SessionScoped
 public class AdminCreateGamesBean implements Serializable {
-
-    private final Object synchronizer = new Object();
+    private final Object synchronizer = new Serializable() {};
     private final CodeDefendersAuth login;
     private final MessagesBean messages;
     private final GameManagingUtils gameManagingUtils;

@@ -40,7 +40,7 @@ public class UserEntity implements Serializable {
 
     private int id;
     private String username;
-    private transient String encodedPassword;
+    private String encodedPassword;
     private String email;
     private boolean validated;
     private boolean active;

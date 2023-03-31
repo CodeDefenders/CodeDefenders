@@ -77,6 +77,9 @@ public class HistoryBean {
                 userMessage += "finished game";
                 break;
             case PLAYER_JOINED:
+                if (e.getEventStatus() == EventStatus.NEW) {
+                    return null;
+                }
                 userMessage += "joined";
                 colour = "blue";
                 break;

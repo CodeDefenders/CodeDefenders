@@ -18,8 +18,11 @@
  */
 package org.codedefenders.analysis.coverage.line;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.codedefenders.analysis.coverage.line.CoverageTokens.Token;
 
+@ApplicationScoped
 public class CoverageTokenAnalyser {
     public SimpleLineCoverage analyse(CoverageTokens tokens) {
         SimpleLineCoverage coverage = new SimpleLineCoverage();
@@ -30,7 +33,7 @@ public class CoverageTokenAnalyser {
         return coverage;
     }
 
-    public LineCoverageStatus analyse(Token token) {
+    private LineCoverageStatus analyse(Token token) {
         State state = analyse(token, State.defaultState());
         return state.status;
     }

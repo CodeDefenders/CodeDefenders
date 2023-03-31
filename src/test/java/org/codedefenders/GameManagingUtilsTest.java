@@ -76,10 +76,10 @@ public class GameManagingUtilsTest {
         Mockito.reset(mockedTestSmellDAO);
     }
 
-    // https://github.com/weld/weld-junit/blob/master/junit4/README.md
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    // https://github.com/weld/weld-junit/blob/master/junit4/README.md
     @Rule
     public WeldInitiator weld = WeldInitiator
             .from(GameManagingUtils.class,

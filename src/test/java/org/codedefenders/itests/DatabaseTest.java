@@ -22,7 +22,6 @@ package org.codedefenders.itests;
 import java.sql.Connection;
 import java.sql.Timestamp;
 
-import org.codedefenders.DatabaseRule;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -41,7 +40,6 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -51,7 +49,6 @@ import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -66,7 +63,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
-import static org.mockito.Mockito.mock;
 
 /**
  * @author Jose Rojas
@@ -113,15 +109,16 @@ public class DatabaseTest {
 
     // This will re-create the same DB from scratch every time... is this really
     // necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
-    @Rule
-    public DatabaseRule db = new DatabaseRule();
+    // TODO(Alex): Migrate to /src/integration/ and convert to proper Database Test
+    //@Rule
+    //public DatabaseRule db = new DatabaseRule();
 
     @Before
     public void mockDBConnections() throws Exception {
         PowerMockito.mockStatic(DatabaseConnection.class);
         PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer((Answer<Connection>) invocation -> {
             // Return a new connection from the rule instead
-            return db.getConnection();
+            return null; //db.getConnection();
         });
     }
 
@@ -232,7 +229,7 @@ public class DatabaseTest {
     @Ignore
     @Test
     public void testInsertPlayer() throws Exception {
-        UserRepository userRepo = new UserRepository(db.getQueryRunner(), mock(MetricsRegistry.class));
+        UserRepository userRepo = null; //new UserRepository(db.getQueryRunner(), mock(MetricsRegistry.class));
 
         assumeTrue(creator.insert());
         assumeTrue(user1.insert());

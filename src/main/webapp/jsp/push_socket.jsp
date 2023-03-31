@@ -35,7 +35,7 @@
     import {objects, PushSocket} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
 
-    const baseWsUri = document.baseURI
+    const baseWsUri = '${url.getAbsoluteURLForPath("/")}'
             .replace(/^http/, 'ws')
             .replace(/\/$/, '');
     const ticket = '${requestScope[TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME]}';

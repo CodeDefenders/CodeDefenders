@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -32,8 +30,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UncheckedSQLException;
@@ -131,24 +127,12 @@ public class Test {
     }
 
     // TODO Check that increment score does not consider mutants that were killed already
+    /**
+     * @deprecated Use {@link TestDAO#incrementTestScore(Test, int)} instead.
+     */
+    @Deprecated
     public void incrementScore(int score) {
-        if (score == 0) {
-            // Why this is happening?
-            // Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
-            logger.warn("Do not increment score for test {} when score is zero", getId());
-            return;
-        }
-
-        String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
-        Connection conn = DB.getConnection();
-
-        DatabaseValue<?>[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
-
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        boolean incremented = DB.executeUpdate(stmt, conn);
-
-        logger.info("Increment score for {} by {}. Update? {} ", this, score, incremented);
+        TestDAO.incrementTestScore(this, score);
     }
 
     @Deprecated
@@ -181,29 +165,20 @@ public class Test {
         return file.getAbsoluteFile().getParent();
     }
 
+    public void setMutantsKilled(int mutantsKilled) {
+        this.mutantsKilled = mutantsKilled;
+    }
+
     // Increment the number of mutant killed directly on the DB
     // And update the local object. But it requires several queries/connections
     //
     // TODO Check that this method is never called for tests that kill a mutant that was already dead...
+    /**
+     * @deprecated Use {@link TestDAO#killMutant(Test)} instead.
+     */
+    @Deprecated
     public void killMutant() {
-        // TODO Phil 06/08/19: Why isn't the out-commented code called?
-        // mutantsKilled++;
-        // update();
-        logger.info("Test {} killed a new mutant", getId());
-
-        String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
-        Connection conn = DB.getConnection();
-
-        DatabaseValue<?>[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
-
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        boolean updated = DB.executeUpdate(stmt, conn);
-
-        // Eventually update the kill count from the DB
-        mutantsKilled = TestDAO.getTestById(getId()).getMutantsKilled();
-
-        logger.info("Test {} new killcount is {}. Was updated ? {} ", this, mutantsKilled, updated);
+        TestDAO.killMutant(this);
     }
 
     public boolean isMutantCovered(Mutant mutant) {

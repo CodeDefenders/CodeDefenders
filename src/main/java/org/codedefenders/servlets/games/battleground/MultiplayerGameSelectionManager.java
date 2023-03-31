@@ -122,7 +122,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         final String action = formType(request);
 
         if (!action.equals("createGame")) {
-            MultiplayerGame game = gameProducer.getGame();
+            MultiplayerGame game = gameProducer.getMultiplayerGame();
             if (game == null) {
                 logger.error("No game or wrong type of game found. Aborting request.");
                 Redirect.redirectBack(request, response);
@@ -221,7 +221,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final boolean canJoinGames = AdminDAO.getSystemSetting(GAME_JOINING).getBoolValue();
-        final MultiplayerGame game = gameProducer.getGame();
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
 
         if (!canJoinGames) {
             logger.warn("User {} tried to join a battleground game, but joining games is not permitted.", login.getUserId());
@@ -283,7 +283,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final MultiplayerGame game = gameProducer.getGame();
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
         int gameId = game.getId();
 
         final boolean removalSuccess = game.removePlayer(login.getUserId());
@@ -318,7 +318,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void startGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final MultiplayerGame game = gameProducer.getGame();
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can start the game.");
@@ -344,7 +344,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final MultiplayerGame game = gameProducer.getGame();
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
 
         if (game.getCreatorId() != login.getUserId()) {
             messages.add("Only the game's creator can end the game.");
@@ -404,7 +404,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void rematch(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        MultiplayerGame oldGame = gameProducer.getGame();
+        MultiplayerGame oldGame = gameProducer.getMultiplayerGame();
 
         if (login.getUser().getId() != oldGame.getCreatorId()) {
             messages.add("Only the creator of this game can call a rematch.");
@@ -452,7 +452,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     }
 
     private void changeDuration(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final MultiplayerGame game = gameProducer.getGame();
+        final MultiplayerGame game = gameProducer.getMultiplayerGame();
 
         if (login.getUser().getId() != game.getCreatorId()) {
             messages.add("Only the creator of this game can change its duration.");
