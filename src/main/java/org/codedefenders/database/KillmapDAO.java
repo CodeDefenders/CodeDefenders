@@ -308,7 +308,7 @@ public class KillmapDAO {
                 "SELECT ID, Mode",
                 "FROM games",
                 "WHERE ID >= 0",
-                "  AND (Mode = 'DUEL' OR MODE = 'PARTY')",
+                "  AND (Mode = 'DUEL' OR MODE = 'PARTY' OR MODE = 'MELEE')",
                 "  AND NOT EXISTS (",
                 "     SELECT *",
                 "     FROM killmapjob",
