@@ -78,7 +78,7 @@ class KillMapMutantAccordion extends KillMapAccordion {
                     language: {
                         emptyTable: category.id === 'all'
                             ? 'No tests.'
-                            : 'No tests cover this method.',
+                            : "This mutant isn't covered by any tests",
                         zeroRecords: 'No tests match the selected category and filter.'
                     },
                     createdRow: function (row, data, index) {
