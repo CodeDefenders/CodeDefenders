@@ -19,6 +19,7 @@
 
 --%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -43,84 +44,37 @@
         <h2 class="mb-3" id="stats">Player Statistics</h2>
 
         <div class="dashboards">
-            <div class="dashboard-box dashboard-mutants">
-                <h3>Mutants created</h3>
-                <div class="pie animate no-round ${profile.stats.totalMutants == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.aliveMutantsPercentage}">
-                    ${profile.stats.totalMutants}
-                </div>
+            <t:dashboard_pie
+                    type="mutants" title="Mutants created"
+                    total="${profile.stats.totalMutants}"
+                    percentage="${profile.stats.aliveMutantsPercentage}"
+                    label1="Mutants still alive:" value1="${profile.stats.aliveMutants}"
+                    label2="Killed mutants:" value2="${profile.stats.killedMutants}"
+            />
 
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">Mutants still alive:</span>
-                        <span class="legend-value">${profile.stats.aliveMutants}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">Killed mutants:</span>
-                        <span class="legend-value">${profile.stats.killedMutants}</span>
-                    </div>
-                </div>
-            </div>
+            <t:dashboard_pie
+                    type="tests" title="Tests written"
+                    total="${profile.stats.totalTests}"
+                    percentage="${profile.stats.killingTestsPercentage}"
+                    label1="Tests that killed mutants:" value1="${profile.stats.killingTests}"
+                    label2="Non-killing tests:" value2="${profile.stats.nonKillingTests}"
+            />
 
-            <div class="dashboard-box dashboard-tests">
-                <h3>Tests written</h3>
+            <t:dashboard_pie
+                    type="points" title="Points earned"
+                    total="${profile.stats.totalPoints}"
+                    percentage="${profile.stats.testPointsPercentage}"
+                    label1="By writing tests:" value1="${profile.stats.totalPointsTests}"
+                    label2="By creating mutants:" value2="${profile.stats.totalPointsMutants}"
+            />
 
-                <div class="pie animate no-round ${profile.stats.totalTests == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.killingTestsPercentage}">
-                    ${profile.stats.totalTests}
-                </div>
-
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">Tests that killed mutants:</span>
-                        <span class="legend-value">${profile.stats.killingTests}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">Non-killing tests:</span>
-                        <span class="legend-value">${profile.stats.nonKillingTests}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-box dashboard-points">
-                <h3>Points earned</h3>
-
-                <div class="pie animate no-round ${profile.stats.totalPoints == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.testPointsPercentage}">
-                    ${profile.stats.totalPoints}
-                </div>
-
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">By writing tests:</span>
-                        <span class="legend-value">${profile.stats.totalPointsTests}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">By creating mutants:</span>
-                        <span class="legend-value">${profile.stats.totalPointsMutants}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-box dashboard-games">
-                <h3>Games played</h3>
-
-                <div class="pie animate no-round ${profile.stats.totalGames == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.defenderGamesPercentage}">
-                    ${profile.stats.totalGames}
-                </div>
-
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">As defender:</span>
-                        <span class="legend-value">${profile.stats.defenderGames}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">As attacker:</span>
-                        <span class="legend-value">${profile.stats.attackerGames}</span>
-                    </div>
-                </div>
-            </div>
+            <t:dashboard_pie
+                    type="games" title="Games played"
+                    total="${profile.stats.totalGames}"
+                    percentage="${profile.stats.defenderGamesPercentage}"
+                    label1="As defender:" value1="${profile.stats.defenderGames}"
+                    label2="As attacker:" value2="${profile.stats.attackerGames}"
+            />
         </div>
 
         <dl class="other-stats mt-3">
