@@ -39,8 +39,11 @@
 }
 
 /* Indent inner accordions */
-#kill-map-mutant-accordion .accordion:not(.empty) {
-    padding-inline-start: .6rem;
+#kill-map-mutant-accordion .accordion {
+    padding-inline-start: 1rem;
+    padding-inline-end: 1rem;
+    padding-bottom: 1rem;
+    padding-top: .5rem;
 }
 
 #kill-map-mutant-accordion .accordion-body {
