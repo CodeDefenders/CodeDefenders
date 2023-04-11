@@ -86,7 +86,7 @@
                             <c:if test="${category.testIds.size() == 0}">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
-                                        <p class="text-center m-0">No tests in this category.</p>
+                                        <p class="text-center m-0 py-1">No tests in this category.</p>
                                     </div>
                                 </div>
                             </c:if>
@@ -114,7 +114,7 @@
                                                 ${test.killedMutantIds.size()}
                                             </span>
                                             <span class="kta-col">
-                                                <span class="kta-column-name">Points:</span>
+                                                <span class="kta-column-name mx-2">Points:</span>
                                                 ${test.points}
                                             </span>
                                             <span class="kta-col">

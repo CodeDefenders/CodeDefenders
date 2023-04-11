@@ -88,7 +88,7 @@
                             <c:if test="${category.mutantIds.size() == 0}">
                                 <div class="accordion-item">
                                     <div class="accordion-header">
-                                        <p class="text-center m-0">No mutants in this category.</p>
+                                        <p class="text-center m-0 py-1">No mutants in this category.</p>
                                     </div>
                                 </div>
                             </c:if>
@@ -126,7 +126,7 @@
                                                 ${mutant.description}
                                             </span>
                                             <span class="kma-col">
-                                                <span class="kma-column-name">Points:</span>
+                                                <span class="kma-column-name mx-2">Points:</span>
                                                 ${mutant.points}
                                             </span>
                                             <span class="kta-col">
