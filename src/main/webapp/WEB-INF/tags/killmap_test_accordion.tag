@@ -96,8 +96,7 @@
                                         id="kta-heading-category-${category.id}-test-${test.id}">
                                         <button class="${category.testIds.size() == 0 ? "" : 'kta-covered'}
                                                         accordion-button collapsed"
-                                                type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#kta-collapse-category-${category.id}-test-${test.id}"
+                                                type="button" role="button"
                                                 aria-controls="kta-collapse-category-${category.id}-test-${test.id}">
                                             <span class="kta-test-link">
                                                 Test ${test.id}
@@ -118,6 +117,11 @@
                                                 <span class="kta-column-name">Points:</span>
                                                 ${test.points}
                                             </span>
+                                            <span class="kta-col">
+                                                <span class="btn btn-xs btn-primary kta-view-test-button">
+                                                    View
+                                                </span>
+                                            </span>
                                         </button>
                                     </h3>
                                     <div class="accordion-collapse collapse"
@@ -126,9 +130,6 @@
                                          aria-expanded="false"
                                          aria-labelledby="kta-heading-category-${category.id}-test-${test.id}">
                                         <div class="accordion-body p-0">
-                                            <div class="kta-test-details">
-                                                <small><a role="button" class="kta-view-button">View Test</a></small>
-                                            </div>
                                             <table id="kta-table-category-${category.id}-test-${test.id}"
                                                    class="table table-sm"></table>
                                         </div>

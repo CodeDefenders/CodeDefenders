@@ -98,8 +98,7 @@
                                         id="kma-heading-category-${category.id}-mutant-${mutant.id}">
                                         <button class="${category.testIds.size() == 0 ? "" : 'kma-covered'}
                                                         accordion-button collapsed"
-                                                type="button" role="button" data-bs-toggle="collapse"
-                                                data-bs-target="#kma-collapse-category-${category.id}-mutant-${mutant.id}"
+                                                type="button" role="button"
                                                 aria-controls="kma-collapse-category-${category.id}-mutant-${mutant.id}">
                                             <c:set var="state" value="${mutant.state}"/>
                                             <c:choose>
@@ -130,6 +129,16 @@
                                                 <span class="kma-column-name">Points:</span>
                                                 ${mutant.points}
                                             </span>
+                                            <span class="kta-col">
+                                                <span class="btn btn-xs btn-primary kta-view-mutant-button">
+                                                    View
+                                                </span>
+                                                <c:if test="${state == 'KILLED'}">
+                                                    <span class="btn btn-xs btn-secondary kta-view-killing-test-button">
+                                                        View Killing Test
+                                                    </span>
+                                                </c:if>
+                                            </span>
                                         </button>
                                     </h3>
                                     <div class="accordion-collapse collapse"
@@ -138,13 +147,6 @@
                                          aria-expanded="false"
                                          aria-labelledby="kma-heading-category-${category.id}-mutant-${mutant.id}">
                                         <div class="accordion-body p-0">
-                                            <div class="kma-mutant-details">
-                                                <small><a role="button" class="kma-view-button">View Mutant</a></small>
-                                                <c:if test="${mutant.state == 'KILLED'}">
-                                                    <small><a role="button"
-                                                              class="kma-view-test-button">View Killing Test</a></small>
-                                                </c:if>
-                                            </div>
                                             <table id="kma-table-category-${category.id}-mutant-${mutant.id}"
                                                    class="table table-sm"></table>
                                         </div>

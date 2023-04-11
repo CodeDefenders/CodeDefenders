@@ -1,3 +1,4 @@
+import {Collapse} from '../thirdparty/bootstrap';
 import DataTable from '../thirdparty/datatables';
 import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
 import {Popover} from "../thirdparty/bootstrap";
@@ -34,9 +35,16 @@ class KillMapTestAccordion extends KillMapAccordion {
                 const identifier = `category-${category.id}-test-${testId}`;
                 const test = self._tests.get(testId);
 
-                /* Init "View test" button. */
-                const btn = categoryAccordion.querySelector(`#kta-collapse-${identifier} .kta-view-button`);
-                if (btn) btn.addEventListener('click', self._viewTestModal.bind(self, test));
+                /* Init "View test" button and accordion trigger. */
+                const headingElem = categoryAccordion.querySelector(`#kta-heading-${identifier}`);
+                const collapseElem = categoryAccordion.querySelector(`#kta-collapse-${identifier}`);
+                headingElem.addEventListener('click', function (event) {
+                    if (event.target.classList.contains('kta-view-test-button')) {
+                        self._viewTestModal(test);
+                    } else {
+                        Collapse.getOrCreateInstance(collapseElem).toggle();
+                    }
+                });
 
                 /* Create the DataTable. */
                 const tableElement = categoryAccordion.querySelector(`#kta-table-${identifier}`);

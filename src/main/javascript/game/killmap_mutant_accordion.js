@@ -1,3 +1,4 @@
+import {Collapse} from '../thirdparty/bootstrap';
 import DataTable from '../thirdparty/datatables';
 import {InfoApi, LoadingAnimation, Modal, objects} from '../main';
 import {Popover} from "../thirdparty/bootstrap";
@@ -37,14 +38,19 @@ class KillMapMutantAccordion extends KillMapAccordion {
                 const identifier = `category-${category.id}-mutant-${mutantId}`;
                 const mutant = self._mutants.get(mutantId);
 
-                /* Init "View mutant" button. */
-                let btn = categoryAccordion.querySelector(`#kma-collapse-${identifier} .kma-view-button`);
-                if (btn) btn.addEventListener('click', self._viewMutantModal.bind(self, mutant));
-
-                /* Init "View killing test" button. */
-                const killingTest = self._tests.get(mutant.killedByTestId);
-                btn = categoryAccordion.querySelector(`#kma-collapse-${identifier} .kma-view-test-button`);
-                if (btn) btn.addEventListener('click', self._viewMutantTestModal.bind(self, mutant, killingTest));
+                /* Init "View mutant" / "View killing test" buttons and accordion trigger. */
+                const headingElem = categoryAccordion.querySelector(`#kma-heading-${identifier}`);
+                const collapseElem = categoryAccordion.querySelector(`#kma-collapse-${identifier}`);
+                headingElem.addEventListener('click', function (event) {
+                    if (event.target.classList.contains('kta-view-mutant-button')) {
+                        self._viewMutantModal(mutant);
+                    } else if (event.target.classList.contains('kta-view-killing-test-button')) {
+                        const killingTest = self._tests.get(mutant.killedByTestId);
+                        self._viewMutantTestModal(mutant, killingTest);
+                    } else {
+                        Collapse.getOrCreateInstance(collapseElem).toggle();
+                    }
+                });
 
                 /* Create the DataTable. */
                 const tableElement = categoryAccordion.querySelector(`#kma-table-${identifier}`);
