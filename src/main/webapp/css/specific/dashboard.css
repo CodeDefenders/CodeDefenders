@@ -25,17 +25,15 @@
 
 .pie::before {
     inset: 0;
-    /* anti-aliasing by using a small gradient instead of instant color change: */
-    --smoothing-percentage: .15;
-    --secondary-percentage: calc(100 - var(--percentage));
+    --secondary-percentage: calc((100 - var(--percentage)) * 1%);
     background: radial-gradient(
             farthest-side,
             var(--color-secondary) 98%,
             #0000
     ) top/var(--border-width) var(--border-width) no-repeat,
     conic-gradient(
-            var(--color-secondary) calc((var(--secondary-percentage) * 1%)),
-            var(--color-primary, #0000) calc((var(--secondary-percentage) + var(--smoothing-percentage)) * 1%));
+            var(--color-secondary) var(--secondary-percentage),
+            var(--color-primary, #0000) var(--secondary-percentage));
     -webkit-mask: radial-gradient(
             farthest-side,
             #0000 calc(99% - var(--border-width)),
