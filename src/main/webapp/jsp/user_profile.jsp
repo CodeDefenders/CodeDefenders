@@ -42,10 +42,11 @@
 <div class="container">
     <h1>${pageInfo.pageTitle}</h1>
 
-    <section class="mt-5 statistics" aria-labelledby="stats">
-        <h2 class="mb-3" id="stats-multiplayer">Player Statistics for Multiplayer Games</h2>
+    <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
+        <h2 class="mb-3" id="stats-multiplayer">Statistics for Multiplayer Games</h2>
 
         <div class="dashboards">
+            <%--@elvariable id="stats" type="org.codedefenders.dto.UserStats"--%>
             <c:set var="stats" value="${profile.stats.get(GameType.MULTIPLAYER)}"/>
 
             <t:dashboard_pie
@@ -88,8 +89,10 @@
             <dt>Average points per mutant:</dt>
             <dd>${stats.avgPointsMutants}</dd>
         </dl>
+    </section>
 
-        <h2 class="mb-3" id="stats-melee">Player Statistics for Melee Games</h2>
+    <section class="mt-5 statistics" aria-labelledby="stats-melee">
+        <h2 class="mb-3" id="stats-melee">Statistics for Melee Games</h2>
 
         <div class="dashboards">
             <c:set var="stats" value="${profile.stats.get(GameType.MELEE)}"/>
