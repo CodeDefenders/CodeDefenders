@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.game.GameType" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
@@ -41,48 +43,96 @@
     <h1>${pageInfo.pageTitle}</h1>
 
     <section class="mt-5 statistics" aria-labelledby="stats">
-        <h2 class="mb-3" id="stats">Player Statistics</h2>
+        <h2 class="mb-3" id="stats-multiplayer">Player Statistics for Multiplayer Games</h2>
 
         <div class="dashboards">
+            <c:set var="stats" value="${profile.stats.get(GameType.MULTIPLAYER)}"/>
+
             <t:dashboard_pie
                     type="mutants" title="Mutants created"
-                    total="${profile.stats.totalMutants}"
-                    percentage="${profile.stats.aliveMutantsPercentage}"
-                    label1="Mutants still alive:" value1="${profile.stats.aliveMutants}"
-                    label2="Killed mutants:" value2="${profile.stats.killedMutants}"
+                    total="${stats.totalMutants}"
+                    percentage="${stats.aliveMutantsPercentage}"
+                    label1="Mutants still alive:" value1="${stats.aliveMutants}"
+                    label2="Killed mutants:" value2="${stats.killedMutants}"
             />
 
             <t:dashboard_pie
                     type="tests" title="Tests written"
-                    total="${profile.stats.totalTests}"
-                    percentage="${profile.stats.killingTestsPercentage}"
-                    label1="Tests that killed mutants:" value1="${profile.stats.killingTests}"
-                    label2="Non-killing tests:" value2="${profile.stats.nonKillingTests}"
+                    total="${stats.totalTests}"
+                    percentage="${stats.killingTestsPercentage}"
+                    label1="Tests that killed mutants:" value1="${stats.killingTests}"
+                    label2="Non-killing tests:" value2="${stats.nonKillingTests}"
             />
 
             <t:dashboard_pie
                     type="points" title="Points earned"
-                    total="${profile.stats.totalPoints}"
-                    percentage="${profile.stats.testPointsPercentage}"
-                    label1="By writing tests:" value1="${profile.stats.totalPointsTests}"
-                    label2="By creating mutants:" value2="${profile.stats.totalPointsMutants}"
+                    total="${stats.totalPoints}"
+                    percentage="${stats.testPointsPercentage}"
+                    label1="By writing tests:" value1="${stats.totalPointsTests}"
+                    label2="By creating mutants:" value2="${stats.totalPointsMutants}"
             />
 
             <t:dashboard_pie
                     type="games" title="Games played"
-                    total="${profile.stats.totalGames}"
-                    percentage="${profile.stats.defenderGamesPercentage}"
-                    label1="As defender:" value1="${profile.stats.defenderGames}"
-                    label2="As attacker:" value2="${profile.stats.attackerGames}"
+                    total="${stats.totalGames}"
+                    percentage="${stats.defenderGamesPercentage}"
+                    label1="As defender:" value1="${stats.defenderGames}"
+                    label2="As attacker:" value2="${stats.attackerGames}"
             />
         </div>
 
         <dl class="other-stats mt-3">
             <dt>Average points per tests:</dt>
-            <dd>${profile.stats.avgPointsTests}</dd>
+            <dd>${stats.avgPointsTests}</dd>
 
             <dt>Average points per mutant:</dt>
-            <dd>${profile.stats.avgPointsMutants}</dd>
+            <dd>${stats.avgPointsMutants}</dd>
+        </dl>
+
+        <h2 class="mb-3" id="stats-melee">Player Statistics for Melee Games</h2>
+
+        <div class="dashboards">
+            <c:set var="stats" value="${profile.stats.get(GameType.MELEE)}"/>
+
+            <t:dashboard_pie
+                    type="mutants" title="Mutants created"
+                    total="${stats.totalMutants}"
+                    percentage="${stats.aliveMutantsPercentage}"
+                    label1="Mutants still alive:" value1="${stats.aliveMutants}"
+                    label2="Killed mutants:" value2="${stats.killedMutants}"
+            />
+
+            <t:dashboard_pie
+                    type="tests" title="Tests written"
+                    total="${stats.totalTests}"
+                    percentage="${stats.killingTestsPercentage}"
+                    label1="Tests that killed mutants:" value1="${stats.killingTests}"
+                    label2="Non-killing tests:" value2="${stats.nonKillingTests}"
+            />
+
+            <t:dashboard_pie
+                    type="points" title="Points earned"
+                    total="${stats.totalPoints}"
+                    percentage="${stats.testPointsPercentage}"
+                    label1="By writing tests:" value1="${stats.totalPointsTests}"
+                    label2="By creating mutants:" value2="${stats.totalPointsMutants}"
+            />
+
+            <t:dashboard_pie
+                    type="games" title="Games played"
+                    total="${stats.totalGames}"
+                    percentage="${stats.defenderGamesPercentage}"
+                    label1="As defender:" value1="${stats.defenderGames}"
+                    label2="As attacker:" value2="${stats.attackerGames}"
+            />
+        </div>
+
+        <dl class="other-stats mt-3">
+            <dt>Average points per tests:</dt>
+            <dd>${stats.avgPointsTests}</dd>
+
+            <dt>Average points per mutant:</dt>
+            <dd>${stats.avgPointsMutants}</dd>
         </dl>
     </section>
 

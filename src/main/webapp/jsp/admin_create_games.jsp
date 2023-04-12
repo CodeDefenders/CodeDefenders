@@ -23,10 +23,10 @@
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.beans.admin.AdminCreateGamesBean" %>
-<%@ page import="org.codedefenders.beans.admin.StagedGameList" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidator" %>
+<%@ page import="org.codedefenders.game.GameType" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -119,14 +119,17 @@
                                 <label class="form-label" for="gameType-group">Game Type</label>
                                 <div id="gameType-group">
                                     <div class="form-check">
-                                        <input type="radio" class="form-check-input" id="gameType-radio-battleground" name="gameType"
-                                               value="<%=StagedGameList.GameSettings.GameType.MULTIPLAYER%>"
+                                        <input type="radio" class="form-check-input" id="gameType-radio-battleground"
+                                               name="gameType"
+                                               value="<%=GameType.MULTIPLAYER%>"
                                                checked>
-                                        <label class="form-check-label" for="gameType-radio-battleground">Battleground</label>
+                                        <label class="form-check-label"
+                                               for="gameType-radio-battleground">Battleground</label>
                                     </div>
                                     <div class="form-check">
-                                        <input type="radio" class="form-check-input" id="gameType-radio-melee" name="gameType"
-                                               value="<%=StagedGameList.GameSettings.GameType.MELEE%>">
+                                        <input type="radio" class="form-check-input" id="gameType-radio-melee"
+                                               name="gameType"
+                                               value="<%=GameType.MELEE%>">
                                         <label class="form-check-label" for="gameType-radio-melee">Melee</label>
                                     </div>
                                 </div>

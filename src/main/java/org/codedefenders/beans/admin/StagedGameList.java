@@ -13,14 +13,15 @@ import java.util.Set;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
 
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
 import static org.codedefenders.game.GameLevel.HARD;
+import static org.codedefenders.game.GameType.MULTIPLAYER;
 import static org.codedefenders.game.Role.OBSERVER;
 import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
 
@@ -480,19 +481,5 @@ public class StagedGameList implements Serializable {
             return gameSettings;
         }
 
-        public enum GameType {
-            MULTIPLAYER("Multiplayer"),
-            MELEE("Melee");
-
-            private final String name;
-
-            GameType(String name) {
-                this.name = name;
-            }
-
-            public String getName() {
-                return name;
-            }
-        }
     }
 }

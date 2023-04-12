@@ -1,9 +1,12 @@
 package org.codedefenders.beans.user;
 
+import java.util.Map;
+
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 
 import org.codedefenders.dto.UserStats;
+import org.codedefenders.game.GameType;
 import org.codedefenders.model.UserEntity;
 
 /**
@@ -13,7 +16,7 @@ import org.codedefenders.model.UserEntity;
 @ManagedBean
 public class UserProfileBean {
     private UserEntity user;
-    private UserStats stats;
+    private Map<GameType, UserStats> stats;
     private boolean isSelf;
 
     /**
@@ -26,9 +29,10 @@ public class UserProfileBean {
 
     /**
      * Statistics of {@link UserProfileBean#getUser()}.
+     *
      * @return the user statistics shown on the profile page.
      */
-    public UserStats getStats() {
+    public Map<GameType, UserStats> getStats() {
         return stats;
     }
 
@@ -44,7 +48,7 @@ public class UserProfileBean {
         this.user = user;
     }
 
-    public void setStats(UserStats userStats) {
+    public void setStats(Map<GameType, UserStats> userStats) {
         this.stats = userStats;
     }
 

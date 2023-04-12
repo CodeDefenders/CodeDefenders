@@ -46,6 +46,7 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
@@ -58,7 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static java.text.MessageFormat.format;
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MELEE;
+import static org.codedefenders.game.GameType.MELEE;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 
 /**
@@ -151,7 +152,7 @@ public class AdminCreateGames extends HttpServlet {
     private GameSettings extractGameSettings(HttpServletRequest request) {
         GameSettings gameSettings = new GameSettings();
         try {
-            gameSettings.setGameType(GameSettings.GameType.valueOf(request.getParameter("gameType")));
+            gameSettings.setGameType(GameType.valueOf(request.getParameter("gameType")));
             gameSettings.setCut(GameClassDAO.getClassForId(getIntParameter(request, "cut").get()));
             gameSettings.setWithMutants(request.getParameter("withMutants") != null);
             gameSettings.setWithTests(request.getParameter("withTests") != null);

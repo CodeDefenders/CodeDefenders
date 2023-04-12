@@ -19,6 +19,7 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -32,6 +33,7 @@ import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.user.UserProfileBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.dto.UserStats;
+import org.codedefenders.game.GameType;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.UserStatsService;
@@ -134,7 +136,7 @@ public class UserProfileManager extends HttpServlet {
 
         // load stats
         final UserEntity user = urlParamUser.orElseGet(login::getUserEntity);
-        final UserStats stats = userStatsService.getStatsByUserId(user.getId());
+        final Map<GameType, UserStats> stats = userStatsService.getStatsByUserId(user.getId());
 
         // Pass values to JSP page
         userProfileBean.setUser(user);
