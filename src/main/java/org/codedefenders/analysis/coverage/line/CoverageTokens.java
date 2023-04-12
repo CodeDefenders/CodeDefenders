@@ -373,11 +373,11 @@ public class CoverageTokens extends LineMapping<Deque<CoverageTokens.Token>> {
     }
 
     public static class Priority {
-        public final static int EMPTY = 0;
-        public final static int BLOCK = 1;
-        public final static int STMT = 2;
-        public final static int STMT_STRONG = 3;
-        public final static int OVERRIDE = 4;
+        public static final int EMPTY = 0;
+        public static final int BLOCK = 1;
+        public static final int STMT = 2;
+        public static final int STMT_STRONG = 3;
+        public static final int OVERRIDE = 4;
     }
 }
 

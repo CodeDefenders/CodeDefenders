@@ -28,12 +28,11 @@ import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.GameClass;
 import org.codedefenders.util.JavaParserUtils;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
@@ -115,6 +114,16 @@ public class ClassCodeAnalyser {
             signature = signature.substring(signature.indexOf(' ') + 1); // remove return type
             result.methodDescriptions.add(new MethodDescription(signature,
                     beginOf(methodDecl), endOf(methodDecl)));
+        }
+
+        @Override
+        public void visit(ConstructorDeclaration constrDecl, ClassAnalysisResult result) {
+            super.visit(constrDecl, result);
+
+            // Constructors always have a body.
+
+            String signature = constrDecl.getDeclarationAsString(false, false, false);
+            result.methodDescriptions.add(new MethodDescription(signature, beginOf(constrDecl), endOf(constrDecl)));
         }
     }
 

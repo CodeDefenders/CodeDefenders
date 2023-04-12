@@ -32,7 +32,11 @@ import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.persistence.database.util.QueryRunner;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles the database logic for mutants.
@@ -41,6 +45,7 @@ import org.codedefenders.util.FileUtils;
  * @see Mutant
  */
 public class MutantDAO {
+    private static final Logger logger = LoggerFactory.getLogger(MutantDAO.class);
 
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
@@ -440,5 +445,50 @@ public class MutantDAO {
                 DatabaseValue.of(mutant.getScore())
         };
         return DB.executeUpdateQuery(query, values);
+    }
+
+    public static void incrementMutantScore(Mutant mutant, int score) {
+        if (score == 0) {
+            logger.debug("Do not update mutant {} score by 0", mutant.getId());
+            return;
+        }
+
+        String query = "UPDATE mutants\n"
+                + "SET Points = Points + ?\n"
+                + "WHERE Mutant_ID=? AND Alive=1;";
+
+        try {
+            CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,
+                    score, mutant.getId());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean killMutant(Mutant mutant, Equivalence equivalence) {
+        mutant.setAlive(false);
+        int roundKilled = GameDAO.getCurrentRound(mutant.getGameId());
+        mutant.setRoundKilled(roundKilled);
+        mutant.setEquivalent(equivalence);
+
+        String query;
+        if (equivalence.equals(Equivalence.DECLARED_YES) || equivalence.equals(Equivalence.ASSUMED_YES)) {
+            // if mutant is equivalent, we need to set score to 0
+            query = "UPDATE mutants\n"
+                    + "SET Equivalent=?, Alive=?, RoundKilled=?, Points=0\n"
+                    + "WHERE Mutant_ID=? AND Alive=1;";
+        } else {
+            // We cannot update killed mutants
+            query = "UPDATE mutants\n"
+                    + "SET Equivalent=?, Alive=?, RoundKilled=?\n"
+                    + "WHERE Mutant_ID=? AND Alive=1;";
+        }
+
+        try {
+            return CDIUtil.getBeanFromCDI(QueryRunner.class).update(query,
+                    equivalence.name(), false, roundKilled, mutant.getId()) > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

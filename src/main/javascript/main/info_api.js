@@ -20,15 +20,15 @@ class InfoApi {
     }
 
     static async getClassInfo (classId) {
-        return await InfoApi.fetchJSON(`api/class?classId=${classId}`);
+        return await InfoApi.fetchJSON(`${contextPath}api/class?classId=${classId}`);
     }
 
     static async getMutantInfo (mutantId) {
-        return await InfoApi.fetchJSON(`api/mutant?mutantId=${mutantId}`);
+        return await InfoApi.fetchJSON(`${contextPath}api/mutant?mutantId=${mutantId}`);
     }
 
     static async getTestInfo (testId) {
-        return await InfoApi.fetchJSON(`api/test?testId=${testId}`);
+        return await InfoApi.fetchJSON(`${contextPath}api/test?testId=${testId}`);
     }
 
     static async setClassEditorValue (editor, classId) {

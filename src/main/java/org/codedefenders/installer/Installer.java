@@ -319,7 +319,7 @@ public class Installer {
         // This adds a jacoco.exec file to the testDir
         backend.testOriginal(cut, testDir, qualifiedName);
 
-        LineCoverage lineCoverage = coverageGenerator.generate(cut, javaFilePath).getLineCoverage();
+        LineCoverage lineCoverage = coverageGenerator.generate(cut, javaFilePath);
         Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);
 
         int testId = TestDAO.storeTest(test);

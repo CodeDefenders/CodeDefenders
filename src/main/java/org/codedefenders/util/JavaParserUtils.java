@@ -79,20 +79,20 @@ public class JavaParserUtils {
         return beginOf(node);
     }
 
-    public static int beginOf(NodeWithRange<?> node) {
-        return node.getBegin().get().line;
-    }
-
-    public static int endOf(NodeWithRange<?> node) {
-        return node.getEnd().get().line;
-    }
-
     public static int lineOf(JavaToken token) {
         return beginOf(token);
     }
 
+    public static int beginOf(NodeWithRange<?> node) {
+        return node.getBegin().get().line;
+    }
+
     public static int beginOf(JavaToken token) {
         return token.getRange().get().begin.line;
+    }
+
+    public static int endOf(NodeWithRange<?> node) {
+        return node.getEnd().get().line;
     }
 
     public static int endOf(JavaToken token) {

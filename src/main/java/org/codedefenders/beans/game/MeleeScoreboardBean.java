@@ -41,7 +41,7 @@ public class MeleeScoreboardBean {
 
     @Inject
     public MeleeScoreboardBean(UserService userService, GameProducer gameProducer, ScoreCalculator scoreCalculator) {
-        MeleeGame meleeGame = gameProducer.getGame();
+        MeleeGame meleeGame = gameProducer.getMeleeGame();
 
         final Map<Integer, PlayerScore> mutantsScores = scoreCalculator.getMutantScores(meleeGame.getId());
         final Map<Integer, PlayerScore> testsScores = scoreCalculator.getTestScores(meleeGame.getId());

@@ -32,7 +32,8 @@ import javax.inject.Named;
 import org.codedefenders.configuration.Configuration;
 
 /**
- *
+ * A helper class for constructing relative and absolute URLs for paths in our application
+ * for usage from Java and JSP code.
  */
 @Named("url")
 @ApplicationScoped
@@ -42,16 +43,20 @@ public class URLUtils {
 
     @Inject
     public URLUtils(@SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
-        // TODO(Alex): How to fallback to parsing the request?
         config.getApplicationURL().ifPresent(this::setAppURI);
     }
 
+    /**
+     * Retrieves the protocol, host, port and path components of the passed {@link URL}
+     * to construct the application url.
+     */
     public synchronized void setAppURI(@Nonnull URL url) {
         if (!appURI.isPresent()) {
             try {
                 // Ensure path always ends with a leading "/"
                 String path = url.getPath() + (url.getPath().endsWith("/") ? "" : "/");
-                appURI = Optional.of(new URI(url.getProtocol(), null, url.getHost(), url.getPort(), path, null, null).normalize());
+                appURI = Optional.of(new URI(url.getProtocol(), null, url.getHost(), url.getPort(), path,
+                        null, null).normalize());
             } catch (URISyntaxException e) {
                 throw new RuntimeException(e);
             }
@@ -59,7 +64,16 @@ public class URLUtils {
     }
 
     /**
-     * @param path A context-relative URL
+     * Constructs a root-relative URL from the given context-relative URL.
+     *
+     * <p>This should be used for all links in JSP pages and redirects.
+     *
+     * <p>A context-relative URL is relative to the path we consider the root of our application (the landing page)
+     * and might contain a leading slash.<br>
+     * A root-relative URL is the full path component (with any necessary parents) and will always have a leading
+     * slash.
+     *
+     * @param path A context-relative URL with or without leading slash(es)
      * @return A root-relative URL
      */
     @Nonnull
@@ -67,10 +81,18 @@ public class URLUtils {
         return getURIForPath(path).getPath();
     }
 
+    /**
+     * Constructs an absolute URL (with protocol, host, and port if necessary) for the given path.
+     *
+     * <p>This should only be used if the full URL is really necessary (e.g. when generating links that can/will be
+     * distributed outside our application, e.g. via e-mail)
+     */
+    @Nonnull
     public String getAbsoluteURLForPath(@Nonnull String path) {
         return getURIForPath(path).toString();
     }
 
+    @Nonnull
     private URI getURIForPath(@Nonnull String path) {
         if (path.startsWith("/")) {
             return getURIForPath(path.substring(1));

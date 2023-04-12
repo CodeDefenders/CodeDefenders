@@ -123,6 +123,7 @@ unit-tests:
     MYSQL_ROOT_PASSWORD: ''
     MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
   before_script:
+    - printf 'url=database:3306/codedefenders\nusername=root\npassword=\n' > src/integration/resources/database.properties
     # Update timestamps of build output files, so maven does not think it needs to recompile those
     - find ./target | xargs -exec touch -c {} \;
   script:
