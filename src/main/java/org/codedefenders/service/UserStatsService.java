@@ -22,12 +22,18 @@ public class UserStatsService {
     private final UserStatsDAO dao;
 
     @Inject
-    public UserStatsService(UserStatsDAO userStatsDAO) {
+    private UserStatsService(UserStatsDAO userStatsDAO) {
         dao = userStatsDAO;
     }
 
+    /**
+     * Fetches the statistics of a user for all game types (MELEE, MULTIPLAYER).
+     *
+     * @param userId The id of the user.
+     * @return The statistics of the user, grouped by game type.
+     */
     public Map<GameType, UserStats> getStatsByUserId(int userId) {
-        Map<GameType, UserStats> stats = new HashMap<GameType, UserStats>();
+        Map<GameType, UserStats> stats = new HashMap<>();
         for (GameType gameType : GameType.values()) {
             stats.put(gameType, getStatsByUserId(userId, gameType));
         }
