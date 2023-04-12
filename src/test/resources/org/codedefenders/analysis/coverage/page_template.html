@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{title}</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+            html, body {
+                margin: 0;
+                padding: 0;
+                font-size: 16px;
+            }
+
+            .container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+            }
+            .column {
+                flex-basis: 0;
+                flex-grow: 1;
+                min-width: 0;
+                padding: .25em;
+            }
+            #tokens {
+                flex-grow: 3;
+                overflow: scroll;
+            }
+
+            .header {
+                width: 100%;
+                position: sticky;
+                top: .5em;
+            }
+            .header-text{
+                width: fit-content;
+                margin-bottom: 1em;
+                white-space: nowrap;
+
+                background: white;
+                padding: .25em 2em;
+                border: 2px solid;
+                border-radius: 99em;
+                box-shadow: 2px 2px black;
+                cursor: default;
+                font-family: sans-serif;
+
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .controls {
+                position: absolute;
+                top: 0;
+                right: 0;
+
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: .25em;
+                padding-right: .5em;
+            }
+
+            .line {
+                display: flex;
+                justify-content: flex-start;
+                align-items: baseline;
+
+                font-family: monospace;
+                width: 100%;
+                white-space: pre;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                cursor: default;
+                font-size: 12px;
+                line-height: 1.35;
+            }
+            .line > * {
+                flex-grow: 0;
+                flex-shrink: 0;
+            }
+            .line::before {
+                font-family: monospace;
+                content: attr(data-line-num);
+                display: inline-block;
+                width: 3em;
+
+                flex-shrink: 0;
+                flex-grow: 0;
+            }
+            .token {
+                display: inline-block;
+                width: 15em;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            #expected .line {
+                user-select: none;
+            }
+            #expected .line:hover {
+                box-shadow: rgba(0, 0, 0, 0.05) 0 0 0 9999px inset;
+
+            }
+            #tokens .line {
+                overflow: visible;
+            }
+
+            .EMPTY {
+                background: transparent;
+            }
+            .FULLY_COVERED {
+                background: #73ff73;
+            }
+            .PARTLY_COVERED {
+                background: #fff673;
+            }
+            .NOT_COVERED {
+                background: #ff7373;
+            }
+
+            button {
+                box-shadow: 1px 1px black;
+                border: 1px solid black;
+                border-radius: 99em;
+                padding: .2em .75em;
+                cursor: pointer;
+                background: white;
+                font-size: 12px;
+            }
+            button:hover {
+                background: #e6e6e6;
+                box-shadow: none;
+                margin: 1px -1px -1px 1px;
+            }
+        </style>
+        <script>
+            const STATUSES = ['EMPTY', 'NOT_COVERED', 'FULLY_COVERED', 'PARTLY_COVERED'];
+            const lines = [];
+
+            let editLines = false;
+            let viewTokens = false;
+            let dragLineNum = null;
+
+            const getLine = function(lineNum) {
+                return lines[lineNum - 1] ?? null;
+            };
+            const getNumLines = function() {
+                return lines.length;
+            };
+            const setStatus = function(line, status) {
+                const oldStatus = line.dataset.status;
+                line.dataset.status = status;
+                line.classList.replace(oldStatus, status);
+            };
+
+            const handleEditModeButton = function(event) {
+                editLines = !editLines;
+                event.target.innerText = editLines
+                        ? 'disable editing'
+                        : 'enable editing';
+            };
+
+            const handleCopyButton = function(event) {
+                const statuses = lines.map(line => line.dataset.status);
+                navigator.clipboard.writeText(statuses.join('\n'));
+
+                event.target.innerText = 'copied';
+                setTimeout(() => event.target.innerText = 'copy', 1000);
+            };
+
+            const handleLineClick = function(event) {
+                if (!editLines) {
+                    return;
+                }
+
+                const status = event.target.dataset.status;
+                const index = STATUSES.indexOf(status);
+                const newStatus = STATUSES[(index + 1) % STATUSES.length];
+                setStatus(event.target, newStatus);
+            };
+
+            const handleViewTokensButton = function(event) {
+                viewTokens = !viewTokens;
+                event.target.innerText = viewTokens
+                        ? 'hide tokens'
+                        : 'view tokens';
+
+                document.getElementById('original').toggleAttribute('hidden', viewTokens);
+                document.getElementById('expected').toggleAttribute('hidden', viewTokens);
+                document.getElementById('tokens').toggleAttribute('hidden', !viewTokens);
+            };
+
+            const handleLineDrag = function(event) {
+                if (!editLines) {
+                    return;
+                }
+
+                dragLineNum = Number(event.target.dataset.lineNum);
+            };
+
+            const handleLineDrop = function(event) {
+                if (!editLines || dragLineNum === null) {
+                    return;
+                }
+
+                const dropLineNum = Number(event.target.dataset.lineNum);
+
+                if (event.ctrlKey) {
+                    const status = getLine(dragLineNum).dataset.status;
+                    const begin = Math.min(dragLineNum, dropLineNum);
+                    const end = Math.max(dragLineNum, dropLineNum);
+                    for (let i = begin; i <= end; i++) {
+                        const line = getLine(i);
+                        setStatus(line, status);
+                    }
+                    return;
+                }
+
+                if (event.shiftKey) {
+                    const diff = dragLineNum - dropLineNum;
+                    if (dragLineNum > dropLineNum) {
+                        // shift upwards
+                        for (let i = dropLineNum; i <= getNumLines(); i++) {
+                            let sinkLine = getLine(i);
+                            const sourceLine = getLine(i + diff);
+                            const status = sourceLine !== null ? sourceLine.dataset.status : 'EMPTY';
+                            setStatus(sinkLine, status);
+                        }
+                    } else {
+                        // shift downwards
+                        for (let i = getNumLines(); i > dragLineNum; i--) {
+                            let sinkLine = getLine(i);
+                            const sourceLine = getLine(i + diff);
+                            let status = sourceLine !== null ? sourceLine.dataset.status : 'EMPTY';
+                            setStatus(sinkLine, status);
+                        }
+                        for (let i = dragLineNum; i < dropLineNum; i++) {
+                            let line = getLine(i);
+                            setStatus(line, 'EMPTY');
+                        }
+                    }
+                }
+            };
+
+            window.addEventListener('load', function(event) {
+                for (const lineElem of document.querySelectorAll('#expected .line')) {
+                    const lineNum = Number(lineElem.dataset.lineNum);
+                    lines[lineNum - 1] = lineElem;
+                }
+
+                document.getElementById('expected').addEventListener('click', function(event) {
+                    if (!event.target.classList.contains('line')) {
+                        return;
+                    }
+                    handleLineClick(event);
+                });
+                document.addEventListener('mousedown', function(event) {
+                    if (event.target.classList.contains('line') && event.target.closest('#expected') !== null) {
+                        handleLineDrag(event);
+                    } else {
+                        dragLineNum = null;
+                    }
+                });
+                document.addEventListener('mouseup', function(event) {
+                    if (event.target !== null
+                            && event.target.classList.contains('line')
+                            && event.target.closest('#expected') !== null) {
+                        handleLineDrop(event);
+                    } else {
+                        dragLineNum = null;
+                    }
+                });
+                document.getElementById('edit-lines').addEventListener('click', handleEditModeButton);
+                document.getElementById('copy').addEventListener('click', handleCopyButton);
+                document.getElementById('view-tokens').addEventListener('click', handleViewTokensButton);
+            });
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="column" id="tokens" hidden>
+                <div class="header">
+                    <div class="header-text">Tokens</div>
+                </div>
+                {tokens}
+            </div>
+            <div class="column" id="original">
+                <div class="header">
+                    <div class="header-text">JaCoCo Coverage</div>
+                </div>
+                {code_original}
+            </div>
+            <div class="column" id="transformed">
+                <div class="header">
+                    <div class="header-text">Transformed Coverage</div>
+                    <div class="controls">
+                        <button type="button" id="view-tokens">view tokens</button>
+                    </div>
+                </div>
+                {code_transformed}
+            </div>
+            <div class="column" id="expected">
+                <div class="header">
+                    <div class="header-text">Expected Coverage</div>
+                    <div class="controls">
+                        <button type="button" id="edit-lines"
+                                title="Click on a line to cycle coverage.
+Ctrl+Drag a line to fill with the line's coverage.
+Shift+Drag a line to shift the coverage from that line on.">
+                            enable editing</button>
+                        <button type="button" id="copy">copy</button>
+                    </div>
+                </div>
+                {code_expected}
+            </div>
+        </div>
+    </body>
+</html>

@@ -35,7 +35,7 @@ public class LineCoverage {
     /**
      * Creating a empty line coverage in which zero covered and uncovered lines are stored.
      */
-    public LineCoverage() {
+    private LineCoverage() {
         linesCovered = new LinkedList<>();
         linesUncovered = new LinkedList<>();
     }
@@ -49,6 +49,10 @@ public class LineCoverage {
     public LineCoverage(List<Integer> linesCovered, List<Integer> linesUncovered) {
         this.linesCovered = new LinkedList<>(linesCovered);
         this.linesUncovered = new LinkedList<>(linesUncovered);
+    }
+
+    public static LineCoverage empty() {
+        return new LineCoverage();
     }
 
     public List<Integer> getLinesCovered() {

@@ -13,6 +13,7 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
@@ -69,7 +70,7 @@ public class TestAccordionBean {
         TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
         allTests.addTestIds(tests.keySet());
 
-        List<GameClass.MethodDescription> methodDescriptions = cut.getMethodDescriptions();
+        List<MethodDescription> methodDescriptions = cut.getMethodDescriptions();
         List<TestAccordionCategory> methodCategories = new ArrayList<>();
         for (int i = 0; i < methodDescriptions.size(); i++) {
             methodCategories.add(new TestAccordionCategory(methodDescriptions.get(i), String.valueOf(i)));
@@ -171,7 +172,7 @@ public class TestAccordionBean {
             this.id = id;
         }
 
-        public TestAccordionCategory(GameClass.MethodDescription methodDescription, String id) {
+        public TestAccordionCategory(MethodDescription methodDescription, String id) {
             this(methodDescription.getDescription(), id);
             this.startLine = methodDescription.getStartLine();
             this.endLine = methodDescription.getEndLine();

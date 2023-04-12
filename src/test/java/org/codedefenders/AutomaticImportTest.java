@@ -18,17 +18,41 @@
  */
 package org.codedefenders;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
+import org.codedefenders.instrumentation.MetricsRegistry;
+import org.codedefenders.service.ClassAnalysisService;
+import org.jboss.weld.junit4.WeldInitiator;
+import org.junit.Rule;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class AutomaticImportTest {
+
+    @Rule
+    public WeldInitiator weld = WeldInitiator
+            .from(AutomaticImportTest.class,
+                    ClassAnalysisService.class,
+                    ClassCodeAnalyser.class)
+            .inject(this)
+            .activate(ApplicationScoped.class)
+            .build();
+
+    @ApplicationScoped
+    @Produces
+    public MetricsRegistry getMockedMetricsRegistry() {
+        return mock(MetricsRegistry.class);
+    }
 
     @org.junit.Test
     public void testAutomaticImportOfMockitoIfEnabled() {

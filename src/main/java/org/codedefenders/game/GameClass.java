@@ -21,22 +21,17 @@ package org.codedefenders.game;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import org.apache.commons.lang3.Range;
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.analysis.gameclass.ClassCodeAnalyser.ClassAnalysisResult;
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.service.ClassAnalysisService;
+import org.codedefenders.util.CDIUtil;
 import org.codedefenders.util.FileUtils;
-import org.codedefenders.util.analysis.ClassCodeAnalyser;
-import org.codedefenders.util.analysis.CodeAnalysisResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,16 +58,8 @@ public class GameClass {
     private boolean isActive;
 
     private boolean visitedCode = false;
-    private Set<String> additionalImports = new HashSet<>();
-    // Store begin and end line which corresponds to uncoverable non-initialized fields
+    private List<String> additionalImports = new ArrayList<>();
     private List<Integer> linesOfCompileTimeConstants = new ArrayList<>();
-    private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
-    private List<Integer> nonInitializedFields = new ArrayList<>();
-    private List<Integer> emptyLines = new ArrayList<>();
-    private Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
-    private List<Range<Integer>> linesOfMethods = new ArrayList<>();
-    private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
-    private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
     private List<MethodDescription> methodDescriptions = new ArrayList<>();
 
     private TestTemplate testTemplate;
@@ -146,23 +133,6 @@ public class GameClass {
                 .create();
     }
 
-    private void visitCode() {
-        if (!this.visitedCode) {
-            final CodeAnalysisResult visit = ClassCodeAnalyser.visitCode(this.name, this.getSourceCode());
-            this.additionalImports.addAll(visit.getAdditionalImports());
-            this.linesOfCompileTimeConstants.addAll(visit.getCompileTimeConstants());
-            this.linesOfNonCoverableCode.addAll(visit.getNonCoverableCode());
-            this.nonInitializedFields.addAll(visit.getNonInitializedFields());
-            this.linesOfMethods.addAll(visit.getMethods());
-            this.linesOfMethodSignatures.addAll(visit.getMethodSignatures());
-            this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
-            this.emptyLines.addAll(visit.getEmptyLines());
-            this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
-            this.methodDescriptions.addAll(visit.getMethodDescriptions());
-            this.visitedCode = true;
-        }
-    }
-
     /**
      * Calls {@link GameClassDAO} to insert this {@link GameClass} instance into the database.
      * <p></p>
@@ -200,14 +170,6 @@ public class GameClass {
 
     public String getName() {
         return name;
-    }
-
-    /**
-     * Returns a copy of the additional import statements computed for this class.
-     */
-    public Set<String> getAdditionalImports() {
-        visitCode();
-        return new HashSet<>(additionalImports);
     }
 
     public String getJavaFile() {
@@ -305,7 +267,7 @@ public class GameClass {
     /**
      * HTML escapes the test template.
      *
-     * @return a HTML escaped test template for a Junit Test as a {@link String}.
+     * @return an HTML escaped test template for a Junit Test as a {@link String}.
      */
     public String getHTMLEscapedTestTemplate() {
         return StringEscapeUtils.escapeHtml4(getTestTemplate());
@@ -327,115 +289,35 @@ public class GameClass {
         return testTemplate.getEditableLinesStart();
     }
 
-    /**
-     * Gathers and returns all lines which non initialized fields.
-     *
-     * @return All lines of not initialized fields as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
-     */
-    public List<Integer> getNonInitializedFields() {
-        visitCode();
-        Collections.sort(this.nonInitializedFields);
-        return Collections.unmodifiableList(this.nonInitializedFields);
+    private ClassAnalysisResult getClassAnalysis() {
+        ClassAnalysisService analyser = CDIUtil.getBeanFromCDI(ClassAnalysisService.class);
+        if (id != null) {
+            return analyser.analyze(getId()).get();
+        } else {
+            return analyser.analyze(getSourceCode()).get();
+        }
     }
 
     /**
-     * Gathers and returns all lines which contain a method signature.
-     *
-     * @return All lines of method signatures as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
+     * Returns a copy of the additional import statements computed for this class.
      */
-    public List<Integer> getMethodSignatures() {
-        visitCode();
-        return this.linesOfMethodSignatures
-                .stream()
-                .flatMap(range -> IntStream.rangeClosed(range.getMinimum(), range.getMaximum()).boxed())
-                .sorted()
-                .collect(Collectors.toList());
+    public List<String> getAdditionalImports() {
+        return Collections.unmodifiableList(getClassAnalysis().getAdditionalImports());
     }
 
     /**
-     * Gathers and returns all non coverable lines.
-     *
-     * @return All lines which are not coverable as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
-     */
-    public List<Integer> getNonCoverableCode() {
-        visitCode();
-        return linesOfNonCoverableCode;
-    }
-
-    /**
-     * Return the lines which correspond to Compile Time Constants. Mutation of those lines requires tests
+     * Return the lines which correspond to compile-time constants. Mutation of those lines requires tests
      * to be recompiled against the mutant.
      *
      * @return All lines of compile time constants as a {@link List} of {@link Integer Integers}.
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getCompileTimeConstants() {
-        visitCode();
-        return Collections.unmodifiableList(linesOfCompileTimeConstants);
-    }
-
-    /**
-     * Return the lines of the method signature for the method which contains a given line.
-     *
-     * @param line the line the method signature is returned for.
-     * @return All lines of the method signature a given line resides as a {@link List} of {@link Integer Integers}.
-     * Can be empty, but never {@code null}.
-     */
-    public List<Integer> getMethodSignaturesForLine(Integer line) {
-        visitCode();
-        final List<Integer> collect = linesOfMethods
-                .stream()
-                .filter(method -> method.contains(line))
-                .flatMap(methodRange -> linesOfMethodSignatures.stream()
-                        .filter(methodSignature -> methodSignature.contains(methodRange.getMinimum()))
-                        .flatMap(msRange -> IntStream.rangeClosed(msRange.getMinimum(), msRange.getMaximum()).boxed()))
-                .collect(Collectors.toList());
-        return Collections.unmodifiableList(collect);
-    }
-
-    /**
-     * Return the lines of closing brackets from the if-statements which contain a given line.
-     *
-     * @param line the line closing brackets are returned for.
-     * @return All lines of closing brackets from if-statements a given line resides as a {@link List} of
-     * {@link Integer Integers}. Can be empty, but never {@code null}.
-     */
-    public List<Integer> getClosingBracketForLine(Integer line) {
-        visitCode();
-        final List<Integer> collect = linesOfClosingBrackets
-                .stream()
-                .filter(integerRange -> integerRange.contains(line))
-                .map(Range::getMaximum)
-                .sorted()
-                .collect(Collectors.toList());
-        return Collections.unmodifiableList(collect);
-    }
-
-    /**
-     * Returns the empty lines which are covered by any of the already covered lines. An empty line
-     * can be covered if it belongs to a method and is followed by a covered line (either empty or not)
-     */
-    public List<Integer> getCoveredEmptyLines(List<Integer> alreadyCoveredLines) {
-        visitCode();
-        List<Integer> collect = new ArrayList<>();
-        for (Range<Integer> linesOfMethod : linesOfMethods) {
-            for (int line = linesOfMethod.getMinimum(); line < linesOfMethod.getMaximum(); line++) {
-                if (emptyLines.contains(line)) {
-                    if (alreadyCoveredLines.contains(linesCoveringEmptyLines.get(line))) {
-                        collect.add(line);
-                    }
-                }
-            }
-        }
-        return Collections.unmodifiableList(collect);
+        return Collections.unmodifiableList(getClassAnalysis().getCompileTimeConstants());
     }
 
     public List<MethodDescription> getMethodDescriptions() {
-        visitCode();
-        return Collections.unmodifiableList(methodDescriptions);
+        return Collections.unmodifiableList(getClassAnalysis().getMethodDescriptions());
     }
 
     @Override
@@ -522,30 +404,6 @@ public class GameClass {
 
         public GameClass create() {
             return new GameClass(this);
-        }
-    }
-
-    public static class MethodDescription {
-        private String description;
-        private int startLine;
-        private int endLine;
-
-        public MethodDescription(String description, int startLine, int endLine) {
-            this.description = description;
-            this.startLine = startLine;
-            this.endLine = endLine;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public int getStartLine() {
-            return startLine;
-        }
-
-        public int getEndLine() {
-            return endLine;
         }
     }
 }

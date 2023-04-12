@@ -45,6 +45,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.analysis.coverage.CoverageGenerator;
+import org.codedefenders.analysis.coverage.CoverageGenerator.CoverageGeneratorException;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
@@ -59,7 +61,6 @@ import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMapService;
-import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -102,6 +103,9 @@ public class ClassUploadManager extends HttpServlet {
 
     @Inject
     private BackendExecutorService backend;
+
+    @Inject
+    private CoverageGenerator coverageGenerator;
 
     @Inject
     private KillMapService killMapService;
@@ -813,14 +817,25 @@ public class ClassUploadManager extends HttpServlet {
                 return true;
             }
 
-            int testId;
-            final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, Paths.get(javaFilePath));
+            LineCoverage lineCoverage;
+            try {
+                lineCoverage = coverageGenerator.generate(cut, Paths.get(javaFilePath));
+            } catch (CoverageGeneratorException e) {
+                logger.error("Class upload with test failed. Failed to compute coverage.", e);
+                messages.add("Class upload failed. Internal error. Sorry about that!");
+
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
+                return true;
+            }
+
             final Test test = new Test(javaFilePath, classFilePath, cutId, lineCoverage);
+
+            int testId;
             try {
                 testId = TestDAO.storeTest(test);
                 TestDAO.mapTestToClass(testId, cutId);
             } catch (UncheckedSQLException e) {
-                logger.error("Class upload with mutant failed. Could not store test to database.");
+                logger.error("Class upload with test failed. Could not store test to database.", e);
                 messages.add("Class upload failed. Internal error. Sorry about that!");
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);

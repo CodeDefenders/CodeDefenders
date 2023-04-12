@@ -18,7 +18,7 @@
  */
 package org.codedefenders.game;
 
-import java.util.Set;
+import java.util.List;
 
 import org.apache.commons.text.StringEscapeUtils;
 
@@ -179,7 +179,7 @@ public class TestTemplate {
         }
 
         private void addAdditionalImports() {
-            Set<String> additionalImports = clazz.getAdditionalImports();
+            List<String> additionalImports = clazz.getAdditionalImports();
             for (String additionalImport : additionalImports) {
                 // Additional import are already in the form of "import X.Y.Z;\n", no additional "\n" required
                 appendLines(additionalImport);
