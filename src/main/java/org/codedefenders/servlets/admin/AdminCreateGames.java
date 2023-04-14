@@ -166,7 +166,7 @@ public class AdminCreateGames extends HttpServlet {
                     getIntParameter(request, "automaticEquivalenceTrigger").get());
             gameSettings.setLevel(GameLevel.valueOf(request.getParameter("level")));
 
-            gameSettings.setStartGame(request.getParameter("startGame") != null);
+            gameSettings.setStartGame(request.getParameter("startGames") != null);
 
             gameSettings.setGameDurationMinutes(getIntParameter(request, "gameDurationMinutes").get())
                     .map(messages::add);
