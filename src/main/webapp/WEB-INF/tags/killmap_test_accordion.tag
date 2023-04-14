@@ -98,28 +98,30 @@
                                                         accordion-button collapsed"
                                                 type="button" role="button"
                                                 aria-controls="kta-collapse-category-${category.id}-test-${test.id}">
-                                            <span class="kta-test-link">
-                                                Test ${test.id}
-                                            </span>
-                                            <span class="kta-col">
-                                                <span class="kta-column-name mx-2">by</span>
-                                                ${test.creator.name}
-                                            </span>
-                                            <span class="kta-col">
-                                                <span class="kta-column-name mx-2">Covered:</span>
-                                                ${test.coveredMutantIds.size()}
-                                            </span>
-                                            <span class="kta-col">
-                                                <span class="kta-column-name mx-2">Killed:</span>
-                                                ${test.killedMutantIds.size()}
-                                            </span>
-                                            <span class="kta-col">
-                                                <span class="kta-column-name mx-2">Points:</span>
-                                                ${test.points}
-                                            </span>
-                                            <span class="kta-col">
-                                                <span class="btn btn-xs btn-primary kta-view-test-button">
-                                                    View
+                                            <span class="kta-button-content">
+                                                <span class="kta-test-link">
+                                                    Test ${test.id}
+                                                </span>
+                                                <span class="kta-col">
+                                                    <span class="kta-column-name mx-2">by</span>
+                                                    ${test.creator.name}
+                                                </span>
+                                                <span class="kta-col">
+                                                    <span class="kta-column-name mx-2">Covered:</span>
+                                                    ${test.coveredMutantIds.size()}
+                                                </span>
+                                                <span class="kta-col">
+                                                    <span class="kta-column-name mx-2">Killed:</span>
+                                                    ${test.killedMutantIds.size()}
+                                                </span>
+                                                <span class="kta-col">
+                                                    <span class="kta-column-name mx-2">Points:</span>
+                                                    ${test.points}
+                                                </span>
+                                                <span class="kta-col ms-auto me-3 text-end">
+                                                    <span class="kta-view-test-button btn btn-xs btn-primary">
+                                                        View
+                                                    </span>
                                                 </span>
                                             </span>
                                         </button>

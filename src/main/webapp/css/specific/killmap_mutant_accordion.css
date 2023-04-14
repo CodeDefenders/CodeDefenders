@@ -32,10 +32,14 @@
 /* Mutant headers.
 ----------------------------------------------------------------------------- */
 #kill-map-mutant-accordion .accordion-item .accordion-item .accordion-header .accordion-button {
+    background: #edcece88; /*transparentize(var(--bg-attacker-light));*/
+}
+#kill-map-mutant-accordion .accordion-item .accordion-item .accordion-header .accordion-button .kma-button-content {
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap: 1.5rem;
-    background: #edcece88; /*transparentize(var(--bg-attacker-light));*/
+    width: 100%;
 }
 
 /* Indent inner accordions */

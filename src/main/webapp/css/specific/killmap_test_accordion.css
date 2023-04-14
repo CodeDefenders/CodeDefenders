@@ -32,10 +32,14 @@
 /* test headers.
 ----------------------------------------------------------------------------- */
 #kill-map-test-accordion .accordion-item .accordion-item .accordion-header .accordion-button {
+    background: #ced6ed88; /*transperentize(var(--bg-defender-light));*/
+}
+#kill-map-test-accordion .accordion-item .accordion-item .accordion-header .accordion-button .kta-button-content {
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap: 1.5rem;
-    background: #ced6ed88; /*transperentize(var(--bg-defender-light));*/
+    width: 100%;
 }
 
 /* Indent inner accordions */

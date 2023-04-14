@@ -100,44 +100,46 @@
                                                         accordion-button collapsed"
                                                 type="button" role="button"
                                                 aria-controls="kma-collapse-category-${category.id}-mutant-${mutant.id}">
-                                            <c:set var="state" value="${mutant.state}"/>
-                                            <c:choose>
-                                                <c:when test="${state == 'ALIVE'}">
-                                                    <span class="mutantCUTImage mutantImageAlive"></span>
-                                                </c:when>
-                                                <c:when test="${state == 'KILLED'}">
-                                                    <span class="mutantCUTImage mutantImageKilled"></span>
-                                                </c:when>
-                                                <c:when test="${state == 'EQUIVALENT'}">
-                                                    <span class="mutantCUTImage mutantImageEquiv"></span>
-                                                </c:when>
-                                                <c:when test="${state == 'FLAGGED'}">
-                                                    <span class="mutantCUTImage mutantImageFlagged"></span>
-                                                </c:when>
-                                            </c:choose>
-                                            <span class="kma-mutant-link">
-                                                Mutant ${mutant.id}
-                                            </span>
-                                            <span class="kma-col">
-                                                <span class="kma-column-name mx-2">by</span>
-                                                ${mutant.creator.name}
-                                            </span>
-                                            <span class="kma-col">
-                                                ${mutant.description}
-                                            </span>
-                                            <span class="kma-col">
-                                                <span class="kma-column-name mx-2">Points:</span>
-                                                ${mutant.points}
-                                            </span>
-                                            <span class="kta-col">
-                                                <span class="btn btn-xs btn-primary kta-view-mutant-button">
-                                                    View
+                                            <span class="kma-button-content">
+                                                <c:set var="state" value="${mutant.state}"/>
+                                                <c:choose>
+                                                    <c:when test="${state == 'ALIVE'}">
+                                                        <span class="mutantCUTImage mutantImageAlive"></span>
+                                                    </c:when>
+                                                    <c:when test="${state == 'KILLED'}">
+                                                        <span class="mutantCUTImage mutantImageKilled"></span>
+                                                    </c:when>
+                                                    <c:when test="${state == 'EQUIVALENT'}">
+                                                        <span class="mutantCUTImage mutantImageEquiv"></span>
+                                                    </c:when>
+                                                    <c:when test="${state == 'FLAGGED'}">
+                                                        <span class="mutantCUTImage mutantImageFlagged"></span>
+                                                    </c:when>
+                                                </c:choose>
+                                                <span class="kma-mutant-link">
+                                                    Mutant ${mutant.id}
                                                 </span>
-                                                <c:if test="${state == 'KILLED'}">
-                                                    <span class="btn btn-xs btn-secondary kta-view-killing-test-button">
-                                                        View Killing Test
+                                                <span class="kma-col">
+                                                    <span class="kma-column-name mx-2">by</span>
+                                                    ${mutant.creator.name}
+                                                </span>
+                                                <span class="kma-col">
+                                                    ${mutant.description}
+                                                </span>
+                                                <span class="kma-col">
+                                                    <span class="kma-column-name mx-2">Points:</span>
+                                                    ${mutant.points}
+                                                </span>
+                                                <span class="kta-col ms-auto me-3 text-end">
+                                                    <span class="kta-view-mutant-button btn btn-xs btn-primary">
+                                                        View
                                                     </span>
-                                                </c:if>
+                                                    <c:if test="${state == 'KILLED'}">
+                                                        <span class="kta-view-killing-test-button btn btn-xs btn-secondary ms-2">
+                                                            View Killing Test
+                                                        </span>
+                                                    </c:if>
+                                                </span>
                                             </span>
                                         </button>
                                     </h3>
