@@ -227,16 +227,13 @@ public class GameDAO {
      */
     public static boolean isGameExpired(int gameId) {
         final String sql = String.join("\n",
-                "SELECT COUNT(*) AS isExpired",
-                "FROM games",
-                "WHERE State = ?",
-                "AND ID = ?",
                 // do not use TIMESTAMPADD here to avoid errors with daylight saving
-                "AND FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW();"
+                "SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired",
+                "FROM games",
+                "WHERE ID = ?;"
         );
         return DB.executeQueryReturnValue(sql,
                 l -> l.getBoolean("isExpired"),
-                DatabaseValue.of(GameState.ACTIVE.toString()),
                 DatabaseValue.of(gameId)
         );
     }
