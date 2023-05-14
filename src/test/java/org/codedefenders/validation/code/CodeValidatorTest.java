@@ -44,6 +44,7 @@ import com.google.common.truth.Correspondence;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.codedefenders.game.AssertionLibrary.JUNIT4_HAMCREST;
+import static org.codedefenders.util.ResourceUtils.loadResource;
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
 import static org.codedefenders.validation.code.CodeValidator.validateTestCodeGetMessage;
@@ -73,27 +74,13 @@ public class CodeValidatorTest {
      */
     private static final String RESOURCE_DIR = "org/codedefenders/validation/code/CodeValidator/";
 
-    // TODO: Could be extracted into utility class (for tests)?!
-    private static String loadResource(String filename) {
-        URL url = Thread.currentThread().getContextClassLoader().getResource(filename);
-        assume().withMessage("File with the given name was not found in the ClassPath").that(url).isNotNull();
-
-        String code = null;
-        try {
-            code = new String(Files.readAllBytes(Paths.get(url.getPath())), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            assume().withMessage("IOException while reading file").fail();
-        }
-        return code;
-    }
-
     /**
      * Loads the {@code original.txt} file from a subdirectory path given by {@code name} below the {@code mutants} directory
      * in the {@link #RESOURCE_DIR}.
      */
     // TODO: Could be extracted into utility class (for tests)?!
     private static String loadMutantOriginal(String name) {
-        return loadResource(RESOURCE_DIR + "mutants/" + name + "/original.txt");
+        return loadResource(RESOURCE_DIR, "mutants/" + name + "/original.txt");
     }
 
     /**
@@ -102,7 +89,7 @@ public class CodeValidatorTest {
      */
     // TODO: Could be extracted into utility class (for tests)?!
     private static String loadMutantMutated(String name) {
-        return loadResource(RESOURCE_DIR + "mutants/" + name + "/mutated.txt");
+        return loadResource(RESOURCE_DIR, "mutants/" + name + "/mutated.txt");
     }
 
     /**
@@ -110,7 +97,7 @@ public class CodeValidatorTest {
      */
     // TODO: Could be extracted into utility class (for tests)?!
     private static String loadTest(String name) {
-        return loadResource(RESOURCE_DIR + "tests/" + name + ".txt");
+        return loadResource(RESOURCE_DIR, "tests/" + name + ".txt");
     }
 
 

@@ -91,7 +91,7 @@ public class Test {
         this.classFile = classFile;
         this.playerId = playerId;
         this.score = 0;
-        this.lineCoverage = new LineCoverage();
+        this.lineCoverage = LineCoverage.empty();
     }
 
     @Deprecated

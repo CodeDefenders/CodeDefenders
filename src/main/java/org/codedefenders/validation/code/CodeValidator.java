@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -50,11 +51,10 @@ import org.slf4j.LoggerFactory;
 import com.github.difflib.DiffUtils;
 import com.github.difflib.patch.AbstractDelta;
 import com.github.difflib.patch.Chunk;
-import com.github.javaparser.ParseException;
 import com.github.javaparser.ParseResult;
-import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -117,17 +117,11 @@ public class CodeValidator {
     // TODO Cannot use ValidationMessage as that is an ENUM type...
     public static List<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions,
             AssertionLibrary assertionLibrary) {
-        try {
-            CompilationUnit cu = getCompilationUnitFromText(testCode);
-            return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, assertionLibrary);
-        } catch (ParseException e) {
-            // Pretend this never happened so we send back to the user the compiler error message
-            // return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});
+        Optional<CompilationUnit> parseResult = JavaParserUtils.parse(testCode);
+        if (parseResult.isPresent()) {
+            return TestCodeVisitor.validFor(parseResult.get(), maxNumberOfAssertions, assertionLibrary);
+        } else {
             return new ArrayList<>();
-        } catch (IOException e) {
-            logger.error("Problem in validating test code \n {}", testCode, e);
-            return Arrays.asList("Invalid test. Something went wrong.");
-
         }
     }
 
@@ -150,18 +144,13 @@ public class CodeValidator {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
 
-        // NOTE: there might be problem in parsing?
-        final CompilationUnit originalCU;
-        final CompilationUnit mutatedCU;
-        try {
-            originalCU = getCompilationUnitFromText(originalCode);
-            mutatedCU = getCompilationUnitFromText(mutatedCode);
-        } catch (IOException | ParseException e) {
-            // At this point the syntax of original code and the mutant is broken and the compiler will spot the same
-            // error so we return a mutant valid message to allow the request processing to move forward
-            logger.debug("Error parsing code: {}", e.getMessage());
+        Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
+        Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
+        if (!originalParseResult.isPresent() || !mutatedParseResult.isPresent()) {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
+        CompilationUnit originalCU = originalParseResult.get();
+        CompilationUnit mutatedCU = mutatedParseResult.get();
 
         // Check if package was modified
         if (containsChangesToPackageDeclarations(originalCU, mutatedCU)) {
@@ -510,14 +499,13 @@ public class CodeValidator {
 
     private static ValidationMessage validInsertion(String diff, CodeValidatorLevel level) {
         String stmtString = String.format("{ %s }", diff);
-        final ParseResult<BlockStmt> parseResult =
-                JavaParserUtils.getDefaultParser().parseBlock(stmtString);
 
-        if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
-            BlockStmt blockStmt = parseResult.getResult().get();
+        Optional<BlockStmt> parseResult = JavaParserUtils.parse(
+                stmtString, JavaParserUtils.defaultParser()::parseBlock);
+        if (parseResult.isPresent()) {
             // TODO Should this called always and not only for checking if there's validInsertion ?
             MutationVisitor visitor = new MutationVisitor(level);
-            visitor.visit(blockStmt, null);
+            visitor.visit(parseResult.get(), null);
             if (!visitor.isValid()) {
                 return visitor.getMessage();
             }
@@ -579,22 +567,6 @@ public class CodeValidator {
 
     private static boolean containsAny(String str, String[] tokens) {
         return Arrays.stream(tokens).anyMatch(str::contains);
-    }
-
-
-    private static CompilationUnit getCompilationUnitFromText(String code) throws ParseException, IOException {
-        final ParseResult<CompilationUnit> parseResult =
-                JavaParserUtils.getDefaultParser().parse(code);
-
-        if (parseResult.isSuccessful() && parseResult.getResult().isPresent()) {
-            return parseResult.getResult().get();
-        } else {
-            String message = parseResult.getProblems().stream()
-                    .map(Problem::getMessage)
-                    .findFirst()
-                    .orElse(null);
-            throw new ParseException(message);
-        }
     }
 
     private static List<AbstractDelta<String>> getDeltas(String original, String changed) {

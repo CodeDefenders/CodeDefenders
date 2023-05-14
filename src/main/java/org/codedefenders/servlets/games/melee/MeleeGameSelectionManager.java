@@ -51,6 +51,7 @@ import org.codedefenders.notification.events.server.game.GameCreatedEvent;
 import org.codedefenders.notification.events.server.game.GameJoinedEvent;
 import org.codedefenders.notification.events.server.game.GameLeftEvent;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
+import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -97,6 +98,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
 
     @Inject
     private EventDAO eventDAO;
+
+    @Inject
+    private UserRepository userRepo;
 
     @Inject
     private GameManagingUtils gameManagingUtils;
@@ -358,6 +362,9 @@ public class MeleeGameSelectionManager extends HttpServlet {
             messages.add("Creating games is currently not enabled.");
             return false;
         }
+
+        game.setEventDAO(eventDAO);
+        game.setUserRepository(userRepo);
 
         int newGameId = MeleeGameDAO.storeMeleeGame(game);
         game.setId(newGameId);

@@ -222,8 +222,7 @@ public class AdminMonitorGames extends HttpServlet {
             if (newState == GameState.FINISHED) { // close game
                 updated = gameService.closeGame(game);
             } else { // start game
-                game.setState(newState);
-                updated = game.update();
+                updated = gameService.startGame(game);
             }
         }
 
