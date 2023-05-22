@@ -1,10 +1,7 @@
 package org.codedefenders.beans.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,21 +13,18 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;

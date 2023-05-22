@@ -1,15 +1,12 @@
 package org.codedefenders.beans.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -19,6 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.dto.MutantDTO;
@@ -27,7 +25,6 @@ import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameClass.MethodDescription;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
 import org.codedefenders.util.JSONUtils;
