@@ -29,9 +29,11 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.api.analytics.TestSmellDetectorProducer;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
@@ -86,7 +88,8 @@ public class GameManagingUtilsTest {
                     GameManagingUtilsTest.class,
                     TestSmellDetectorProducer.class,
                     NotificationService.class,
-                    MetricsRegistry.class)
+                    MetricsRegistry.class,
+                    Configuration.class)
             .inject(this)
             .activate(RequestScoped.class)
             .activate(ApplicationScoped.class)
@@ -109,6 +112,12 @@ public class GameManagingUtilsTest {
     @Produces
     BackendExecutorService produceBackend() {
         return Mockito.mock(BackendExecutorService.class);
+    }
+
+    @Produces
+    @Singleton
+    Configuration produceConfiguration() {
+        return mock(Configuration.class);
     }
 
     @Inject

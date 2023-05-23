@@ -144,12 +144,13 @@ public class CoverageTest {
         System.setProperty("java.naming.factory.initial", this.getClass().getCanonicalName() + "$MyContextFactory");
         //
         // Recreate codedefenders' folders
-        boolean isCreated = false;
-        isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
-        isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
-        isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
+        //boolean isCreated = false;
+        //isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
+        //isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+        //isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
         //
         // Setup the environment
+        /* TODO(Alex): DATA_DIR is nowadays exposed via Configuration#getDataDir()
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),
                 Paths.get(new File("src/test/resources/itests/build.xml").getAbsolutePath()));
 
@@ -158,7 +159,7 @@ public class CoverageTest {
 
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "lib").toPath(),
                 Paths.get(new File("src/test/resources/itests/lib").getAbsolutePath()));
-
+         */
     }
 
     @Test
@@ -173,7 +174,7 @@ public class CoverageTest {
         UserEntity defender = new UserEntity("demodefender", UserEntity.encodePassword("password"), "demo@defender.com");
         defender.insert();
         // CUT with Inner Static Class
-        File cutFolder = new File(Constants.CUTS_DIR, "ClassWithPrivateInnerClass");
+        File cutFolder = new File(codedefendersHome.getAbsolutePath() + "/sources", "ClassWithPrivateInnerClass");
         cutFolder.mkdirs();
         File jFile = new File(cutFolder, "ClassWithPrivateInnerClass.java");
         File cFile = new File(cutFolder, "ClassWithPrivateInnerClass.class");
