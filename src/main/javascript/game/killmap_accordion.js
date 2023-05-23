@@ -43,6 +43,11 @@ import {Popover} from "../thirdparty/bootstrap";
  * @property {string} name
  */
 
+/**
+ * @typedef {'KILL'|'NO_KILL'|'NO_COVERAGE'|'ERROR'|'UNKNOWN'} KillMapEntryStatus
+ * @typedef {Record<number, Record<number, KillMapEntryStatus>>} KillMapDTO
+ */
+
 class KillMapAccordion {
 
     /**
@@ -52,7 +57,7 @@ class KillMapAccordion {
      *      Given by [new Map(JSON.parse('${killMapAccordion.mutantsAsJSON()}'))]
      * @param {Map<number, object>} tests
      *     Given by [new Map(JSON.parse('${killMapAccordion.testsAsJSON()}'))]
-     * @param {Record<number, Record<number, 'KILL'|'NO_KILL'|'NO_COVERAGE'|'ERROR'|'UNKNOWN'>>} killMap
+     * @param {KillMapDTO} killMap
      *    Given by [JSON.parse('${killMapAccordion.killMapForMutantsAsJSON()}')]
      *    It maps mutant ids to an object that maps test ids to the kill-map result.
      * @param {number} gameId
@@ -79,7 +84,7 @@ class KillMapAccordion {
 
         /**
          * Maps mutant ids to a record which maps test ids to the kill-map result.
-         * @type {Record<number, Record<number, 'KILL'|'NO_KILL'|'NO_COVERAGE'|'ERROR'|'UNKNOWN'>>}
+         * @type {KillMapDTO}
          */
         this._killMap = killMap;
 
@@ -109,6 +114,12 @@ class KillMapAccordion {
         this._mutantTestModals = new Map();
     }
 
+    /**
+     * @protected
+     * @param {Number} mutantId
+     * @param {Number} testId
+     * @return {KillMapEntryStatus} the result of the kill map run for the given mutant and test.
+     */
     _killMapAt(mutantId, testId) {
         if (this._killMap[mutantId] === undefined || this._killMap[mutantId][testId] === undefined) {
             return 'UNKNOWN';

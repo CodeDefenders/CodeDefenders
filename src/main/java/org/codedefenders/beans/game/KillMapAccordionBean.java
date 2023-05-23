@@ -2,7 +2,6 @@ package org.codedefenders.beans.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,10 +17,9 @@ import javax.inject.Named;
 import org.apache.commons.text.StringEscapeUtils;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.dto.KillMapDTO;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.dto.TestDTO;
-import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
@@ -40,13 +38,10 @@ import com.google.gson.annotations.Expose;
 @RequestScoped
 public class KillMapAccordionBean {
     private final AbstractGame game;
-
-    // TODO(kreismar): we should probably introduce a KillmapDTO type, maybe with a corresponding JS class?
-    private final Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> killMapForMutants;
+    private final KillMapDTO killMap;
     private final List<KillMapAccordionCategory> categories = new ArrayList<>();
     private final Map<Integer, MutantDTO> mutantsById;
     private final Map<Integer, TestDTO> testsById;
-
     private static final Logger logger = LoggerFactory.getLogger(KillMapAccordionBean.class);
 
     /**
@@ -58,12 +53,13 @@ public class KillMapAccordionBean {
      */
     @Inject
     public KillMapAccordionBean(CodeDefendersAuth login, GameService gameService, GameProducer gameProducer) {
-        this.game = gameProducer.getGame();
-        this.killMapForMutants = getKillMapForMutants();
+        game = gameProducer.getGame();
+        assert game != null;
+        killMap = new KillMapDTO(game.getId());
 
-        this.mutantsById = gameService.getMutants(login.getUserId(), game.getId()).stream()
+        mutantsById = gameService.getMutants(login.getUserId(), game.getId()).stream()
                 .collect(Collectors.toMap(MutantDTO::getId, Function.identity()));
-        this.testsById = gameService.getTests(login.getUserId(), game.getId()).stream()
+        testsById = gameService.getTests(login.getUserId(), game.getId()).stream()
                 .collect(Collectors.toMap(TestDTO::getId, Function.identity()));
 
         initCategories();
@@ -100,26 +96,8 @@ public class KillMapAccordionBean {
         }
     }
 
-    List<KillMap.KillMapEntry> getKillMap() {
-        return KillmapDAO.getKillMapEntriesForGame(game.getId());
-    }
-
-    private Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> getKillMapForMutants() {
-        Map<Integer, Map<Integer, KillMap.KillMapEntry.Status>> killMapForMutants = new HashMap<>();
-        for (KillMap.KillMapEntry entry : getKillMap()) {
-            if (!killMapForMutants.containsKey(entry.mutant.getId())) {
-                killMapForMutants.put(entry.mutant.getId(), new HashMap<>());
-            }
-            killMapForMutants.get(entry.mutant.getId()).put(entry.test.getId(), entry.status);
-        }
-        return killMapForMutants;
-    }
-
     public String getKillMapForMutantsAsJSON() {
-        Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-        return gson.toJson(killMapForMutants);
+        return killMap.getKillMapForMutantsAsJSON();
     }
 
     public String getCategoriesAsJSON() {
