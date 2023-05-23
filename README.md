@@ -2,7 +2,7 @@
 
 This is Code Defenders, a mutation testing game. Publicly available at [code-defenders.org](<http://code-defenders.org>).
 
-For information regarding running Code Defenders via docker see [the corresponding documentation](docs/Docker.md).
+For information regarding running Code Defenders via docker see [the corresponding documentation](docker/README.md).
 
 ## Vagrant
 

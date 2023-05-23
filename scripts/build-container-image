@@ -23,18 +23,18 @@ GIT_COMMIT_REV_SHORT="$(cd "${GIT_ROOT}"; git rev-parse --short HEAD)"
 readonly GIT_COMMIT_REV_SHORT
 GIT_COMMIT_TIMESTAMP="$(cd "${GIT_ROOT}"; git show -s --format="%ct" "${GIT_COMMIT_REV_SHORT}")"
 readonly GIT_COMMIT_TIMESTAMP
-GIT_STATUS="$(cd "${GIT_ROOT}"; git status --porcelain=v2 --ignored | grep -v -e '^#')"
+GIT_STATUS="$(cd "${GIT_ROOT}"; git status --porcelain=v2 --ignored | grep -v -e '^#' || true)"
 readonly GIT_STATUS
 
-readonly CONTAINER_IMAGE_NAME=${1:-"docker.io/codedefenders/codedefenders"}
+printf '\n[INFO] Building image for git-rev %s\n' "${GIT_COMMIT_REV_SHORT}"
 
-CONTAINER_IMAGE_TAG="${CONTAINER_IMAGE_NAME}:git-${GIT_COMMIT_REV_SHORT}"
+DIRTY_LABEL=""
 if [[ -n "${GIT_STATUS}" ]]; then
-    printf 'Working directory is dirty!\n\n' >&2
-    CONTAINER_IMAGE_TAG="${CONTAINER_IMAGE_TAG}-dirty"
+    printf '[WARNING] Working directory is dirty!\n\n' >&2
+    DIRTY_LABEL='--label=org.code-defenders.git-status=dirty'
+else
+    printf '[INFO] Working directory is clean.\n\n' >&2
+    DIRTY_LABEL='--label=org.code-defenders.git-status=clean'
 fi
-readonly CONTAINER_IMAGE_TAG
 
-
-
-podman build --file "${GIT_ROOT}/docker/Dockerfile" --timestamp="${GIT_COMMIT_TIMESTAMP}" --tag="${CONTAINER_IMAGE_TAG}" "${GIT_ROOT}"
+exec podman build --file "${GIT_ROOT}/docker/Dockerfile" --timestamp="${GIT_COMMIT_TIMESTAMP}" "${GIT_ROOT}" ${DIRTY_LABEL} "$@"
