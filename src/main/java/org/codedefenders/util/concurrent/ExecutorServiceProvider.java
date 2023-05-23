@@ -45,7 +45,14 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 public class ExecutorServiceProvider {
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceProvider.class);
 
-    private static final int AWAIT_SHUTDOWN_TIME = 20; // wait 20 seconds for tasks to complete before shutting down
+    /**
+     * The time we wait for tasks in a {@link ExecutorService} to finish after calling
+     * {@link ExecutorService#shutdown()} and again after calling {@link ExecutorService#shutdownNow()}.
+     *
+     * <p>Note: This results in {@link #shutdown()} taking up to
+     * {@code 2 * AWAIT_SHUTDOWN_TIME * <Number of ExecutorServices>} time to complete.
+     */
+    private static final int AWAIT_SHUTDOWN_TIME = 20;
     private static final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
     private final MetricsRegistry metricsRegistry;
@@ -81,7 +88,6 @@ public class ExecutorServiceProvider {
         }
 
         try {
-            // TODO(Alex): This might potential wait for 2 * AWAIT_SHUTDOWN_TIME * <Number of ExecutorServices>
             for (Map.Entry<String, ExecutorService> entry : executorServices.entrySet()) {
                 String name = entry.getKey();
                 ExecutorService executor = entry.getValue();
@@ -98,10 +104,8 @@ public class ExecutorServiceProvider {
         } catch (InterruptedException ex) {
             logger.debug("Thread got interrupted, shutdownNow all pools");
             // (Re-)Cancel if current thread also interrupted
-            for (Map.Entry<String, ExecutorService> entry : executorServices.entrySet()) {
-                ExecutorService executor = entry.getValue();
-                executor.shutdownNow();
-            }
+            executorServices.values().forEach(ExecutorService::shutdownNow);
+
             // Preserve interrupt status
             Thread.currentThread().interrupt();
         }
