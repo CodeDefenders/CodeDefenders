@@ -94,7 +94,6 @@ public class Paths {
     public static final String API_ANALYTICS_USERS = "/admin/api/users";
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";
     public static final String API_ANALYTICS_KILLMAP = "/admin/api/killmap";
-    public static final String API_PUBLIC_KILLMAP = "/api/killmap";
     public static final String API_KILLMAP_MANAGEMENT = "/admin/api/killmapmanagement";
     public static final String API_ADMIN_PUZZLES_ALL = "/admin/api/puzzles";
     public static final String API_ADMIN_PUZZLE = "/admin/api/puzzles/puzzle";

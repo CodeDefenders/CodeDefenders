@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-@WebServlet({Paths.API_ANALYTICS_KILLMAP, Paths.API_PUBLIC_KILLMAP})
+@WebServlet({Paths.API_ANALYTICS_KILLMAP})
 public class AdminAnalyticsKillMapsApi extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsKillMapsApi.class);
 
