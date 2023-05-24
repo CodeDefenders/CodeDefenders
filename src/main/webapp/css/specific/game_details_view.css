@@ -11,6 +11,8 @@
     background: #eee;
     border-radius: 5px;
     padding: 2rem;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .details-content__item > :is(h1, h2, h3, h4, h5, h6):first-child {
