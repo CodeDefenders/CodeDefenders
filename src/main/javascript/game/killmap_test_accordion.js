@@ -58,8 +58,6 @@ class KillMapTestAccordion extends KillMapAccordion {
                 const dataTable = new DataTable(tableElement, {
                     data: rows,
                     columns: [
-                        {data: null, title: '', defaultContent: ''},
-                        // {data: this._renderIcon.bind(this), title: ''},
                         {data: this._renderKillMapResult.bind(this), title: ''},
                         {data: this._renderId.bind(this), title: ''},
                         {data: this._renderLines.bind(this), title: ''},
