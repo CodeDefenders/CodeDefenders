@@ -82,7 +82,7 @@
 	<div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
 		<h2 class="m-0 text-center">${pageInfo.pageTitle}</h2>
 		<div class="d-flex flex-wrap align-items-center gap-2">
-			<c:if test="${game.state == GameState.ACTIVE || game.state == GameState.FINISHED}">
+			<c:if test="${game.creatorId == login.userId && (game.state == GameState.ACTIVE || game.state == GameState.FINISHED)}">
 				<div>
 					<div data-bs-toggle="tooltip"
 						 title="Start a new game with the same settings and opposite roles.">
