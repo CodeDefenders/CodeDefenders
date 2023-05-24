@@ -67,8 +67,6 @@
 	history.setPlayers(Collections.singletonList(player), otherPlayers);
 %>
 
-<jsp:useBean id="previousSubmission" class="org.codedefenders.beans.game.PreviousSubmissionBean" scope="request"/>
-
 <%-- HEADER --%>
 <link href="${url.forPath("css/specific/game.css")}" rel="stylesheet">
 <link href="${url.forPath("/css/specific/game_details_view.css")}" rel="stylesheet">
@@ -225,6 +223,3 @@
 
 	<!-- This corresponds to dispatcher.Dispatch -->
 	<%@ include file="/jsp/footer_game.jsp" %>
-
-
-		<% previousSubmission.clear(); %>
