@@ -18,35 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
-
-<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
-<%--@elvariable id="meleeScoreboard" type="org.codedefenders.beans.game.MeleeScoreboardBean"--%>
 
 <t:modal id="scoreboard" title="Scoreboard">
     <jsp:attribute name="content">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>User</th>
-                <th>Attack</th>
-                <th>Defense</th>
-                <th>Duels</th>
-                <th>Total Points</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${meleeScoreboard.scoreItems}" var="scoreItem">
-                <tr class="${login.userId eq scoreItem.user.id ? "bg-warning bg-gradient" : ""}">
-                    <td>${scoreItem.user.name}</td>
-                    <td>${scoreItem.attackScore.totalScore}</td>
-                    <td>${scoreItem.defenseScore.totalScore}</td>
-                    <td>${scoreItem.duelScore.totalScore}</td>
-                    <td>${scoreItem.attackScore.totalScore + scoreItem.defenseScore.totalScore + scoreItem.duelScore.totalScore}</td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
+        <t:melee_game_scoreboard/>
     </jsp:attribute>
 </t:modal>

@@ -134,28 +134,7 @@
                 </jsp:attribute>
 			</t:modal>
 
-			<table class="table">
-				<thead>
-				<tr>
-					<th>User</th>
-					<th>Attack</th>
-					<th>Defense</th>
-					<th>Duels</th>
-					<th>Total Points</th>
-				</tr>
-				</thead>
-				<tbody>
-				<c:forEach items="${meleeScoreboard.scoreItems}" var="scoreItem">
-					<tr class="${login.userId eq scoreItem.user.id ? "bg-warning bg-gradient" : ""}">
-						<td>${scoreItem.user.name}</td>
-						<td>${scoreItem.attackScore.totalScore}</td>
-						<td>${scoreItem.defenseScore.totalScore}</td>
-						<td>${scoreItem.duelScore.totalScore}</td>
-						<td>${scoreItem.attackScore.totalScore + scoreItem.defenseScore.totalScore + scoreItem.duelScore.totalScore}</td>
-					</tr>
-				</c:forEach>
-				</tbody>
-			</table>
+			<t:melee_game_scoreboard/>
 		</div>
 		<div class="details-content__item">
 			<h3>The game's duration</h3>

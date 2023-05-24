@@ -122,7 +122,7 @@
                 </jsp:attribute>
 			</t:modal>
 
-			<t:game_scoreboard
+			<t:battleground_game_scoreboard
 					playerId="${playerId}"
 					gameFinished="${game.state == GameState.ACTIVE || game.state == GameState.FINISHED}"
 			/>
