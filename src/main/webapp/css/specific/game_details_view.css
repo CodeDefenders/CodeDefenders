@@ -22,3 +22,8 @@
 .details-content .details-content__item .game-component-header {
     margin-top: 0;
 }
+
+.details-content #cut-div .game-component-resize {
+    height: 70vh;
+    min-height: 250px;
+}

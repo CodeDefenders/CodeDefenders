@@ -55,6 +55,23 @@
 	history.setPlayers(game.getAttackerPlayers(), game.getDefenderPlayers());
 %>
 
+<jsp:useBean id="classViewer" class="org.codedefenders.beans.game.ClassViewerBean" scope="request"/>
+<%
+	classViewer.setClassCode(game.getCUT());
+	classViewer.setDependenciesForClass(game.getCUT());
+%>
+
+<jsp:useBean id="gameHighlighting" class="org.codedefenders.beans.game.GameHighlightingBean" scope="request"/>
+<%
+	gameHighlighting.setGameData(game.getMutants(), game.getTests());
+	gameHighlighting.setFlaggingData(game.getMode(), game.getId());
+	gameHighlighting.setEnableFlagging(false);
+	gameHighlighting.setCodeDivSelector("#cut-div");
+%>
+
+<jsp:useBean id="mutantExplanation" class="org.codedefenders.beans.game.MutantExplanationBean" scope="request"/>
+<% mutantExplanation.setCodeValidatorLevel(game.getMutantValidatorLevel()); %>
+
 <%-- HEADER --%>
 <link href="${url.forPath("css/specific/game.css")}" rel="stylesheet">
 <link href="${url.forPath("/css/specific/game_details_view.css")}" rel="stylesheet">
@@ -171,31 +188,10 @@
 			</div>
 		</div>
 
-		<div class="details-content__item">
+		<div class="details-content__item" id="cut-div">
 			<h3>Class under test</h3>
-			<div class="p-0 codemirror-expand loading loading-bg-gray loading-height-200">
-				<pre class="m-0"><textarea aria-label="Class under test" id="class-under-test"></textarea></pre>
-			</div>
-			<script>
-				(async function () {
-					const {default: CodeMirror} = await import('${url.forPath("/js/codemirror.mjs")}');
-					const {InfoApi, LoadingAnimation} = await import('${url.forPath("/js/codedefenders_main.mjs")}');
-
-					const textarea = document.getElementById('class-under-test');
-
-					const editor = CodeMirror.fromTextArea(textarea, {
-						lineNumbers: true,
-						readOnly: true,
-						mode: 'text/x-java',
-						autoRefresh: true,
-						viewportMargin: Infinity,
-					});
-					editor.getWrapperElement().classList.add('codemirror-readonly');
-
-					await InfoApi.setClassEditorValue(editor, ${game.classId});
-					LoadingAnimation.hideAnimation(textarea);
-				})();
-			</script>
+			<jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+			<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
 		</div>
 
 		<div class="details-content__item">
