@@ -61,16 +61,6 @@
     border-top: 1px solid rgba(0, 0, 0, .125);
 }
 
-/* Details.
------------------------------------------------------------------------------ */
-#kill-map-mutant-accordion .kma-mutant-details {
-    border-bottom: 1px solid #dee2e6;
-    display: flex;
-    justify-content: flex-start;
-    gap: 1.5rem;
-    padding: .6rem .8rem;
-}
-
 /* Tables.
 ----------------------------------------------------------------------------- */
 
