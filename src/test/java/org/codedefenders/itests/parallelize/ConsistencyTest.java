@@ -184,14 +184,15 @@ public class ConsistencyTest {
         //
         // Recreate codedefenders' folders
         boolean isCreated = false;
-        isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/mutants")).mkdirs() || (new File(codedefendersHome + "/mutants")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-        isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/sources")).mkdirs() || (new File(codedefendersHome + "/sources")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-        isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/tests")).mkdirs() || (new File(codedefendersHome + "/tests")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
         //
         // Setup the environment
+        /* TODO(Alex): DATA_DIR is nowadays exposed via Configuration#getDataDir()
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),
                 Paths.get(new File("src/test/resources/itests/build.xml").getAbsolutePath()));
 
@@ -200,7 +201,7 @@ public class ConsistencyTest {
 
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "lib").toPath(),
                 Paths.get(new File("src/test/resources/itests/lib").getAbsolutePath()));
-
+         */
     }
 
     /**
@@ -227,7 +228,7 @@ public class ConsistencyTest {
         }
 
         // Upload the Class Under test - Maybe better use Classloader
-        File cutFolder = new File(Constants.CUTS_DIR, "Lift");
+        File cutFolder = new File(codedefendersHome + "/sources", "Lift");
         cutFolder.mkdirs();
         File jFile = new File(cutFolder, "Lift.java");
         File cFile = new File(cutFolder, "Lift.class");

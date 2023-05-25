@@ -143,14 +143,15 @@ public class ExecutionTest {
         //
         // Recreate codedefenders' folders
         boolean isCreated = false;
-        isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/mutants")).mkdirs() || (new File(codedefendersHome + "/mutants")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-        isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/sources").mkdirs()) || (new File(codedefendersHome + "/sources").exists());
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-        isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
+        isCreated = (new File(codedefendersHome + "/tests")).mkdirs() || (new File(codedefendersHome + "/tests")).exists();
         System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
         //
         // Setup the environment
+        /* TODO(Alex): DATA_DIR is nowadays exposed via Configuration#getDataDir()
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),
                 Paths.get(new File("src/test/resources/itests/build.xml").getAbsolutePath()));
 
@@ -159,7 +160,7 @@ public class ExecutionTest {
 
         Files.createSymbolicLink(new File(Constants.DATA_DIR, "lib").toPath(),
                 Paths.get(new File("src/test/resources/itests/lib").getAbsolutePath()));
-
+         */
     }
 
     /*
@@ -185,7 +186,7 @@ public class ExecutionTest {
         UserEntity defender = new UserEntity("demodefender", UserEntity.encodePassword("password"), "demo@defender.com");
         defender.insert();
         // CUT
-        File cutFolder = new File(Constants.CUTS_DIR, "XmlElement");
+        File cutFolder = new File(codedefendersHome + "/sources", "XmlElement");
         cutFolder.mkdirs();
         File javaFile = new File(cutFolder, "XmlElement.java");
         File classFile = new File(cutFolder, "XmlElement.class");

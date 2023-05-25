@@ -33,13 +33,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.codedefenders.configuration.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 
-import static org.codedefenders.util.Constants.DATA_DIR;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.util.Constants.TEST_PREFIX;
 
@@ -48,6 +48,8 @@ import static org.codedefenders.util.Constants.TEST_PREFIX;
  */
 public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
+
+    private static final Configuration config = CDIUtil.getBeanFromCDI(Configuration.class);
 
     /*
      * Some Notes regarding file organization of Code Defenders.
@@ -201,11 +203,11 @@ public class FileUtils {
     }
 
     /**
-     * Converts a path relative to {@link Constants#DATA_DIR} to an absolute path.
+     * Converts a path relative to {@link Configuration#getDataDir()} to an absolute path.
      * If the given path is absolute, returns the given path. If the given path is relative, returns an absolute path
-     * that concatenates {@link Constants#DATA_DIR} and the given path.
+     * that concatenates {@link Configuration#getDataDir()}} and the given path.
      *
-     * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
+     * @param path a path relative to {@link Configuration#getDataDir()}}, or an absolute path.
      * @return an absolute path that describes the given path.
      */
     public static Path getAbsoluteDataPath(String path) {
@@ -213,42 +215,42 @@ public class FileUtils {
     }
 
     /**
-     * Converts a path relative to {@link Constants#DATA_DIR} to an absolute path.
+     * Converts a path relative to {@link Configuration#getDataDir()}} to an absolute path.
      * If the given path is absolute, returns the given path. If the given path is relative, returns an absolute path
-     * that concatenates {@link Constants#DATA_DIR} and the given path.
+     * that concatenates {@link Configuration#getDataDir()}} and the given path.
      *
-     * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
+     * @param path a path relative to {@link Configuration#getDataDir()}}, or an absolute path.
      * @return an absolute path that describes the given path.
      */
     public static Path getAbsoluteDataPath(Path path) {
         if (path.isAbsolute()) {
             return path;
         } else {
-            return Paths.get(DATA_DIR, path.toString());
+            return Paths.get(config.getDataDir().toString(), path.toString());
         }
     }
 
     /**
-     * Converts an absolute path to a path relative to {@link Constants#DATA_DIR} if the path is a descendant of
-     * {@link Constants#DATA_DIR}. Otherwise, returns the given path itself.
+     * Converts an absolute path to a path relative to {@link  Configuration#getDataDir()}} if the path is a descendant of
+     * {@link Configuration#getDataDir()}}. Otherwise, returns the given path itself.
      *
      * @param path an absolute path.
-     * @return a path relative to {@link Constants#DATA_DIR} or the path itself.
+     * @return a path relative to {@link Configuration#getDataDir()}} or the path itself.
      */
     public static Path getRelativeDataPath(String path) {
         return getRelativeDataPath(Paths.get(path));
     }
 
     /**
-     * Converts an absolute path to a path relative to {@link Constants#DATA_DIR} if the path is a descendant of
-     * {@link Constants#DATA_DIR}. Otherwise, returns the given path itself.
+     * Converts an absolute path to a path relative to {@link Configuration#getDataDir()}} if the path is a descendant of
+     * {@link Configuration#getDataDir()}}. Otherwise, returns the given path itself.
      *
      * @param path an absolute path.
-     * @return a path relative to {@link Constants#DATA_DIR} or the path itself.
+     * @return a path relative to {@link Configuration#getDataDir()}} or the path itself.
      */
     public static Path getRelativeDataPath(Path path) {
-        if (path.startsWith(DATA_DIR)) {
-            return Paths.get(DATA_DIR).relativize(path);
+        if (path.startsWith(config.getDataDir().toString())) {
+            return config.getDataDir().toPath().relativize(path);
         } else {
             return path;
         }
