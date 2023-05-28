@@ -18,6 +18,7 @@ public class UserProfileBean {
     private UserEntity user;
     private Map<GameType, UserStats> stats;
     private boolean isSelf;
+    private UserStats.PuzzleStats puzzleStats;
 
     /**
      * Show the profile page for this user.
@@ -54,5 +55,13 @@ public class UserProfileBean {
 
     public void setSelf(boolean self) {
         isSelf = self;
+    }
+
+    public UserStats.PuzzleStats getPuzzleStats() {
+        return puzzleStats;
+    }
+
+    public void setPuzzleStats(UserStats.PuzzleStats puzzleStats) {
+        this.puzzleStats = puzzleStats;
     }
 }

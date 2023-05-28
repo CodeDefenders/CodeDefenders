@@ -137,11 +137,13 @@ public class UserProfileManager extends HttpServlet {
         // load stats
         final UserEntity user = urlParamUser.orElseGet(login::getUserEntity);
         final Map<GameType, UserStats> stats = userStatsService.getStatsByUserId(user.getId());
+        final UserStats.PuzzleStats puzzleStats = userStatsService.getPuzzleStatsByUserId(user.getId());
 
         // Pass values to JSP page
         userProfileBean.setUser(user);
         userProfileBean.setSelf(isSelf);
         userProfileBean.setStats(stats);
+        userProfileBean.setPuzzleStats(puzzleStats);
         request.setAttribute("profile", userProfileBean);
 
         request.getRequestDispatcher(Constants.USER_PROFILE_JSP).forward(request, response);

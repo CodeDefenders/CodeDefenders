@@ -120,22 +120,39 @@
                     label1="By writing tests:" value1="${stats.totalPointsTests}"
                     label2="By creating mutants:" value2="${stats.totalPointsMutants}"
             />
-
-            <t:dashboard_pie
-                    type="games" title="Games played"
-                    total="${stats.totalGames}"
-                    percentage="${stats.defenderGamesPercentage}"
-                    label1="As defender:" value1="${stats.defenderGames}"
-                    label2="As attacker:" value2="${stats.attackerGames}"
-            />
         </div>
 
         <dl class="other-stats mt-3">
+            <dt>Total melee games played:</dt>
+            <dd>${stats.totalGames}</dd>
+
             <dt>Average points per tests:</dt>
             <dd>${stats.avgPointsTests}</dd>
 
             <dt>Average points per mutant:</dt>
             <dd>${stats.avgPointsMutants}</dd>
+        </dl>
+    </section>
+
+    <section class="mt-5 statistics" aria-labelledby="stats-puzzle">
+        <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
+
+        <dl class="other-stats">
+            <%--@elvariable id="chapter" type="org.codedefenders.game.puzzle.PuzzleChapter"--%>
+            <%--@elvariable id="maxPuzzle" type="java.lang.Integer"--%>
+            <%--@elvariable id="hasPlayed" type="java.lang.String"--%>
+            <c:forEach items="${profile.puzzleStats.chapters}" var="chapter">
+                <c:set var="maxPuzzle" value="${profile.puzzleStats.getMaxPuzzle(chapter.position)}"/>
+                <c:set var="hasPlayed" value="${maxPuzzle == 0 ? 'class=\"text-muted\"' : ''}"/>
+                <dt ${hasPlayed}>Chapter ${chapter.position} - ${chapter.title}:</dt>
+                <dd ${hasPlayed}>
+                    <c:choose><c:when test="${maxPuzzle != 0}">
+                        highest puzzle solved is puzzle ${maxPuzzle}
+                    </c:when><c:otherwise>
+                        chapter not played yet
+                    </c:otherwise></c:choose>
+                </dd>
+            </c:forEach>
         </dl>
     </section>
 

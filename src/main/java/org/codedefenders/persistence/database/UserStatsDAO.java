@@ -8,6 +8,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.dto.UserStats;
+import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.persistence.database.util.QueryRunner;
@@ -261,6 +264,60 @@ public class UserStatsDAO {
                     resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
                     userId,
                     role.toString()
+            ).orElse(0);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public UserStats.PuzzleStats getPuzzleStatsByUser(int userId) {
+        final String query = String.join("\n",
+                "SELECT puzzle_chapters.Position AS chapter, MAX(puzzles.Position) AS puzzle",
+                "FROM puzzles, puzzle_chapters, games",
+                "WHERE puzzles.Chapter_ID = puzzle_chapters.Chapter_ID",
+                "AND games.Puzzle_ID = puzzles.Puzzle_ID",
+                "AND games.Mode = ?",
+                "AND games.State = ?",
+                "AND games.Creator_ID = ?",
+                "GROUP BY puzzle_chapters.Position"
+        );
+
+        try {
+            return queryRunner.query(
+                    query,
+                    resultSet -> {
+                        final UserStats.PuzzleStats stats = new UserStats.PuzzleStats();
+                        while (resultSet.next()) {
+                            stats.addPuzzle(
+                                    resultSet.getInt("chapter"),
+                                    resultSet.getInt("puzzle")
+                            );
+                        }
+                        return stats;
+                    },
+                    GameMode.PUZZLE.toString(), GameState.SOLVED.toString(), userId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public int getTotalGamesByUser(int userId, GameType gameType) {
+        final String query = String.join("\n",
+                "SELECT count(view_players.Game_ID) AS games",
+                "FROM view_players",
+                "JOIN " + getViewForGameType(gameType) + " AS g",
+                "ON view_players.Game_ID = g.ID",
+                "WHERE User_ID = ? "
+        );
+
+        try {
+            return queryRunner.query(
+                    query,
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
+                    userId
             ).orElse(0);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
