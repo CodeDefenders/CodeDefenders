@@ -1,6 +1,7 @@
 package org.codedefenders.servlets;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @WebServlet(Paths.CLASSROOM)
 public class ClassroomServlet extends HttpServlet {
@@ -66,8 +68,10 @@ public class ClassroomServlet extends HttpServlet {
 
         // Go to join classroom page
         if (classroom.get().isOpen()) {
+            List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.get().getId());
             pageInfo.setPageTitle("Join " + classroom.get().getName());
             request.setAttribute("classroom", classroom.get());
+            request.setAttribute("numMembers", members.size());
             request.getRequestDispatcher("/jsp/join_classroom_page.jsp").forward(request, response);
             return;
         }
@@ -96,10 +100,12 @@ public class ClassroomServlet extends HttpServlet {
 
         Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
                 classroom.get().getId(), login.getUserId());
-        if (!member.isPresent() || member.get().getRole() != ClassroomRole.OWNER) {
-            messages.add("You must be the owner of this classroom.");
-            Redirect.redirectBack(request, response);
-            return;
+        if (!action.get().equals("join")) {
+            if (!member.isPresent() || member.get().getRole() != ClassroomRole.OWNER) {
+                messages.add("You must be the owner of this classroom.");
+                Redirect.redirectBack(request, response);
+                return;
+            }
         }
 
         try {
@@ -130,6 +136,9 @@ public class ClassroomServlet extends HttpServlet {
                     break;
                 case "kick-member":
                     kickMember(request, response, classroom.get());
+                    break;
+                case "join":
+                    join(request, response, classroom.get());
                     break;
             }
         } catch (ValidationException e) {
@@ -235,6 +244,25 @@ public class ClassroomServlet extends HttpServlet {
         classroomService.removeMember(classroom.getId(), userId);
 
         messages.add("Successfully kicked member");
+        response.sendRedirect(url.forPath(Paths.CLASSROOM) + "?classroomId=" + classroom.getId());
+    }
+
+    private void join(HttpServletRequest request, HttpServletResponse response, Classroom classroom)
+            throws IOException {
+        if (classroom.getPassword().isPresent()) {
+            String password = ServletUtils.getStringParameter(request, "password").get();
+            boolean matches = new BCryptPasswordEncoder().matches(password, classroom.getPassword().get());
+            if (!matches) {
+                messages.add("Wrong password");
+                Redirect.redirectBack(request, response);
+                return;
+            }
+        }
+
+        ClassroomMember member = new ClassroomMember(login.getUserId(), classroom.getId(), ClassroomRole.STUDENT);
+        classroomService.addMember(member);
+
+        messages.add("Successfully joined classroom");
         response.sendRedirect(url.forPath(Paths.CLASSROOM) + "?classroomId=" + classroom.getId());
     }
 }
