@@ -218,6 +218,10 @@ public class ClassroomService {
         return classroomRepository.getClassroomsByMemberAndRole(userId, role);
     }
 
+    public List<Classroom> getAllClassrooms() {
+        return classroomRepository.getAllClassrooms();
+    }
+
     public List<Classroom> getClassroomsByMember(int userId) {
         return classroomRepository.getClassroomsByMember(userId);
     }

@@ -110,6 +110,16 @@ public class ClassroomRepository {
         }
     }
 
+    public List<Classroom> getAllClassrooms() {
+        @Language("SQL") String query = "SELECT * FROM classrooms";
+        try {
+            return queryRunner.query(query, listFromRS(this::classroomFromRS));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
     public List<Classroom> getClassroomsByMemberAndRole(int userId, ClassroomRole role) {
         @Language("SQL") String query = String.join("\n",
                 "SELECT classrooms.* FROM classrooms, classroom_members",

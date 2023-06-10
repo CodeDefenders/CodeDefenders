@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -13,11 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
-import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
+import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -35,7 +36,7 @@ public class ClassroomAPI extends HttpServlet {
     @Inject
     private UserService userService;
     @Inject
-    private CodeDefendersAuth login;
+    private AuthService login;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -49,6 +50,9 @@ public class ClassroomAPI extends HttpServlet {
         }
 
         switch (type.get()) {
+            case "classrooms":
+                handleClassrooms(request, response);
+                return;
             case "members":
                 handleMembers(request, response);
                 return;
@@ -78,6 +82,22 @@ public class ClassroomAPI extends HttpServlet {
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
         gson.toJson(getMembers(classroom.get()), response.getWriter());
+    }
+
+    private void handleClassrooms(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (!login.isAdmin()) {
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return;
+        }
+
+        List<Classroom> classrooms = classroomService.getAllClassrooms();
+        List<ClassroomDTO> classroomDTOs = classrooms.stream()
+                .map(c -> new ClassroomDTO(c.getId(), c.getName(), c.getRoomCode(), c.isOpen()))
+                .collect(Collectors.toList());
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        gson.toJson(classroomDTOs, response.getWriter());
     }
 
     private List<ClassroomMemberDTO> getMembers(Classroom classroom) {
@@ -120,6 +140,27 @@ public class ClassroomAPI extends HttpServlet {
         public ClassroomMemberDTO(SimpleUser user, ClassroomRole role) {
             this.user = user;
             this.role = role;
+        }
+    }
+
+    private static class ClassroomDTO {
+        @Expose
+        private final int id;
+
+        @Expose
+        private final String name;
+
+        @Expose
+        private final String roomCode;
+
+        @Expose
+        private final boolean open;
+
+        public ClassroomDTO(int id, String name, String roomCode, boolean open) {
+            this.id = id;
+            this.name = name;
+            this.roomCode = roomCode;
+            this.open = open;
         }
     }
 }
