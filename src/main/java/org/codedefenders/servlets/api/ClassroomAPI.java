@@ -64,6 +64,13 @@ public class ClassroomAPI extends HttpServlet {
         }
     }
 
+    private Optional<ClassroomMember> getMember(int classroomId) {
+        if (login.isAdmin()) {
+            return Optional.of(new ClassroomMember(login.getUserId(), classroomId, ClassroomRole.OWNER));
+        }
+        return classroomService.getMemberForClassroomAndUser(classroomId, login.getUserId());
+    }
+
     private void handleMembers(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
         if (!classroom.isPresent()) {
@@ -71,8 +78,7 @@ public class ClassroomAPI extends HttpServlet {
             return;
         }
 
-        Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
-                classroom.get().getId(), login.getUserId());
+        Optional<ClassroomMember> member = getMember(classroom.get().getId());
         if (!member.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;

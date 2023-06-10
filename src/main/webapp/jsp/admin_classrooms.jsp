@@ -161,6 +161,7 @@
         import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
         const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
+        const CLASSROOM_URL = '${url.forPath(Paths.CLASSROOM)}';
 
         const getClassrooms = async function() {
             const params = new URLSearchParams({
@@ -177,6 +178,24 @@
                 return null;
             }
             return await response.json();
+        };
+
+        const renderLinkButton = function(data, type, row, meta) {
+            switch (type) {
+                case 'type':
+                case 'sort':
+                case 'filter':
+                    return null;
+                case 'display':
+                    const params = new URLSearchParams({
+                        room: data.roomCode
+                    });
+                    return `
+                        <a href="\${CLASSROOM_URL}?\${params}" class="cursor-pointer float-end px-2">
+                            <i class="fa fa-external-link text-primary"></i>
+                        </a>
+                    `;
+            }
         };
 
         const classrooms = await getClassrooms();
@@ -203,7 +222,13 @@
                     data: 'open',
                     type: 'boolean',
                     title: 'Open'
-                }
+                },
+                {
+                    data: null,
+                    title: 'Link',
+                    render: renderLinkButton,
+                    width: '2em'
+                },
             ],
             order: [[1, 'asc']],
             scrollY: '600px',

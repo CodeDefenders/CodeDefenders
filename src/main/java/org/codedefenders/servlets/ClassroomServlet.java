@@ -13,12 +13,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
 
-import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
+import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -33,7 +33,7 @@ public class ClassroomServlet extends HttpServlet {
     private ClassroomService classroomService;
 
     @Inject
-    private CodeDefendersAuth login;
+    private AuthService login; // for some reason it injects LoginBean if the type is CodeDefendersAuth
 
     @Inject
     private MessagesBean messages;
@@ -54,8 +54,7 @@ public class ClassroomServlet extends HttpServlet {
             return;
         }
 
-        Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
-                classroom.get().getId(), login.getUserId());
+        Optional<ClassroomMember> member = getMember(classroom.get().getId());
 
         // Go to classroom page
         if (member.isPresent()) {
@@ -98,8 +97,7 @@ public class ClassroomServlet extends HttpServlet {
             return;
         }
 
-        Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
-                classroom.get().getId(), login.getUserId());
+        Optional<ClassroomMember> member = getMember(classroom.get().getId());
         if (!action.get().equals("join")) {
             if (!member.isPresent() || member.get().getRole() != ClassroomRole.OWNER) {
                 messages.add("You must be the owner of this classroom.");
@@ -148,6 +146,13 @@ public class ClassroomServlet extends HttpServlet {
             messages.add("Missing or invalid parameter.");
             Redirect.redirectBack(request, response);
         }
+    }
+
+    private Optional<ClassroomMember> getMember(int classroomId) {
+        if (login.isAdmin()) {
+            return Optional.of(new ClassroomMember(login.getUserId(), classroomId, ClassroomRole.OWNER));
+        }
+        return classroomService.getMemberForClassroomAndUser(classroomId, login.getUserId());
     }
 
     private Optional<Classroom> getClassroomFromRequest(HttpServletRequest request) {
