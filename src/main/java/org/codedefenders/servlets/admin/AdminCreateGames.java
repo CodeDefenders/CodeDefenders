@@ -20,13 +20,16 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -47,9 +50,12 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.Classroom;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -181,12 +187,7 @@ public class AdminCreateGames extends HttpServlet {
         return gameSettings;
     }
 
-    /**
-     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGamesWithUsers(Set,
-     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int, int) AdminCreateGamesBean#stageGames()}.
-     * @param request The HTTP request.
-     */
-    private void stageGamesWithUsers(HttpServletRequest request) {
+    private Optional<Set<UserInfo>> extractPlayers(HttpServletRequest request) {
         /* Extract user IDs from the table. */
         String userIdsStr = request.getParameter("userIds");
         Set<Integer> userIdsFromTable;
@@ -198,10 +199,10 @@ public class AdminCreateGames extends HttpServlet {
                     .collect(Collectors.toSet());
         } catch (NullPointerException e) {
             messages.add("ERROR: Missing parameter: userIds.");
-            return;
+            return Optional.empty();
         } catch (NumberFormatException e) {
             messages.add("ERROR: Invalid parameter: userIds.");
-            return;
+            return Optional.empty();
         }
 
         /* Extract user names/emails from the text field. */
@@ -214,12 +215,40 @@ public class AdminCreateGames extends HttpServlet {
                     .collect(Collectors.toSet());
         } catch (NullPointerException e) {
             messages.add("ERROR: Missing parameter: userNames.");
-            return;
-        } catch (NumberFormatException e) {
-            messages.add("ERROR: Invalid parameter: userNames.");
-            return;
+            return Optional.empty();
         }
 
+        Optional<Integer> classroomId = getIntParameter(request, "classroomId");
+
+
+        /* Map given user IDs to users and validate that all exist. */
+        Optional<Set<UserInfo>> usersFromTable = adminCreateGamesBean.getUserInfosForIds(userIdsFromTable);
+        if (!usersFromTable.isPresent()) {
+            return Optional.empty();
+        }
+
+        /* Map given user names/emails to users and validate that all exist. */
+        Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
+        if (!usersFromTextArea.isPresent()) {
+            return Optional.empty();
+        }
+
+        /* Get users for classrooms. */
+        Optional<Set<UserInfo>> usersFromClassroomTable = classroomId.map(adminCreateGamesBean::getPlayersForClassroom);
+
+        Set<UserInfo> players = new HashSet<>();
+        players.addAll(usersFromTable.get());
+        players.addAll(usersFromTextArea.get());
+        usersFromClassroomTable.ifPresent(players::addAll);
+        return Optional.of(players);
+    }
+
+    /**
+     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGamesWithUsers(Set,
+     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int, int, Set) AdminCreateGamesBean#stageGames()}.
+     * @param request The HTTP request.
+     */
+    private void stageGamesWithUsers(HttpServletRequest request) {
         /* Extract game settings. */
         GameSettings gameSettings = extractGameSettings(request);
         if (gameSettings == null) {
@@ -246,25 +275,14 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        /* Map given user IDs to users and validate that all exist. */
-        Optional<Set<UserInfo>> usersFromTable = adminCreateGamesBean.getUserInfosForIds(userIdsFromTable);
-        if (!usersFromTable.isPresent()) {
+        Optional<Set<UserInfo>> players = extractPlayers(request);
+        if (!players.isPresent()) {
             return;
         }
-
-        /* Map given user names/emails to users and validate that all exist. */
-        Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
-        if (!usersFromTextArea.isPresent()) {
-            return;
-        }
-
-        Set<UserInfo> users = new HashSet<>();
-        users.addAll(usersFromTable.get());
-        users.addAll(usersFromTextArea.get());
 
         /* Validate that no users are already assigned to other staged games. */
         Set<Integer> assignedUsers = stagedGameList.getAssignedUsers();
-        for (UserInfo user : users) {
+        for (UserInfo user : players.get()) {
             if (assignedUsers.contains(user.getUser().getId())) {
                 messages.add(format("ERROR: Cannot create staged games with user {0}. "
                         + "User is already assigned to a staged game.",
@@ -286,8 +304,7 @@ public class AdminCreateGames extends HttpServlet {
             }
         }
 
-
-        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod,
+        adminCreateGamesBean.stageGamesWithUsers(players.get(), gameSettings, roleAssignmentMethod,
                 teamAssignmentMethod, attackersPerGame, defendersPerGame, playersPerGame);
     }
 

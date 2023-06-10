@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,9 +33,13 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.Classroom;
+import org.codedefenders.model.ClassroomMember;
+import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -72,16 +77,19 @@ public class AdminCreateGamesBean implements Serializable {
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
     private final GameService gameService;
+    private final ClassroomService classroomService;
 
     @Inject
     public AdminCreateGamesBean(CodeDefendersAuth login, MessagesBean messages, GameManagingUtils gameManagingUtils,
-                                EventDAO eventDAO, UserRepository userRepo, GameService gameService) {
+                                EventDAO eventDAO, UserRepository userRepo, GameService gameService,
+                                ClassroomService classroomService) {
         this.login = login;
         this.messages = messages;
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
         this.gameService = gameService;
+        this.classroomService = classroomService;
     }
 
     public Object getSynchronizer() {
@@ -479,6 +487,16 @@ public class AdminCreateGamesBean implements Serializable {
         return success ? Optional.of(users) : Optional.empty();
     }
 
+    public Set<UserInfo> getPlayersForClassroom(int classroomId) {
+        List<ClassroomMember> members = classroomService.getMembersForClassroom(classroomId);
+        return members.stream()
+                .filter(member -> member.getRole() == ClassroomRole.STUDENT)
+                .map(ClassroomMember::getUserId)
+                .map(userInfos::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
     /**
      * Assigns roles to a collection of users based on a {@link RoleAssignmentMethod}. The users will be added to the
      * given {@code attackers} and {@code defenders} sets accordingly. Users that cannot be assigned with the given
@@ -773,6 +791,29 @@ public class AdminCreateGamesBean implements Serializable {
                 .collect(Collectors.toList());
         Gson gson = new GsonBuilder().create();
         return gson.toJson(userIds);
+    }
+
+    public String getClassroomsJSON() {
+        List<Classroom> classrooms = new ArrayList<>();
+        classrooms.addAll(classroomService.getClassroomsByMemberAndRole(login.getUserId(), ClassroomRole.OWNER));
+        classrooms.addAll(classroomService.getClassroomsByMemberAndRole(login.getUserId(), ClassroomRole.MODERATOR));
+        Gson gson = new GsonBuilder()
+                .serializeNulls()
+                .registerTypeAdapter(Classroom.class, new ClassroomSerializer())
+                .create();
+        return gson.toJson(classrooms);
+    }
+
+    // TODO: Move this elsewhere?
+    public static class ClassroomSerializer implements JsonSerializer<Classroom> {
+        @Override
+        public JsonElement serialize(Classroom classroom, Type type, JsonSerializationContext context) {
+            JsonObject obj = new JsonObject();
+            obj.addProperty("id", classroom.getId());
+            obj.addProperty("name", classroom.getName());
+            obj.addProperty("roomCode", classroom.getRoomCode());
+            return obj;
+        }
     }
 
     // TODO: Move this elsewhere?

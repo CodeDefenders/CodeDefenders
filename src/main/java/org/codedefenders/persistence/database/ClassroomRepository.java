@@ -121,7 +121,7 @@ public class ClassroomRepository {
             return queryRunner.query(query,
                     listFromRS(this::classroomFromRS),
                     userId,
-                    role
+                    role.name()
             );
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);

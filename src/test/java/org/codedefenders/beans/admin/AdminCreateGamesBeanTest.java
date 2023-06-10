@@ -1,6 +1,7 @@
 package org.codedefenders.beans.admin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -99,8 +101,9 @@ public class AdminCreateGamesBeanTest {
         EventDAO eventDAO = PowerMockito.mock(EventDAO.class);
         userRepo = PowerMockito.mock(UserRepository.class);
         GameService gameService = PowerMockito.mock(GameService.class);
+        ClassroomService classroomService = PowerMockito.mock(ClassroomService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService);
+        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService, classroomService);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
