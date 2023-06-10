@@ -19,13 +19,23 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.ValidationException;
 
+import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.model.Classroom;
+import org.codedefenders.service.ClassroomService;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +44,52 @@ import org.slf4j.LoggerFactory;
 public class AdminClassrooms extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminClassrooms.class);
 
+    @Inject
+    private ClassroomService classroomService;
+
+    @Inject
+    private CodeDefendersAuth login;
+
+    @Inject
+    private MessagesBean messages;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher("/jsp/admin_classrooms.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Optional<String> action = ServletUtils.getStringParameter(request, "action");
+        if (!action.isPresent()) {
+            messages.add("Missing required parameter: action.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        try {
+            switch (action.get()) {
+                case "create-classroom":
+                    createClassroom(request, response);
+                    break;
+            }
+        } catch (ValidationException e) {
+            messages.add("Validation failed: " + e.getMessage());
+            Redirect.redirectBack(request, response);
+        } catch (NoSuchElementException e) {
+            messages.add("Missing or invalid parameter.");
+            Redirect.redirectBack(request, response);
+        }
+    }
+
+    private void createClassroom(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String name = ServletUtils.getStringParameter(request, "name").get();
+        String roomCode = ServletUtils.getStringParameter(request, "room-code").orElse(null);
+
+        Classroom classroom = new Classroom(name, roomCode, null, false);
+        classroomService.addClassroom(classroom, login.getUserId());
+
+        Redirect.redirectBack(request, response);
     }
 }

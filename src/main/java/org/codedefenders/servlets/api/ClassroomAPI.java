@@ -36,7 +36,7 @@ public class ClassroomAPI extends HttpServlet {
     @Inject
     private UserService userService;
     @Inject
-    private AuthService login;
+    private AuthService login; // for some reason it injects LoginBean if the type is CodeDefendersAuth
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
