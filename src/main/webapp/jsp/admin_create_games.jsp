@@ -1166,10 +1166,11 @@
                 columns: [
                     {
                         data: null,
-                        title: '',
+                        title: 'Select',
                         defaultContent: '',
                         className: 'select-checkbox',
-                        orderDataType: 'select-extension'
+                        orderDataType: 'select-extension',
+                        width: '3em'
                     },
                     {
                         data: 'id',
@@ -1377,10 +1378,11 @@
                 columns: [
                     {
                         data: null,
-                        title: '',
+                        title: 'Select',
                         defaultContent: '',
                         className: 'select-checkbox',
-                        orderDataType: 'select-extension'
+                        orderDataType: 'select-extension',
+                        width: '3em'
                     },
                     {
                         data: 'user.id',
@@ -1529,10 +1531,11 @@
                 columns: [
                     {
                         data: null,
-                        title: '',
+                        title: 'Select',
                         defaultContent: '',
                         className: 'select-checkbox',
-                        orderDataType: 'select-extension'
+                        orderDataType: 'select-extension',
+                        width: '3em'
                     },
                     {
                         data: 'id',
