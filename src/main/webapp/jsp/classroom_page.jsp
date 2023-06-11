@@ -145,7 +145,8 @@
                     <label for="name-input" class="form-label">Name</label>
                     <input type="text" class="form-control" id="name-input" name="name"
                            value="<c:out value="${classroom.name}"/>"
-                           required maxlength="100">
+                           required maxlength="100"
+                           placeholder="Name">
                     <div class="invalid-feedback">
                         Please enter a valid name.
                     </div>
@@ -250,7 +251,8 @@
                     <div class="input-group has-validation">
                         <input type="text" class="form-control" id="room-code-input" name="room-code"
                                value="<c:out value="${classroom.roomCode}"/>"
-                               required minlength="4" maxlength="20" pattern="[a-zA-Z0-9_\-]*">
+                               required minlength="4" maxlength="20" pattern="[a-zA-Z0-9_\-]*"
+                               placeholder="Room Code">
                         <button type="button" id="randomize-room-code" class="btn btn-outline-primary"
                                 title="Generate random room code." data-bs-toggle="tooltip">
                             <i class="fa fa-random"></i>
