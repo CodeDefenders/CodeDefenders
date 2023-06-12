@@ -41,6 +41,8 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.transaction.TransactionManager;
+import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -88,6 +90,7 @@ public class GameManagingUtilsTest {
                     GameManagingUtilsTest.class,
                     TestSmellDetectorProducer.class,
                     NotificationService.class,
+                    ExecutorServiceProvider.class,
                     MetricsRegistry.class,
                     Configuration.class)
             .inject(this)
@@ -119,6 +122,12 @@ public class GameManagingUtilsTest {
     Configuration produceConfiguration() {
         return mock(Configuration.class);
     }
+
+    @Produces
+    TransactionManager produceTransactionManager() {
+        return mock(TransactionManager.class);
+    }
+
 
     @Inject
     // Testing configuration ?
