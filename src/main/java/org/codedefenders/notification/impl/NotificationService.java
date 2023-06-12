@@ -18,14 +18,12 @@
  */
 package org.codedefenders.notification.impl;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import javax.annotation.ManagedBean;
-import javax.annotation.PreDestroy;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +43,14 @@ public class NotificationService implements INotificationService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
     private static final int NUM_THREADS = 8;
 
-    private final ExecutorService executor;
-
+    /**
+     * @implNote executor is shutdown by {@link ExecutorServiceProvider#shutdown()}
+     */
     private final EventBus eventBus;
 
-    public NotificationService() {
-        executor = Executors.newFixedThreadPool(NUM_THREADS);
-        eventBus = new AsyncEventBus(executor, ((exception, context) -> {
+    @Inject
+    public NotificationService(ExecutorServiceProvider executorServiceProvider) {
+        eventBus = new AsyncEventBus(executorServiceProvider.createExecutorService("notificationServiceEventBus", NUM_THREADS), ((exception, context) -> {
             logger.warn("Got {} while calling notification handler.", exception.getClass().getSimpleName(), exception);
             logger.warn("Event was: {}", new Gson().toJson(context.getEvent()));
         }));
@@ -70,10 +69,5 @@ public class NotificationService implements INotificationService {
     @Override
     public void unregister(Object eventHandler) {
         eventBus.unregister(eventHandler);
-    }
-
-    @PreDestroy
-    public void shutdown() {
-        executor.shutdown();
     }
 }

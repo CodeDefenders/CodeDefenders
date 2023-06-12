@@ -27,10 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -41,6 +39,7 @@ import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.util.concurrent.ExecutorServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,22 +55,22 @@ public class KillMapService {
     private final BackendExecutorService backendExecutorService;
     private final Configuration config;
 
+    /**
+     * @implNote executor is shutdown by {@link ExecutorServiceProvider#shutdown()}
+     */
     private final ExecutorService executor;
 
     @Inject
-    public KillMapService(BackendExecutorService backendExecutorService,
+    public KillMapService(BackendExecutorService backendExecutorService, ExecutorServiceProvider executorServiceProvider,
             @SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
         this.backendExecutorService = backendExecutorService;
         this.config = config;
 
+        // TODO(Alex): It might be better to allow the threads of this executor to time-out, so we do not keep all the
+        //  threads around forever.
         executor = config.isParallelize()
-                ? Executors.newFixedThreadPool(config.getNumberOfKillmapThreads())
-                : Executors.newSingleThreadExecutor();
-    }
-
-    @PreDestroy
-    public void shutdown() {
-        executor.shutdown();
+                ? executorServiceProvider.createExecutorService("killMap-executer-parallel", config.getNumberOfKillmapThreads())
+                : executorServiceProvider.createExecutorService("killMap-executer-single", 1);
     }
 
     /**
