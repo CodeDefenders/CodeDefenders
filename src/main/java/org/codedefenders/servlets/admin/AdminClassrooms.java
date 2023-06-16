@@ -32,7 +32,6 @@ import javax.validation.ValidationException;
 
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.model.Classroom;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -85,11 +84,7 @@ public class AdminClassrooms extends HttpServlet {
 
     private void createClassroom(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = ServletUtils.getStringParameter(request, "name").get();
-        String roomCode = ServletUtils.getStringParameter(request, "room-code").orElse(null);
-
-        Classroom classroom = new Classroom(name, roomCode, null, false);
-        classroomService.addClassroom(classroom, login.getUserId());
-
+        classroomService.addClassroom(name, login.getUserId());
         Redirect.redirectBack(request, response);
     }
 }

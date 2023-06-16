@@ -12,8 +12,8 @@
 
 <c:set var="classroom" value="${requestScope.classroom}"/>
 <c:set var="member" value="${requestScope.member}"/>
+<c:set var="link" value="${requestScope.link}"/>
 <c:set var="isOwner" value="${member.role == ClassroomRole.OWNER}"/>
-<c:set var="link" value="${url.getAbsoluteURLForPath(Paths.CLASSROOM)}?room=${classroom.roomCode}"/>
 
 <jsp:include page="/jsp/header.jsp"/>
 
@@ -106,28 +106,16 @@
                         </div>
 
                         <div class="d-flex flex-column align-items-baseline gap-1 mt-3">
-                            <span>
-                                Room Code is
-                                <span class="d-inline-block border rounded ms-1 px-2">
-                                    <span id="room-code"><c:out value="${classroom.roomCode}"/></span>
-                                    <i class="fa fa-clipboard copy ms-1 cursor-pointer text-primary"
-                                       data-copy-target="#room-code"></i>
+                            <div class="align-items-baseline d-flex flex-row w-100">
+                                <span class="flex-shrink-0 flex-grow-0">
+                                    Invite link is
                                 </span>
-                            </span>
-                            <span>
-                                Invite link is
-                                <span class="d-inline-block border rounded ms-1 px-2">
-                                    <span id="invite-link"><c:out value="${link}"/></span>
-                                    <i class="fa fa-clipboard copy ms-1 cursor-pointer text-primary"
-                                       data-copy-target="#invite-link"></i>
-                                </span>
-                            </span>
-                            <button id="change-room-code" class="btn btn-sm btn-secondary"
-                                    data-bs-toggle="modal" data-bs-target="#change-room-code-modal">
-                                Change room code
-                            </button>
+                                <span id="invite-link" class="flex-grow-0 flex-shrink-1 border rounded text-truncate mx-1 px-2"><c:out value="${link}"/></span>
+                                <i class="fa fa-clipboard copy cursor-pointer text-primary flex-grow-0 flex-shrink-0 ms-1"
+                                   data-copy-target="#invite-link"
+                                   title="copy"></i>
+                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -232,110 +220,6 @@
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                     <button type="submit" class="btn btn-danger">Remove password</button>
-                </jsp:attribute>
-            </t:modal>
-
-        </form>
-    </c:if>
-
-    <%-- Change room code modal --%>
-    <c:if test="${isOwner}">
-        <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
-            <input type="hidden" name="action" value="change-room-code"/>
-            <input type="hidden" name="classroomId" value="${classroom.id}"/>
-
-            <t:modal title="Change room code" id="change-room-code-modal" closeButtonText="Cancel">
-                <jsp:attribute name="content">
-                    <p>Changing the room code will invalidate the old room code and invite link.</p>
-                    <label for="room-code-input" class="form-label">Room Code</label>
-                    <div class="input-group has-validation">
-                        <input type="text" class="form-control" id="room-code-input" name="room-code"
-                               value="<c:out value="${classroom.roomCode}"/>"
-                               required minlength="4" maxlength="20" pattern="[a-zA-Z0-9_\-]*"
-                               placeholder="Room Code">
-                        <button type="button" id="randomize-room-code" class="btn btn-outline-primary"
-                                title="Generate random room code." data-bs-toggle="tooltip">
-                            <i class="fa fa-random"></i>
-                        </button>
-                        <div class="invalid-feedback" id="room-code-feedback">
-                            Please enter a valid room code.
-                        </div>
-                    </div>
-                    <div class="form-text">
-                        4-20 alphanumeric characters (a-z, A-Z, 0-9).
-                        Dashes (-) are allowed, but spaces aren't.
-                    </div>
-
-                    <script>
-                        const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
-                        const ORIGINAL_ROOM_CODE = '${classroom.roomCode}';
-                        const ROOM_CODE_RANDOM_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-                        const roomCodeInput = document.getElementById('room-code-input');
-                        const randomizeButton = document.getElementById('randomize-room-code');
-                        const feedback = document.getElementById('room-code-feedback');
-
-                        const generateRoomCode = function() {
-                            let code = '';
-                            for (let i = 0; i < 4; i++) {
-                                const choice = Math.floor(Math.random() * ROOM_CODE_RANDOM_CHARS.length);
-                                code += ROOM_CODE_RANDOM_CHARS[choice];
-                            }
-                            return code;
-                        };
-
-                        const checkRoomCodeExists = async function(roomCode) {
-                            const params = new URLSearchParams({
-                                type: 'exists',
-                                room: roomCode
-                            });
-                            const response = await fetch(`\${API_URL}?\${params}`, {
-                                method: 'GET',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                }
-                            });
-                            if (!response.ok) {
-                                console.error('Failed to check if room code exists.');
-                                return false;
-                            }
-                            return response.json();
-                        };
-
-                        const validateRoomCode = async function() {
-                            const roomCode = roomCodeInput.value;
-                            if (roomCode !== ''
-                                    && roomCode.trimEnd() !== ORIGINAL_ROOM_CODE
-                                    && await checkRoomCodeExists(roomCode)) {
-                                roomCodeInput.setCustomValidity('room-code-in-use');
-                                feedback.innerText = 'Room code is already in use. Please choose a different one.';
-                            } else {
-                                roomCodeInput.setCustomValidity('');
-                                feedback.innerText = 'Please enter a valid room code.';
-                            }
-                        };
-
-                        let timeout = null;
-                        const validateRoomCodeDelayed = function() {
-                            if (timeout != null) {
-                                clearTimeout(timeout);
-                            }
-                            timeout = setTimeout(() => {
-                                validateRoomCode()
-                                timeout = null;
-                            }, 200);
-                        }
-
-                        randomizeButton.addEventListener('click', function(event) {
-                            roomCodeInput.value = generateRoomCode();
-                            validateRoomCodeDelayed();
-                        });
-
-                        roomCodeInput.addEventListener('input', validateRoomCodeDelayed);
-                    </script>
-                </jsp:attribute>
-                <jsp:attribute name="footer">
-                    <button type="submit" class="btn btn-primary">Save changes</button>
                 </jsp:attribute>
             </t:modal>
 

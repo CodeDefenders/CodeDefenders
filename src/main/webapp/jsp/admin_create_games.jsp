@@ -668,6 +668,8 @@
             minute: '2-digit'
         });
 
+        const CLASSROOM_URL = '${url.forPath(Paths.CLASSROOM)}';
+
         /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
         DataTable.ext.order['select-extension'] = function (settings, col) {
             return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
@@ -1523,6 +1525,24 @@
             });
         });
 
+        const renderClassroomLinkButton = function(data, type, row, meta) {
+            switch (type) {
+                case 'type':
+                case 'sort':
+                case 'filter':
+                    return null;
+                case 'display':
+                    const params = new URLSearchParams({
+                        classroomUid: data.uuid
+                    });
+                    return `
+                        <a href="\${CLASSROOM_URL}?\${params}" class="cursor-pointer float-end px-2">
+                            <i class="fa fa-external-link text-primary"></i>
+                        </a>
+                    `;
+            }
+        };
+
         let classroomsTable;
         /* Classrooms table and related components. */
         $(document).ready(function () {
@@ -1548,10 +1568,16 @@
                         title: 'Name'
                     },
                     {
-                        data: 'roomCode',
+                        data: 'uuid',
                         type: 'string',
-                        title: 'Room Code'
-                    }
+                        title: 'UUID'
+                    },
+                    {
+                        data: null,
+                        title: 'Link',
+                        render: renderClassroomLinkButton,
+                        width: '2em'
+                    },
                 ],
                 select: {
                     style: 'single',

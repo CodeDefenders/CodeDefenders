@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -56,19 +55,9 @@ public class ClassroomAPI extends HttpServlet {
             case "members":
                 handleMembers(request, response);
                 return;
-            case "exists":
-                handleExists(request, response);
-                return;
             default:
                 response.setStatus(HttpStatus.SC_BAD_REQUEST);
         }
-    }
-
-    private Optional<ClassroomMember> getMember(int classroomId) {
-        if (login.isAdmin()) {
-            return Optional.of(new ClassroomMember(login.getUserId(), classroomId, ClassroomRole.OWNER));
-        }
-        return classroomService.getMemberForClassroomAndUser(classroomId, login.getUserId());
     }
 
     private void handleMembers(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -78,16 +67,21 @@ public class ClassroomAPI extends HttpServlet {
             return;
         }
 
-        Optional<ClassroomMember> member = getMember(classroom.get().getId());
-        if (!member.isPresent()) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            return;
+        if (!login.isAdmin()) {
+            Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
+                    classroom.get().getId(), login.getUserId());
+            if (!member.isPresent()) {
+                response.setStatus(HttpStatus.SC_BAD_REQUEST);
+                return;
+            }
         }
 
+        List<ClassroomMemberDTO> members = getMembersForClassroom(classroom.get());
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
+                .serializeNulls()
                 .create();
-        gson.toJson(getMembers(classroom.get()), response.getWriter());
+        gson.toJson(members, response.getWriter());
     }
 
     private void handleClassrooms(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -96,17 +90,15 @@ public class ClassroomAPI extends HttpServlet {
             return;
         }
 
-        List<Classroom> classrooms = classroomService.getAllClassrooms();
-        List<ClassroomDTO> classroomDTOs = classrooms.stream()
-                .map(c -> new ClassroomDTO(c.getId(), c.getName(), c.getRoomCode(), c.isOpen()))
-                .collect(Collectors.toList());
+        List<Classroom> classrooms = classroomService.getActiveClassrooms();
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
+                .serializeNulls()
                 .create();
-        gson.toJson(classroomDTOs, response.getWriter());
+        gson.toJson(classrooms, response.getWriter());
     }
 
-    private List<ClassroomMemberDTO> getMembers(Classroom classroom) {
+    private List<ClassroomMemberDTO> getMembersForClassroom(Classroom classroom) {
         List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.getId());
 
         List<ClassroomMemberDTO> memberDTOs = new ArrayList<>();
@@ -119,21 +111,15 @@ public class ClassroomAPI extends HttpServlet {
         return memberDTOs;
     }
 
-    private void handleExists(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Optional<Classroom> classroom = getClassroomFromRequest(request);
-        String json = classroom.isPresent() ? "true" : "false";
-        response.getWriter().print(json);
-    }
-
     private Optional<Classroom> getClassroomFromRequest(HttpServletRequest request) {
-        Optional<Classroom> classroom = ServletUtils.getIntParameter(request, "classroomId")
+        Optional<Classroom> classroomById = ServletUtils.getIntParameter(request, "classroomId")
                 .flatMap(classroomService::getClassroomById);
-        if (classroom.isPresent()) {
-            return classroom;
+        if (classroomById.isPresent()) {
+            return classroomById;
         }
 
-        return ServletUtils.getStringParameter(request, "room")
-                .flatMap(classroomService::getClassroomByRoomCode);
+        return ServletUtils.getUUIDParameter(request, "classroomUid")
+                .flatMap(classroomService::getClassroomByUUID);
     }
 
     private static class ClassroomMemberDTO {
@@ -146,27 +132,6 @@ public class ClassroomAPI extends HttpServlet {
         public ClassroomMemberDTO(SimpleUser user, ClassroomRole role) {
             this.user = user;
             this.role = role;
-        }
-    }
-
-    private static class ClassroomDTO {
-        @Expose
-        private final int id;
-
-        @Expose
-        private final String name;
-
-        @Expose
-        private final String roomCode;
-
-        @Expose
-        private final boolean open;
-
-        public ClassroomDTO(int id, String name, String roomCode, boolean open) {
-            this.id = id;
-            this.name = name;
-            this.roomCode = roomCode;
-            this.open = open;
         }
     }
 }

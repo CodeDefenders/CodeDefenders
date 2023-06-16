@@ -51,104 +51,15 @@
 
         <t:modal title="Create classroom" id="create-classroom-modal" closeButtonText="Cancel">
             <jsp:attribute name="content">
-                <div class="mb-3">
-                    <label for="name-input" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name-input" name="name"
-                           required maxlength="100" placeholder="Name">
-                    <div class="invalid-feedback">
-                        Please enter a valid name.
-                    </div>
-                    <div class="form-text">
-                        Maximum length: 100 characters.
-                    </div>
+                <label for="name-input" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name-input" name="name"
+                       required maxlength="100" placeholder="Name">
+                <div class="invalid-feedback">
+                    Please enter a valid name.
                 </div>
-
-                <div>
-                    <label for="room-code-input" class="form-label">Room Code (optional)</label>
-                    <div class="input-group has-validation">
-                        <input type="text" class="form-control" id="room-code-input" name="room-code"
-                               minlength="4" maxlength="20" pattern="[a-zA-Z0-9_\-]*"
-                               placeholder="Room Code (optional)">
-                        <button type="button" id="randomize-room-code" class="btn btn-outline-primary"
-                                title="Generate random room code." data-bs-toggle="tooltip">
-                            <i class="fa fa-random"></i>
-                        </button>
-                        <div class="invalid-feedback" id="room-code-feedback">
-                            Please enter a valid room code.
-                        </div>
-                    </div>
-                    <div class="form-text">
-                        4-20 alphanumeric characters (a-z, A-Z, 0-9).
-                        Dashes (-) are allowed, but spaces aren't.
-                        Leave empty to generate a random room code.
-                    </div>
+                <div class="form-text">
+                    Maximum length: 100 characters.
                 </div>
-
-                <%-- Set up room code randomization and checking. --%>
-                <script>
-                    const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
-                    const ROOM_CODE_RANDOM_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
-                    const roomCodeInput = document.getElementById('room-code-input');
-                    const randomizeButton = document.getElementById('randomize-room-code');
-                    const feedback = document.getElementById('room-code-feedback');
-
-                    const generateRoomCode = function() {
-                        let code = '';
-                        for (let i = 0; i < 4; i++) {
-                            const choice = Math.floor(Math.random() * ROOM_CODE_RANDOM_CHARS.length);
-                            code += ROOM_CODE_RANDOM_CHARS[choice];
-                        }
-                        return code;
-                    };
-
-                    const checkRoomCodeExists = async function(roomCode) {
-                        const params = new URLSearchParams({
-                            type: 'exists',
-                            room: roomCode
-                        });
-                        const response = await fetch(`\${API_URL}?\${params}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        });
-                        if (!response.ok) {
-                            console.error('Failed to check if room code exists.');
-                            return false;
-                        }
-                        return response.json();
-                    };
-
-                    const validateRoomCode = async function() {
-                        const roomCode = roomCodeInput.value;
-                        if (roomCode !== '' && await checkRoomCodeExists(roomCode)) {
-                            roomCodeInput.setCustomValidity('room-code-in-use');
-                            feedback.innerText = 'Room code is already in use. Please choose a different one.';
-                        } else {
-                            roomCodeInput.setCustomValidity('');
-                            feedback.innerText = 'Please enter a valid room code.';
-                        }
-                    };
-
-                    let timeout = null;
-                    const validateRoomCodeDelayed = function() {
-                        if (timeout != null) {
-                            clearTimeout(timeout);
-                        }
-                        timeout = setTimeout(() => {
-                            validateRoomCode()
-                            timeout = null;
-                        }, 200);
-                    }
-
-                    randomizeButton.addEventListener('click', function(event) {
-                        roomCodeInput.value = generateRoomCode();
-                        validateRoomCodeDelayed();
-                    });
-
-                    roomCodeInput.addEventListener('input', validateRoomCodeDelayed);
-                </script>
             </jsp:attribute>
             <jsp:attribute name="footer">
                 <button type="submit" class="btn btn-primary">Create Classroom</button>
@@ -188,7 +99,7 @@
                     return null;
                 case 'display':
                     const params = new URLSearchParams({
-                        room: data.roomCode
+                        classroomUid: data.uuid
                     });
                     return `
                         <a href="\${CLASSROOM_URL}?\${params}" class="cursor-pointer float-end px-2">
@@ -214,9 +125,9 @@
                     title: 'Name'
                 },
                 {
-                    data: 'roomCode',
+                    data: 'uuid',
                     type: 'string',
-                    title: 'Room Code'
+                    title: 'UUID'
                 },
                 {
                     data: 'open',

@@ -11,52 +11,38 @@
 
 <jsp:include page="/jsp/header.jsp"/>
 
-<style>
-    .center-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .center-container > * {
-        flex: 0 0 auto;
-    }
-    .center-container::before,
-    .center-container::after {
-        content: '';
-        flex: 0 1 7.5rem;
-    }
-
-    #join-card {
-        width: max-content;
-        min-width: 30em;
-    }
-</style>
-
 <div class="container">
-    <div class="center-container">
-        <div class="card" id="join-card">
-            <div class="card-body">
-                <p class="card-text mb-3">
+    <div class="w-100 d-flex flex-row justify-content-center" style="margin-top: min(15rem, 20vh);">
+        <div class="card" style="width: 40rem;">
+            <div class="card-body p-4">
+                <p class="card-text mb-3 fs-5">
                     You are invited to join the classroom
                 </p>
-                <h5 class="card-title mb-1">
+                <h5 class="card-title mb-1 fs-4">
                     <c:out value="${classroom.name}"/>
                 </h5>
-                <p class="card-text text-muted mb-3">
+                <p class="card-text text-muted mb-3 fs-5">
                     ${numMembers} members
                 </p>
                 <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
-                    <c:if test="${classroom.password.isPresent()}">
-                        <label for="password-input" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password-input"
-                               name="password" placeholder="Password" required>
-                        <div class="invalid-feedback">
-                            Please enter the password.
-                        </div>
-                    </c:if>
                     <input type="hidden" name="action" value="join">
                     <input type="hidden" name="classroomId" value="${classroom.id}">
-                    <button type="submit" class="btn btn-primary">Join</button>
+
+                    <c:choose>
+                        <c:when test="${classroom.password.isPresent()}">
+                            <div class="input-group has-validation">
+                                <input type="password" class="form-control" id="password-input"
+                                       name="password" placeholder="Password" required>
+                                <button type="submit" class="btn btn-primary btn-highlight">Join</button>
+                                <div class="invalid-feedback">
+                                    Please enter the password.
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <button type="submit" class="btn btn-primary btn-highlight">Join</button>
+                        </c:otherwise>
+                    </c:choose>
                 </form>
             </div>
         </div>
