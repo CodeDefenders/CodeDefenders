@@ -30,36 +30,25 @@
         </c:if>
     </div>
 
-    <%-- Tables --%>
-    <div class="row g-5 mb-5" id="tables-container">
-        <div class="col-lg-6 col-12">
-            <div class="loading loading-height-200 loading-border-card">
-                <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-                    <h4 class="mb-3">Students</h4>
-                    <input type="search" id="search-students" placeholder="Search"
-                           class="form-control form-control-sm" style="width: 15em;">
-                </div>
-                <table id="students-table" class="table" style="width: 100%;"></table>
-            </div>
-        </div>
-        <div class="col-lg-6 col-12">
-            <div class="loading loading-height-200 loading-border-card">
-                <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-                    <h4 class="mb-3">Moderators</h4>
-                    <input type="search" id="search-moderators" placeholder="Search"
-                           class="form-control form-control-sm" style="width: 15em;">
-                </div>
-                <table id="moderators-table" class="table" style="width: 100%;"></table>
-            </div>
-        </div>
-    </div>
+    <div class="row g-5">
 
-    <%-- Join Settigns --%>
-    <c:if test="${isOwner}">
-        <div class="row">
-            <div class="col-lg-6 col-12 ps-0">
+        <%-- Members table --%>
+        <div class="col-lg-6 col-12">
+            <div class="loading loading-height-200 loading-border-card">
+                <div class="d-flex justify-content-between flex-wrap align-items-baseline">
+                    <h4 class="mb-3">Members</h4>
+                    <input type="search" id="search-members" placeholder="Search"
+                           class="form-control form-control-sm" style="width: 15em;">
+                </div>
+                <table id="members-table" class="table" style="width: 100%;"></table>
+            </div>
+        </div>
+
+        <%-- Join Settigns --%>
+        <c:if test="${isOwner}">
+            <div class="col-lg-6 col-12">
                 <div class="card">
-                    <div class="card-body">
+                    <div class="card-body p-4">
 
                         <h4 class="card-title mb-3">Join Settings</h4>
 
@@ -119,8 +108,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </c:if>
+        </c:if>
+
+    </div>
 
     <%-- Change classroom name modal --%>
     <c:if test="${isOwner}">
@@ -386,63 +376,63 @@
             }
         };
 
-        const renderStudentButtons = function(data, type, row, meta) {
-            return `
-                <div class="float-end">
-                    <span type="button" class="cursor-pointer px-3" data-bs-toggle="dropdown">
-                        <i class="fa fa-ellipsis-v"></i>
-                    </span>
-                    <div class="dropdown-menu">
-                        <li><h6 class="dropdown-header">Change Role to ...</h6></li>
-                        <li>
-                            <a href="#" class="dropdown-item promote-student">
-                                <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                Moderator
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item kick-member" href="#">
-                                <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
-                                Kick
-                            </a>
-                        </li>
-                    </div>
-                </div>
-            `;
-        };
-
-        const renderModeratorButtons = function(data, type, row, meta) {
-            if (data.role === '<%=ClassroomRole.OWNER.name()%>') {
-                return '';
+        const renderMemberActions = function(data, type, row, meta) {
+            switch (data.role) {
+                case '<%=ClassroomRole.OWNER.name()%>':
+                    return '';
+                case '<%=ClassroomRole.MODERATOR.name()%>':
+                    return `
+                        <div class="float-end">
+                            <span type="button" class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </span>
+                            <div class="dropdown-menu">
+                                <li><h6 class="dropdown-header">Change Role to ...</h6></li>
+                                <li>
+                                    <a href="#" class="dropdown-item demote-moderator">
+                                        <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
+                                        Student
+                                    </a>
+                                    <a href="#" class="dropdown-item change-owner">
+                                        <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
+                                        Owner
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item kick-member" href="#">
+                                        <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
+                                        Kick
+                                    </a>
+                                </li>
+                            </div>
+                        </div>
+                    `;
+                case '<%=ClassroomRole.STUDENT.name()%>':
+                    return `
+                        <div class="float-end">
+                            <span type="button" class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </span>
+                            <div class="dropdown-menu">
+                                <li><h6 class="dropdown-header">Change Role to ...</h6></li>
+                                <li>
+                                    <a href="#" class="dropdown-item promote-student">
+                                        <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
+                                        Moderator
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item kick-member" href="#">
+                                        <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
+                                        Kick
+                                    </a>
+                                </li>
+                            </div>
+                        </div>
+                    `;
             }
-            return `
-                <div class="float-end">
-                    <span type="button" class="cursor-pointer px-3" data-bs-toggle="dropdown">
-                        <i class="fa fa-ellipsis-v"></i>
-                    </span>
-                    <div class="dropdown-menu">
-                        <li><h6 class="dropdown-header">Change Role to ...</h6></li>
-                        <li>
-                            <a href="#" class="dropdown-item demote-moderator">
-                                <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                Student
-                            </a>
-                            <a href="#" class="dropdown-item change-owner">
-                                <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                Owner
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item kick-member" href="#">
-                                <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
-                                Kick
-                            </a>
-                        </li>
-                    </div>
-                </div>
-            `;
         };
 
         const kickMember = function(data) {
@@ -477,57 +467,8 @@
             new Modal(form.querySelector('.modal')).show();
         };
 
-        const initStudentsTable = function(data) {
-            const studentsTable = new DataTable('#students-table', {
-                data,
-                columns: [
-                    {
-                        data: 'user.id',
-                        title: 'User ID',
-                        type: 'number',
-                        width: '5em',
-                        visible: isOwner
-                    },
-                    {
-                        data: 'user.name',
-                        title: 'Name',
-                        type: 'string'
-                    },
-                    {
-                        data: null,
-                        title: 'Actions',
-                        orderable: false,
-                        searchable: false,
-                        render: renderStudentButtons,
-                        type: 'html',
-                        width: '4em',
-                        visible: isOwner
-                    }
-                ].filter(e => e !== null),
-                order: [[1, 'asc']],
-                scrollY: '500px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {emptyTable: 'This classroom has no students... yet.'}
-            });
-            LoadingAnimation.hideAnimation(studentsTable.table().container());
-
-            document.getElementById('search-students').addEventListener('keyup', function(event) {
-                setTimeout(() => studentsTable.search(this.value).draw(), 0);
-            });
-            for (const button of studentsTable.table().container().getElementsByClassName('kick-member')) {
-                const data = studentsTable.row(button.closest('tr')).data();
-                button.addEventListener('click', _ => kickMember(data));
-            }
-            for (const button of studentsTable.table().container().getElementsByClassName('promote-student')) {
-                const data = studentsTable.row(button.closest('tr')).data();
-                button.addEventListener('click', _ => promoteStudent(data));
-            }
-        };
-
-        const initModeratorsTable = function(data) {
-            const moderatorsTable = new DataTable('#moderators-table', {
+        const initMembersTable = function(data) {
+            const membersTable = new DataTable('#members-table', {
                 data,
                 columns: [
                     {
@@ -553,34 +494,38 @@
                         title: 'Actions',
                         orderable: false,
                         searchable: false,
+                        render: renderMemberActions,
                         type: 'html',
-                        render: renderModeratorButtons,
                         width: '4em',
                         visible: isOwner
                     }
-                ],
+                ].filter(e => e !== null),
                 order: [[2, 'asc'], [1, 'asc']],
-                scrollY: '500px',
+                scrollY: '600px',
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: 'This classroom has no moderators.'}
+                language: {emptyTable: 'This classroom has no students... yet.'}
             });
-            LoadingAnimation.hideAnimation(moderatorsTable.table().container());
+            LoadingAnimation.hideAnimation(membersTable.table().container());
 
-            document.getElementById('search-moderators').addEventListener('keyup', function(event) {
-                setTimeout(() => moderatorsTable.search(this.value).draw(), 0);
+            document.getElementById('search-members').addEventListener('keyup', function(event) {
+                setTimeout(() => membersTable.search(this.value).draw(), 0);
             });
-            for (const button of moderatorsTable.table().container().getElementsByClassName('kick-member')) {
-                const data = moderatorsTable.row(button.closest('tr')).data();
+            for (const button of membersTable.table().container().getElementsByClassName('kick-member')) {
+                const data = membersTable.row(button.closest('tr')).data();
                 button.addEventListener('click', _ => kickMember(data));
             }
-            for (const button of moderatorsTable.table().container().getElementsByClassName('demote-moderator')) {
-                const data = moderatorsTable.row(button.closest('tr')).data();
+            for (const button of membersTable.table().container().getElementsByClassName('promote-student')) {
+                const data = membersTable.row(button.closest('tr')).data();
+                button.addEventListener('click', _ => promoteStudent(data));
+            }
+            for (const button of membersTable.table().container().getElementsByClassName('demote-moderator')) {
+                const data = membersTable.row(button.closest('tr')).data();
                 button.addEventListener('click', _ => demoteModerator(data));
             }
-            for (const button of moderatorsTable.table().container().getElementsByClassName('change-owner')) {
-                const data = moderatorsTable.row(button.closest('tr')).data();
+            for (const button of membersTable.table().container().getElementsByClassName('change-owner')) {
+                const data = membersTable.row(button.closest('tr')).data();
                 button.addEventListener('click', _ => changeOwner(data));
             }
         };
@@ -609,28 +554,29 @@
          * Moves dropdowns out of the table, so they don't get clipped by the scroll area.
          */
         const initMoveDropdowns = function() {
-            const tablesContainer = document.getElementById('tables-container');
-            tablesContainer.addEventListener('show.bs.dropdown', function(event) {
+            document.addEventListener('show.bs.dropdown', function(event) {
                 const trigger = event.target;
                 const menu = trigger.nextElementSibling;
+                if (!trigger.classList.contains('member-actions')) {
+                    return;
+                }
 
                 trigger.menu = menu;
                 document.getElementById('content').appendChild(menu);
             });
-            tablesContainer.addEventListener('hide.bs.dropdown', function(event) {
+            document.addEventListener('hide.bs.dropdown', function(event) {
                 const trigger = event.target;
                 const menu = trigger.menu;
+                if (!trigger.classList.contains('member-actions')) {
+                    return;
+                }
 
                 trigger.insertAdjacentElement('afterend', menu);
             });
         };
 
         const members = await getMembers();
-        const students = members.filter(member => member.role === STUDENT);
-        const moderators = members.filter(member => member.role !== STUDENT);
-
-        initStudentsTable(students);
-        initModeratorsTable(moderators);
+        initMembersTable(members);
         initCopyButtons();
         initMoveDropdowns();
     </script>
