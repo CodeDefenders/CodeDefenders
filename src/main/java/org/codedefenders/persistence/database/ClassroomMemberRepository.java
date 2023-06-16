@@ -51,34 +51,40 @@ public class ClassroomMemberRepository {
         }
     }
 
-    public boolean updateMember(ClassroomMember member) {
+    public void updateMember(ClassroomMember member) {
         @Language("SQL") String query = String.join("\n",
                 "UPDATE classroom_members",
                 "SET Role = ?",
                 "WHERE User_ID = ?",
                 "  AND Classroom_ID = ?;");
         try {
-            return 1 == queryRunner.update(query,
+            int updatedRows = queryRunner.update(query,
                     member.getRole().name(),
                     member.getUserId(),
                     member.getClassroomId()
             );
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update classroom.");
+            }
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
     }
 
-    public boolean deleteMember(int classroomId, int userId) {
+    public void deleteMember(int classroomId, int userId) {
         @Language("SQL") String query = String.join("\n",
                 "DELETE FROM classroom_members",
                 "WHERE User_ID = ?",
                 "  AND Classroom_ID = ?;");
         try {
-            return 1 == queryRunner.update(query,
+            int updatedRows = queryRunner.update(query,
                     userId,
                     classroomId
             );
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update classroom member.");
+            }
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -94,24 +100,6 @@ public class ClassroomMemberRepository {
             return queryRunner.query(query,
                     listFromRS(this::classroomMemberFromRS),
                     id
-            );
-        } catch (SQLException e) {
-            logger.error("SQLException while executing query", e);
-            throw new UncheckedSQLException("SQLException while executing query", e);
-        }
-    }
-
-    public List<ClassroomMember> getMembersForClassroom(int id, ClassroomRole role) {
-        @Language("SQL") String query = String.join("\n",
-                "SELECT * FROM classroom_members",
-                "WHERE Classroom_ID = ?",
-                "  AND Role = ?;"
-        );
-        try {
-            return queryRunner.query(query,
-                    listFromRS(this::classroomMemberFromRS),
-                    id,
-                    role.name()
             );
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);

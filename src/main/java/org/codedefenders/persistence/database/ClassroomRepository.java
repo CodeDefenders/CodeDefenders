@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -39,16 +40,19 @@ public class ClassroomRepository {
 
         @Language("SQL") String query = String.join("\n",
                 "INSERT INTO classrooms"
-                + "(Name, Room_Code, Password, Open)"
-                + "VALUES (?, ?, ?, ?);");
+                + "(UUID, Creator_ID, Name, Password, Open, Visible, Archived)"
+                + "VALUES (?, ?, ?, ?, ?, ?, ?);");
 
         try {
             return queryRunner.insert(query,
                     oneFromRS(rs -> rs.getInt(1)),
+                    classroom.getUUID().toString(),
+                    classroom.getCreatorId().orElse(null),
                     classroom.getName(),
-                    classroom.getRoomCode(),
                     classroom.getPassword().orElse(null),
-                    classroom.isOpen()
+                    classroom.isOpen(),
+                    classroom.isVisible(),
+                    classroom.isArchived()
             );
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -56,22 +60,31 @@ public class ClassroomRepository {
         }
     }
 
-    public boolean updateClassroom(Classroom classroom) {
+    public void updateClassroom(Classroom classroom) {
         @Language("SQL") String query = String.join("\n",
                 "UPDATE classrooms",
-                "SET Name = ?,",
-                "  Room_Code = ?,",
+                "SET UUID = ?,",
+                "  Creator_ID = ?,",
+                "  Name = ?,",
                 "  Password = ?,",
-                "  Open = ?",
+                "  Open = ?,",
+                "  Visible = ?,",
+                "  Archived = ?",
                 "WHERE classrooms.ID = ?");
         try {
-            return 1 == queryRunner.update(query,
-                    classroom.getName(),
-                    classroom.getRoomCode(),
-                    classroom.getPassword().orElse(null),
-                    classroom.isOpen(),
-                    classroom.getId()
+             int updatedRows = queryRunner.update(query,
+                     classroom.getUUID().toString(),
+                     classroom.getCreatorId().orElse(null),
+                     classroom.getName(),
+                     classroom.getPassword().orElse(null),
+                     classroom.isOpen(),
+                     classroom.isVisible(),
+                     classroom.isArchived(),
+                     classroom.getId()
             );
+            if (updatedRows != 1) {
+                throw new UncheckedSQLException("Couldn't update classroom.");
+            }
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
@@ -94,15 +107,15 @@ public class ClassroomRepository {
         }
     }
 
-    public Optional<Classroom> getClassroomByRoomCode(String roomCode) {
+    public Optional<Classroom> getClassroomByUUID(UUID uuid) {
         @Language("SQL") String query = String.join("\n",
                 "SELECT * FROM classrooms",
-                "WHERE Room_Code = ?;"
+                "WHERE UUID = ?;"
         );
         try {
             return queryRunner.query(query,
                     oneFromRS(this::classroomFromRS),
-                    roomCode
+                    uuid.toString()
             );
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);
@@ -110,8 +123,8 @@ public class ClassroomRepository {
         }
     }
 
-    public List<Classroom> getAllClassrooms() {
-        @Language("SQL") String query = "SELECT * FROM classrooms";
+    public List<Classroom> getActiveClassrooms() {
+        @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 0";
         try {
             return queryRunner.query(query, listFromRS(this::classroomFromRS));
         } catch (SQLException e) {
@@ -120,7 +133,24 @@ public class ClassroomRepository {
         }
     }
 
-    public List<Classroom> getClassroomsByMemberAndRole(int userId, ClassroomRole role) {
+    public List<Classroom> getActiveClassroomsByMember(int userId) {
+        @Language("SQL") String query = String.join("\n",
+                "SELECT classrooms.* FROM classrooms, classroom_members",
+                "WHERE classrooms.ID = classroom_members.Classroom_ID",
+                "AND classroom_members.User_ID = ?;"
+        );
+        try {
+            return queryRunner.query(query,
+                    listFromRS(this::classroomFromRS),
+                    userId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public List<Classroom> getActiveClassroomsByMemberAndRole(int userId, ClassroomRole role) {
         @Language("SQL") String query = String.join("\n",
                 "SELECT classrooms.* FROM classrooms, classroom_members",
                 "WHERE classrooms.ID = classroom_members.Classroom_ID",
@@ -139,11 +169,22 @@ public class ClassroomRepository {
         }
     }
 
-    public List<Classroom> getClassroomsByMember(int userId) {
+    public List<Classroom> getArchivedClassrooms() {
+        @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 1";
+        try {
+            return queryRunner.query(query, listFromRS(this::classroomFromRS));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public List<Classroom> getArchivedClassroomsByMember(int userId) {
         @Language("SQL") String query = String.join("\n",
                 "SELECT classrooms.* FROM classrooms, classroom_members",
                 "WHERE classrooms.ID = classroom_members.Classroom_ID",
-                "AND classroom_members.User_ID = ?;"
+                "AND classroom_members.User_ID = ?",
+                "AND classrooms.Archived = 0;"
         );
         try {
             return queryRunner.query(query,
@@ -156,13 +197,38 @@ public class ClassroomRepository {
         }
     }
 
+    public List<Classroom> getArchivedClassroomsByMemberAndRole(int userId, ClassroomRole role) {
+        @Language("SQL") String query = String.join("\n",
+                "SELECT classrooms.* FROM classrooms, classroom_members",
+                "WHERE classrooms.ID = classroom_members.Classroom_ID",
+                "AND classroom_members.User_ID = ?",
+                "AND classroom_members.Role = ?",
+                "AND classrooms.Archived = 0;"
+        );
+        try {
+            return queryRunner.query(query,
+                    listFromRS(this::classroomFromRS),
+                    userId,
+                    role.name()
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
 
     private Classroom classroomFromRS(ResultSet rs) throws SQLException {
         int id = rs.getInt("ID");
+        UUID uuid = UUID.fromString(rs.getString("UUID"));
+        Integer creatorId = rs.getInt("Creator_ID");
+        if (rs.wasNull()) {
+            creatorId = null;
+        }
         String name = rs.getString("Name");
-        String roomCode = rs.getString("Room_Code");
         String password = rs.getString("Password");
         boolean open = rs.getBoolean("Open");
-        return new Classroom(id, name, roomCode, password, open);
+        boolean visible = rs.getBoolean("Visible");
+        boolean archived = rs.getBoolean("Archived");
+        return new Classroom(id, uuid, creatorId, name, password, open, visible, archived);
     }
 }

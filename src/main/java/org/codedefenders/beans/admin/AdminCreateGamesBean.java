@@ -795,25 +795,15 @@ public class AdminCreateGamesBean implements Serializable {
 
     public String getClassroomsJSON() {
         List<Classroom> classrooms = new ArrayList<>();
-        classrooms.addAll(classroomService.getClassroomsByMemberAndRole(login.getUserId(), ClassroomRole.OWNER));
-        classrooms.addAll(classroomService.getClassroomsByMemberAndRole(login.getUserId(), ClassroomRole.MODERATOR));
+        classrooms.addAll(classroomService.getActiveClassroomsByMemberAndRole(
+                login.getUserId(), ClassroomRole.OWNER));
+        classrooms.addAll(classroomService.getActiveClassroomsByMemberAndRole(
+                login.getUserId(), ClassroomRole.MODERATOR));
         Gson gson = new GsonBuilder()
                 .serializeNulls()
-                .registerTypeAdapter(Classroom.class, new ClassroomSerializer())
+                .excludeFieldsWithoutExposeAnnotation()
                 .create();
         return gson.toJson(classrooms);
-    }
-
-    // TODO: Move this elsewhere?
-    public static class ClassroomSerializer implements JsonSerializer<Classroom> {
-        @Override
-        public JsonElement serialize(Classroom classroom, Type type, JsonSerializationContext context) {
-            JsonObject obj = new JsonObject();
-            obj.addProperty("id", classroom.getId());
-            obj.addProperty("name", classroom.getName());
-            obj.addProperty("roomCode", classroom.getRoomCode());
-            return obj;
-        }
     }
 
     // TODO: Move this elsewhere?
