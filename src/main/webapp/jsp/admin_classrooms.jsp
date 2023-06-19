@@ -76,7 +76,8 @@
 
         const getClassrooms = async function() {
             const params = new URLSearchParams({
-                type: 'classrooms'
+                type: 'classrooms',
+                which: 'all'
             });
             const response = await fetch(`\${API_URL}?\${params}`, {
                 method: 'GET',

@@ -167,6 +167,7 @@ public class ShiroConfig {
         fcMan.createChain("/admin/**", "authc, roles[admin]");
 
         fcMan.createChain("/classroom/**", "authc");
+        fcMan.createChain("/classrooms", "authc");
 
         PathMatchingFilterChainResolver resolver = new PathMatchingFilterChainResolver();
         resolver.setFilterChainManager(fcMan);

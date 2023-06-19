@@ -85,12 +85,31 @@ public class ClassroomAPI extends HttpServlet {
     }
 
     private void handleClassrooms(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (!login.isAdmin()) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            return;
+        String which = ServletUtils.getStringParameter(request, "which").orElse("all");
+
+        List<Classroom> classrooms;
+        switch (which) {
+            case "all":
+                if (!login.isAdmin()) {
+                    response.setStatus(HttpStatus.SC_BAD_REQUEST);
+                    return;
+                }
+                classrooms = classroomService.getActiveClassrooms();
+                break;
+            case "visible":
+                classrooms = classroomService.getVisibleClassrooms();
+                break;
+            case "user":
+                classrooms = classroomService.getActiveClassroomsByMember(login.getUserId());
+                break;
+            case "user-archived":
+                classrooms = classroomService.getArchivedClassroomsByMember(login.getUserId());
+                break;
+            default:
+                response.setStatus(HttpStatus.SC_BAD_REQUEST);
+                return;
         }
 
-        List<Classroom> classrooms = classroomService.getActiveClassrooms();
         Gson gson = new GsonBuilder()
                 .excludeFieldsWithoutExposeAnnotation()
                 .serializeNulls()

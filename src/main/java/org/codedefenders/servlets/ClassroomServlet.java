@@ -301,6 +301,6 @@ public class ClassroomServlet extends HttpServlet {
         classroomService.removeMember(classroom.getId(), login.getUserId());
 
         messages.add("Successfully left classroom");
-        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+        response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
     }
 }

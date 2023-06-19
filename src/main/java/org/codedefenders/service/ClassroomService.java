@@ -154,6 +154,10 @@ public class ClassroomService {
         return classroomRepository.getActiveClassroomsByMemberAndRole(userId, role);
     }
 
+    public List<Classroom> getVisibleClassrooms() {
+        return classroomRepository.getVisibleClassrooms();
+    }
+
     public List<Classroom> getArchivedClassrooms() {
         return classroomRepository.getArchivedClassrooms();
     }

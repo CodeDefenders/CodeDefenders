@@ -68,6 +68,7 @@ public class Paths {
     public static final String PUZZLE_GAME = "/puzzlegame";
 
     public static final String CLASSROOM = "/classroom";
+    public static final String CLASSROOMS_OVERVIEW = "/classrooms";
 
 
     public static final String ADMIN_PAGE = "/admin";

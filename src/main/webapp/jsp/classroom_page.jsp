@@ -33,12 +33,12 @@
 
         <%-- Members table --%>
         <div class="col-lg-6 col-12">
+            <div class="d-flex justify-content-between flex-wrap align-items-baseline">
+                <h4 class="mb-3">Members</h4>
+                <input type="search" id="search-members" placeholder="Search"
+                       class="form-control form-control-sm" style="width: 15em;">
+            </div>
             <div class="loading loading-height-200 loading-border-card">
-                <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-                    <h4 class="mb-3">Members</h4>
-                    <input type="search" id="search-members" placeholder="Search"
-                           class="form-control form-control-sm" style="width: 15em;">
-                </div>
                 <table id="members-table" class="table" style="width: 100%;"></table>
             </div>
         </div>
@@ -176,8 +176,7 @@
 
                         <div>
                             <button id="leave" class="btn btn-xs btn-secondary"
-                                    data-bs-toggle="modal" data-bs-target="#leave-modal"
-                                ${disabledIfArchved}>
+                                    data-bs-toggle="modal" data-bs-target="#leave-modal">
                                 Leave Classroom
                             </button>
                         </div>

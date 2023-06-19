@@ -124,7 +124,7 @@ public class ClassroomRepository {
     }
 
     public List<Classroom> getActiveClassrooms() {
-        @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 0";
+        @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 0;";
         try {
             return queryRunner.query(query, listFromRS(this::classroomFromRS));
         } catch (SQLException e) {
@@ -169,8 +169,18 @@ public class ClassroomRepository {
         }
     }
 
+    public List<Classroom> getVisibleClassrooms() {
+        @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 0 AND Visible = 1;";
+        try {
+            return queryRunner.query(query, listFromRS(this::classroomFromRS));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
     public List<Classroom> getArchivedClassrooms() {
-        @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 1";
+        @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 1;";
         try {
             return queryRunner.query(query, listFromRS(this::classroomFromRS));
         } catch (SQLException e) {
