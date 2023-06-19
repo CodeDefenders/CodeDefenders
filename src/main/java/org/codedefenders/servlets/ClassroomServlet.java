@@ -116,6 +116,12 @@ public class ClassroomServlet extends HttpServlet {
                 case "disable-joining":
                     setOpen(request, response, classroom.get(), false);
                     break;
+                case "make-public":
+                    setVisible(request, response, classroom.get(), true);
+                    break;
+                case "make-private":
+                    setVisible(request, response, classroom.get(), false);
+                    break;
                 case "change-name":
                     changeName(request, response, classroom.get());
                     break;
@@ -175,6 +181,14 @@ public class ClassroomServlet extends HttpServlet {
         classroomService.setOpen(classroom.getId(), open);
 
         messages.add("Successfully set classroom to " + (open ? "open" : "closed"));
+        redirectToClassroomPage(response, classroom.getUUID());
+    }
+
+    private void setVisible(HttpServletRequest request, HttpServletResponse response, Classroom classroom,
+                            boolean visible) throws IOException {
+        classroomService.setVisible(classroom.getId(), visible);
+
+        messages.add("Successfully set classroom to " + (visible ? "public" : "private"));
         redirectToClassroomPage(response, classroom.getUUID());
     }
 

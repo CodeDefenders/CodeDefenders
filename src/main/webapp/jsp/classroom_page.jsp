@@ -19,16 +19,7 @@
 
 <div class="container">
 
-    <%-- Heading --%>
-    <div class="d-flex flex-row align-items-center gap-3 mb-5">
-        <h2 class="m-0"><c:out value="${classroom.name}"/></h2>
-        <c:if test="${isOwner}">
-            <button id="change-name" type="button" class="btn btn-sm btn-secondary"
-                    data-bs-toggle="modal" data-bs-target="#change-name-modal">
-                <i class="fa fa-edit" title="Change classroom name"></i>
-            </button>
-        </c:if>
-    </div>
+    <h2 class="mb-5"><c:out value="${classroom.name}"/></h2>
 
     <div class="row g-5">
 
@@ -44,26 +35,28 @@
             </div>
         </div>
 
-        <%-- Join Settigns --%>
+        <%-- Settigns --%>
         <c:if test="${isOwner}">
             <div class="col-lg-6 col-12">
-                <div class="card">
+
+                <%-- Join Settigns --%>
+                <div class="card mb-4">
                     <div class="card-body p-4">
 
-                        <h4 class="card-title mb-3">Join Settings</h4>
+                        <h4 class="card-title mb-4">Join Settings</h4>
 
-                        <div class="d-flex flex-column align-items-baseline gap-1 mb-3">
+                        <div class="d-flex gap-2 mb-1">
                             <c:choose>
                                 <c:when test="${classroom.open}">
-                                    <span>Joining this classroom is <span class="text-success">enabled</span>.</span>
-                                    <button id="disable-joining" class="btn btn-sm btn-danger"
+                                    <span>Joining is <span class="text-success">enabled</span>.</span>
+                                    <button id="disable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#disable-joining-modal">
                                         Disable Joining
                                     </button>
                                 </c:when>
                                 <c:otherwise>
-                                    <span>Joining this classroom is <span class="text-danger">disabled</span>.</span>
-                                    <button id="enable-joining" class="btn btn-sm btn-success"
+                                    <span>Joining is <span class="text-danger">disabled</span>.</span>
+                                    <button id="enable-joining" class="btn btn-xs btn-secondary"
                                             data-bs-toggle="modal" data-bs-target="#enable-joining-modal">
                                         Enable Joining
                                     </button>
@@ -71,7 +64,26 @@
                             </c:choose>
                         </div>
 
-                        <div class="d-flex flex-column align-items-baseline gap-1">
+                        <div class="d-flex gap-2 mb-1">
+                            <c:choose>
+                                <c:when test="${classroom.visible}">
+                                    <span>Visibility is <span class="text-success">public</span>.</span>
+                                    <button id="disable-joining" class="btn btn-xs btn-secondary"
+                                            data-bs-toggle="modal" data-bs-target="#make-private-modal">
+                                        Make Private
+                                    </button>
+                                </c:when>
+                                <c:otherwise>
+                                    <span>Visibility is <span class="text-danger">private</span>.</span>
+                                    <button id="enable-joining" class="btn btn-xs btn-secondary"
+                                            data-bs-toggle="modal" data-bs-target="#make-public-modal">
+                                        Make Public
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                        <div class="d-flex gap-2 mb-3">
                             <c:choose>
                                 <c:when test="${classroom.password.isPresent()}">
                                     <span>Password is <span class="text-success">set</span>.</span>
@@ -80,13 +92,13 @@
                                     <span>Password is <span class="text-danger">not set</span>.</span>
                                 </c:otherwise>
                             </c:choose>
-                            <div class="d-flex flex-row gap-1">
-                                <button id="set-password" class="btn btn-sm btn-secondary"
+                            <div class="d-flex gap-1">
+                                <button id="set-password" class="btn btn-xs btn-secondary me-1"
                                         data-bs-toggle="modal" data-bs-target="#set-password-modal">
                                     Set Password
                                 </button>
                                 <c:if test="${classroom.password.isPresent()}">
-                                    <button id="remove-password" class="btn btn-sm btn-danger"
+                                    <button id="remove-password" class="btn btn-xs btn-secondary"
                                             data-bs-toggle="modal" data-bs-target="#remove-password-modal">
                                         Remove Password
                                     </button>
@@ -94,19 +106,41 @@
                             </div>
                         </div>
 
-                        <div class="d-flex flex-column align-items-baseline gap-1 mt-3">
-                            <div class="align-items-baseline d-flex flex-row w-100">
-                                <span class="flex-shrink-0 flex-grow-0">
-                                    Invite link is
-                                </span>
-                                <span id="invite-link" class="flex-grow-0 flex-shrink-1 border rounded text-truncate mx-1 px-2"><c:out value="${link}"/></span>
-                                <i class="fa fa-clipboard copy cursor-pointer text-primary flex-grow-0 flex-shrink-0 ms-1"
-                                   data-copy-target="#invite-link"
-                                   title="copy"></i>
-                            </div>
+                        <div class="d-flex flex-row align-items-baseline w-100 gap-2">
+                            <span class="flex-shrink-0 flex-grow-0">
+                                Invite link is
+                            </span>
+                            <span id="invite-link" class="flex-grow-0 flex-shrink-1 border rounded text-truncate px-2"><c:out value="${link}"/></span>
+                            <i class="fa fa-clipboard copy cursor-pointer text-primary flex-grow-0 flex-shrink-0"
+                               data-copy-target="#invite-link"></i>
                         </div>
+
                     </div>
                 </div>
+
+                <%-- Classroom Settigns --%>
+                <div class="card">
+                    <div class="card-body p-4">
+
+                        <h4 class="card-title mb-4">Classroom Settings</h4>
+
+                        <div class="mb-1">
+                            <button id="change-name" class="btn btn-xs btn-secondary"
+                                    data-bs-toggle="modal" data-bs-target="#change-name-modal">
+                                Change Name
+                            </button>
+                        </div>
+
+                        <div>
+                            <button id="change-name" class="btn btn-xs btn-danger"
+                                    data-bs-toggle="modal" data-bs-target="#archive-classroom-modal">
+                                Archive Classroom
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </c:if>
 
@@ -254,7 +288,46 @@
         </form>
     </c:if>
 
-    <%-- Promote/Demote student/moderator modal --%>
+    <%-- Make public modal --%>
+    <c:if test="${isOwner}">
+        <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
+            <input type="hidden" name="action" value="make-public"/>
+            <input type="hidden" name="classroomId" value="${classroom.id}"/>
+
+            <t:modal title="Change visibility" id="make-public-modal" closeButtonText="Cancel">
+            <jsp:attribute name="content">
+                Are you sure you want to make the classroom publicly visible?
+                The classroom will be shown in the public list.
+                If the classroom is open, players will be able to join from there.
+            </jsp:attribute>
+                <jsp:attribute name="footer">
+                <button type="submit" class="btn btn-success">Make Public</button>
+            </jsp:attribute>
+            </t:modal>
+
+        </form>
+    </c:if>
+
+    <%-- Make private modal --%>
+    <c:if test="${isOwner}">
+        <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
+            <input type="hidden" name="action" value="make-private"/>
+            <input type="hidden" name="classroomId" value="${classroom.id}"/>
+
+            <t:modal title="Change visibility" id="make-private-modal" closeButtonText="Cancel">
+            <jsp:attribute name="content">
+                Are you sure you want to change the classroom's visibility to private?
+                The classroom will no longer be shown in the public list and players won't be able to join from there.
+            </jsp:attribute>
+                <jsp:attribute name="footer">
+                <button type="submit" class="btn btn-danger">Make Private</button>
+            </jsp:attribute>
+            </t:modal>
+
+        </form>
+    </c:if>
+
+    <%-- Change role modal --%>
     <c:if test="${isOwner}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="change-role-form">
             <input type="hidden" name="action" value="change-role"/>
