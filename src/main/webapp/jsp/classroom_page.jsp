@@ -13,13 +13,21 @@
 <c:set var="classroom" value="${requestScope.classroom}"/>
 <c:set var="member" value="${requestScope.member}"/>
 <c:set var="link" value="${requestScope.link}"/>
+
 <c:set var="isOwner" value="${member.role == ClassroomRole.OWNER}"/>
+<c:set var="disabledIfArchved" value="${classroom.archived ? 'disabled' : ''}"/>
+<c:set var="mutedIfArchved" value="${classroom.archived ? 'text-muted' : ''}"/>
 
 <jsp:include page="/jsp/header.jsp"/>
 
 <div class="container">
 
-    <h2 class="mb-5"><c:out value="${classroom.name}"/></h2>
+    <h2 class="mb-5 d-flex align-items-center gap-3">
+        <c:out value="${classroom.name}"/>
+        <c:if test="${classroom.archived}">
+            <span class="badge bg-secondary">Archived</span>
+        </c:if>
+    </h2>
 
     <div class="row g-5">
 
@@ -36,11 +44,11 @@
         </div>
 
         <%-- Settigns --%>
-        <c:if test="${isOwner}">
-            <div class="col-lg-6 col-12">
+        <div class="col-lg-6 col-12">
 
-                <%-- Join Settigns --%>
-                <div class="card mb-4">
+            <%-- Join Settigns --%>
+            <c:if test="${isOwner}">
+                <div class="card mb-4 ${mutedIfArchved}">
                     <div class="card-body p-4">
 
                         <h4 class="card-title mb-4">Join Settings</h4>
@@ -50,14 +58,16 @@
                                 <c:when test="${classroom.open}">
                                     <span>Joining is <span class="text-success">enabled</span>.</span>
                                     <button id="disable-joining" class="btn btn-xs btn-secondary"
-                                        data-bs-toggle="modal" data-bs-target="#disable-joining-modal">
+                                        data-bs-toggle="modal" data-bs-target="#disable-joining-modal"
+                                        ${disabledIfArchved}>
                                         Disable Joining
                                     </button>
                                 </c:when>
                                 <c:otherwise>
                                     <span>Joining is <span class="text-danger">disabled</span>.</span>
                                     <button id="enable-joining" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#enable-joining-modal">
+                                            data-bs-toggle="modal" data-bs-target="#enable-joining-modal"
+                                            ${disabledIfArchved}>
                                         Enable Joining
                                     </button>
                                 </c:otherwise>
@@ -69,14 +79,16 @@
                                 <c:when test="${classroom.visible}">
                                     <span>Visibility is <span class="text-success">public</span>.</span>
                                     <button id="disable-joining" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#make-private-modal">
+                                            data-bs-toggle="modal" data-bs-target="#make-private-modal"
+                                            ${disabledIfArchved}>
                                         Make Private
                                     </button>
                                 </c:when>
                                 <c:otherwise>
                                     <span>Visibility is <span class="text-danger">private</span>.</span>
                                     <button id="enable-joining" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#make-public-modal">
+                                            data-bs-toggle="modal" data-bs-target="#make-public-modal"
+                                            ${disabledIfArchved}>
                                         Make Public
                                     </button>
                                 </c:otherwise>
@@ -92,14 +104,16 @@
                                     <span>Password is <span class="text-danger">not set</span>.</span>
                                 </c:otherwise>
                             </c:choose>
-                            <div class="d-flex gap-1">
+                            <div class="d-flex gap-0">
                                 <button id="set-password" class="btn btn-xs btn-secondary me-1"
-                                        data-bs-toggle="modal" data-bs-target="#set-password-modal">
+                                        data-bs-toggle="modal" data-bs-target="#set-password-modal"
+                                        ${disabledIfArchved}>
                                     Set Password
                                 </button>
                                 <c:if test="${classroom.password.isPresent()}">
                                     <button id="remove-password" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#remove-password-modal">
+                                            data-bs-toggle="modal" data-bs-target="#remove-password-modal"
+                                            ${disabledIfArchved}>
                                         Remove Password
                                     </button>
                                 </c:if>
@@ -117,33 +131,64 @@
 
                     </div>
                 </div>
+            </c:if>
 
-                <%-- Classroom Settigns --%>
-                <div class="card">
+            <%-- Classroom Settigns --%>
+            <c:if test="${isOwner}">
+                <div class="card ${mutedIfArchved}">
                     <div class="card-body p-4">
 
                         <h4 class="card-title mb-4">Classroom Settings</h4>
 
                         <div class="mb-1">
                             <button id="change-name" class="btn btn-xs btn-secondary"
-                                    data-bs-toggle="modal" data-bs-target="#change-name-modal">
+                                    data-bs-toggle="modal" data-bs-target="#change-name-modal"
+                                    ${disabledIfArchved}>
                                 Change Name
                             </button>
                         </div>
 
                         <div>
-                            <button id="change-name" class="btn btn-xs btn-danger"
-                                    data-bs-toggle="modal" data-bs-target="#archive-classroom-modal">
-                                Archive Classroom
+                            <c:choose>
+                                <c:when test="${classroom.archived}">
+                                    <button id="change-name" class="btn btn-xs btn-success"
+                                            data-bs-toggle="modal" data-bs-target="#restore-classroom-modal">
+                                        Restore Classroom
+                                    </button>
+                                </c:when>
+                                <c:otherwise>
+                                    <button id="change-name" class="btn btn-xs btn-danger"
+                                            data-bs-toggle="modal" data-bs-target="#archive-classroom-modal">
+                                        Archive Classroom
+                                    </button>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+
+                    </div>
+                </div>
+            </c:if>
+
+            <%-- Member Actinos --%>
+            <c:if test="${!isOwner}">
+                <div class="card ${mutedIfArchved}">
+                    <div class="card-body p-4">
+
+                        <h4 class="card-title mb-4">Member Actions</h4>
+
+                        <div>
+                            <button id="leave" class="btn btn-xs btn-secondary"
+                                    data-bs-toggle="modal" data-bs-target="#leave-modal"
+                                ${disabledIfArchved}>
+                                Leave Classroom
                             </button>
                         </div>
 
                     </div>
                 </div>
+            </c:if>
 
-            </div>
-        </c:if>
-
+        </div>
     </div>
 
     <%-- Change classroom name modal --%>
@@ -327,6 +372,62 @@
         </form>
     </c:if>
 
+    <%-- Archive classroom modal --%>
+    <c:if test="${isOwner}">
+        <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
+            <input type="hidden" name="action" value="archive"/>
+            <input type="hidden" name="classroomId" value="${classroom.id}"/>
+
+            <t:modal title="Archive classroom" id="archive-classroom-modal" closeButtonText="Cancel">
+            <jsp:attribute name="content">
+                Are you sure you want to archive the classroom?
+                This will make the classroom read-only and prevent players from joining.
+                You can undo this later by restoring the classroom.
+            </jsp:attribute>
+                <jsp:attribute name="footer">
+                <button type="submit" class="btn btn-danger">Archive</button>
+            </jsp:attribute>
+            </t:modal>
+
+        </form>
+    </c:if>
+
+    <%-- Restore classroom modal --%>
+    <c:if test="${isOwner}">
+        <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
+            <input type="hidden" name="action" value="restore"/>
+            <input type="hidden" name="classroomId" value="${classroom.id}"/>
+
+            <t:modal title="Restore classroom" id="restore-classroom-modal" closeButtonText="Cancel">
+            <jsp:attribute name="content">
+                Are you sure you want to restore the classroom?
+            </jsp:attribute>
+                <jsp:attribute name="footer">
+                <button type="submit" class="btn btn-success">Restore</button>
+            </jsp:attribute>
+            </t:modal>
+
+        </form>
+    </c:if>
+
+    <%-- Leave modal --%>
+    <c:if test="${!isOwner}">
+        <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
+            <input type="hidden" name="action" value="leave"/>
+            <input type="hidden" name="classroomId" value="${classroom.id}"/>
+
+            <t:modal title="Leave classroom" id="leave-modal" closeButtonText="Cancel">
+            <jsp:attribute name="content">
+                Are you sure you want to leave the classroom?
+            </jsp:attribute>
+                <jsp:attribute name="footer">
+                <button type="submit" class="btn btn-danger">Leave</button>
+            </jsp:attribute>
+            </t:modal>
+
+        </form>
+    </c:if>
+
     <%-- Change role modal --%>
     <c:if test="${isOwner}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="change-role-form">
@@ -363,6 +464,7 @@
                     Are you sure you want to make
                     <span data-fill="username" class="border rounded px-1"></span>
                     the owner of this classroom?
+                    This will change your role to Moderator.
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                     <button type="submit" class="btn btn-primary">Change owner</button>
@@ -404,8 +506,9 @@
 
         const classroomId = ${classroom.id};
         const ownUserId = ${member.userId};
-        const isOwner = ${isOwner ? "true" : "false"};
 
+        const isOwner = ${isOwner ? "true" : "false"};
+        const isArchived = ${classroom.archived ? "true" : "false"};
 
         /**
          * Fetches members from the API.
@@ -450,13 +553,26 @@
         };
 
         const renderMemberActions = function(data, type, row, meta) {
+            if (isArchived) {
+                if (data.role !== '<%=ClassroomRole.OWNER%>') {
+                    return `
+                        <div class="float-end">
+                            <span class="text-muted px-3">
+                                <i class="fa fa-ellipsis-v"></i>
+                            </span>
+                        </div>
+                    `;
+                }
+                return '';
+            }
+
             switch (data.role) {
                 case '<%=ClassroomRole.OWNER.name()%>':
                     return '';
                 case '<%=ClassroomRole.MODERATOR.name()%>':
                     return `
                         <div class="float-end">
-                            <span type="button" class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
+                            <span class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
                                 <i class="fa fa-ellipsis-v"></i>
                             </span>
                             <div class="dropdown-menu">
@@ -484,7 +600,7 @@
                 case '<%=ClassroomRole.STUDENT.name()%>':
                     return `
                         <div class="float-end">
-                            <span type="button" class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
+                            <span class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
                                 <i class="fa fa-ellipsis-v"></i>
                             </span>
                             <div class="dropdown-menu">

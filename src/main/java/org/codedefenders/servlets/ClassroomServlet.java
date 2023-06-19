@@ -100,7 +100,7 @@ public class ClassroomServlet extends HttpServlet {
         }
 
         Optional<ClassroomMember> member = getMember(classroom.get().getId());
-        if (!action.get().equals("join")) {
+        if (!action.get().equals("join") && !action.get().equals("leave")) {
             if (!member.isPresent() || member.get().getRole() != ClassroomRole.OWNER) {
                 messages.add("You must be the owner of this classroom.");
                 Redirect.redirectBack(request, response);
@@ -142,6 +142,15 @@ public class ClassroomServlet extends HttpServlet {
                     break;
                 case "join":
                     join(request, response, classroom.get());
+                    break;
+                case "leave":
+                    leave(request, response, classroom.get());
+                    break;
+                case "archive":
+                    setArchived(request, response, classroom.get(), true);
+                    break;
+                case "restore":
+                    setArchived(request, response, classroom.get(), false);
                     break;
             }
         } catch (ValidationException e) {
@@ -189,6 +198,14 @@ public class ClassroomServlet extends HttpServlet {
         classroomService.setVisible(classroom.getId(), visible);
 
         messages.add("Successfully set classroom to " + (visible ? "public" : "private"));
+        redirectToClassroomPage(response, classroom.getUUID());
+    }
+
+    private void setArchived(HttpServletRequest request, HttpServletResponse response, Classroom classroom,
+                             boolean archived) throws IOException {
+        classroomService.setArchived(classroom.getId(), archived);
+
+        messages.add("Successfully " + (archived ? "archived" : "restored") + " classroom");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -277,5 +294,13 @@ public class ClassroomServlet extends HttpServlet {
 
         messages.add("Successfully joined classroom");
         redirectToClassroomPage(response, classroom.getUUID());
+    }
+
+    private void leave(HttpServletRequest request, HttpServletResponse response, Classroom classroom)
+            throws IOException {
+        classroomService.removeMember(classroom.getId(), login.getUserId());
+
+        messages.add("Successfully left classroom");
+        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
     }
 }
