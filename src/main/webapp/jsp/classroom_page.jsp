@@ -120,12 +120,10 @@
                             </div>
                         </div>
 
-                        <div class="d-flex flex-row align-items-baseline w-100 gap-2">
-                            <span class="flex-shrink-0 flex-grow-0">
-                                Invite link is
-                            </span>
-                            <span id="invite-link" class="flex-grow-0 flex-shrink-1 border rounded text-truncate px-2"><c:out value="${link}"/></span>
-                            <i class="fa fa-clipboard copy cursor-pointer text-primary flex-grow-0 flex-shrink-0"
+                        <div>
+                            <span class="me-1">Invite link is</span>
+                            <span id="invite-link" class="border rounded px-2"><c:out value="${link}"/></span>
+                            <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
                                data-copy-target="#invite-link"></i>
                         </div>
 
