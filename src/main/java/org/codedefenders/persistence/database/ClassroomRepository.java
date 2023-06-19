@@ -137,7 +137,8 @@ public class ClassroomRepository {
         @Language("SQL") String query = String.join("\n",
                 "SELECT classrooms.* FROM classrooms, classroom_members",
                 "WHERE classrooms.ID = classroom_members.Classroom_ID",
-                "AND classroom_members.User_ID = ?;"
+                "AND classroom_members.User_ID = ?",
+                "AND classrooms.Archived = 0;"
         );
         try {
             return queryRunner.query(query,
@@ -155,7 +156,8 @@ public class ClassroomRepository {
                 "SELECT classrooms.* FROM classrooms, classroom_members",
                 "WHERE classrooms.ID = classroom_members.Classroom_ID",
                 "AND classroom_members.User_ID = ?",
-                "AND classroom_members.Role = ?;"
+                "AND classroom_members.Role = ?",
+                "AND classrooms.Archived = 0;"
         );
         try {
             return queryRunner.query(query,
@@ -194,7 +196,7 @@ public class ClassroomRepository {
                 "SELECT classrooms.* FROM classrooms, classroom_members",
                 "WHERE classrooms.ID = classroom_members.Classroom_ID",
                 "AND classroom_members.User_ID = ?",
-                "AND classrooms.Archived = 0;"
+                "AND classrooms.Archived = 1;"
         );
         try {
             return queryRunner.query(query,
@@ -213,7 +215,7 @@ public class ClassroomRepository {
                 "WHERE classrooms.ID = classroom_members.Classroom_ID",
                 "AND classroom_members.User_ID = ?",
                 "AND classroom_members.Role = ?",
-                "AND classrooms.Archived = 0;"
+                "AND classrooms.Archived = 1;"
         );
         try {
             return queryRunner.query(query,

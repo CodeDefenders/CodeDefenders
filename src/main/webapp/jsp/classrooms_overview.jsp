@@ -45,6 +45,15 @@
         <table id="public-classrooms" class="table"></table>
     </div>
 
+    <div class="d-flex justify-content-between flex-wrap align-items-baseline">
+        <h2 class="mt-5 mb-3">My Archived Classrooms</h2>
+        <input type="search" id="search-user-archived" placeholder="Search"
+               class="form-control form-control-sm" style="width: 15em;">
+    </div>
+    <div class="loading loading-border-card loading-height-200">
+        <table id="user-archived-classrooms" class="table"></table>
+    </div>
+
     <script type="module">
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
         import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
@@ -108,6 +117,7 @@
 
         const userClassrooms = await getClassrooms("user");
         const publicClassrooms = await getClassrooms("visible");
+        const userArchivedClassrooms = await getClassrooms("user-archived");
 
         const classroomIds = new Set();
         for (const classroom of userClassrooms) {
@@ -163,11 +173,38 @@
         });
         LoadingAnimation.hideAnimation(publicTable.table().container());
 
+        const userArchivedTable = new DataTable('#user-archived-classrooms', {
+            data: userArchivedClassrooms,
+            columns: [
+                {
+                    data: 'name',
+                    type: 'string',
+                    title: 'Name'
+                },
+                {
+                    data: null,
+                    title: 'Link',
+                    render: renderClassroomLink,
+                    width: '2em'
+                },
+            ],
+            order: [[0, 'asc']],
+            scrollY: '600px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: {emptyTable: "You're not part of any archived classrooms."}
+        });
+        LoadingAnimation.hideAnimation(userArchivedTable.table().container());
+
         document.getElementById('search-user').addEventListener('keyup', function(event) {
             setTimeout(() => userTable.search(this.value).draw(), 0);
         });
         document.getElementById('search-public').addEventListener('keyup', function(event) {
             setTimeout(() => publicTable.search(this.value).draw(), 0);
+        });
+        document.getElementById('search-user-archived').addEventListener('keyup', function(event) {
+            setTimeout(() => userArchivedTable.search(this.value).draw(), 0);
         });
     </script>
 

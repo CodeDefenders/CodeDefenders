@@ -108,6 +108,14 @@ public class ClassroomServlet extends HttpServlet {
             }
         }
 
+        if (action.get().equals("join")) {
+            if (!classroom.get().isOpen() || classroom.get().isArchived()) {
+                messages.add("Can't join this classroom.");
+                Redirect.redirectBack(request, response);
+                return;
+            }
+        }
+
         try {
             switch (action.get()) {
                 case "enable-joining":
