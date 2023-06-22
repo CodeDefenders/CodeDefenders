@@ -72,6 +72,9 @@ public class AdminClassrooms extends HttpServlet {
                 case "create-classroom":
                     createClassroom(request, response);
                     break;
+                default:
+                    messages.add("Invalid action: " + action);
+                    Redirect.redirectBack(request, response);
             }
         } catch (ValidationException e) {
             messages.add("Validation failed: " + e.getMessage());

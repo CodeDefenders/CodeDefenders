@@ -157,6 +157,9 @@ public class ClassroomServlet extends HttpServlet {
                 case "restore":
                     setArchived(request, response, classroom.get(), false);
                     break;
+                default:
+                    messages.add("Invalid action: " + action);
+                    Redirect.redirectBack(request, response);
             }
         } catch (ValidationException e) {
             messages.add("Validation failed: " + e.getMessage());
