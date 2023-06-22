@@ -32,7 +32,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.service.AuthService;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class CacheControlFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(CacheControlFilter.class);
 
     @Inject
-    private AuthService login;
+    private CodeDefendersAuth login;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

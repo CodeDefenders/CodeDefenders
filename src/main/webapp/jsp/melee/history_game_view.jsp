@@ -33,7 +33,7 @@
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Game History"); %>
 
-<jsp:useBean id="login" class="org.codedefenders.beans.user.LoginBean" scope="request"/>
+<jsp:useBean id="login" type="org.codedefenders.auth.CodeDefendersAuth" scope="request"/>
 
 <%
     MeleeGame game = (MeleeGame) request.getAttribute("game");

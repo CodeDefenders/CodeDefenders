@@ -20,7 +20,7 @@
 --%>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
-<%--@elvariable id="login" type="org.codedefenders.beans.user.LoginBean"--%>
+<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
 <%--@elvariable id="gameProducer" type="org.codedefenders.servlets.games.GameProducer"--%>
 
 </div> <%-- closes #game-container --%>

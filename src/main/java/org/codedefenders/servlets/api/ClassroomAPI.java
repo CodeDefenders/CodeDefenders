@@ -13,11 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.SimpleUser;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
-import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.UserService;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -35,7 +35,7 @@ public class ClassroomAPI extends HttpServlet {
     @Inject
     private UserService userService;
     @Inject
-    private AuthService login; // for some reason it injects LoginBean if the type is CodeDefendersAuth
+    private CodeDefendersAuth login;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

@@ -10,12 +10,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod;
 import org.codedefenders.beans.admin.AdminCreateGamesBean.TeamAssignmentMethod;
 import org.codedefenders.beans.admin.StagedGameList.GameSettings;
 import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
-import org.codedefenders.beans.user.LoginBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
 import org.codedefenders.database.GameDAO;
@@ -28,6 +28,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
+import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
@@ -92,9 +93,9 @@ public class AdminCreateGamesBeanTest {
     @Before
     public void initializeBean() {
         /* Mock bean dependencies of AdminCreateGamesBean. */
-        LoginBean loginBean = PowerMockito.mock(LoginBean.class);
-        PowerMockito.when(loginBean.getUserId()).thenReturn(0);
-        PowerMockito.when(loginBean.getUserEntity()).thenReturn(new UserEntity(0, "creator", "", ""));
+        CodeDefendersAuth login = PowerMockito.mock(AuthService.class);
+        PowerMockito.when(login.getUserId()).thenReturn(0);
+        PowerMockito.when(login.getUserEntity()).thenReturn(new UserEntity(0, "creator", "", ""));
 
         MessagesBean messagesBean = PowerMockito.mock(MessagesBean.class);
         GameManagingUtils gameManagingUtils = PowerMockito.mock(GameManagingUtils.class);
@@ -103,7 +104,7 @@ public class AdminCreateGamesBeanTest {
         GameService gameService = PowerMockito.mock(GameService.class);
         ClassroomService classroomService = PowerMockito.mock(ClassroomService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(loginBean, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService, classroomService);
+        adminCreateGamesBean = new AdminCreateGamesBean(login, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService, classroomService);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 

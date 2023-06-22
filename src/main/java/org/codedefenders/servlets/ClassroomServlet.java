@@ -14,12 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
-import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -34,7 +34,7 @@ public class ClassroomServlet extends HttpServlet {
     private ClassroomService classroomService;
 
     @Inject
-    private AuthService login; // for some reason it injects LoginBean if the type is CodeDefendersAuth
+    private CodeDefendersAuth login;
 
     @Inject
     private MessagesBean messages;
