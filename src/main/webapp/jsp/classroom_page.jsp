@@ -5,7 +5,7 @@
 
 <%@ page import="org.codedefenders.model.ClassroomRole" %>
 
-<%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
+<%--@elvariable id="login" type="org.codedefenders.service.AuthService"--%>
 <%--@elvariable id="classroomService" type="org.codedefenders.service.ClassroomService"--%>
 <%--@elvariable id="userService" type="org.codedefenders.service.UserService"--%>
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
@@ -14,7 +14,9 @@
 <c:set var="member" value="${requestScope.member}"/>
 <c:set var="link" value="${requestScope.link}"/>
 
-<c:set var="isOwner" value="${member.role == ClassroomRole.OWNER}"/>
+<c:set var="canEdit" value="${(member != null && member.role == ClassroomRole.OWNER) || login.admin}"/>
+<c:set var="canLeave" value="${member != null && member.role != ClassroomRole.OWNER}"/>
+
 <c:set var="disabledIfArchved" value="${classroom.archived ? 'disabled' : ''}"/>
 <c:set var="mutedIfArchved" value="${classroom.archived ? 'text-muted' : ''}"/>
 
@@ -46,8 +48,28 @@
         <%-- Settigns --%>
         <div class="col-lg-6 col-12">
 
+            <%-- Join as admin --%>
+            <c:if test="${login.admin && (member == null || member.role != ClassroomRole.OWNER)}">
+                <div class="card mb-4 ${mutedIfArchved}">
+                    <div class="card-body p-4">
+                        <c:choose>
+                            <c:when test="${member == null}">
+                                You are able to view and edit this classroom because you are logged in as admin.
+                            </c:when>
+                            <c:otherwise>
+                                You are able to edit this classroom because you are logged in as admin.
+                            </c:otherwise>
+                        </c:choose>
+                        <c:if test="${classroom.open && !classroom.archived && member == null}">
+                            If you would like to join the classroom, please go
+                            <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}&join">here</a>.
+                        </c:if>
+                    </div>
+                </div>
+            </c:if>
+
             <%-- Join Settigns --%>
-            <c:if test="${isOwner}">
+            <c:if test="${canEdit}">
                 <div class="card mb-4 ${mutedIfArchved}">
                     <div class="card-body p-4">
 
@@ -132,8 +154,8 @@
             </c:if>
 
             <%-- Classroom Settigns --%>
-            <c:if test="${isOwner}">
-                <div class="card ${mutedIfArchved}">
+            <c:if test="${canEdit}">
+                <div class="card ${mutedIfArchved} ${canLeave ? 'mb-4' : ''}">
                     <div class="card-body p-4">
 
                         <h4 class="card-title mb-4">Classroom Settings</h4>
@@ -167,8 +189,8 @@
                 </div>
             </c:if>
 
-            <%-- Member Actinos --%>
-            <c:if test="${!isOwner}">
+            <%-- Member Actions --%>
+            <c:if test="${canLeave}">
                 <div class="card ${mutedIfArchved}">
                     <div class="card-body p-4">
 
@@ -189,7 +211,7 @@
     </div>
 
     <%-- Change classroom name modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
             <input type="hidden" name="action" value="change-name"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -217,7 +239,7 @@
     </c:if>
 
     <%-- Set password modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
             <input type="hidden" name="action" value="set-password"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -275,7 +297,7 @@
     </c:if>
 
     <%-- Remove password modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="remove-password"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -293,7 +315,7 @@
     </c:if>
 
     <%-- Enable joining modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="enable-joining"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -312,7 +334,7 @@
     </c:if>
 
     <%-- Disable joining modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="disable-joining"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -331,7 +353,7 @@
     </c:if>
 
     <%-- Make public modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="make-public"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -351,7 +373,7 @@
     </c:if>
 
     <%-- Make private modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="make-private"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -370,7 +392,7 @@
     </c:if>
 
     <%-- Archive classroom modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="archive"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -390,7 +412,7 @@
     </c:if>
 
     <%-- Restore classroom modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="restore"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -426,7 +448,7 @@
     </c:if>
 
     <%-- Change role modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="change-role-form">
             <input type="hidden" name="action" value="change-role"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -450,7 +472,7 @@
     </c:if>
 
     <%-- Change owner modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="change-owner-form">
             <input type="hidden" name="action" value="change-owner"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -461,7 +483,7 @@
                     Are you sure you want to make
                     <span data-fill="username" class="border rounded px-1"></span>
                     the owner of this classroom?
-                    This will change your role to Moderator.
+                    This will change the current owner's role to Moderator.
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                     <button type="submit" class="btn btn-primary">Change owner</button>
@@ -472,7 +494,7 @@
     </c:if>
 
     <%-- Kick member modal --%>
-    <c:if test="${isOwner}">
+    <c:if test="${canEdit}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="kick-member-form">
             <input type="hidden" name="action" value="kick-member"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -502,9 +524,9 @@
         const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
 
         const classroomId = ${classroom.id};
-        const ownUserId = ${member.userId};
+        const ownUserId = ${login.userId};
 
-        const isOwner = ${isOwner ? "true" : "false"};
+        const canEdit = ${canEdit ? "true" : "false"};
         const isArchived = ${classroom.archived ? "true" : "false"};
 
         /**
@@ -662,7 +684,7 @@
                         title: 'User ID',
                         type: 'number',
                         width: '5em',
-                        visible: isOwner
+                        visible: canEdit
                     },
                     {
                         data: 'user.name',
@@ -683,7 +705,7 @@
                         render: renderMemberActions,
                         type: 'html',
                         width: '4em',
-                        visible: isOwner
+                        visible: canEdit
                     }
                 ].filter(e => e !== null),
                 order: [[2, 'asc'], [1, 'asc']],

@@ -55,13 +55,16 @@ public class ClassroomServlet extends HttpServlet {
             return;
         }
 
-        Optional<ClassroomMember> member = getMember(classroom.get().getId());
+        Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
+                classroom.get().getId(), login.getUserId());
+        // Admins are allowed to access the page without joining
+        boolean adminJoinBypass = login.isAdmin() && request.getParameter("join") == null;
 
         // Go to classroom page
-        if (member.isPresent()) {
+        if (member.isPresent() || adminJoinBypass) {
             pageInfo.setPageTitle(classroom.get().getName());
             request.setAttribute("classroom", classroom.get());
-            request.setAttribute("member", member.get());
+            request.setAttribute("member", member.orElse(null));
             request.setAttribute("link", classroomService.getInviteLinkForClassroom(classroom.get().getUUID()));
             request.getRequestDispatcher("/jsp/classroom_page.jsp").forward(request, response);
             return;
@@ -99,18 +102,12 @@ public class ClassroomServlet extends HttpServlet {
             return;
         }
 
-        Optional<ClassroomMember> member = getMember(classroom.get().getId());
-        if (!action.get().equals("join") && !action.get().equals("leave")) {
+        // non-admins need to be the owner of the classroom for all actions except join/leave
+        if (!login.isAdmin() && !action.get().equals("join") && !action.get().equals("leave")) {
+            Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
+                    classroom.get().getId(), login.getUserId());
             if (!member.isPresent() || member.get().getRole() != ClassroomRole.OWNER) {
                 messages.add("You must be the owner of this classroom.");
-                Redirect.redirectBack(request, response);
-                return;
-            }
-        }
-
-        if (action.get().equals("join")) {
-            if (!classroom.get().isOpen() || classroom.get().isArchived()) {
-                messages.add("Can't join this classroom.");
                 Redirect.redirectBack(request, response);
                 return;
             }
@@ -172,14 +169,6 @@ public class ClassroomServlet extends HttpServlet {
 
     public void redirectToClassroomPage(HttpServletResponse response, UUID classroomUUID) throws IOException {
         response.sendRedirect(url.forPath(Paths.CLASSROOM) + "?classroomUid=" + classroomUUID.toString());
-    }
-
-    // TODO: find a better way to implement admin view
-    private Optional<ClassroomMember> getMember(int classroomId) {
-        if (login.isAdmin()) {
-            return Optional.of(new ClassroomMember(login.getUserId(), classroomId, ClassroomRole.OWNER));
-        }
-        return classroomService.getMemberForClassroomAndUser(classroomId, login.getUserId());
     }
 
     private Optional<Classroom> getClassroomFromRequest(HttpServletRequest request) {
@@ -287,6 +276,12 @@ public class ClassroomServlet extends HttpServlet {
 
     private void join(HttpServletRequest request, HttpServletResponse response, Classroom classroom)
             throws IOException {
+        if (!classroom.isOpen() || classroom.isArchived()) {
+            messages.add("Can't join this classroom.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
         if (classroom.getPassword().isPresent()) {
             String password = ServletUtils.getStringParameter(request, "password").get();
             boolean matches = new BCryptPasswordEncoder().matches(password, classroom.getPassword().get());
