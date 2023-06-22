@@ -142,6 +142,14 @@ public class ClassroomService {
         return classroomRepository.getClassroomByUUID(uuid);
     }
 
+    public List<Classroom> getAllClassrooms() {
+        return classroomRepository.getAllClassrooms();
+    }
+
+    public List<Classroom> getAllClassroomsByMember(int userId) {
+        return classroomRepository.getAllClassroomsByMember(userId);
+    }
+
     public List<Classroom> getActiveClassrooms() {
         return classroomRepository.getActiveClassrooms();
     }

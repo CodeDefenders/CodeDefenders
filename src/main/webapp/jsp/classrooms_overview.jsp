@@ -29,8 +29,17 @@
 
     <div class="d-flex justify-content-between flex-wrap align-items-baseline">
         <h2 class="mb-3">My Classrooms</h2>
-        <input type="search" id="search-user" placeholder="Search"
-               class="form-control form-control-sm" style="width: 15em;">
+        <div class="d-flex gap-3">
+            <div>
+                <input type="radio" class="btn-check" name="classroom-type" id="radio-active" autocomplete="off" checked>
+                <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-active">Active</label>
+
+                <input type="radio" class="btn-check" name="classroom-type" id="radio-archived" autocomplete="off">
+                <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-archived">Archived</label>
+            </div>
+            <input type="search" id="search-user" placeholder="Search"
+                   class="form-control form-control-sm" style="width: 15em;">
+        </div>
     </div>
     <div class="loading loading-border-card loading-height-200">
         <table id="user-classrooms" class="table"></table>
@@ -43,15 +52,6 @@
     </div>
     <div class="loading loading-border-card loading-height-200">
         <table id="public-classrooms" class="table"></table>
-    </div>
-
-    <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-        <h2 class="mt-5 mb-3">My Archived Classrooms</h2>
-        <input type="search" id="search-user-archived" placeholder="Search"
-               class="form-control form-control-sm" style="width: 15em;">
-    </div>
-    <div class="loading loading-border-card loading-height-200">
-        <table id="user-archived-classrooms" class="table"></table>
     </div>
 
     <script type="module">
@@ -117,8 +117,8 @@
 
         const userClassrooms = await getClassrooms("user");
         const publicClassrooms = await getClassrooms("visible");
-        const userArchivedClassrooms = await getClassrooms("user-archived");
 
+        // Exclude "My classrooms" from "Public Classrooms"
         const classroomIds = new Set();
         for (const classroom of userClassrooms) {
             classroomIds.add(classroom.id);
@@ -145,9 +145,14 @@
             scrollCollapse: true,
             paging: false,
             dom: 't',
-            language: {emptyTable: "You're not part of any classrooms."}
+            language: {
+                emptyTable: "You're not part of any classrooms.",
+                zeroRecords: 'No classrooms found.'
+            }
         });
         LoadingAnimation.hideAnimation(userTable.table().container());
+
+
 
         const publicTable = new DataTable('#public-classrooms', {
             data: filteredPublicClassrooms,
@@ -173,39 +178,33 @@
         });
         LoadingAnimation.hideAnimation(publicTable.table().container());
 
-        const userArchivedTable = new DataTable('#user-archived-classrooms', {
-            data: userArchivedClassrooms,
-            columns: [
-                {
-                    data: 'name',
-                    type: 'string',
-                    title: 'Name'
-                },
-                {
-                    data: null,
-                    title: 'Link',
-                    render: renderClassroomLink,
-                    width: '2em'
-                },
-            ],
-            order: [[0, 'asc']],
-            scrollY: '600px',
-            scrollCollapse: true,
-            paging: false,
-            dom: 't',
-            language: {emptyTable: "You're not part of any archived classrooms."}
-        });
-        LoadingAnimation.hideAnimation(userArchivedTable.table().container());
-
         document.getElementById('search-user').addEventListener('keyup', function(event) {
             setTimeout(() => userTable.search(this.value).draw(), 0);
         });
         document.getElementById('search-public').addEventListener('keyup', function(event) {
             setTimeout(() => publicTable.search(this.value).draw(), 0);
         });
-        document.getElementById('search-user-archived').addEventListener('keyup', function(event) {
-            setTimeout(() => userArchivedTable.search(this.value).draw(), 0);
-        });
+
+
+        const activeRadio = document.getElementById("radio-active");
+        const archivedRadio = document.getElementById("radio-archived");
+
+        const searchFunction = (settings, renderedData, index, data, counter) => {
+            /* Let this only affect the "My Classrooms" table. */
+            if (!settings.nTable.id === 'user-classrooms') {
+                return true;
+            }
+
+            if (activeRadio.checked) {
+                return !data.archived;
+            } else {
+                return data.archived;
+            }
+        };
+        DataTable.ext.search.push(searchFunction);
+
+        activeRadio.addEventListener('change', e => userTable.draw());
+        archivedRadio.addEventListener('change', e => userTable.draw());
     </script>
 
 

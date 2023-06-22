@@ -94,16 +94,13 @@ public class ClassroomAPI extends HttpServlet {
                     response.setStatus(HttpStatus.SC_BAD_REQUEST);
                     return;
                 }
-                classrooms = classroomService.getActiveClassrooms();
+                classrooms = classroomService.getAllClassrooms();
                 break;
             case "visible":
                 classrooms = classroomService.getVisibleClassrooms();
                 break;
             case "user":
-                classrooms = classroomService.getActiveClassroomsByMember(login.getUserId());
-                break;
-            case "user-archived":
-                classrooms = classroomService.getArchivedClassroomsByMember(login.getUserId());
+                classrooms = classroomService.getAllClassroomsByMember(login.getUserId());
                 break;
             default:
                 response.setStatus(HttpStatus.SC_BAD_REQUEST);

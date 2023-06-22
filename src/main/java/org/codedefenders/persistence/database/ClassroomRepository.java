@@ -123,6 +123,33 @@ public class ClassroomRepository {
         }
     }
 
+    public List<Classroom> getAllClassrooms() {
+        @Language("SQL") String query = "SELECT * FROM classrooms;";
+        try {
+            return queryRunner.query(query, listFromRS(this::classroomFromRS));
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public List<Classroom> getAllClassroomsByMember(int userId) {
+        @Language("SQL") String query = String.join("\n",
+                "SELECT classrooms.* FROM classrooms, classroom_members",
+                "WHERE classrooms.ID = classroom_members.Classroom_ID",
+                "AND classroom_members.User_ID = ?;"
+        );
+        try {
+            return queryRunner.query(query,
+                    listFromRS(this::classroomFromRS),
+                    userId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
     public List<Classroom> getActiveClassrooms() {
         @Language("SQL") String query = "SELECT * FROM classrooms WHERE Archived = 0;";
         try {
