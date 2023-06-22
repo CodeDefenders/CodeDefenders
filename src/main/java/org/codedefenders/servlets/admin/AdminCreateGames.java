@@ -20,16 +20,13 @@ package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -50,12 +47,9 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.Classroom;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
-import org.codedefenders.service.ClassroomService;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
@@ -124,6 +118,7 @@ public class AdminCreateGames extends HttpServlet {
                     break;
                 case "removePlayerFromStagedGame":
                     removePlayerFromStagedGame(request);
+                    break;
                 case "removeCreatorFromStagedGame":
                     removeCreatorFromStagedGame(request);
                     break;
@@ -177,6 +172,8 @@ public class AdminCreateGames extends HttpServlet {
             gameSettings.setGameDurationMinutes(getIntParameter(request, "gameDurationMinutes").get())
                     .map(messages::add);
 
+            gameSettings.setClassroomId(getIntParameter(request, "classroomId").orElse(null));
+
         } catch (NullPointerException | NoSuchElementException e) {
             messages.add("ERROR: Missing game settings parameter.");
             return null;
@@ -218,28 +215,31 @@ public class AdminCreateGames extends HttpServlet {
             return Optional.empty();
         }
 
-        Optional<Integer> classroomId = getIntParameter(request, "classroomId");
-
-
-        /* Map given user IDs to users and validate that all exist. */
-        Optional<Set<UserInfo>> usersFromTable = adminCreateGamesBean.getUserInfosForIds(userIdsFromTable);
-        if (!usersFromTable.isPresent()) {
-            return Optional.empty();
-        }
-
-        /* Map given user names/emails to users and validate that all exist. */
-        Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
-        if (!usersFromTextArea.isPresent()) {
-            return Optional.empty();
-        }
-
-        /* Get users for classrooms. */
-        Optional<Set<UserInfo>> usersFromClassroomTable = classroomId.map(adminCreateGamesBean::getPlayersForClassroom);
-
         Set<UserInfo> players = new HashSet<>();
-        players.addAll(usersFromTable.get());
-        players.addAll(usersFromTextArea.get());
-        usersFromClassroomTable.ifPresent(players::addAll);
+
+        Optional<Integer> classroomId = getIntParameter(request, "classroomId");
+        if (classroomId.isPresent()) {
+            /* Get users for classrooms. */
+            Set<UserInfo> usersFromClassroomTable = adminCreateGamesBean.getPlayersForClassroom(classroomId.get());
+            players.addAll(usersFromClassroomTable);
+
+        } else {
+            /* Map given user IDs to users and validate that all exist. */
+            Optional<Set<UserInfo>> usersFromTable = adminCreateGamesBean.getUserInfosForIds(userIdsFromTable);
+            if (!usersFromTable.isPresent()) {
+                return Optional.empty();
+            }
+
+            /* Map given user names/emails to users and validate that all exist. */
+            Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
+            if (!usersFromTextArea.isPresent()) {
+                return Optional.empty();
+            }
+
+            players.addAll(usersFromTable.get());
+            players.addAll(usersFromTextArea.get());
+        }
+
         return Optional.of(players);
     }
 

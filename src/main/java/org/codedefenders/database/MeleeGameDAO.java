@@ -76,6 +76,11 @@ public class MeleeGameDAO {
 
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
+        Integer classroomId = rs.getInt("Classroom_ID");
+        if (rs.wasNull()) {
+            classroomId = null;
+        }
+
         return new MeleeGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
                 .id(id)
@@ -90,6 +95,7 @@ public class MeleeGameDAO {
                 .gameDurationMinutes(gameDuration)
                 .startTimeUnixSeconds(startTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
+                .classroomId(classroomId)
                 .build();
     }
 
@@ -172,6 +178,7 @@ public class MeleeGameDAO {
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
         int gameDurationMinutes = game.getGameDurationMinutes();
+        Integer classroomId = game.getClassroomId().orElse(null);
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -190,8 +197,9 @@ public class MeleeGameDAO {
                 "MutantValidator,",
                 "CapturePlayersIntention,",
                 "EquivalenceThreshold,",
-                "Game_Duration_Minutes)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "Game_Duration_Minutes,",
+                "Classroom_ID)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -210,6 +218,7 @@ public class MeleeGameDAO {
                 DatabaseValue.of(capturePlayersIntention),
                 DatabaseValue.of(automaticMutantEquivalenceThreshold),
                 DatabaseValue.of(gameDurationMinutes),
+                DatabaseValue.of(classroomId),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);

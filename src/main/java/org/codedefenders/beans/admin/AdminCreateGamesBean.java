@@ -647,6 +647,7 @@ public class AdminCreateGamesBean implements Serializable {
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
                     .gameDurationMinutes(gameSettings.getGameDurationMinutes())
+                    .classroomId(gameSettings.getClassroomId().orElse(null))
                     .build();
         } else if (gameSettings.getGameType() == MELEE) {
             game = new MeleeGame.Builder(
@@ -661,6 +662,7 @@ public class AdminCreateGamesBean implements Serializable {
                     .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
                     .level(gameSettings.getLevel())
                     .gameDurationMinutes(gameSettings.getGameDurationMinutes())
+                    .classroomId(gameSettings.getClassroomId().orElse(null))
                     .build();
         } else {
             messages.add(format("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",

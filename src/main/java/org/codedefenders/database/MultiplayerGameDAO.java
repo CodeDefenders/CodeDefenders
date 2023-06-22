@@ -74,6 +74,11 @@ public class MultiplayerGameDAO {
         long startTime = rs.getLong("Timestamp_Start");
         int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
 
+        Integer classroomId = rs.getInt("Classroom_ID");
+        if (rs.wasNull()) {
+            classroomId = null;
+        }
+
         return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
                 .id(id)
@@ -90,6 +95,7 @@ public class MultiplayerGameDAO {
                 .gameDurationMinutes(gameDuration)
                 .startTimeUnixSeconds(startTime)
                 .automaticMutantEquivalenceThreshold(automaticMutantEquivalenceThreshold)
+                .classroomId(classroomId)
                 .build();
     }
 
@@ -169,6 +175,7 @@ public class MultiplayerGameDAO {
         GameMode mode = game.getMode();
         int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
         int gameDurationMinutes = game.getGameDurationMinutes();
+        Integer classroomId = game.getClassroomId().orElse(null);
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -187,8 +194,9 @@ public class MultiplayerGameDAO {
                 "MutantValidator,",
                 "CapturePlayersIntention,",
                 "EquivalenceThreshold,",
-                "Game_Duration_Minutes)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "Game_Duration_Minutes,",
+                "Classroom_ID)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
 
         DatabaseValue<?>[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
@@ -207,6 +215,7 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(capturePlayersIntention),
                 DatabaseValue.of(automaticMutantEquivalenceThreshold),
                 DatabaseValue.of(gameDurationMinutes),
+                DatabaseValue.of(classroomId),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
