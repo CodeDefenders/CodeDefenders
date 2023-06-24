@@ -31,6 +31,26 @@
         </c:if>
     </h2>
 
+    <div class="p-4 border rounded mb-4">
+        <div class="d-flex justify-content-between flex-wrap align-items-baseline">
+            <h4 class="mb-3">Games</h4>
+            <div class="d-flex gap-3">
+                <div>
+                    <input type="radio" class="btn-check" name="classroom-type" id="radio-active" autocomplete="off" checked>
+                    <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-active">Active</label>
+
+                    <input type="radio" class="btn-check" name="classroom-type" id="radio-archived" autocomplete="off">
+                    <label class="btn btn-sm btn-outline-secondary rounded-pill" for="radio-archived">Archived</label>
+                </div>
+                <input type="search" id="search-games" placeholder="Search"
+                       class="form-control form-control-sm" style="width: 15em;">
+            </div>
+        </div>
+        <div class="loading loading-height-200 loading-border-card">
+            <table id="games-table" class="table table-no-last-border" style="width: 100%;"></table>
+        </div>
+    </div>
+
     <div class="row g-4">
 
         <%-- Members table --%>
@@ -547,6 +567,27 @@
         };
 
         /**
+         * Fetches games from the API.
+         */
+        const getGames = async function() {
+            const params = new URLSearchParams({
+                type: 'games',
+                classroomId
+            });
+            const response = await fetch(`\${API_URL}?\${params}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                // TODO: Show toast message here? But we don't have toasts :(
+                return null;
+            }
+            return await response.json();
+        };
+
+        /**
          * Renders roles with correct capitalization and sorts owners first.
          */
         const renderRole = function(role, type, row, meta) {
@@ -659,6 +700,10 @@
             }
         };
 
+        const renderGameActions = function(data, type, row, meta) {
+
+        };
+
         const initMembersTable = function(data) {
             const membersTable = new DataTable('#members-table', {
                 data,
@@ -691,7 +736,7 @@
                         width: '4em',
                         visible: canEdit
                     }
-                ].filter(e => e !== null),
+                ],
                 order: [[2, 'asc'], [1, 'asc']],
                 scrollY: '500px',
                 scrollCollapse: true,
@@ -715,6 +760,41 @@
                 const data = membersTable.row(button.closest('tr')).data();
                 button.addEventListener('click', e => kickMember(data, role));
             }
+        };
+
+        const initGamesTable = function(data) {
+            const gamesTable = new DataTable('#games-table', {
+                data,
+                columns: [
+                    {
+                        data: 'gameId',
+                        title: 'Game ID',
+                        type: 'number',
+                        width: '5em'
+                    },
+                    {
+                        data: 'mode',
+                        title: 'Game Mode',
+                        type: 'string'
+                    },
+                    {
+                        data: 'role',
+                        title: 'Your Role',
+                        type: 'string'
+                    }
+                ],
+                order: [[0, 'asc']],
+                scrollY: '500px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: {emptyTable: 'This classroom has no games... yet.'}
+            });
+            LoadingAnimation.hideAnimation(gamesTable.table().container());
+
+            document.getElementById('search-games').addEventListener('keyup', function(event) {
+                setTimeout(() => gamesTable.search(this.value).draw(), 0);
+            });
         };
 
         /**
@@ -762,8 +842,8 @@
             });
         };
 
-        const members = await getMembers();
-        initMembersTable(members);
+        getMembers().then(members => initMembersTable(members));
+        getGames().then(games => initGamesTable(games));
         initCopyButtons();
         initMoveDropdowns();
     </script>

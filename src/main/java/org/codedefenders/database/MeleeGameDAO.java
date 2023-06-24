@@ -30,6 +30,7 @@ import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserMeleeGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
@@ -474,5 +475,14 @@ public class MeleeGameDAO {
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
         return DB.executeQueryReturnList(sql, MeleeGameDAO::meleeGameFromRS, state);
+    }
+
+    public static List<MeleeGame> getClassroomGames(int classroomId) {
+        final String query = String.join("\n",
+                "SELECT * FROM view_melee_games as games",
+                "WHERE games.Classroom_ID = ?;"
+        );
+        return DB.executeQueryReturnList(query, MeleeGameDAO::meleeGameFromRS,
+                DatabaseValue.of(classroomId));
     }
 }

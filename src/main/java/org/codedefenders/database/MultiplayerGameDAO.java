@@ -340,7 +340,6 @@ public class MultiplayerGameDAO {
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::openGameInfoFromRS, DatabaseValue.of(userId));
     }
 
-
     /**
      * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} for games
      * a given user has created or joined.
@@ -474,5 +473,14 @@ public class MultiplayerGameDAO {
 
         DatabaseValue<String> state = DatabaseValue.of(GameState.ACTIVE.toString());
         return DB.executeQueryReturnList(sql, MultiplayerGameDAO::multiplayerGameFromRS, state);
+    }
+
+    public static List<MultiplayerGame> getClassroomGames(int classroomId) {
+        final String query = String.join("\n",
+                "SELECT * FROM view_battleground_games as games",
+                "WHERE games.Classroom_ID = ?;"
+        );
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS,
+                DatabaseValue.of(classroomId));
     }
 }
