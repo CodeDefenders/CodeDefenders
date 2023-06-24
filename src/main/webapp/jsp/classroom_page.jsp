@@ -24,186 +24,180 @@
 
 <div class="container">
 
-    <h2 class="mb-5 d-flex align-items-center gap-3">
+    <h2 class="d-flex align-items-center gap-3 mb-4 ms-4">
         <c:out value="${classroom.name}"/>
         <c:if test="${classroom.archived}">
             <span class="badge bg-secondary">Archived</span>
         </c:if>
     </h2>
 
-    <div class="row g-5">
+    <div class="row g-4">
 
         <%-- Members table --%>
         <div class="col-lg-6 col-12">
-            <div class="d-flex justify-content-between flex-wrap align-items-baseline">
-                <h4 class="mb-3">Members</h4>
-                <input type="search" id="search-members" placeholder="Search"
-                       class="form-control form-control-sm" style="width: 15em;">
-            </div>
-            <div class="loading loading-height-200 loading-border-card">
-                <table id="members-table" class="table" style="width: 100%;"></table>
+            <div class="p-4 border rounded">
+                <div class="d-flex justify-content-between flex-wrap align-items-baseline">
+                    <h4 class="mb-3">Members</h4>
+                    <input type="search" id="search-members" placeholder="Search"
+                           class="form-control form-control-sm" style="width: 15em;">
+                </div>
+                <div class="loading loading-height-200 loading-border-card">
+                    <table id="members-table" class="table table-no-last-border" style="width: 100%;"></table>
+                </div>
             </div>
         </div>
 
         <%-- Settigns --%>
-        <div class="col-lg-6 col-12">
+        <div class="col-lg-6 col-12 d-flex flex-column gap-4">
 
             <%-- Join as admin --%>
             <c:if test="${login.admin && (member == null || member.role != ClassroomRole.OWNER)}">
-                <div class="card mb-4 ${mutedIfArchved}">
-                    <div class="card-body p-4">
-                        <c:choose>
-                            <c:when test="${member == null}">
-                                You are able to view and edit this classroom because you are logged in as admin.
-                            </c:when>
-                            <c:otherwise>
-                                You are able to edit this classroom because you are logged in as admin.
-                            </c:otherwise>
-                        </c:choose>
-                        <c:if test="${classroom.open && !classroom.archived && member == null}">
-                            If you would like to join the classroom, please go
-                            <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}&join">here</a>.
-                        </c:if>
-                    </div>
+                <div class="p-4 border rounded ${mutedIfArchved}">
+                    <c:choose>
+                        <c:when test="${member == null}">
+                            You are able to view and edit this classroom because you are logged in as admin.
+                        </c:when>
+                        <c:otherwise>
+                            You are able to edit this classroom because you are logged in as admin.
+                        </c:otherwise>
+                    </c:choose>
+                    <c:if test="${classroom.open && !classroom.archived && member == null}">
+                        If you would like to join the classroom, please go
+                        <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}&join">here</a>.
+                    </c:if>
                 </div>
             </c:if>
 
             <%-- Join Settigns --%>
             <c:if test="${canEdit}">
-                <div class="card mb-4 ${mutedIfArchved}">
-                    <div class="card-body p-4">
+                <div class="p-4 border rounded ${mutedIfArchved}">
 
-                        <h4 class="card-title mb-4">Join Settings</h4>
+                    <h4 class="mb-4">Join Settings</h4>
 
-                        <div class="d-flex gap-2 mb-1">
-                            <c:choose>
-                                <c:when test="${classroom.open}">
-                                    <span>Joining is <span class="text-success">enabled</span>.</span>
-                                    <button id="disable-joining" class="btn btn-xs btn-secondary"
-                                        data-bs-toggle="modal" data-bs-target="#disable-joining-modal"
-                                        ${disabledIfArchved}>
-                                        Disable Joining
-                                    </button>
-                                </c:when>
-                                <c:otherwise>
-                                    <span>Joining is <span class="text-danger">disabled</span>.</span>
-                                    <button id="enable-joining" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#enable-joining-modal"
-                                            ${disabledIfArchved}>
-                                        Enable Joining
-                                    </button>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-
-                        <div class="d-flex gap-2 mb-1">
-                            <c:choose>
-                                <c:when test="${classroom.visible}">
-                                    <span>Visibility is <span class="text-success">public</span>.</span>
-                                    <button id="disable-joining" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#make-private-modal"
-                                            ${disabledIfArchved}>
-                                        Make Private
-                                    </button>
-                                </c:when>
-                                <c:otherwise>
-                                    <span>Visibility is <span class="text-danger">private</span>.</span>
-                                    <button id="enable-joining" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#make-public-modal"
-                                            ${disabledIfArchved}>
-                                        Make Public
-                                    </button>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-
-                        <div class="d-flex gap-2 mb-3">
-                            <c:choose>
-                                <c:when test="${classroom.password.isPresent()}">
-                                    <span>Password is <span class="text-success">set</span>.</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span>Password is <span class="text-danger">not set</span>.</span>
-                                </c:otherwise>
-                            </c:choose>
-                            <div class="d-flex gap-0">
-                                <button id="set-password" class="btn btn-xs btn-secondary me-1"
-                                        data-bs-toggle="modal" data-bs-target="#set-password-modal"
-                                        ${disabledIfArchved}>
-                                    Set Password
+                    <div class="d-flex gap-2 mb-1">
+                        <c:choose>
+                            <c:when test="${classroom.open}">
+                                <span>Joining is <span class="text-success">enabled</span>.</span>
+                                <button id="disable-joining" class="btn btn-xs btn-secondary"
+                                    data-bs-toggle="modal" data-bs-target="#disable-joining-modal"
+                                    ${disabledIfArchved}>
+                                    Disable Joining
                                 </button>
-                                <c:if test="${classroom.password.isPresent()}">
-                                    <button id="remove-password" class="btn btn-xs btn-secondary"
-                                            data-bs-toggle="modal" data-bs-target="#remove-password-modal"
-                                            ${disabledIfArchved}>
-                                        Remove Password
-                                    </button>
-                                </c:if>
-                            </div>
-                        </div>
-
-                        <div>
-                            <span class="me-1">Invite link is</span>
-                            <span id="invite-link" class="border rounded px-2"><c:out value="${link}"/></span>
-                            <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
-                               data-copy-target="#invite-link"></i>
-                        </div>
-
+                            </c:when>
+                            <c:otherwise>
+                                <span>Joining is <span class="text-danger">disabled</span>.</span>
+                                <button id="enable-joining" class="btn btn-xs btn-secondary"
+                                        data-bs-toggle="modal" data-bs-target="#enable-joining-modal"
+                                        ${disabledIfArchved}>
+                                    Enable Joining
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
+
+                    <div class="d-flex gap-2 mb-1">
+                        <c:choose>
+                            <c:when test="${classroom.visible}">
+                                <span>Visibility is <span class="text-success">public</span>.</span>
+                                <button id="disable-joining" class="btn btn-xs btn-secondary"
+                                        data-bs-toggle="modal" data-bs-target="#make-private-modal"
+                                        ${disabledIfArchved}>
+                                    Make Private
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+                                <span>Visibility is <span class="text-danger">private</span>.</span>
+                                <button id="enable-joining" class="btn btn-xs btn-secondary"
+                                        data-bs-toggle="modal" data-bs-target="#make-public-modal"
+                                        ${disabledIfArchved}>
+                                    Make Public
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
+                    <div class="d-flex gap-2 mb-3">
+                        <c:choose>
+                            <c:when test="${classroom.password.isPresent()}">
+                                <span>Password is <span class="text-success">set</span>.</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span>Password is <span class="text-danger">not set</span>.</span>
+                            </c:otherwise>
+                        </c:choose>
+                        <div class="d-flex gap-0">
+                            <button id="set-password" class="btn btn-xs btn-secondary me-1"
+                                    data-bs-toggle="modal" data-bs-target="#set-password-modal"
+                                    ${disabledIfArchved}>
+                                Set Password
+                            </button>
+                            <c:if test="${classroom.password.isPresent()}">
+                                <button id="remove-password" class="btn btn-xs btn-secondary"
+                                        data-bs-toggle="modal" data-bs-target="#remove-password-modal"
+                                        ${disabledIfArchved}>
+                                    Remove Password
+                                </button>
+                            </c:if>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="me-1">Invite link is</span>
+                        <span id="invite-link" class="border rounded px-2"><c:out value="${link}"/></span>
+                        <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
+                           data-copy-target="#invite-link"></i>
+                    </div>
+
                 </div>
             </c:if>
 
             <%-- Classroom Settigns --%>
             <c:if test="${canEdit}">
-                <div class="card ${mutedIfArchved} ${canLeave ? 'mb-4' : ''}">
-                    <div class="card-body p-4">
+                <div class="p-4 border rounded ${mutedIfArchved}">
 
-                        <h4 class="card-title mb-4">Classroom Settings</h4>
+                    <h4 class="mb-4">Classroom Settings</h4>
 
-                        <div class="mb-1">
-                            <button id="change-name" class="btn btn-xs btn-secondary"
-                                    data-bs-toggle="modal" data-bs-target="#change-name-modal"
-                                    ${disabledIfArchved}>
-                                Change Name
-                            </button>
-                        </div>
-
-                        <div>
-                            <c:choose>
-                                <c:when test="${classroom.archived}">
-                                    <button id="change-name" class="btn btn-xs btn-success"
-                                            data-bs-toggle="modal" data-bs-target="#restore-classroom-modal">
-                                        Restore Classroom
-                                    </button>
-                                </c:when>
-                                <c:otherwise>
-                                    <button id="change-name" class="btn btn-xs btn-danger"
-                                            data-bs-toggle="modal" data-bs-target="#archive-classroom-modal">
-                                        Archive Classroom
-                                    </button>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-
+                    <div class="mb-1">
+                        <button id="change-name" class="btn btn-xs btn-secondary"
+                                data-bs-toggle="modal" data-bs-target="#change-name-modal"
+                                ${disabledIfArchved}>
+                            Change Name
+                        </button>
                     </div>
+
+                    <div>
+                        <c:choose>
+                            <c:when test="${classroom.archived}">
+                                <button id="change-name" class="btn btn-xs btn-success"
+                                        data-bs-toggle="modal" data-bs-target="#restore-classroom-modal">
+                                    Restore Classroom
+                                </button>
+                            </c:when>
+                            <c:otherwise>
+                                <button id="change-name" class="btn btn-xs btn-danger"
+                                        data-bs-toggle="modal" data-bs-target="#archive-classroom-modal">
+                                    Archive Classroom
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+
                 </div>
             </c:if>
 
             <%-- Member Actions --%>
             <c:if test="${canLeave}">
-                <div class="card ${mutedIfArchved}">
-                    <div class="card-body p-4">
+                <div class="p-4 border rounded ${mutedIfArchved}">
 
-                        <h4 class="card-title mb-4">Member Actions</h4>
+                    <h4 class="mb-4">Member Actions</h4>
 
-                        <div>
-                            <button id="leave" class="btn btn-xs btn-secondary"
-                                    data-bs-toggle="modal" data-bs-target="#leave-modal">
-                                Leave Classroom
-                            </button>
-                        </div>
-
+                    <div>
+                        <button id="leave" class="btn btn-xs btn-secondary"
+                                data-bs-toggle="modal" data-bs-target="#leave-modal">
+                            Leave Classroom
+                        </button>
                     </div>
+
                 </div>
             </c:if>
 
@@ -520,7 +514,9 @@
         import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
         const STUDENT = '${ClassroomRole.STUDENT.name()}';
+        const MODERATOR = '${ClassroomRole.MODERATOR.name()}';
         const OWNER = '${ClassroomRole.OWNER.name()}';
+
         const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
 
         const classroomId = ${classroom.id};
@@ -573,74 +569,70 @@
 
         const renderMemberActions = function(data, type, row, meta) {
             if (isArchived) {
-                if (data.role !== '<%=ClassroomRole.OWNER%>') {
-                    return `
-                        <div class="float-end">
-                            <span class="text-muted px-3">
-                                <i class="fa fa-ellipsis-v"></i>
-                            </span>
-                        </div>
-                    `;
-                }
-                return '';
+                return `
+                    <div class="float-end">
+                        <span class="text-muted px-3">
+                            <i class="fa fa-ellipsis-v"></i>
+                        </span>
+                    </div>
+                `;
             }
 
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <div class="float-end">
+                    <span class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </span>
+                    <div class="dropdown-menu">
+                        <li><h6 class="dropdown-header">Change Role to ...</h6></li>
+                        <li>
+                            <a href="#" class="dropdown-item change-role" data-role="STUDENT">
+                                <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
+                                Student
+                            </a>
+                            <a href="#" class="dropdown-item change-role" data-role="MODERATOR">
+                                <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
+                                Moderator
+                            </a>
+                            <a href="#" class="dropdown-item change-role" data-role="OWNER">
+                                <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
+                                Owner
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item kick-member" href="#">
+                                <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
+                                Kick
+                            </a>
+                        </li>
+                    </div>
+                </div>
+            `;
+
+            const changeRoleStudent = div.querySelector('.change-role[data-role="STUDENT"]');
+            const changeRoleModerator = div.querySelector('.change-role[data-role="MODERATOR"]');
+            const changeRoleOwner = div.querySelector('.change-role[data-role="OWNER"]');
+            const kickMember = div.querySelector('.kick-member');
+
             switch (data.role) {
-                case '<%=ClassroomRole.OWNER.name()%>':
-                    return '';
-                case '<%=ClassroomRole.MODERATOR.name()%>':
-                    return `
-                        <div class="float-end">
-                            <span class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
-                                <i class="fa fa-ellipsis-v"></i>
-                            </span>
-                            <div class="dropdown-menu">
-                                <li><h6 class="dropdown-header">Change Role to ...</h6></li>
-                                <li>
-                                    <a href="#" class="dropdown-item demote-moderator">
-                                        <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                        Student
-                                    </a>
-                                    <a href="#" class="dropdown-item change-owner">
-                                        <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                        Owner
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item kick-member" href="#">
-                                        <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
-                                        Kick
-                                    </a>
-                                </li>
-                            </div>
-                        </div>
-                    `;
-                case '<%=ClassroomRole.STUDENT.name()%>':
-                    return `
-                        <div class="float-end">
-                            <span class="cursor-pointer px-3 member-actions" data-bs-toggle="dropdown">
-                                <i class="fa fa-ellipsis-v"></i>
-                            </span>
-                            <div class="dropdown-menu">
-                                <li><h6 class="dropdown-header">Change Role to ...</h6></li>
-                                <li>
-                                    <a href="#" class="dropdown-item promote-student">
-                                        <i style="width: 1.25em;" class="fa fa-user text-primary"></i>
-                                        Moderator
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item kick-member" href="#">
-                                        <i class="fa fa-trash text-danger" style="width: 1.25em;"></i>
-                                        Kick
-                                    </a>
-                                </li>
-                            </div>
-                        </div>
-                    `;
+                case OWNER:
+                    changeRoleStudent.classList.add('disabled');
+                    changeRoleModerator.classList.add('disabled');
+                    changeRoleOwner.setAttribute('hidden', '');
+                    kickMember.classList.add('disabled');
+                    break;
+                case MODERATOR:
+                    changeRoleModerator.setAttribute('hidden', '')
+                    break;
+                case STUDENT:
+                    changeRoleStudent.setAttribute('hidden', '');
+                    changeRoleOwner.classList.add('disabled');
+                    break;
             }
+
+            return div.innerHTML;
         };
 
         const kickMember = function(data) {
@@ -650,29 +642,21 @@
             new Modal(form.querySelector('.modal')).show();
         };
 
-        const demoteModerator = function(data) {
-            const form = document.getElementById('change-role-form');
-            form.querySelector('input[name="userId"]').value = data.user.id;
-            form.querySelector('input[name="role"]').value = '<%=ClassroomRole.STUDENT.name()%>';
-            form.querySelector('[data-fill="username"]').innerText = data.user.name;
-            form.querySelector('[data-fill="role"]').innerText = 'Student';
-            new Modal(form.querySelector('.modal')).show();
-        };
-
-        const promoteStudent = function(data) {
-            const form = document.getElementById('change-role-form');
-            form.querySelector('input[name="userId"]').value = data.user.id;
-            form.querySelector('input[name="role"]').value = '<%=ClassroomRole.MODERATOR.name()%>';
-            form.querySelector('[data-fill="username"]').innerText = data.user.name;
-            form.querySelector('[data-fill="role"]').innerText = 'Moderator';
-            new Modal(form.querySelector('.modal')).show();
-        };
-
-        const changeOwner = function(data) {
-            const form = document.getElementById('change-owner-form');
-            form.querySelector('input[name="userId"]').value = data.user.id;
-            form.querySelector('[data-fill="username"]').innerText = data.user.name;
-            new Modal(form.querySelector('.modal')).show();
+        const changeRole = function(data, role) {
+            if (role === OWNER) {
+                const form = document.getElementById('change-owner-form');
+                form.querySelector('input[name="userId"]').value = data.user.id;
+                form.querySelector('[data-fill="username"]').innerText = data.user.name;
+                new Modal(form.querySelector('.modal')).show();
+            } else {
+                const roleStr = role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
+                const form = document.getElementById('change-role-form');
+                form.querySelector('input[name="userId"]').value = data.user.id;
+                form.querySelector('input[name="role"]').value = role;
+                form.querySelector('[data-fill="username"]').innerText = data.user.name;
+                form.querySelector('[data-fill="role"]').innerText = roleStr;
+                new Modal(form.querySelector('.modal')).show();
+            }
         };
 
         const initMembersTable = function(data) {
@@ -709,7 +693,7 @@
                     }
                 ].filter(e => e !== null),
                 order: [[2, 'asc'], [1, 'asc']],
-                scrollY: '600px',
+                scrollY: '500px',
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
@@ -720,21 +704,16 @@
             document.getElementById('search-members').addEventListener('keyup', function(event) {
                 setTimeout(() => membersTable.search(this.value).draw(), 0);
             });
+
+            for (const button of membersTable.table().container().getElementsByClassName('change-role')) {
+                const data = membersTable.row(button.closest('tr')).data();
+                const role = button.dataset.role;
+                button.addEventListener('click', e => changeRole(data, role));
+            }
+
             for (const button of membersTable.table().container().getElementsByClassName('kick-member')) {
                 const data = membersTable.row(button.closest('tr')).data();
-                button.addEventListener('click', _ => kickMember(data));
-            }
-            for (const button of membersTable.table().container().getElementsByClassName('promote-student')) {
-                const data = membersTable.row(button.closest('tr')).data();
-                button.addEventListener('click', _ => promoteStudent(data));
-            }
-            for (const button of membersTable.table().container().getElementsByClassName('demote-moderator')) {
-                const data = membersTable.row(button.closest('tr')).data();
-                button.addEventListener('click', _ => demoteModerator(data));
-            }
-            for (const button of membersTable.table().container().getElementsByClassName('change-owner')) {
-                const data = membersTable.row(button.closest('tr')).data();
-                button.addEventListener('click', _ => changeOwner(data));
+                button.addEventListener('click', e => kickMember(data, role));
             }
         };
 
