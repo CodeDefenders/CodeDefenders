@@ -249,7 +249,7 @@
                     </div>
 
                     <script type="module">
-                        import {GameTimeValidator, formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+                        import {GameTimeValidator, GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                         const gameTimeValidator = new GameTimeValidator(
                                 Number(${maximumDuration}),
@@ -261,7 +261,7 @@
                         );
 
                         document.getElementById('displayMaxDuration').innerText =
-                                formatTime(${maximumDuration});
+                                GameTime.formatTime(${maximumDuration});
                     </script>
                 </div>
 

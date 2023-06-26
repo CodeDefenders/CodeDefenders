@@ -315,7 +315,7 @@
                                 </small>
 
                                 <script type="module">
-                                    import {GameTimeValidator, formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+                                    import {GameTimeValidator, GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                                     const gameTimeValidator = new GameTimeValidator(
                                             Number(${maximumDuration}),
@@ -328,7 +328,7 @@
 
 
                                     document.getElementById('displayMaxDuration').innerText =
-                                            formatTime(${maximumDuration});
+                                            GameTime.formatTime(${maximumDuration});
 
                                     // show the max duration limit in red if an invalid duration was given
                                     const maxDurationInfo = document.getElementById('maxDurationInfo');
@@ -564,7 +564,7 @@
         import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
-        import {formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
+        import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
         const loggedInUserId = ${login.userId};
 
