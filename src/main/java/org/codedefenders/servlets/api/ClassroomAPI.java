@@ -226,11 +226,28 @@ public class ClassroomAPI extends HttpServlet {
         @Expose
         private final Role role;
 
+        @Expose
+        private final Long startTime;
+
+        @Expose
+        private final Integer duration;
+
         public ClassroomGameDTO(AbstractGame game, Role role) {
             this.gameId = game.getId();
             this.mode = game.getMode();
             this.state = game.getState();
             this.role = role;
+
+            if (game instanceof MeleeGame) {
+                this.startTime = ((MeleeGame) game).getStartTimeUnixSeconds();
+                this.duration = ((MeleeGame) game).getGameDurationMinutes();
+            } else if (game instanceof MultiplayerGame) {
+                this.startTime = ((MultiplayerGame) game).getStartTimeUnixSeconds();
+                this.duration = ((MultiplayerGame) game).getGameDurationMinutes();
+            } else {
+                this.startTime = null;
+                this.duration = null;
+            }
         }
     }
 }

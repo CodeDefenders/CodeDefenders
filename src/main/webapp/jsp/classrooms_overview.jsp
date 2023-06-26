@@ -191,7 +191,7 @@
 
         const searchFunction = (settings, renderedData, index, data, counter) => {
             /* Let this only affect the "My Classrooms" table. */
-            if (!settings.nTable.id === 'user-classrooms') {
+            if (settings.nTable.id !== 'user-classrooms') {
                 return true;
             }
 

@@ -3,6 +3,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.ClassroomRole" %>
 
 <%--@elvariable id="login" type="org.codedefenders.service.AuthService"--%>
@@ -31,7 +34,7 @@
         </c:if>
     </h2>
 
-    <div class="p-4 border rounded mb-4">
+    <div class="p-4 border rounded mb-4 loading loading-height-200">
         <div class="d-flex justify-content-between flex-wrap align-items-baseline">
             <h4 class="mb-3">Games</h4>
             <div class="d-flex gap-3">
@@ -46,24 +49,20 @@
                        class="form-control form-control-sm" style="width: 15em;">
             </div>
         </div>
-        <div class="loading loading-height-200 loading-border-card">
-            <table id="games-table" class="table table-no-last-border" style="width: 100%;"></table>
-        </div>
+        <table id="games-table" class="table table-no-last-border" style="width: 100%;"></table>
     </div>
 
     <div class="row g-4">
 
         <%-- Members table --%>
         <div class="col-lg-6 col-12">
-            <div class="p-4 border rounded">
+            <div class="p-4 border rounded loading loading-height-200">
                 <div class="d-flex justify-content-between flex-wrap align-items-baseline">
                     <h4 class="mb-3">Members</h4>
                     <input type="search" id="search-members" placeholder="Search"
                            class="form-control form-control-sm" style="width: 15em;">
                 </div>
-                <div class="loading loading-height-200 loading-border-card">
-                    <table id="members-table" class="table table-no-last-border" style="width: 100%;"></table>
-                </div>
+                <table id="members-table" class="table table-no-last-border" style="width: 100%;"></table>
             </div>
         </div>
 
@@ -532,12 +531,25 @@
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
         import {Tooltip, Modal} from '${url.forPath("/js/bootstrap.mjs")}';
         import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
+        import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
         const STUDENT = '${ClassroomRole.STUDENT.name()}';
         const MODERATOR = '${ClassroomRole.MODERATOR.name()}';
         const OWNER = '${ClassroomRole.OWNER.name()}';
 
+        const MELEE = '${GameMode.MELEE.name()}';
+        const PARTY = '${GameMode.PARTY.name()}';
+
+        const OBSERVER = '${Role.OBSERVER.name()}';
+        const NONE = '${Role.NONE.name()}';
+
+        const CREATED = '${GameState.CREATED.name()}';
+        const ACTIVE = '${GameState.ACTIVE.name()}';
+        const FINISHED = '${GameState.FINISHED.name()}';
+
         const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
+        const BATTLEGROUND_URL = '${url.forPath(Paths.BATTLEGROUND_GAME)}';
+        const MELEE_URL = '${url.forPath(Paths.MELEE_GAME)}';
 
         const classroomId = ${classroom.id};
         const ownUserId = ${login.userId};
@@ -590,7 +602,7 @@
         /**
          * Renders roles with correct capitalization and sorts owners first.
          */
-        const renderRole = function(role, type, row, meta) {
+        const renderClassroomRole = function(role, type, row, meta) {
             switch (type) {
                 case 'type':
                     return role;
@@ -700,10 +712,6 @@
             }
         };
 
-        const renderGameActions = function(data, type, row, meta) {
-
-        };
-
         const initMembersTable = function(data) {
             const membersTable = new DataTable('#members-table', {
                 data,
@@ -724,7 +732,7 @@
                         data: 'role',
                         title: 'Role',
                         type: 'string',
-                        render: renderRole,
+                        render: renderClassroomRole,
                     },
                     {
                         data: null,
@@ -762,7 +770,139 @@
             }
         };
 
+        const renderGameMode = function(mode, type, row, meta) {
+            switch (mode) {
+                case PARTY:
+                    return 'Battleground';
+                case MELEE:
+                    return 'Melee';
+                default:
+                    return 'unknown';
+            }
+        };
+
+        const renderGameRole = function(role, type, row, meta) {
+            switch (type) {
+                case 'type':
+                    return role;
+                case 'sort':
+                    // Sort owner(s) first
+                    if (role === OBSERVER) {
+                        return 'a';
+                    } else if (role === NONE) {
+                        return 'z';
+                    }
+                case 'filter':
+                case 'display':
+                    if (role === NONE) {
+                        return '';
+                    }
+                    // Capitalize first letter, make rest lower case
+                    return role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
+            }
+        };
+
+        const renderGameStateActive = function(data, type, row, meta) {
+            const timeLeft = GameTime.calculateRemainingTime(data.startTime, data.duration);
+
+            switch (type) {
+                case 'sort':
+                    return timeLeft;
+                case 'filter':
+                case 'type':
+                    return GameTime.formatTime(timeLeft);
+                case 'display':
+                    const timeLeftStr = GameTime.formatTime(timeLeft) + ' left';
+                    const percentElapsed = GameTime.calculateElapsedPercentage(data.startTime, data.duration);
+                    return `
+                        <div class="d-flex flex-row align-items-center gap-2">
+                            <div class="progress border-primary border" style="width: 6em; height: 10px;">
+                                <div class="progress-bar" style="width: \${percentElapsed * 100}%;"></div>
+                            </div>
+                            <span>\${timeLeftStr}</span>
+                        </div>
+                    `;
+            }
+        };
+
+        const renderGameStateFinished = function(data, type, row, meta) {
+            const endDate = GameTime.calculateEndDate(data.startTime, data.duration);
+
+            switch (type) {
+                case 'sort':
+                    return endDate.getTime();
+                case 'filter':
+                case 'type':
+                    return GameTime.formatDate(endDate);
+                case 'display':
+                    return 'Ended at ' + GameTime.formatDate(endDate);
+            }
+        };
+
+        const renderGameState = function(data, type, row, meta) {
+            switch (data.state) {
+                case CREATED:
+                    return 'not started';
+                case ACTIVE:
+                    return renderGameStateActive(data, type, row, meta);
+                case FINISHED:
+                    return renderGameStateFinished(data, type, row, meta);
+                default:
+                    return '';
+            }
+        };
+
+        const renderGameActions = function(data, type, row, meta) {
+            if (data.role === NONE) {
+                return '';
+            }
+
+            let url;
+            if (data.mode === PARTY) {
+                url = BATTLEGROUND_URL;
+            } else if (data.mode === MELEE) {
+                url = MELEE_URL;
+            } else {
+                return '';
+            }
+
+            switch (type) {
+                case 'type':
+                case 'sort':
+                case 'filter':
+                    return null;
+                case 'display':
+                    const params = new URLSearchParams({
+                        gameId: data.gameId
+                    });
+                    return `
+                        <a href="\${url}?\${params}" class="cursor-pointer float-end px-2">
+                            <i class="fa fa-external-link text-primary"></i>
+                        </a>
+                    `;
+            }
+        };
+
         const initGamesTable = function(data) {
+            const activeRadio = document.getElementById("radio-active");
+            const archivedRadio = document.getElementById("radio-archived");
+
+            const searchFunction = (settings, renderedData, index, data, counter) => {
+                /* Let this only affect the "My Classrooms" table. */
+                if (settings.nTable.id !== 'games-table') {
+                    return true;
+                }
+
+                if (activeRadio.checked) {
+                    return data.state === CREATED || data.state === ACTIVE;
+                } else {
+                    return data.state === FINISHED;
+                }
+            };
+            DataTable.ext.search.push(searchFunction);
+
+            activeRadio.addEventListener('change', e => gamesTable.draw());
+            archivedRadio.addEventListener('change', e => gamesTable.draw());
             const gamesTable = new DataTable('#games-table', {
                 data,
                 columns: [
@@ -775,12 +915,27 @@
                     {
                         data: 'mode',
                         title: 'Game Mode',
-                        type: 'string'
+                        type: 'string',
+                        render: renderGameMode
                     },
                     {
                         data: 'role',
                         title: 'Your Role',
-                        type: 'string'
+                        type: 'string',
+                        render: renderGameRole
+                    },
+                    {
+                        data: null,
+                        title: 'State',
+                        type: 'html',
+                        render: renderGameState
+                    },
+                    {
+                        data: null,
+                        title: 'Link',
+                        type: 'html',
+                        render: renderGameActions,
+                        width: '2em'
                     }
                 ],
                 order: [[0, 'asc']],
