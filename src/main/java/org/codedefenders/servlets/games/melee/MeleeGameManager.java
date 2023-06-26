@@ -118,7 +118,7 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  *
  * @see org.codedefenders.util.Paths#MELEE_GAME
  */
-@WebServlet(Paths.MELEE_GAME)
+@WebServlet({Paths.MELEE_GAME, Paths.MELEE_HISTORY})
 public class MeleeGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MeleeGameManager.class);
 
