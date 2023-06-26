@@ -108,24 +108,28 @@
                         <% pageContext.setAttribute("classId", g.cutId()); %>
                         <% pageContext.setAttribute("classAlias", g.cutAlias()); %>
                         <% pageContext.setAttribute("gameId", gameId); %>
-                        <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
+                        <t:class_modal classId="${classId}" classAlias="${classAlias}"
+                                       htmlId="class-modal-for-game-${gameId}"/>
                     </td>
-                    <td><%=attackers.size()%></td>
-                    <td><%=defenders.size()%></td>
-                    <td><%=g.gameLevel().getFormattedString()%></td>
+                    <td><%=attackers.size()%>
+                    </td>
+                    <td><%=defenders.size()%>
+                    </td>
+                    <td><%=g.gameLevel().getFormattedString()%>
+                    </td>
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
-                           href="${url.forPath(Paths.BATTLEGROUND_HISTORY)}?gameId=<%=gameId%>">
+                           href="${url.forPath(Paths.BATTLEGROUND_GAME)}?gameId=<%=gameId%>">
                             View Results
                         </a>
                     </td>
                 </tr>
 
-                <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                    <td colspan="100">
-                        <div class="child-row-wrapper">
-                            <table class="child-row-details">
-                                <thead>
+            <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+                <td colspan="100">
+                    <div class="child-row-wrapper">
+                        <table class="child-row-details">
+                            <thead>
                                     <tr>
                                         <th class="text-end">Attacker</th>
                                         <th class="text-end">Mutants</th>
@@ -245,23 +249,26 @@
                         <% pageContext.setAttribute("classId", g.cutId()); %>
                         <% pageContext.setAttribute("classAlias", g.cutAlias()); %>
                         <% pageContext.setAttribute("gameId", gameId); %>
-                        <t:class_modal classId="${classId}" classAlias="${classAlias}" htmlId="class-modal-for-game-${gameId}"/>
+                        <t:class_modal classId="${classId}" classAlias="${classAlias}"
+                                       htmlId="class-modal-for-game-${gameId}"/>
                     </td>
-                    <td><%=players.size()%></td>
-                    <td><%=g.gameLevel().getFormattedString()%></td>
+                    <td><%=players.size()%>
+                    </td>
+                    <td><%=g.gameLevel().getFormattedString()%>
+                    </td>
                     <td>
                         <a class="btn btn-sm btn-secondary text-nowrap" id="<%="results_"+gameId%>"
-                           href="${url.forPath(Paths.MELEE_HISTORY)}?gameId=<%=gameId%>">
+                           href="${url.forPath(Paths.MELEE_GAME)}?gameId=<%=gameId%>">
                             View Results
                         </a>
                     </td>
                 </tr>
 
-                <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
-                    <td colspan="100">
-                        <div class="child-row-wrapper">
-                            <table class="child-row-details">
-                                <thead>
+            <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+                <td colspan="100">
+                    <div class="child-row-wrapper">
+                        <table class="child-row-details">
+                            <thead>
                                     <tr>
                                         <th>Player</th>
                                         <th class="text-end">Points</th>

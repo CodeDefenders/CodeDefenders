@@ -350,7 +350,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
             response.sendRedirect(url.forPath(Paths.MELEE_SELECTION));
         } else {
             // TODO Update this later !
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_HISTORY) + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.MELEE_GAME) + "?gameId=" + gameId);
         }
     }
 
