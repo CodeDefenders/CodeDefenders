@@ -25,17 +25,15 @@
 
 .pie::before {
     inset: 0;
-    /* anti-aliasing by using a small gradient instead of instant color change: */
-    --smoothing-percentage: .15;
-    --secondary-percentage: calc(100 - var(--percentage));
+    --secondary-percentage: calc((100 - var(--percentage)) * 1%);
     background: radial-gradient(
             farthest-side,
             var(--color-secondary) 98%,
             #0000
     ) top/var(--border-width) var(--border-width) no-repeat,
     conic-gradient(
-            var(--color-secondary) calc((var(--secondary-percentage) * 1%)),
-            var(--color-primary, #0000) calc((var(--secondary-percentage) + var(--smoothing-percentage)) * 1%));
+            var(--color-secondary) var(--secondary-percentage),
+            var(--color-primary, #0000) var(--secondary-percentage));
     -webkit-mask: radial-gradient(
             farthest-side,
             #0000 calc(99% - var(--border-width)),
@@ -92,29 +90,40 @@
 
 .dashboards {
     --width: 12rem;
-    --padding: 3rem;
+    --cols: 1;
+    display: grid;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    gap: 2rem;
+}
 
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: stretch;
-    align-items: flex-start;
-    gap: var(--padding);
+@media screen and (min-width: 40rem) {
+    .dashboards {
+        --cols: 2;
+    }
+}
+
+@media screen and (min-width: 85rem) {
+    .dashboards {
+        --cols: 4;
+    }
 }
 
 .dashboard-box {
     background-color: #f8f9fa; /* .bg-light */
     border-radius: .3rem; /* .rounded-3 */
-    padding: var(--padding);
+    padding: 3rem 1.5rem;
     flex: 1;
 
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
 }
 
 .legend {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    gap: 1ch;
 }
 
 .legend .legend-title,
@@ -124,17 +133,19 @@
 
 .legend .legend-title {
     font-weight: bold;
+    margin: 1ch;
 }
 
 .legend .legend-title::before {
+    margin-top: .25ch;
+    flex-shrink: 0;
+    flex-grow: 0;
     content: '';
     display: inline-block;
 
     --size: 2ch;
     height: var(--size);
     width: var(--size);
-
-    margin: 1ch;
 }
 
 .other-stats dt {

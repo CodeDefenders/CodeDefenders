@@ -18,7 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.game.GameType" %>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 
@@ -39,96 +42,117 @@
 <div class="container">
     <h1>${pageInfo.pageTitle}</h1>
 
-    <section class="mt-5 statistics" aria-labelledby="stats">
-        <h2 class="mb-3" id="stats">Player Statistics</h2>
+    <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
+        <h2 class="mb-3" id="stats-multiplayer">Statistics for Multiplayer Games</h2>
 
         <div class="dashboards">
-            <div class="dashboard-box dashboard-mutants">
-                <h3>Mutants created</h3>
-                <div class="pie animate no-round ${profile.stats.totalMutants == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.aliveMutantsPercentage}">
-                    ${profile.stats.totalMutants}
-                </div>
+            <%--@elvariable id="stats" type="org.codedefenders.dto.UserStats"--%>
+            <c:set var="stats" value="${profile.stats.get(GameType.MULTIPLAYER)}"/>
 
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">Mutants still alive:</span>
-                        <span class="legend-value">${profile.stats.aliveMutants}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">Killed mutants:</span>
-                        <span class="legend-value">${profile.stats.killedMutants}</span>
-                    </div>
-                </div>
-            </div>
+            <t:dashboard_pie
+                    type="mutants" title="Mutants created"
+                    total="${stats.totalMutants}"
+                    percentage="${stats.aliveMutantsPercentage}"
+                    label1="Mutants still alive:" value1="${stats.aliveMutants}"
+                    label2="Killed mutants:" value2="${stats.killedMutants}"
+            />
 
-            <div class="dashboard-box dashboard-tests">
-                <h3>Tests written</h3>
+            <t:dashboard_pie
+                    type="tests" title="Tests written"
+                    total="${stats.totalTests}"
+                    percentage="${stats.killingTestsPercentage}"
+                    label1="Tests that killed mutants:" value1="${stats.killingTests}"
+                    label2="Non-killing tests:" value2="${stats.nonKillingTests}"
+            />
 
-                <div class="pie animate no-round ${profile.stats.totalTests == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.killingTestsPercentage}">
-                    ${profile.stats.totalTests}
-                </div>
+            <t:dashboard_pie
+                    type="points" title="Points earned"
+                    total="${stats.totalPoints}"
+                    percentage="${stats.testPointsPercentage}"
+                    label1="By writing tests:" value1="${stats.totalPointsTests}"
+                    label2="By creating mutants:" value2="${stats.totalPointsMutants}"
+            />
 
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">Tests that killed mutants:</span>
-                        <span class="legend-value">${profile.stats.killingTests}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">Non-killing tests:</span>
-                        <span class="legend-value">${profile.stats.nonKillingTests}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-box dashboard-points">
-                <h3>Points earned</h3>
-
-                <div class="pie animate no-round ${profile.stats.totalPoints == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.testPointsPercentage}">
-                    ${profile.stats.totalPoints}
-                </div>
-
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">By writing tests:</span>
-                        <span class="legend-value">${profile.stats.totalPointsTests}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">By creating mutants:</span>
-                        <span class="legend-value">${profile.stats.totalPointsMutants}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="dashboard-box dashboard-games">
-                <h3>Games played</h3>
-
-                <div class="pie animate no-round ${profile.stats.totalGames == 0 ? "no-data" : ""}"
-                     style="--percentage: ${profile.stats.defenderGamesPercentage}">
-                    ${profile.stats.totalGames}
-                </div>
-
-                <div>
-                    <div class="legend">
-                        <span class="legend-title">As defender:</span>
-                        <span class="legend-value">${profile.stats.defenderGames}</span>
-                    </div>
-                    <div class="legend">
-                        <span class="legend-title">As attacker:</span>
-                        <span class="legend-value">${profile.stats.attackerGames}</span>
-                    </div>
-                </div>
-            </div>
+            <t:dashboard_pie
+                    type="games" title="Games played"
+                    total="${stats.totalGames}"
+                    percentage="${stats.defenderGamesPercentage}"
+                    label1="As defender:" value1="${stats.defenderGames}"
+                    label2="As attacker:" value2="${stats.attackerGames}"
+            />
         </div>
 
         <dl class="other-stats mt-3">
             <dt>Average points per tests:</dt>
-            <dd>${profile.stats.avgPointsTests}</dd>
+            <dd>${stats.avgPointsTests}</dd>
 
             <dt>Average points per mutant:</dt>
-            <dd>${profile.stats.avgPointsMutants}</dd>
+            <dd>${stats.avgPointsMutants}</dd>
+        </dl>
+    </section>
+
+    <section class="mt-5 statistics" aria-labelledby="stats-melee">
+        <h2 class="mb-3" id="stats-melee">Statistics for Melee Games</h2>
+
+        <div class="dashboards">
+            <c:set var="stats" value="${profile.stats.get(GameType.MELEE)}"/>
+
+            <t:dashboard_pie
+                    type="mutants" title="Mutants created"
+                    total="${stats.totalMutants}"
+                    percentage="${stats.aliveMutantsPercentage}"
+                    label1="Mutants still alive:" value1="${stats.aliveMutants}"
+                    label2="Killed mutants:" value2="${stats.killedMutants}"
+            />
+
+            <t:dashboard_pie
+                    type="tests" title="Tests written"
+                    total="${stats.totalTests}"
+                    percentage="${stats.killingTestsPercentage}"
+                    label1="Tests that killed mutants:" value1="${stats.killingTests}"
+                    label2="Non-killing tests:" value2="${stats.nonKillingTests}"
+            />
+
+            <t:dashboard_pie
+                    type="points" title="Points earned"
+                    total="${stats.totalPoints}"
+                    percentage="${stats.testPointsPercentage}"
+                    label1="By writing tests:" value1="${stats.totalPointsTests}"
+                    label2="By creating mutants:" value2="${stats.totalPointsMutants}"
+            />
+        </div>
+
+        <dl class="other-stats mt-3">
+            <dt>Total melee games played:</dt>
+            <dd>${stats.totalGames}</dd>
+
+            <dt>Average points per tests:</dt>
+            <dd>${stats.avgPointsTests}</dd>
+
+            <dt>Average points per mutant:</dt>
+            <dd>${stats.avgPointsMutants}</dd>
+        </dl>
+    </section>
+
+    <section class="mt-5 statistics" aria-labelledby="stats-puzzle">
+        <h2 class="mb-3" id="stats-puzzle">Statistics for Puzzle Games</h2>
+
+        <dl class="other-stats">
+            <%--@elvariable id="chapter" type="org.codedefenders.game.puzzle.PuzzleChapter"--%>
+            <%--@elvariable id="maxPuzzle" type="java.lang.Integer"--%>
+            <%--@elvariable id="hasPlayed" type="java.lang.String"--%>
+            <c:forEach items="${profile.puzzleStats.chapters}" var="chapter">
+                <c:set var="maxPuzzle" value="${profile.puzzleStats.getMaxPuzzle(chapter.position)}"/>
+                <c:set var="hasPlayed" value="${maxPuzzle == 0 ? 'class=\"text-muted\"' : ''}"/>
+                <dt ${hasPlayed}>Chapter ${chapter.position} - ${chapter.title}:</dt>
+                <dd ${hasPlayed}>
+                    <c:choose><c:when test="${maxPuzzle != 0}">
+                        highest puzzle solved is puzzle ${maxPuzzle}
+                    </c:when><c:otherwise>
+                        chapter not played yet
+                    </c:otherwise></c:choose>
+                </dd>
+            </c:forEach>
         </dl>
     </section>
 
