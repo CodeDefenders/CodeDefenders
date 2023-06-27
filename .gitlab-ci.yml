@@ -16,12 +16,17 @@ stages:
   - deploy
   - visualize
 
+.cache-maven-repo: &cache-maven-repo
+  key: maven-repo
+  when: always
+  policy: pull-push
+  paths:
+    - .m2/repository/
+
 default:
   image: maven:3-jdk-11-slim
   cache:
-    paths:
-      - .m2/repository/
-    when: always
+    - *cache-maven-repo
   artifacts:
     # Expire all artifacts already after 36 hours. (Default is around 30 days/4 weeks)
     expire_in: 36 hours
@@ -42,6 +47,9 @@ variables:
 checkstyle:
   stage: validate
   needs: [ ]
+  cache:
+    - <<: *cache-maven-repo
+      policy: pull
   script:
     - mvn $MAVEN_ARGS validate
   after_script: # Will also execute if the above fails so the errors will be shown in the MergeRequest
@@ -76,6 +84,14 @@ metrics:
 build:
   stage: build
   needs: [ ]
+  cache:
+    - *cache-maven-repo
+    # TODO(Alex): Add caching for node/npm/js stuff
+    #- key: node-stuff
+    #  when: always
+    #  paths:
+    #    - node/
+    #    - node_modules/
   script:
     - mvn $MAVEN_ARGS -DskipCheckstyle -DskipTests package
     - printf 'artifact_size_bytes{artifact="codedefenders.war"} %d\n' "$(stat --printf="%s" target/codedefenders.war)" >> metrics.txt
