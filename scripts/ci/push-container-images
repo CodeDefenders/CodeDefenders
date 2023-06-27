@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -eu
+umask 022
+IFS=$'\n\t'
+
+export LC_ALL=C.UTF-8
+
+GIT_COMMIT_REV_SHORT="${CI_COMMIT_SHORT_SHA:-$(git rev-parse --short HEAD)}"
+readonly GIT_COMMIT_REV_SHORT
+
+SOURCE_CONTAINER_TAG="$1"
+shift
+
+TARGET_CONTAINER_NAME="$1"
+shift
+
+for registry in "$@"; do
+    buildah push "${SOURCE_CONTAINER_TAG}" "${registry}/${TARGET_CONTAINER_NAME}:git-${GIT_COMMIT_REV_SHORT}"
+done
+
+# TODO(Alex): Add additional handling for git tags

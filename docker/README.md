@@ -100,13 +100,10 @@ We build from the git repository root, so we can simply copy the source code for
 
 ```sh
 cd <path to codedefenders repository>
-docker build --file ./docker/Dockerfile --tag codedefenders/codedefenders:<Codedefenders version> --label "maintainer=$(git config --get user.email)" .
-docker push codedefenders/codedefenders:<codedefenders version>
+docker build --file ./docker/Dockerfile --tag codedefenders/codedefenders:<Codedefenders version> .
 ```
 
-For building reproducible container images, you can use the [build-container-image](../scripts/build-container-image) (Repository local link).  
-It utilizes [podman](https://podman.io/) which allows us to control the timestamp of the layers and files.  
-The script will only output an image hash. Tagging (and publishing) has to be done manually afterwards.
+The official images are build (and published) from the CI with the help of the [build-container-image](../scripts/ci/build-container-image) and [push-container-images](../scripts/ci/push-container-images) scripts (Repository local links).
 
 
 ## Using docker for local testing/development

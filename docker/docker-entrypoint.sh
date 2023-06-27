@@ -18,18 +18,8 @@ gen_tomcat_users() {
     echo '</tomcat-users>' >> "${FILE}"
 }
 
-# TODO: Remove if execution dependency management is handled by CodeDefenders (GitLab #746)
-download_dependencies() {
-    DATA_DIR="$1"
-
-    mkdir -vp "$DATA_DIR/lib"
-
-    mvn --no-transfer-progress -f /installation-pom.xml clean package -Dconfig.properties=<(echo "data.dir=$DATA_DIR")
-}
-
 main() {
     gen_tomcat_users "/etc/tomcat9/tomcat-users.xml" "${CODEDEFENDERS_ADMIN_USERNAME}" "${CODEDEFENDERS_AUTH_ADMIN_ROLE:-"codedefenders-admin"}"
-    download_dependencies "/srv/codedefenders"
 }
 
 main

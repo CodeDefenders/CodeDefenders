@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -eu
+umask 022
+IFS=$'\n\t'
+
+export LC_ALL=C.UTF-8
+
+GIT_COMMIT_REV="${CI_COMMIT_SHA:-$(git rev-parse HEAD)}"
+readonly GIT_COMMIT_REV
+if [[ -z "${CI_COMMIT_TIMESTAMP:-}" ]]; then
+    GIT_COMMIT_TIMESTAMP="$(git show -s --format="%ct" "${GIT_COMMIT_REV}")"
+else
+    GIT_COMMIT_TIMESTAMP="$(date +%s --date="${CI_COMMIT_TIMESTAMP}")"
+fi
+readonly GIT_COMMIT_TIMESTAMP
+
+readonly CONTAINER_TAG="$1"
+readonly CONTAINERFILE_TARGET="${2:-production}"
+
+# opencontainers annotations https://github.com/opencontainers/image-spec/blob/master/annotations.md
+
+buildah build --file "docker/Dockerfile" --target "${CONTAINERFILE_TARGET}" \
+  --annotation "org.opencontainers.image.title=Code Defenders" \
+  --annotation "org.opencontainers.image.description=This is Code Defenders, a mutation testing game" \
+  --annotation "org.opencontainers.image.url=https://www.code-defenders.org" \
+  --annotation "org.opencontainers.image.source=https://github.com/CodeDefenders/CodeDefenders" \
+  --annotation "org.opencontainers.image.revision=${GIT_COMMIT_REV}" \
+  --timestamp="${GIT_COMMIT_TIMESTAMP}" \
+  --tag "${CONTAINER_TAG}" \
+  --build-context build-webapp=. \
+  --build-context bundle-libs=. \
+  .
