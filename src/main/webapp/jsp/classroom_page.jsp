@@ -540,6 +540,9 @@
         const MELEE = '${GameMode.MELEE.name()}';
         const PARTY = '${GameMode.PARTY.name()}';
 
+        const ATTACKER = '${Role.ATTACKER.name()}';
+        const DEFENDER = '${Role.DEFENDER.name()}';
+        const PLAYER = '${Role.PLAYER.name()}';
         const OBSERVER = '${Role.OBSERVER.name()}';
         const NONE = '${Role.NONE.name()}';
 
@@ -766,7 +769,7 @@
 
             for (const button of membersTable.table().container().getElementsByClassName('kick-member')) {
                 const data = membersTable.row(button.closest('tr')).data();
-                button.addEventListener('click', e => kickMember(data, role));
+                button.addEventListener('click', e => kickMember(data));
             }
         };
 
@@ -794,11 +797,18 @@
                     }
                 case 'filter':
                 case 'display':
-                    if (role === NONE) {
-                        return '';
+                    switch (role) {
+                        case ATTACKER:
+                            return '<span class="badge bg-attacker" style="font-size: .85rem;">Attacker</span>';
+                        case DEFENDER:
+                            return '<span class="badge bg-defender" style="font-size: .85rem;">Defender</span>';
+                        case PLAYER:
+                            return '<span class="badge bg-player" style="font-size: .85rem;">Player</span>';
+                        case OBSERVER:
+                            return '<span class="badge bg-warning text-dark" style="font-size: .85rem;">Observer</span>';
+                        case NONE:
+                            return '';
                     }
-                    // Capitalize first letter, make rest lower case
-                    return role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
             }
         };
 
@@ -812,14 +822,14 @@
                 case 'type':
                     return GameTime.formatTime(timeLeft);
                 case 'display':
-                    const timeLeftStr = GameTime.formatTime(timeLeft) + ' left';
+                    const timeLeftStr = GameTime.formatTime(timeLeft);
                     const percentElapsed = GameTime.calculateElapsedPercentage(data.startTime, data.duration);
                     return `
-                        <div class="d-flex flex-row align-items-center gap-2">
-                            <div class="progress border-primary border" style="width: 6em; height: 10px;">
+                        <div style="margin-top: -5px;">
+                            <span class="small">Running: \${timeLeftStr} left</span>
+                            <div class="progress" style="max-width: 15rem; height: 4px;">
                                 <div class="progress-bar" style="width: \${percentElapsed * 100}%;"></div>
                             </div>
-                            <span>\${timeLeftStr}</span>
                         </div>
                     `;
             }
@@ -842,7 +852,7 @@
         const renderGameState = function(data, type, row, meta) {
             switch (data.state) {
                 case CREATED:
-                    return 'not started';
+                    return 'Not Started';
                 case ACTIVE:
                     return renderGameStateActive(data, type, row, meta);
                 case FINISHED:
@@ -921,7 +931,7 @@
                     {
                         data: 'role',
                         title: 'Your Role',
-                        type: 'string',
+                        type: 'html',
                         render: renderGameRole
                     },
                     {
