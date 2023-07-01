@@ -415,6 +415,7 @@ public class MeleeGameSelectionManager extends HttpServlet {
                 .mutantValidatorLevel(oldGame.getMutantValidatorLevel())
                 .automaticMutantEquivalenceThreshold(oldGame.getAutomaticMutantEquivalenceThreshold())
                 .gameDurationMinutes(oldGame.getGameDurationMinutes())
+                .classroomId(oldGame.getClassroomId().orElse(null))
                 .build();
 
         boolean withMutants = gameManagingUtils.hasPredefinedMutants(oldGame);
