@@ -167,7 +167,10 @@
             scrollCollapse: true,
             paging: false,
             dom: 't',
-            language: {emptyTable: "There are currently no public classrooms."}
+            language: {
+                emptyTable: 'There are currently no public classrooms.',
+                zeroRecords: 'No Classrooms found.'
+            }
         });
         LoadingAnimation.hideAnimation(publicTable.table().container());
 

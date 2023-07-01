@@ -753,7 +753,10 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: 'This classroom has no students... yet.'}
+                language: {
+                    emptyTable: 'This classroom has no members... yet.',
+                    zeroRecords: 'No members found.'
+                }
             });
             LoadingAnimation.hideAnimation(membersTable.table().container());
 
@@ -953,7 +956,10 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: 'This classroom has no games... yet.'}
+                language: {
+                    emptyTable: 'This classroom has no games... yet.',
+                    zeroRecords: 'No games found.'
+                }
             });
             LoadingAnimation.hideAnimation(gamesTable.table().container());
 
