@@ -118,13 +118,6 @@
         const userClassrooms = await getClassrooms("user");
         const publicClassrooms = await getClassrooms("visible");
 
-        // Exclude "My classrooms" from "Public Classrooms"
-        const classroomIds = new Set();
-        for (const classroom of userClassrooms) {
-            classroomIds.add(classroom.id);
-        }
-        const filteredPublicClassrooms = publicClassrooms.filter(classroom => !classroomIds.has(classroom.id));
-
         const userTable = new DataTable('#user-classrooms', {
             data: userClassrooms,
             columns: [
@@ -155,7 +148,7 @@
 
 
         const publicTable = new DataTable('#public-classrooms', {
-            data: filteredPublicClassrooms,
+            data: publicClassrooms,
             columns: [
                 {
                     data: 'name',
