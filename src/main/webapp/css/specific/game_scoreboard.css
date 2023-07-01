@@ -17,7 +17,32 @@
 .scoreboard .defender {
     background-color: var(--bg-defender);
 }
+
 .scoreboard .defender.header,
 .scoreboard .defender.total {
     background-color: var(--bg-defender-contrast);
+}
+
+.total-attacker-score,
+.total-defender-score {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.total-attacker-score .player-message,
+.total-defender-score .player-message {
+    font-size: 16px;
+    top: 50%;
+    position: absolute;
+    width: max-content;
+}
+
+.total-attacker-score .player-message {
+    transform: translateY(-50%) translateX(calc(-100% - 1rem));
+}
+
+.total-defender-score .player-message {
+    transform: translateY(-50%) translateX(1rem);
+    left: 100%;
 }

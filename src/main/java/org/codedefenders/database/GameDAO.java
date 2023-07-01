@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
@@ -216,6 +217,25 @@ public class GameDAO {
         games.addAll(MultiplayerGameDAO.getExpiredGames());
         games.addAll(MeleeGameDAO.getExpiredGames());
         return games;
+    }
+
+    /**
+     * Checks if a game is expired.
+     *
+     * @param gameId the game to check.
+     * @return {@code true} if the game is active but expired.
+     */
+    public static boolean isGameExpired(int gameId) {
+        final String sql = String.join("\n",
+                // do not use TIMESTAMPADD here to avoid errors with daylight saving
+                "SELECT FROM_UNIXTIME(UNIX_TIMESTAMP(Start_Time) + Game_Duration_Minutes * 60) <= NOW() AS isExpired",
+                "FROM games",
+                "WHERE ID = ?;"
+        );
+        return DB.executeQueryReturnValue(sql,
+                l -> l.getBoolean("isExpired"),
+                DatabaseValue.of(gameId)
+        );
     }
 
     public static Role getRole(int userId, int gameId) {

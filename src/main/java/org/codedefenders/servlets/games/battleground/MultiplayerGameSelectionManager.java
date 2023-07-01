@@ -360,7 +360,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
             response.sendRedirect(url.forPath(Paths.BATTLEGROUND_SELECTION));
         } else {
-            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_HISTORY) + "?gameId=" + gameId);
+            response.sendRedirect(url.forPath(Paths.BATTLEGROUND_GAME) + "?gameId=" + gameId);
         }
     }
 

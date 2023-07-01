@@ -252,12 +252,12 @@
                         import {GameTimeValidator, formatTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
                         const gameTimeValidator = new GameTimeValidator(
-                                Number(${maximumDuration}),
-                                Number(${defaultDuration}),
-                                document.getElementById('minutes-input'),
-                                document.getElementById('hours-input'),
-                                document.getElementById('days-input'),
-                                document.getElementById('gameDurationMinutes')
+                            Number(${maximumDuration}),
+                            Number(${defaultDuration}),
+                            document.getElementById('minutes-input'),
+                            document.getElementById('hours-input'),
+                            document.getElementById('days-input'),
+                            document.getElementById('gameDurationMinutes')
                         );
 
                         document.getElementById('displayMaxDuration').innerText =
