@@ -2,12 +2,18 @@ package org.codedefenders.persistence.database;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.ClassroomMember;
 import org.codedefenders.model.ClassroomRole;
@@ -123,6 +129,38 @@ public class ClassroomMemberRepository {
             logger.error("SQLException while executing query", e);
             throw new UncheckedSQLException("SQLException while executing query", e);
         }
+    }
+
+    public Map<Integer, Integer> getMemberCountForClassrooms(Collection<Integer> classroomIds) {
+        String placeholders = IntStream.range(0, classroomIds.size())
+                .mapToObj(n -> "?")
+                .collect(Collectors.joining(","));
+        @Language("SQL") String query = String.join("\n",
+                "SELECT classrooms.ID AS ID, COUNT(*) AS Count",
+                "FROM classrooms, classroom_members",
+                "WHERE classrooms.ID = classroom_members.Classroom_ID",
+                "AND classrooms.ID IN (" + placeholders + ")",
+                "GROUP BY classrooms.ID;"
+        );
+        Map<Integer, Integer> memberCounts = new HashMap<>();
+        ResultSetHandler<Void> handler = rs -> {
+            while (rs.next()) {
+                int classroomId = rs.getInt("ID");
+                int count = rs.getInt("Count");
+                memberCounts.put(classroomId, count);
+            }
+            return null;
+        };
+        try {
+            queryRunner.query(query,
+                    handler,
+                    classroomIds.toArray()
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+        return memberCounts;
     }
 
     private ClassroomMember classroomMemberFromRS(ResultSet rs) throws SQLException {

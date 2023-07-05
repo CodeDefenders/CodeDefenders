@@ -3,7 +3,9 @@ package org.codedefenders.servlets.api;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -127,7 +129,7 @@ public class ClassroomAPI extends HttpServlet {
     private void handleClassrooms(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String which = ServletUtils.getStringParameter(request, "which").orElse("all");
 
-        Optional<List<Classroom>> classrooms = getClassroomsData(which);
+        Optional<List<ClassroomDTO>> classrooms = getClassrooms(which).map(this::addMemberCounts);
         if (!classrooms.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
@@ -152,7 +154,20 @@ public class ClassroomAPI extends HttpServlet {
                 .collect(Collectors.toList());
     }
 
-    private Optional<List<Classroom>> getClassroomsData(String which) {
+    private List<ClassroomDTO> addMemberCounts(List<Classroom> classrooms) {
+        List<Integer> classroomIds = classrooms.stream()
+                .map(Classroom::getId)
+                .collect(Collectors.toList());
+        Map<Integer, Integer> memberCounts = classroomService.getMemberCountForClassrooms(classroomIds);
+        return classrooms.stream()
+                .map(classroom -> {
+                    int memberCount = memberCounts.getOrDefault(classroom.getId(), 0);
+                    return new ClassroomDTO(classroom, memberCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Optional<List<Classroom>> getClassrooms(String which) {
         switch (which) {
             case "all":
                 if (!login.isAdmin()) {
@@ -198,6 +213,16 @@ public class ClassroomAPI extends HttpServlet {
 
         return ServletUtils.getUUIDParameter(request, "classroomUid")
                 .flatMap(classroomService::getClassroomByUUID);
+    }
+
+    private static class ClassroomDTO extends Classroom {
+        @Expose
+        private final int memberCount;
+
+        public ClassroomDTO(Classroom classroom, int memberCount) {
+            super(classroom);
+            this.memberCount = memberCount;
+        }
     }
 
     private static class ClassroomMemberDTO {

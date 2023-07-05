@@ -42,6 +42,7 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
+import org.codedefenders.servlets.api.ClassroomAPI;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
 
@@ -51,6 +52,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.annotations.Expose;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod.RANDOM;
@@ -805,7 +807,20 @@ public class AdminCreateGamesBean implements Serializable {
                 .serializeNulls()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
-        return gson.toJson(classrooms);
+        return gson.toJson(addMemberCounts(classrooms));
+    }
+
+    private List<ClassroomDTO> addMemberCounts(List<Classroom> classrooms) {
+        List<Integer> classroomIds = classrooms.stream()
+                .map(Classroom::getId)
+                .collect(Collectors.toList());
+        Map<Integer, Integer> memberCounts = classroomService.getMemberCountForClassrooms(classroomIds);
+        return classrooms.stream()
+                .map(classroom -> {
+                    int memberCount = memberCounts.getOrDefault(classroom.getId(), 0);
+                    return new ClassroomDTO(classroom, memberCount);
+                })
+                .collect(Collectors.toList());
     }
 
     // TODO: Move this elsewhere?
@@ -871,5 +886,15 @@ public class AdminCreateGamesBean implements Serializable {
          * putting users with similar total scores in the same team.
          */
         SCORE_DESCENDING
+    }
+
+    private static class ClassroomDTO extends Classroom {
+        @Expose
+        private final int memberCount;
+
+        public ClassroomDTO(Classroom classroom, int memberCount) {
+            super(classroom);
+            this.memberCount = memberCount;
+        }
     }
 }

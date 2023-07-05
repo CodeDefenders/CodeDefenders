@@ -98,3 +98,13 @@ table.dataTable tr.selected th.select-checkbox::after {
     background-color: var(--bs-primary);
     border-color: var(--bs-primary);
 }
+
+/* Class for truncating overflowing cell text instead of line wrapping.
+----------------------------------------------------------------------------- */
+
+table.dataTable tbody td.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 0;
+}

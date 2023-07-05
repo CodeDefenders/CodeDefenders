@@ -1,6 +1,8 @@
 package org.codedefenders.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -242,5 +244,9 @@ public class ClassroomService {
         return String.format("%s?classroomUid=%s",
                 url.getAbsoluteURLForPath(Paths.CLASSROOM),
                 uuid);
+    }
+
+    public Map<Integer, Integer> getMemberCountForClassrooms(Collection<Integer> classroomIds) {
+        return memberRepository.getMemberCountForClassrooms(classroomIds);
     }
 }

@@ -48,6 +48,17 @@ public class Classroom {
         this.archived = archived;
     }
 
+    public Classroom(Classroom other) {
+        this.id = other.id;
+        this.uuid = other.uuid;
+        this.creatorId = other.creatorId;
+        this.name = other.name;
+        this.password = other.password;
+        this.open = other.open;
+        this.visible = other.visible;
+        this.archived = other.archived;
+    }
+
     public int getId() {
         return id;
     }
