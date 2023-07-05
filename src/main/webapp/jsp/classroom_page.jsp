@@ -7,6 +7,9 @@
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.ClassroomRole" %>
+<%@ page import="org.codedefenders.service.ClassroomService" %>
+<%@ page import="org.codedefenders.model.ClassroomMember" %>
+<%@ page import="org.codedefenders.auth.CodeDefendersAuth" %>
 
 <%--@elvariable id="login" type="org.codedefenders.service.AuthService"--%>
 <%--@elvariable id="classroomService" type="org.codedefenders.service.ClassroomService"--%>
@@ -16,9 +19,12 @@
 <c:set var="classroom" value="${requestScope.classroom}"/>
 <c:set var="member" value="${requestScope.member}"/>
 <c:set var="link" value="${requestScope.link}"/>
-
-<c:set var="canEdit" value="${(member != null && member.role == ClassroomRole.OWNER) || login.admin}"/>
-<c:set var="canLeave" value="${member != null && member.role != ClassroomRole.OWNER}"/>
+<c:set var="canEditClassroom"  value="${requestScope.canEditClassroom}"/>
+<c:set var="canChangeRoles" value="${requestScope.canChangeRoles}"/>
+<c:set var="canChangeOwner" value="${requestScope.canChangeOwner}"/>
+<c:set var="canKickStudents" value="${requestScope.canKickStudents}"/>
+<c:set var="canKickModerators" value="${requestScope.canKickModerators}"/>
+<c:set var="canLeave" value="${requestScope.canLeave}"/>
 
 <c:set var="disabledIfArchved" value="${classroom.archived ? 'disabled' : ''}"/>
 <c:set var="mutedIfArchved" value="${classroom.archived ? 'text-muted' : ''}"/>
@@ -74,10 +80,10 @@
                 <div class="p-4 border rounded ${mutedIfArchved}">
                     <c:choose>
                         <c:when test="${member == null}">
-                            You are able to view and edit this classroom because you are logged in as admin.
+                            You are able to fully view and edit this classroom because you are logged in as admin.
                         </c:when>
                         <c:otherwise>
-                            You are able to edit this classroom because you are logged in as admin.
+                            You are able to fully edit this classroom because you are logged in as admin.
                         </c:otherwise>
                     </c:choose>
                     <c:if test="${classroom.open && !classroom.archived && member == null}">
@@ -88,7 +94,7 @@
             </c:if>
 
             <%-- Join Settigns --%>
-            <c:if test="${canEdit}">
+            <c:if test="${canEditClassroom}">
                 <div class="p-4 border rounded ${mutedIfArchved}">
 
                     <h4 class="mb-4">Join Settings</h4>
@@ -178,7 +184,7 @@
             </c:if>
 
             <%-- Classroom Settigns --%>
-            <c:if test="${canEdit}">
+            <c:if test="${canEditClassroom}">
                 <div class="p-4 border rounded ${mutedIfArchved}">
 
                     <h4 class="mb-4">Classroom Settings</h4>
@@ -231,7 +237,7 @@
     </div>
 
     <%-- Change classroom name modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
             <input type="hidden" name="action" value="change-name"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -259,7 +265,7 @@
     </c:if>
 
     <%-- Set password modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" class="needs-validation">
             <input type="hidden" name="action" value="set-password"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -320,7 +326,7 @@
     </c:if>
 
     <%-- Remove password modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="remove-password"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -338,7 +344,7 @@
     </c:if>
 
     <%-- Enable joining modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="enable-joining"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -357,7 +363,7 @@
     </c:if>
 
     <%-- Disable joining modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="disable-joining"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -376,7 +382,7 @@
     </c:if>
 
     <%-- Make public modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="make-public"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -396,7 +402,7 @@
     </c:if>
 
     <%-- Make private modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="make-private"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -415,7 +421,7 @@
     </c:if>
 
     <%-- Archive classroom modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="archive"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -435,7 +441,7 @@
     </c:if>
 
     <%-- Restore classroom modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canEditClassroom}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="restore"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -453,7 +459,7 @@
     </c:if>
 
     <%-- Leave modal --%>
-    <c:if test="${!isOwner}">
+    <c:if test="${canLeave}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post">
             <input type="hidden" name="action" value="leave"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -471,7 +477,7 @@
     </c:if>
 
     <%-- Change role modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canChangeRoles}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="change-role-form">
             <input type="hidden" name="action" value="change-role"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -495,7 +501,7 @@
     </c:if>
 
     <%-- Change owner modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canChangeOwner}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="change-owner-form">
             <input type="hidden" name="action" value="change-owner"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -517,7 +523,7 @@
     </c:if>
 
     <%-- Kick member modal --%>
-    <c:if test="${canEdit}">
+    <c:if test="${canKickStudents || canKickModerators}">
         <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="kick-member-form">
             <input type="hidden" name="action" value="kick-member"/>
             <input type="hidden" name="classroomId" value="${classroom.id}"/>
@@ -550,7 +556,12 @@
         const classroomId = ${classroom.id};
         const ownUserId = ${login.userId};
 
-        const canEdit = ${canEdit ? "true" : "false"};
+        const canEditClassroom = ${canEditClassroom ? "true" : "false"};
+        const canChangeRoles = ${canChangeRoles ? "true" : "false"};
+        const canChangeOwner = ${canChangeOwner ? "true" : "false"};
+        const canKickStudents = ${canKickStudents ? "true" : "false"};
+        const canKickModerators = ${canKickModerators ? "true" : "false"};
+
         const isArchived = ${classroom.archived ? "true" : "false"};
 
         const ClassroomRole = {
@@ -698,11 +709,26 @@
                     kickMember.classList.add('disabled');
                     break;
                 case ClassroomRole.MODERATOR:
-                    changeRoleModerator.setAttribute('hidden', '')
+                    changeRoleModerator.setAttribute('hidden', '');
+                    if (!canChangeRoles) {
+                        changeRoleStudent.classList.add('disabled');
+                    }
+                    if (!canChangeOwner) {
+                        changeRoleOwner.classList.add('disabled');
+                    }
+                    if (!canKickModerators) {
+                        kickMember.classList.add('disabled');
+                    }
                     break;
                 case ClassroomRole.STUDENT:
                     changeRoleStudent.setAttribute('hidden', '');
                     changeRoleOwner.classList.add('disabled');
+                    if (!canChangeRoles) {
+                        changeRoleModerator.classList.add('disabled');
+                    }
+                    if (!canKickStudents) {
+                        changeRoleStudent.classList.add('disabled');
+                    }
                     break;
             }
 
@@ -742,7 +768,7 @@
                         title: 'User ID',
                         type: 'number',
                         width: '5em',
-                        visible: canEdit
+                        visible: canChangeRoles || canChangeOwner || canKickStudents || canKickModerators
                     },
                     {
                         data: 'user.name',
@@ -763,7 +789,7 @@
                         render: renderMemberActions,
                         type: 'html',
                         width: '4em',
-                        visible: canEdit
+                        visible: canChangeRoles || canChangeOwner || canKickStudents || canKickModerators
                     }
                 ],
                 order: [[2, 'asc'], [1, 'asc']],

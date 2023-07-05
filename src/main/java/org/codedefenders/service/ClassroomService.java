@@ -12,6 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.ValidationException;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
@@ -248,5 +249,59 @@ public class ClassroomService {
 
     public Map<Integer, Integer> getMemberCountForClassrooms(Collection<Integer> classroomIds) {
         return memberRepository.getMemberCountForClassrooms(classroomIds);
+    }
+
+    public boolean canEditClassroom(ClassroomMember member, CodeDefendersAuth login) {
+        if (login.isAdmin()) {
+            return true;
+        }
+        if (member == null) {
+            return false;
+        }
+        return member.getRole() == ClassroomRole.OWNER || member.getRole() == ClassroomRole.MODERATOR;
+    }
+
+    public boolean canChangeRoles(ClassroomMember member, CodeDefendersAuth login) {
+        if (login.isAdmin()) {
+            return true;
+        }
+        if (member == null) {
+            return false;
+        }
+        return member.getRole() == ClassroomRole.OWNER;
+    }
+
+    public boolean canChangeOwner(ClassroomMember member, CodeDefendersAuth login) {
+        if (login.isAdmin()) {
+            return true;
+        }
+        if (member == null) {
+            return false;
+        }
+        return member.getRole() == ClassroomRole.OWNER;
+    }
+
+    public boolean canKickStudents(ClassroomMember member, CodeDefendersAuth login) {
+        if (login.isAdmin()) {
+            return true;
+        }
+        if (member == null) {
+            return false;
+        }
+        return member.getRole() == ClassroomRole.OWNER || member.getRole() == ClassroomRole.MODERATOR;
+    }
+
+    public boolean canKickModerators(ClassroomMember member, CodeDefendersAuth login) {
+        if (login.isAdmin()) {
+            return true;
+        }
+        if (member == null) {
+            return false;
+        }
+        return member.getRole() == ClassroomRole.OWNER;
+    }
+
+    public boolean canLeave(ClassroomMember member, CodeDefendersAuth login) {
+        return member != null && member.getRole() != ClassroomRole.OWNER;
     }
 }
