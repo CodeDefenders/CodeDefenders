@@ -77,15 +77,21 @@
 
             <%-- Join as admin --%>
             <c:if test="${login.admin && (member == null || member.role != ClassroomRole.OWNER)}">
-                <div class="p-4 border rounded ${mutedIfArchved}">
+                <div class="p-4 border rounded border-warning ${mutedIfArchved}">
+
+                    <h4 class="mb-4">Admin Info</h4>
+
                     <c:choose>
                         <c:when test="${member == null}">
-                            You are able to fully view and edit this classroom because you are logged in as admin.
+                            You are logged in as admin.
+                            Because of that, you are able to fully view and edit this classroom without joining.
                         </c:when>
                         <c:otherwise>
-                            You are able to fully edit this classroom because you are logged in as admin.
+                            You are logged in as admin.
+                            Because of that, you are able to fully view and edit this classroom without being the owner.
                         </c:otherwise>
                     </c:choose>
+
                     <c:if test="${classroom.open && !classroom.archived && member == null}">
                         If you would like to join the classroom, please go
                         <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}&join">here</a>.
