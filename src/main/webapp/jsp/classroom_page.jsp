@@ -275,7 +275,7 @@
                             Please enter a valid password.
                         </div>
                     </div>
-                    <div>
+                    <div class="mb-3">
                         <input type="password" class="form-control" id="confirm-password-input"
                                name="confirm" placeholder="Confirm Password" required>
                         <div class="invalid-feedback" id="confirm-password-feedback">
@@ -284,6 +284,9 @@
                         <div class="form-text">
                             Maximum length: 100 characters.
                         </div>
+                    </div>
+                    <div>
+                        The password will be asked whenever someone joins the classroom.
                     </div>
                     <script>
                         const passwordInput = document.getElementById('password-input');
@@ -343,7 +346,7 @@
             <t:modal title="Enable joining" id="enable-joining-modal" closeButtonText="Cancel">
                 <jsp:attribute name="content">
                     Are you sure you want to enable joining?
-                    Students will be able to join via room code or invite link.
+                    Students will be able to join via invite link or from the public list (if the classroom is public).
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                     <button type="submit" class="btn btn-success">Enable joining</button>
@@ -362,7 +365,7 @@
             <t:modal title="Disable joining" id="disable-joining-modal" closeButtonText="Cancel">
                 <jsp:attribute name="content">
                     Are you sure you want to disable joining?
-                    Students won't be able to join via room code or invite link.
+                    Students won't be able to join the classroom via invite link or from the public list.
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                     <button type="submit" class="btn btn-danger">Disable joining</button>
@@ -984,7 +987,7 @@
         };
 
         /**
-         * Initializes the buttons to copy room code and invite link.
+         * Initializes the buttons to copy UID and invite link.
          */
         const initCopyButtons = function() {
             for (const element of document.getElementsByClassName('copy')) {
