@@ -92,6 +92,19 @@
             return await response.json();
         };
 
+        const renderMemberCount = function(memberCount, type, row, meta) {
+            switch (type) {
+                case 'type':
+                case 'sort':
+                case 'filter':
+                    return memberCount;
+                case 'display':
+                    return `
+                        <span class="text-muted">\${memberCount} Members</span>
+                    `;
+            }
+        };
+
         const renderLinkButton = function(data, type, row, meta) {
             switch (type) {
                 case 'type':
@@ -123,17 +136,30 @@
                 {
                     data: 'name',
                     type: 'string',
-                    title: 'Name'
+                    title: 'Name',
+                    width: '25em',
+                    className: 'truncate'
+                },
+                {
+                    data: 'memberCount',
+                    type: 'html',
+                    title: 'Members',
+                    render: renderMemberCount
                 },
                 {
                     data: 'uuid',
                     type: 'string',
-                    title: 'UUID'
+                    title: 'UID'
                 },
                 {
                     data: 'open',
                     type: 'boolean',
                     title: 'Open'
+                },
+                {
+                    data: 'visible',
+                    type: 'boolean',
+                    title: 'Visible'
                 },
                 {
                     data: null,
