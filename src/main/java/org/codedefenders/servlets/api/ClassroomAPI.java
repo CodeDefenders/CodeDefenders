@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -76,6 +75,33 @@ public class ClassroomAPI extends HttpServlet {
         }
     }
 
+    private Optional<Classroom> getClassroomFromRequest(HttpServletRequest request) {
+        Optional<Classroom> classroomById = ServletUtils.getIntParameter(request, "classroomId")
+                .flatMap(classroomService::getClassroomById);
+        if (classroomById.isPresent()) {
+            return classroomById;
+        }
+
+        return ServletUtils.getUUIDParameter(request, "classroomUid")
+                .flatMap(classroomService::getClassroomByUUID);
+    }
+
+    private void handleClassrooms(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String which = ServletUtils.getStringParameter(request, "which").orElse("all");
+
+        Optional<List<ClassroomDTO>> classrooms = getClassroomsData(which);
+        if (!classrooms.isPresent()) {
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            return;
+        }
+
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .serializeNulls()
+                .create();
+        gson.toJson(classrooms.get(), response.getWriter());
+    }
+
     private void handleMembers(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
         if (!classroom.isPresent()) {
@@ -126,45 +152,8 @@ public class ClassroomAPI extends HttpServlet {
         gson.toJson(games, response.getWriter());
     }
 
-    private void handleClassrooms(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String which = ServletUtils.getStringParameter(request, "which").orElse("all");
-
-        Optional<List<ClassroomDTO>> classrooms = getClassrooms(which).map(this::addMemberCounts);
-        if (!classrooms.isPresent()) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
-            return;
-        }
-
-        Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
-                .serializeNulls()
-                .create();
-        gson.toJson(classrooms.get(), response.getWriter());
-    }
-
-    private List<ClassroomMemberDTO> getMembersData(Classroom classroom) {
-        List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.getId());
-
-        return members.stream()
-                .map(member -> {
-                    SimpleUser user = userService.getSimpleUserById(member.getUserId())
-                            .orElseThrow(() -> new IllegalStateException("Non-existing user is part of this classroom."));
-                    return new ClassroomMemberDTO(user, member.getRole());
-                })
-                .collect(Collectors.toList());
-    }
-
-    private List<ClassroomDTO> addMemberCounts(List<Classroom> classrooms) {
-        List<Integer> classroomIds = classrooms.stream()
-                .map(Classroom::getId)
-                .collect(Collectors.toList());
-        Map<Integer, Integer> memberCounts = classroomService.getMemberCountForClassrooms(classroomIds);
-        return classrooms.stream()
-                .map(classroom -> {
-                    int memberCount = memberCounts.getOrDefault(classroom.getId(), 0);
-                    return new ClassroomDTO(classroom, memberCount);
-                })
-                .collect(Collectors.toList());
+    private Optional<List<ClassroomDTO>> getClassroomsData(String which) {
+        return getClassrooms(which).map(this::addClassroomMemberCounts);
     }
 
     private Optional<List<Classroom>> getClassrooms(String which) {
@@ -181,6 +170,31 @@ public class ClassroomAPI extends HttpServlet {
             default:
                 return Optional.empty();
         }
+    }
+
+    private List<ClassroomDTO> addClassroomMemberCounts(List<Classroom> classrooms) {
+        List<Integer> classroomIds = classrooms.stream()
+                .map(Classroom::getId)
+                .collect(Collectors.toList());
+        Map<Integer, Integer> memberCounts = classroomService.getMemberCountForClassrooms(classroomIds);
+        return classrooms.stream()
+                .map(classroom -> {
+                    int memberCount = memberCounts.getOrDefault(classroom.getId(), 0);
+                    return new ClassroomDTO(classroom, memberCount);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<ClassroomMemberDTO> getMembersData(Classroom classroom) {
+        List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.getId());
+
+        return members.stream()
+                .map(member -> {
+                    SimpleUser user = userService.getSimpleUserById(member.getUserId())
+                            .orElseThrow(() -> new IllegalStateException("Non-existing user is part of this classroom."));
+                    return new ClassroomMemberDTO(user, member.getRole());
+                })
+                .collect(Collectors.toList());
     }
 
     private List<ClassroomGameDTO> getGamesData(Classroom classroom) {
@@ -202,17 +216,6 @@ public class ClassroomAPI extends HttpServlet {
                     return new ClassroomGameDTO(game, role);
                 })
                 .collect(Collectors.toList());
-    }
-
-    private Optional<Classroom> getClassroomFromRequest(HttpServletRequest request) {
-        Optional<Classroom> classroomById = ServletUtils.getIntParameter(request, "classroomId")
-                .flatMap(classroomService::getClassroomById);
-        if (classroomById.isPresent()) {
-            return classroomById;
-        }
-
-        return ServletUtils.getUUIDParameter(request, "classroomUid")
-                .flatMap(classroomService::getClassroomByUUID);
     }
 
     private static class ClassroomDTO extends Classroom {
