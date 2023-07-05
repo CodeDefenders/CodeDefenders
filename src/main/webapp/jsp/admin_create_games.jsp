@@ -832,6 +832,24 @@
             }
         }
 
+        const renderClassroomLinkButton = function(data, type, row, meta) {
+            switch (type) {
+                case 'type':
+                case 'sort':
+                case 'filter':
+                    return null;
+                case 'display':
+                    const params = new URLSearchParams({
+                        classroomUid: data.uuid
+                    });
+                    return `
+                        <a href="\${CLASSROOM_URL}?\${params}" class="cursor-pointer float-end px-2">
+                            <i class="fa fa-external-link text-primary"></i>
+                        </a>
+                    `;
+            }
+        };
+
         /**
          * Creates a table displaying the players of a staged game, as well as a "form" to manipulate them.
          * @param {StagedGame} stagedGame The staged game to create the table for.
@@ -1146,8 +1164,8 @@
             return table;
         };
 
-        /* Restore the state of show/hide toggles for the tables. */
         $(document).ready(function () {
+            /* Restore the state of show/hide toggles for the tables. */
             const setCheckboxButton = function (checkbox, checked) {
                 if (checked) {
                     checkbox.checked = true;
@@ -1159,10 +1177,8 @@
             }
             setCheckboxButton($('#toggle-hide-players').get(0), hideStagedGamePlayers);
             setCheckboxButton($('#toggle-show-assigned-users').get(0), showAssignedUsers);
-        });
 
-        /* Staged games table and related components. */
-        $(document).ready(function () {
+            /* Staged games table and related components. */
             const stagedGamesTable = new DataTable('#table-staged-games', {
                 data: stagedGamesTableData,
                 columns: [
@@ -1370,12 +1386,9 @@
                     stagedGameIds
                 });
             });
-        });
 
-        let usersTable;
-        /* Users table and related components. */
-        $(document).ready(function () {
-            usersTable = new DataTable('#table-users', {
+            /* Users table and related components. */
+            const usersTable = new DataTable('#table-users', {
                 data: usersTableData,
                 columns: [
                     {
@@ -1523,30 +1536,9 @@
                         break;
                 }
             });
-        });
 
-        const renderClassroomLinkButton = function(data, type, row, meta) {
-            switch (type) {
-                case 'type':
-                case 'sort':
-                case 'filter':
-                    return null;
-                case 'display':
-                    const params = new URLSearchParams({
-                        classroomUid: data.uuid
-                    });
-                    return `
-                        <a href="\${CLASSROOM_URL}?\${params}" class="cursor-pointer float-end px-2">
-                            <i class="fa fa-external-link text-primary"></i>
-                        </a>
-                    `;
-            }
-        };
-
-        let classroomsTable;
-        /* Classrooms table and related components. */
-        $(document).ready(function () {
-            classroomsTable = new DataTable('#table-classrooms', {
+            /* Classrooms table and related components. */
+            const classroomsTable = new DataTable('#table-classrooms', {
                 data: classrooms,
                 columns: [
                     {
@@ -1570,7 +1562,7 @@
                     {
                         data: 'uuid',
                         type: 'string',
-                        title: 'UUID'
+                        title: 'UID'
                     },
                     {
                         data: null,
@@ -1595,10 +1587,8 @@
             $('#search-classrooms').on('keyup', function () {
                 setTimeout(() => classroomsTable.search(this.value).draw(), 0);
             });
-        });
 
-        /* Classrooms table and users table interaction. */
-        $(document).ready(function () {
+            /* Classrooms table and users table interaction. */
             /* Toggle stage games button based on whether users are selected or usernames are given. */
             usersTable.on('select', function (e, dt, type, indexes) {
                 $('#stage-games-button').get(0).disabled = false;

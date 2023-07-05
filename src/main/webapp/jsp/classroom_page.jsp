@@ -533,23 +533,6 @@
         import {LoadingAnimation} from '${url.forPath("/js/codedefenders_main.mjs")}';
         import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
-        const STUDENT = '${ClassroomRole.STUDENT.name()}';
-        const MODERATOR = '${ClassroomRole.MODERATOR.name()}';
-        const OWNER = '${ClassroomRole.OWNER.name()}';
-
-        const MELEE = '${GameMode.MELEE.name()}';
-        const PARTY = '${GameMode.PARTY.name()}';
-
-        const ATTACKER = '${Role.ATTACKER.name()}';
-        const DEFENDER = '${Role.DEFENDER.name()}';
-        const PLAYER = '${Role.PLAYER.name()}';
-        const OBSERVER = '${Role.OBSERVER.name()}';
-        const NONE = '${Role.NONE.name()}';
-
-        const CREATED = '${GameState.CREATED.name()}';
-        const ACTIVE = '${GameState.ACTIVE.name()}';
-        const FINISHED = '${GameState.FINISHED.name()}';
-
         const API_URL = '${url.forPath(Paths.API_CLASSROOM)}';
         const BATTLEGROUND_URL = '${url.forPath(Paths.BATTLEGROUND_GAME)}';
         const MELEE_URL = '${url.forPath(Paths.MELEE_GAME)}';
@@ -559,6 +542,31 @@
 
         const canEdit = ${canEdit ? "true" : "false"};
         const isArchived = ${classroom.archived ? "true" : "false"};
+
+        const ClassroomRole = {
+            STUDENT: '${ClassroomRole.STUDENT.name()}',
+            MODERATOR: '${ClassroomRole.MODERATOR.name()}',
+            OWNER: '${ClassroomRole.OWNER.name()}'
+        };
+
+        const GameMode = {
+            MELEE: '${GameMode.MELEE.name()}',
+            PARTY: '${GameMode.PARTY.name()}'
+        }
+
+        const Role = {
+            ATTACKER: '${Role.ATTACKER.name()}',
+            DEFENDER: '${Role.DEFENDER.name()}',
+            PLAYER: '${Role.PLAYER.name()}',
+            OBSERVER: '${Role.OBSERVER.name()}',
+            NONE: '${Role.NONE.name()}'
+        };
+
+        const GameState = {
+            CREATED: '${GameState.CREATED.name()}',
+            ACTIVE: '${GameState.ACTIVE.name()}',
+            FINISHED: '${GameState.FINISHED.name()}'
+        };
 
         /**
          * Fetches members from the API.
@@ -611,7 +619,7 @@
                     return role;
                 case 'sort':
                     // Sort owner(s) first
-                    if (role === OWNER) {
+                    if (role === ClassroomRole.OWNER) {
                         return 'a';
                     } else {
                         return role;
@@ -667,22 +675,22 @@
                 </div>
             `;
 
-            const changeRoleStudent = div.querySelector('.change-role[data-role="STUDENT"]');
-            const changeRoleModerator = div.querySelector('.change-role[data-role="MODERATOR"]');
-            const changeRoleOwner = div.querySelector('.change-role[data-role="OWNER"]');
+            const changeRoleStudent = div.querySelector(`.change-role[data-role="\${ClassroomRole.STUDENT}"]`);
+            const changeRoleModerator = div.querySelector(`.change-role[data-role="\${ClassroomRole.MODERATOR}"]`);
+            const changeRoleOwner = div.querySelector(`.change-role[data-role="\${ClassroomRole.OWNER}"]`);
             const kickMember = div.querySelector('.kick-member');
 
             switch (data.role) {
-                case OWNER:
+                case ClassroomRole.OWNER:
                     changeRoleStudent.classList.add('disabled');
                     changeRoleModerator.classList.add('disabled');
                     changeRoleOwner.setAttribute('hidden', '');
                     kickMember.classList.add('disabled');
                     break;
-                case MODERATOR:
+                case ClassroomRole.MODERATOR:
                     changeRoleModerator.setAttribute('hidden', '')
                     break;
-                case STUDENT:
+                case ClassroomRole.STUDENT:
                     changeRoleStudent.setAttribute('hidden', '');
                     changeRoleOwner.classList.add('disabled');
                     break;
@@ -699,7 +707,7 @@
         };
 
         const changeRole = function(data, role) {
-            if (role === OWNER) {
+            if (role === ClassroomRole.OWNER) {
                 const form = document.getElementById('change-owner-form');
                 form.querySelector('input[name="userId"]').value = data.user.id;
                 form.querySelector('[data-fill="username"]').innerText = data.user.name;
@@ -778,9 +786,9 @@
 
         const renderGameMode = function(mode, type, row, meta) {
             switch (mode) {
-                case PARTY:
+                case GameMode.PARTY:
                     return 'Battleground';
-                case MELEE:
+                case GameMode.MELEE:
                     return 'Melee';
                 default:
                     return 'unknown';
@@ -793,23 +801,23 @@
                     return role;
                 case 'sort':
                     // Sort owner(s) first
-                    if (role === OBSERVER) {
+                    if (role === Role.OBSERVER) {
                         return 'a';
-                    } else if (role === NONE) {
+                    } else if (role === Role.NONE) {
                         return 'z';
                     }
                 case 'filter':
                 case 'display':
                     switch (role) {
-                        case ATTACKER:
+                        case Role.ATTACKER:
                             return '<span class="badge bg-attacker" style="font-size: .85rem;">Attacker</span>';
-                        case DEFENDER:
+                        case Role.DEFENDER:
                             return '<span class="badge bg-defender" style="font-size: .85rem;">Defender</span>';
-                        case PLAYER:
+                        case Role.PLAYER:
                             return '<span class="badge bg-player" style="font-size: .85rem;">Player</span>';
-                        case OBSERVER:
+                        case Role.OBSERVER:
                             return '<span class="badge bg-warning text-dark" style="font-size: .85rem;">Observer</span>';
-                        case NONE:
+                        case Role.NONE:
                             return '';
                     }
             }
@@ -854,11 +862,11 @@
 
         const renderGameState = function(data, type, row, meta) {
             switch (data.state) {
-                case CREATED:
+                case GameState.CREATED:
                     return 'Not Started';
-                case ACTIVE:
+                case GameState.ACTIVE:
                     return renderGameStateActive(data, type, row, meta);
-                case FINISHED:
+                case GameState.FINISHED:
                     return renderGameStateFinished(data, type, row, meta);
                 default:
                     return '';
@@ -866,14 +874,14 @@
         };
 
         const renderGameActions = function(data, type, row, meta) {
-            if (data.role === NONE) {
+            if (data.role === Role.NONE) {
                 return '';
             }
 
             let url;
-            if (data.mode === PARTY) {
+            if (data.mode === GameMode.PARTY) {
                 url = BATTLEGROUND_URL;
-            } else if (data.mode === MELEE) {
+            } else if (data.mode === GameMode.MELEE) {
                 url = MELEE_URL;
             } else {
                 return '';
@@ -907,9 +915,9 @@
                 }
 
                 if (activeRadio.checked) {
-                    return data.state === CREATED || data.state === ACTIVE;
+                    return data.state === GameState.CREATED || data.state === GameState.ACTIVE;
                 } else {
-                    return data.state === FINISHED;
+                    return data.state === GameState.FINISHED;
                 }
             };
             DataTable.ext.search.push(searchFunction);

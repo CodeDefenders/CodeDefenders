@@ -35,9 +35,6 @@ import org.codedefenders.util.Paths;
 public class ClassroomsOverview extends HttpServlet {
 
     @Inject
-    private CodeDefendersAuth login;
-
-    @Inject
     private PageInfoBean pageInfo;
 
     @Override

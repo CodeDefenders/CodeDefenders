@@ -97,7 +97,7 @@
             }
         };
 
-        const renderOpenClassroomLink = function(data, type, row, meta) {
+        const renderPublicClassroomLink = function(data, type, row, meta) {
             switch (type) {
                 case 'type':
                 case 'sort':
@@ -115,94 +115,101 @@
             }
         };
 
-        const userClassrooms = await getClassrooms("user");
-        const publicClassrooms = await getClassrooms("visible");
+        const initUserTable = function(data) {
+            const userTable = new DataTable('#user-classrooms', {
+                data,
+                columns: [
+                    {
+                        data: 'name',
+                        type: 'string',
+                        title: 'Name'
+                    },
+                    {
+                        data: null,
+                        title: 'Link',
+                        render: renderClassroomLink,
+                        width: '2em'
+                    },
+                ],
+                order: [[0, 'asc']],
+                scrollY: '600px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: {
+                    emptyTable: "You're not part of any classrooms.",
+                    zeroRecords: 'No classrooms found.'
+                }
+            });
 
-        const userTable = new DataTable('#user-classrooms', {
-            data: userClassrooms,
-            columns: [
-                {
-                    data: 'name',
-                    type: 'string',
-                    title: 'Name'
-                },
-                {
-                    data: null,
-                    title: 'Link',
-                    render: renderClassroomLink,
-                    width: '2em'
-                },
-            ],
-            order: [[0, 'asc']],
-            scrollY: '600px',
-            scrollCollapse: true,
-            paging: false,
-            dom: 't',
-            language: {
-                emptyTable: "You're not part of any classrooms.",
-                zeroRecords: 'No classrooms found.'
-            }
-        });
-        LoadingAnimation.hideAnimation(userTable.table().container());
+            LoadingAnimation.hideAnimation(userTable.table().container());
 
+            document.getElementById('search-user').addEventListener('keyup', function(event) {
+                setTimeout(() => userTable.search(this.value).draw(), 0);
+            });
 
+            const activeRadio = document.getElementById("radio-active");
+            const archivedRadio = document.getElementById("radio-archived");
 
-        const publicTable = new DataTable('#public-classrooms', {
-            data: publicClassrooms,
-            columns: [
-                {
-                    data: 'name',
-                    type: 'string',
-                    title: 'Name'
-                },
-                {
-                    data: null,
-                    title: 'Link',
-                    render: renderOpenClassroomLink,
-                    width: '2em'
-                },
-            ],
-            order: [[0, 'asc']],
-            scrollY: '600px',
-            scrollCollapse: true,
-            paging: false,
-            dom: 't',
-            language: {
-                emptyTable: 'There are currently no public classrooms.',
-                zeroRecords: 'No Classrooms found.'
-            }
-        });
-        LoadingAnimation.hideAnimation(publicTable.table().container());
+            const searchFunction = (settings, renderedData, index, data, counter) => {
+                /* Let this only affect the "My Classrooms" table. */
+                if (settings.nTable.id !== 'user-classrooms') {
+                    return true;
+                }
 
-        document.getElementById('search-user').addEventListener('keyup', function(event) {
-            setTimeout(() => userTable.search(this.value).draw(), 0);
-        });
-        document.getElementById('search-public').addEventListener('keyup', function(event) {
-            setTimeout(() => publicTable.search(this.value).draw(), 0);
-        });
+                if (activeRadio.checked) {
+                    return !data.archived;
+                } else {
+                    return data.archived;
+                }
+            };
+            DataTable.ext.search.push(searchFunction);
 
+            activeRadio.addEventListener('change', e => userTable.draw());
+            archivedRadio.addEventListener('change', e => userTable.draw());
 
-        const activeRadio = document.getElementById("radio-active");
-        const archivedRadio = document.getElementById("radio-archived");
-
-        const searchFunction = (settings, renderedData, index, data, counter) => {
-            /* Let this only affect the "My Classrooms" table. */
-            if (settings.nTable.id !== 'user-classrooms') {
-                return true;
-            }
-
-            if (activeRadio.checked) {
-                return !data.archived;
-            } else {
-                return data.archived;
-            }
+            return userTable;
         };
-        DataTable.ext.search.push(searchFunction);
 
-        activeRadio.addEventListener('change', e => userTable.draw());
-        archivedRadio.addEventListener('change', e => userTable.draw());
+        const initPublicTable = function(data) {
+            const publicTable = new DataTable('#public-classrooms', {
+                data,
+                columns: [
+                    {
+                        data: 'name',
+                        type: 'string',
+                        title: 'Name'
+                    },
+                    {
+                        data: null,
+                        title: 'Link',
+                        render: renderPublicClassroomLink,
+                        width: '2em'
+                    },
+                ],
+                order: [[0, 'asc']],
+                scrollY: '600px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: {
+                    emptyTable: 'There are currently no public classrooms.',
+                    zeroRecords: 'No Classrooms found.'
+                }
+            });
+
+            LoadingAnimation.hideAnimation(publicTable.table().container());
+
+            document.getElementById('search-public').addEventListener('keyup', function(event) {
+                setTimeout(() => publicTable.search(this.value).draw(), 0);
+            });
+
+            return publicTable;
+        };
+
+        getClassrooms('user').then(userClassrooms => initUserTable(userClassrooms));
+        getClassrooms('visible').then(publicClassrooms => initPublicTable(publicClassrooms));
     </script>
-
 
 </div>
 <%@ include file="/jsp/footer.jsp" %>

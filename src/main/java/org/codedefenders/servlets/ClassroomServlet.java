@@ -189,7 +189,7 @@ public class ClassroomServlet extends HttpServlet {
             throws IOException {
         classroomService.setOpen(classroom.getId(), open);
 
-        messages.add("Successfully set classroom to " + (open ? "open" : "closed"));
+        messages.add("Successfully set classroom to " + (open ? "open" : "closed") + ".");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -197,7 +197,7 @@ public class ClassroomServlet extends HttpServlet {
                             boolean visible) throws IOException {
         classroomService.setVisible(classroom.getId(), visible);
 
-        messages.add("Successfully set classroom to " + (visible ? "public" : "private"));
+        messages.add("Successfully set classroom to " + (visible ? "public" : "private") + ".");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -205,7 +205,7 @@ public class ClassroomServlet extends HttpServlet {
                              boolean archived) throws IOException {
         classroomService.setArchived(classroom.getId(), archived);
 
-        messages.add("Successfully " + (archived ? "archived" : "restored") + " classroom");
+        messages.add("Successfully " + (archived ? "archived" : "restored") + " classroom.");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -253,7 +253,7 @@ public class ClassroomServlet extends HttpServlet {
 
         classroomService.changeRole(classroom.getId(), userId, role);
 
-        messages.add("Successfully changed role");
+        messages.add("Successfully changed role.");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -263,7 +263,7 @@ public class ClassroomServlet extends HttpServlet {
 
         classroomService.changeOwner(classroom.getId(), userId);
 
-        messages.add("Successfully changed the owner");
+        messages.add("Successfully changed the owner.");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -273,7 +273,7 @@ public class ClassroomServlet extends HttpServlet {
 
         classroomService.removeMember(classroom.getId(), userId);
 
-        messages.add("Successfully kicked member");
+        messages.add("Successfully kicked member.");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -298,7 +298,7 @@ public class ClassroomServlet extends HttpServlet {
         ClassroomMember member = new ClassroomMember(login.getUserId(), classroom.getId(), ClassroomRole.STUDENT);
         classroomService.addMember(member);
 
-        messages.add("Successfully joined classroom");
+        messages.add("Successfully joined classroom.");
         redirectToClassroomPage(response, classroom.getUUID());
     }
 
@@ -306,7 +306,7 @@ public class ClassroomServlet extends HttpServlet {
             throws IOException {
         classroomService.removeMember(classroom.getId(), login.getUserId());
 
-        messages.add("Successfully left classroom");
+        messages.add("Successfully left classroom.");
         response.sendRedirect(url.forPath(Paths.CLASSROOMS_OVERVIEW));
     }
 }
