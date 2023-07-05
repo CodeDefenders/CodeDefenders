@@ -807,18 +807,14 @@ public class AdminCreateGamesBean implements Serializable {
                 .serializeNulls()
                 .excludeFieldsWithoutExposeAnnotation()
                 .create();
-        return gson.toJson(addMemberCounts(classrooms));
+        return gson.toJson(addClassroomMemberCounts(classrooms));
     }
 
-    private List<ClassroomDTO> addMemberCounts(List<Classroom> classrooms) {
-        List<Integer> classroomIds = classrooms.stream()
-                .map(Classroom::getId)
-                .collect(Collectors.toList());
-        Map<Integer, Integer> memberCounts = classroomService.getMemberCountForClassrooms(classroomIds);
+    private List<ClassroomDTO> addClassroomMemberCounts(List<Classroom> classrooms) {
         return classrooms.stream()
                 .map(classroom -> {
-                    int memberCount = memberCounts.getOrDefault(classroom.getId(), 0);
-                    return new ClassroomDTO(classroom, memberCount);
+                    List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.getId());
+                    return new ClassroomDTO(classroom, members.size());
                 })
                 .collect(Collectors.toList());
     }

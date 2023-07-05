@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpStatus;
 import org.codedefenders.auth.CodeDefendersAuth;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MeleeGameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -173,14 +174,10 @@ public class ClassroomAPI extends HttpServlet {
     }
 
     private List<ClassroomDTO> addClassroomMemberCounts(List<Classroom> classrooms) {
-        List<Integer> classroomIds = classrooms.stream()
-                .map(Classroom::getId)
-                .collect(Collectors.toList());
-        Map<Integer, Integer> memberCounts = classroomService.getMemberCountForClassrooms(classroomIds);
         return classrooms.stream()
                 .map(classroom -> {
-                    int memberCount = memberCounts.getOrDefault(classroom.getId(), 0);
-                    return new ClassroomDTO(classroom, memberCount);
+                    List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.getId());
+                    return new ClassroomDTO(classroom, members.size());
                 })
                 .collect(Collectors.toList());
     }

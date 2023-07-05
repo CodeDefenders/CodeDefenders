@@ -247,10 +247,6 @@ public class ClassroomService {
                 uuid);
     }
 
-    public Map<Integer, Integer> getMemberCountForClassrooms(Collection<Integer> classroomIds) {
-        return memberRepository.getMemberCountForClassrooms(classroomIds);
-    }
-
     public boolean canEditClassroom(ClassroomMember member, CodeDefendersAuth login) {
         if (login.isAdmin()) {
             return true;
