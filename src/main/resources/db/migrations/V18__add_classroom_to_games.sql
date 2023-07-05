@@ -1,6 +1,0 @@
-ALTER TABLE games
-    ADD COLUMN Classroom_ID int(11) NULL DEFAULT NULL;
-
-ALTER TABLE games
-    ADD CONSTRAINT fk_games_classroom_id
-        FOREIGN KEY (Classroom_ID) REFERENCES classrooms (ID) ON UPDATE CASCADE ON DELETE SET NULL;

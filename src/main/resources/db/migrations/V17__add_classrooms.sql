@@ -1,7 +1,7 @@
 CREATE TABLE classrooms
 (
     ID         int(11)      NOT NULL AUTO_INCREMENT,
-    UUID       UUID         NOT NULL,
+    UUID       CHAR(36)     NOT NULL,
     Creator_ID int(11)      NULL,
     Name       VARCHAR(100) NOT NULL,
     Password   CHAR(60)     NULL DEFAULT NULL,
@@ -36,3 +36,10 @@ CREATE TABLE classroom_members
     CONSTRAINT fk_classroom_id
         FOREIGN KEY (Classroom_ID) REFERENCES classrooms (ID) ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+-- Add classroom ID to games
+ALTER TABLE games
+    ADD COLUMN Classroom_ID int(11) NULL DEFAULT NULL;
+ALTER TABLE games
+    ADD CONSTRAINT fk_games_classroom_id
+        FOREIGN KEY (Classroom_ID) REFERENCES classrooms (ID) ON UPDATE CASCADE ON DELETE SET NULL;
