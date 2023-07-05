@@ -160,6 +160,13 @@
                         </div>
                     </div>
 
+                    <div class="mb-1">
+                        <span class="me-1">Classroom UID is</span>
+                        <span id="classroom-uid" class="border rounded px-2"><c:out value="${classroom.UUID}"/></span>
+                        <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
+                           data-copy-target="#classroom-uid"></i>
+                    </div>
+
                     <div>
                         <span class="me-1">Invite link is</span>
                         <span id="invite-link" class="border rounded px-2"><c:out value="${link}"/></span>
