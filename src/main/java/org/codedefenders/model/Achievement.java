@@ -1,6 +1,8 @@
 package org.codedefenders.model;
 
-public class Achievement {
+import java.io.Serializable;
+
+public class Achievement implements Serializable {
     private final int achievementId;
     private final int level;
     private final String name;
