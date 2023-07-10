@@ -842,8 +842,9 @@
                 case 'filter':
                     return memberCount;
                 case 'display':
+                    const members = memberCount > 1 ? 'Members' : 'Member';
                     return `
-                        <span class="text-muted">\${memberCount} Members</span>
+                        <span class="text-muted">\${memberCount} \${members}</span>
                     `;
             }
         };
