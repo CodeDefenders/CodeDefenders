@@ -87,7 +87,7 @@ public class AdminClassrooms extends HttpServlet {
 
     private void createClassroom(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String name = ServletUtils.getStringParameter(request, "name").get();
-        classroomService.addClassroom(name, login.getUserId());
+        classroomService.addClassroom(name);
         Redirect.redirectBack(request, response);
     }
 }

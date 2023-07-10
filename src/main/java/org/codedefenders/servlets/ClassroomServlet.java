@@ -66,12 +66,12 @@ public class ClassroomServlet extends HttpServlet {
             request.setAttribute("classroom", classroom.get());
             request.setAttribute("member", member.orElse(null));
             request.setAttribute("link", classroomService.getInviteLinkForClassroom(classroom.get().getUUID()));
-            request.setAttribute("canEditClassroom", classroomService.canEditClassroom(member.orElse(null), login));
-            request.setAttribute("canChangeRoles", classroomService.canChangeRoles(member.orElse(null), login));
-            request.setAttribute("canChangeOwner", classroomService.canChangeOwner(member.orElse(null), login));
-            request.setAttribute("canKickStudents", classroomService.canKickStudents(member.orElse(null), login));
-            request.setAttribute("canKickModerators", classroomService.canKickModerators(member.orElse(null), login));
-            request.setAttribute("canLeave", classroomService.canLeave(member.orElse(null), login));
+            request.setAttribute("canEditClassroom", classroomService.canEditClassroom(member.orElse(null)));
+            request.setAttribute("canChangeRoles", classroomService.canChangeRoles(member.orElse(null)));
+            request.setAttribute("canChangeOwner", classroomService.canChangeOwner(member.orElse(null)));
+            request.setAttribute("canKickStudents", classroomService.canKickStudents(member.orElse(null)));
+            request.setAttribute("canKickModerators", classroomService.canKickModerators(member.orElse(null)));
+            request.setAttribute("canLeave", classroomService.canLeave(member.orElse(null)));
             request.getRequestDispatcher("/jsp/classroom_page.jsp").forward(request, response);
             return;
         }
@@ -195,7 +195,7 @@ public class ClassroomServlet extends HttpServlet {
     private void setOpen(HttpServletRequest request, HttpServletResponse response, Classroom classroom,
                          ClassroomMember member, boolean open)
             throws IOException {
-        checkPermission(classroomService.canEditClassroom(member, login));
+        checkPermission(classroomService.canEditClassroom(member));
         classroomService.setOpen(classroom.getId(), open);
 
         messages.add("Successfully set classroom to " + (open ? "open" : "closed") + ".");
@@ -204,7 +204,7 @@ public class ClassroomServlet extends HttpServlet {
 
     private void setVisible(HttpServletRequest request, HttpServletResponse response, Classroom classroom,
                             ClassroomMember member, boolean visible) throws IOException {
-        checkPermission(classroomService.canEditClassroom(member, login));
+        checkPermission(classroomService.canEditClassroom(member));
         classroomService.setVisible(classroom.getId(), visible);
 
         messages.add("Successfully set classroom to " + (visible ? "public" : "private") + ".");
@@ -213,7 +213,7 @@ public class ClassroomServlet extends HttpServlet {
 
     private void setArchived(HttpServletRequest request, HttpServletResponse response, Classroom classroom,
                              ClassroomMember member, boolean archived) throws IOException {
-        checkPermission(classroomService.canEditClassroom(member, login));
+        checkPermission(classroomService.canEditClassroom(member));
         classroomService.setArchived(classroom.getId(), archived);
 
         messages.add("Successfully " + (archived ? "archived" : "restored") + " classroom.");
@@ -224,7 +224,7 @@ public class ClassroomServlet extends HttpServlet {
                             ClassroomMember member) throws IOException {
         String name = ServletUtils.getStringParameter(request, "name").get();
 
-        checkPermission(classroomService.canEditClassroom(member, login));
+        checkPermission(classroomService.canEditClassroom(member));
         classroomService.changeName(classroom.getId(), name);
 
         messages.add("Successfully changed the name to: " + name);
@@ -235,7 +235,7 @@ public class ClassroomServlet extends HttpServlet {
                              ClassroomMember member) throws IOException {
         String password = ServletUtils.getStringParameter(request, "password").get();
 
-        checkPermission(classroomService.canEditClassroom(member, login));
+        checkPermission(classroomService.canEditClassroom(member));
         classroomService.setPassword(classroom.getId(), password);
 
         messages.add("Successfully set the password.");
@@ -244,7 +244,7 @@ public class ClassroomServlet extends HttpServlet {
 
     private void removePassword(HttpServletRequest request, HttpServletResponse response, Classroom classroom,
                                 ClassroomMember member) throws IOException {
-        checkPermission(classroomService.canEditClassroom(member, login));
+        checkPermission(classroomService.canEditClassroom(member));
         classroomService.removePassword(classroom.getId());
 
         messages.add("Successfully removed the password.");
@@ -265,7 +265,7 @@ public class ClassroomServlet extends HttpServlet {
             return;
         }
 
-        checkPermission(classroomService.canChangeRoles(member, login));
+        checkPermission(classroomService.canChangeRoles(member));
         classroomService.changeRole(classroom.getId(), userId, role);
 
         messages.add("Successfully changed role.");
@@ -276,7 +276,7 @@ public class ClassroomServlet extends HttpServlet {
                              ClassroomMember member) throws IOException {
         int userId = ServletUtils.getIntParameter(request, "userId").get();
 
-        checkPermission(classroomService.canChangeOwner(member, login));
+        checkPermission(classroomService.canChangeOwner(member));
         classroomService.changeOwner(classroom.getId(), userId);
 
         messages.add("Successfully changed the owner.");
@@ -293,9 +293,9 @@ public class ClassroomServlet extends HttpServlet {
             messages.add("Member not found.");
             Redirect.redirectBack(request, response);
         } else if (kickedMember.get().getRole() == ClassroomRole.MODERATOR) {
-            checkPermission(classroomService.canKickModerators(member, login));
+            checkPermission(classroomService.canKickModerators(member));
         } else if (kickedMember.get().getRole() == ClassroomRole.STUDENT) {
-            checkPermission(classroomService.canKickStudents(member, login));
+            checkPermission(classroomService.canKickStudents(member));
         }
 
         classroomService.removeMember(classroom.getId(), userId);

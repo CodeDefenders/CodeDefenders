@@ -1,8 +1,6 @@
 package org.codedefenders.service;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -12,7 +10,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.ValidationException;
 
-import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.model.Classroom;
 import org.codedefenders.model.ClassroomMember;
@@ -32,22 +29,26 @@ public class ClassroomService {
     private final ClassroomMemberRepository memberRepository;
     private final URLUtils url;
 
+    private final AuthService login;
+
     @Inject
     public ClassroomService(ClassroomRepository classroomRepository,
                             ClassroomMemberRepository memberRepository,
-                            URLUtils urlUtils) {
+                            URLUtils urlUtils,
+                            AuthService login) {
         this.classroomRepository = classroomRepository;
         this.memberRepository = memberRepository;
         this.url = urlUtils;
+        this.login = login;
     }
 
-    public int addClassroom(String name, int creatorId) throws ValidationException {
+    public int addClassroom(String name) throws ValidationException {
         validateName(name);
 
         Classroom classroom = new Classroom(
                 -1,
                 UUID.randomUUID(),
-                creatorId,
+                login.getUserId(),
                 name,
                 null,
                 false,
@@ -58,7 +59,7 @@ public class ClassroomService {
         int id = classroomRepository.storeClassroom(classroom)
                 .orElseThrow(() -> new UncheckedSQLException("Could not store classroom."));
 
-        ClassroomMember owner = new ClassroomMember(creatorId, id, ClassroomRole.OWNER);
+        ClassroomMember owner = new ClassroomMember(login.getUserId(), id, ClassroomRole.OWNER);
         memberRepository.storeMember(owner);
 
         return id;
@@ -247,7 +248,7 @@ public class ClassroomService {
                 uuid);
     }
 
-    public boolean canEditClassroom(ClassroomMember member, CodeDefendersAuth login) {
+    public boolean canEditClassroom(ClassroomMember member) {
         if (login.isAdmin()) {
             return true;
         }
@@ -257,7 +258,7 @@ public class ClassroomService {
         return member.getRole() == ClassroomRole.OWNER || member.getRole() == ClassroomRole.MODERATOR;
     }
 
-    public boolean canChangeRoles(ClassroomMember member, CodeDefendersAuth login) {
+    public boolean canChangeRoles(ClassroomMember member) {
         if (login.isAdmin()) {
             return true;
         }
@@ -267,7 +268,7 @@ public class ClassroomService {
         return member.getRole() == ClassroomRole.OWNER;
     }
 
-    public boolean canChangeOwner(ClassroomMember member, CodeDefendersAuth login) {
+    public boolean canChangeOwner(ClassroomMember member) {
         if (login.isAdmin()) {
             return true;
         }
@@ -277,7 +278,7 @@ public class ClassroomService {
         return member.getRole() == ClassroomRole.OWNER;
     }
 
-    public boolean canKickStudents(ClassroomMember member, CodeDefendersAuth login) {
+    public boolean canKickStudents(ClassroomMember member) {
         if (login.isAdmin()) {
             return true;
         }
@@ -287,7 +288,7 @@ public class ClassroomService {
         return member.getRole() == ClassroomRole.OWNER || member.getRole() == ClassroomRole.MODERATOR;
     }
 
-    public boolean canKickModerators(ClassroomMember member, CodeDefendersAuth login) {
+    public boolean canKickModerators(ClassroomMember member) {
         if (login.isAdmin()) {
             return true;
         }
@@ -297,7 +298,7 @@ public class ClassroomService {
         return member.getRole() == ClassroomRole.OWNER;
     }
 
-    public boolean canLeave(ClassroomMember member, CodeDefendersAuth login) {
+    public boolean canLeave(ClassroomMember member) {
         return member != null && member.getRole() != ClassroomRole.OWNER;
     }
 }
