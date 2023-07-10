@@ -35,13 +35,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.cron.KillMapCronJob;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapType;
-import org.codedefenders.execution.KillMapProcessor;
-import org.codedefenders.execution.KillMapProcessor.KillMapJob;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO;
 import org.codedefenders.util.Constants;
@@ -93,7 +93,7 @@ public class AdminKillmapManagement extends HttpServlet {
     private CodeDefendersAuth login;
 
     @Inject
-    private KillMapProcessor killMapProcessor;
+    private KillMapCronJob killMapCronJob;
 
     @Inject
     private URLUtils url;
@@ -281,7 +281,7 @@ public class AdminKillmapManagement extends HttpServlet {
 
     private void toggleProcessing(boolean enable) {
         if (enable) {
-            killMapProcessor.setEnabled(true);
+            killMapCronJob.setEnabled(true);
             if (AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, true))) {
                 logger.info("User {} enabled killmap processing", login.getUserId());
                 messages.add("Successfully enabled killmap processing.");
@@ -290,7 +290,7 @@ public class AdminKillmapManagement extends HttpServlet {
                 messages.add("Failed to enable killmap processing");
             }
         } else {
-            killMapProcessor.setEnabled(false);
+            killMapCronJob.setEnabled(false);
             if (AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, false))) {
                 logger.info("User {} disabled killmap processing", login.getUserId());
                 messages.add("Successfully disabled killmap processing.");

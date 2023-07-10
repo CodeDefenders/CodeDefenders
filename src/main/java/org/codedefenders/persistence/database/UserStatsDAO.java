@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2023 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.persistence.database;
 
 
@@ -8,6 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.dto.UserStats;
+import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
 import org.codedefenders.persistence.database.util.QueryRunner;
 import org.slf4j.Logger;
@@ -37,8 +59,8 @@ public class UserStatsDAO {
      * @param userId The id of the user
      * @return amount of killed mutants written by a user
      */
-    public int getNumKilledMutantsByUser(int userId) {
-        return getNumMutantsByUser(userId, false);
+    public int getNumKilledMutantsByUser(int userId, GameType gameType) {
+        return getNumMutantsByUser(userId, false, gameType);
     }
 
     /**
@@ -47,15 +69,31 @@ public class UserStatsDAO {
      * @param userId The id of the user
      * @return amount of alive mutants written by a user
      */
-    public int getNumAliveMutantsByUser(int userId) {
-        return getNumMutantsByUser(userId, true);
+    public int getNumAliveMutantsByUser(int userId, GameType gameType) {
+        return getNumMutantsByUser(userId, true, gameType);
     }
 
-    private int getNumMutantsByUser(int userId, boolean alive) {
-        final String query = "SELECT count(Mutant_ID) AS mutants "
-                + "FROM view_valid_mutants "
-                + "WHERE User_ID = ? "
-                + "AND Alive = ?;";
+    private String getViewForGameType(GameType gameType) {
+        switch (gameType) {
+            case MULTIPLAYER:
+                return "view_battleground_games";
+            case MELEE:
+                return "view_melee_games";
+            default:
+                throw new IllegalArgumentException("Unknown game type: " + gameType);
+        }
+    }
+
+    private int getNumMutantsByUser(int userId, boolean alive, GameType gameType) {
+        final String query = String.join("\n",
+                "SELECT count(Mutant_ID) AS mutants",
+                "FROM view_valid_mutants",
+                "JOIN " + getViewForGameType(gameType) + " AS g",
+                "ON view_valid_mutants.Game_ID = g.ID",
+                "WHERE User_ID = ?",
+                "AND Alive = ?;"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -72,28 +110,35 @@ public class UserStatsDAO {
     /**
      * Fetches the amount of tests written by a user that killed mutants.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return amount of killing tests written by a user
      */
-    public int getNumKillingTestsByUser(int userId) {
-        return getNumTestsByUser(userId, true);
+    public int getNumKillingTestsByUser(int userId, GameType gameType) {
+        return getNumTestsByUser(userId, gameType, true);
     }
 
     /**
      * Fetches the amount of tests written by a user that did not (yet) kill mutants.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return amount of non-killing tests written by a user
      */
-    public int getNumNonKillingTestsByUser(int userId) {
-        return getNumTestsByUser(userId, false);
+    public int getNumNonKillingTestsByUser(int userId, GameType gameType) {
+        return getNumTestsByUser(userId, gameType, false);
     }
 
-    private int getNumTestsByUser(int userId, boolean killingTest) {
-        final String query = "SELECT count(Test_ID) AS tests "
-                + "FROM view_valid_tests "
-                + "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?) "
-                + "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;";
+    private int getNumTestsByUser(int userId, GameType gameType, boolean killingTest) {
+        final String query = String.join("\n",
+                "SELECT count(Test_ID) AS tests",
+                "FROM view_valid_tests",
+                "JOIN " + getViewForGameType(gameType) + " AS g",
+                "ON view_valid_tests.Game_ID = g.ID",
+                "WHERE User_ID = ?",
+                "AND MutantsKilled " + (killingTest ? ">" : "=") + " 0;"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -109,28 +154,35 @@ public class UserStatsDAO {
     /**
      * Fetches the amount of points a given user received through a test on average.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return average points received through tests
      */
-    public double getAveragePointsTestByUser(int userId) {
-        return getPointsTestByUser(userId, true);
+    public double getAveragePointsTestByUser(int userId, GameType gameType) {
+        return getPointsTestByUser(userId, gameType, true);
     }
 
     /**
      * Fetches the amount of total points a given user received through all of their tests.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return total points received through tests
      */
-    public int getTotalPointsTestsByUser(int userId) {
-        return (int) getPointsTestByUser(userId, false);
+    public int getTotalPointsTestsByUser(int userId, GameType gameType) {
+        return (int) getPointsTestByUser(userId, gameType, false);
     }
 
-    private double getPointsTestByUser(int userId, boolean avg) {
+    private double getPointsTestByUser(int userId, GameType gameType, boolean avg) {
         final String acc = avg ? "avg" : "sum";
-        final String query = "SELECT " + acc + "(Points) AS points "
-                + "FROM view_valid_tests "
-                + "WHERE Player_ID IN (SELECT ID as Player_ID FROM view_players WHERE User_ID = ?);";
+        final String query = String.join("\n",
+                "SELECT " + acc + "(Points) AS points",
+                "FROM view_valid_tests",
+                "JOIN " + getViewForGameType(gameType) + " AS g",
+                "ON view_valid_tests.Game_ID = g.ID",
+                "WHERE User_ID = ?;"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -146,28 +198,35 @@ public class UserStatsDAO {
     /**
      * Fetches the amount of points a given user received through a mutant on average.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return average points received through mutants
      */
-    public double getAveragePointsMutantByUser(int userId) {
-        return getPointsMutantByUser(userId, true);
+    public double getAveragePointsMutantByUser(int userId, GameType gameType) {
+        return getPointsMutantByUser(userId, gameType, true);
     }
 
     /**
      * Fetches the amount of total points a given user received through all of their mutants.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return total points received through mutants
      */
-    public int getTotalPointsMutantByUser(int userId) {
-        return (int) getPointsMutantByUser(userId, false);
+    public int getTotalPointsMutantByUser(int userId, GameType gameType) {
+        return (int) getPointsMutantByUser(userId, gameType, false);
     }
 
-    private double getPointsMutantByUser(int userId, boolean avg) {
+    private double getPointsMutantByUser(int userId, GameType gameType, boolean avg) {
         final String acc = avg ? "avg" : "sum";
-        final String query = "SELECT " + acc + "(Points) AS points "
-                + "FROM view_valid_mutants "
-                + "WHERE User_ID = ?;";
+        final String query = String.join("\n",
+                "SELECT " + acc + "(Points) AS points",
+                "FROM view_valid_mutants",
+                "JOIN " + getViewForGameType(gameType) + " AS g",
+                "ON view_valid_mutants.Game_ID = g.ID",
+                "WHERE User_ID = ?;"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -183,35 +242,100 @@ public class UserStatsDAO {
     /**
      * Fetches the amount of total games a user played as attacker.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return games played as attacker
      */
-    public int getAttackerGamesByUser(int userId) {
-        return getGamesOfRoleByUser(userId, false);
+    public int getAttackerGamesByUser(int userId, GameType gameType) {
+        return getGamesOfRoleByUser(userId, gameType, Role.ATTACKER);
     }
 
     /**
      * Fetches the amount of total games a user played as defender.
      *
-     * @param userId The id of the user
+     * @param userId   The id of the user
+     * @param gameType The game type
      * @return games played as defender
      */
-    public int getDefenderGamesByUser(int userId) {
-        return getGamesOfRoleByUser(userId, true);
+    public int getDefenderGamesByUser(int userId, GameType gameType) {
+        return getGamesOfRoleByUser(userId, gameType, Role.DEFENDER);
     }
 
-    private int getGamesOfRoleByUser(int userId, boolean defender) {
-        final Role role = defender ? Role.DEFENDER : Role.ATTACKER;
-        final String query = "SELECT count(ID) AS games "
-                + "FROM view_players "
-                + "WHERE User_ID = ? "
-                + "AND Role = ?";
+    private int getGamesOfRoleByUser(int userId, GameType gameType, Role role) {
+        if (gameType == GameType.MELEE && (role == Role.DEFENDER || role == Role.ATTACKER)) {
+            logger.warn("Role {} is not used for game type {}", role, gameType);
+            return 0;
+        }
+
+        final String query = String.join("\n",
+                "SELECT count(view_players.Game_ID) AS games",
+                "FROM view_players",
+                "JOIN " + getViewForGameType(gameType) + " AS g",
+                "ON view_players.Game_ID = g.ID",
+                "WHERE User_ID = ? ",
+                "AND Role = ?"
+        );
+
         try {
             return queryRunner.query(
                     query,
                     resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
                     userId,
                     role.toString()
+            ).orElse(0);
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public UserStats.PuzzleStats getPuzzleStatsByUser(int userId) {
+        final String query = String.join("\n",
+                "SELECT puzzle_chapters.Position AS chapter, MAX(puzzles.Position) AS puzzle",
+                "FROM puzzles, puzzle_chapters, games",
+                "WHERE puzzles.Chapter_ID = puzzle_chapters.Chapter_ID",
+                "AND games.Puzzle_ID = puzzles.Puzzle_ID",
+                "AND games.Mode = ?",
+                "AND games.State = ?",
+                "AND games.Creator_ID = ?",
+                "GROUP BY puzzle_chapters.Position"
+        );
+
+        try {
+            return queryRunner.query(
+                    query,
+                    resultSet -> {
+                        final UserStats.PuzzleStats stats = new UserStats.PuzzleStats();
+                        while (resultSet.next()) {
+                            stats.addPuzzle(
+                                    resultSet.getInt("chapter"),
+                                    resultSet.getInt("puzzle")
+                            );
+                        }
+                        return stats;
+                    },
+                    GameMode.PUZZLE.toString(), GameState.SOLVED.toString(), userId
+            );
+        } catch (SQLException e) {
+            logger.error("SQLException while executing query", e);
+            throw new UncheckedSQLException("SQLException while executing query", e);
+        }
+    }
+
+    public int getTotalGamesByUser(int userId, GameType gameType) {
+        final String query = String.join("\n",
+                "SELECT count(view_players.Game_ID) AS games",
+                "FROM view_players",
+                "JOIN " + getViewForGameType(gameType) + " AS g",
+                "ON view_players.Game_ID = g.ID",
+                "WHERE User_ID = ? "
+        );
+
+        try {
+            return queryRunner.query(
+                    query,
+                    resultSet -> oneFromRS(resultSet, rs -> rs.getInt("games")),
+                    userId
             ).orElse(0);
         } catch (SQLException e) {
             logger.error("SQLException while executing query", e);

@@ -25,19 +25,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.enterprise.inject.Produces;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -52,11 +57,28 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore({
+        // The next are required so that the Weld rule works properly with PowerMock
+        "org.jboss.weld.*",
+        "javax.enterprise.inject.*",
+        "javax.xml.*",
+        "org.apache.xerces.*",
+})
 @PrepareForTest({GameDAO.class, GameClassDAO.class, MultiplayerGame.class, MultiplayerGameDAO.class})
 public class MutantTest {
 
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
+    @Rule
+    public WeldInitiator weld = WeldInitiator.of(MutantTest.class);
+
+    @Produces
+    public Configuration produceConfiguration() {
+        return new Configuration() {};
+    }
+
 
     @org.junit.Test
     public void testApplyPatch() throws IOException, PatchFailedException {

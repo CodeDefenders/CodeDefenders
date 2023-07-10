@@ -56,8 +56,8 @@ import com.google.gson.annotations.Expose;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod.RANDOM;
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MELEE;
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
+import static org.codedefenders.game.GameType.MELEE;
+import static org.codedefenders.game.GameType.MULTIPLAYER;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 

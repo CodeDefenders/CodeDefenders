@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
@@ -52,7 +53,6 @@ import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.test.TestCompiledEvent;
 import org.codedefenders.notification.events.server.test.TestTestedOriginalEvent;
 import org.codedefenders.util.CDIUtil;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.util.URLUtils;
@@ -68,7 +68,6 @@ import testsmell.TestSmellDetector;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.TESTS_DIR;
 
 /**
  * This class offers utility methods used by servlets managing active
@@ -111,6 +110,9 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private INotificationService notificationService;
 
+    @Inject
+    private Configuration config;
+
     /**
      * {@inheritDoc}
      */
@@ -144,7 +146,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         GameClass classMutated = GameClassDAO.getClassForId(classId);
         String classMutatedBaseName = classMutated.getBaseName();
 
-        Path path = Paths.get(Constants.MUTANTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId));
+        Path path = Paths.get(config.getMutantDir().getAbsolutePath(), subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId));
         File newMutantDir = FileUtils.getNextSubDir(path);
 
         logger.debug("NewMutantDir: {}", newMutantDir.getAbsolutePath());
@@ -175,7 +177,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             throws IOException {
         GameClass cut = GameClassDAO.getClassForId(classId);
 
-        Path path = Paths.get(TESTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
+        Path path = Paths.get(config.getTestsDir().getAbsolutePath(), subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
         File newTestDir = FileUtils.getNextSubDir(path);
 
         String javaFile = FileUtils.createJavaTestFile(newTestDir, cut.getBaseName(), testText);

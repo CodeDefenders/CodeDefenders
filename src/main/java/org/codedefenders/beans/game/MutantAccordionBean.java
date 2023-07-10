@@ -1,12 +1,11 @@
 package org.codedefenders.beans.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -15,11 +14,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.text.StringEscapeUtils;
-import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
 import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.MutantDTO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
@@ -27,9 +26,6 @@ import org.codedefenders.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
@@ -50,75 +46,33 @@ public class MutantAccordionBean {
 
     @Inject
     public MutantAccordionBean(GameService gameService, CodeDefendersAuth login, GameProducer gameProducer) {
-        this.game = gameProducer.getGame();
-
+        game = gameProducer.getGame();
         mutantList = gameService.getMutants(login.getUserId(), game.getId());
 
+        GameClass cut = game.getCUT();
+        List<MethodDescription> methodDescriptions = cut.getMethodDescriptions();
+        GameAccordionMapping mapping = GameAccordionMapping.computeForMutants(methodDescriptions, mutantList);
+
         categories = new ArrayList<>();
+        categories.add(
+                new MutantAccordionCategory(
+                        "All Mutants",
+                        GameAccordionMapping.ALL_CATEGORY_ID,
+                        mapping.allElements));
+        categories.add(
+                new MutantAccordionCategory(
+                        "Mutants outside methods",
+                        GameAccordionMapping.OUTSIDE_METHODS_CATEGORY_ID,
+                        mapping.elementsOutsideMethods));
 
-        MutantAccordionCategory allMutants = new MutantAccordionCategory("All Mutants", "all");
-        allMutants.addMutantIds(getMutants().stream().map(MutantDTO::getId).collect(Collectors.toList()));
-        categories.add(allMutants);
-
-        MutantAccordionCategory mutantsWithoutMethod =
-                new MutantAccordionCategory("Mutants outside methods", "noMethod");
-        categories.add(mutantsWithoutMethod);
-
-        List<MethodDescription> methodDescriptions = game.getCUT().getMethodDescriptions();
-        List<MutantAccordionCategory> methodCategories = new ArrayList<>();
         for (int i = 0; i < methodDescriptions.size(); i++) {
-            methodCategories.add(new MutantAccordionCategory(methodDescriptions.get(i), String.valueOf(i)));
-        }
-        categories.addAll(methodCategories);
+            MethodDescription method = methodDescriptions.get(i);
 
-        if (methodCategories.isEmpty()) {
-            return;
-        }
+            String description = method.getDescription();
+            String id = Integer.toString(i);
+            SortedSet<Integer> testIds = mapping.elementsPerMethod.get(method);
 
-        /* Map ranges of methods to their test accordion infos. */
-        @SuppressWarnings("UnstableApiUsage")
-        RangeMap<Integer, MutantAccordionCategory> methodRanges = TreeRangeMap.create();
-        for (MutantAccordionCategory method : methodCategories) {
-            //noinspection UnstableApiUsage
-            methodRanges.put(Range.closed(method.startLine, method.endLine), method);
-        }
-
-        //noinspection UnstableApiUsage
-        Range<Integer> beforeFirst = Range.closedOpen(0, methodRanges.span().lowerEndpoint());
-
-
-        /* For every test, go through all covered lines and find the methods that are covered by it. */
-        for (MutantDTO mutant : mutantList) {
-
-            /* Save the last range a line number fell into to avoid checking a line number in the same method twice. */
-            Range<Integer> lastRange = null;
-
-            boolean belongsMethod = false;
-
-            for (Integer line : mutant.getLines()) {
-
-                /* Skip if line falls into a method that was already considered. */
-                if (lastRange != null && lastRange.contains(line)) {
-                    continue;
-                }
-
-                Map.Entry<Range<Integer>, MutantAccordionCategory> entry = methodRanges.getEntry(line);
-
-                /* Line does not belong to any method. */
-                if (entry == null) {
-                    lastRange = beforeFirst;
-
-                    /* Line belongs to a method. */
-                } else {
-                    lastRange = entry.getKey();
-                    belongsMethod = true;
-                    entry.getValue().addMutantId(mutant.getId());
-                }
-            }
-
-            if (!belongsMethod) {
-                mutantsWithoutMethod.addMutantId(mutant.getId());
-            }
+            categories.add(new MutantAccordionCategory(description, id, testIds));
         }
     }
 
@@ -158,31 +112,15 @@ public class MutantAccordionBean {
     public static class MutantAccordionCategory {
         @Expose
         private String description;
-        private Integer startLine;
-        private Integer endLine;
-        @Expose
-        private Set<Integer> mutantIds;
         @Expose
         private String id;
+        @Expose
+        private SortedSet<Integer> mutantIds;
 
-        public MutantAccordionCategory(String description, String id) {
+        public MutantAccordionCategory(String description, String id, SortedSet<Integer> mutantIds) {
             this.description = description;
-            this.mutantIds = new HashSet<>();
             this.id = id;
-        }
-
-        public MutantAccordionCategory(MethodDescription methodDescription, String id) {
-            this(methodDescription.getDescription(), id);
-            this.startLine = methodDescription.getStartLine();
-            this.endLine = methodDescription.getEndLine();
-        }
-
-        public void addMutantId(int mutantId) {
-            this.mutantIds.add(mutantId);
-        }
-
-        public void addMutantIds(Collection<Integer> mutantIds) {
-            this.mutantIds.addAll(mutantIds);
+            this.mutantIds = mutantIds;
         }
 
         public String getDescription() {

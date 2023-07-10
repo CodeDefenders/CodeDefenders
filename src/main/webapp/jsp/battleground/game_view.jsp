@@ -67,7 +67,7 @@
 <%
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
 
-    switch (role){
+    switch (role) {
         case ATTACKER:
             if (openEquivalenceDuel) { %>
                 <jsp:include page="/jsp/battleground/equivalence_view.jsp"/>

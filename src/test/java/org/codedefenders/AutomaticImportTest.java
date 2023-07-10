@@ -22,6 +22,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
 import org.codedefenders.analysis.gameclass.ClassCodeAnalyser;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.TestingFramework;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.mock;
 
 public class AutomaticImportTest {
 
+    // Required for mocking Configuration, which is loaded into a static field of FileUtils, required by GameClass.
     @Rule
     public WeldInitiator weld = WeldInitiator
             .from(AutomaticImportTest.class,
@@ -47,6 +49,11 @@ public class AutomaticImportTest {
             .inject(this)
             .activate(ApplicationScoped.class)
             .build();
+
+    @Produces
+    public Configuration produceConfiguration() {
+        return new Configuration() {};
+    }
 
     @ApplicationScoped
     @Produces

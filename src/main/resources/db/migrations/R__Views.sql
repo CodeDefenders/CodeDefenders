@@ -82,8 +82,10 @@ FROM players AS p,
 WHERE p.User_ID = u.User_ID;
 
 CREATE OR REPLACE VIEW `view_valid_tests` AS
-SELECT *
+SELECT tests.*, users.User_ID
 FROM tests
+         LEFT JOIN players ON players.ID = tests.Player_ID AND tests.Game_ID = players.Game_ID
+         LEFT JOIN users ON players.User_ID = users.User_ID
 WHERE tests.ClassFile IS NOT NULL
   AND EXISTS(
         SELECT *

@@ -43,8 +43,8 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import com.google.common.collect.Sets;
 
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MELEE;
-import static org.codedefenders.beans.admin.StagedGameList.GameSettings.GameType.MULTIPLAYER;
+import static org.codedefenders.game.GameType.MELEE;
+import static org.codedefenders.game.GameType.MULTIPLAYER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;

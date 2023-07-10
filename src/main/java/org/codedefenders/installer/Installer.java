@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import org.codedefenders.analysis.coverage.CoverageGenerator;
+import org.codedefenders.configuration.Configuration;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
@@ -83,18 +84,19 @@ public class Installer {
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
     private final BackendExecutorService backend;
-
     private final CoverageGenerator coverageGenerator;
-
     private final KillMapService killMapService;
+    private final Configuration config;
 
     @Inject
     public Installer(BackendExecutorService backend,
                      CoverageGenerator coverageGenerator,
-                     KillMapService killMapService) {
+                     KillMapService killMapService,
+            @SuppressWarnings("CdiInjectionPointsInspection") Configuration config) {
         this.backend = backend;
         this.coverageGenerator = coverageGenerator;
         this.killMapService = killMapService;
+        this.config = config;
     }
 
     /**
@@ -218,7 +220,7 @@ public class Installer {
 
         String fileContent = new String(Files.readAllBytes(cutFile.toPath()), Charset.defaultCharset());
 
-        Path cutDir = Paths.get(Constants.CUTS_DIR, classAlias);
+        Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
         String cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
         String cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
         String classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
@@ -265,7 +267,7 @@ public class Installer {
 
         String mutantFileContent = new String(Files.readAllBytes(mutantFile.toPath()), Charset.defaultCharset());
 
-        Path cutDir = Paths.get(Constants.CUTS_DIR, classAlias);
+        Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
         Path folderPath = cutDir.resolve(Constants.CUTS_MUTANTS_DIR).resolve(String.valueOf(targetPosition));
         String javaFilePath = FileUtils.storeFile(folderPath, mutantFileName, mutantFileContent).toString();
         String classFilePath = Compiler.compileJavaFileForContent(javaFilePath, mutantFileContent);
@@ -307,7 +309,7 @@ public class Installer {
 
         String testFileContent = new String(Files.readAllBytes(testFile.toPath()), Charset.defaultCharset());
 
-        Path cutDir = Paths.get(Constants.CUTS_DIR, classAlias);
+        Path cutDir = Paths.get(config.getSourcesDir().getAbsolutePath(), classAlias);
         Path folderPath = cutDir.resolve(Constants.CUTS_TESTS_DIR).resolve(String.valueOf(targetPosition));
         Path javaFilePath = FileUtils.storeFile(folderPath, testFileName, testFileContent);
         String classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath.toString(),

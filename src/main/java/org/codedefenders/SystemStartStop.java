@@ -30,9 +30,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.codedefenders.configuration.Configuration;
 import org.codedefenders.configuration.ConfigurationValidationException;
-import org.codedefenders.cron.GameCronJobManager;
-import org.codedefenders.execution.KillMapProcessor;
-import org.codedefenders.execution.ThreadPoolManager;
+import org.codedefenders.cron.CronJobManager;
 import org.codedefenders.instrumentation.MetricsRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,21 +43,16 @@ import net.bull.javamelody.ReportServlet;
 public class SystemStartStop implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(SystemStartStop.class);
 
-    @Inject
-    private ThreadPoolManager mgr;
-
     @SuppressWarnings("CdiInjectionPointsInspection")
     @Inject
     private Configuration config;
 
     @Inject
-    GameCronJobManager gameCronJobManager;
+    private CronJobManager cronJobManager;
 
     @Inject
     private MetricsRegistry metricsRegistry;
 
-    @Inject
-    private KillMapProcessor killMapProcessor;
 
     /**
      * This method is called when the servlet context is initialized(when
@@ -75,8 +68,6 @@ public class SystemStartStop implements ServletContextListener {
             throw new RuntimeException("Invalid configuration! Reason: " + e.getMessage(), e);
         }
 
-        mgr.register("test-executor").withCore(config.getNumberOfParallelAntExecutions()).add();
-
         if (config.isMetricsCollectionEnabled()) {
             metricsRegistry.registerDefaultCollectors();
             sce.getServletContext().addServlet("prom", new MetricsServlet()).addMapping("/metrics");
@@ -85,9 +76,7 @@ public class SystemStartStop implements ServletContextListener {
             sce.getServletContext().addServlet("javamelody", new ReportServlet()).addMapping("/monitoring");
         }
 
-        gameCronJobManager.startup();
-
-        killMapProcessor.start();
+        cronJobManager.startup();
     }
 
     /**
@@ -116,6 +105,6 @@ public class SystemStartStop implements ServletContextListener {
             }
         }
 
-        // The ThreadPoolManager should be able to automatically stop the instances
+        // The ExecutorServiceProvider should be able to automatically stop the instances
     }
 }

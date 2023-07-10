@@ -1,9 +1,30 @@
+/*
+ * Copyright (C) 2023 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.beans.user;
+
+import java.util.Map;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.RequestScoped;
 
 import org.codedefenders.dto.UserStats;
+import org.codedefenders.game.GameType;
 import org.codedefenders.model.UserEntity;
 
 /**
@@ -13,8 +34,9 @@ import org.codedefenders.model.UserEntity;
 @ManagedBean
 public class UserProfileBean {
     private UserEntity user;
-    private UserStats stats;
+    private Map<GameType, UserStats> stats;
     private boolean isSelf;
+    private UserStats.PuzzleStats puzzleStats;
 
     /**
      * Show the profile page for this user.
@@ -26,9 +48,10 @@ public class UserProfileBean {
 
     /**
      * Statistics of {@link UserProfileBean#getUser()}.
+     *
      * @return the user statistics shown on the profile page.
      */
-    public UserStats getStats() {
+    public Map<GameType, UserStats> getStats() {
         return stats;
     }
 
@@ -44,11 +67,19 @@ public class UserProfileBean {
         this.user = user;
     }
 
-    public void setStats(UserStats userStats) {
+    public void setStats(Map<GameType, UserStats> userStats) {
         this.stats = userStats;
     }
 
     public void setSelf(boolean self) {
         isSelf = self;
+    }
+
+    public UserStats.PuzzleStats getPuzzleStats() {
+        return puzzleStats;
+    }
+
+    public void setPuzzleStats(UserStats.PuzzleStats puzzleStats) {
+        this.puzzleStats = puzzleStats;
     }
 }

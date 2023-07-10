@@ -1,13 +1,13 @@
 package org.codedefenders.beans.game;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -17,6 +17,7 @@ import org.codedefenders.analysis.gameclass.MethodDescription;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.dto.TestDTO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameAccordionMapping;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.games.GameProducer;
@@ -24,9 +25,6 @@ import org.codedefenders.util.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Range;
-import com.google.common.collect.RangeMap;
-import com.google.common.collect.TreeRangeMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
@@ -56,70 +54,31 @@ public class TestAccordionBean {
     @Inject
     public TestAccordionBean(CodeDefendersAuth login, GameService gameService, GameProducer gameProducer) {
         AbstractGame game = gameProducer.getGame();
-
-        GameClass cut = game.getCUT();
         List<TestDTO> testsList = gameService.getTests(login.getUserId(), game.getId());
 
-        tests = new HashMap<>();
-        categories = new ArrayList<>();
-
-        for (TestDTO test : testsList) {
-            tests.put(test.getId(), test);
-        }
-
-        TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
-        allTests.addTestIds(tests.keySet());
-
+        GameClass cut = game.getCUT();
         List<MethodDescription> methodDescriptions = cut.getMethodDescriptions();
-        List<TestAccordionCategory> methodCategories = new ArrayList<>();
+        GameAccordionMapping mapping = GameAccordionMapping.computeForTests(methodDescriptions, testsList);
+
+        categories = new ArrayList<>();
+        categories.add(
+                new TestAccordionCategory(
+                        "All Tests",
+                        GameAccordionMapping.ALL_CATEGORY_ID,
+                        mapping.allElements));
+
         for (int i = 0; i < methodDescriptions.size(); i++) {
-            methodCategories.add(new TestAccordionCategory(methodDescriptions.get(i), String.valueOf(i)));
+            MethodDescription method = methodDescriptions.get(i);
+
+            String description = method.getDescription();
+            String id = Integer.toString(i);
+            SortedSet<Integer> testIds = mapping.elementsPerMethod.get(method);
+
+            categories.add(new TestAccordionCategory(description, id, testIds));
         }
 
-        categories.add(allTests);
-        categories.addAll(methodCategories);
-
-        if (methodCategories.isEmpty()) {
-            return;
-        }
-
-        /* Map ranges of methods to their test accordion infos. */
-        @SuppressWarnings("UnstableApiUsage")
-        RangeMap<Integer, TestAccordionCategory> methodRanges = TreeRangeMap.create();
-        for (TestAccordionCategory method : methodCategories) {
-            //noinspection UnstableApiUsage
-            methodRanges.put(Range.closed(method.startLine, method.endLine), method);
-        }
-
-        //noinspection UnstableApiUsage
-        Range<Integer> beforeFirst = Range.closedOpen(0, methodRanges.span().lowerEndpoint());
-
-        /* For every test, go through all covered lines and find the methods that are covered by it. */
-        for (TestDTO test : testsList) {
-
-            /* Save the last range a line number fell into to avoid checking a line number in the same method twice. */
-            Range<Integer> lastRange = null;
-
-            for (Integer line : test.getLinesCovered()) {
-
-                /* Skip if line falls into a method that was already considered. */
-                if (lastRange != null && lastRange.contains(line)) {
-                    continue;
-                }
-
-                Map.Entry<Range<Integer>, TestAccordionCategory> entry = methodRanges.getEntry(line);
-
-                /* Line does not belong to any method. */
-                if (entry == null) {
-                    lastRange = beforeFirst;
-
-                    /* Line belongs to a method. */
-                } else {
-                    lastRange = entry.getKey();
-                    entry.getValue().addTestId(test.getId());
-                }
-            }
-        }
+        tests = testsList.stream()
+                .collect(Collectors.toMap(TestDTO::getId, Function.identity()));
     }
 
     // --------------------------------------------------------------------------------
@@ -159,31 +118,15 @@ public class TestAccordionBean {
     public static class TestAccordionCategory {
         @Expose
         private String description;
-        private Integer startLine;
-        private Integer endLine;
-        @Expose
-        private Set<Integer> testIds;
         @Expose
         private String id;
+        @Expose
+        private SortedSet<Integer> testIds;
 
-        public TestAccordionCategory(String description, String id) {
+        public TestAccordionCategory(String description, String id, SortedSet<Integer> testIds) {
             this.description = description;
-            this.testIds = new HashSet<>();
             this.id = id;
-        }
-
-        public TestAccordionCategory(MethodDescription methodDescription, String id) {
-            this(methodDescription.getDescription(), id);
-            this.startLine = methodDescription.getStartLine();
-            this.endLine = methodDescription.getEndLine();
-        }
-
-        public void addTestId(int testId) {
-            this.testIds.add(testId);
-        }
-
-        public void addTestIds(Collection<Integer> testIds) {
-            this.testIds.addAll(testIds);
+            this.testIds = testIds;
         }
 
         public String getDescription() {
