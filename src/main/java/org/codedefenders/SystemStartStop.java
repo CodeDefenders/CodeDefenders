@@ -80,6 +80,9 @@ public class SystemStartStop implements ServletContextListener {
             sce.getServletContext().addServlet("javamelody", new ReportServlet()).addMapping("/monitoring");
         }
 
+        sce.getServletContext().setRequestCharacterEncoding("UTF-8");
+        sce.getServletContext().setResponseCharacterEncoding("UTF-8");
+
         cronJobManager.startup();
         achievementService.registerEventHandler();
     }
