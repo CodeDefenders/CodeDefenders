@@ -65,6 +65,9 @@ E.g. all `cluster.*` related properties (inclusive `force.local.execution`) are 
 Changing the `CODEDEFENDERS_DB_*` variables after creating the container for the first time requires you to update the settings in the database container manually.  
 Otherwise, you have to destroy the [volumes](#persistence).
 
+**NOTE:**  
+The container supports the intentionally undocumented `CODEDEFENDERS_TOMCAT_LISTENING_PORT` variable to change the port the tomcat server in the container binds to.  
+It can be used to prevent port collisions for setups were the codedefenders containers are run with the (less secure) `--network=host` option.
 
 ### Persistence
 

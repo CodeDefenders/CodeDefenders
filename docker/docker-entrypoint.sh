@@ -18,8 +18,13 @@ gen_tomcat_users() {
     echo '</tomcat-users>' >> "${FILE}"
 }
 
+config_tomcat_listening_port() {
+    sed -i -E -e "$(printf 's|^(.*<Connector port=")[0-9]*(" protocol="HTTP/1.1".*)$|\\1%d\\2|' "$1")" /etc/tomcat9/server.xml
+}
+
 main() {
     gen_tomcat_users "/etc/tomcat9/tomcat-users.xml" "${CODEDEFENDERS_ADMIN_USERNAME}" "${CODEDEFENDERS_AUTH_ADMIN_ROLE:-"codedefenders-admin"}"
+    config_tomcat_listening_port "${CODEDEFENDERS_TOMCAT_LISTENING_PORT:-8080}"
 }
 
 main
