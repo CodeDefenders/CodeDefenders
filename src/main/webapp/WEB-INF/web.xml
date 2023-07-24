@@ -66,6 +66,11 @@
 	</context-param>
 
 	<filter>
+		<filter-name>PathFilter</filter-name>
+		<filter-class>org.codedefenders.PathFilter</filter-class>
+	</filter>
+
+	<filter>
 		<filter-name>ShiroFilter</filter-name>
 		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
 	</filter>
@@ -88,9 +93,15 @@
 	<!-- End Filter Declarations -->
 
 	<!-- Begin Filter Mapping/Ordering -->
+	<filter-mapping>
+		<filter-name>PathFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 	<!-- You will most likely want this to be the first filter in the chain
 	(therefore the first <filter-mapping> in the web.xml file), so that you can get
 	the most accurate measurement of latency. -->
+	<!-- I've put PathFilter first, so redirected requests don't show up twice in the metrics. -Marvin -->
 	<filter-mapping> <!-- See: @WebFilter annotated class with same name -->
 		<filter-name>metricsFilter</filter-name>
 		<url-pattern>/*</url-pattern>
