@@ -84,36 +84,47 @@
                     </td>
                     <td><%=gamesWithClass%></td>
                     <td>
-                        <%
-                            if (deletable) {
-                        %>
+                        <div class="d-flex flex-row gap-1">
+                            <%
+                                if (active) {
+                            %>
+                                <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
+                                    <input type="hidden" name="formType" value="setClassInactive">
+                                    <button class="btn btn-sm btn-danger" id="<%="active_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
+                                            title="Set class as inactive. This class won't be available for games afterwards."
+                                            onclick="return confirm('Are you sure you want to set class \'<%=name%>\' to inactive?');">
+                                        <i class="fa fa-power-off"></i>
+                                    </button>
+                                </form>
+                            <%
+                                } else {
+                            %>
+                                <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
+                                    <input type="hidden" name="formType" value="setClassActive">
+                                    <button class="btn btn-sm btn-success" id="<%="inactive_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
+                                            title="Set class as active. This class will be available for games afterwards again."
+                                            onclick="return confirm('Are you sure you want to set class \'<%=name%>\' to active?');">
+                                        <i class="fa fa-power-off"></i>
+                                    </button>
+                                </form>
+                            <%
+                                }
+                            %>
                             <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
                                 <input type="hidden" name="formType" value="classRemoval">
                                 <button class="btn btn-sm btn-danger" id="<%="delete_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
-                                        title="Delete class from the system. This class won't be available for games afterwards."
-                                        onclick="return confirm('Are you sure you want to delete class \'<%=name%>\' forever? This cannot be undone.');">
+                                        <% if (deletable) { %>
+                                            title="Delete class from the system. This class won't be available for games afterwards."
+                                            onclick="return confirm('Are you sure you want to delete class \'<%=name%>\' forever? This cannot be undone.');"
+                                        <% } else { %>
+                                            disabled
+                                            title="Class can't be deleted, since games were already played on it."
+                                        <% } %>
+                                    >
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </form>
-                        <%
-                            } else {
-                        %>
-                            <form id="manageClass_<%=classId%>" action="${url.forPath(Paths.ADMIN_CLASSES)}" method="post">
-                                <input type="hidden" name="formType" value="classInactive">
-
-                                <button class="btn btn-sm btn-danger" id="<%="inactive_class_"+classId%>" type="submit" value="<%=classId%>" name="classId"
-                                        <% if (!active) { %>
-                                            title="Class is already inactive." disabled
-                                        <% } else { %>
-                                            title="Set class as inactive. This class won't be available for games afterwards."
-                                        <% } %>
-                                        onclick="return confirm('Are you sure you want to set class \'<%=name%>\' to inactive?');">
-                                    <i class="fa fa-power-off"></i>
-                                </button>
-                            </form>
-                        <%
-                            }
-                        %>
+                        </div>
                     </td>
                 </tr>
             <%

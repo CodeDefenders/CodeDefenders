@@ -65,20 +65,25 @@ public class AdminClassesManagement extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final String formType = ServletUtils.formType(request);
         switch (formType) {
-            case "classInactive": {
+            case "setClassInactive":
+            case "setClassActive": {
+                boolean active = formType.equals("setClassActive");
+                String newState = active ? "active" : "inactive";
+
                 final Optional<Integer> classId = ServletUtils.getIntParameter(request, "classId");
                 if (!classId.isPresent()) {
-                    logger.warn("Setting class as inactive failed. Missing request parameter 'classId'.");
-                    messages.add("Failed to set class as inactive.");
+                    logger.warn("Setting class as " + newState + " failed. Missing request parameter 'classId'.");
+                    messages.add("Failed to set class as " + newState + ".");
+                    break;
+                }
+
+                logger.info("Setting class as " + newState + "...");
+                if (setClassActive(classId.get(), active)) {
+                    logger.info("Successfully set class as " + newState + "!");
+                    messages.add("Successfully set class as " + newState + "!");
                 } else {
-                    logger.info("Setting class as inactive...");
-                    if (setClassInactive(classId.get())) {
-                        logger.info("Successfully set class as inactive!");
-                        messages.add("Successfully set class as inactive!");
-                    } else {
-                        logger.info("Failed to set class as inactive!");
-                        messages.add("Failed to set class as inactive!");
-                    }
+                    logger.info("Failed to set class as " + newState + "!");
+                    messages.add("Failed to set class as " + newState + "!");
                 }
                 break;
             }
@@ -112,12 +117,12 @@ public class AdminClassesManagement extends HttpServlet {
         response.sendRedirect(url.forPath(Paths.ADMIN_CLASSES));
     }
 
-    private boolean setClassInactive(int classId) {
+    private boolean setClassActive(int classId, boolean active) {
         final GameClass gameClass = GameClassDAO.getClassForId(classId);
         if (gameClass == null || gameClass.isPuzzleClass()) {
             return false;
         }
-        gameClass.setActive(false);
+        gameClass.setActive(active);
         return gameClass.update();
     }
 
