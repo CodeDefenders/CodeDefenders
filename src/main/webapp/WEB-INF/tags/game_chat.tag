@@ -8,7 +8,7 @@
 
 <link href="${url.forPath("/css/specific/game_chat.css")}" rel="stylesheet">
 
-<div id="chat" style="position: fixed; left: 0; bottom: 0; z-index: 11;" hidden>
+<div id="chat" class="rounded-3 shadow-sm" style="position: fixed; left: 0; bottom: 0; z-index: 11;" hidden>
     <div class="card m-0">
         <c:choose>
             <c:when test="${gameChat.showTabs}">
