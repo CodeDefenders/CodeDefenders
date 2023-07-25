@@ -226,38 +226,45 @@ class MutantAccordion {
         /* Bind "this" to safely use it in callback functions. */
         const self = this;
 
-        /* Setup filter functionality for mutant-accordion */
+        /* Setup filter functionality for mutant-accordion. */
         document.getElementById('ma-filter')
                 .addEventListener('change', function(event) {
                     const selectedCategory = event.target.value;
-
-                    const searchFunction = (settings, renderedData, index, data, counter) => {
-                        /* Let this only affect mutant accordion tables. */
-                        if (!settings.nTable.id.startsWith('ma-table-')) {
-                            return true;
-                        }
-
-                        return selectedCategory === 'ALL'
-                                || data.state === selectedCategory;
-                    }
-
-                    DataTable.ext.search.push(searchFunction);
-
-                    for (const category of self._categories) {
-                        self._dataTablesByCategory.get(category.id).draw();
-
-                        const filteredMutants = category.mutantIds
-                                .map(self._mutants.get, self._mutants)
-                                .filter(mutant => selectedCategory === 'ALL'
-                                        || mutant.state === selectedCategory);
-
-                        document.getElementById('ma-count-' + category.id).innerText = filteredMutants.length;
-                    }
-
-                    /* Remove search function again after tables have been filtered. */
-                    DataTable.ext.search.splice(DataTable.ext.search.indexOf(searchFunction), 1);
-                })
+                    self.filterMutants(selectedCategory);
+                });
     }
+
+    /**
+     * Filter displayed mutants according to the given equivalence state / category.
+     * @param {string} state The equivalence state / category to display.
+     */
+    filterMutants (state) {
+        const searchFunction = (settings, renderedData, index, data, counter) => {
+            /* Let this only affect mutant accordion tables. */
+            if (!settings.nTable.id.startsWith('ma-table-')) {
+                return true;
+            }
+
+            return state === 'ALL'
+                    || data.state === state;
+        }
+
+        DataTable.ext.search.push(searchFunction);
+
+        for (const category of this._categories) {
+            this._dataTablesByCategory.get(category.id).draw();
+
+            const filteredMutants = category.mutantIds
+                    .map(this._mutants.get, this._mutants)
+                    .filter(mutant => state === 'ALL'
+                            || mutant.state === state);
+
+            document.getElementById('ma-count-' + category.id).innerText = filteredMutants.length;
+        }
+
+        /* Remove search function again after tables have been filtered. */
+        DataTable.ext.search.splice(DataTable.ext.search.indexOf(searchFunction), 1);
+    };
 
     /** @private */
     _renderId (data) {
