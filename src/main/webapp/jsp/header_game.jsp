@@ -73,8 +73,51 @@
 <link href="${url.forPath("/css/specific/game.css")}" rel="stylesheet">
 
 <div id="game-container" class="container-fluid"> <%-- closed in footer --%>
-    <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
-        <h2 class="m-0">${pageInfo.pageTitle}</h2>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+        <%
+            String modeText = "Unknown Mode";
+            String modeBg = "bg-secondary";
+            switch (game.getMode()) {
+                case PARTY:
+                    modeText = "Battleground";
+                    modeBg = "bg-battleground";
+                    break;
+                case MELEE:
+                    modeText = "Melee";
+                    modeBg = "bg-player";
+                    break;
+            }
+
+            String roleText = role.getFormattedString();
+            String roleBg = "bg-secondary";
+            switch (role) {
+                case ATTACKER:
+                    roleBg = "bg-attacker";
+                    break;
+                case DEFENDER:
+                    roleBg = "bg-defender";
+                    break;
+                case PLAYER:
+                    roleBg = "bg-player";
+                    break;
+            }
+        %>
+        <div class="d-flex gap-1 align-items-center">
+            <h2 class="m-0 me-2 mt-1">
+                Game
+                <span class="font-monospace text-muted">#<%=game.getId()%></span>
+            </h2>
+            <span class="badge fs-5 rounded-pill <%=modeBg%>" title="Game Mode: <%=modeText%>">
+                <i class="fa fa-play-circle"></i>
+                <%=modeText%>
+            </span>
+            <span class="badge fs-5 rounded-pill <%=roleBg%>" title="Your Role: <%=roleText%>">
+                <i class="fa fa-user-circle"></i>
+                <%=roleText%>
+            </span>
+        </div>
+
         <div class="d-flex flex-wrap align-items-center gap-2">
 
             <%
