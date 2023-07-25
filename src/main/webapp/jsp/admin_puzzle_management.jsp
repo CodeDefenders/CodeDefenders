@@ -63,11 +63,12 @@
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
         import $ from '${url.forPath("/js/jquery.mjs")}';
 
-        import {PuzzleAPI} from '${url.forPath("/js/codedefenders_main.mjs")}';
-
+        import {PuzzleAPI, DeferredPromise} from '${url.forPath("/js/codedefenders_main.mjs")}';
 
         let puzzleTable = null;
         let chapterTable = null;
+        let puzzleTablePromise = new DeferredPromise();
+        let chapterTablePromise = new DeferredPromise();
 
         $(document).ready(async function() {
             const puzzleData = await PuzzleAPI.fetchPuzzleData();
@@ -131,8 +132,8 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                            onclick="updatePuzzleChapter(\${chapter.id}, \${meta.row})">
+                    <button type="button" class="btn btn-primary updatePuzzleChapter" data-bs-dismiss="modal"
+                            data-chapter-id="\${chapter.id}">
                         Update
                     </button>
                 </div>
@@ -148,8 +149,8 @@
                             "data": null,
                             "defaultContent": "",
                             "render": function(data, type, row, meta) {
-                                return `<button class="btn btn-sm btn-danger"
-                                           onclick="removePuzzleChapter(\${data.id}, \${meta.row}, \${meta.col});">
+                                return `<button class="btn btn-sm btn-danger removePuzzleChapter"
+                                           data-chapter-id="\${data.id}">
                                            <i class="fa fa-trash"></i>
                                        </button>`;
                             },
@@ -162,6 +163,7 @@
                     "language": {"info": "Showing _TOTAL_ entries"},
                     "order": [[ 1, "asc" ]]
                 });
+                chapterTablePromise.resolve();
             }
 
             const puzzles = puzzleData.puzzles;
@@ -254,8 +256,8 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                            onclick="updatePuzzle(\${puzzle.id}, \${meta.row})">
+                    <button type="button" class="btn btn-primary updatePuzzle" data-bs-dismiss="modal"
+                            data-puzzle-id="\${puzzle.id}">
                         Update
                     </button>
                 </div>
@@ -271,8 +273,8 @@
                             "data": null,
                             "defaultContent": "",
                             "render": function(data, type, row, meta) {
-                                return `<button class="btn btn-sm btn-danger"
-                                           onclick="removePuzzle(\${data.id}, \${meta.row}, \${meta.col});">
+                                return `<button class="btn btn-sm btn-danger removePuzzle"
+                                           data-puzzle-id="\${data.id}">
                                            <i class="fa fa-trash"></i>
                                        </button>`;
                             },
@@ -285,6 +287,7 @@
                     "language": {"info": "Showing _TOTAL_ entries"},
                     "order": [[ 1, "asc" ], [ 2, "asc" ]]
                 });
+                puzzleTablePromise.resolve();
             }
         });
 
@@ -315,7 +318,7 @@
             });
         }
 
-        function removePuzzleChapter(puzzleChapterId, row, column) {
+        function removePuzzleChapter(puzzleChapterId, row) {
             let confirmResult = confirm('Are you sure you want to delete puzzle chapter ' + puzzleChapterId + '?'
                 + ' This will not remove the puzzles of the chapter.');
             if (confirmResult) {
@@ -326,7 +329,7 @@
                         // Forces re-rendering to update row index
                         chapterTable.rows().invalidate('data').draw();
                     }).catch(error => {
-                        chapterTable.cell(row, column).node().firstChild.disabled = true;
+                        chapterTable.row(row).node().querySelector('.removePuzzleChapter').disabled = true;
                         alert(`Puzzle chapter \${puzzleChapterId} could not be removed.`);
                     });
             }
@@ -359,7 +362,7 @@
                 });
         }
 
-        function removePuzzle(puzzleId, row, column) {
+        function removePuzzle(puzzleId, row) {
             let confirmResult = confirm(`Are you sure you want to delete puzzle \${puzzleId}?`);
             if (confirmResult) {
                 PuzzleAPI.deletePuzzle(puzzleId)
@@ -369,11 +372,32 @@
                         // Forces re-rendering to update row index
                         puzzleTable.rows().invalidate('data').draw();
                     }).catch(error => {
-                        puzzleTable.cell(row, column).node().firstChild.disabled = true;
+                        puzzleTable.row(row).node().querySelector('.removePuzzle').disabled = true;
                         alert(`Puzzle \${puzzleId} could not be removed.`);
                 });
             }
         }
+
+        puzzleTablePromise.promise.then(() => {
+            puzzleTable.table().container().addEventListener('click', function (event) {
+                if (event.target.classList.contains('updatePuzzle')) {
+                    updatePuzzle(event.target.dataset.puzzleId, event.target.closest('tr'));
+                }
+                if (event.target.classList.contains('removePuzzle')) {
+                    removePuzzle(event.target.dataset.puzzleId, event.target.closest('tr'));
+                }
+            });
+        });
+        chapterTablePromise.promise.then(() => {
+            chapterTable.table().container().addEventListener('click', function (event) {
+                if (event.target.classList.contains('updatePuzzleChapter')) {
+                    updatePuzzleChapter(event.target.dataset.chapterId, event.target.closest('tr'));
+                }
+                if (event.target.classList.contains('removePuzzleChapter')) {
+                    removePuzzleChapter(event.target.dataset.chapterId, event.target.closest('tr'));
+                }
+            });
+        });
     </script>
 
 </div>

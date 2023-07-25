@@ -33,8 +33,18 @@ const postForm = function (action, formData) {
     form.submit();
 };
 
+class DeferredPromise {
+    constructor() {
+        this.promise = new Promise((resolve, reject) => {
+            this.reject = reject;
+            this.resolve = resolve;
+        });
+    }
+}
+
 
 export {
+    DeferredPromise,
     parseHTML,
     postForm
 };
