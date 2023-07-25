@@ -68,6 +68,8 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.ast.visitor.NoCommentEqualsVisitor;
+import com.github.javaparser.ast.visitor.NoCommentHashCodeVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 
 /**
@@ -129,22 +131,6 @@ public class CodeValidator {
     // This validation pipeline should use the Chain-of-Responsibility design pattern
     public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode,
             CodeValidatorLevel level) {
-
-        // Literally identical
-        if (originalCode.equals(mutatedCode)) {
-            return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-        }
-
-        // Identical line by line by removing spaces
-        if (onlyWhitespacesChanged(originalCode, mutatedCode)) {
-            return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-        }
-
-        // if only string literals were changed
-        if (onlyLiteralsChanged(originalCode, mutatedCode)) {
-            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-        }
-
         Optional<CompilationUnit> originalParseResult = JavaParserUtils.parse(originalCode);
         Optional<CompilationUnit> mutatedParseResult = JavaParserUtils.parse(mutatedCode);
         if (!originalParseResult.isPresent() || !mutatedParseResult.isPresent()) {
@@ -152,6 +138,15 @@ public class CodeValidator {
         }
         CompilationUnit originalCU = originalParseResult.get();
         CompilationUnit mutatedCU = mutatedParseResult.get();
+
+        if (NoCommentEqualsVisitor.equals(originalCU, mutatedCU)) {
+            return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+        }
+
+        // if only string literals were changed
+        if (onlyLiteralsChanged(originalCode, mutatedCode)) {
+            return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+        }
 
         // Check if package was modified
         if (containsChangesToPackageDeclarations(originalCU, mutatedCU)) {
@@ -390,24 +385,6 @@ public class CodeValidator {
             s = s.substring(0, indexFirstOcc) + s.substring(indexSecondOcc + 2);
         }
         return s;
-    }
-
-    private static boolean onlyWhitespacesChanged(String originalCode, String mutatedCode) {
-        String[] originalTokens = originalCode.split("\n");
-        String[] mutatedTokens = mutatedCode.split("\n");
-        if (originalTokens.length == mutatedTokens.length) {
-            for (int i = 0; i < originalTokens.length; i++) {
-                // TODO 29/10/18: Extract Mutant.regex somewhere else. This isn't mutant specific.
-                if (!originalTokens[i].replaceAll(Mutant.regex, "")
-                        .equals(mutatedTokens[i].replaceAll(Mutant.regex, ""))) {
-                    return false;
-                }
-            }
-            // Same amount of lines but all the lines are equals
-            return true;
-        }
-        // Adding a line (possibly empty) does not count as changing only white spaces
-        return false;
     }
 
     //FIXME this will not work if a string contains \"
