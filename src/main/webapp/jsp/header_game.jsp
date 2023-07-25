@@ -81,13 +81,24 @@
                 if (game.getCreatorId() == login.getUserId()) {
                     if (game.getState() == GameState.ACTIVE) {
             %>
-                    <form id="adminEndBtn" action="<%=selectionManagerUrl%>" method="post">
-                        <input type="hidden" name="formType" value="endGame">
-                        <input type="hidden" name="gameId" value="<%=game.getId()%>">
-                        <button type="submit" class="btn btn-sm btn-danger" id="endGame" form="adminEndBtn">
+                    <div>
+                        <button type="button" class="btn btn-sm btn-danger" id="endGame"
+                                data-bs-toggle="modal" data-bs-target="#end-game-modal">
                             End Game
                         </button>
-                    </form>
+                        <form id="adminEndBtn" action="<%=selectionManagerUrl%>" method="post">
+                            <input type="hidden" name="formType" value="endGame">
+                            <input type="hidden" name="gameId" value="<%=game.getId()%>">
+                            <t:modal title="Confirm End Game" id="end-game-modal" closeButtonText="Cancel">
+                                <jsp:attribute name="content">
+                                    Are you sure you want to end the game?
+                                </jsp:attribute>
+                                <jsp:attribute name="footer">
+                                    <button type="submit" class="btn btn-primary">Confirm</button>
+                                </jsp:attribute>
+                            </t:modal>
+                        </form>
+                    </div>
             <%
                     }
 
