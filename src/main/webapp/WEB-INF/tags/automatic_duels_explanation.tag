@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2019 Code Defenders contributors
+    Copyright (C) 2016-2023 Code Defenders contributors
 
     This file is part of Code Defenders.
 

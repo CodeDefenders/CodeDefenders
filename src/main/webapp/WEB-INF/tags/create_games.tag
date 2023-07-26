@@ -157,7 +157,13 @@
                         </div>
 
                         <div class="col-12">
-                            <label class="form-label" for="level-group">Game Level</label>
+                            <label class="form-label" for="level-group">
+                                <a class="text-decoration-none text-reset cursor-pointer text-nowrap"
+                                   data-bs-toggle="modal" data-bs-target="#levelExplanation">
+                                    Game Level
+                                    <i class="fa fa-question-circle ms-1"></i>
+                                </a>
+                            </label>
                             <div id="level-group">
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" id="level-radio-hard" name="level"
@@ -440,7 +446,16 @@
     </div> <%-- row --%>
 </form>
 
-<t:modal id="validatorExplanation" title="Validator Explanations">
+<t:modal id="levelExplanation" title="Level Explanation">
+        <jsp:attribute name="content">
+            <h3>Battleground Games</h3>
+            <t:level_explanation_multiplayer/>
+            <h3 class="mt-3">Melee Games</h3>
+            <t:level_explanation_melee/>
+        </jsp:attribute>
+</t:modal>
+
+<t:modal id="validatorExplanation" title="Validator Explanation">
         <jsp:attribute name="content">
             <t:validator_explanation_mutant/>
             <div class="mt-3"></div> <%-- spacing --%>
@@ -448,9 +463,9 @@
         </jsp:attribute>
 </t:modal>
 
-<t:modal id="automaticEquivalenceTriggerExplanation" title="Equivalence Duel Threshold Explanation">
+<t:modal id="automaticEquivalenceTriggerExplanation" title="Auto Equivalence Duel Threshold Explanation">
         <jsp:attribute name="content">
-            <%@ include file="/jsp/automatic_duels_explanation.jsp"%>
+            <t:automatic_duels_explanation/>
         </jsp:attribute>
 </t:modal>
 
