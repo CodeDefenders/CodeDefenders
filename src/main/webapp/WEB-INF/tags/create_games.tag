@@ -597,12 +597,12 @@
     /**
      * Hide assigned players in the staged games table.
      */
-    let hideStagedGamePlayers = JSON.parse(localStorage.getItem('hideStagedGamePlayers')) || false;
+    let hideStagedGamePlayers = JSON.parse(sessionStorage.getItem('hideStagedGamePlayers')) || false;
 
     /**
      * Show users assigned to active games in the users table.
      */
-    let showAssignedUsers = JSON.parse(localStorage.getItem('showAssignedUsers')) || false;
+    let showAssignedUsers = JSON.parse(sessionStorage.getItem('showAssignedUsers')) || false;
 
 
     // TODO: Generate these automatically with a bean?.
@@ -1296,7 +1296,7 @@
     /* Show/hide players assigned to staged games. */
     document.getElementById('toggle-hide-players').addEventListener('change', function (event) {
         hideStagedGamePlayers = this.checked;
-        localStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
+        sessionStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
         stagedGamesTable.rows().invalidate().draw();
     });
 
@@ -1526,7 +1526,7 @@
     /* Show/hide users assigned to active existing games. */
     document.getElementById('toggle-show-assigned-users').addEventListener('change', function (event) {
         showAssignedUsers = this.checked;
-        localStorage.setItem('showAssignedUsers', JSON.stringify(showAssignedUsers));
+        sessionStorage.setItem('showAssignedUsers', JSON.stringify(showAssignedUsers));
         usersTable.draw();
     });
 
