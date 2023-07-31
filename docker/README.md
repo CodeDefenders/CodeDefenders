@@ -67,7 +67,7 @@ Otherwise, you have to destroy the [volumes](#persistence).
 
 **NOTE:**  
 The container supports the intentionally undocumented `CODEDEFENDERS_TOMCAT_LISTENING_PORT` variable to change the port the tomcat server in the container binds to.  
-It can be used to prevent port collisions for setups were the codedefenders containers are run with the (less secure) `--network=host` option.
+It can be used to prevent port collisions for setups where the codedefenders containers are run with the (less secure) `--network=host` option.
 
 ### Persistence
 
