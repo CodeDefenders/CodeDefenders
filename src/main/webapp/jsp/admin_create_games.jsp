@@ -1709,8 +1709,13 @@
                 }
 
                 const params = {
-                    formType: 'stageEmptyGames',
+                    formType: 'stageEmptyGames'
                 };
+
+                if (classroomsTable.rows({selected: true})[0].length > 0) {
+                    params.classroomId = classroomsTable.rows({selected: true}).data()[0].id;
+                }
+
                 for (const {name, value} of $("#form-settings").serializeArray()) {
                     params[name] = value;
                 }
