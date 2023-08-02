@@ -1567,11 +1567,6 @@
                         width: '3em'
                     },
                     {
-                        data: 'id',
-                        type: 'number',
-                        title: 'ID'
-                    },
-                    {
                         data: 'name',
                         type: 'string',
                         title: 'Name',
