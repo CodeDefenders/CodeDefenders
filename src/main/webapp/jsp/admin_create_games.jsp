@@ -1176,7 +1176,7 @@
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Game Duration';
-            tr.insertCell().textContent = formatTime(gameSettings.gameDurationMinutes);
+            tr.insertCell().textContent = GameTime.formatTime(gameSettings.gameDurationMinutes);
 
             return table;
         };
