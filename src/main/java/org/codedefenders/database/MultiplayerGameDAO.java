@@ -330,6 +330,7 @@ public class MultiplayerGameDAO {
                 "WHERE u.User_ID = ?",
                 "  AND (g.State = 'CREATED' OR g.State = 'ACTIVE')",
                 "  AND g.Creator_ID != u.User_ID",
+                "  AND g.Classroom_ID IS NULL",
                 "  AND g.ID NOT IN (SELECT ig.ID",
                 "    FROM games ig",
                 "    INNER JOIN players p ON ig.ID = p.Game_ID",
