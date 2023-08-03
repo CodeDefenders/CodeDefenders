@@ -60,7 +60,7 @@ public class Constants {
                     "org.jacoco.report-0.8.8.jar",
                     "org.jacoco.agent-0.8.8.jar",
                     "org.jacoco.ant-0.8.8.jar"
-            ).map(jarName -> config.getDataDir().toPath().resolve("lib").resolve(jarName))
+            ).map(jarName -> config.getLibraryDir().toPath().resolve(jarName))
             .map(Path::toString)
             .collect(Collectors.joining(Character.toString(File.pathSeparatorChar)));
 
@@ -81,7 +81,7 @@ public class Constants {
                     "truth-1.1.3.jar",
                     "truth-java8-extension-1.1.3.jar",
                     "guava-31.1-jre.jar"
-            ).map(jarName -> config.getDataDir().toPath().resolve("lib").resolve(jarName))
+            ).map(jarName -> config.getLibraryDir().toPath().resolve(jarName))
             .map(Path::toString)
             .collect(Collectors.joining(Character.toString(File.pathSeparatorChar)));
 
