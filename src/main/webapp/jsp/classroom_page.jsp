@@ -102,62 +102,70 @@
         <div class="col-lg-6 col-12 d-flex flex-column gap-4">
 
             <%-- Join Settigns --%>
-            <c:if test="${canEditClassroom}">
-                <div class="p-4 border rounded ${mutedIfArchved}">
+            <div class="p-4 border rounded ${mutedIfArchved}">
 
-                    <h4 class="mb-4">Join Settings</h4>
+                <h4 class="mb-4">Join Settings</h4>
 
-                    <div class="d-flex gap-2 mb-1">
-                        <c:choose>
-                            <c:when test="${classroom.open}">
-                                <span>Joining is <span class="text-success">enabled</span>.</span>
+                <div class="d-flex gap-2 mb-1">
+                    <c:choose>
+                        <c:when test="${classroom.open}">
+                            <span>Joining is <span class="text-success">enabled</span>.</span>
+                            <c:if test="${canEditClassroom}">
                                 <button id="disable-joining" class="btn btn-xs btn-secondary"
-                                    data-bs-toggle="modal" data-bs-target="#disable-joining-modal"
+                                        data-bs-toggle="modal" data-bs-target="#disable-joining-modal"
                                     ${disabledIfArchved}>
                                     Disable Joining
                                 </button>
-                            </c:when>
-                            <c:otherwise>
-                                <span>Joining is <span class="text-danger">disabled</span>.</span>
+                            </c:if>
+                        </c:when>
+                        <c:otherwise>
+                            <span>Joining is <span class="text-danger">disabled</span>.</span>
+                            <c:if test="${canEditClassroom}">
                                 <button id="enable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#enable-joining-modal"
                                         ${disabledIfArchved}>
                                     Enable Joining
                                 </button>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
 
-                    <div class="d-flex gap-2 mb-1">
-                        <c:choose>
-                            <c:when test="${classroom.visible}">
-                                <span>Visibility is <span class="text-success">public</span>.</span>
+                <div class="d-flex gap-2 mb-1">
+                    <c:choose>
+                        <c:when test="${classroom.visible}">
+                            <span>Visibility is <span class="text-success">public</span>.</span>
+                            <c:if test="${canEditClassroom}">
                                 <button id="disable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#make-private-modal"
                                         ${disabledIfArchved}>
                                     Make Private
                                 </button>
-                            </c:when>
-                            <c:otherwise>
-                                <span>Visibility is <span class="text-danger">private</span>.</span>
+                            </c:if>
+                        </c:when>
+                        <c:otherwise>
+                            <span>Visibility is <span class="text-danger">private</span>.</span>
+                            <c:if test="${canEditClassroom}">
                                 <button id="enable-joining" class="btn btn-xs btn-secondary"
                                         data-bs-toggle="modal" data-bs-target="#make-public-modal"
                                         ${disabledIfArchved}>
                                     Make Public
                                 </button>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+                            </c:if>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
 
-                    <div class="d-flex gap-2 mb-3">
-                        <c:choose>
-                            <c:when test="${classroom.password.isPresent()}">
-                                <span>Password is <span class="text-success">set</span>.</span>
-                            </c:when>
-                            <c:otherwise>
-                                <span>Password is <span class="text-danger">not set</span>.</span>
-                            </c:otherwise>
-                        </c:choose>
+                <div class="d-flex gap-2 mb-3">
+                    <c:choose>
+                        <c:when test="${classroom.password.isPresent()}">
+                            <span>Password is <span class="text-success">set</span>.</span>
+                        </c:when>
+                        <c:otherwise>
+                            <span>Password is <span class="text-danger">not set</span>.</span>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:if test="${canEditClassroom}">
                         <div class="d-flex gap-0">
                             <button id="set-password" class="btn btn-xs btn-secondary me-1"
                                     data-bs-toggle="modal" data-bs-target="#set-password-modal"
@@ -172,26 +180,26 @@
                                 </button>
                             </c:if>
                         </div>
-                    </div>
-
-                    <div>
-                        <span class="me-1">Classroom UID is</span>
-                        <span id="classroom-uid" class="border rounded px-2"><c:out value="${classroom.UUID}"/></span>
-                        <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
-                           data-copy-target="#classroom-uid"></i>
-                    </div>
-
-                    <c:if test="${classroom.open}">
-                        <div class="mt-1">
-                            <span class="me-1">Invite link is</span>
-                            <span id="invite-link" class="border rounded px-2"><c:out value="${link}"/></span>
-                            <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
-                               data-copy-target="#invite-link"></i>
-                        </div>
                     </c:if>
-
                 </div>
-            </c:if>
+
+                <div>
+                    <span class="me-1">Classroom UID is</span>
+                    <span id="classroom-uid" class="border rounded px-2"><c:out value="${classroom.UUID}"/></span>
+                    <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
+                       data-copy-target="#classroom-uid"></i>
+                </div>
+
+                <c:if test="${classroom.open}">
+                    <div class="mt-1">
+                        <span class="me-1">Invite link is</span>
+                        <span id="invite-link" class="border rounded px-2"><c:out value="${link}"/></span>
+                        <i class="fa fa-clipboard copy cursor-pointer text-primary ms-1"
+                           data-copy-target="#invite-link"></i>
+                    </div>
+                </c:if>
+
+            </div>
 
             <%-- Classroom Settigns --%>
             <c:if test="${canEditClassroom}">
