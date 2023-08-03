@@ -301,4 +301,8 @@ public class ClassroomService {
     public boolean canLeave(ClassroomMember member) {
         return member != null && member.getRole() != ClassroomRole.OWNER;
     }
+
+    public boolean canJoin(Classroom classroom, ClassroomMember member) {
+        return classroom.isOpen() && !classroom.isArchived() && member == null;
+    }
 }

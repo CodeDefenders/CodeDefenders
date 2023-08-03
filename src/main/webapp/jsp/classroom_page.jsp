@@ -7,9 +7,6 @@
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.ClassroomRole" %>
-<%@ page import="org.codedefenders.service.ClassroomService" %>
-<%@ page import="org.codedefenders.model.ClassroomMember" %>
-<%@ page import="org.codedefenders.auth.CodeDefendersAuth" %>
 
 <%--@elvariable id="login" type="org.codedefenders.service.AuthService"--%>
 <%--@elvariable id="classroomService" type="org.codedefenders.service.ClassroomService"--%>
@@ -25,6 +22,7 @@
 <c:set var="canKickStudents" value="${requestScope.canKickStudents}"/>
 <c:set var="canKickModerators" value="${requestScope.canKickModerators}"/>
 <c:set var="canLeave" value="${requestScope.canLeave}"/>
+<c:set var="canJoin" value="${requestScope.canJoin}"/>
 
 <c:set var="disabledIfArchved" value="${classroom.archived ? 'disabled' : ''}"/>
 <c:set var="mutedIfArchved" value="${classroom.archived ? 'text-muted' : ''}"/>
@@ -39,6 +37,34 @@
             <span class="badge bg-secondary">Archived</span>
         </c:if>
     </h2>
+
+    <%-- Guest / admin info and join button --%>
+    <c:if test="${member == null || (login.admin && member.role != ClassroomRole.OWNER)}">
+        <div class="p-4 border rounded border-warning d-flex align-items-baseline mb-4 ${mutedIfArchved}">
+
+            <c:choose>
+                <c:when test="${login.admin && member == null}">
+                    You are able to fully view and edit this classroom without joining,
+                    because you are logged in as admin.
+                </c:when>
+                <c:when test="${login.admin && member != null && member.role != ClassroomRole.OWNER}">
+                    You are able to fully view and edit this classroom without being the owner,
+                    because you are logged in as admin.
+                </c:when>
+                <c:when test="${!login.admin && member == null}">
+                    You are viewing this classroom as a guest.
+                </c:when>
+            </c:choose>
+
+            <c:if test="${canJoin}">
+                If you would like to join the classroom, you can do so here:
+                <button type="button" class="btn btn-sm btn-outline-primary ms-2"
+                        data-bs-toggle="modal" data-bs-target="#join-modal">
+                    Join
+                </button>
+            </c:if>
+        </div>
+    </c:if>
 
     <div class="p-4 border rounded mb-4 loading loading-height-200">
         <div class="d-flex justify-content-between flex-wrap align-items-baseline">
@@ -74,30 +100,6 @@
 
         <%-- Settigns --%>
         <div class="col-lg-6 col-12 d-flex flex-column gap-4">
-
-            <%-- Join as admin --%>
-            <c:if test="${login.admin && (member == null || member.role != ClassroomRole.OWNER)}">
-                <div class="p-4 border rounded border-warning ${mutedIfArchved}">
-
-                    <h4 class="mb-4">Admin Info</h4>
-
-                    <c:choose>
-                        <c:when test="${member == null}">
-                            You are logged in as admin.
-                            Because of that, you are able to fully view and edit this classroom without joining.
-                        </c:when>
-                        <c:otherwise>
-                            You are logged in as admin.
-                            Because of that, you are able to fully view and edit this classroom without being the owner.
-                        </c:otherwise>
-                    </c:choose>
-
-                    <c:if test="${classroom.open && !classroom.archived && member == null}">
-                        If you would like to join the classroom, please go
-                        <a href="${url.forPath(Paths.CLASSROOM)}?classroomUid=${classroom.UUID}&join">here</a>.
-                    </c:if>
-                </div>
-            </c:if>
 
             <%-- Join Settigns --%>
             <c:if test="${canEditClassroom}">
@@ -545,6 +547,34 @@
                 </jsp:attribute>
                 <jsp:attribute name="footer">
                     <button type="submit" class="btn btn-danger">Kick</button>
+                </jsp:attribute>
+            </t:modal>
+
+        </form>
+    </c:if>
+
+    <%-- Join modal --%>
+    <c:if test="${canJoin}">
+        <form action="${url.forPath(Paths.CLASSROOM)}" method="post" id="join-form" class="needs-validation">
+            <input type="hidden" name="action" value="join"/>
+            <input type="hidden" name="classroomId" value="${classroom.id}"/>
+
+            <t:modal title="Join Classroom" id="join-modal" closeButtonText="Cancel">
+                <jsp:attribute name="content">
+                    <c:choose>
+                        <c:when test="${classroom.password.isPresent()}">
+                            <p>A password is required to join this classroom:</p>
+                            <input type="password" class="form-control" id="join-password-input"
+                                   name="password" placeholder="Password" required>
+                            <div class="invalid-feedback">Please enter the password.</div>
+                        </c:when>
+                        <c:otherwise>
+                            Are you sure you want to join this classroom?
+                        </c:otherwise>
+                    </c:choose>
+                </jsp:attribute>
+                <jsp:attribute name="footer">
+                    <button type="submit" class="btn btn-primary">Join</button>
                 </jsp:attribute>
             </t:modal>
 

@@ -57,38 +57,20 @@ public class ClassroomServlet extends HttpServlet {
 
         Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
                 classroom.get().getId(), login.getUserId());
-        // Admins are allowed to access the page without joining
-        boolean adminJoinBypass = login.isAdmin() && request.getParameter("join") == null;
 
         // Go to classroom page
-        if (member.isPresent() || adminJoinBypass) {
-            pageInfo.setPageTitle(classroom.get().getName());
-            request.setAttribute("classroom", classroom.get());
-            request.setAttribute("member", member.orElse(null));
-            request.setAttribute("link", classroomService.getInviteLinkForClassroom(classroom.get().getUUID()));
-            request.setAttribute("canEditClassroom", classroomService.canEditClassroom(member.orElse(null)));
-            request.setAttribute("canChangeRoles", classroomService.canChangeRoles(member.orElse(null)));
-            request.setAttribute("canChangeOwner", classroomService.canChangeOwner(member.orElse(null)));
-            request.setAttribute("canKickStudents", classroomService.canKickStudents(member.orElse(null)));
-            request.setAttribute("canKickModerators", classroomService.canKickModerators(member.orElse(null)));
-            request.setAttribute("canLeave", classroomService.canLeave(member.orElse(null)));
-            request.getRequestDispatcher("/jsp/classroom_page.jsp").forward(request, response);
-            return;
-        }
-
-        // Go to join classroom page
-        if (classroom.get().isOpen()) {
-            List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.get().getId());
-            pageInfo.setPageTitle("Join " + classroom.get().getName());
-            request.setAttribute("classroom", classroom.get());
-            request.setAttribute("numMembers", members.size());
-            request.getRequestDispatcher("/jsp/join_classroom_page.jsp").forward(request, response);
-            return;
-        }
-
-        // Don't
-        messages.add("You are not a member of this classroom.");
-        response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+        pageInfo.setPageTitle(classroom.get().getName());
+        request.setAttribute("classroom", classroom.get());
+        request.setAttribute("member", member.orElse(null));
+        request.setAttribute("link", classroomService.getInviteLinkForClassroom(classroom.get().getUUID()));
+        request.setAttribute("canEditClassroom", classroomService.canEditClassroom(member.orElse(null)));
+        request.setAttribute("canChangeRoles", classroomService.canChangeRoles(member.orElse(null)));
+        request.setAttribute("canChangeOwner", classroomService.canChangeOwner(member.orElse(null)));
+        request.setAttribute("canKickStudents", classroomService.canKickStudents(member.orElse(null)));
+        request.setAttribute("canKickModerators", classroomService.canKickModerators(member.orElse(null)));
+        request.setAttribute("canLeave", classroomService.canLeave(member.orElse(null)));
+        request.setAttribute("canJoin", classroomService.canJoin(classroom.get(), member.orElse(null)));
+        request.getRequestDispatcher("/jsp/classroom_page.jsp").forward(request, response);
     }
 
     @Override

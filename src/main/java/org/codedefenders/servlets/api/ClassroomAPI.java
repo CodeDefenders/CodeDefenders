@@ -110,15 +110,6 @@ public class ClassroomAPI extends HttpServlet {
             return;
         }
 
-        if (!login.isAdmin()) {
-            Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
-                    classroom.get().getId(), login.getUserId());
-            if (!member.isPresent()) {
-                response.setStatus(HttpStatus.SC_BAD_REQUEST);
-                return;
-            }
-        }
-
         List<ClassroomMemberDTO> members = getMembersData(classroom.get());
 
         Gson gson = new GsonBuilder()
@@ -133,15 +124,6 @@ public class ClassroomAPI extends HttpServlet {
         if (!classroom.isPresent()) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
-        }
-
-        if (!login.isAdmin()) {
-            Optional<ClassroomMember> member = classroomService.getMemberForClassroomAndUser(
-                    classroom.get().getId(), login.getUserId());
-            if (!member.isPresent()) {
-                response.setStatus(HttpStatus.SC_BAD_REQUEST);
-                return;
-            }
         }
 
         List<ClassroomGameDTO> games = getGamesData(classroom.get());
