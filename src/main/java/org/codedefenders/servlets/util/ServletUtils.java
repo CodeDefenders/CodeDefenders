@@ -18,6 +18,8 @@
  */
 package org.codedefenders.servlets.util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -116,6 +118,27 @@ public final class ServletUtils {
      */
     public static Optional<String> getStringParameter(HttpServletRequest request, String parameter) {
         return Optional.ofNullable(request.getParameter(parameter)).filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * Extracts a given enum URL parameter from a given request.
+     *
+     * <p>If the parameter is not a valid value for the given enum, the method returns an empty {@link Optional}.
+     *
+     * @param request   the request, which the parameter is extracted from.
+     * @param enumClass the given enum type.
+     * @param parameter the given URL parameter.
+     * @return an enum value for the request parameter
+     */
+    public static <T extends Enum<T>> Optional<T> getEnumParameter(
+            HttpServletRequest request, Class<T> enumClass, String parameter) {
+        return Optional.ofNullable(request.getParameter(parameter)).map(s -> {
+            try {
+                return Enum.valueOf(enumClass, s);
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        });
     }
 
     /**
