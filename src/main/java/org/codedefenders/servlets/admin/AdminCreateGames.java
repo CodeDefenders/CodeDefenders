@@ -42,6 +42,7 @@ import org.codedefenders.beans.admin.StagedGameList;
 import org.codedefenders.beans.admin.StagedGameList.GameSettings;
 import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
@@ -60,7 +61,9 @@ import org.slf4j.LoggerFactory;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.game.GameType.MELEE;
+import static org.codedefenders.servlets.util.ServletUtils.getEnumParameter;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 
 /**
  * Handles extraction and verification of parameters for the admin create games page.
@@ -97,48 +100,55 @@ public class AdminCreateGames extends HttpServlet {
             adminCreateGamesBean.update();
             stagedGameList = adminCreateGamesBean.getStagedGameList();
 
-            final String action = request.getParameter("formType");
-            if (action == null) {
+            final Optional<String> action = getStringParameter(request, "formType");
+            if (!action.isPresent()) {
                 logger.error("Missing parameter: formType.");
                 Redirect.redirectBack(request, response);
                 return;
             }
 
-            switch (action) {
-                case "stageGamesWithUsers":
-                    stageGamesWithUsers(request);
-                    break;
-                case "stageEmptyGames":
-                    stageEmptyGames(request);
-                    break;
-                case "deleteStagedGames":
-                    deleteStagedGames(request);
-                    break;
-                case "createStagedGames":
-                    createStagedGames(request);
-                    break;
-                case "removePlayerFromStagedGame":
-                    removePlayerFromStagedGame(request);
-                    break;
-                case "removeCreatorFromStagedGame":
-                    removeCreatorFromStagedGame(request);
-                    break;
-                case "switchRole":
-                    switchRole(request);
-                    break;
-                case "switchCreatorRole":
-                    switchCreatorRole(request);
-                    break;
-                case "movePlayerBetweenStagedGames":
-                    movePlayerBetweenStagedGames(request);
-                    break;
-                case "addPlayerToGame":
-                    addPlayerToGame(request);
-                    break;
-                default:
-                    logger.error("Unknown form type: {}", action);
-                    Redirect.redirectBack(request, response);
-                    break;
+            try {
+                switch (action.get()) {
+                    case "stageGamesWithUsers":
+                        stageGamesWithUsers(request);
+                        break;
+                    case "stageEmptyGames":
+                        stageEmptyGames(request);
+                        break;
+                    case "deleteStagedGames":
+                        deleteStagedGames(request);
+                        break;
+                    case "createStagedGames":
+                        createStagedGames(request);
+                        break;
+                    case "removePlayerFromStagedGame":
+                        removePlayerFromStagedGame(request);
+                        break;
+                    case "removeCreatorFromStagedGame":
+                        removeCreatorFromStagedGame(request);
+                        break;
+                    case "switchRole":
+                        switchRole(request);
+                        break;
+                    case "switchCreatorRole":
+                        switchCreatorRole(request);
+                        break;
+                    case "movePlayerBetweenStagedGames":
+                        movePlayerBetweenStagedGames(request);
+                        break;
+                    case "addPlayerToGame":
+                        addPlayerToGame(request);
+                        break;
+                    default:
+                        logger.error("Unknown form type: {}", action.get());
+                        Redirect.redirectBack(request, response);
+                        break;
+                }
+            } catch (NoSuchElementException e) {
+                messages.add("ERROR: Missing parameter");
+            } catch (IllegalArgumentException e) {
+                messages.add("ERROR: Invalid parameter");
+
             }
 
             response.sendRedirect(url.forPath(Paths.ADMIN_GAMES));
@@ -152,69 +162,100 @@ public class AdminCreateGames extends HttpServlet {
      */
     private GameSettings extractGameSettings(HttpServletRequest request) {
         GameSettings gameSettings = new GameSettings();
-        try {
-            gameSettings.setGameType(GameType.valueOf(request.getParameter("gameType")));
-            gameSettings.setCut(GameClassDAO.getClassForId(getIntParameter(request, "cut").get()));
-            gameSettings.setWithMutants(request.getParameter("withMutants") != null);
-            gameSettings.setWithTests(request.getParameter("withTests") != null);
 
-            gameSettings.setMaxAssertionsPerTest(getIntParameter(request, "maxAssertionsPerTest").get());
-            gameSettings.setMutantValidatorLevel(
-                    CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel")));
-            gameSettings.setCreatorRole(Role.valueOf(request.getParameter("creatorRole")));
-            gameSettings.setChatEnabled(request.getParameter("chatEnabled") != null);
-            gameSettings.setCaptureIntentions(request.getParameter("captureIntentions") != null);
-            gameSettings.setEquivalenceThreshold(
-                    getIntParameter(request, "automaticEquivalenceTrigger").get());
-            gameSettings.setLevel(GameLevel.valueOf(request.getParameter("level")));
+        gameSettings.setGameType(
+                getEnumParameter(request, GameType.class, "gameType").get());
 
-            gameSettings.setStartGame(request.getParameter("startGames") != null);
+        gameSettings.setCut(
+                getIntParameter(request, "cut")
+                        .map(GameClassDAO::getClassForId).get());
 
-            gameSettings.setGameDurationMinutes(getIntParameter(request, "gameDurationMinutes").get())
-                    .map(messages::add);
+        gameSettings.setWithMutants(
+                request.getParameter("withMutants") != null);
 
-            gameSettings.setClassroomId(getIntParameter(request, "classroomId").orElse(null));
+        gameSettings.setWithTests(
+                request.getParameter("withTests") != null);
 
-        } catch (NullPointerException | NoSuchElementException e) {
-            messages.add("ERROR: Missing game settings parameter.");
-            return null;
-        } catch (IllegalArgumentException e) {
-            messages.add("ERROR: Invalid game settings parameter.");
-            return null;
-        }
+        gameSettings.setMaxAssertionsPerTest(
+                getIntParameter(request, "maxAssertionsPerTest").get());
+
+        gameSettings.setMutantValidatorLevel(
+                getEnumParameter(request, CodeValidatorLevel.class, "mutantValidatorLevel").get());
+
+        gameSettings.setCreatorRole(
+                getEnumParameter(request, Role.class, "creatorRole").get());
+
+        gameSettings.setChatEnabled(
+                request.getParameter("chatEnabled") != null);
+
+        gameSettings.setCaptureIntentions(
+                request.getParameter("captureIntentions") != null);
+
+        gameSettings.setEquivalenceThreshold(
+                getIntParameter(request, "automaticEquivalenceTrigger").get());
+
+        gameSettings.setLevel(
+                getEnumParameter(request, GameLevel.class, "level").get());
+
+        gameSettings.setLevel(
+                getEnumParameter(request, GameLevel.class, "level").get());
+
+        gameSettings.setStartGame(
+                request.getParameter("startGames") != null);
+
+        setGameDurationMinutes(gameSettings,
+                getIntParameter(request, "gameDurationMinutes").get());
+
+        // Don't user getIntParameter here because we want to error if the parameter is not parseable as int
+        gameSettings.setClassroomId(
+                getStringParameter(request, "classroomId").map(Integer::parseInt).get());
+
         return gameSettings;
+    }
+
+    /**
+     * Sets the game duration and checks if it is in the valid range defined by the system settings.
+     * If the value is out of bounds, it will be clamped and an info message is returned.
+     *
+     * @param duration The game duration in minutes
+     */
+    private void setGameDurationMinutes(GameSettings settings, int duration) {
+        final int maxDuration = AdminDAO.getSystemSetting(
+                AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
+        final int minDuration = 1;
+
+        if (duration > maxDuration) {
+            settings.setGameDurationMinutes(maxDuration);
+            messages.add(String.format(
+                    "INFO: The max. allowed duration is %d minutes.",
+                    maxDuration
+            ));
+        } else if (duration < minDuration) {
+            settings.setGameDurationMinutes(minDuration);
+            messages.add(String.format(
+                    "INFO: The min. allowed duration is %d minutes.",
+                    minDuration
+            ));
+        } else {
+            settings.setGameDurationMinutes(duration);
+        }
     }
 
     private Optional<Set<UserInfo>> extractPlayers(HttpServletRequest request) {
         /* Extract user IDs from the table. */
-        String userIdsStr = request.getParameter("userIds");
-        Set<Integer> userIdsFromTable;
-        try {
-            userIdsFromTable = Arrays.stream(userIdsStr.split(","))
+        String userIdsStr = getStringParameter(request, "userIds").get();
+        Set<Integer> userIdsFromTable = Arrays.stream(userIdsStr.split(","))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
                     .map(Integer::valueOf)
                     .collect(Collectors.toSet());
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter: userIds.");
-            return Optional.empty();
-        } catch (NumberFormatException e) {
-            messages.add("ERROR: Invalid parameter: userIds.");
-            return Optional.empty();
-        }
 
-        /* Extract user names/emails from the text field. */
-        String userNamesStr = request.getParameter("userNames");
-        Set<String> userNames;
-        try {
-            userNames = Arrays.stream(userNamesStr.split("\\R"))
+        /* Extract usernames/emails from the text field. */
+        String userNamesStr = getStringParameter(request, "userNames").get();
+        Set<String> userNames = Arrays.stream(userNamesStr.split("\\R"))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
                     .collect(Collectors.toSet());
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter: userNames.");
-            return Optional.empty();
-        }
 
         Set<UserInfo> players = new HashSet<>();
 
@@ -231,7 +272,7 @@ public class AdminCreateGames extends HttpServlet {
                 return Optional.empty();
             }
 
-            /* Map given user names/emails to users and validate that all exist. */
+            /* Map given usernames/emails to users and validate that all exist. */
             Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
             if (!usersFromTextArea.isPresent()) {
                 return Optional.empty();
@@ -246,35 +287,20 @@ public class AdminCreateGames extends HttpServlet {
 
     /**
      * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGamesWithUsers(Set,
-     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int, int, Set) AdminCreateGamesBean#stageGames()}.
+     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int, int) AdminCreateGamesBean#stageGames()}.
      * @param request The HTTP request.
      */
     private void stageGamesWithUsers(HttpServletRequest request) {
-        /* Extract game settings. */
         GameSettings gameSettings = extractGameSettings(request);
-        if (gameSettings == null) {
-            return;
-        }
 
         /* Extract game management settings settings. */
-        RoleAssignmentMethod roleAssignmentMethod;
-        TeamAssignmentMethod teamAssignmentMethod;
-        int attackersPerGame;
-        int defendersPerGame;
-        int playersPerGame;
-        try {
-            roleAssignmentMethod = RoleAssignmentMethod.valueOf(request.getParameter("roleAssignmentMethod"));
-            teamAssignmentMethod = TeamAssignmentMethod.valueOf(request.getParameter("teamAssignmentMethod"));
-            attackersPerGame = getIntParameter(request, "attackersPerGame").get();
-            defendersPerGame = getIntParameter(request, "defendersPerGame").get();
-            playersPerGame = getIntParameter(request, "playersPerGame").get();
-        } catch (NullPointerException | NoSuchElementException e) {
-            messages.add("ERROR: Missing game management settings parameter.");
-            return;
-        } catch (IllegalArgumentException e) {
-            messages.add("ERROR: Invalid game management settings parameter.");
-            return;
-        }
+        RoleAssignmentMethod roleAssignmentMethod
+                = RoleAssignmentMethod.valueOf(getStringParameter(request, "roleAssignmentMethod").get());
+        TeamAssignmentMethod teamAssignmentMethod
+                = TeamAssignmentMethod.valueOf(getStringParameter(request, "teamAssignmentMethod").get());
+        int attackersPerGame = getIntParameter(request, "attackersPerGame").get();
+        int defendersPerGame = getIntParameter(request, "defendersPerGame").get();
+        int playersPerGame = getIntParameter(request, "playersPerGame").get();
 
         Optional<Set<UserInfo>> players = extractPlayers(request);
         if (!players.isPresent()) {
@@ -315,21 +341,8 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void stageEmptyGames(HttpServletRequest request) {
-        int numGames;
-        try {
-            numGames = getIntParameter(request, "numGames").get();
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter: numGames.");
-            return;
-        } catch (NoSuchElementException e) {
-            messages.add("ERROR: Invalid parameter: numGames.");
-            return;
-        }
-
+        int numGames = getIntParameter(request, "numGames").get();
         GameSettings gameSettings = extractGameSettings(request);
-        if (gameSettings == null) {
-            return;
-        }
 
         if (numGames > 100) {
             messages.add("ERROR: Won't create more than 100 staged games.");
@@ -346,23 +359,14 @@ public class AdminCreateGames extends HttpServlet {
      */
     private void deleteStagedGames(HttpServletRequest request) {
         /* Convert game IDs to ints. */
-        String stagedGameIdsStr = request.getParameter("stagedGameIds");
-        List<Integer> stagedGameIds;
-        try {
-            stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .map(stagedGameList::formattedToNumericGameId)
-                    .map(Optional::get)
-                    .distinct()
-                    .collect(Collectors.toList());
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter: stagedGameIds.");
-            return;
-        } catch (NoSuchElementException e) {
-            messages.add("ERROR: Invalid parameter: stagedGameIds.");
-            return;
-        }
+        String stagedGameIdsStr = getStringParameter(request, "stagedGameIds").get();
+        List<Integer> stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(stagedGameList::formattedToNumericGameId)
+                .map(Optional::get)
+                .distinct()
+                .collect(Collectors.toList());
 
         Map<Integer, StagedGame> existingStagedGames = stagedGameList.getStagedGames();
 
@@ -386,23 +390,14 @@ public class AdminCreateGames extends HttpServlet {
      */
     private void createStagedGames(HttpServletRequest request) {
         /* Convert game IDs to ints. */
-        String stagedGameIdsStr = request.getParameter("stagedGameIds");
-        List<Integer> stagedGameIds;
-        try {
-            stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .map(stagedGameList::formattedToNumericGameId)
-                    .map(Optional::get)
-                    .distinct()
-                    .collect(Collectors.toList());
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter: stagedGameIds.");
-            return;
-        } catch (NoSuchElementException e) {
-            messages.add("ERROR: Invalid parameter: stagedGameIds.");
-            return;
-        }
+        String stagedGameIdsStr = getStringParameter(request, "stagedGameIds").get();
+        List<Integer> stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(stagedGameList::formattedToNumericGameId)
+                .map(Optional::get)
+                .distinct()
+                .collect(Collectors.toList());
 
         Map<Integer, StagedGame> existingStagedGames = stagedGameList.getStagedGames();
 
@@ -425,18 +420,9 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void removePlayerFromStagedGame(HttpServletRequest request) {
-        int userId;
-        int gameId;
-        try {
-            userId = getIntParameter(request, "userId").get();
-            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter.");
-            return;
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            messages.add("ERROR: Invalid parameter.");
-            return;
-        }
+        int userId = getIntParameter(request, "userId").get();
+        int gameId = getStringParameter(request, "gameId")
+                .flatMap(stagedGameList::formattedToNumericGameId).get();
 
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
@@ -455,16 +441,8 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void removeCreatorFromStagedGame(HttpServletRequest request) {
-        int gameId;
-        try {
-            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter.");
-            return;
-        } catch (NoSuchElementException | IllegalArgumentException e) {
-            messages.add("ERROR: Invalid parameter.");
-            return;
-        }
+        int gameId = getStringParameter(request, "gameId")
+                .flatMap(stagedGameList::formattedToNumericGameId).get();
 
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
@@ -482,18 +460,9 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void switchRole(HttpServletRequest request) {
-        int userId;
-        int gameId;
-        try {
-            userId = getIntParameter(request, "userId").get();
-            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter.");
-            return;
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            messages.add("ERROR: Invalid parameter.");
-            return;
-        }
+        int userId = getIntParameter(request, "userId").get();
+        int gameId = getStringParameter(request, "gameId")
+                .flatMap(stagedGameList::formattedToNumericGameId).get();
 
         UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
         if (user == null) {
@@ -517,16 +486,8 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void switchCreatorRole(HttpServletRequest request) {
-        int gameId;
-        try {
-            gameId = stagedGameList.formattedToNumericGameId(request.getParameter("gameId")).get();
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter.");
-            return;
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            messages.add("ERROR: Invalid parameter.");
-            return;
-        }
+        int gameId = getStringParameter(request, "gameId")
+                .flatMap(stagedGameList::formattedToNumericGameId).get();
 
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
@@ -544,22 +505,12 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void movePlayerBetweenStagedGames(HttpServletRequest request) {
-        int userId;
-        int gameIdFrom;
-        int gameIdTo;
-        Role role;
-        try {
-            userId = getIntParameter(request, "userId").get();
-            role = Role.valueOf(request.getParameter("role"));
-            gameIdFrom = stagedGameList.formattedToNumericGameId(request.getParameter("gameIdFrom")).get();
-            gameIdTo = stagedGameList.formattedToNumericGameId(request.getParameter("gameIdTo")).get();
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter.");
-            return;
-        } catch (IllegalArgumentException | NoSuchElementException e) {
-            messages.add("ERROR: Invalid parameter.");
-            return;
-        }
+        int userId = getIntParameter(request, "userId").get();
+        int gameIdFrom = getStringParameter(request, "gameIdFrom")
+                .flatMap(stagedGameList::formattedToNumericGameId).get();
+        int gameIdTo = getStringParameter(request, "gameIdTo")
+                .flatMap(stagedGameList::formattedToNumericGameId).get();
+        Role role = getEnumParameter(request, Role.class, "role").get();
 
         StagedGame stagedGameFrom = stagedGameList.getStagedGame(gameIdFrom);
         if (stagedGameFrom == null) {
@@ -592,29 +543,21 @@ public class AdminCreateGames extends HttpServlet {
      * @param request The HTTP request.
      */
     private void addPlayerToGame(HttpServletRequest request) {
+        String gameIdStr = getStringParameter(request, "gameId").get();
+        Optional<Integer> stagedGameId = stagedGameList.formattedToNumericGameId(gameIdStr);
+
         int gameId;
         boolean isStagedGame;
-        int userId;
-        Role role;
-        try {
-            String gameIdStr = request.getParameter("gameId");
-            Optional<Integer> stagedGameId = stagedGameList.formattedToNumericGameId(gameIdStr);
-            if (stagedGameId.isPresent()) {
-                isStagedGame = true;
-                gameId = stagedGameId.get();
-            } else {
-                isStagedGame = false;
-                gameId = Integer.parseInt(gameIdStr);
-            }
-            userId = getIntParameter(request, "userId").get();
-            role = Role.valueOf(request.getParameter("role"));
-        } catch (NullPointerException e) {
-            messages.add("ERROR: Missing parameter.");
-            return;
-        } catch (IllegalArgumentException e) {
-            messages.add("ERROR: Invalid parameter.");
-            return;
+        if (stagedGameId.isPresent()) {
+            isStagedGame = true;
+            gameId = stagedGameId.get();
+        } else {
+            isStagedGame = false;
+            gameId = Integer.parseInt(gameIdStr);
         }
+
+        int userId = getIntParameter(request, "userId").get();
+        Role role = getEnumParameter(request, Role.class, "role").get();
 
         UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
         if (user == null) {

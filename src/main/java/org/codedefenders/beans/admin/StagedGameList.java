@@ -425,34 +425,8 @@ public class StagedGameList implements Serializable {
             return gameDurationMinutes;
         }
 
-        /**
-         * Sets the game duration and checks if it is in the valid range defined by the system settings.
-         * If the value is out of bounds, it will be clamped and an info message is returned.
-         *
-         * @param duration The game duration in minutes
-         * @return Info about the boundaries of the duration if clamping was necessary.
-         */
-        public Optional<String> setGameDurationMinutes(final int duration) {
-            final int maxDuration = AdminDAO.getSystemSetting(
-                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
-            final int minDuration = 1;
-
-            if (duration > maxDuration) {
-                this.gameDurationMinutes = maxDuration;
-                return Optional.of(String.format(
-                        "INFO: The max. allowed duration is %d minutes.",
-                        maxDuration
-                ));
-            } else if (duration < minDuration) {
-                this.gameDurationMinutes = minDuration;
-                return Optional.of(String.format(
-                        "INFO: The min. allowed duration is %d minutes.",
-                        minDuration
-                ));
-            } else {
-                this.gameDurationMinutes = duration;
-                return Optional.empty();
-            }
+        public void setGameDurationMinutes(final int duration) {
+            this.gameDurationMinutes = duration;
         }
 
         public boolean isStartGame() {
