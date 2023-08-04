@@ -27,7 +27,7 @@ public class AchievementRepository {
 
     public Achievement achievementFromRS(ResultSet rs) throws SQLException {
         return new Achievement(
-                rs.getInt("ID"),
+                Achievement.Id.fromInt(rs.getInt("ID")),
                 rs.getInt("Level"),
                 rs.getString("Name"),
                 rs.getInt("Metric")
@@ -50,6 +50,21 @@ public class AchievementRepository {
             );
         } catch (SQLException e) {
             logger.error("Failed to get achievements for user {}", userId, e);
+            throw new UncheckedSQLException(e);
+        }
+    }
+
+    public int updateAchievementForUser(int userId, Achievement.Id achievementId, int metricChange) {
+        // TODO: Is there a way of doing this in bulk for multiple userIds?
+        @Language("SQL") String query = String.join("\n",
+                "INSERT INTO has_achievement(`Achievement_ID`, `User_ID`, `Metric`)",
+                "VALUES (?, ?, ?)",
+                "ON DUPLICATE KEY UPDATE",
+                "Metric = Metric + ?");
+        try {
+            return queryRunner.update(query, achievementId.getAsInt(), userId, metricChange, metricChange);
+        } catch (SQLException e) {
+            logger.error("Failed to update achievement for user {} and achievement {}", userId, achievementId, e);
             throw new UncheckedSQLException(e);
         }
     }

@@ -10,6 +10,7 @@ import javax.inject.Named;
 
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.Achievement;
 import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
@@ -38,7 +39,12 @@ public class AchievementService {
     }
 
     private void addGamePlayed(List<Player> players, Role role) {
-
+        int affected = players.stream().mapToInt(player ->
+                repo.updateAchievementForUser(player.getUser().getId(), Achievement.Id.PLAY_GAMES, 1)
+        ).sum();
+        if (affected > 0) {
+            logger.info("Updated {} PLAY_GAMES achievements for role {}", affected, role);
+        }
     }
 
     public void registerEventHandler() {
