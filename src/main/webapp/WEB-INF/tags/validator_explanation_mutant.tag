@@ -22,10 +22,11 @@
 <b>Relaxed</b> <br>
 <ul>
     <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
+    <li>No mutants with only changes to comments or formatting</li>
 </ul>
 <b>Moderate</b> <br>
 <ul>
-    <li>No comments</li>
+    <li>No changes to comments</li>
     <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
     <li>No ternary operators</li>
     <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
