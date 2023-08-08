@@ -206,10 +206,6 @@ public class AdminCreateGames extends HttpServlet {
         setGameDurationMinutes(gameSettings,
                 getIntParameter(request, "gameDurationMinutes").get());
 
-        // Don't user getIntParameter here because we want to error if the parameter is not parseable as int
-        gameSettings.setClassroomId(
-                getStringParameter(request, "classroomId").map(Integer::parseInt).get());
-
         return gameSettings;
     }
 
@@ -243,7 +239,7 @@ public class AdminCreateGames extends HttpServlet {
 
     private Optional<Set<UserInfo>> extractPlayers(HttpServletRequest request) {
         /* Extract user IDs from the table. */
-        String userIdsStr = getStringParameter(request, "userIds").get();
+        String userIdsStr = Optional.ofNullable(request.getParameter("userIds")).get();
         Set<Integer> userIdsFromTable = Arrays.stream(userIdsStr.split(","))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
@@ -251,7 +247,7 @@ public class AdminCreateGames extends HttpServlet {
                     .collect(Collectors.toSet());
 
         /* Extract usernames/emails from the text field. */
-        String userNamesStr = getStringParameter(request, "userNames").get();
+        String userNamesStr = Optional.ofNullable(request.getParameter("userNames")).get();
         Set<String> userNames = Arrays.stream(userNamesStr.split("\\R"))
                     .map(String::trim)
                     .filter(s -> !s.isEmpty())
@@ -259,29 +255,20 @@ public class AdminCreateGames extends HttpServlet {
 
         Set<UserInfo> players = new HashSet<>();
 
-        Optional<Integer> classroomId = getIntParameter(request, "classroomId");
-        if (classroomId.isPresent()) {
-            /* Get users for classrooms. */
-            Set<UserInfo> usersFromClassroomTable = adminCreateGamesBean.getPlayersForClassroom(classroomId.get());
-            players.addAll(usersFromClassroomTable);
-
-        } else {
-            /* Map given user IDs to users and validate that all exist. */
-            Optional<Set<UserInfo>> usersFromTable = adminCreateGamesBean.getUserInfosForIds(userIdsFromTable);
-            if (!usersFromTable.isPresent()) {
-                return Optional.empty();
-            }
-
-            /* Map given usernames/emails to users and validate that all exist. */
-            Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
-            if (!usersFromTextArea.isPresent()) {
-                return Optional.empty();
-            }
-
-            players.addAll(usersFromTable.get());
-            players.addAll(usersFromTextArea.get());
+        /* Map given user IDs to users and validate that all exist. */
+        Optional<Set<UserInfo>> usersFromTable = adminCreateGamesBean.getUserInfosForIds(userIdsFromTable);
+        if (!usersFromTable.isPresent()) {
+            return Optional.empty();
         }
 
+        /* Map given usernames/emails to users and validate that all exist. */
+        Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
+        if (!usersFromTextArea.isPresent()) {
+            return Optional.empty();
+        }
+
+        players.addAll(usersFromTable.get());
+        players.addAll(usersFromTextArea.get());
         return Optional.of(players);
     }
 

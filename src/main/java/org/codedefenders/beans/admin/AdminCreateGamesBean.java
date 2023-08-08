@@ -33,16 +33,11 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.Classroom;
-import org.codedefenders.model.ClassroomMember;
-import org.codedefenders.model.ClassroomRole;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.ClassroomService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
-import org.codedefenders.servlets.api.ClassroomAPI;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
 
@@ -79,19 +74,16 @@ public class AdminCreateGamesBean implements Serializable {
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
     private final GameService gameService;
-    private final ClassroomService classroomService;
 
     @Inject
     public AdminCreateGamesBean(CodeDefendersAuth login, MessagesBean messages, GameManagingUtils gameManagingUtils,
-                                EventDAO eventDAO, UserRepository userRepo, GameService gameService,
-                                ClassroomService classroomService) {
+                                EventDAO eventDAO, UserRepository userRepo, GameService gameService) {
         this.login = login;
         this.messages = messages;
         this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
         this.gameService = gameService;
-        this.classroomService = classroomService;
     }
 
     public Object getSynchronizer() {
@@ -489,16 +481,6 @@ public class AdminCreateGamesBean implements Serializable {
         return success ? Optional.of(users) : Optional.empty();
     }
 
-    public Set<UserInfo> getPlayersForClassroom(int classroomId) {
-        List<ClassroomMember> members = classroomService.getMembersForClassroom(classroomId);
-        return members.stream()
-                .filter(member -> member.getRole() == ClassroomRole.STUDENT)
-                .map(ClassroomMember::getUserId)
-                .map(userInfos::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-    }
-
     /**
      * Assigns roles to a collection of users based on a {@link RoleAssignmentMethod}. The users will be added to the
      * given {@code attackers} and {@code defenders} sets accordingly. Users that cannot be assigned with the given
@@ -797,28 +779,6 @@ public class AdminCreateGamesBean implements Serializable {
         return gson.toJson(userIds);
     }
 
-    public String getClassroomsJSON() {
-        List<Classroom> classrooms = new ArrayList<>();
-        classrooms.addAll(classroomService.getActiveClassroomsByMemberAndRole(
-                login.getUserId(), ClassroomRole.OWNER));
-        classrooms.addAll(classroomService.getActiveClassroomsByMemberAndRole(
-                login.getUserId(), ClassroomRole.MODERATOR));
-        Gson gson = new GsonBuilder()
-                .serializeNulls()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
-        return gson.toJson(addClassroomMemberCounts(classrooms));
-    }
-
-    private List<ClassroomDTO> addClassroomMemberCounts(List<Classroom> classrooms) {
-        return classrooms.stream()
-                .map(classroom -> {
-                    List<ClassroomMember> members = classroomService.getMembersForClassroom(classroom.getId());
-                    return new ClassroomDTO(classroom, members.size());
-                })
-                .collect(Collectors.toList());
-    }
-
     // TODO: Move this elsewhere?
     public static class UserInfoSerializer implements JsonSerializer<UserInfo> {
         @Override
@@ -882,15 +842,5 @@ public class AdminCreateGamesBean implements Serializable {
          * putting users with similar total scores in the same team.
          */
         SCORE_DESCENDING
-    }
-
-    private static class ClassroomDTO extends Classroom {
-        @Expose
-        private final int memberCount;
-
-        public ClassroomDTO(Classroom classroom, int memberCount) {
-            super(classroom);
-            this.memberCount = memberCount;
-        }
     }
 }

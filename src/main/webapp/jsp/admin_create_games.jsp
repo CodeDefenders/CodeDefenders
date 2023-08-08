@@ -84,31 +84,8 @@
 
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between flex-wrap gap-1">
-            <ul class="nav nav-pills nav-fill card-header-pills gap-1" role="tablist" id="table-tabs">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link py-1 active" id="classrooms-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#classrooms-pane"
-                            aria-controls="classrooms-pane"
-                            type="button" role="tab" aria-selected="true">
-                        Classrooms
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link py-1" id="users-tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#users-pane"
-                            aria-controls="users-pane"
-                            type="button" role="tab" aria-selected="true">
-                        Unassigned Users
-                    </button>
-                </li>
-            </ul>
-
-            <div id="classroom-table-controls" class="d-flex flex-wrap gap-2">
-                <input type="search" id="search-classrooms" class="form-control input-xs" placeholder="Search">
-            </div>
-            <div id="user-table-controls" class="d-flex flex-wrap gap-2" hidden>
+            Unassigned Users
+            <div class="d-flex flex-wrap gap-2">
                 <button id="select-visible-users" class="btn btn-xs btn-secondary">Select Visible</button>
                 <button id="deselect-visible-users" class="btn btn-xs btn-secondary">Deselect Visible</button>
                 <div>
@@ -126,14 +103,7 @@
         </div>
 
         <div class="card-body">
-            <div class="tab-content">
-                <div class="tab-pane active" id="classrooms-pane" role="tabpanel">
-                    <table id="table-classrooms" class="table table-v-align-middle"></table>
-                </div>
-                <div class="tab-pane" id="users-pane" role="tabpanel">
-                    <table id="table-users" class="table table-v-align-middle"></table>
-                </div>
-            </div>
+            <table id="table-users" class="table table-v-align-middle"></table>
         </div>
     </div>
 
@@ -566,7 +536,6 @@
     <script type="module">
         import {Popover} from '${url.forPath("/js/bootstrap.mjs")}';
         import DataTable from '${url.forPath("/js/datatables.mjs")}';
-        import $ from '${url.forPath("/js/jquery.mjs")}';
         import {GameTime} from '${url.forPath("/js/codedefenders_game.mjs")}';
 
         const loggedInUserId = ${login.userId};
@@ -596,10 +565,6 @@
          */
         const unassignedUserIds = new Set(JSON.parse('${adminCreateGames.unassignedUserIdsJSON}'));
 
-        /**
-         * Classrooms the user is participating in as OWNER or MODERATOR.
-         */
-        const classrooms = JSON.parse('${adminCreateGames.classroomsJSON}');
 
         /**
          * IDs of users assigned to any staged game.
@@ -671,12 +636,20 @@
             minute: '2-digit'
         });
 
-        const CLASSROOM_URL = '${url.forPath(Paths.CLASSROOM)}';
+        /* Returns the selected entries from a data table. */
+        const getSelected = function (table) {
+            const entries = [];
+            table.rows({selected: true}).every(function () {
+                entries.push(this.data());
+            });
+            return entries;
+        };
 
         /* Sorting method to select DataTables rows by whether they are selected by the select extension. */
         DataTable.ext.order['select-extension'] = function (settings, col) {
             return this.api().column(col, {order:'index'}).nodes().map(function (td, i) {
-                return $(td).closest('tr').hasClass('selected') ? '0' : '1';
+                const tr = td.closest('tr');
+                return tr.classList.contains('selected') ? '0' : '1';
             });
         };
 
@@ -834,38 +807,6 @@
                     }
             }
         }
-
-        const renderClassroomMemberCount = function(memberCount, type, row, meta) {
-            switch (type) {
-                case 'type':
-                case 'sort':
-                case 'filter':
-                    return memberCount;
-                case 'display':
-                    const members = memberCount > 1 ? 'Members' : 'Member';
-                    return `
-                        <span class="text-muted">\${memberCount} \${members}</span>
-                    `;
-            }
-        };
-
-        const renderClassroomLinkButton = function(data, type, row, meta) {
-            switch (type) {
-                case 'type':
-                case 'sort':
-                case 'filter':
-                    return null;
-                case 'display':
-                    const params = new URLSearchParams({
-                        classroomUid: data.uuid
-                    });
-                    return `
-                        <a href="\${CLASSROOM_URL}?\${params}" class="cursor-pointer float-end px-2">
-                            <i class="fa fa-external-link text-primary"></i>
-                        </a>
-                    `;
-            }
-        };
 
         /**
          * Creates a table displaying the players of a staged game, as well as a "form" to manipulate them.
@@ -1181,541 +1122,461 @@
             return table;
         };
 
-        $(document).ready(function () {
-            /* Restore the state of show/hide toggles for the tables. */
-            const setCheckboxButton = function (checkbox, checked) {
-                if (checked) {
-                    checkbox.checked = true;
-                    checkbox.parentNode.classList.add('active');
-                } else {
-                    checkbox.checked = false;
-                    checkbox.parentNode.classList.remove('active');
+        /* Restore the state of show/hide toggles for the tables. */
+        const setCheckboxButton = function (checkbox, checked) {
+            if (checked) {
+                checkbox.checked = true;
+                checkbox.parentNode.classList.add('active');
+            } else {
+                checkbox.checked = false;
+                checkbox.parentNode.classList.remove('active');
+            }
+        }
+        setCheckboxButton(document.getElementById('toggle-hide-players'), hideStagedGamePlayers);
+        setCheckboxButton(document.getElementById('toggle-show-assigned-users'), showAssignedUsers);
+
+        /* Staged games table and related components. */
+        const stagedGamesTable = new DataTable('#table-staged-games', {
+            data: stagedGamesTableData,
+            columns: [
+                {
+                    data: null,
+                    title: 'Select',
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    orderDataType: 'select-extension',
+                    width: '3em'
+                },
+                {
+                    data: 'id',
+                    render: renderStagedGameId,
+                    type: 'num-fmt',
+                    title: 'ID'
+                },
+                {
+                    data: 'gameSettings.cut',
+                    render: renderStagedGameClass,
+                    type: 'string',
+                    title: 'Class'
+                },
+                {
+                    data: 'gameSettings.gameType',
+                    render: renderStagedGameType,
+                    type: 'string',
+                    title: 'Game Type'
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    defaultContent: '<span class="btn btn-xs btn-secondary show-settings">Show</span>',
+                    type: 'html',
+                    title: 'Settings'
+                },
+                {
+                    data: null,
+                    render: renderStagedGamePlayers,
+                    type: 'html',
+                    width: '55%',
+                    title: 'Players (Username, Last Role, Total Score)'
+                },
+            ],
+            select: {
+                style: 'multi',
+                className: 'selected'
+            },
+            drawCallback: function () {
+                const table = this.api().table().container();
+
+                /* Select nothing in all selects in the table. */
+                for (const select of table.querySelectorAll('select')) {
+                    select.selectedIndex = -1;
+                }
+
+                /* Setup popovers to display the game settings. */
+                for (const button of table.querySelectorAll('.show-settings')) {
+                    new Popover(button, {
+                        container: document.body,
+                        placement: 'right',
+                        trigger: 'hover',
+                        html: true,
+                        title: 'Game Settings',
+                        content: function () {
+                            const tr = this.closest('tr');
+                            const row = stagedGamesTable.row(tr);
+                            const stagedGame = row.data();
+                            return createSettingsTable(stagedGame.gameSettings);
+                        }
+                    });
+                }
+            },
+            order: [[1, 'asc']],
+            scrollY: '800px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: {emptyTable: 'There are currently no staged multiplayer games.'}
+        });
+
+        /* Search bar. */
+        document.getElementById('search-staged-games').addEventListener('keyup', function (event) {
+            stagedGamesTable.search(this.value).draw();
+        });
+
+        /* Show/hide players assigned to staged games. */
+        document.getElementById('toggle-hide-players').addEventListener('change', function (event) {
+            hideStagedGamePlayers = this.checked;
+            localStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
+            stagedGamesTable.rows().invalidate().draw();
+        });
+
+        /* Toggle create-games and delete-games buttons based on whether staged games are selected. */
+        stagedGamesTable.on('select', function (e, dt, type, indexes) {
+            document.getElementById('create-games-button').disabled = false;
+            document.getElementById('delete-games-button').disabled = false;
+        });
+        stagedGamesTable.on('deselect', function (e, dt, type, indexes) {
+            if (getSelected(stagedGamesTable).length === 0) {
+                document.getElementById('create-games-button').disabled = true;
+                document.getElementById('delete-games-button').disabled = true;
+            }
+        });
+
+        /* Select / deselect all visible staged games. */
+        document.getElementById('select-visible-games').addEventListener('click', function (event) {
+            stagedGamesTable.rows({search: 'applied'}).select();
+        })
+        document.getElementById('deselect-visible-games').addEventListener('click', function (event) {
+            stagedGamesTable.rows({search: 'applied'}).deselect();
+        });
+
+        /* Set role options according to the game type when a game id is selected. */
+        stagedGamesTable.table().node().addEventListener('change', function (event) {
+            const select = event.target.closest('.move-player-game');
+            if (select === null) return;
+
+            const tr = select.closest('tr');
+            const roleSelect = tr.querySelector('.move-player-role');
+            const button = tr.querySelector('.move-player-button');
+            adjustFormForGame(roleSelect, button, select.value);
+        });
+
+        /* Switch a player's role. */
+        stagedGamesTable.table().node().addEventListener('click', function (event) {
+            const button = event.target.closest('.switch-role-button');
+            if (button === null) return;
+
+            const innerTr = button.closest('tr');
+            const outerTr = innerTr.parentElement.closest('tr');
+            const userId = Number(innerTr.dataset.userId);
+            const stagedGame = stagedGamesTable.row(outerTr).data();
+            postForm({
+                formType: 'switchRole',
+                userId: userId,
+                gameId: 'T' + stagedGame.id,
+            });
+        });
+
+        /* Switch creator role. */
+        stagedGamesTable.table().node().addEventListener('click', function (event) {
+            const button = event.target.closest('.switch-creator-role-button');
+            if (button === null) return;
+
+            const outerTr = button.closest('tr').parentElement.closest('tr');
+            const stagedGame = stagedGamesTable.row(outerTr).data();
+            postForm({
+                formType: 'switchCreatorRole',
+                gameId: 'T' + stagedGame.id,
+            });
+        });
+
+        /* Remove a player from a staged game. */
+        stagedGamesTable.table().node().addEventListener('click', function (event) {
+            const button = event.target.closest('.remove-player-button');
+            if (button === null) return;
+
+            const innerTr = button.closest('tr');
+            const outerTr = innerTr.parentElement.closest('tr');
+            const stagedGame = stagedGamesTable.row(outerTr).data();
+            postForm({
+                formType: 'removePlayerFromStagedGame',
+                userId: innerTr.getAttribute('data-user-id'),
+                gameId: 'T' + stagedGame.id,
+            });
+        });
+
+        /* Remove creator from staged game. */
+        stagedGamesTable.table().node().addEventListener('click', function (event) {
+            const button = event.target.closest('.remove-creator-button');
+            if (button === null) return;
+
+            const outerTr = button.closest('tr').parentElement.closest('tr');
+            const stagedGame = stagedGamesTable.row(outerTr).data();
+            postForm({
+                formType: 'removeCreatorFromStagedGame',
+                gameId: 'T' + stagedGame.id,
+            });
+        });
+
+        /* Move a player between staged games. */
+        stagedGamesTable.table().node().addEventListener('click', function (event) {
+            const button = event.target.closest('.move-player-button');
+            if (button === null) return;
+
+            const innerTr = button.closest('tr');
+            const outerTr = innerTr.parentElement.closest('tr');
+            const stagedGame = stagedGamesTable.row(outerTr).data();
+            const gameSelect = innerTr.querySelector('.move-player-game');
+            const roleSelect = innerTr.querySelector('.move-player-role');
+            postForm({
+                formType: 'movePlayerBetweenStagedGames',
+                userId: innerTr.getAttribute('data-user-id'),
+                gameIdFrom: 'T' + stagedGame.id,
+                gameIdTo: gameSelect.value,
+                role: roleSelect.value
+            });
+        });
+
+        /* Delete selected games. */
+        document.getElementById('delete-games-button').addEventListener('click', function (event) {
+            const stagedGameIds = getSelected(stagedGamesTable)
+                    .map(stagedGame => 'T' + stagedGame.id);
+            postForm({
+                formType: 'deleteStagedGames',
+                stagedGameIds
+            });
+        });
+
+        /* Create selected games. */
+        document.getElementById('create-games-button').addEventListener('click', function (event) {
+            const stagedGameIds = getSelected(stagedGamesTable)
+                    .map(stagedGame => 'T' + stagedGame.id);
+            postForm({
+                formType: 'createStagedGames',
+                stagedGameIds
+            });
+        });
+
+        /* Users table and related components. */
+        const usersTable = new DataTable('#table-users', {
+            data: usersTableData,
+            columns: [
+                {
+                    data: null,
+                    title: 'Select',
+                    defaultContent: '',
+                    className: 'select-checkbox',
+                    orderDataType: 'select-extension',
+                    width: '3em'
+                },
+                {
+                    data: 'user.id',
+                    type: 'num',
+                    title: 'ID'
+                },
+                {
+                    data: 'user.username',
+                    type: 'string',
+                    title: 'Name'
+                },
+                {
+                    data: 'lastRole',
+                    render: renderUserLastRole,
+                    type: 'html',
+                    title: 'Last Role'
+                },
+                {
+                    data: 'totalScore',
+                    type: 'num',
+                    title: 'Total Score'
+                },
+                {
+                    data: 'lastLogin',
+                    render: renderUserLastLogin,
+                    type: 'html',
+                    title: 'Last Login'
+                },
+                {
+                    data: null,
+                    render: renderUserAddToGame,
+                    orderable: false,
+                    type: 'html',
+                    title: 'Add to existing game'
+                }
+            ],
+            select: {
+                style: 'multi',
+                className: 'selected'
+            },
+            drawCallback: function () {
+                const table = this.api().table().container();
+
+                /* Select nothing in all selects in the table. */
+                for (const select of table.querySelectorAll('select')) {
+                    select.selectedIndex = -1;
+                }
+            },
+            order: [[5, 'asc']],
+            scrollY: '600px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: {emptyTable: 'There are currently no unassigned users.'}
+        });
+
+        /* Search bar. */
+        document.getElementById('search-users').addEventListener('keyup', function (event) {
+            usersTable.search(this.value).draw();
+        });
+
+        /* Show/hide users assigned to active existing games. */
+        document.getElementById('toggle-show-assigned-users').addEventListener('change', function (event) {
+            showAssignedUsers = this.checked;
+            localStorage.setItem('showAssignedUsers', JSON.stringify(showAssignedUsers));
+            usersTable.draw();
+        });
+
+        /* Select / deselect all visible users. */
+        document.getElementById('select-visible-users').addEventListener('click', function () {
+            usersTable.rows({search: 'applied'}).select();
+        })
+        document.getElementById('deselect-visible-users').addEventListener('click', function () {
+            usersTable.rows({search: 'applied'}).deselect();
+        });
+
+        /* Set role options according to the game type when a game id is selected. */
+        usersTable.table().node().addEventListener('change', function (event) {
+            const select = event.target.closest('.add-player-game');
+            if (select === null) return;
+
+            const tr = select.closest('tr');
+            const roleSelect = tr.querySelector('.add-player-role');
+            const button = tr.querySelector('.add-player-button');
+            adjustFormForGame(roleSelect, button, select.value);
+        });
+
+        /* Add a users to a staged game or existing active game. */
+        usersTable.table().node().addEventListener('click', function (event) {
+            const button = event.target.closest('.add-player-button');
+            if (button === null) return;
+
+            /* Go up two levels of tr, since the form is in a table itself. */
+            const outerTr = button.closest('tr').parentElement.closest('tr');
+            const userInfo = usersTable.row(outerTr).data();
+            const gameSelect = outerTr.querySelector('.add-player-game');
+            const roleSelect = outerTr.querySelector('.add-player-role');
+            postForm({
+                formType: 'addPlayerToGame',
+                userId: userInfo.user.id,
+                gameId: gameSelect.value,
+                role: roleSelect.value
+            });
+        });
+
+        /* Toggle multiplayer/melee specific forms based on selected game type. */
+        document.getElementById('gameType-group').addEventListener('change', function (event) {
+            const roleSelect = document.getElementById('role-select');
+            const observerOption = document.createElement('option');
+            observerOption.value = Role.OBSERVER.name;
+            observerOption.innerText = Role.OBSERVER.display;
+
+            switch (event.target.value) {
+                case 'MULTIPLAYER':
+                    for (const element of document.querySelectorAll('.melee-specific')) {
+                        element.setAttribute('hidden', '');
+                    }
+                    for (const element of document.querySelectorAll('.multiplayer-specific')) {
+                        element.removeAttribute('hidden');
+                    }
+                    const attackerOption = document.createElement('option');
+                    attackerOption.value = Role.ATTACKER.name;
+                    attackerOption.innerText = Role.ATTACKER.display;
+                    const defenderOption = document.createElement('option');
+                    defenderOption.value = Role.DEFENDER.name;
+                    defenderOption.innerText = Role.DEFENDER.display;
+                    roleSelect.replaceChildren(observerOption, attackerOption, defenderOption);
+                    roleSelect.selectedIndex = 0;
+                    break;
+                case 'MELEE':
+                    for (const element of document.querySelectorAll('.multiplayer-specific')) {
+                        element.setAttribute('hidden', '');
+                    }
+                    for (const element of document.querySelectorAll('.melee-specific')) {
+                        element.removeAttribute('hidden');
+                    }
+                    const playerOption = document.createElement('option');
+                    playerOption.value = Role.PLAYER.name;
+                    playerOption.innerText = Role.PLAYER.display;
+                    roleSelect.replaceChildren(observerOption, playerOption);
+                    roleSelect.selectedIndex = 0;
+                    break;
+            }
+        });
+
+        /* Toggle stage games button based on whether users are selected or usernames are given. */
+        usersTable.on('select', function (e, dt, type, indexes) {
+            document.getElementById('stage-games-button').disabled = false;
+        });
+        usersTable.on('deselect', function (e, dt, type, indexes) {
+            const userNames = document.getElementById('userNames').value;
+            const button = document.getElementById('stage-games-button');
+
+            if (getSelected(usersTable).length === 0
+                    && userNames.length === 0) {
+                button.disabled = true;
+            }
+        });
+        document.getElementById('userNames').addEventListener('keyup', function (event) {
+            const userNames = document.getElementById('userNames').value;
+            const button = document.getElementById('stage-games-button');
+
+            if (getSelected(usersTable).length === 0
+                    && userNames.length === 0) {
+                button.disabled = true;
+            } else {
+                button.disabled = false;
+            }
+        });
+
+        /* Create new staged games with users. */
+        document.getElementById('stage-games-button').addEventListener('click', function (event) {
+            const userIds = getSelected(usersTable)
+                    .map(userInfo => userInfo.user.id);
+
+            const params = {
+                formType: 'stageGamesWithUsers',
+                userIds
+            };
+
+            const formData = new FormData(document.getElementById('form-settings'));
+            for (const [name, value] of formData.entries()) {
+                params[name] = value;
+            }
+            postForm(params);
+        });
+
+        /* Create new empty staged games. */
+        document.getElementById('stage-games-empty-button').addEventListener('click', function (event) {
+            const userNames = document.getElementById('userNames').value;
+
+            if (getSelected(usersTable).length > 0) {
+                if (!confirm("You have users selected. Are you sure you want to stage empty games?")) {
+                    return;
+                }
+            } else if (userNames.length > 0) {
+                if (!confirm("You entered user names/emails. Are you sure you want to stage empty games?")) {
+                    return;
                 }
             }
-            setCheckboxButton($('#toggle-hide-players').get(0), hideStagedGamePlayers);
-            setCheckboxButton($('#toggle-show-assigned-users').get(0), showAssignedUsers);
 
-            /* Staged games table and related components. */
-            const stagedGamesTable = new DataTable('#table-staged-games', {
-                data: stagedGamesTableData,
-                columns: [
-                    {
-                        data: null,
-                        title: 'Select',
-                        defaultContent: '',
-                        className: 'select-checkbox',
-                        orderDataType: 'select-extension',
-                        width: '3em'
-                    },
-                    {
-                        data: 'id',
-                        render: renderStagedGameId,
-                        type: 'num-fmt',
-                        title: 'ID'
-                    },
-                    {
-                        data: 'gameSettings.cut',
-                        render: renderStagedGameClass,
-                        type: 'string',
-                        title: 'Class'
-                    },
-                    {
-                        data: 'gameSettings.gameType',
-                        render: renderStagedGameType,
-                        type: 'string',
-                        title: 'Game Type'
-                    },
-                    {
-                        data: null,
-                        orderable: false,
-                        defaultContent: '<span class="btn btn-xs btn-secondary show-settings">Show</span>',
-                        type: 'html',
-                        title: 'Settings'
-                    },
-                    {
-                        data: null,
-                        render: renderStagedGamePlayers,
-                        type: 'html',
-                        width: '55%',
-                        title: 'Players (Username, Last Role, Total Score)'
-                    },
-                ],
-                select: {
-                    style: 'multi',
-                    className: 'selected'
-                },
-                drawCallback: function () {
-                    const table = this.api().table().container();
+            const params = {
+                formType: 'stageEmptyGames'
+            };
 
-                    /* Select nothing in all selects in the table. */
-                    for (const select of table.querySelectorAll('select')) {
-                        select.selectedIndex = -1;
-                    }
-
-                    /* Setup popovers to display the game settings. */
-                    for (const button of table.querySelectorAll('.show-settings')) {
-                        new Popover(button, {
-                            container: document.body,
-                            placement: 'right',
-                            trigger: 'hover',
-                            html: true,
-                            title: 'Game Settings',
-                            content: function () {
-                                const tr = $(this).closest('tr').get(0);
-                                const row = stagedGamesTable.row(tr);
-                                const stagedGame = row.data();
-                                return createSettingsTable(stagedGame.gameSettings);
-                            }
-                        });
-                    }
-                },
-                order: [[1, 'asc']],
-                scrollY: '800px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {emptyTable: 'There are currently no staged multiplayer games.'}
-            });
-
-            /* Search bar. */
-            $('#search-staged-games').on('keyup', function () {
-                setTimeout(() => stagedGamesTable.search(this.value).draw(), 0);
-            });
-
-            /* Show/hide players assigned to staged games. */
-            $('#toggle-hide-players').on('change', function () {
-                hideStagedGamePlayers = $(this).is(':checked');
-                localStorage.setItem('hideStagedGamePlayers', JSON.stringify(hideStagedGamePlayers));
-                stagedGamesTable.rows().invalidate().draw();
-            });
-
-            /* Toggle create-games and delete-games buttons based on whether staged games are selected. */
-            stagedGamesTable.on('select', function (e, dt, type, indexes) {
-                $('#create-games-button').get(0).disabled = false;
-                $('#delete-games-button').get(0).disabled = false;
-            });
-            stagedGamesTable.on('deselect', function (e, dt, type, indexes) {
-                if (stagedGamesTable.rows({selected: true})[0].length === 0) {
-                    $('#create-games-button').get(0).disabled = true;
-                    $('#delete-games-button').get(0).disabled = true;
-                }
-            });
-
-            /* Select / deselect all visible staged games. */
-            $('#select-visible-games').on('click', function () {
-                stagedGamesTable.rows({search: 'applied'}).select();
-            })
-            $('#deselect-visible-games').on('click', function () {
-                stagedGamesTable.rows({search: 'applied'}).deselect();
-            });
-
-            /* Set role options according to the game type when a game id is selected. */
-            $(stagedGamesTable.table().node()).on('change', '.move-player-game', function () {
-                const tr = $(this).closest('tr');
-                const roleSelect = $(tr).find('.move-player-role').get(0);
-                const button = $(tr).find('.move-player-button').get(0);
-                adjustFormForGame(roleSelect, button, this.value);
-            });
-
-            /* Switch a player's role. */
-            $(stagedGamesTable.table().node()).on('click', '.switch-role-button', function () {
-                const innerTr = $(this).parents('tr').get(0);
-                const outerTr = $(this).parents('tr').get(1);
-                const userId = Number(innerTr.getAttribute('data-user-id'));
-                const stagedGame = stagedGamesTable.row(outerTr).data();
-                postForm({
-                    formType: 'switchRole',
-                    userId: userId,
-                    gameId: 'T' + stagedGame.id,
-                });
-            });
-
-            /* Switch creator role. */
-            $(stagedGamesTable.table().node()).on('click', '.switch-creator-role-button', function () {
-                const outerTr = $(this).parents('tr').get(1);
-                const stagedGame = stagedGamesTable.row(outerTr).data();
-                postForm({
-                    formType: 'switchCreatorRole',
-                    gameId: 'T' + stagedGame.id,
-                });
-            });
-
-            /* Remove a player from a staged game. */
-            $(stagedGamesTable.table().node()).on('click', '.remove-player-button', function () {
-                const innerTr = $(this).parents('tr').get(0);
-                const outerTr = $(this).parents('tr').get(1);
-                const stagedGame = stagedGamesTable.row(outerTr).data();
-                postForm({
-                    formType: 'removePlayerFromStagedGame',
-                    userId: innerTr.getAttribute('data-user-id'),
-                    gameId: 'T' + stagedGame.id,
-                });
-            });
-
-            /* Remove creator from staged game. */
-            $(stagedGamesTable.table().node()).on('click', '.remove-creator-button', function () {
-                const outerTr = $(this).parents('tr').get(1);
-                const stagedGame = stagedGamesTable.row(outerTr).data();
-                postForm({
-                    formType: 'removeCreatorFromStagedGame',
-                    gameId: 'T' + stagedGame.id,
-                });
-            });
-
-            /* Move a player between staged games. */
-            $(stagedGamesTable.table().node()).on('click', '.move-player-button', function () {
-                const innerTr = $(this).parents('tr').get(0);
-                const outerTr = $(this).parents('tr').get(1);
-                const stagedGame = stagedGamesTable.row(outerTr).data();
-                const gameSelect = $(innerTr).find('.move-player-game').get(0);
-                const roleSelect = $(innerTr).find('.move-player-role').get(0);
-                postForm({
-                    formType: 'movePlayerBetweenStagedGames',
-                    userId: innerTr.getAttribute('data-user-id'),
-                    gameIdFrom: 'T' + stagedGame.id,
-                    gameIdTo: gameSelect.value,
-                    role: roleSelect.value
-                });
-            });
-
-            /* Delete selected games. */
-            $('#delete-games-button').on('click', function () {
-                const stagedGameIds = [];
-                stagedGamesTable.rows({selected: true}).every(function () {
-                    const stagedGame = this.data();
-                    stagedGameIds.push('T' + stagedGame.id);
-                });
-                postForm({
-                    formType: 'deleteStagedGames',
-                    stagedGameIds
-                });
-            });
-
-            /* Create selected games. */
-            $('#create-games-button').on('click', function () {
-                const stagedGameIds = [];
-                stagedGamesTable.rows({selected: true}).every(function () {
-                    const stagedGame = this.data();
-                    stagedGameIds.push('T' + stagedGame.id);
-                });
-                postForm({
-                    formType: 'createStagedGames',
-                    stagedGameIds
-                });
-            });
-
-            /* Users table and related components. */
-            const usersTable = new DataTable('#table-users', {
-                data: usersTableData,
-                columns: [
-                    {
-                        data: null,
-                        title: 'Select',
-                        defaultContent: '',
-                        className: 'select-checkbox',
-                        orderDataType: 'select-extension',
-                        width: '3em'
-                    },
-                    {
-                        data: 'user.id',
-                        type: 'num',
-                        title: 'ID'
-                    },
-                    {
-                        data: 'user.username',
-                        type: 'string',
-                        title: 'Name'
-                    },
-                    {
-                        data: 'lastRole',
-                        render: renderUserLastRole,
-                        type: 'html',
-                        title: 'Last Role'
-                    },
-                    {
-                        data: 'totalScore',
-                        type: 'num',
-                        title: 'Total Score'
-                    },
-                    {
-                        data: 'lastLogin',
-                        render: renderUserLastLogin,
-                        type: 'html',
-                        title: 'Last Login'
-                    },
-                    {
-                        data: null,
-                        render: renderUserAddToGame,
-                        orderable: false,
-                        type: 'html',
-                        title: 'Add to existing game'
-                    }
-                ],
-                select: {
-                    style: 'multi',
-                    className: 'selected'
-                },
-                drawCallback: function () {
-                    const table = this.api().table().container();
-
-                    /* Select nothing in all selects in the table. */
-                    for (const select of table.querySelectorAll('select')) {
-                        select.selectedIndex = -1;
-                    }
-                },
-                order: [[5, 'asc']],
-                scrollY: '600px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {emptyTable: 'There are currently no unassigned users.'}
-            });
-
-            /* Search bar. */
-            $('#search-users').on('keyup', function () {
-                setTimeout(() => usersTable.search(this.value).draw(), 0);
-            });
-
-            /* Show/hide users assigned to active existing games. */
-            $('#toggle-show-assigned-users').on('change', function () {
-                showAssignedUsers = $(this).is(':checked');
-                localStorage.setItem('showAssignedUsers', JSON.stringify(showAssignedUsers));
-                usersTable.draw();
-            });
-
-            /* Select / deselect all visible users. */
-            $('#select-visible-users').on('click', function () {
-                usersTable.rows({search: 'applied'}).select();
-            })
-            $('#deselect-visible-users').on('click', function () {
-                usersTable.rows({search: 'applied'}).deselect();
-            });
-
-            /* Set role options according to the game type when a game id is selected. */
-            $(usersTable.table().node()).on('change', '.add-player-game', function () {
-                const tr = $(this).closest('tr').get(0);
-                const roleSelect = $(tr).find('.add-player-role').get(0);
-                const button = $(tr).find('.add-player-button').get(0);
-                adjustFormForGame(roleSelect, button, this.value);
-            });
-
-            /* Add a users to a staged game or existing active game. */
-            $(usersTable.table().node()).on('click', '.add-player-button', function () {
-                /* Go up two levels of tr, since the form is in a table itself. */
-                const tr = $(this).parents('tr').get(1);
-                const userInfo = usersTable.row(tr).data();
-                const gameSelect = $(tr).find('.add-player-game').get(0);
-                const roleSelect = $(tr).find('.add-player-role').get(0);
-                postForm({
-                    formType: 'addPlayerToGame',
-                    userId: userInfo.user.id,
-                    gameId: gameSelect.value,
-                    role: roleSelect.value
-                });
-            });
-
-            /* Toggle multiplayer/melee specific forms based on selected game type. */
-            $('#gameType-group').on('change', function (event) {
-                const roleSelect = document.getElementById('role-select');
-                const observerOption = document.createElement('option');
-                observerOption.value = Role.OBSERVER.name;
-                observerOption.innerText = Role.OBSERVER.display;
-
-                switch (event.target.value) {
-                    case 'MULTIPLAYER':
-                        for (const element of document.querySelectorAll('.melee-specific')) {
-                            element.setAttribute('hidden', '');
-                        }
-                        for (const element of document.querySelectorAll('.multiplayer-specific')) {
-                            element.removeAttribute('hidden');
-                        }
-                        const attackerOption = document.createElement('option');
-                        attackerOption.value = Role.ATTACKER.name;
-                        attackerOption.innerText = Role.ATTACKER.display;
-                        const defenderOption = document.createElement('option');
-                        defenderOption.value = Role.DEFENDER.name;
-                        defenderOption.innerText = Role.DEFENDER.display;
-                        roleSelect.replaceChildren(observerOption, attackerOption, defenderOption);
-                        roleSelect.selectedIndex = 0;
-                        break;
-                    case 'MELEE':
-                        for (const element of document.querySelectorAll('.multiplayer-specific')) {
-                            element.setAttribute('hidden', '');
-                        }
-                        for (const element of document.querySelectorAll('.melee-specific')) {
-                            element.removeAttribute('hidden');
-                        }
-                        const playerOption = document.createElement('option');
-                        playerOption.value = Role.PLAYER.name;
-                        playerOption.innerText = Role.PLAYER.display;
-                        roleSelect.replaceChildren(observerOption, playerOption);
-                        roleSelect.selectedIndex = 0;
-                        break;
-                }
-            });
-
-            /* Classrooms table and related components. */
-            const classroomsTable = new DataTable('#table-classrooms', {
-                data: classrooms,
-                columns: [
-                    {
-                        data: null,
-                        title: 'Select',
-                        defaultContent: '',
-                        className: 'select-checkbox',
-                        orderDataType: 'select-extension',
-                        width: '3em'
-                    },
-                    {
-                        data: 'name',
-                        type: 'string',
-                        title: 'Name',
-                        width: '25em',
-                        className: 'truncate'
-                    },
-                    {
-                        data: 'memberCount',
-                        type: 'html',
-                        title: 'Members',
-                        render: renderClassroomMemberCount
-                    },
-                    {
-                        data: 'uuid',
-                        type: 'string',
-                        title: 'UID'
-                    },
-                    {
-                        data: null,
-                        title: 'Link',
-                        render: renderClassroomLinkButton,
-                        width: '2em'
-                    },
-                ],
-                select: {
-                    style: 'single',
-                    className: 'selected'
-                },
-                order: [[1, 'asc']],
-                scrollY: '600px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: {emptyTable: "You don't manage any classrooms."}
-            });
-
-            /* Search bar. */
-            $('#search-classrooms').on('keyup', function () {
-                setTimeout(() => classroomsTable.search(this.value).draw(), 0);
-            });
-
-            /* Classrooms table and users table interaction. */
-            /* Toggle stage games button based on whether users are selected or usernames are given. */
-            usersTable.on('select', function (e, dt, type, indexes) {
-                $('#stage-games-button').get(0).disabled = false;
-            });
-            classroomsTable.on('select', function (e, dt, type, indexes) {
-                $('#stage-games-button').get(0).disabled = false;
-            });
-            usersTable.on('deselect', function (e, dt, type, indexes) {
-                if (usersTable.rows({selected: true})[0].length === 0
-                        && classroomsTable.rows({selected: true})[0].length === 0
-                        && $('#userNames').val().length === 0) {
-                    $('#stage-games-button').get(0).disabled = true;
-                }
-            });
-            classroomsTable.on('deselect', function (e, dt, type, indexes) {
-                if (usersTable.rows({selected: true})[0].length === 0
-                        && classroomsTable.rows({selected: true})[0].length === 0
-                        && $('#userNames').val().length === 0) {
-                    $('#stage-games-button').get(0).disabled = true;
-                }
-            });
-            $('#userNames').on('keyup', function () {
-                if (usersTable.rows({selected: true})[0].length === 0
-                        && classroomsTable.rows({selected: true})[0].length === 0
-                        && $('#userNames').val().length === 0) {
-                    $('#stage-games-button').get(0).disabled = true;
-                } else {
-                    $('#stage-games-button').get(0).disabled = false;
-                }
-            });
-
-            /* Toggle table controls when tab is selected. */
-            document.getElementById('table-tabs').addEventListener('shown.bs.tab', function (event) {
-                const userControls = document.getElementById('user-table-controls');
-                const classroomControls = document.getElementById('classroom-table-controls');
-
-                if (event.target.id === 'classrooms-tab') {
-                    userControls.classList.remove('d-flex');
-                    userControls.classList.add('d-none');
-                    classroomControls.classList.remove('d-none');
-                    classroomControls.classList.add('d-flex');
-                    classroomsTable.draw();
-                } else if (event.target.id === 'users-tab') {
-                    classroomControls.classList.remove('d-flex');
-                    classroomControls.classList.add('d-none');
-                    userControls.classList.remove('d-none');
-                    userControls.classList.add('d-flex');
-                    usersTable.draw();
-                }
-            });
-            /* Switch the controls to the initial state. */
-            const userControls = document.getElementById('user-table-controls');
-            userControls.classList.remove('d-flex');
-            userControls.classList.add('d-none');
-
-            /* Create new staged games with users. */
-            $('#stage-games-button').on('click', function () {
-                const userIds = [];
-                usersTable.rows({selected: true}).every(function () {
-                    const userInfo = this.data();
-                    userIds.push(userInfo.user.id);
-                });
-
-                const params = {
-                    formType: 'stageGamesWithUsers',
-                    userIds
-                };
-
-                if (classroomsTable.rows({selected: true})[0].length > 0) {
-                    params.classroomId = classroomsTable.rows({selected: true}).data()[0].id;
-                }
-
-                for (const {name, value} of $("#form-settings").serializeArray()) {
-                    params[name] = value;
-                }
-                postForm(params);
-            });
-
-            /* Create new empty staged games. */
-            $('#stage-games-empty-button').on('click', function () {
-                if (classroomsTable.rows({selected: true})[0].length > 0) {
-                    if (!confirm("You have a classroom selected. Are you sure you want to stage empty games?")) {
-                        return;
-                    }
-                } else if (usersTable.rows({selected: true})[0].length > 0) {
-                    if (!confirm("You have users selected. Are you sure you want to stage empty games?")) {
-                        return;
-                    }
-                } else if ($('#userNames').val().length > 0) {
-                    if (!confirm("You entered user names/emails. Are you sure you want to stage empty games?")) {
-                        return;
-                    }
-                }
-
-                const params = {
-                    formType: 'stageEmptyGames'
-                };
-
-                if (classroomsTable.rows({selected: true})[0].length > 0) {
-                    params.classroomId = classroomsTable.rows({selected: true}).data()[0].id;
-                }
-
-                for (const {name, value} of $("#form-settings").serializeArray()) {
-                    params[name] = value;
-                }
-                postForm(params);
-            });
+            const formData = new FormData(document.getElementById('form-settings'));
+            for (const [name, value] of formData.entries()) {
+                params[name] = value;
+            }
+            postForm(params);
         });
     </script>
 </div>
