@@ -35,13 +35,16 @@ public class AchievementRepository {
     }
 
     public Collection<Achievement> getAchievementsForUser(int userId) {
-        @Language("SQL") String query = String.join("\n",
+        @Language("SQL")
+        String query = String.join("\n",
                 "SELECT Achievement_ID, Achievement_Level",
                 "FROM has_achievement",
                 "WHERE User_ID = ?",
                 "LEFT JOIN achievements",
                 "ON has_achievement.Achievement_ID = achievement.ID",
-                "AND has_achievement.Achievement_Level = achievement.Level");
+                "AND has_achievement.Achievement_Level = achievement.Level"
+        );
+
         try {
             return queryRunner.query(
                     query,
@@ -53,18 +56,47 @@ public class AchievementRepository {
             throw new UncheckedSQLException(e);
         }
     }
-
     public int updateAchievementForUser(int userId, Achievement.Id achievementId, int metricChange) {
-        // TODO: Is there a way of doing this in bulk for multiple userIds?
-        @Language("SQL") String query = String.join("\n",
+        int updated = updateAchievementMetricForUser(userId, achievementId, metricChange);
+        return updated > 0 ? updateAchievementLevelForUser(userId, achievementId) : updated;
+    }
+
+    private int updateAchievementMetricForUser(int userId, Achievement.Id achievementId, int metricChange) {
+        @Language("SQL")
+        String query = String.join("\n",
                 "INSERT INTO has_achievement(`Achievement_ID`, `User_ID`, `Metric`)",
                 "VALUES (?, ?, ?)",
                 "ON DUPLICATE KEY UPDATE",
-                "Metric = Metric + ?");
+                "Metric = Metric + ?"
+        );
+
         try {
             return queryRunner.update(query, achievementId.getAsInt(), userId, metricChange, metricChange);
         } catch (SQLException e) {
-            logger.error("Failed to update achievement for user {} and achievement {}", userId, achievementId, e);
+            logger.error("Failed to update achievement metric for user {} and achievement {}", userId, achievementId,
+                    e);
+            throw new UncheckedSQLException(e);
+        }
+    }
+
+    private int updateAchievementLevelForUser(int userId, Achievement.Id achievementId) {
+        @Language("SQL")
+        String query = String.join("\n",
+                "UPDATE has_achievement",
+                "SET Achievement_Level = Achievement_Level + 1",
+                "WHERE User_ID = ?",
+                "AND Achievement_ID = ?",
+                "AND Metric >= (SELECT Metric ",
+                "FROM achievements",
+                "WHERE ID = ? ",
+                "AND Level = Achievement_Level + 1",
+                ")"
+        );
+
+        try {
+            return queryRunner.update(query, userId, achievementId.getAsInt(), achievementId.getAsInt());
+        } catch (SQLException e) {
+            logger.error("Failed to update achievement level for user {} and achievement {}", userId, achievementId, e);
             throw new UncheckedSQLException(e);
         }
     }

@@ -39,11 +39,28 @@ public class AchievementService {
     }
 
     private void addGamePlayed(List<Player> players, Role role) {
-        int affected = players.stream().mapToInt(player ->
-                repo.updateAchievementForUser(player.getUser().getId(), Achievement.Id.PLAY_GAMES, 1)
-        ).sum();
+        int affected = players.stream().mapToInt(player -> {
+            int userId = player.getUser().getId();
+            // TODO: replace with switch expression once we are on a higher language level
+            Achievement.Id achievementId;
+            switch (role) {
+                case DEFENDER:
+                    achievementId = Achievement.Id.PLAY_AS_DEFENDER;
+                    break;
+                case ATTACKER:
+                    achievementId = Achievement.Id.PLAY_AS_ATTACKER;
+                    break;
+                case PLAYER:
+                    achievementId = Achievement.Id.PLAY_MELEE_GAMES;
+                    break;
+                default:
+                    throw new IllegalArgumentException();
+            }
+            return repo.updateAchievementForUser(userId, Achievement.Id.PLAY_GAMES, 1)
+                    + repo.updateAchievementForUser(userId, achievementId, 1);
+        }).sum();
         if (affected > 0) {
-            logger.info("Updated {} PLAY_GAMES achievements for role {}", affected, role);
+            logger.info("Updated {} achievements for role {}", affected, role);
         }
     }
 
