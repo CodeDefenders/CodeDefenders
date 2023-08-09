@@ -47,7 +47,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.google.gson.annotations.Expose;
 
 import static java.text.MessageFormat.format;
 import static org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod.RANDOM;

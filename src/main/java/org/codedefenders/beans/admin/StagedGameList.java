@@ -43,11 +43,6 @@ public class StagedGameList implements Serializable {
     private final Map<Integer, StagedGame> stagedGames = new HashMap<>();
 
     /**
-     * User IDs of users assigned to any staged game.
-     */
-    private final Set<Integer> assignedUsers = new HashSet<>();
-
-    /**
      * The ID the next created staged game will receive.
      */
     private int currentId = 0;
@@ -112,14 +107,13 @@ public class StagedGameList implements Serializable {
      * @return {@code true} if the game was in the list, {@code false} otherwise.
      */
     public boolean removeStagedGame(int gameId) {
-        StagedGame stagedGame = stagedGames.get(gameId);
-        if (stagedGame == null) {
+        if (!stagedGames.containsKey(gameId)) {
             return false;
         }
-
-        assignedUsers.removeAll(stagedGame.getPlayers());
         stagedGames.remove(gameId);
-        stagedGame.delete();
+        if (stagedGames.isEmpty()) {
+            currentId = 0;
+        }
         return true;
     }
 
@@ -128,7 +122,26 @@ public class StagedGameList implements Serializable {
      * @return The IDs of all users currently assigned to any staged game.
      */
     public Set<Integer> getAssignedUsers() {
-        return Collections.unmodifiableSet(assignedUsers);
+        Set<Integer> assignedUsers = new HashSet<>();
+        for (StagedGame stagedGame : stagedGames.values()) {
+            assignedUsers.addAll(stagedGame.attackers);
+            assignedUsers.addAll(stagedGame.defenders);
+        }
+        return assignedUsers;
+    }
+
+    /**
+     * Checks whether a user with the given ID is assigned to any staged game.
+     * @return Whether a user with the given ID is assigned to any staged game.
+     */
+    public boolean isAssigned(int userId) {
+        for (StagedGame stagedGame : stagedGames.values()) {
+            if (stagedGame.attackers.contains(userId)
+                    || stagedGame.defenders.contains(userId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -150,24 +163,18 @@ public class StagedGameList implements Serializable {
         /**
          * User IDs of users listed as attackers for the staged game.
          */
-        @Expose private final List<Integer> attackers;
+        @Expose private final Set<Integer> attackers;
 
         /**
          * User IDs of users listed as defenders for the staged game.
          */
-        @Expose private final List<Integer> defenders;
-
-        /**
-         * If this staged game is still part of the list of the list of staged games.
-         */
-        private boolean exists;
+        @Expose private final Set<Integer> defenders;
 
         private StagedGame(int id, GameSettings gameSettings) {
             this.id = id;
             this.gameSettings = gameSettings;
-            this.attackers = new ArrayList<>();
-            this.defenders = new ArrayList<>();
-            this.exists = true;
+            this.attackers = new HashSet<>();
+            this.defenders = new HashSet<>();
         }
 
         /**
@@ -198,16 +205,16 @@ public class StagedGameList implements Serializable {
          * Returns the user IDs of users listed as attackers for the staged game.
          * @return The user IDs of users listed as attackers for the staged game.
          */
-        public List<Integer> getAttackers() {
-            return Collections.unmodifiableList(attackers);
+        public Set<Integer> getAttackers() {
+            return Collections.unmodifiableSet(attackers);
         }
 
         /**
          * Returns the user IDs of users listed as defenders for the staged game.
          * @return The user IDs of users listed as defenders for the staged game.
          */
-        public List<Integer> getDefenders() {
-            return Collections.unmodifiableList(defenders);
+        public Set<Integer> getDefenders() {
+            return Collections.unmodifiableSet(defenders);
         }
 
         /**
@@ -215,8 +222,8 @@ public class StagedGameList implements Serializable {
          * This includes both attackers and defenders.
          * @return The user IDs of users listed as players for the staged game.
          */
-        public List<Integer> getPlayers() {
-            List<Integer> players = new ArrayList<>();
+        public Set<Integer> getPlayers() {
+            Set<Integer> players = new HashSet<>();
             players.addAll(attackers);
             players.addAll(defenders);
             return players;
@@ -230,33 +237,25 @@ public class StagedGameList implements Serializable {
          * @throws IllegalStateException If the game is no longer part of the list of staged games.
          */
         public boolean addAttacker(int userId) {
-            if (!exists) {
-                throw new IllegalStateException("Staged game no longer exists.");
-            }
-            if (assignedUsers.contains(userId)) {
+            if (isAssigned(userId)) {
                 return false;
             }
             attackers.add(userId);
-            assignedUsers.add(userId);
             return true;
         }
 
         /**
-         * Assigns the given user ID to the game as an defender.
+         * Assigns the given user ID to the game as a defender.
          * @param userId The user ID to add.
          * @return {@code true} if the user was added successfully,
          *         {@code false} if the user is already assigned to a staged game, or the user doesn't exist.
          * @throws IllegalStateException If the game is no longer part of the list of staged games.
          */
         public boolean addDefender(int userId) {
-            if (!exists) {
-                throw new IllegalStateException("Staged game no longer exists.");
-            }
-            if (assignedUsers.contains(userId)) {
+            if (isAssigned(userId)) {
                 return false;
             }
             defenders.add(userId);
-            assignedUsers.add(userId);
             return true;
         }
 
@@ -267,21 +266,8 @@ public class StagedGameList implements Serializable {
          * @throws IllegalStateException If the game is no longer part of the list of staged games.
          */
         public boolean removePlayer(int userId) {
-            if (!exists) {
-                throw new IllegalStateException("Staged game no longer exists.");
-            }
-            if (attackers.remove((Integer) userId) || defenders.remove((Integer) userId)) {
-                assignedUsers.remove(userId);
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * Marks the staged game as no longer part of the staged games list.
-         */
-        private void delete() {
-            this.exists = false;
+            return attackers.remove(userId)
+                    || defenders.remove(userId);
         }
     }
 

@@ -104,7 +104,7 @@ public class AdminCreateGamesBeanTest {
         GameService gameService = PowerMockito.mock(GameService.class);
         ClassroomService classroomService = PowerMockito.mock(ClassroomService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(login, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService, classroomService);
+        adminCreateGamesBean = new AdminCreateGamesBean(login, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
