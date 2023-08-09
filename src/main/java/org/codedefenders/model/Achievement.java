@@ -50,7 +50,10 @@ public class Achievement implements Serializable {
     }
 
     public enum Id {
-        PLAY_GAMES(0);
+        PLAY_GAMES(0),
+        PLAY_AS_ATTACKER(1),
+        PLAY_AS_DEFENDER(2),
+        PLAY_MELEE_GAMES(3);
 
         private final int id;
         private static final Map<Integer, Id> MAP = new HashMap<>();
