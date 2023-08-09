@@ -48,9 +48,15 @@
         <div class="card-header d-flex justify-content-between flex-wrap gap-1">
             Staged Games
             <div class="d-flex flex-wrap gap-2">
-                <button id="select-visible-games" class="btn btn-xs btn-secondary">Select Visible</button>
-                <button id="deselect-visible-games" class="btn btn-xs btn-secondary">Deselect Visible</button>
-                <div>
+                <button id="select-visible-games" class="btn btn-xs btn-secondary"
+                        title="Select all games (that your search applies to)">
+                    Select All
+                </button>
+                <button id="deselect-visible-games" class="btn btn-xs btn-secondary"
+                        title="Deselect all games (that your search applies to)">
+                    Deselect All
+                </button>
+                <div class="mx-2">
                     <input type="checkbox" id="toggle-hide-players" class="btn-check" autocomplete="off">
                     <label for="toggle-hide-players" class="btn btn-xs btn-outline-secondary">
                         Hide Players
@@ -86,9 +92,15 @@
         <div class="card-header d-flex justify-content-between flex-wrap gap-1">
             Unassigned Users
             <div class="d-flex flex-wrap gap-2">
-                <button id="select-visible-users" class="btn btn-xs btn-secondary">Select Visible</button>
-                <button id="deselect-visible-users" class="btn btn-xs btn-secondary">Deselect Visible</button>
-                <div>
+                <button id="select-visible-users" class="btn btn-xs btn-secondary"
+                    title="Select all users (that your search applies to)">
+                    Select All
+                </button>
+                <button id="deselect-visible-users" class="btn btn-xs btn-secondary"
+                    title="Deselect all users (that your search applies to)">
+                    Deselect All
+                </button>
+                <div class="mx-2">
                     <input type="checkbox" id="toggle-show-assigned-users" class="btn-check" autocomplete="off">
                     <label for="toggle-show-assigned-users"
                            class="btn btn-xs btn-outline-secondary d-flex align-items-center gap-1"
@@ -1214,7 +1226,10 @@
             scrollCollapse: true,
             paging: false,
             dom: 't',
-            language: {emptyTable: 'There are currently no staged multiplayer games.'}
+            language: {
+                emptyTable: 'There are currently no staged games.',
+                zeroRecords: 'No matching staged games found.'
+            }
         });
 
         /* Search bar. */
@@ -1420,7 +1435,10 @@
             scrollCollapse: true,
             paging: false,
             dom: 't',
-            language: {emptyTable: 'There are currently no unassigned users.'}
+            language: {
+                emptyTable: 'No users found.',
+                zeroRecords: 'No matching users found.'
+            }
         });
 
         /* Search bar. */
