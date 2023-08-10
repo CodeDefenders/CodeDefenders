@@ -203,37 +203,37 @@ public class AdminCreateGames extends HttpServlet {
         gameSettings.setStartGame(
                 request.getParameter("startGames") != null);
 
-        setGameDurationMinutes(gameSettings,
-                getIntParameter(request, "gameDurationMinutes").get());
+        gameSettings.setGameDurationMinutes(
+                clampGameDuration(getIntParameter(request, "gameDurationMinutes").get()));
 
         return gameSettings;
     }
 
     /**
-     * Sets the game duration and checks if it is in the valid range defined by the system settings.
-     * If the value is out of bounds, it will be clamped and an info message is returned.
+     * Clamps the game duration to the valid range defined by the system settings.
+     * If the value is out of bounds, an info message is returned.
      *
      * @param duration The game duration in minutes
      */
-    private void setGameDurationMinutes(GameSettings settings, int duration) {
+    private int clampGameDuration(int duration) {
         final int maxDuration = AdminDAO.getSystemSetting(
                 AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_MAX).getIntValue();
         final int minDuration = 1;
 
         if (duration > maxDuration) {
-            settings.setGameDurationMinutes(maxDuration);
             messages.add(String.format(
                     "INFO: The max. allowed duration is %d minutes.",
                     maxDuration
             ));
+            return maxDuration;
         } else if (duration < minDuration) {
-            settings.setGameDurationMinutes(minDuration);
             messages.add(String.format(
                     "INFO: The min. allowed duration is %d minutes.",
                     minDuration
             ));
+            return minDuration;
         } else {
-            settings.setGameDurationMinutes(duration);
+            return duration;
         }
     }
 
