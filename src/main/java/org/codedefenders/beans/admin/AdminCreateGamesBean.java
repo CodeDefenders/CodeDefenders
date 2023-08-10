@@ -19,9 +19,6 @@ import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.admin.StagedGameList.GameSettings;
-import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
@@ -30,14 +27,14 @@ import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.multiplayer.MeleeGame;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.model.creategames.GameSettings;
+import org.codedefenders.model.creategames.StagedGameList;
+import org.codedefenders.model.creategames.StagedGameList.StagedGame;
 import org.codedefenders.persistence.database.UserRepository;
-import org.codedefenders.service.game.GameService;
+import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
-import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.JSONUtils;
 
 import com.google.gson.Gson;
@@ -50,9 +47,6 @@ import com.google.gson.JsonSerializer;
 import static java.text.MessageFormat.format;
 import static org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod.RANDOM;
 import static org.codedefenders.game.GameType.MELEE;
-import static org.codedefenders.game.GameType.MULTIPLAYER;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * Implements the functionality of the admin create games page.
@@ -66,22 +60,19 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 @SessionScoped
 public class AdminCreateGamesBean implements Serializable {
     private final Object synchronizer = new Serializable() {};
-    private final CodeDefendersAuth login;
     private final MessagesBean messages;
-    private final GameManagingUtils gameManagingUtils;
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
-    private final GameService gameService;
+    private final CreateGamesService createGamesService;
 
     @Inject
-    public AdminCreateGamesBean(CodeDefendersAuth login, MessagesBean messages, GameManagingUtils gameManagingUtils,
-                                EventDAO eventDAO, UserRepository userRepo, GameService gameService) {
-        this.login = login;
+    public AdminCreateGamesBean(MessagesBean messages,
+                                EventDAO eventDAO, UserRepository userRepo,
+                                CreateGamesService createGamesService) {
         this.messages = messages;
-        this.gameManagingUtils = gameManagingUtils;
         this.eventDAO = eventDAO;
         this.userRepo = userRepo;
-        this.gameService = gameService;
+        this.createGamesService = createGamesService;
     }
 
     public Object getSynchronizer() {
@@ -116,13 +107,7 @@ public class AdminCreateGamesBean implements Serializable {
         for (UserInfo userInfo : AdminDAO.getAllUsersInfo()) {
             userInfos.put(userInfo.getUser().getId(), userInfo);
         }
-        for (StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
-            for (int userId : stagedGame.getPlayers()) {
-                if (!userInfos.containsKey(userId)) {
-                    stagedGame.removePlayer(userId);
-                }
-            }
-        }
+        stagedGameList.retainUsers(userInfos.keySet());
     }
 
     /**
@@ -231,7 +216,7 @@ public class AdminCreateGamesBean implements Serializable {
      */
     public void createStagedGames(List<StagedGame> stagedGames) {
         for (StagedGame stagedGame : stagedGames) {
-            if (insertStagedGame(stagedGame)) {
+            if (createGamesService.createGame(stagedGame)) {
                 stagedGameList.removeStagedGame(stagedGame.getId());
             }
         }
@@ -370,29 +355,14 @@ public class AdminCreateGamesBean implements Serializable {
      * @return {@code true} if the user could be added, {@code false} if not.
      */
     public boolean addPlayerToStagedGame(StagedGame stagedGame, UserEntity user, Role role) {
-        boolean success;
-        switch (role) {
-            case PLAYER:
-            case ATTACKER:
-                success = stagedGame.addAttacker(user.getId());
-                break;
-            case DEFENDER:
-                success = stagedGame.addDefender(user.getId());
-                break;
-            default:
-                messages.add(format("ERROR: Cannot add player to staged game with role {0}. Invalid role.", role));
-                return false;
-        }
-
+        boolean success = stagedGame.addPlayer(user.getId(), role);
         if (success) {
             messages.add(format("Added user {0} to staged game {1} as {2}.",
                     user.getId(), stagedGame.getFormattedId(), role.getFormattedString()));
         } else {
-            messages.add(format("ERROR: Cannot add user {0} to staged game {1}. "
-                    + "User is already assigned to a different staged game.",
+            messages.add(format("ERROR: Cannot add user {0} to staged game {1}. ",
                     user.getId(), stagedGame.getFormattedId()));
         }
-
         return success;
     }
 
@@ -606,131 +576,6 @@ public class AdminCreateGamesBean implements Serializable {
         return teams;
     }
 
-    /**
-     * Creates a stages game as a real game and adds its assigned users to it.
-     * @param stagedGame The staged game to create.
-     * @return {@code true} if the game was successfully created, {@code false} if not.
-     */
-    public boolean insertStagedGame(StagedGame stagedGame) {
-        GameSettings gameSettings = stagedGame.getGameSettings();
-
-        /* Create the game. */
-        AbstractGame game;
-        if (gameSettings.getGameType() == MULTIPLAYER) {
-            game = new MultiplayerGame.Builder(
-                        gameSettings.getCut().getId(),
-                        login.getUserId(),
-                        gameSettings.getMaxAssertionsPerTest()
-                    )
-                    .cut(gameSettings.getCut())
-                    .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
-                    .chatEnabled(gameSettings.isChatEnabled())
-                    .capturePlayersIntention(gameSettings.isCaptureIntentions())
-                    .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
-                    .level(gameSettings.getLevel())
-                    .gameDurationMinutes(gameSettings.getGameDurationMinutes())
-                    .classroomId(gameSettings.getClassroomId().orElse(null))
-                    .build();
-        } else if (gameSettings.getGameType() == MELEE) {
-            game = new MeleeGame.Builder(
-                        gameSettings.getCut().getId(),
-                        login.getUserId(),
-                        gameSettings.getMaxAssertionsPerTest()
-                    )
-                    .cut(gameSettings.getCut())
-                    .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
-                    .chatEnabled(gameSettings.isChatEnabled())
-                    .capturePlayersIntention(gameSettings.isCaptureIntentions())
-                    .automaticMutantEquivalenceThreshold(gameSettings.getEquivalenceThreshold())
-                    .level(gameSettings.getLevel())
-                    .gameDurationMinutes(gameSettings.getGameDurationMinutes())
-                    .classroomId(gameSettings.getClassroomId().orElse(null))
-                    .build();
-        } else {
-            messages.add(format("ERROR: Cannot create staged game {0}. Invalid game type: {1}.",
-                    stagedGame.getFormattedId(), gameSettings.getGameType().getName()));
-            return false;
-        }
-
-        /* Insert the game. */
-        game.setEventDAO(eventDAO);
-        game.setUserRepository(userRepo);
-        if (!game.insert()) {
-            messages.add(format("ERROR: Could not create game for staged game {0}.",
-                    stagedGame.getFormattedId()));
-            return false;
-        }
-
-        /* Add system users and predefined mutants/tests. */
-        if (gameSettings.getGameType() != MELEE) {
-            if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)
-                    || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER)) {
-                messages.add(format("ERROR: Could not add system players to game {0}.",
-                        stagedGame.getFormattedId()));
-                return false;
-            }
-        } else {
-            if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.PLAYER)
-                    || !game.addPlayer(DUMMY_DEFENDER_USER_ID, Role.PLAYER)) {
-                messages.add(format("ERROR: Could not add system players to game {0}.",
-                        stagedGame.getFormattedId()));
-                return false;
-            }
-        }
-
-        if (gameSettings.isWithMutants() || gameSettings.isWithTests()) {
-            gameManagingUtils.addPredefinedMutantsAndTests(game,
-                    gameSettings.isWithMutants(), gameSettings.isWithTests());
-        }
-
-        /* Add users to the game. */
-        if (gameSettings.getGameType() == MULTIPLAYER) {
-            if (gameSettings.getCreatorRole() == Role.ATTACKER || gameSettings.getCreatorRole() == Role.DEFENDER) {
-                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
-            }
-            for (int userId : stagedGame.getAttackers()) {
-                UserInfo user = userInfos.get(userId);
-                if (user != null) {
-                    game.addPlayer(user.getUser().getId(), Role.ATTACKER);
-                } else {
-                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
-                            + "User does not exist.",
-                            userId, game.getId(), Role.ATTACKER.getFormattedString()));
-                }
-            }
-            for (int userId : stagedGame.getDefenders()) {
-                UserInfo user = userInfos.get(userId);
-                if (user != null) {
-                    game.addPlayer(user.getUser().getId(), Role.DEFENDER);
-                } else {
-                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
-                            + "User does not exist.",
-                            userId, game.getId(), Role.DEFENDER.getFormattedString()));
-                }
-            }
-        } else if (gameSettings.getGameType() == MELEE) {
-            if (gameSettings.getCreatorRole() == Role.PLAYER) {
-                game.addPlayer(login.getUserId(), gameSettings.getCreatorRole());
-            }
-            for (int userId : stagedGame.getPlayers()) {
-                UserInfo user = userInfos.get(userId);
-                if (user != null) {
-                    game.addPlayer(user.getUser().getId(), Role.PLAYER);
-                } else {
-                    messages.add(format("ERROR: Cannot add user {0} to existing game {1} as {2}. "
-                            + "User does not exist.",
-                            userId, game.getId(), Role.PLAYER.getFormattedString()));
-                }
-            }
-        }
-
-        /* Start game if configured to. */
-        if (gameSettings.isStartGame()) {
-            gameService.startGame(game);
-        }
-
-        return true;
-    }
 
     /* ============================================================================================================== */
 
@@ -748,6 +593,7 @@ public class AdminCreateGamesBean implements Serializable {
         Gson gson = new GsonBuilder()
                 .serializeNulls()
                 .registerTypeAdapterFactory(new JSONUtils.MapTypeAdapterFactory())
+                .registerTypeAdapterFactory(new JSONUtils.SetTypeAdapterFactory())
                 .registerTypeAdapter(GameClass.class, new GameClassSerializer())
                 .create();
         return gson.toJson(getStagedGameList().getStagedGames());

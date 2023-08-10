@@ -1,7 +1,7 @@
 package org.codedefenders.beans.admin;
 
-import org.codedefenders.beans.admin.StagedGameList.GameSettings;
-import org.codedefenders.beans.admin.StagedGameList.StagedGame;
+import org.codedefenders.model.creategames.GameSettings;
+import org.codedefenders.model.creategames.StagedGameList;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,16 +25,16 @@ public class StagedGameListTest {
 
     @Test
     public void testStagedGameIds() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         assertThat(stagedGame1.getId(), not(equalTo(stagedGame2.getId())));
     }
 
     @Test
     public void testGetStagedGame() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         assertThat(stagedGameList.getStagedGame(stagedGame1.getId()), equalTo(stagedGame1));
         assertThat(stagedGameList.getStagedGame(stagedGame2.getId()), equalTo(stagedGame2));
@@ -45,17 +45,17 @@ public class StagedGameListTest {
     public void testGetStagedGames() {
         assertThat(stagedGameList.getStagedGames().values(), empty());
 
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
         assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1));
 
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
         assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame2));
     }
 
     @Test
     public void testRemoveStagedGame() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         assertThat(stagedGameList.removeStagedGame(stagedGame1.getId()), is(true));
         assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame2));
@@ -68,8 +68,8 @@ public class StagedGameListTest {
 
     @Test
     public void testAddUsers() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         /* Unassigned user. */
         assertThat(stagedGame1.addAttacker(0), is(true));
@@ -90,8 +90,8 @@ public class StagedGameListTest {
 
     @Test
     public void testGetPlayers() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         stagedGame1.addAttacker(0);
         stagedGame1.addDefender(1);
@@ -110,8 +110,8 @@ public class StagedGameListTest {
 
     @Test
     public void testRemovePlayers() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         stagedGame1.addAttacker(0);
         stagedGame1.addDefender(1);
@@ -142,8 +142,8 @@ public class StagedGameListTest {
 
     @Test
     public void testGetAssignedUsers() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         stagedGame1.addAttacker(0);
         stagedGame1.addDefender(1);
@@ -164,7 +164,7 @@ public class StagedGameListTest {
 
     @Test
     public void testDetachedGame() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
         stagedGameList.removeStagedGame(stagedGame1.getId());
 
         try {

@@ -1,29 +1,17 @@
-package org.codedefenders.beans.admin;
+package org.codedefenders.model.creategames;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
-
-import static org.codedefenders.game.GameLevel.HARD;
-import static org.codedefenders.game.GameType.MULTIPLAYER;
-import static org.codedefenders.game.Role.OBSERVER;
-import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
 
 /**
  * Manages a list of staged games.
@@ -62,6 +50,16 @@ public class StagedGameList implements Serializable {
      */
     public StagedGame getStagedGame(int gameId) {
         return stagedGames.get(gameId);
+    }
+
+    /**
+     * Removes any users that are not in the given set from any staged games.
+     * Useful to update a staged games list when the users change.
+     */
+    public void retainUsers(Collection<Integer> userIds) {
+        for (StagedGame stagedGame : stagedGames.values()) {
+            stagedGame.retainUsers(userIds);
+        }
     }
 
     /**
@@ -124,8 +122,8 @@ public class StagedGameList implements Serializable {
     public Set<Integer> getAssignedUsers() {
         Set<Integer> assignedUsers = new HashSet<>();
         for (StagedGame stagedGame : stagedGames.values()) {
-            assignedUsers.addAll(stagedGame.attackers);
-            assignedUsers.addAll(stagedGame.defenders);
+            assignedUsers.addAll(stagedGame.getAttackers());
+            assignedUsers.addAll(stagedGame.getDefenders());
         }
         return assignedUsers;
     }
@@ -136,8 +134,8 @@ public class StagedGameList implements Serializable {
      */
     public boolean isAssigned(int userId) {
         for (StagedGame stagedGame : stagedGames.values()) {
-            if (stagedGame.attackers.contains(userId)
-                    || stagedGame.defenders.contains(userId)) {
+            if (stagedGame.getAttackers().contains(userId)
+                    || stagedGame.getDefenders().contains(userId)) {
                 return true;
             }
         }
@@ -170,7 +168,7 @@ public class StagedGameList implements Serializable {
          */
         @Expose private final Set<Integer> defenders;
 
-        private StagedGame(int id, GameSettings gameSettings) {
+        public StagedGame(int id, GameSettings gameSettings) {
             this.id = id;
             this.gameSettings = gameSettings;
             this.attackers = new HashSet<>();
@@ -179,6 +177,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Returns the ID of the staged game.
+         *
          * @return The ID of the staged game.
          */
         public int getId() {
@@ -187,6 +186,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Returns the ID of the staged game formatted as a string to differentiate it from IDs of normal games.
+         *
          * @return The formatted ID of the staged game.
          */
         public String getFormattedId() {
@@ -195,6 +195,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Returns the game settings of the staged game.
+         *
          * @return The game settings of the staged game.
          */
         public GameSettings getGameSettings() {
@@ -203,6 +204,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Returns the user IDs of users listed as attackers for the staged game.
+         *
          * @return The user IDs of users listed as attackers for the staged game.
          */
         public Set<Integer> getAttackers() {
@@ -211,6 +213,7 @@ public class StagedGameList implements Serializable {
 
         /**
          * Returns the user IDs of users listed as defenders for the staged game.
+         *
          * @return The user IDs of users listed as defenders for the staged game.
          */
         public Set<Integer> getDefenders() {
@@ -220,6 +223,7 @@ public class StagedGameList implements Serializable {
         /**
          * Returns the user IDs of users listed as players for the staged game.
          * This includes both attackers and defenders.
+         *
          * @return The user IDs of users listed as players for the staged game.
          */
         public Set<Integer> getPlayers() {
@@ -231,10 +235,10 @@ public class StagedGameList implements Serializable {
 
         /**
          * Assigns the given user ID to the game as an attacker.
+         *
          * @param userId The user ID to add.
          * @return {@code true} if the user was added successfully,
-         *         {@code false} if the user is already assigned to a staged game, or the user doesn't exist.
-         * @throws IllegalStateException If the game is no longer part of the list of staged games.
+         * {@code false} if the user is already assigned to a staged game.
          */
         public boolean addAttacker(int userId) {
             if (isAssigned(userId)) {
@@ -246,10 +250,10 @@ public class StagedGameList implements Serializable {
 
         /**
          * Assigns the given user ID to the game as a defender.
+         *
          * @param userId The user ID to add.
          * @return {@code true} if the user was added successfully,
-         *         {@code false} if the user is already assigned to a staged game, or the user doesn't exist.
-         * @throws IllegalStateException If the game is no longer part of the list of staged games.
+         * {@code false} if the user is already assigned to a staged game.
          */
         public boolean addDefender(int userId) {
             if (isAssigned(userId)) {
@@ -259,199 +263,36 @@ public class StagedGameList implements Serializable {
             return true;
         }
 
+        public boolean addPlayer(int userId, Role role) {
+            switch (role) {
+                case PLAYER:
+                case ATTACKER:
+                    return addAttacker(userId);
+                case DEFENDER:
+                    return addDefender(userId);
+                default:
+                    return false;
+            }
+        }
+
         /**
          * Removes a user ID from the game's players.
+         *
          * @param userId The user ID to remove.
          * @return {@code true} if the user was assigned to the game, {@code false} if the user wasn't.
-         * @throws IllegalStateException If the game is no longer part of the list of staged games.
          */
         public boolean removePlayer(int userId) {
             return attackers.remove(userId)
                     || defenders.remove(userId);
         }
-    }
-
-    public static class GameSettings implements Serializable {
-        @Expose private GameType gameType;
-
-        @Expose private GameClass cut;
-        @Expose private Boolean withMutants;
-        @Expose private Boolean withTests;
-
-        @Expose private Integer maxAssertionsPerTest;
-        @Expose private CodeValidatorLevel mutantValidatorLevel;
-        @Expose private Boolean chatEnabled;
-        @Expose private Boolean captureIntentions;
-        @Expose private Integer equivalenceThreshold;
-        @Expose private GameLevel level;
-        @Expose private Role creatorRole;
-        @Expose private Integer gameDurationMinutes;
-
-        @Expose private Boolean startGame;
-
-        @Expose private Integer classroomId;
 
         /**
-         * Creates a new GameSettings object with empty settings.
+         * Removes any users that are not in the given set from the players.
+         * Useful to update a staged game when the users change.
          */
-        public GameSettings() {
-
+        public void retainUsers(Collection<Integer> userIds) {
+            attackers.retainAll(userIds);
+            defenders.retainAll(userIds);
         }
-
-        /**
-         * Creates a copy of the given GameSettings object.
-         * @param other The settings to copy.
-         */
-        public GameSettings(GameSettings other) {
-            this.gameType = other.gameType;
-            this.cut = other.cut;
-            this.withMutants = other.withMutants;
-            this.withTests = other.withTests;
-            this.maxAssertionsPerTest = other.maxAssertionsPerTest;
-            this.mutantValidatorLevel = other.mutantValidatorLevel;
-            this.chatEnabled = other.chatEnabled;
-            this.captureIntentions = other.captureIntentions;
-            this.equivalenceThreshold = other.equivalenceThreshold;
-            this.level = other.level;
-            this.creatorRole = other.creatorRole;
-            this.startGame = other.startGame;
-            this.gameDurationMinutes = other.gameDurationMinutes;
-            this.classroomId = other.classroomId;
-        }
-
-        public GameType getGameType() {
-            return gameType;
-        }
-
-        public void setGameType(GameType gameType) {
-            this.gameType = gameType;
-        }
-
-        public GameClass getCut() {
-            return cut;
-        }
-
-        public void setCut(GameClass cut) {
-            this.cut = cut;
-        }
-
-        public boolean isWithMutants() {
-            return withMutants;
-        }
-
-        public void setWithMutants(boolean withMutants) {
-            this.withMutants = withMutants;
-        }
-
-        public boolean isWithTests() {
-            return withTests;
-        }
-
-        public void setWithTests(boolean withTests) {
-            this.withTests = withTests;
-        }
-
-        public int getMaxAssertionsPerTest() {
-            return maxAssertionsPerTest;
-        }
-
-        public void setMaxAssertionsPerTest(int maxAssertionsPerTest) {
-            this.maxAssertionsPerTest = maxAssertionsPerTest;
-        }
-
-        public CodeValidatorLevel getMutantValidatorLevel() {
-            return mutantValidatorLevel;
-        }
-
-        public void setMutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
-            this.mutantValidatorLevel = mutantValidatorLevel;
-        }
-
-        public boolean isChatEnabled() {
-            return chatEnabled;
-        }
-
-        public void setChatEnabled(boolean chatEnabled) {
-            this.chatEnabled = chatEnabled;
-        }
-
-        public boolean isCaptureIntentions() {
-            return captureIntentions;
-        }
-
-        public void setCaptureIntentions(boolean captureIntentions) {
-            this.captureIntentions = captureIntentions;
-        }
-
-        public int getEquivalenceThreshold() {
-            return equivalenceThreshold;
-        }
-
-        public void setEquivalenceThreshold(int equivalenceThreshold) {
-            this.equivalenceThreshold = equivalenceThreshold;
-        }
-
-        public GameLevel getLevel() {
-            return level;
-        }
-
-        public void setLevel(GameLevel level) {
-            this.level = level;
-        }
-
-        public Role getCreatorRole() {
-            return creatorRole;
-        }
-
-        public void setCreatorRole(Role creatorRole) {
-            this.creatorRole = creatorRole;
-        }
-
-        public int getGameDurationMinutes() {
-            return gameDurationMinutes;
-        }
-
-        public void setGameDurationMinutes(final int duration) {
-            this.gameDurationMinutes = duration;
-        }
-
-        public boolean isStartGame() {
-            return startGame;
-        }
-
-        public void setStartGame(boolean startGame) {
-            this.startGame = startGame;
-        }
-
-        public Optional<Integer> getClassroomId() {
-            return Optional.ofNullable(classroomId);
-        }
-
-        public void setClassroomId(Integer classroomId) {
-            this.classroomId = classroomId;
-        }
-
-        public static GameSettings getDefault() {
-            GameSettings gameSettings = new GameSettings();
-            gameSettings.setGameType(MULTIPLAYER);
-            gameSettings.setWithMutants(false);
-            gameSettings.setWithTests(false);
-            gameSettings.setMaxAssertionsPerTest(3);
-            gameSettings.setMutantValidatorLevel(MODERATE);
-            gameSettings.setChatEnabled(true);
-            gameSettings.setCaptureIntentions(false);
-            gameSettings.setEquivalenceThreshold(0);
-            gameSettings.setLevel(HARD);
-            gameSettings.setCreatorRole(OBSERVER);
-            gameSettings.setStartGame(false);
-            gameSettings.setClassroomId(null);
-
-            final int currentDefaultGameDurationMinutes = AdminDAO.getSystemSetting(
-                    AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue();
-            gameSettings.setGameDurationMinutes(currentDefaultGameDurationMinutes);
-
-            return gameSettings;
-        }
-
     }
 }

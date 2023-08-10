@@ -1,7 +1,6 @@
 package org.codedefenders.beans.admin;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,8 +12,6 @@ import java.util.stream.Stream;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod;
 import org.codedefenders.beans.admin.AdminCreateGamesBean.TeamAssignmentMethod;
-import org.codedefenders.beans.admin.StagedGameList.GameSettings;
-import org.codedefenders.beans.admin.StagedGameList.StagedGame;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
@@ -27,9 +24,12 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.model.creategames.GameSettings;
+import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
+import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.service.game.GameService;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.GameManagingUtils;
@@ -103,8 +103,10 @@ public class AdminCreateGamesBeanTest {
         userRepo = PowerMockito.mock(UserRepository.class);
         GameService gameService = PowerMockito.mock(GameService.class);
         ClassroomService classroomService = PowerMockito.mock(ClassroomService.class);
+        CreateGamesService createGamesService = PowerMockito.mock(CreateGamesService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(login, messagesBean, gameManagingUtils, eventDAO, userRepo, gameService);
+        adminCreateGamesBean = new AdminCreateGamesBean(login, messagesBean, gameManagingUtils, eventDAO, userRepo,
+                gameService, createGamesService);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
@@ -162,7 +164,7 @@ public class AdminCreateGamesBeanTest {
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
 
-        for (StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+        for (StagedGameList.StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
             assertThat(stagedGame.getAttackers(), hasSize(2));
             assertThat(stagedGame.getDefenders(), hasSize(2));
         }
@@ -182,7 +184,7 @@ public class AdminCreateGamesBeanTest {
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
 
-        for (StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+        for (StagedGameList.StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
             assertThat(stagedGame.getPlayers(), hasSize(4));
         }
     }
@@ -202,7 +204,7 @@ public class AdminCreateGamesBeanTest {
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(1));
 
-        for (StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
+        for (StagedGameList.StagedGame stagedGame : stagedGameList.getStagedGames().values()) {
             assertThat(stagedGame.getAttackers(), hasSize(1));
             assertThat(stagedGame.getDefenders(), hasSize(1));
         }
@@ -210,12 +212,12 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testDeleteStagedGames() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame3 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame4 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame3 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame4 = stagedGameList.addStagedGame(new GameSettings());
 
-        List<StagedGame> stagedGames = new ArrayList<>();
+        List<StagedGameList.StagedGame> stagedGames = new ArrayList<>();
         stagedGames.add(stagedGame2);
         stagedGames.add(stagedGame3);
 
@@ -246,12 +248,12 @@ public class AdminCreateGamesBeanTest {
         PowerMockito.when(cut.getId()).thenReturn(0);
         gameSettings.setCut(cut);
 
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(gameSettings);
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(gameSettings);
-        StagedGame stagedGame3 = stagedGameList.addStagedGame(gameSettings);
-        StagedGame stagedGame4 = stagedGameList.addStagedGame(gameSettings);
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(gameSettings);
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(gameSettings);
+        StagedGameList.StagedGame stagedGame3 = stagedGameList.addStagedGame(gameSettings);
+        StagedGameList.StagedGame stagedGame4 = stagedGameList.addStagedGame(gameSettings);
 
-        List<StagedGame> stagedGames = new ArrayList<>();
+        List<StagedGameList.StagedGame> stagedGames = new ArrayList<>();
         stagedGames.add(stagedGame2);
         stagedGames.add(stagedGame3);
 
@@ -269,8 +271,8 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testRemovePlayerFromStagedGame() {
-        StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
-        StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame1 = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame2 = stagedGameList.addStagedGame(new GameSettings());
 
         stagedGame1.addAttacker(1);
         stagedGame1.addDefender(2);
@@ -285,7 +287,7 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testAddPlayerToStagedGame() {
-        StagedGame stagedGame = stagedGameList.addStagedGame(new GameSettings());
+        StagedGameList.StagedGame stagedGame = stagedGameList.addStagedGame(new GameSettings());
 
         assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.OBSERVER), is(false));
         assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.NONE), is(false));
