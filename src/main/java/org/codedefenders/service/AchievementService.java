@@ -15,6 +15,8 @@ import org.codedefenders.model.Player;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.events.server.game.GameStartedEvent;
 import org.codedefenders.notification.events.server.game.GameStoppedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
+import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.persistence.database.AchievementRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +66,23 @@ public class AchievementService {
         }
     }
 
+    private void addTestWritten(int userId) {
+        int affected = repo.updateAchievementForUser(userId, Achievement.Id.WRITE_TESTS, 1);
+        if (affected > 0) {
+            logger.info("Updated achievement WRITE_TESTS for user with id {}", userId);
+        }
+    }
+
+    private void addMutantCreated(int userId) {
+        int affected = repo.updateAchievementForUser(userId, Achievement.Id.CREATE_MUTANTS, 1);
+        if (affected > 0) {
+            logger.info("Updated achievement CREATE_MUTANTS for user with id {}", userId);
+        }
+    }
+
     public void registerEventHandler() {
         if (isEventHandlerRegistered) {
-            logger.info("AchievementEventHandler is already registered");
+            logger.warn("AchievementEventHandler is already registered");
             return;
         }
 
@@ -77,7 +93,7 @@ public class AchievementService {
     @PreDestroy
     public void unregisterEventHandler() {
         if (!isEventHandlerRegistered) {
-            logger.info("AchievementEventHandler is not registered");
+            logger.warn("AchievementEventHandler is not registered");
             return;
         }
 
@@ -100,6 +116,26 @@ public class AchievementService {
         @SuppressWarnings("unused")
         public void handleGameStopped(GameStoppedEvent event) {
 
+        }
+
+        /**
+         * The {@link TestTestedMutantsEvent} is the last event that is fired when a test is successfully submitted.
+         * So we use this event to count the test for the achievements.
+         */
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleTestTestedMutantsEvent(TestTestedMutantsEvent event) {
+            addTestWritten(event.getUserId());
+        }
+
+        /**
+         * The {@link MutantTestedEvent} is the last event that is fired when a mutant is successfully submitted.
+         * So we use this event to count the mutant for the achievements.
+         */
+        @Subscribe
+        @SuppressWarnings("unused")
+        public void handleMutantTestedEvent(MutantTestedEvent event) {
+            addMutantCreated(event.getUserId());
         }
     }
 }

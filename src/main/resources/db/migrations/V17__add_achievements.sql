@@ -41,4 +41,14 @@ VALUES (0, 1, 'Newbie', 'Play your first game!', 1),
        (3, 1, 'Melee Starter', 'Play your first melee game', 1),
        (3, 2, 'Melee Bronze', 'Play {0} melee games', 3),
        (3, 3, 'Melee Silver', 'Play {0} melee games', 10),
-       (3, 4, 'Melee Gold', 'Play {0} melee games', 50);
+       (3, 4, 'Melee Gold', 'Play {0} melee games', 50),
+
+       (4, 1, 'The First Test', 'Write your first test', 1),
+       (4, 2, 'Bronze Test Writer', 'Write {0} tests', 10),
+       (4, 3, 'Silver Test Writer', 'Write {0} tests', 50),
+       (4, 4, 'Gold Test Writer', 'Write {0} tests', 200),
+
+       (5, 1, 'The First Mutant', 'Create your first mutant', 1),
+       (5, 2, 'Bronze Mutant Creator', 'Create {0} mutants', 10),
+       (5, 3, 'Silver Mutant Creator', 'Create {0} mutants', 50),
+       (5, 4, 'Gold Mutant Creator', 'Create {0} mutants', 200);
