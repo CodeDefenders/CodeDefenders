@@ -18,6 +18,7 @@
  */
 package org.codedefenders.beans.user;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.annotation.ManagedBean;
@@ -25,6 +26,7 @@ import javax.enterprise.context.RequestScoped;
 
 import org.codedefenders.dto.UserStats;
 import org.codedefenders.game.GameType;
+import org.codedefenders.model.Achievement;
 import org.codedefenders.model.UserEntity;
 
 /**
@@ -37,6 +39,7 @@ public class UserProfileBean {
     private Map<GameType, UserStats> stats;
     private boolean isSelf;
     private UserStats.PuzzleStats puzzleStats;
+    private Collection<Achievement> achievements;
 
     /**
      * Show the profile page for this user.
@@ -81,5 +84,13 @@ public class UserProfileBean {
 
     public void setPuzzleStats(UserStats.PuzzleStats puzzleStats) {
         this.puzzleStats = puzzleStats;
+    }
+
+    public Collection<Achievement> getAchievements() {
+        return achievements;
+    }
+
+    public void setAchievements(Collection<Achievement> achievements) {
+        this.achievements = achievements;
     }
 }

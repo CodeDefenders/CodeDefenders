@@ -27,22 +27,25 @@ public class AchievementRepository {
 
     public Achievement achievementFromRS(ResultSet rs) throws SQLException {
         return new Achievement(
-                Achievement.Id.fromInt(rs.getInt("ID")),
-                rs.getInt("Level"),
-                rs.getString("Name"),
-                rs.getInt("Metric")
+                Achievement.Id.fromInt(rs.getInt("achievements.ID")),
+                rs.getInt("achievements.Level"),
+                rs.getString("achievements.Name"),
+                rs.getString("achievements.Description"),
+                rs.getInt("achievements.Metric"),
+                rs.getInt("NextLevelMetric"),
+                rs.getInt("has_achievement.Metric")
         );
     }
 
     public Collection<Achievement> getAchievementsForUser(int userId) {
         @Language("SQL")
         String query = String.join("\n",
-                "SELECT Achievement_ID, Achievement_Level",
-                "FROM has_achievement",
-                "WHERE User_ID = ?",
-                "LEFT JOIN achievements",
-                "ON has_achievement.Achievement_ID = achievement.ID",
-                "AND has_achievement.Achievement_Level = achievement.Level"
+                "SELECT achievements.*, has_achievement.Metric, (SELECT a.Metric FROM achievements a ",
+                "    WHERE a.ID = achievements.ID AND a.Level = achievements.Level + 1) AS NextLevelMetric",
+                "FROM has_achievement, achievements",
+                "WHERE has_achievement.User_ID = ?",
+                "AND has_achievement.Achievement_ID = achievements.ID",
+                "AND has_achievement.Achievement_Level = achievements.Level"
         );
 
         try {

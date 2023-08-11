@@ -42,6 +42,20 @@
 <div class="container">
     <h1>${pageInfo.pageTitle}</h1>
 
+    <section>
+        <h2>Achievements</h2>
+        <div class="achievements">
+            <%--@elvariable id="achievement" type="org.codedefenders.model.Achievement"--%>
+            <c:forEach items="${profile.achievements}" var="achievement">
+                <p id="achievement-${achievement.id}">
+                        ${achievement.name} (Level ${achievement.level}) <br>
+                        ${achievement.description} <br>
+                        ${achievement.metricCurrent} / ${achievement.numMetricNeededForNextLevel} to next level
+                </p>
+            </c:forEach>
+        </div>
+    </section>
+
     <section class="mt-5 statistics" aria-labelledby="stats-multiplayer">
         <h2 class="mb-3" id="stats-multiplayer">Statistics for Multiplayer Games</h2>
 

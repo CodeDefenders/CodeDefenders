@@ -1,6 +1,7 @@
 package org.codedefenders.service;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
@@ -38,6 +39,10 @@ public class AchievementService {
         repo = achievementRepository;
         this.notificationService = notificationService;
         handler = new AchievementEventHandler();
+    }
+
+    public Collection<Achievement> getAchievementsForUser(int userId) {
+        return repo.getAchievementsForUser(userId);
     }
 
     private void addGamePlayed(List<Player> players, Role role) {

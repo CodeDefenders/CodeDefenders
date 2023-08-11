@@ -1,6 +1,7 @@
 package org.codedefenders.model;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,18 +10,24 @@ public class Achievement implements Serializable {
     private final Id achievementId;
     private final int level;
     private final String name;
+    private final String description;
+    private final int metricForCurrentLevel;
     private final int metricForNextLevel;
     private int metricCurrent = 0;
 
-    public Achievement(Id achievementId, int level, String name, int metricForNextLevel) {
+    public Achievement(Id achievementId, int level, String name, String description, int metricForCurrentLevel,
+                       int metricForNextLevel) {
         this.achievementId = achievementId;
         this.level = level;
         this.name = name;
+        this.description = MessageFormat.format(description, metricForCurrentLevel);
+        this.metricForCurrentLevel = metricForCurrentLevel;
         this.metricForNextLevel = metricForNextLevel;
     }
 
-    public Achievement(Id achievementId, int level, String name, int metricForNextLevel, int metricCurrent) {
-        this(achievementId, level, name, metricForNextLevel);
+    public Achievement(Id achievementId, int level, String name, String description, int metricForCurrentLevel,
+                       int metricForNextLevel, int metricCurrent) {
+        this(achievementId, level, name, description, metricForCurrentLevel, metricForNextLevel);
         this.metricCurrent = metricCurrent;
     }
 
@@ -36,8 +43,20 @@ public class Achievement implements Serializable {
         return name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public int getMetricForCurrentLevel() {
+        return metricForCurrentLevel;
+    }
+
     public int getNumMetricNeededForNextLevel() {
         return metricForNextLevel;
+    }
+
+    public int getMetricCurrent() {
+        return metricCurrent;
     }
 
     public boolean updateCurrentMetric(int metricChange) {
