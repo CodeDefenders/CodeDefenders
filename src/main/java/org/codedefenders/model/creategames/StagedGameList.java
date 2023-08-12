@@ -5,13 +5,19 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.codedefenders.game.Role;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
+import org.codedefenders.model.creategames.teamassignment.GameAssignment;
 
 import com.google.gson.annotations.Expose;
+
+import static java.text.MessageFormat.format;
+import static org.codedefenders.game.GameType.MELEE;
 
 /**
  * Manages a list of staged games.
@@ -140,6 +146,51 @@ public class StagedGameList implements Serializable {
             }
         }
         return false;
+    }
+
+    public int stageGamesWithUsers(Set<Integer> userIds, GameSettings gameSettings,
+                                    RoleAssignment roleAssignment, GameAssignment gameAssignment,
+                                    int attackersPerGame, int defendersPerGame, int playersPerGame) {
+        /* Split users into attackers and defenders. */
+        Set<Integer> attackers = new HashSet<>();
+        Set<Integer> defenders = new HashSet<>();
+        roleAssignment.assignRoles(userIds, attackersPerGame, defendersPerGame, attackers, defenders);
+
+        int numGames;
+        if (gameSettings.getGameType() != MELEE) {
+            numGames = userIds.size() / (attackersPerGame + defendersPerGame);
+            /* Avoid empty games. */
+            if (numGames > attackers.size() && numGames > defenders.size())  {
+                int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
+                int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
+                numGames = Math.max(numGames1, numGames2);
+            }
+        } else {
+            numGames = userIds.size() / playersPerGame;
+        }
+
+        /* Always create at least one game. */
+        if (numGames == 0) {
+            numGames = 1;
+        }
+
+        /* Assign attackers and defenders to teams. */
+        List<List<Integer>> attackerTeams = gameAssignment.assignGames(attackers, numGames);
+        List<List<Integer>> defenderTeams = gameAssignment.assignGames(defenders, numGames);
+
+        for (int i = 0; i < numGames; i++) {
+            StagedGame stagedGame = addStagedGame(gameSettings);
+            List<Integer> attackerTeam = attackerTeams.get(i);
+            List<Integer> defenderTeam = defenderTeams.get(i);
+            for (int userId : attackerTeam) {
+                stagedGame.addAttacker(userId);
+            }
+            for (int userId : defenderTeam) {
+                stagedGame.addDefender(userId);
+            }
+        }
+
+        return numGames;
     }
 
     /**
