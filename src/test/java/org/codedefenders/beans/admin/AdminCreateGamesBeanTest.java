@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod;
-import org.codedefenders.beans.admin.AdminCreateGamesBean.TeamAssignmentMethod;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
@@ -362,10 +362,10 @@ public class AdminCreateGamesBeanTest {
     }
 
     private void testAssignRoles(RoleAssignmentMethod roleAssignmentMethod,
-            Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
-            int attackersPerGame, int defendersPerGame,
-            int expectedNumAttackers, int expectedNumDefenders,
-            Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
+                                 Set<UserInfo> users, Set<UserInfo> attackers, Set<UserInfo> defenders,
+                                 int attackersPerGame, int defendersPerGame,
+                                 int expectedNumAttackers, int expectedNumDefenders,
+                                 Set<UserInfo> expectedAttackers, Set<UserInfo> expectedDefenders) {
         int numUsers = users.size() + attackers.size() + defenders.size();
         Set<UserInfo> usersBefore = new HashSet<>(users);
         Set<UserInfo> attackersBefore = new HashSet<>(attackers);

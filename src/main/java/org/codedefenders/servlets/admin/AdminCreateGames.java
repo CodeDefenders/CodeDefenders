@@ -36,8 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.admin.AdminCreateGamesBean;
-import org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod;
-import org.codedefenders.beans.admin.AdminCreateGamesBean.TeamAssignmentMethod;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;

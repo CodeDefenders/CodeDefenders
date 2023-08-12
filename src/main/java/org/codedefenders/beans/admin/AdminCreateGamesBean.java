@@ -2,7 +2,6 @@ package org.codedefenders.beans.admin;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
@@ -32,6 +30,15 @@ import org.codedefenders.model.UserInfo;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
+import org.codedefenders.model.creategames.roleassignment.MeleeRoleAssignment;
+import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignment;
+import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignment;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.teamassignment.RandomGameAssignment;
+import org.codedefenders.model.creategames.teamassignment.ScoreGameAssignment;
+import org.codedefenders.model.creategames.teamassignment.GameAssignment;
+import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.admin.AdminCreateGames;
@@ -45,7 +52,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import static java.text.MessageFormat.format;
-import static org.codedefenders.beans.admin.AdminCreateGamesBean.RoleAssignmentMethod.RANDOM;
 import static org.codedefenders.game.GameType.MELEE;
 
 /**
@@ -136,21 +142,54 @@ public class AdminCreateGamesBean implements Serializable {
                                     RoleAssignmentMethod roleAssignmentMethod,
                                     TeamAssignmentMethod teamAssignmentMethod,
                                     int attackersPerGame, int defendersPerGame, int playersPerGame) {
-        /* Split users into attackers and defenders. */
-        Set<UserInfo> attackers = new HashSet<>();
-        Set<UserInfo> defenders = new HashSet<>();
-        if (gameSettings.getGameType() != MELEE) {
-            assignRoles(users, roleAssignmentMethod, attackersPerGame, defendersPerGame, attackers, defenders);
-        } else {
-            /* Add all users to one role for melee games to avoid player numbers differing by more than 1 between games.
-             * For non-melee games this is expected, since, if the players can't be evenly distributed between games,
-             * games that are assigned more attackers should also get assigned more defenders as other games. */
-            attackers.addAll(users);
+
+        Map<Integer, UserInfo> usersMap = users.stream()
+                .collect(Collectors.toMap(
+                        info -> info.getUser().getId(),
+                        info -> info
+                ));
+
+        RoleAssignment role = null;
+        switch (roleAssignmentMethod) {
+            case RANDOM:
+                role = new RandomRoleAssignment();
+                break;
+            case OPPOSITE:
+                role = new OppositeRoleAssignment(
+                        userId -> usersMap.get(userId).getLastRole(),
+                        new RandomRoleAssignment());
+                break;
         }
+        if (gameSettings.getGameType() == MELEE) {
+            role = new MeleeRoleAssignment();
+        }
+
+        GameAssignment game = null;
+        switch (teamAssignmentMethod) {
+            case RANDOM:
+                game = new RandomGameAssignment();
+                break;
+            case SCORE_DESCENDING:
+                game = new ScoreGameAssignment(Comparator.comparingInt(userId -> usersMap.get(userId).getTotalScore()));
+                break;
+        }
+
+        stageGamesWithUsers(usersMap.keySet(), gameSettings, role, game,
+                attackersPerGame, defendersPerGame, playersPerGame);
+    }
+
+    public void stageGamesWithUsers(Set<Integer> userIds, GameSettings gameSettings,
+                                    RoleAssignment roleAssignment,
+                                    GameAssignment gameAssignment,
+                                    int attackersPerGame, int defendersPerGame, int playersPerGame) {
+        /* Split users into attackers and defenders. */
+        Set<Integer> attackers = new HashSet<>();
+        Set<Integer> defenders = new HashSet<>();
+        roleAssignment.assignRoles(userIds, attackersPerGame, defendersPerGame, attackers, defenders);
 
         int numGames;
         if (gameSettings.getGameType() != MELEE) {
-            numGames = users.size() / (attackersPerGame + defendersPerGame);
+            numGames = userIds.size() / (attackersPerGame + defendersPerGame);
             /* Avoid empty games. */
             if (numGames > attackers.size() && numGames > defenders.size())  {
                 int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
@@ -158,7 +197,7 @@ public class AdminCreateGamesBean implements Serializable {
                 numGames = Math.max(numGames1, numGames2);
             }
         } else {
-            numGames = users.size() / playersPerGame;
+            numGames = userIds.size() / playersPerGame;
         }
 
         /* Always create at least one game. */
@@ -167,18 +206,18 @@ public class AdminCreateGamesBean implements Serializable {
         }
 
         /* Assign attackers and defenders to teams. */
-        List<List<UserInfo>> attackerTeams = splitIntoTeams(attackers, numGames, teamAssignmentMethod);
-        List<List<UserInfo>> defenderTeams = splitIntoTeams(defenders, numGames, teamAssignmentMethod);
+        List<List<Integer>> attackerTeams = gameAssignment.assignGames(attackers, numGames);
+        List<List<Integer>> defenderTeams = gameAssignment.assignGames(defenders, numGames);
 
         for (int i = 0; i < numGames; i++) {
             StagedGame stagedGame = stagedGameList.addStagedGame(gameSettings);
-            List<UserInfo> attackerTeam = attackerTeams.get(i);
-            List<UserInfo> defenderTeam = defenderTeams.get(i);
-            for (UserInfo user : attackerTeam) {
-                stagedGame.addAttacker(user.getUser().getId());
+            List<Integer> attackerTeam = attackerTeams.get(i);
+            List<Integer> defenderTeam = defenderTeams.get(i);
+            for (int userId : attackerTeam) {
+                stagedGame.addAttacker(userId);
             }
-            for (UserInfo user : defenderTeam) {
-                stagedGame.addDefender(user.getUser().getId());
+            for (int userId : defenderTeam) {
+                stagedGame.addDefender(userId);
             }
         }
 
@@ -449,133 +488,6 @@ public class AdminCreateGamesBean implements Serializable {
         return success ? Optional.of(users) : Optional.empty();
     }
 
-    /**
-     * Assigns roles to a collection of users based on a {@link RoleAssignmentMethod}. The users will be added to the
-     * given {@code attackers} and {@code defenders} sets accordingly. Users that cannot be assigned with the given
-     * {@link RoleAssignmentMethod} are assigned {@link RoleAssignmentMethod#RANDOM randomly}, trying to assign the
-     * correct number of attackers and defenders.
-     * <br/>
-     * <br/>
-     * The passed {@code attackers} and {@code defenders} sets can be non-empty. In this case, the number of already
-     * assigned attackers and defenders
-     * will be taken into account.
-     * @param users The users to be assigned roles. Must be disjoint with {@code attackers} and {@code defenders}.
-     * @param method The method of assigning the roles.
-     * @param attackersPerGame The number of attackers per game.
-     * @param defendersPerGame The number of defenders per game.
-     * @param attackers The users assigned as attackers. Must be disjoint with {@code users} and {@code defenders}.
-     * @param defenders The users assigned as defenders. Must be disjoint with {@code users} and {@code attackers}.
-     * @throws IllegalArgumentException If the given {@code users}, {@code attackers} and {@code defenders} sets
-     *                                  are not disjoint.
-     */
-    public void assignRoles(Set<UserInfo> users, RoleAssignmentMethod method,
-                            int attackersPerGame, int defendersPerGame,
-                            Set<UserInfo> attackers, Set<UserInfo> defenders) {
-
-        if (attackersPerGame < 0 || defendersPerGame < 0 || attackersPerGame + defendersPerGame == 0) {
-            throw new IllegalArgumentException(format("Invalid team sizes. "
-                    + "Attackers per game: {0}, defenders per game: {1}.",
-                    attackersPerGame, defendersPerGame));
-        }
-
-        if (Stream.of(users, attackers, defenders).flatMap(Collection::stream).distinct().count()
-                != users.size() + attackers.size() + defenders.size()) {
-            throw new IllegalArgumentException("User sets must be disjoint.");
-        }
-
-        switch (method) {
-            case RANDOM:
-                /* Calculate the number of attackers to assign, while taking into account how users have previously been
-                 * distributed. (This method can be called with non-empty attackers and defenders sets containing
-                 * already assigned users.) */
-                int numUsers = users.size() + attackers.size() + defenders.size();
-                int numAttackers = (int) Math.round(numUsers
-                        * ((double) attackersPerGame / (attackersPerGame + defendersPerGame)));
-                int remainingNumAttackers = Math.max(0, numAttackers - attackers.size());
-                remainingNumAttackers = Math.min(remainingNumAttackers, users.size());
-
-                List<UserInfo> shuffledUsers = new ArrayList<>(users);
-                Collections.shuffle(shuffledUsers);
-                for (int i = 0; i < remainingNumAttackers; i++) {
-                    attackers.add(shuffledUsers.get(i));
-                }
-                for (int i = remainingNumAttackers; i < shuffledUsers.size(); i++) {
-                    defenders.add(shuffledUsers.get(i));
-                }
-
-                break;
-
-            case OPPOSITE:
-                Set<UserInfo> remainingUsers = new HashSet<>();
-
-                for (UserInfo userInfo : users) {
-                    if (userInfo.getLastRole() == Role.ATTACKER) {
-                        defenders.add(userInfo);
-                    } else if (userInfo.getLastRole() == Role.DEFENDER) {
-                        attackers.add(userInfo);
-                    } else {
-                        remainingUsers.add(userInfo);
-                    }
-                }
-
-                /* Randomly assign remaining users (that were neither attacker or defender in their last game). */
-                assignRoles(remainingUsers, RANDOM, attackersPerGame, defendersPerGame, attackers, defenders);
-
-                break;
-
-            default:
-                throw new IllegalArgumentException(format("Unknown role assignment method: {0}.", method));
-        }
-    }
-
-    /**
-     * Splits the given users into teams according to a {@link TeamAssignmentMethod}. If the users cannot be split into
-     * teams evenly, the size of some teams is increased by 1 to fit the remaining users into teams.
-     * @param users The users to be split into teams.
-     * @param numTeams The number of teams to split the users into.
-     * @param method The method of splitting the users into teams.
-     * @return A list of the assigned teams.
-     * @throws IllegalArgumentException If {@code numTeams} is <= 0;
-     */
-    public List<List<UserInfo>> splitIntoTeams(Set<UserInfo> users, int numTeams, TeamAssignmentMethod method) {
-        if (numTeams <= 0) {
-            throw new IllegalArgumentException("Need at least one team to be able to assign players to teams.");
-        }
-
-        List<UserInfo> usersList = new ArrayList<>(users);
-
-        switch (method) {
-            case RANDOM:
-                Collections.shuffle(usersList);
-                break;
-            case SCORE_DESCENDING:
-                usersList.sort(Comparator.comparingInt(UserInfo::getTotalScore).reversed());
-                break;
-            default:
-                throw new IllegalArgumentException(format("Unknown team assignment method: {0}.", method));
-        }
-
-        int numUsersPerTeam = usersList.size() / numTeams;
-        int numRemainingUsers = usersList.size() % numTeams;
-
-        List<List<UserInfo>> teams = new ArrayList<>();
-
-        int index = 0;
-        for (int i = 0; i < numTeams; i++) {
-            List<UserInfo> subList;
-            if (i < numRemainingUsers) {
-                subList = usersList.subList(index, index + numUsersPerTeam + 1);
-                index += numUsersPerTeam + 1;
-            } else {
-                subList = usersList.subList(index, index + numUsersPerTeam);
-                index += numUsersPerTeam;
-            }
-            teams.add(new ArrayList<>(subList));
-        }
-
-        return teams;
-    }
-
 
     /* ============================================================================================================== */
 
@@ -659,32 +571,5 @@ public class AdminCreateGamesBean implements Serializable {
             obj.addProperty("alias", gameClass.getAlias());
             return obj;
         }
-    }
-
-    /* ============================================================================================================== */
-
-    public enum RoleAssignmentMethod {
-        /**
-         * Users are assigned roles randomly, trying to assign the correct number of attackers and defenders.
-         */
-        RANDOM,
-
-        /**
-         * Users are assigned the role opposite of the last role they played as.
-         */
-        OPPOSITE
-    }
-
-    public enum TeamAssignmentMethod {
-        /**
-         * Teams are assigned randomly.
-         */
-        RANDOM,
-
-        /**
-         * Teams are assigned based on the total score of users,
-         * putting users with similar total scores in the same team.
-         */
-        SCORE_DESCENDING
     }
 }

@@ -27,6 +27,8 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidator" %>
 <%@ page import="org.codedefenders.game.GameType" %>
+<%@ page import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod" %>
+<%@ page import="org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
@@ -354,26 +356,26 @@
 
                             <div class="col-12 multiplayer-specific"
                                  title="Method of assigning roles to players.">
-                                <label class="form-label" for="roleAssignmentMethod-group">
+                                <label class="form-label" for="roleAssignment-group">
                                     <a class="text-decoration-none text-reset cursor-pointer"
                                        data-bs-toggle="modal" data-bs-target="#roleAssignmentExplanation">
                                         Role Assignment
                                         <i class="fa fa-question-circle ms-1"></i>
                                     </a>
                                 </label>
-                                <div id="roleAssignmentMethod-group">
+                                <div id="roleAssignment-group">
                                     <div class="form-check">
-                                        <input type="radio" name="roleAssignmentMethod"
-                                               class="form-check-input" id="roleAssignmentMethod-radio-random"
-                                               value="<%=AdminCreateGamesBean.RoleAssignmentMethod.RANDOM%>"
+                                        <input type="radio" name="roleAssignment"
+                                               class="form-check-input" id="roleAssignment-radio-random"
+                                               value="<%=RoleAssignmentMethod.RANDOM%>"
                                                checked>
-                                        <label class="form-check-label" for="roleAssignmentMethod-radio-random">Random</label>
+                                        <label class="form-check-label" for="roleAssignment-radio-random">Random</label>
                                     </div>
                                     <div class="form-check">
-                                        <input type="radio" name="roleAssignmentMethod"
-                                               class="form-check-input" id="roleAssignmentMethod-radio-opposite"
-                                               value="<%=AdminCreateGamesBean.RoleAssignmentMethod.OPPOSITE%>">
-                                        <label class="form-check-label" for="roleAssignmentMethod-radio-opposite">Opposite Role</label>
+                                        <input type="radio" name="roleAssignment"
+                                               class="form-check-input" id="roleAssignment-radio-opposite"
+                                               value="<%=RoleAssignmentMethod.OPPOSITE%>">
+                                        <label class="form-check-label" for="roleAssignment-radio-opposite">Opposite Role</label>
                                     </div>
                                 </div>
                             </div>
@@ -391,14 +393,14 @@
                                     <div class="form-check">
                                         <input type="radio" name="teamAssignmentMethod"
                                                class="form-check-input" id="teamAssignmentMethod-radio-random"
-                                               value="<%=AdminCreateGamesBean.TeamAssignmentMethod.RANDOM%>"
+                                               value="<%=TeamAssignmentMethod.RANDOM%>"
                                                checked>
                                         <label class="form-check-label" for="teamAssignmentMethod-radio-random">Random</label>
                                     </div>
                                     <div class="form-check">
                                         <input type="radio" name="teamAssignmentMethod"
                                                class="form-check-input" id="teamAssignmentMethod-radio-score-descending"
-                                               value="<%=AdminCreateGamesBean.TeamAssignmentMethod.SCORE_DESCENDING%>">
+                                               value="<%=TeamAssignmentMethod.SCORE_DESCENDING%>">
                                         <label class="form-check-label" for="teamAssignmentMethod-radio-score-descending">Score Descending</label>
                                     </div>
                                 </div>
