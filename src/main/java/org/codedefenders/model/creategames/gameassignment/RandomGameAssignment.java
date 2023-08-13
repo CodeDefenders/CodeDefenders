@@ -1,4 +1,4 @@
-package org.codedefenders.model.creategames.teamassignment;
+package org.codedefenders.model.creategames.gameassignment;
 
 import java.util.ArrayList;
 import java.util.Collection;

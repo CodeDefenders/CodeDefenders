@@ -1,6 +1,6 @@
-package org.codedefenders.model.creategames.teamassignment;
+package org.codedefenders.model.creategames.gameassignment;
 
-public enum TeamAssignmentMethod {
+public enum GameAssignmentMethod {
     /**
      * Teams are assigned randomly.
      */

@@ -12,11 +12,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import com.google.gson.annotations.Expose;
 
-import static org.codedefenders.game.GameLevel.HARD;
-import static org.codedefenders.game.GameType.MULTIPLAYER;
-import static org.codedefenders.game.Role.OBSERVER;
-import static org.codedefenders.validation.code.CodeValidatorLevel.MODERATE;
-
 public class GameSettings implements Serializable {
     @Expose private final GameType gameType;
 
@@ -151,17 +146,17 @@ public class GameSettings implements Serializable {
         public Builder withDefaultSettings() {
             final int currentDefaultGameDurationMinutes = AdminDAO.getSystemSetting(
                     AdminSystemSettings.SETTING_NAME.GAME_DURATION_MINUTES_DEFAULT).getIntValue();
-            this.gameType = MULTIPLAYER;
+            this.gameType = GameType.MULTIPLAYER;
             this.classId = null;
             this.withMutants = false;
             this.withTests = false;
             this.maxAssertionsPerTest = 3;
-            this.mutantValidatorLevel = MODERATE;
+            this.mutantValidatorLevel = CodeValidatorLevel.MODERATE;
             this.chatEnabled = true;
             this.captureIntentions = false;
             this.equivalenceThreshold = 0;
-            this.level = HARD;
-            this.creatorRole = OBSERVER;
+            this.level = GameLevel.HARD;
+            this.creatorRole = Role.OBSERVER;
             this.gameDurationMinutes = currentDefaultGameDurationMinutes;
             this.startGame = false;
             this.classroomId = null;

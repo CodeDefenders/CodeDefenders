@@ -22,20 +22,20 @@
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.beans.creategames.AdminCreateGamesBean" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidator" %>
 <%@ page import="org.codedefenders.game.GameType" %>
 <%@ page import="org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod" %>
-<%@ page import="org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod" %>
+<%@ page import="org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod" %>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
-<%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.creategames.AdminCreateGamesBean"--%>
+
+<c:set var="createGamesBean" value="${requestScope.createGamesBean}"/>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Games"); %>
@@ -365,14 +365,14 @@
                                 </label>
                                 <div id="roleAssignment-group">
                                     <div class="form-check">
-                                        <input type="radio" name="roleAssignment"
+                                        <input type="radio" name="roleAssignmentMethod"
                                                class="form-check-input" id="roleAssignment-radio-random"
                                                value="<%=RoleAssignmentMethod.RANDOM%>"
                                                checked>
                                         <label class="form-check-label" for="roleAssignment-radio-random">Random</label>
                                     </div>
                                     <div class="form-check">
-                                        <input type="radio" name="roleAssignment"
+                                        <input type="radio" name="roleAssignmentMethod"
                                                class="form-check-input" id="roleAssignment-radio-opposite"
                                                value="<%=RoleAssignmentMethod.OPPOSITE%>">
                                         <label class="form-check-label" for="roleAssignment-radio-opposite">Opposite Role</label>
@@ -382,26 +382,26 @@
 
                             <div class="col-12"
                                  title="Method of assigning players to teams. Click the question mark for more information.">
-                                <label class="form-label" for="teamAssignmentMethod-group">
+                                <label class="form-label" for="gameAssignmentMethod-group">
                                     <a class="text-decoration-none text-reset cursor-pointer"
-                                       data-bs-toggle="modal" data-bs-target="#teamAssignmentExplanation">
-                                        Team Assignment
+                                       data-bs-toggle="modal" data-bs-target="#gameAssignmentExplanation">
+                                        Game Assignment
                                         <i class="fa fa-question-circle ms-1"></i>
                                     </a>
                                 </label>
-                                <div id="teamAssignmentMethod-group">
+                                <div id="gameAssignmentMethod-group">
                                     <div class="form-check">
-                                        <input type="radio" name="teamAssignmentMethod"
-                                               class="form-check-input" id="teamAssignmentMethod-radio-random"
-                                               value="<%=TeamAssignmentMethod.RANDOM%>"
+                                        <input type="radio" name="gameAssignmentMethod"
+                                               class="form-check-input" id="gameAssignmentMethod-radio-random"
+                                               value="<%=GameAssignmentMethod.RANDOM%>"
                                                checked>
-                                        <label class="form-check-label" for="teamAssignmentMethod-radio-random">Random</label>
+                                        <label class="form-check-label" for="gameAssignmentMethod-radio-random">Random</label>
                                     </div>
                                     <div class="form-check">
-                                        <input type="radio" name="teamAssignmentMethod"
-                                               class="form-check-input" id="teamAssignmentMethod-radio-score-descending"
-                                               value="<%=TeamAssignmentMethod.SCORE_DESCENDING%>">
-                                        <label class="form-check-label" for="teamAssignmentMethod-radio-score-descending">Score Descending</label>
+                                        <input type="radio" name="gameAssignmentMethod"
+                                               class="form-check-input" id="gameAssignmentMethod-radio-score-descending"
+                                               value="<%=GameAssignmentMethod.SCORE_DESCENDING%>">
+                                        <label class="form-check-label" for="gameAssignmentMethod-radio-score-descending">Score Descending</label>
                                     </div>
                                 </div>
                             </div>
@@ -497,24 +497,19 @@
         </jsp:attribute>
     </t:modal>
 
-    <t:modal id="teamAssignmentExplanation" title="Team Assignment Explanation">
+    <t:modal id="gameAssignmentExplanation" title="Game Assignment Explanation">
         <jsp:attribute name="content">
-            <p>Specifies how players are assigned to teams:</p>
+            <p>Specifies how players are assigned to games:</p>
             <ul>
                 <li>
                     <b>Random:</b>
-                    Players are assigned to teams randomly.
+                    Players are assigned to games randomly.
                 </li>
                 <li>
                     <b>Scores Descending:</b>
-                    Players are assigned to teams based on their total score in past games.
+                    Players are assigned to games based on their total score in past games.
                     The players with the highest scores are assigned to the first games,
                     the players with the lowest scores are assigned to the last games.
-                </li>
-                <li>
-                    <b>Scores block shuffled:</b>
-                    Players are grouped on their total score in past games,
-                    then block shuffled and assigned to teams.
                 </li>
             </ul>
         </jsp:attribute>
@@ -557,27 +552,29 @@
         /**
          *  Maps IDs to staged games.
          */
-        const stagedGames = new Map(JSON.parse('${adminCreateGames.stagedGamesAsJSON}'));
+        const stagedGames = new Map(JSON.parse('${createGamesBean.stagedGamesAsJSON}'));
 
         /**
          * Maps IDs to user infos.
          */
-        const userInfos = new Map(JSON.parse('${adminCreateGames.userInfosAsJSON}'));
+        const userInfos = new Map(JSON.parse('${createGamesBean.userInfosAsJSON}'));
 
         /**
          * IDs of active (started and not finished) multiplayer games.
          */
-        const activeMultiplayerGameIds = new Set(JSON.parse('${adminCreateGames.activeMultiplayerGameIdsJSON}'));
+        const activeMultiplayerGameIds = new Set(JSON.parse('${createGamesBean.activeMultiplayerGameIdsJSON}'));
 
         /**
          *  IDs of active (started and not finished) melee games.
          */
-        const activeMeleeGameIds = new Set(JSON.parse('${adminCreateGames.activeMeleeGameIdsJSON}'));
+        const activeMeleeGameIds = new Set(JSON.parse('${createGamesBean.activeMeleeGameIdsJSON}'));
 
         /**
          * IDs of users not assigned to any active games.
          */
-        const unassignedUserIds = new Set(JSON.parse('${adminCreateGames.unassignedUserIdsJSON}'));
+        const unassignedUserIds = new Set(JSON.parse('${createGamesBean.unassignedUserIdsJSON}'));
+
+        const classes = new Map(JSON.parse('${createGamesBean.usedClassesJSON}'));
 
 
         /**
@@ -602,8 +599,8 @@
          * User infos to be displayed in the table, sorted by ID.
          */
         const usersTableData = [...userInfos.values()]
-            .filter(userInfo => !assignedUserIdsStaged.has(userInfo.user.id))
-            .sort((a, b) => a.user.id - b.user.id);
+            .filter(userInfo => !assignedUserIdsStaged.has(userInfo.id))
+            .sort((a, b) => a.id - b.id);
 
 
         /**
@@ -675,7 +672,7 @@
             }
 
             /* Filter out logged-in user. */
-            if (data.user.id === loggedInUserId) {
+            if (data.id === loggedInUserId) {
                 return false;
             }
 
@@ -684,7 +681,7 @@
             }
 
             /* Filter out assigned users. */
-            return unassignedUserIds.has(data.user.id);
+            return unassignedUserIds.has(data.id);
         };
         DataTable.ext.search.push(searchFunction);
 
@@ -787,7 +784,8 @@
             }
         };
 
-        const renderStagedGameClass = function (cut, type, row, meta) {
+        const renderStagedGameClass = function (classId, type, row, meta) {
+            const cut = classes.get(classId) ?? {id: -1, name: 'unknown', alias: 'unknown'};
             const name = cut.name;
             const alias = cut.alias;
             if (name === alias) {
@@ -808,7 +806,7 @@
 
             switch (type) {
                 case 'filter':
-                    return players.map(userInfo => userInfo.user.username).join(' ');
+                    return players.map(userInfo => userInfo.name).join(' ');
                 case 'sort':
                 case 'type':
                     /* Sort the players column by the number of players. */
@@ -839,7 +837,7 @@
 
             if (stagedGame.gameSettings.gameType === GameType.MELEE.name) {
                 const players = [...attackers, ...defenders];
-                players.sort((a, b) => a.user.id - b.user.id);
+                players.sort((a, b) => a.id - b.id);
 
                 if (creatorRole === Role.PLAYER.name) {
                     addCreatorRow(table, stagedGame, creator, creatorRole);
@@ -848,8 +846,8 @@
                     addStagedGamePlayersRow(table, stagedGame, player, Role.PLAYER.name);
                 }
             } else {
-                attackers.sort((a, b) => a.user.id - b.user.id);
-                defenders.sort((a, b) => a.user.id - b.user.id);
+                attackers.sort((a, b) => a.id - b.id);
+                defenders.sort((a, b) => a.id - b.id);
 
                 if (creatorRole === Role.ATTACKER.name) {
                     addCreatorRow(table, stagedGame, creator, Role.ATTACKER.name);
@@ -877,7 +875,7 @@
          */
         const addCreatorRow = function (table, stagedGame, userInfo, role) {
             const tr = table.insertRow();
-            tr.setAttribute('data-user-id', userInfo.user.id);
+            tr.setAttribute('data-user-id', userInfo.id);
             if (role === Role.ATTACKER.name) {
                 tr.classList.add('bg-attacker-light');
             } else if (role === Role.DEFENDER.name) {
@@ -887,7 +885,7 @@
             const userNameCell = tr.insertCell();
             userNameCell.style.paddingLeft = '1em';
             userNameCell.style.width = '20%';
-            userNameCell.textContent = userInfo.user.username;
+            userNameCell.textContent = userInfo.name;
 
             const lastRoleCell = tr.insertCell();
             lastRoleCell.style.width = '15%';
@@ -932,7 +930,7 @@
          */
         const addStagedGamePlayersRow = function (table, stagedGame, userInfo, role) {
             const tr = table.insertRow();
-            tr.setAttribute('data-user-id', userInfo.user.id);
+            tr.setAttribute('data-user-id', userInfo.id);
             if (role === Role.ATTACKER.name) {
                 tr.classList.add('bg-attacker-light');
             } else if (role === Role.DEFENDER.name) {
@@ -942,7 +940,7 @@
             const userNameCell = tr.insertCell();
             userNameCell.style.paddingLeft = '1em';
             userNameCell.style.width = '20%';
-            userNameCell.textContent = userInfo.user.username;
+            userNameCell.textContent = userInfo.name;
 
             const lastRoleCell = tr.insertCell();
             lastRoleCell.style.width = '15%';
@@ -1087,7 +1085,7 @@
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Class';
-            tr.insertCell().innerHTML = renderStagedGameClass(gameSettings.cut);
+            tr.insertCell().innerHTML = renderStagedGameClass(gameSettings.classId);
 
             tr = table.insertRow();
             tr.insertCell().textContent = 'Level';
@@ -1168,7 +1166,7 @@
                     title: 'ID'
                 },
                 {
-                    data: 'gameSettings.cut',
+                    data: 'gameSettings.classId',
                     render: renderStagedGameClass,
                     type: 'string',
                     title: 'Class'
@@ -1386,12 +1384,12 @@
                     width: '3em'
                 },
                 {
-                    data: 'user.id',
+                    data: 'id',
                     type: 'num',
                     title: 'ID'
                 },
                 {
-                    data: 'user.username',
+                    data: 'name',
                     type: 'string',
                     title: 'Name'
                 },
@@ -1486,7 +1484,7 @@
             const roleSelect = outerTr.querySelector('.add-player-role');
             postForm({
                 formType: 'addPlayerToGame',
-                userId: userInfo.user.id,
+                userId: userInfo.id,
                 gameId: gameSelect.value,
                 role: roleSelect.value
             });
@@ -1560,7 +1558,7 @@
         /* Create new staged games with users. */
         document.getElementById('stage-games-button').addEventListener('click', function (event) {
             const userIds = getSelected(usersTable)
-                    .map(userInfo => userInfo.user.id);
+                    .map(userInfo => userInfo.id);
 
             const params = {
                 formType: 'stageGamesWithUsers',

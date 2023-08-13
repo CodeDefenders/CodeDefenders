@@ -25,7 +25,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.codedefenders.game.Role;
 import org.codedefenders.model.UserEntity;
@@ -91,6 +93,27 @@ public class AdminDAO {
     }
 
     public static List<UserInfo> getAllUsersInfo() throws UncheckedSQLException, SQLMappingException {
+        return getUsersInfo(null);
+    }
+
+    public static List<UserInfo> getUsersInfo(Collection<Integer> ids)
+            throws UncheckedSQLException, SQLMappingException {
+        String userIdClause = "";
+        DatabaseValue<?>[] params = new DatabaseValue[0];
+
+        if (ids != null) {
+            userIdClause = String.join("",
+                    "WHERE users.ID IN (",
+                    ids.stream()
+                            .map(id -> "?")
+                            .collect(Collectors.joining(",")),
+                    ")"
+            );
+            params = ids.stream()
+                    .map(DatabaseValue::of)
+                    .toArray(DatabaseValue[]::new);
+        }
+
         String query = String.join("\n",
                 "SELECT DISTINCT users.*,",
                 "       lastLogin.timeStamp AS lastLogin,",
@@ -142,8 +165,10 @@ public class AdminDAO {
                 "         tests",
                 "    WHERE players.id = tests.Player_ID",
                 "    GROUP BY players.User_ID",
-                ") AS defenderScore ON users.User_ID = defenderScore.User_ID;");
-        return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS);
+                ") AS defenderScore ON users.User_ID = defenderScore.User_ID",
+                userIdClause,
+                ";");
+        return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS, params);
     }
 
     public static List<List<String>> getPlayersInfo(int gameId) throws UncheckedSQLException, SQLMappingException {

@@ -35,7 +35,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.creategames.AdminCreateGamesBean;
+import org.codedefenders.beans.creategames.CreateGamesBean;
+import org.codedefenders.beans.creategames.CreateGamesBean.UserInfo;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameDAO;
@@ -43,13 +46,12 @@ import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameType;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.UserEntity;
-import org.codedefenders.model.UserInfo;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
+import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
-import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
+import org.codedefenders.service.CreateGamesService;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -66,38 +68,44 @@ import static org.codedefenders.servlets.util.ServletUtils.getStringParameter;
 
 /**
  * Handles extraction and verification of parameters for the admin create games page.
- * @see AdminCreateGamesBean
+ * @see CreateGamesBean
  */
 @WebServlet(urlPatterns = {Paths.ADMIN_PAGE, Paths.ADMIN_GAMES})
 public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
 
     @Inject
+    private CodeDefendersAuth login;
+
+    @Inject
     private MessagesBean messages;
 
     @Inject
-    private AdminCreateGamesBean adminCreateGamesBean;
+    private CreateGamesService createGamesService;
 
     @Inject
     private URLUtils url;
 
+
+    private AdminCreateGamesBean createGamesBean;
     private StagedGameList stagedGameList;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        synchronized (adminCreateGamesBean.getSynchronizer()) {
-            adminCreateGamesBean.update();
-            stagedGameList = adminCreateGamesBean.getStagedGameList();
-
+        createGamesBean = createGamesService.getContextForAdmin(login.getUserId());
+        synchronized (createGamesBean.getSynchronizer()) {
+            createGamesBean.update();
+            request.setAttribute("createGamesBean", createGamesBean);
             request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
         }
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        synchronized (adminCreateGamesBean.getSynchronizer()) {
-            adminCreateGamesBean.update();
-            stagedGameList = adminCreateGamesBean.getStagedGameList();
+        createGamesBean = createGamesService.getContextForAdmin(login.getUserId());
+        synchronized (createGamesBean.getSynchronizer()) {
+            createGamesBean.update();
+            stagedGameList = createGamesBean.getStagedGames();
 
             final Optional<String> action = getStringParameter(request, "formType");
             if (!action.isPresent()) {
@@ -254,13 +262,13 @@ public class AdminCreateGames extends HttpServlet {
         Set<UserInfo> players = new HashSet<>();
 
         /* Map given user IDs to users and validate that all exist. */
-        Optional<Set<UserInfo>> usersFromTable = adminCreateGamesBean.getUserInfosForIds(userIdsFromTable);
+        Optional<Set<UserInfo>> usersFromTable = createGamesBean.getUserInfosForIds(userIdsFromTable);
         if (!usersFromTable.isPresent()) {
             return Optional.empty();
         }
 
         /* Map given usernames/emails to users and validate that all exist. */
-        Optional<Set<UserInfo>> usersFromTextArea = adminCreateGamesBean.getUserInfosForNamesAndEmails(userNames);
+        Optional<Set<UserInfo>> usersFromTextArea = createGamesBean.getUserInfosForNamesAndEmails(userNames);
         if (!usersFromTextArea.isPresent()) {
             return Optional.empty();
         }
@@ -271,23 +279,23 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     /**
-     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageGamesWithUsers(Set,
-     * GameSettings, RoleAssignmentMethod, TeamAssignmentMethod, int, int, int) AdminCreateGamesBean#stageGames()}.
+     * Extract and validate POST parameters and forward them to {@link CreateGamesBean#stageGamesWithUsers(Set,
+     * GameSettings, RoleAssignmentMethod, GameAssignmentMethod, int, int)}.
      * @param request The HTTP request.
      */
     private void stageGamesWithUsers(HttpServletRequest request) {
         GameSettings gameSettings = extractGameSettings(request);
 
         /* Extract game management settings settings. */
-        RoleAssignmentMethod roleAssignmentMethod
-                = RoleAssignmentMethod.valueOf(getStringParameter(request, "roleAssignmentMethod").get());
-        TeamAssignmentMethod teamAssignmentMethod
-                = TeamAssignmentMethod.valueOf(getStringParameter(request, "teamAssignmentMethod").get());
+        RoleAssignmentMethod roleAssignmentMethod = getEnumParameter(request, RoleAssignmentMethod.class,
+                "roleAssignmentMethod").get();
+        GameAssignmentMethod gameAssignmentMethod = getEnumParameter(request, GameAssignmentMethod.class,
+                "gameAssignmentMethod").get();
         int attackersPerGame = getIntParameter(request, "attackersPerGame").get();
         int defendersPerGame = getIntParameter(request, "defendersPerGame").get();
         int playersPerGame = getIntParameter(request, "playersPerGame").get();
 
-        Optional<Set<UserInfo>> players = extractPlayers(request);
+        Optional<Set<CreateGamesBean.UserInfo>> players = extractPlayers(request);
         if (!players.isPresent()) {
             return;
         }
@@ -295,10 +303,10 @@ public class AdminCreateGames extends HttpServlet {
         /* Validate that no users are already assigned to other staged games. */
         Set<Integer> assignedUsers = stagedGameList.getAssignedUsers();
         for (UserInfo user : players.get()) {
-            if (assignedUsers.contains(user.getUser().getId())) {
+            if (assignedUsers.contains(user.getId())) {
                 messages.add(format("ERROR: Cannot create staged games with user {0}. "
                         + "User is already assigned to a staged game.",
-                        user.getUser().getId()));
+                        user.getId()));
                 return;
             }
         }
@@ -317,12 +325,15 @@ public class AdminCreateGames extends HttpServlet {
             }
         }
 
-        adminCreateGamesBean.stageGamesWithUsers(players.get(), gameSettings, roleAssignmentMethod,
-                teamAssignmentMethod, attackersPerGame, defendersPerGame);
+        Set<Integer> userIds = players.get().stream()
+                .map(UserInfo::getId)
+                .collect(Collectors.toSet());
+        createGamesBean.stageGamesWithUsers(userIds, gameSettings, roleAssignmentMethod,
+                gameAssignmentMethod, attackersPerGame, defendersPerGame);
     }
 
     /**
-     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#stageEmptyGames(
+     * Extract and validate POST parameters and forward them to {@link CreateGamesBean#stageEmptyGames(
      * GameSettings, int) AdminCreateGamesBean#stageEmptyGames()}.
      * @param request The HTTP request.
      */
@@ -335,11 +346,11 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        adminCreateGamesBean.stageEmptyGames(gameSettings, numGames);
+        createGamesBean.stageEmptyGames(gameSettings, numGames);
     }
 
     /**
-     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#deleteStagedGames(List)
+     * Extract and validate POST parameters and forward them to {@link CreateGamesBean#deleteStagedGames(List)
      * AdminCreateGamesBean#deleteStagedGames()}.
      * @param request The HTTP request.
      */
@@ -366,11 +377,11 @@ public class AdminCreateGames extends HttpServlet {
                 .map(existingStagedGames::get)
                 .collect(Collectors.toList());
 
-        adminCreateGamesBean.deleteStagedGames(stagedGames);
+        createGamesBean.deleteStagedGames(stagedGames);
     }
 
     /**
-     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#createStagedGames(List)
+     * Extract and validate POST parameters and forward them to {@link CreateGamesBean#createStagedGames(List)
      * AdminCreateGamesBean#createStagedGames()}.
      * @param request The HTTP request.
      */
@@ -397,11 +408,11 @@ public class AdminCreateGames extends HttpServlet {
                 .map(existingStagedGames::get)
                 .collect(Collectors.toList());
 
-        adminCreateGamesBean.createStagedGames(stagedGames);
+        createGamesBean.createStagedGames(stagedGames);
     }
 
     /**
-     * Extract and validate POST parameters and forward them to {@link AdminCreateGamesBean#removePlayerFromStagedGame(
+     * Extract and validate POST parameters and forward them to {@link CreateGamesBean#removePlayerFromStagedGame(
      * StagedGame, int) AdminCreateGamesBean#removePlayerFromStagedGame()}.
      * @param request The HTTP request.
      */
@@ -417,12 +428,12 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        adminCreateGamesBean.removePlayerFromStagedGame(stagedGame, userId);
+        createGamesBean.removePlayerFromStagedGame(stagedGame, userId);
     }
 
     /**
      * Extract and validate POST parameters and forward them to
-     * {@link AdminCreateGamesBean#removeCreatorFromStagedGame(StagedGame)}
+     * {@link CreateGamesBean#removeCreatorFromStagedGame(StagedGame)}
      * AdminCreateGamesBean#removeCreatorFromStagedGame()}.
      * @param request The HTTP request.
      */
@@ -437,12 +448,11 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        adminCreateGamesBean.removeCreatorFromStagedGame(stagedGame);
+        createGamesBean.removeCreatorFromStagedGame(stagedGame);
     }
 
     /**
-     * Extract and validate POST parameters for {@link AdminCreateGamesBean#switchRole(StagedGame, UserEntity)
-     * AdminCreateGamesBean#switchRole()}.
+     * Extract and validate POST parameters for {@link CreateGamesBean#switchRole(StagedGame, int)}
      * @param request The HTTP request.
      */
     private void switchRole(HttpServletRequest request) {
@@ -450,9 +460,9 @@ public class AdminCreateGames extends HttpServlet {
         int gameId = getStringParameter(request, "gameId")
                 .flatMap(StagedGameList::formattedToNumericGameId).get();
 
-        UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
+        UserInfo user = createGamesBean.getUserInfo(userId);
         if (user == null) {
-            messages.add(format("ERROR: Cannot switch role of user {0}. User does not exist.", userId));
+            messages.add(format("ERROR: Cannot switch role of user {0}. Invalid user.", userId));
             return;
         }
 
@@ -463,11 +473,11 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        adminCreateGamesBean.switchRole(stagedGame, user.getUser());
+        createGamesBean.switchRole(stagedGame, user.getId());
     }
 
     /**
-     * Extract and validate POST parameters for {@link AdminCreateGamesBean#switchCreatorRole(StagedGame)
+     * Extract and validate POST parameters for {@link CreateGamesBean#switchCreatorRole(StagedGame)
      * AdminCreateGamesBean#switchCreatorRole()}.
      * @param request The HTTP request.
      */
@@ -482,12 +492,12 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        adminCreateGamesBean.switchCreatorRole(stagedGame);
+        createGamesBean.switchCreatorRole(stagedGame);
     }
 
     /**
-     * Extract and validate POST parameters for {@link AdminCreateGamesBean#movePlayerBetweenStagedGames(StagedGame,
-     * StagedGame, UserEntity, Role) AdminCreateGamesBean#movePlayerBetweenStagedGames()}.
+     * Extract and validate POST parameters for {@link CreateGamesBean#movePlayerBetweenStagedGames(StagedGame,
+     * StagedGame, int, Role)}
      * @param request The HTTP request.
      */
     private void movePlayerBetweenStagedGames(HttpServletRequest request) {
@@ -512,20 +522,19 @@ public class AdminCreateGames extends HttpServlet {
             return;
         }
 
-        UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
+        UserInfo user = createGamesBean.getUserInfos().get(userId);
         if (user == null) {
             messages.add(format("ERROR: Cannot move user {0}. User does not exist.",
                     userId, gameIdTo));
             return;
         }
 
-        adminCreateGamesBean.movePlayerBetweenStagedGames(stagedGameFrom, stagedGameTo, user.getUser(), role);
+        createGamesBean.movePlayerBetweenStagedGames(stagedGameFrom, stagedGameTo, user.getId(), role);
     }
 
     /**
-     * Extract and validate POST parameters for {@link AdminCreateGamesBean#addPlayerToStagedGame(StagedGame, UserEntity,
-     * Role) AdminCreateGamesBean#addPlayerToStagedGame()} or {@link AdminCreateGamesBean#addPlayerToExistingGame(
-     * AbstractGame, UserEntity, Role) AdminCreateGamesBean#addPlayerToExistingGame()}.
+     * Extract and validate POST parameters for {@link CreateGamesBean#addPlayerToStagedGame(StagedGame, int, Role)}
+     * or {@link CreateGamesBean#addPlayerToExistingGame(AbstractGame, int, Role)}
      * @param request The HTTP request.
      */
     private void addPlayerToGame(HttpServletRequest request) {
@@ -545,7 +554,7 @@ public class AdminCreateGames extends HttpServlet {
         int userId = getIntParameter(request, "userId").get();
         Role role = getEnumParameter(request, Role.class, "role").get();
 
-        UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
+        UserInfo user = createGamesBean.getUserInfos().get(userId);
         if (user == null) {
             if (isStagedGame) {
                 messages.add(format("ERROR: Cannot add user {0} to staged game {1}. User does not exist.",
@@ -564,7 +573,7 @@ public class AdminCreateGames extends HttpServlet {
                         userId, StagedGameList.numericToFormattedGameId(gameId)));
                 return;
             }
-            adminCreateGamesBean.addPlayerToStagedGame(stagedGame, user.getUser(), role);
+            createGamesBean.addPlayerToStagedGame(stagedGame, user.getId(), role);
         } else {
             AbstractGame game = GameDAO.getGame(gameId);
             if (game == null) {
@@ -572,7 +581,7 @@ public class AdminCreateGames extends HttpServlet {
                         userId, gameId));
                 return;
             }
-            adminCreateGamesBean.addPlayerToExistingGame(game, user.getUser(), role);
+            createGamesBean.addPlayerToExistingGame(game, user.getId(), role);
         }
     }
 }

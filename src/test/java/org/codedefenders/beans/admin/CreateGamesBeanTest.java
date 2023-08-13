@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.beans.creategames.AdminCreateGamesBean;
+import org.codedefenders.beans.creategames.CreateGamesBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
@@ -25,8 +25,8 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
+import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
-import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
@@ -62,14 +62,14 @@ import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({
-        AdminCreateGamesBean.class,
+        CreateGamesBean.class,
         AdminDAO.class,
         GameDAO.class,
         MultiplayerGameDAO.class,
         MeleeGameDAO.class
 })
-public class AdminCreateGamesBeanTest {
-    private AdminCreateGamesBean adminCreateGamesBean;
+public class CreateGamesBeanTest {
+    private CreateGamesBean createGamesBean;
     private StagedGameList stagedGameList;
 
     private HashMap<Integer, UserInfo> userInfos;
@@ -84,7 +84,7 @@ public class AdminCreateGamesBeanTest {
         PowerMockito.mockStatic(GameDAO.class);
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(MeleeGameDAO.class);
-        PowerMockito.mockStatic(AdminCreateGamesBean.class);
+        PowerMockito.mockStatic(CreateGamesBean.class);
     }
 
     /*
@@ -106,8 +106,8 @@ public class AdminCreateGamesBeanTest {
         ClassroomService classroomService = PowerMockito.mock(ClassroomService.class);
         CreateGamesService createGamesService = PowerMockito.mock(CreateGamesService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(messagesBean, eventDAO, userRepo, createGamesService);
-        stagedGameList = adminCreateGamesBean.getStagedGameList();
+        createGamesBean = new CreateGamesBean(messagesBean, eventDAO, userRepo, createGamesService);
+        stagedGameList = createGamesBean.getStagedGames();
     }
 
     @Before
@@ -133,8 +133,8 @@ public class AdminCreateGamesBeanTest {
 
     @Test
     public void testGetStagedGamesList() {
-        StagedGameList list1 = adminCreateGamesBean.getStagedGameList();
-        StagedGameList list2 = adminCreateGamesBean.getStagedGameList();
+        StagedGameList list1 = createGamesBean.getStagedGames();
+        StagedGameList list2 = createGamesBean.getStagedGames();
 
         assertThat(list1, not(nullValue()));
         assertThat(list2, not(nullValue()));
@@ -145,8 +145,8 @@ public class AdminCreateGamesBeanTest {
     public void testGetUserInfos() {
         PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
 
-        adminCreateGamesBean.update();
-        assertThat(adminCreateGamesBean.getUserInfos(), equalTo(userInfos));
+        createGamesBean.update();
+        assertThat(createGamesBean.getUserInfos(), equalTo(userInfos));
     }
 
     @Test
@@ -157,11 +157,11 @@ public class AdminCreateGamesBeanTest {
                 .setGameType(MULTIPLAYER)
                 .build();
         RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
-        TeamAssignmentMethod teamAssignmentMethod = TeamAssignmentMethod.RANDOM;
+        GameAssignmentMethod gameAssignmentMethod = GameAssignmentMethod.RANDOM;
         int attackersPerGame = 2;
         int defendersPerGame = 2;
 
-        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
+        createGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, gameAssignmentMethod,
                 attackersPerGame, defendersPerGame, 0);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
@@ -180,10 +180,10 @@ public class AdminCreateGamesBeanTest {
                 .setGameType(MELEE)
                 .build();
         RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
-        TeamAssignmentMethod teamAssignmentMethod = TeamAssignmentMethod.RANDOM;
+        GameAssignmentMethod gameAssignmentMethod = GameAssignmentMethod.RANDOM;
         int playersPerGame = 4;
 
-        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
+        createGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, gameAssignmentMethod,
                 0, 0, playersPerGame);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(2));
@@ -199,11 +199,11 @@ public class AdminCreateGamesBeanTest {
         GameSettings gameSettings = new GameSettings();
         gameSettings.setGameType(MULTIPLAYER);
         RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
-        TeamAssignmentMethod teamAssignmentMethod = TeamAssignmentMethod.RANDOM;
+        GameAssignmentMethod gameAssignmentMethod = GameAssignmentMethod.RANDOM;
         int attackersPerGame = 2;
         int defendersPerGame = 2;
 
-        adminCreateGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, teamAssignmentMethod,
+        createGamesBean.stageGamesWithUsers(users, gameSettings, roleAssignmentMethod, gameAssignmentMethod,
                 attackersPerGame, defendersPerGame, 0);
 
         assertThat(stagedGameList.getStagedGames().values(), hasSize(1));
@@ -225,7 +225,7 @@ public class AdminCreateGamesBeanTest {
         stagedGames.add(stagedGame2);
         stagedGames.add(stagedGame3);
 
-        adminCreateGamesBean.deleteStagedGames(stagedGames);
+        createGamesBean.deleteStagedGames(stagedGames);
         assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame4));
     }
 
@@ -264,13 +264,13 @@ public class AdminCreateGamesBeanTest {
         PowerMockito.when(MultiplayerGameDAO.storeMultiplayerGame(any(MultiplayerGame.class))).thenReturn(0);
         PowerMockito.when(GameDAO.addPlayerToGame(anyInt(), anyInt(), any(Role.class))).thenReturn(true);
         PowerMockito.when(userRepo.getUserById(anyInt())).thenReturn(Optional.of(new UserEntity("")));
-        adminCreateGamesBean = PowerMockito.spy(adminCreateGamesBean);
+        createGamesBean = PowerMockito.spy(createGamesBean);
 
-        adminCreateGamesBean.createStagedGames(stagedGames);
+        createGamesBean.createStagedGames(stagedGames);
 
         assertThat(stagedGameList.getStagedGames().values(), containsInAnyOrder(stagedGame1, stagedGame4));
-        PowerMockito.verifyPrivate(adminCreateGamesBean).invoke("insertStagedGame", stagedGame2);
-        PowerMockito.verifyPrivate(adminCreateGamesBean).invoke("insertStagedGame", stagedGame3);
+        PowerMockito.verifyPrivate(createGamesBean).invoke("insertStagedGame", stagedGame2);
+        PowerMockito.verifyPrivate(createGamesBean).invoke("insertStagedGame", stagedGame3);
     }
 
     @Test
@@ -283,9 +283,9 @@ public class AdminCreateGamesBeanTest {
         stagedGame2.addAttacker(3);
         stagedGame2.addDefender(4);
 
-        assertThat(adminCreateGamesBean.removePlayerFromStagedGame(stagedGame1, 0), is(false));
-        assertThat(adminCreateGamesBean.removePlayerFromStagedGame(stagedGame1, 3), is(false));
-        assertThat(adminCreateGamesBean.removePlayerFromStagedGame(stagedGame1, 1), is(true));
+        assertThat(createGamesBean.removePlayerFromStagedGame(stagedGame1, 0), is(false));
+        assertThat(createGamesBean.removePlayerFromStagedGame(stagedGame1, 3), is(false));
+        assertThat(createGamesBean.removePlayerFromStagedGame(stagedGame1, 1), is(true));
         assertThat(stagedGame1.getAttackers(), empty());
     }
 
@@ -293,23 +293,23 @@ public class AdminCreateGamesBeanTest {
     public void testAddPlayerToStagedGame() {
         StagedGameList.StagedGame stagedGame = stagedGameList.addStagedGame(new GameSettings());
 
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.OBSERVER), is(false));
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.NONE), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.OBSERVER), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.NONE), is(false));
 
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.ATTACKER), is(true));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.ATTACKER), is(true));
         assertThat(stagedGame.getAttackers(), containsInAnyOrder(1));
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.DEFENDER), is(false));
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.PLAYER), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.DEFENDER), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(1).getUser(), Role.PLAYER), is(false));
 
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(2).getUser(), Role.DEFENDER), is(true));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(2).getUser(), Role.DEFENDER), is(true));
         assertThat(stagedGame.getDefenders(), containsInAnyOrder(2));
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(2).getUser(), Role.ATTACKER), is(false));
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(2).getUser(), Role.PLAYER), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(2).getUser(), Role.ATTACKER), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(2).getUser(), Role.PLAYER), is(false));
 
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(3).getUser(), Role.PLAYER), is(true));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(3).getUser(), Role.PLAYER), is(true));
         assertThat(stagedGame.getPlayers(), containsInAnyOrder(1, 2, 3));
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(3).getUser(), Role.ATTACKER), is(false));
-        assertThat(adminCreateGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(3).getUser(), Role.DEFENDER), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(3).getUser(), Role.ATTACKER), is(false));
+        assertThat(createGamesBean.addPlayerToStagedGame(stagedGame, userInfos.get(3).getUser(), Role.DEFENDER), is(false));
     }
 
     @Test
@@ -320,9 +320,9 @@ public class AdminCreateGamesBeanTest {
         Mockito.when(game.addPlayer(eq(2), eq(Role.DEFENDER))).thenReturn(true);
         Mockito.when(game.addPlayer(eq(3), eq(Role.PLAYER))).thenReturn(true);
 
-        assertThat(adminCreateGamesBean.addPlayerToExistingGame(game, userInfos.get(1).getUser(), Role.ATTACKER), is(false));
-        assertThat(adminCreateGamesBean.addPlayerToExistingGame(game, userInfos.get(2).getUser(), Role.DEFENDER), is(true));
-        assertThat(adminCreateGamesBean.addPlayerToExistingGame(game, userInfos.get(3).getUser(), Role.PLAYER), is(true));
+        assertThat(createGamesBean.addPlayerToExistingGame(game, userInfos.get(1).getUser(), Role.ATTACKER), is(false));
+        assertThat(createGamesBean.addPlayerToExistingGame(game, userInfos.get(2).getUser(), Role.DEFENDER), is(true));
+        assertThat(createGamesBean.addPlayerToExistingGame(game, userInfos.get(3).getUser(), Role.PLAYER), is(true));
 
         Mockito.verify(game).addPlayer(1, Role.ATTACKER);
         Mockito.verify(game).addPlayer(2, Role.DEFENDER);
@@ -332,13 +332,13 @@ public class AdminCreateGamesBeanTest {
     @Test
     public void testGetUserInfosForIds() {
         PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
-        adminCreateGamesBean.update();
+        createGamesBean.update();
 
         Set<Integer> validSet = Stream.of(1, 2, 3).collect(Collectors.toSet());
         Set<Integer> inValidSet = Stream.of(0, 1, 2).collect(Collectors.toSet());
 
-        Optional<Set<UserInfo>> validResult = adminCreateGamesBean.getUserInfosForIds(validSet);
-        Optional<Set<UserInfo>> inValidResult = adminCreateGamesBean.getUserInfosForIds(inValidSet);
+        Optional<Set<UserInfo>> validResult = createGamesBean.getUserInfosForIds(validSet);
+        Optional<Set<UserInfo>> inValidResult = createGamesBean.getUserInfosForIds(inValidSet);
 
         assertThat(validResult.isPresent(), is(true));
         assertThat(validResult.get(), containsInAnyOrder(userInfos.get(1), userInfos.get(2), userInfos.get(3)));
@@ -348,15 +348,15 @@ public class AdminCreateGamesBeanTest {
     @Test
     public void testGetUserInfosForNamesAndEmails() {
         PowerMockito.when(AdminDAO.getAllUsersInfo()).thenReturn(new ArrayList<>(userInfos.values()));
-        adminCreateGamesBean.update();
+        createGamesBean.update();
 
         Set<String> validSet1 = Stream.of("userA", "userB", "userC@email.com").collect(Collectors.toSet());
         Set<String> validSet2 = Stream.of("userA", "userA@email.com", "userB").collect(Collectors.toSet());
         Set<String> inValidSet = Stream.of("userA", "X", "").collect(Collectors.toSet());
 
-        Optional<Set<UserInfo>> validResult1 = adminCreateGamesBean.getUserInfosForNamesAndEmails(validSet1);
-        Optional<Set<UserInfo>> validResult2 = adminCreateGamesBean.getUserInfosForNamesAndEmails(validSet2);
-        Optional<Set<UserInfo>> inValidResult = adminCreateGamesBean.getUserInfosForNamesAndEmails(inValidSet);
+        Optional<Set<UserInfo>> validResult1 = createGamesBean.getUserInfosForNamesAndEmails(validSet1);
+        Optional<Set<UserInfo>> validResult2 = createGamesBean.getUserInfosForNamesAndEmails(validSet2);
+        Optional<Set<UserInfo>> inValidResult = createGamesBean.getUserInfosForNamesAndEmails(inValidSet);
 
         assertThat(validResult1.isPresent(), is(true));
         assertThat(validResult1.get(), containsInAnyOrder(userInfos.get(1), userInfos.get(2), userInfos.get(3)));
@@ -375,7 +375,7 @@ public class AdminCreateGamesBeanTest {
         Set<UserInfo> attackersBefore = new HashSet<>(attackers);
         Set<UserInfo> defendersBefore = new HashSet<>(defenders);
 
-        adminCreateGamesBean.assignRoles(users, roleAssignmentMethod, attackersPerGame, defendersPerGame,
+        createGamesBean.assignRoles(users, roleAssignmentMethod, attackersPerGame, defendersPerGame,
                 attackers, defenders);
 
         assertThat(attackers, hasSize(expectedNumAttackers));
@@ -686,16 +686,16 @@ public class AdminCreateGamesBeanTest {
     @Test
     public void testSplitIntoTeams_Random() {
         /* No remaining users. */
-        List<List<UserInfo>> teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 2,
-                TeamAssignmentMethod.RANDOM);
+        List<List<UserInfo>> teams = createGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 2,
+                GameAssignmentMethod.RANDOM);
         assertThat(teams, hasSize(2));
         assertThat(teams.get(0), hasSize(4));
         assertThat(teams.get(1), hasSize(4));
         assertThat(teams.stream().flatMap(List::stream).collect(Collectors.toList()), hasSize(8));
 
         /* With remaining users. */
-        teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 3,
-                TeamAssignmentMethod.RANDOM);
+        teams = createGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 3,
+                GameAssignmentMethod.RANDOM);
         assertThat(teams, hasSize(3));
         assertThat(teams.get(0), hasSize(3));
         assertThat(teams.get(1), hasSize(3));
@@ -703,7 +703,7 @@ public class AdminCreateGamesBeanTest {
         assertThat(teams.stream().flatMap(List::stream).collect(Collectors.toList()), hasSize(8));
 
         /* 0 users. */
-        teams = adminCreateGamesBean.splitIntoTeams(userSet(), 1, TeamAssignmentMethod.RANDOM);
+        teams = createGamesBean.splitIntoTeams(userSet(), 1, GameAssignmentMethod.RANDOM);
         assertThat(teams, hasSize(1));
         assertThat(teams.get(0), hasSize(0));
     }
@@ -724,8 +724,8 @@ public class AdminCreateGamesBeanTest {
          */
 
         /* No remaining users. */
-        List<List<UserInfo>> teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 2,
-                TeamAssignmentMethod.SCORE_DESCENDING);
+        List<List<UserInfo>> teams = createGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 2,
+                GameAssignmentMethod.SCORE_DESCENDING);
         assertThat(teams, hasSize(2));
         assertThat(teams.get(0), hasSize(4));
         assertThat(teams.get(1), hasSize(4));
@@ -734,8 +734,8 @@ public class AdminCreateGamesBeanTest {
         assertThat(teams.get(1), containsInAnyOrder(userSet(4, 3, 2, 1).toArray()));
 
         /* With remaining users. */
-        teams = adminCreateGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 3,
-                TeamAssignmentMethod.SCORE_DESCENDING);
+        teams = createGamesBean.splitIntoTeams(userSet(1, 2, 3, 4, 5, 6, 7, 8), 3,
+                GameAssignmentMethod.SCORE_DESCENDING);
         assertThat(teams, hasSize(3));
         assertThat(teams.get(0), hasSize(3));
         assertThat(teams.get(1), hasSize(3));
@@ -746,7 +746,7 @@ public class AdminCreateGamesBeanTest {
         assertThat(teams.get(2), containsInAnyOrder(userSet(2, 1).toArray()));
 
         /* 0 users. */
-        teams = adminCreateGamesBean.splitIntoTeams(userSet(), 1, TeamAssignmentMethod.RANDOM);
+        teams = createGamesBean.splitIntoTeams(userSet(), 1, GameAssignmentMethod.RANDOM);
         assertThat(teams, hasSize(1));
         assertThat(teams.get(0), hasSize(0));
     }

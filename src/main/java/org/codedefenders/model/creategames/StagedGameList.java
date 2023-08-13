@@ -1,6 +1,7 @@
 package org.codedefenders.model.creategames;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,8 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.codedefenders.game.Role;
+import org.codedefenders.model.creategames.gameassignment.GameAssignment;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
-import org.codedefenders.model.creategames.teamassignment.GameAssignment;
 
 import com.google.gson.annotations.Expose;
 
@@ -57,7 +58,7 @@ public class StagedGameList implements Serializable {
 
     /**
      * Removes any users that are not in the given set from any staged games.
-     * Useful to update a staged games list when the users change.
+     * Useful to update a staged games list when the users (potentially) change.
      */
     public void retainUsers(Collection<Integer> userIds) {
         for (StagedGame stagedGame : stagedGames.values()) {
@@ -118,7 +119,29 @@ public class StagedGameList implements Serializable {
         return false;
     }
 
-    public int stageGamesWithUsers(Set<Integer> userIds, GameSettings gameSettings,
+    /**
+     * <p>Stages games according to the given role/game assignment strategies.
+     *
+     * <p>Users are assigned as follows:
+     * <ol>
+     *     <li>Users are assigned roles according to the role assignment strategy.</li>
+     *     <li>
+     *         The number of games to be staged is calculated from the number of users per role,
+     *         and the number of requested attackers/defenders per game.
+     *     </li>
+     *     <li>Users are assigned to games according to the game assignment strategy.</li>
+     * </ol>
+     *
+     *
+     * @param userIds The users to become players in the games.
+     * @param gameSettings The game settings.
+     * @param roleAssignment The role assignment strategy.
+     * @param gameAssignment The game assignment strategy.
+     * @param attackersPerGame The desired number of attackers per game (or players per game for melee).
+     * @param defendersPerGame The desired number of defenders per game.
+     * @return The number of staged games.
+     */
+    public List<StagedGame> stageGamesWithUsers(Set<Integer> userIds, GameSettings gameSettings,
                                    RoleAssignment roleAssignment, GameAssignment gameAssignment,
                                    int attackersPerGame, int defendersPerGame) {
         /* Split users into attackers and defenders. */
@@ -145,6 +168,7 @@ public class StagedGameList implements Serializable {
         List<List<Integer>> defenderTeams = gameAssignment.assignGames(defenders, numGames);
 
         /* Create the games. */
+        List<StagedGame> newGames = new ArrayList<>();
         for (int i = 0; i < numGames; i++) {
             StagedGame stagedGame = addStagedGame(gameSettings);
             List<Integer> attackerTeam = attackerTeams.get(i);
@@ -155,9 +179,10 @@ public class StagedGameList implements Serializable {
             for (int userId : defenderTeam) {
                 stagedGame.addDefender(userId);
             }
+            newGames.add(stagedGame);
         }
 
-        return numGames;
+        return newGames;
     }
 
     /**
