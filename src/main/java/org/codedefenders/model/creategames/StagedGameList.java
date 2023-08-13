@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
 import org.codedefenders.model.creategames.teamassignment.GameAssignment;
@@ -149,24 +150,20 @@ public class StagedGameList implements Serializable {
     }
 
     public int stageGamesWithUsers(Set<Integer> userIds, GameSettings gameSettings,
-                                    RoleAssignment roleAssignment, GameAssignment gameAssignment,
-                                    int attackersPerGame, int defendersPerGame, int playersPerGame) {
+                                   RoleAssignment roleAssignment, GameAssignment gameAssignment,
+                                   int attackersPerGame, int defendersPerGame) {
         /* Split users into attackers and defenders. */
         Set<Integer> attackers = new HashSet<>();
         Set<Integer> defenders = new HashSet<>();
         roleAssignment.assignRoles(userIds, attackersPerGame, defendersPerGame, attackers, defenders);
 
-        int numGames;
-        if (gameSettings.getGameType() != MELEE) {
-            numGames = userIds.size() / (attackersPerGame + defendersPerGame);
-            /* Avoid empty games. */
-            if (numGames > attackers.size() && numGames > defenders.size())  {
-                int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
-                int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
-                numGames = Math.max(numGames1, numGames2);
-            }
-        } else {
-            numGames = userIds.size() / playersPerGame;
+        int numGames = userIds.size() / (attackersPerGame + defendersPerGame);
+
+        /* Avoid empty games. */
+        if (numGames > attackers.size() && numGames > defenders.size())  {
+            int numGames1 = attackersPerGame > 0 ? attackers.size() / attackersPerGame : 0;
+            int numGames2 = defendersPerGame > 0 ? defenders.size() / defendersPerGame : 0;
+            numGames = Math.max(numGames1, numGames2);
         }
 
         /* Always create at least one game. */
@@ -178,6 +175,7 @@ public class StagedGameList implements Serializable {
         List<List<Integer>> attackerTeams = gameAssignment.assignGames(attackers, numGames);
         List<List<Integer>> defenderTeams = gameAssignment.assignGames(defenders, numGames);
 
+        /* Create the games. */
         for (int i = 0; i < numGames; i++) {
             StagedGame stagedGame = addStagedGame(gameSettings);
             List<Integer> attackerTeam = attackerTeams.get(i);
@@ -321,6 +319,33 @@ public class StagedGameList implements Serializable {
                     return addAttacker(userId);
                 case DEFENDER:
                     return addDefender(userId);
+                default:
+                    return false;
+            }
+        }
+
+        public boolean switchRole(int userId) {
+            if (attackers.remove(userId)) {
+                return defenders.add(userId);
+            } else if (defenders.remove(userId)) {
+                return attackers.add(userId);
+            } else {
+                return false;
+            }
+        }
+
+        public boolean switchCreatorRole() {
+            Role role = gameSettings.getCreatorRole();
+            switch (role) {
+                case ATTACKER:
+                    gameSettings.setCreatorRole(Role.DEFENDER);
+                    return true;
+                case DEFENDER:
+                    gameSettings.setCreatorRole(Role.ATTACKER);
+                    return true;
+                case PLAYER:
+                    gameSettings.setCreatorRole(Role.PLAYER);
+                    return true;
                 default:
                     return false;
             }

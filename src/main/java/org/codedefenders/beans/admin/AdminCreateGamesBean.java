@@ -134,14 +134,13 @@ public class AdminCreateGamesBean implements Serializable {
      * @param teamAssignmentMethod The method of assigning users to teams.
      * @param attackersPerGame The number of attackers per game. Only relevant for non-melee games.
      * @param defendersPerGame The number of defenders per game. Only relevant for non-melee games.
-     * @param playersPerGame The number of defenders per game. Only relevant for melee games.
      * @see RoleAssignmentMethod
      * @see TeamAssignmentMethod
      */
     public void stageGamesWithUsers(Set<UserInfo> users, GameSettings gameSettings,
                                     RoleAssignmentMethod roleAssignmentMethod,
                                     TeamAssignmentMethod teamAssignmentMethod,
-                                    int attackersPerGame, int defendersPerGame, int playersPerGame) {
+                                    int attackersPerGame, int defendersPerGame) {
 
         Map<Integer, UserInfo> usersMap = users.stream()
                 .collect(Collectors.toMap(
@@ -175,7 +174,8 @@ public class AdminCreateGamesBean implements Serializable {
         }
 
         int numGames = stagedGameList.stageGamesWithUsers(usersMap.keySet(), gameSettings, role, game,
-                attackersPerGame, defendersPerGame, playersPerGame);
+                attackersPerGame, defendersPerGame);
+
         messages.add(format("Created {0} staged games.", numGames));
     }
 
@@ -263,21 +263,15 @@ public class AdminCreateGamesBean implements Serializable {
      * @return {@code true} if the user's role could be switched, {@code false} if not.
      */
     public boolean switchRole(StagedGame stagedGame, UserEntity user) {
-        if (stagedGame.getAttackers().contains(user.getId())) {
-            stagedGame.removePlayer(user.getId());
-            stagedGame.addDefender(user.getId());
-        } else if (stagedGame.getDefenders().contains(user.getId())) {
-            stagedGame.removePlayer(user.getId());
-            stagedGame.addAttacker(user.getId());
+        if (stagedGame.switchRole(user.getId())) {
+            messages.add(format("Switched role of user {0} in staged game {1}.",
+                    user.getId(), stagedGame.getFormattedId()));
+            return true;
         } else {
-            messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}. "
-                    + "User is not assigned to the staged game.",
+            messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}.",
                     user.getId(), stagedGame.getFormattedId()));
             return false;
         }
-        messages.add(format("Switched role of user {0} in staged game {1}.",
-                user.getId(), stagedGame.getFormattedId()));
-        return true;
     }
 
     /**
@@ -286,21 +280,15 @@ public class AdminCreateGamesBean implements Serializable {
      * @return {@code true} if the creator's role could be switched, {@code false} if not.
      */
     public boolean switchCreatorRole(StagedGame stagedGame) {
-        if (stagedGame.getGameSettings().getCreatorRole() == Role.PLAYER) {
-            stagedGame.getGameSettings().setCreatorRole(Role.PLAYER);
-        } else if (stagedGame.getGameSettings().getCreatorRole() == Role.ATTACKER) {
-            stagedGame.getGameSettings().setCreatorRole(Role.DEFENDER);
-        } else if (stagedGame.getGameSettings().getCreatorRole() == Role.DEFENDER) {
-            stagedGame.getGameSettings().setCreatorRole(Role.ATTACKER);
+        if (stagedGame.switchCreatorRole()) {
+            messages.add(format("Switched your role in staged game {0}.",
+                    stagedGame.getFormattedId()));
+            return true;
         } else {
-            messages.add(format("ERROR: Cannot switch your role in staged game {0}. "
-                            + "You are not assigned to the staged game.",
+            messages.add(format("ERROR: Cannot switch your role in staged game {0}.",
                     stagedGame.getFormattedId()));
             return false;
         }
-        messages.add(format("Switched your role in staged game {0}.",
-                stagedGame.getFormattedId()));
-        return true;
     }
 
     /**

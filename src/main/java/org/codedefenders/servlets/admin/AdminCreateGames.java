@@ -310,6 +310,7 @@ public class AdminCreateGames extends HttpServlet {
             if (playersPerGame < 0) {
                 messages.add(format("Invalid team sizes. Players per game: {0}.", playersPerGame));
             }
+            attackersPerGame = playersPerGame;
         } else {
             if (attackersPerGame < 0 || defendersPerGame < 0 || attackersPerGame + defendersPerGame == 0) {
                 messages.add(format("Invalid team sizes. Attackers per game: {0}, defenders per game: {1}.",
@@ -319,7 +320,7 @@ public class AdminCreateGames extends HttpServlet {
         }
 
         adminCreateGamesBean.stageGamesWithUsers(players.get(), gameSettings, roleAssignmentMethod,
-                teamAssignmentMethod, attackersPerGame, defendersPerGame, playersPerGame);
+                teamAssignmentMethod, attackersPerGame, defendersPerGame);
     }
 
     /**
