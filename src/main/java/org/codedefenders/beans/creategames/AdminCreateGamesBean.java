@@ -1,4 +1,4 @@
-package org.codedefenders.beans.admin;
+package org.codedefenders.beans.creategames;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -65,7 +65,6 @@ import static org.codedefenders.game.GameType.MELEE;
 @Named("adminCreateGames")
 @SessionScoped
 public class AdminCreateGamesBean implements Serializable {
-    private final Object synchronizer = new Serializable() {};
     private final MessagesBean messages;
     private final EventDAO eventDAO;
     private final UserRepository userRepo;
@@ -81,10 +80,6 @@ public class AdminCreateGamesBean implements Serializable {
         this.createGamesService = createGamesService;
     }
 
-    public Object getSynchronizer() {
-        return synchronizer;
-    }
-
     /**
      * The staged game list managed by the bean.
      */
@@ -95,6 +90,10 @@ public class AdminCreateGamesBean implements Serializable {
      * {@link AdminCreateGamesBean#update()} on every request before this bean is used.
      */
     private final Map<Integer, UserInfo> userInfos = new HashMap<>();
+
+    public Object getSynchronizer() {
+        return stagedGameList;
+    }
 
     /**
      * Returns the staged games list that is managed by the bean.

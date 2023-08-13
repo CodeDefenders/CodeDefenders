@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codedefenders.beans.admin.AdminCreateGamesBean;
+import org.codedefenders.beans.creategames.AdminCreateGamesBean;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameDAO;
@@ -349,7 +349,7 @@ public class AdminCreateGames extends HttpServlet {
         List<Integer> stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .map(stagedGameList::formattedToNumericGameId)
+                .map(StagedGameList::formattedToNumericGameId)
                 .map(Optional::get)
                 .distinct()
                 .collect(Collectors.toList());
@@ -380,7 +380,7 @@ public class AdminCreateGames extends HttpServlet {
         List<Integer> stagedGameIds = Arrays.stream(stagedGameIdsStr.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .map(stagedGameList::formattedToNumericGameId)
+                .map(StagedGameList::formattedToNumericGameId)
                 .map(Optional::get)
                 .distinct()
                 .collect(Collectors.toList());
@@ -408,12 +408,12 @@ public class AdminCreateGames extends HttpServlet {
     private void removePlayerFromStagedGame(HttpServletRequest request) {
         int userId = getIntParameter(request, "userId").get();
         int gameId = getStringParameter(request, "gameId")
-                .flatMap(stagedGameList::formattedToNumericGameId).get();
+                .flatMap(StagedGameList::formattedToNumericGameId).get();
 
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot remove user {0} from staged game {1}. Staged game does not exist.",
-                    userId, stagedGameList.numericToFormattedGameId(gameId)));
+                    userId, StagedGameList.numericToFormattedGameId(gameId)));
             return;
         }
 
@@ -428,12 +428,12 @@ public class AdminCreateGames extends HttpServlet {
      */
     private void removeCreatorFromStagedGame(HttpServletRequest request) {
         int gameId = getStringParameter(request, "gameId")
-                .flatMap(stagedGameList::formattedToNumericGameId).get();
+                .flatMap(StagedGameList::formattedToNumericGameId).get();
 
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot remove you from staged game {1}. Staged game does not exist.",
-                    stagedGameList.numericToFormattedGameId(gameId)));
+                    StagedGameList.numericToFormattedGameId(gameId)));
             return;
         }
 
@@ -448,7 +448,7 @@ public class AdminCreateGames extends HttpServlet {
     private void switchRole(HttpServletRequest request) {
         int userId = getIntParameter(request, "userId").get();
         int gameId = getStringParameter(request, "gameId")
-                .flatMap(stagedGameList::formattedToNumericGameId).get();
+                .flatMap(StagedGameList::formattedToNumericGameId).get();
 
         UserInfo user = adminCreateGamesBean.getUserInfos().get(userId);
         if (user == null) {
@@ -459,7 +459,7 @@ public class AdminCreateGames extends HttpServlet {
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot switch role of user {0} in staged game {1}. Staged game does not exist.",
-                    userId, stagedGameList.numericToFormattedGameId(gameId)));
+                    userId, StagedGameList.numericToFormattedGameId(gameId)));
             return;
         }
 
@@ -473,12 +473,12 @@ public class AdminCreateGames extends HttpServlet {
      */
     private void switchCreatorRole(HttpServletRequest request) {
         int gameId = getStringParameter(request, "gameId")
-                .flatMap(stagedGameList::formattedToNumericGameId).get();
+                .flatMap(StagedGameList::formattedToNumericGameId).get();
 
         StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
         if (stagedGame == null) {
             messages.add(format("ERROR: Cannot switch creator role in staged game {1}. Staged game does not exist.",
-                    stagedGameList.numericToFormattedGameId(gameId)));
+                    StagedGameList.numericToFormattedGameId(gameId)));
             return;
         }
 
@@ -493,22 +493,22 @@ public class AdminCreateGames extends HttpServlet {
     private void movePlayerBetweenStagedGames(HttpServletRequest request) {
         int userId = getIntParameter(request, "userId").get();
         int gameIdFrom = getStringParameter(request, "gameIdFrom")
-                .flatMap(stagedGameList::formattedToNumericGameId).get();
+                .flatMap(StagedGameList::formattedToNumericGameId).get();
         int gameIdTo = getStringParameter(request, "gameIdTo")
-                .flatMap(stagedGameList::formattedToNumericGameId).get();
+                .flatMap(StagedGameList::formattedToNumericGameId).get();
         Role role = getEnumParameter(request, Role.class, "role").get();
 
         StagedGame stagedGameFrom = stagedGameList.getStagedGame(gameIdFrom);
         if (stagedGameFrom == null) {
             messages.add(format("ERROR: Cannot move user {0} from staged game {1}. Staged game does not exist.",
-                    userId, stagedGameList.numericToFormattedGameId(gameIdFrom)));
+                    userId, StagedGameList.numericToFormattedGameId(gameIdFrom)));
             return;
         }
 
         StagedGame stagedGameTo = stagedGameList.getStagedGame(gameIdTo);
         if (stagedGameTo == null) {
             messages.add(format("ERROR: Cannot move user {0} to staged game {1}. Staged game does not exist.",
-                    userId, stagedGameList.numericToFormattedGameId(gameIdTo)));
+                    userId, StagedGameList.numericToFormattedGameId(gameIdTo)));
             return;
         }
 
@@ -530,7 +530,7 @@ public class AdminCreateGames extends HttpServlet {
      */
     private void addPlayerToGame(HttpServletRequest request) {
         String gameIdStr = getStringParameter(request, "gameId").get();
-        Optional<Integer> stagedGameId = stagedGameList.formattedToNumericGameId(gameIdStr);
+        Optional<Integer> stagedGameId = StagedGameList.formattedToNumericGameId(gameIdStr);
 
         int gameId;
         boolean isStagedGame;
@@ -549,7 +549,7 @@ public class AdminCreateGames extends HttpServlet {
         if (user == null) {
             if (isStagedGame) {
                 messages.add(format("ERROR: Cannot add user {0} to staged game {1}. User does not exist.",
-                        userId, stagedGameList.numericToFormattedGameId(gameId)));
+                        userId, StagedGameList.numericToFormattedGameId(gameId)));
             } else {
                 messages.add(format("ERROR: Cannot add user {0} to existing game {1}. User does not exist.",
                         userId, gameId));
@@ -561,7 +561,7 @@ public class AdminCreateGames extends HttpServlet {
             StagedGame stagedGame = stagedGameList.getStagedGame(gameId);
             if (stagedGame == null) {
                 messages.add(format("ERROR: Cannot add user {0} to staged game {1}. Staged game does not exist.",
-                        userId, stagedGameList.numericToFormattedGameId(gameId)));
+                        userId, StagedGameList.numericToFormattedGameId(gameId)));
                 return;
             }
             adminCreateGamesBean.addPlayerToStagedGame(stagedGame, user.getUser(), role);

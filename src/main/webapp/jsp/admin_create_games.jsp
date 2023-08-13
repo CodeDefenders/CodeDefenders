@@ -22,7 +22,7 @@
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.beans.admin.AdminCreateGamesBean" %>
+<%@ page import="org.codedefenders.beans.creategames.AdminCreateGamesBean" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidator" %>
@@ -35,7 +35,7 @@
 
 <%--@elvariable id="url" type="org.codedefenders.util.URLUtils"--%>
 <%--@elvariable id="login" type="org.codedefenders.auth.CodeDefendersAuth"--%>
-<%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.admin.AdminCreateGamesBean"--%>
+<%--@elvariable id="adminCreateGames" type="org.codedefenders.beans.creategames.AdminCreateGamesBean"--%>
 
 <jsp:useBean id="pageInfo" class="org.codedefenders.beans.page.PageInfoBean" scope="request"/>
 <% pageInfo.setPageTitle("Create Games"); %>

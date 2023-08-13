@@ -10,15 +10,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.codedefenders.beans.page.PageInfoBean;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
 import org.codedefenders.model.creategames.teamassignment.GameAssignment;
 
 import com.google.gson.annotations.Expose;
-
-import static java.text.MessageFormat.format;
-import static org.codedefenders.game.GameType.MELEE;
 
 /**
  * Manages a list of staged games.
@@ -70,31 +66,6 @@ public class StagedGameList implements Serializable {
     }
 
     /**
-     * Returns the formatted staged game ID corresponding to the given numeric staged game ID.
-     * @param gameId The numeric staged game ID.
-     * @return The formatted staged game ID.
-     */
-    public String numericToFormattedGameId(int gameId) {
-        return "T" + gameId;
-    }
-
-    /**
-     * Returns the numeric staged game ID corresponding to the given formatted staged game ID.
-     * @param formattedGameId The formatted staged game ID.
-     * @return The numeric staged game ID.
-     */
-    public Optional<Integer> formattedToNumericGameId(String formattedGameId) {
-        if (!formattedGameId.startsWith("T")) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.of(Integer.parseInt(formattedGameId.substring(1)));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * Adds and returns a new staged game with the given settings.
      * @param gameSettings The settings for the staged game.
      * @return The newly created staged game.
@@ -112,10 +83,9 @@ public class StagedGameList implements Serializable {
      * @return {@code true} if the game was in the list, {@code false} otherwise.
      */
     public boolean removeStagedGame(int gameId) {
-        if (!stagedGames.containsKey(gameId)) {
+        if (stagedGames.remove(gameId) == null) {
             return false;
         }
-        stagedGames.remove(gameId);
         if (stagedGames.isEmpty()) {
             currentId = 0;
         }
@@ -129,8 +99,7 @@ public class StagedGameList implements Serializable {
     public Set<Integer> getAssignedUsers() {
         Set<Integer> assignedUsers = new HashSet<>();
         for (StagedGame stagedGame : stagedGames.values()) {
-            assignedUsers.addAll(stagedGame.getAttackers());
-            assignedUsers.addAll(stagedGame.getDefenders());
+            assignedUsers.addAll(stagedGame.getPlayers());
         }
         return assignedUsers;
     }
@@ -189,6 +158,31 @@ public class StagedGameList implements Serializable {
         }
 
         return numGames;
+    }
+
+    /**
+     * Returns the formatted staged game ID corresponding to the given numeric staged game ID.
+     * @param gameId The numeric staged game ID.
+     * @return The formatted staged game ID.
+     */
+    public static String numericToFormattedGameId(int gameId) {
+        return "T" + gameId;
+    }
+
+    /**
+     * Returns the numeric staged game ID corresponding to the given formatted staged game ID.
+     * @param formattedGameId The formatted staged game ID.
+     * @return The numeric staged game ID.
+     */
+    public static Optional<Integer> formattedToNumericGameId(String formattedGameId) {
+        if (!formattedGameId.startsWith("T")) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Integer.parseInt(formattedGameId.substring(1)));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -283,7 +277,7 @@ public class StagedGameList implements Serializable {
             Set<Integer> players = new HashSet<>();
             players.addAll(attackers);
             players.addAll(defenders);
-            return players;
+            return Collections.unmodifiableSet(players);
         }
 
         /**
@@ -354,10 +348,6 @@ public class StagedGameList implements Serializable {
                             .build();
                     return true;
                 case PLAYER:
-                    gameSettings = GameSettings.builder()
-                            .withSettings(gameSettings)
-                            .setCreatorRole(Role.PLAYER)
-                            .build();
                     return true;
                 default:
                     return false;
