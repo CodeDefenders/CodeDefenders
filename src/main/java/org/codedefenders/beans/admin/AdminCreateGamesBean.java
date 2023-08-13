@@ -35,9 +35,9 @@ import org.codedefenders.model.creategames.roleassignment.OppositeRoleAssignment
 import org.codedefenders.model.creategames.roleassignment.RandomRoleAssignment;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignment;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.teamassignment.GameAssignment;
 import org.codedefenders.model.creategames.teamassignment.RandomGameAssignment;
 import org.codedefenders.model.creategames.teamassignment.ScoreGameAssignment;
-import org.codedefenders.model.creategames.teamassignment.GameAssignment;
 import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
@@ -248,7 +248,11 @@ public class AdminCreateGamesBean implements Serializable {
      * @param stagedGame The staged game.
      */
     public void removeCreatorFromStagedGame(StagedGame stagedGame) {
-        stagedGame.getGameSettings().setCreatorRole(Role.OBSERVER);
+        GameSettings gameSettings = GameSettings.builder()
+                .withSettings(stagedGame.getGameSettings())
+                .setCreatorRole(Role.OBSERVER)
+                .build();
+        stagedGame.setGameSettings(gameSettings);
         messages.add(format(
                 "Removed you from staged game {0}. Your role is now {1} again.",
                 stagedGame.getFormattedId(), Role.OBSERVER)

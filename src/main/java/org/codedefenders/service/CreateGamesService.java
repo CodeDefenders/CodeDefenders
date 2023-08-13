@@ -9,7 +9,9 @@ import javax.inject.Inject;
 import org.codedefenders.auth.CodeDefendersAuth;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.EventDAO;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MeleeGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -76,16 +78,17 @@ public class CreateGamesService {
      */
     public boolean createGame(StagedGame stagedGame) {
         GameSettings gameSettings = stagedGame.getGameSettings();
+        GameClass cut = GameClassDAO.getClassForId(gameSettings.getClassId());
 
         /* Create the game. */
         AbstractGame game;
         if (gameSettings.getGameType() == MULTIPLAYER) {
             game = new MultiplayerGame.Builder(
-                    gameSettings.getCut().getId(),
+                    gameSettings.getClassId(),
                     login.getUserId(),
                     gameSettings.getMaxAssertionsPerTest()
             )
-                    .cut(gameSettings.getCut())
+                    .cut(cut)
                     .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
                     .chatEnabled(gameSettings.isChatEnabled())
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())
@@ -96,11 +99,11 @@ public class CreateGamesService {
                     .build();
         } else if (gameSettings.getGameType() == MELEE) {
             game = new MeleeGame.Builder(
-                    gameSettings.getCut().getId(),
+                    gameSettings.getClassId(),
                     login.getUserId(),
                     gameSettings.getMaxAssertionsPerTest()
             )
-                    .cut(gameSettings.getCut())
+                    .cut(cut)
                     .mutantValidatorLevel(gameSettings.getMutantValidatorLevel())
                     .chatEnabled(gameSettings.isChatEnabled())
                     .capturePlayersIntention(gameSettings.isCaptureIntentions())

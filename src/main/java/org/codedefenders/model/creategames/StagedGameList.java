@@ -101,7 +101,7 @@ public class StagedGameList implements Serializable {
      */
     public StagedGame addStagedGame(GameSettings gameSettings) {
         int id = currentId++;
-        StagedGame stagedGame = new StagedGame(id, new GameSettings(gameSettings));
+        StagedGame stagedGame = new StagedGame(id, gameSettings);
         stagedGames.put(id, stagedGame);
         return stagedGame;
     }
@@ -205,7 +205,7 @@ public class StagedGameList implements Serializable {
         /**
          * The game settings of the staged game.
          */
-        @Expose private final GameSettings gameSettings;
+        @Expose private GameSettings gameSettings;
 
         /**
          * User IDs of users listed as attackers for the staged game.
@@ -249,6 +249,10 @@ public class StagedGameList implements Serializable {
          */
         public GameSettings getGameSettings() {
             return gameSettings;
+        }
+
+        public void setGameSettings(GameSettings gameSettings) {
+            this.gameSettings = gameSettings;
         }
 
         /**
@@ -338,13 +342,22 @@ public class StagedGameList implements Serializable {
             Role role = gameSettings.getCreatorRole();
             switch (role) {
                 case ATTACKER:
-                    gameSettings.setCreatorRole(Role.DEFENDER);
+                    gameSettings = GameSettings.builder()
+                            .withSettings(gameSettings)
+                            .setCreatorRole(Role.DEFENDER)
+                            .build();
                     return true;
                 case DEFENDER:
-                    gameSettings.setCreatorRole(Role.ATTACKER);
+                    gameSettings = GameSettings.builder()
+                            .withSettings(gameSettings)
+                            .setCreatorRole(Role.ATTACKER)
+                            .build();
                     return true;
                 case PLAYER:
-                    gameSettings.setCreatorRole(Role.PLAYER);
+                    gameSettings = GameSettings.builder()
+                            .withSettings(gameSettings)
+                            .setCreatorRole(Role.PLAYER)
+                            .build();
                     return true;
                 default:
                     return false;

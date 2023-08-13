@@ -36,11 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.codedefenders.beans.admin.AdminCreateGamesBean;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
-import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -51,6 +48,8 @@ import org.codedefenders.model.UserInfo;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
 import org.codedefenders.model.creategames.StagedGameList.StagedGame;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -161,52 +160,51 @@ public class AdminCreateGames extends HttpServlet {
      * @return The extracted game settings.
      */
     private GameSettings extractGameSettings(HttpServletRequest request) {
-        GameSettings gameSettings = new GameSettings();
+        GameSettings.Builder builder = new GameSettings.Builder();
 
-        gameSettings.setGameType(
+        builder.setGameType(
                 getEnumParameter(request, GameType.class, "gameType").get());
 
-        gameSettings.setCut(
-                getIntParameter(request, "cut")
-                        .map(GameClassDAO::getClassForId).get());
+        builder.setClassId(
+                getIntParameter(request, "cut").get());
 
-        gameSettings.setWithMutants(
+        builder.setWithMutants(
                 request.getParameter("withMutants") != null);
 
-        gameSettings.setWithTests(
+        builder.setWithTests(
                 request.getParameter("withTests") != null);
 
-        gameSettings.setMaxAssertionsPerTest(
+        builder.setMaxAssertionsPerTest(
                 getIntParameter(request, "maxAssertionsPerTest").get());
 
-        gameSettings.setMutantValidatorLevel(
+        builder.setMutantValidatorLevel(
                 getEnumParameter(request, CodeValidatorLevel.class, "mutantValidatorLevel").get());
 
-        gameSettings.setCreatorRole(
+        builder.setCreatorRole(
                 getEnumParameter(request, Role.class, "creatorRole").get());
 
-        gameSettings.setChatEnabled(
+        builder.setChatEnabled(
                 request.getParameter("chatEnabled") != null);
 
-        gameSettings.setCaptureIntentions(
+        builder.setCaptureIntentions(
                 request.getParameter("captureIntentions") != null);
 
-        gameSettings.setEquivalenceThreshold(
+        builder.setEquivalenceThreshold(
                 getIntParameter(request, "automaticEquivalenceTrigger").get());
 
-        gameSettings.setLevel(
+        builder.setLevel(
                 getEnumParameter(request, GameLevel.class, "level").get());
 
-        gameSettings.setLevel(
+        builder.setLevel(
                 getEnumParameter(request, GameLevel.class, "level").get());
 
-        gameSettings.setStartGame(
+        builder.setStartGame(
                 request.getParameter("startGames") != null);
 
-        gameSettings.setGameDurationMinutes(
+        builder.setGameDurationMinutes(
                 clampGameDuration(getIntParameter(request, "gameDurationMinutes").get()));
 
-        return gameSettings;
+        return builder.build();
     }
 
     /**

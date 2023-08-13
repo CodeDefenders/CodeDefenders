@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.codedefenders.auth.CodeDefendersAuth;
-import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
-import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.beans.message.MessagesBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.EventDAO;
@@ -26,6 +24,8 @@ import org.codedefenders.model.UserEntity;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.model.creategames.GameSettings;
 import org.codedefenders.model.creategames.StagedGameList;
+import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
+import org.codedefenders.model.creategames.teamassignment.TeamAssignmentMethod;
 import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.AuthService;
 import org.codedefenders.service.ClassroomService;
@@ -105,8 +105,7 @@ public class AdminCreateGamesBeanTest {
         ClassroomService classroomService = PowerMockito.mock(ClassroomService.class);
         CreateGamesService createGamesService = PowerMockito.mock(CreateGamesService.class);
 
-        adminCreateGamesBean = new AdminCreateGamesBean(login, messagesBean, gameManagingUtils, eventDAO, userRepo,
-                gameService, createGamesService);
+        adminCreateGamesBean = new AdminCreateGamesBean(messagesBean, eventDAO, userRepo, createGamesService);
         stagedGameList = adminCreateGamesBean.getStagedGameList();
     }
 
@@ -152,8 +151,10 @@ public class AdminCreateGamesBeanTest {
     @Test
     public void testStageGamesMultiplayer() {
         Set<UserInfo> users = new HashSet<>(this.userInfos.values());
-        GameSettings gameSettings = new GameSettings();
-        gameSettings.setGameType(MULTIPLAYER);
+        GameSettings gameSettings = GameSettings.builder()
+                .withDefaultSettings()
+                .setGameType(MULTIPLAYER)
+                .build();
         RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
         TeamAssignmentMethod teamAssignmentMethod = TeamAssignmentMethod.RANDOM;
         int attackersPerGame = 2;
@@ -173,8 +174,10 @@ public class AdminCreateGamesBeanTest {
     @Test
     public void testStageGamesMelee() {
         Set<UserInfo> users = new HashSet<>(this.userInfos.values());
-        GameSettings gameSettings = new GameSettings();
-        gameSettings.setGameType(MELEE);
+        GameSettings gameSettings = GameSettings.builder()
+                .withDefaultSettings()
+                .setGameType(MELEE)
+                .build();
         RoleAssignmentMethod roleAssignmentMethod = RoleAssignmentMethod.RANDOM;
         TeamAssignmentMethod teamAssignmentMethod = TeamAssignmentMethod.RANDOM;
         int playersPerGame = 4;
