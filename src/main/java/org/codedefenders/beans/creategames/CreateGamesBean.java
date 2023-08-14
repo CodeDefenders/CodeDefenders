@@ -157,8 +157,7 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
                 return new RandomGameAssignment();
             case SCORE_DESCENDING:
                 return new ScoreGameAssignment(
-                        Comparator.comparingInt(
-                                userId -> getUserInfo(userId).getTotalScore()));
+                        Comparator.comparingInt((Integer userId) -> getUserInfo(userId).getTotalScore()).reversed());
             default:
                 throw new IllegalStateException("Unknown game assignment method: " + method);
         }
@@ -421,7 +420,7 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
         }
         Map<String, UserInfo> userByEmail = new HashMap<>();
         for (UserInfo userInfo : userInfos.values()) {
-            userByEmail.put(userInfo.getEmail(), userInfo);
+            userByEmail.put(userInfo.getEmail().toLowerCase(), userInfo);
         }
 
         boolean success = true;
