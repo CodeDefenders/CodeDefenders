@@ -1,5 +1,6 @@
 package org.codedefenders.beans.creategames;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,16 +15,23 @@ import org.codedefenders.persistence.database.UserRepository;
 import org.codedefenders.service.CreateGamesService;
 
 public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserInfo> {
+    private final Map<Integer, UserInfo> userInfos;
+    private final Set<Integer> availableMultiplayerGames;
+    private final Set<Integer> availableMeleeGames;
+
     public AdminCreateGamesBean(StagedGameList stagedGames,
                                 MessagesBean messages,
                                 EventDAO eventDAO,
                                 UserRepository userRepo,
                                 CreateGamesService createGamesService) {
         super(stagedGames, messages, eventDAO, userRepo, createGamesService);
+        userInfos = fetchUserInfos();
+        availableMultiplayerGames = fetchAvailableMultiplayerGames();
+        availableMeleeGames = fetchAvailableMeleeGames();
+        stagedGames.retainUsers(userInfos.keySet());
     }
 
-    @Override
-    protected Set<UserInfo> fetchUserInfos() {
+    protected Map<Integer, UserInfo> fetchUserInfos() {
         return AdminDAO.getAllUsersInfo().stream()
                 .map(userInfo -> new UserInfo(
                         userInfo.getUser().getId(),
@@ -32,20 +40,36 @@ public class AdminCreateGamesBean extends CreateGamesBean<CreateGamesBean.UserIn
                         userInfo.getLastLogin(),
                         userInfo.getLastRole(),
                         userInfo.getTotalScore()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toMap(
+                        UserInfo::getId,
+                        userInfo -> userInfo
+                ));
     }
 
-    @Override
     protected Set<Integer> fetchAvailableMultiplayerGames() {
         return MultiplayerGameDAO.getAvailableMultiplayerGames().stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
     }
 
-    @Override
     protected Set<Integer> fetchAvailableMeleeGames() {
         return MeleeGameDAO.getAvailableMeleeGames().stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Map<Integer, UserInfo> getUserInfos() {
+        return userInfos;
+    }
+
+    @Override
+    public Set<Integer> getAvailableMultiplayerGames() {
+        return availableMultiplayerGames;
+    }
+
+    @Override
+    public Set<Integer> getAvailableMeleeGames() {
+        return availableMeleeGames;
     }
 }

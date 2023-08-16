@@ -23,6 +23,10 @@ import org.codedefenders.service.CreateGamesService;
 import com.google.gson.annotations.Expose;
 
 public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGamesBean.UserInfo> {
+    private final Map<Integer, UserInfo> userInfos;
+    private final Set<Integer> availableMultiplayerGames;
+    private final Set<Integer> availableMeleeGames;
+
     private final ClassroomService classroomService;
     private final int classroomId;
 
@@ -36,10 +40,13 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
         super(stagedGames, messages, eventDAO, userRepo, createGamesService);
         this.classroomService = classroomService;
         this.classroomId = classroomId;
+        userInfos = fetchUserInfos();
+        availableMultiplayerGames = fetchAvailableMultiplayerGames();
+        availableMeleeGames = fetchAvailableMeleeGames();
+        stagedGames.retainUsers(userInfos.keySet());
     }
 
-    @Override
-    protected Set<UserInfo> fetchUserInfos() {
+    protected Map<Integer, UserInfo> fetchUserInfos() {
         List<ClassroomMember> members = classroomService.getMembersForClassroom(classroomId);
         Map<Integer, ClassroomMember> membersMap = members.stream()
                 .collect(Collectors.toMap(
@@ -55,21 +62,37 @@ public class ClassroomCreateGamesBean extends CreateGamesBean<ClassroomCreateGam
                         userInfo.getLastRole(),
                         userInfo.getTotalScore(),
                         membersMap.get(userInfo.getUser().getId()).getRole()))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toMap(
+                        CreateGamesBean.UserInfo::getId,
+                        userInfo -> userInfo
+                ));
     }
 
-    @Override
     protected Set<Integer> fetchAvailableMultiplayerGames() {
         return MultiplayerGameDAO.getAvailableClassroomGames(classroomId).stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
     }
 
-    @Override
     protected Set<Integer> fetchAvailableMeleeGames() {
         return MeleeGameDAO.getAvailableClassroomGames(classroomId).stream()
                 .map(AbstractGame::getId)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Map<Integer, UserInfo> getUserInfos() {
+        return userInfos;
+    }
+
+    @Override
+    public Set<Integer> getAvailableMultiplayerGames() {
+        return availableMultiplayerGames;
+    }
+
+    @Override
+    public Set<Integer> getAvailableMeleeGames() {
+        return availableMeleeGames;
     }
 
     public static class UserInfo extends CreateGamesBean.UserInfo {

@@ -105,35 +105,17 @@ public abstract class CreateGamesBean<T extends CreateGamesBean.UserInfo> implem
     /**
      * Fetches user information for all possible players and creators in the create-games context.
      */
-    protected abstract Set<T> fetchUserInfos();
+    public abstract Map<Integer, ? extends UserInfo> getUserInfos();
 
     /**
      * Fetches the IDs of all active multiplayer games in the context.
      */
-    protected abstract Set<Integer> fetchAvailableMultiplayerGames();
+    public abstract Set<Integer> getAvailableMultiplayerGames();
 
     /**
      * Fetches the IDs of all active melee games in the context.
      */
-    protected abstract Set<Integer> fetchAvailableMeleeGames();
-
-    /**
-     * Updates the context to keep users and staged games consistent with the actual application state.
-     */
-    public void update() {
-        userInfos.clear();
-        for (T userInfo : fetchUserInfos()) {
-            userInfos.put(userInfo.getId(), userInfo);
-        }
-        stagedGames.retainUsers(userInfos.keySet());
-    }
-
-    /**
-     * Returns user information for all possible players and creators in the create-games context.
-     */
-    public Map<Integer, T> getUserInfos() {
-        return Collections.unmodifiableMap(userInfos);
-    }
+    public abstract Set<Integer> getAvailableMeleeGames();
 
     /**
      * Returns user information for the given user ID.
