@@ -305,4 +305,14 @@ public class ClassroomService {
     public boolean canJoin(Classroom classroom, ClassroomMember member) {
         return classroom.isOpen() && !classroom.isArchived() && member == null;
     }
+
+    public boolean canCreateGames(ClassroomMember member) {
+        if (login.isAdmin()) {
+            return true;
+        }
+        if (member == null) {
+            return false;
+        }
+        return member.getRole() == ClassroomRole.OWNER || member.getRole() == ClassroomRole.MODERATOR;
+    }
 }

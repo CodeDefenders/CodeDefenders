@@ -50,7 +50,6 @@ import org.codedefenders.model.creategames.gameassignment.GameAssignmentMethod;
 import org.codedefenders.model.creategames.roleassignment.RoleAssignmentMethod;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.Paths;
 import org.codedefenders.util.URLUtils;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
@@ -126,8 +125,6 @@ public abstract class CreateGamesServlet extends HttpServlet {
                 messages.add("ERROR: Invalid parameter");
 
             }
-
-            response.sendRedirect(url.forPath(Paths.ADMIN_GAMES));
         }
     }
 

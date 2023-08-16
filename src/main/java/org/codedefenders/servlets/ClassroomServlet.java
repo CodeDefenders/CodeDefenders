@@ -51,7 +51,7 @@ public class ClassroomServlet extends HttpServlet {
         Optional<Classroom> classroom = getClassroomFromRequest(request);
         if (!classroom.isPresent()) {
             messages.add("Classroom not found.");
-            response.sendRedirect(url.forPath(Paths.GAMES_OVERVIEW));
+            Redirect.redirectBack(request, response);
             return;
         }
 
